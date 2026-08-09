@@ -346,12 +346,12 @@
       }
     },
     {
-      "claim_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "claim_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
       "claim_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
@@ -365,6 +365,29 @@
       },
       "verdict": {
         "citation": "現在アクティブなトラックを対象として、type-signals cache に `baseline_hash` を記録する。信号機評価は実際の baseline を読み、その hash を計算してから cache の再利用可否を判定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4decb243b8a0da08c996e49f153ca512210c750e3bc2594c6a3b025954430afe",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-05-1035-type-signals-authority-availability-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`implementation_input_hash` は、commit された成分（source tree、Cargo manifests、`Cargo.lock`、commit された `tddd-features.json` の feature selection）と、local-only 権威である nightly toolchain identity（`rustup run nightly rustc -Vv`）の積として構成する。",
         "kind": "pass"
       }
     },
@@ -507,12 +530,12 @@
       }
     },
     {
-      "claim_hash": "be0e4f36c9a55e0674c479938e51a0160b52d5398c63aa8438a14586d168f92f",
+      "claim_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
       "claim_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
@@ -530,25 +553,48 @@
       }
     },
     {
-      "claim_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "claim_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
       "claim_origin": {
         "data": {
-          "element_id": "CN-04",
+          "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "c61cfe7661653b4f84a88130ddd1c3e4ab993b78cf461f9b879f0a96ca748863",
+      "evidence_hash": "4decb243b8a0da08c996e49f153ca512210c750e3bc2594c6a3b025954430afe",
       "evidence_origin": {
         "data": {
-          "decision_id": "D4",
-          "file_path": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md"
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-05-1035-type-signals-authority-availability-boundary.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "いずれかが不一致なら cache stale として信号機を再評価し、成功後に評価結果と現在の 3 hash で cache を原子的に置き換える。",
+        "citation": "「D4 の 3 hash 照合と baseline の fail-closed 扱いは、baseline 権威が存在する文脈、すなわち local pre-commit workspace に適用する。この workspace が baseline 新鮮度の唯一の enforcement point である。」／「implementation_input_hash は、commit された成分（source tree、Cargo manifests、`Cargo.lock`、commit された `tddd-features.json` の feature selection）と、local-only 権威である nightly toolchain identity（`rustup run nightly rustc -Vv`）の積として構成する。」／「この場合に限り、既存の非対称規則に従って implementation-input の照合だけを skip する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4decb243b8a0da08c996e49f153ca512210c750e3bc2594c6a3b025954430afe",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-05-1035-type-signals-authority-availability-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "規則は非対称とする。存在する権威が読み取り不能または不一致であれば、文脈を問わず常に fail-closed とする。照合を縮退させるのは権威の構造的不在だけであり、取得失敗をこれに含めない。",
         "kind": "pass"
       }
     },
@@ -875,12 +921,12 @@
       }
     },
     {
-      "claim_hash": "7b54404cb71772b0ba0fb9dba8a139fb332f9fbbfd5df060512546c80aa23e09",
+      "claim_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
       "claim_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
+          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
         },
         "kind": "spec_element"
       },
@@ -898,35 +944,35 @@
       }
     },
     {
-      "claim_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "claim_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
       "claim_origin": {
         "data": {
-          "element_id": "AC-08",
+          "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "c61cfe7661653b4f84a88130ddd1c3e4ab993b78cf461f9b879f0a96ca748863",
+      "evidence_hash": "4decb243b8a0da08c996e49f153ca512210c750e3bc2594c6a3b025954430afe",
       "evidence_origin": {
         "data": {
-          "decision_id": "D4",
-          "file_path": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md"
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-05-1035-type-signals-authority-availability-boundary.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "catalogue declaration hash、implementation input hash、baseline hash の 3 値がすべて一致する場合に限り既存評価を再利用する。いずれかが不一致なら cache stale として信号機を再評価し、成功後に評価結果と現在の 3 hash で cache を原子的に置き換える。\n\ntype-signals cache が存在しない場合、または schema version 不一致、必須 field 欠損、不正値、JSON 破損を含む decode 不良がある場合は、cache miss として信号機を再評価する。再評価に成功した場合だけ、現行 schema の cache を原子的に書き戻す。",
+        "citation": "「この workspace が baseline 新鮮度の唯一の enforcement point である。」また、「`implementation_input_hash` は、commit された成分（source tree、Cargo manifests、`Cargo.lock`、commit された `tddd-features.json` の feature selection）と、local-only 権威である nightly toolchain identity（`rustup run nightly rustc -Vv`）の積として構成する。」",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "claim_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
       "claim_origin": {
         "data": {
-          "element_id": "AC-09",
+          "element_id": "AC-08",
           "section": "acceptance_criteria",
-          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
         },
         "kind": "spec_element"
       },
@@ -939,7 +985,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "実際の baseline の欠損・読み取り失敗、その他の権威入力の取得失敗、信号機評価の失敗、cache 書き込みの失敗は fail-closed とする。inactive・archived track の既存成果物は走査・移行・検証しない。type-signals の手動削除を baseline 再取得の通常手順には含めない。",
+        "citation": "「いずれかが不一致なら cache stale として信号機を再評価し、成功後に評価結果と現在の 3 hash で cache を原子的に置き換える。\n\ntype-signals cache が存在しない場合、または schema version 不一致、必須 field 欠損、不正値、JSON 破損を含む decode 不良がある場合は、cache miss として信号機を再評価する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "4decb243b8a0da08c996e49f153ca512210c750e3bc2594c6a3b025954430afe",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-05-1035-type-signals-authority-availability-boundary.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「この意味論は、local pre-commit の `signal check-impl-catalog` freshness check と、merge gate の branch implementation-input verification の両方に同一に適用する。」また、「存在する権威が読み取り不能または不一致であれば、文脈を問わず常に fail-closed とする。」",
         "kind": "pass"
       }
     },

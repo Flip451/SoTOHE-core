@@ -1944,10 +1944,16 @@ mod tests {
             ..first.clone()
         };
 
+        let stamp = track_dir.join(".sync-base.json");
         adapter.write_sync_base_record(&first).unwrap();
+        let first_bytes = std::fs::read(&stamp).unwrap();
         adapter.write_sync_base_record(&first).unwrap();
-        let first_record =
-            decode(&std::fs::read_to_string(track_dir.join(".sync-base.json")).unwrap()).unwrap();
+        assert_eq!(
+            std::fs::read(&stamp).unwrap(),
+            first_bytes,
+            "retrying the same sync-base value must not rewrite the stamp"
+        );
+        let first_record = decode(&std::fs::read_to_string(&stamp).unwrap()).unwrap();
         assert_eq!(first_record.schema_version, SyncBaseRecordSchemaVersion::V1);
         assert_eq!(first_record.track_id, first.track_id);
         assert_eq!(first_record.base_branch, first.base_branch);
@@ -2035,6 +2041,33 @@ mod tests {
             Err(SyncBaseRecordError::Write(_))
         ));
         assert!(stamp.is_dir(), "a non-regular stamp target must remain unchanged");
+    }
+
+    #[test]
+    fn test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed() {
+        let fixture = tempfile::tempdir().unwrap();
+        let track_dir = fixture.path().join("track/items/cleanup-test");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let request = usecase::base_merge::BaseMergeCleanupRequest {
+            workspace_root: fixture.path().to_path_buf(),
+            track_id: TrackId::try_new("cleanup-test").unwrap(),
+            base_branch: BaseBranchName::try_new("develop".to_owned()).unwrap(),
+            base_commit: CommitHash::try_new("0123456789abcdef").unwrap(),
+        };
+        let adapter = FsBaseMergeCleanupAdapter::new();
+
+        super::sync_base_record::force_next_encode_failure_for_test();
+        let result = adapter.write_sync_base_record(&request);
+
+        assert!(matches!(
+            result,
+            Err(SyncBaseRecordError::Generation(detail))
+                if detail.as_str() == "forced sync-base record generation failure"
+        ));
+        assert!(
+            !track_dir.join(".sync-base.json").exists(),
+            "generation failure must not publish a sync-base record"
+        );
     }
 
     #[test]

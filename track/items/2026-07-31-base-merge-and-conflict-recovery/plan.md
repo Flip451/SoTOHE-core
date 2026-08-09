@@ -4,9 +4,9 @@
 ## Summary
 
 GO-01 → T001–T004, T010, and T011.
-GO-02 → T005–T009.
+GO-02 → T005–T009 and T012.
 
-## Tasks (11/11 resolved)
+## Tasks (11/12 resolved)
 
 ### S1 — Guarded base merge
 
@@ -28,8 +28,9 @@ GO-02 → T005–T009.
 
 ### S3 — Baseline-hash-aware type signals
 
-> Modify `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/type_signals/{service.rs,ports.rs,interactor.rs}`, and `libs/infrastructure/src/tddd/{type_signals_executor_adapter.rs,type_signals_codec.rs}`. D4; IN-05; AC-07; AC-08; AC-09.
+> Modify `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/type_signals/{service.rs,ports.rs,interactor.rs}`, and `libs/infrastructure/src/tddd/{type_signals_executor_adapter.rs,type_signals_codec.rs}`; update `TrackBlobReader` in `libs/usecase/src/merge_gate.rs` and `check_impl_catalog_from_signals_file` in `libs/infrastructure/src/verify/spec_states.rs` through T012. D4; IN-05; AC-07; AC-08; AC-09.
 
 - [x] **T007**: At the domain boundary, modify `BaselineHash`, `TypeSignalsCacheKey`, `TypeSignalsDocument`, and `decide_type_signals_reuse` in `libs/domain/src/tddd/type_signals_doc.rs`; migrate every domain-local constructor and caller to supply and compare the three-hash cache key, with regression coverage. T008 owns the usecase port/service/interactor migrations and T009 owns the infrastructure adapter/codec migrations. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09. (`daf758c60802d14be799f267826bec46a2cd8782`)
 - [x] **T008**: At the usecase boundary, modify `TypeSignalsError` in `libs/usecase/src/type_signals/service.rs`, `TypeSignalsExecutionError` and `TypeSignalsExecutorPort` in `ports.rs`, and `TypeSignalsInteractor` in `interactor.rs`; migrate every usecase constructor and caller, with regression coverage in `interactor/tests.rs`. T007 owns domain constructors and T009 owns adapter/codec callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09. (`daf758c60802d14be799f267826bec46a2cd8782`)
 - [x] **T009**: At the infrastructure boundary, modify `EvaluateSignalsError` and preserve the public `execute_type_signals_for_layer` evaluator entrypoint in `type_signals_evaluator.rs`, and modify `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs` and `baseline_hash`, `decode`, and `encode` in `type_signals_codec.rs`; migrate every adapter and codec constructor/caller, with evaluator/adapter/codec regression coverage. T007 owns domain constructors and T008 owns usecase port/interactor callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09. (`daf758c60802d14be799f267826bec46a2cd8782`)
+- [~] **T012**: Update `infrastructure::verify::spec_states::check_impl_catalog_from_signals_file` in `libs/infrastructure/src/verify/spec_states.rs` to accept explicit baseline-path and catalogue-hash inputs; update `TrackBlobReader` in `libs/usecase/src/merge_gate.rs` and `GitShowTrackBlobReader` in `libs/infrastructure/src/verify/merge_gate_adapter.rs` to read implementation-input hashes with catalogue declarations; update `SystemSignalCommandAdapter::run_catalogue_check` in `libs/infrastructure/src/signal.rs`, migrate callers, and add regression coverage. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-09.

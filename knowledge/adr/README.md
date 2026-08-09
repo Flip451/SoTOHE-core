@@ -176,6 +176,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`batch-plan.json` の宣言対象を未 settle タスクに限定する](2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md) | Accepted | 2026-07-30 |
 | [per-task commit hash の記録時に repository 実在と HEAD 到達可能性を要求する](2026-07-30-2101-per-task-commit-hash-record-time-validation.md) | Accepted | 2026-07-30 |
 | [clean な base merge 後の baseline 再取得と同期状態の原子的 lifecycle を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
+| [type-signals の権威照合は権威が存在する文脈に限定する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
 
 ### ADR 運用
 

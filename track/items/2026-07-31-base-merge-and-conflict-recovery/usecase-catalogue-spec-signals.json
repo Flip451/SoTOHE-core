@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "a11bce450ec3179e54d691ab1c70565ba687a869f4a42f9962d0229f64158d3e",
+  "catalogue_declaration_hash": "d6296bbdfb0c02e5a28fe49f0b44697f9e605f6b9af6a2b9706ca05f75785674",
   "schema_version": 1,
   "signals": [
     {
@@ -73,7 +73,7 @@
       "type_name": "SyncBaseRecordError"
     },
     {
-      "entry_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "entry_hash": "a811e305914ad9090d12fcf3120cd580d058ef22e98b35833c32c44e213a3e84",
       "signal": "blue",
       "type_name": "TypeSignalsError"
     },
@@ -93,17 +93,17 @@
       "type_name": "ViewsRegenerationError"
     },
     {
-      "entry_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "entry_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "signal": "blue",
       "type_name": "BaseMergeCleanupPort"
     },
     {
-      "entry_hash": "e7c166194a2ee63585814a9d869ef507d1406ddaf6cf71c41b13e8676997f1d8",
+      "entry_hash": "fe79ec97f3e02913e3af8efa9da83405d61302112a551952ffd39f0a3370877e",
       "signal": "blue",
       "type_name": "BaseMergeContextPort"
     },
     {
-      "entry_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "entry_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "signal": "blue",
       "type_name": "BaseMergeGitPort"
     },
@@ -113,7 +113,7 @@
       "type_name": "BaseMergeService"
     },
     {
-      "entry_hash": "cb101121cbae6a5872b17fe387cd28557e8a6153d4d004105ca8981ff18379f3",
+      "entry_hash": "4477edf18da4aa64392ec715ebdb6ecab5a64c966a01d7d72d6279d93954ecab",
       "signal": "blue",
       "type_name": "GitStashPort"
     },
@@ -123,7 +123,12 @@
       "type_name": "GitStashService"
     },
     {
-      "entry_hash": "42273125a9fc590438c43fb9cc8e2731bc468c0db091a18ffd001478ffe4da6c",
+      "entry_hash": "e91b265f9b43c1c9ce764ef43236a17df6092461cf8c64b3a5075dc66b80c072",
+      "signal": "blue",
+      "type_name": "TrackBlobReader"
+    },
+    {
+      "entry_hash": "66e60dfa4b261a21e54a30bb0622667f9c351e460003f9754e8b382f3793cce8",
       "signal": "blue",
       "type_name": "TypeSignalsExecutorPort"
     }

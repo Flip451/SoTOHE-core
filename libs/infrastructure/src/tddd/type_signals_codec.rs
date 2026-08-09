@@ -178,6 +178,7 @@ fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use domain::ConfidenceSignal;
+    use domain::tddd::type_signals_doc::{TypeSignalsReuseDecision, decide_type_signals_reuse};
 
     use super::*;
 
@@ -384,5 +385,27 @@ mod tests {
             "7061fe86b948cf084b16235a204ce4a357f6b38f637f28edad27213428fda3d6"
         );
         assert_ne!(baseline_hash(b"baseline A"), baseline_hash(b"baseline B"));
+    }
+
+    #[test]
+    fn test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_recomparison() {
+        let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
+        let declaration = CatalogueDeclarationHash::new(digest.clone());
+        let implementation = ImplementationInputHash::new(digest.clone());
+        let recorded_baseline = baseline_hash(b"baseline A");
+        let current_baseline = baseline_hash(b"baseline B");
+        let recorded = TypeSignalsCacheKey::new(
+            declaration.clone(),
+            implementation.clone(),
+            recorded_baseline.clone(),
+        );
+        let current = TypeSignalsCacheKey::new(declaration, implementation, current_baseline);
+
+        assert_eq!(recorded.baseline_hash(), &baseline_hash(b"baseline A"));
+        assert_eq!(
+            decide_type_signals_reuse(&recorded, &current),
+            TypeSignalsReuseDecision::ReevaluateWithoutExtraction,
+            "a changed rustdoc baseline digest must invalidate reuse"
+        );
     }
 }

@@ -46,12 +46,30 @@ pub(crate) fn hash_workspace_inputs(
     target_crate: &str,
     features: &[CargoFeatureName],
 ) -> Result<ImplementationInputHash, EvaluateSignalsError> {
-    let implementation_hash =
-        build_inputs::hash_implementation_inputs(workspace_root, target_crate)?;
+    let toolchain_identifier = build_inputs::nightly_toolchain_identifier(workspace_root)?;
+    hash_workspace_inputs_with_toolchain_identifier(
+        workspace_root,
+        target_crate,
+        features,
+        &toolchain_identifier,
+    )
+}
+
+pub(crate) fn hash_workspace_inputs_with_toolchain_identifier(
+    workspace_root: &Path,
+    target_crate: &str,
+    features: &[CargoFeatureName],
+    toolchain_identifier: &[u8],
+) -> Result<ImplementationInputHash, EvaluateSignalsError> {
+    let implementation_hash = build_inputs::hash_implementation_inputs_with_toolchain_identifier(
+        workspace_root,
+        target_crate,
+        toolchain_identifier,
+    )?;
     implementation_hash_with_feature_selection(implementation_hash, features)
 }
 
-fn implementation_hash_with_feature_selection(
+pub(crate) fn implementation_hash_with_feature_selection(
     implementation_hash: Sha256Digest,
     features: &[CargoFeatureName],
 ) -> Result<ImplementationInputHash, EvaluateSignalsError> {

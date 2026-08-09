@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "73fdb539a89d9da43db38bfab30579022c90eeb371a53be69e63f7390b018a2b",
+  "catalogue_declaration_hash": "5f288de63ee1af75eca429ee4b7125b64198021f50826bd504170255e0b02333",
   "schema_version": 1,
   "signals": [
     {
@@ -66,6 +66,11 @@
       "entry_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+    },
+    {
+      "entry_hash": "9f9d999fa30afa902db21e39b46d268381abbdf6ea2234e0f0b423559b73d4ab",
+      "signal": "blue",
+      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file"
     }
   ]
 }

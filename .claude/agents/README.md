@@ -16,15 +16,15 @@ One file per `provider: claude` capability. `orchestrator` has no file — it is
 |---|---|---|---|---|
 | `spec-designer.md` | spec-designer | `claude-opus-5` | `high` | `/track:spec-design` (Phase 1) — authors `spec.json` |
 | `type-designer.md` | type-designer | `claude-opus-5` | `high` | `/track:type-design` (Phase 2) — authors `<layer>-types.json` |
-| `impl-planner.md` | impl-planner | `claude-opus-5` | `medium` | `/track:impl-plan` (Phase 3) — authors `impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` |
+| `impl-planner.md` | impl-planner | `claude-opus-5` | `high` | `/track:impl-plan` (Phase 3) — authors `impl-plan.json` + `task-coverage.json` + `task-contract.json` + `batch-plan.json` |
 | `adr-editor.md` | adr-editor | `claude-opus-5` | `high` | the sole in-track writer for `knowledge/adr/*.md` |
-| `adr-diagnoser.md` | adr-diagnoser | `claude-opus-5` | `xhigh` | guardian for recorded ADR decisions; read-only verdicts, no `Edit`/`Write` |
-| `rollback-diagnoser.md` | rollback-diagnoser | `claude-opus-5` | `xhigh` | `/track:diagnose` — routes a finding back to the phase owning its root cause |
+| `adr-diagnoser.md` | adr-diagnoser | `claude-opus-5` | `high` | guardian for recorded ADR decisions; read-only verdicts, no `Edit`/`Write` |
+| `rollback-diagnoser.md` | rollback-diagnoser | `claude-opus-5` | `high` | `/track:diagnose` — routes a finding back to the phase owning its root cause |
 | `implementer.md` | implementer | `claude-opus-5` | `medium` | `/track:implement` — implements assigned plan tasks |
 | `review-fix-lead.md` | review-fix-lead | `claude-opus-5` | `medium` | `/track:review` — owns one scope's fix+review loop |
-| `researcher.md` | researcher | `claude-opus-5` | `medium` | crate research, codebase-wide analysis, external research |
+| `researcher.md` | researcher | `claude-opus-5` | `high` | crate research, codebase-wide analysis, external research |
 
-The two `xhigh` entries are the pure-judgment lanes: they run rarely, their verdicts have the highest leverage in the pipeline, and their outputs are small structured objects, so the cost of the top effective tier is bounded.
+The four retuned delegate-in-host Claude lanes — `impl-planner`, `researcher` (in the Claude-heavy profile), `rollback-diagnoser`, and `adr-diagnoser` — use `high` effort. The diagnosers produce high-leverage verdicts, while the planner and researcher produce small structured outputs. The typed-pipeline verifier lanes are configured separately in `.harness/config/agent-profiles.json` and are not represented by these Claude adapter files.
 
 `dry-fix-lead.md` is present but dormant: `capabilities.dry-fix-lead` routes to codex, and `cargo make track-local-dry-fix` implements only the codex provider path, so a Claude resolution fails closed rather than reaching the file. It declares no `effort:` for that reason. Unlike `review-fix-lead`, the dry wrapper has no subagent-dispatch sentinel; adding one spans usecase, infrastructure, cli-composition, and cli-driver, and is deliberately left as separate work.
 

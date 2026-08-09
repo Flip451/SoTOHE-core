@@ -132,6 +132,50 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
+    },
+    "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file": {
+      "action": "modify",
+      "docs": "Explicit-path implementation-catalogue signal checker with track-modified baseline inputs.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "signals_path",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "baseline_path",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "catalog_hash_hex",
+          "ty": "&str"
+        },
+        {
+          "name": "strict",
+          "ty": "bool"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
     }
   },
   "inherent_impls": [

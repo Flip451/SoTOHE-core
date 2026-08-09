@@ -284,11 +284,11 @@
   "traits": {
     "BaseMergeCleanupPort": {
       "action": "add",
-      "docs": "Synchronous secondary port matching the blocking CLI-process and filesystem adapter boundary.",
+      "docs": "Post-merge cleanup driven port. Synchronous by design.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Synchronous derived-view regeneration operation matching the blocking CLI-process and filesystem adapter boundary.",
+          "docs": "Derived-view regeneration operation. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "regenerate_views",
@@ -302,7 +302,7 @@
           "returns": "Result<(), ViewsRegenerationError>"
         },
         {
-          "docs": "Synchronous TDDD baseline-replacement operation matching the blocking CLI-process and filesystem adapter boundary.",
+          "docs": "TDDD baseline-replacement operation. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "replace_baselines",
@@ -316,7 +316,7 @@
           "returns": "Result<(), BaselineReplacementError>"
         },
         {
-          "docs": "Synchronous sync-base record-write operation matching the blocking CLI-process and filesystem adapter boundary.",
+          "docs": "Sync-base record-write operation. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "write_sync_base_record",
@@ -387,11 +387,11 @@
     },
     "BaseMergeContextPort": {
       "action": "add",
-      "docs": "Synchronous context-loading port for a single-shot CLI boundary; its method exposes only context-specific failures without requiring an async runtime.",
+      "docs": "Base-merge context-loading driven port. Synchronous by design.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Blocking CLI-boundary context load with an exact context-error vocabulary.",
+          "docs": "Context load operation. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "load_direction",
@@ -434,11 +434,11 @@
     },
     "BaseMergeGitPort": {
       "action": "add",
-      "docs": "Synchronous git-process port for a single-shot CLI boundary; its method exposes a pre-cleanup attempt result and git-specific error without requiring an async runtime.",
+      "docs": "Base-merge git-process driven port. Synchronous by design.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Blocking CLI-boundary git invocation with an exact git-error vocabulary.",
+          "docs": "Git merge-base invocation. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "merge_base",
@@ -599,11 +599,11 @@
     },
     "GitStashPort": {
       "action": "add",
-      "docs": "Synchronous stash-process port for a single-shot CLI boundary; its typed command and error surface do not require an async runtime.",
+      "docs": "Git-stash process driven port. Synchronous by design.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Blocking CLI-boundary stash invocation over a finite command and error vocabulary.",
+          "docs": "Stash command invocation. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "execute",
@@ -674,9 +674,221 @@
         "Sync"
       ]
     },
+    "TrackBlobReader": {
+      "action": "modify",
+      "docs": "TrackBlobReader: adds read_type_implementation_input_hash and borrows branch in read_adr_verify_report. Synchronous port by design. IN-05 / CN-03 / CN-04 / AC-07 / AC-09.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_spec_document",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::spec::SpecDocument>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_type_catalogue",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<(Vec<u8>, String)>"
+        },
+        {
+          "docs": "Track-added branch-side implementation-input hash reader for one TDDD layer. IN-05 / CN-03 / CN-04 / AC-07 / AC-09.",
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_type_implementation_input_hash",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            },
+            {
+              "name": "_track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "_layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<String>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_impl_plan",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::ImplPlanDocument>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_enabled_layers",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<Vec<String>>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_catalogue_for_spec_ref_check",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            },
+            {
+              "name": "_track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "_layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String, std::collections::HashMap<String, domain::ContentHash>)>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_catalogue_spec_signals_document",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            },
+            {
+              "name": "_track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "_layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_catalogue_spec_signal_opted_in_layers",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<Vec<String>>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_type_signals",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            },
+            {
+              "name": "_track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "_layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::TypeSignalsDocument>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_adr_verify_report",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::AdrVerifyReport>"
+        }
+      ],
+      "module_path": "merge_gate",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
     "TypeSignalsExecutorPort": {
       "action": "reference",
-      "docs": "Baseline-identical driven port carried for executor-adapter edge exposure.",
+      "docs": "Baseline-identical driven port carried for executor-adapter edge exposure. Synchronous by design. IN-05 / CN-03.",
       "informal_grounds": [],
       "methods": [
         {
@@ -1803,10 +2015,6 @@
         },
         {
           "anchor": "CN-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]

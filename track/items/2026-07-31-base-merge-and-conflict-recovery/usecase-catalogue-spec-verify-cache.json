@@ -2401,7 +2401,7 @@
       }
     },
     {
-      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "claim_hash": "a811e305914ad9090d12fcf3120cd580d058ef22e98b35833c32c44e213a3e84",
       "claim_origin": {
         "data": {
           "entry_key": "TypeSignalsError",
@@ -2410,22 +2410,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
       "evidence_origin": {
         "data": {
           "element_id": "CN-04",
           "section": "constraint",
-          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "citation": "evaluation failures and cache-write failures must also fail closed",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "claim_hash": "a811e305914ad9090d12fcf3120cd580d058ef22e98b35833c32c44e213a3e84",
       "claim_origin": {
         "data": {
           "entry_key": "TypeSignalsError",
@@ -2434,22 +2434,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
       "evidence_origin": {
         "data": {
           "element_id": "AC-08",
           "section": "acceptance_criteria",
-          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
+        "citation": "\"a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.\"",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "claim_hash": "a811e305914ad9090d12fcf3120cd580d058ef22e98b35833c32c44e213a3e84",
       "claim_origin": {
         "data": {
           "entry_key": "TypeSignalsError",
@@ -2458,22 +2458,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
       "evidence_origin": {
         "data": {
           "element_id": "AC-09",
           "section": "acceptance_criteria",
-          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed",
+        "citation": "\"rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair\"",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "claim_hash": "a811e305914ad9090d12fcf3120cd580d058ef22e98b35833c32c44e213a3e84",
       "claim_origin": {
         "data": {
           "entry_key": "TypeSignalsError",
@@ -2482,22 +2482,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
       "evidence_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
+      "claim_hash": "a811e305914ad9090d12fcf3120cd580d058ef22e98b35833c32c44e213a3e84",
       "claim_origin": {
         "data": {
           "entry_key": "TypeSignalsError",
@@ -2506,41 +2506,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "be0e4f36c9a55e0674c479938e51a0160b52d5398c63aa8438a14586d168f92f",
+      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
       "evidence_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values.",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "473e9d8da4e5c2fe2375324424da3dd4e41ac8af5140cd76b5ee4c8a088b9346",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsError",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "7b54404cb71772b0ba0fb9dba8a139fb332f9fbbfd5df060512546c80aa23e09",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record.",
+        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
         "kind": "pass"
       }
     },
@@ -2554,17 +2530,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
       "evidence_origin": {
         "data": {
           "element_id": "CN-04",
           "section": "constraint",
-          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "citation": "\"evaluation failures and cache-write failures must also fail closed.\"",
         "kind": "pass"
       }
     },
@@ -2578,17 +2554,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
       "evidence_origin": {
         "data": {
           "element_id": "AC-08",
           "section": "acceptance_criteria",
-          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.\"",
+        "citation": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
         "kind": "pass"
       }
     },
@@ -2602,17 +2578,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
       "evidence_origin": {
         "data": {
           "element_id": "AC-09",
           "section": "acceptance_criteria",
-          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed",
+        "citation": "\"evaluation failures, and cache-write failures fail closed without evaluator repair\"",
         "kind": "pass"
       }
     },
@@ -2626,17 +2602,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
       "evidence_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present.",
         "kind": "pass"
       }
     },
@@ -2650,17 +2626,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "be0e4f36c9a55e0674c479938e51a0160b52d5398c63aa8438a14586d168f92f",
+      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
       "evidence_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values.",
+        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
         "kind": "pass"
       }
     },
@@ -2674,17 +2650,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
+      "evidence_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
       "evidence_origin": {
         "data": {
           "element_id": "CN-04",
           "section": "constraint",
-          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
+          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
+        "citation": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success.",
         "kind": "pass"
       }
     },
@@ -2698,17 +2674,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "7b54404cb71772b0ba0fb9dba8a139fb332f9fbbfd5df060512546c80aa23e09",
+      "evidence_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
+          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record.",
+        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace",
         "kind": "pass"
       }
     },
@@ -2722,17 +2698,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
       "evidence_origin": {
         "data": {
           "element_id": "AC-08",
           "section": "acceptance_criteria",
-          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "successful reevaluation atomically replaces the cache with the new result and all current hashes",
+        "citation": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
         "kind": "pass"
       }
     },
@@ -2746,17 +2722,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
       "evidence_origin": {
         "data": {
           "element_id": "AC-09",
           "section": "acceptance_criteria",
-          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture.",
+        "citation": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification.",
         "kind": "pass"
       }
     },
@@ -2857,7 +2833,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -2881,7 +2857,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -2900,12 +2876,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup.",
+        "citation": "conflict outcomes do not run clean-merge cleanup.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -2929,7 +2905,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -2953,7 +2929,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -2977,7 +2953,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -3001,7 +2977,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -3025,7 +3001,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -3049,7 +3025,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -3073,7 +3049,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -3097,7 +3073,7 @@
       }
     },
     {
-      "claim_hash": "258a4b43498d10f32a9c932ee1561e6e2478677fd1f74928a23f02f7651c2343",
+      "claim_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeCleanupPort",
@@ -3116,12 +3092,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result.",
+        "citation": "a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e7c166194a2ee63585814a9d869ef507d1406ddaf6cf71c41b13e8676997f1d8",
+      "claim_hash": "fe79ec97f3e02913e3af8efa9da83405d61302112a551952ffd39f0a3370877e",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeContextPort",
@@ -3145,7 +3121,7 @@
       }
     },
     {
-      "claim_hash": "e7c166194a2ee63585814a9d869ef507d1406ddaf6cf71c41b13e8676997f1d8",
+      "claim_hash": "fe79ec97f3e02913e3af8efa9da83405d61302112a551952ffd39f0a3370877e",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeContextPort",
@@ -3169,7 +3145,7 @@
       }
     },
     {
-      "claim_hash": "e7c166194a2ee63585814a9d869ef507d1406ddaf6cf71c41b13e8676997f1d8",
+      "claim_hash": "fe79ec97f3e02913e3af8efa9da83405d61302112a551952ffd39f0a3370877e",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeContextPort",
@@ -3193,7 +3169,7 @@
       }
     },
     {
-      "claim_hash": "e7c166194a2ee63585814a9d869ef507d1406ddaf6cf71c41b13e8676997f1d8",
+      "claim_hash": "fe79ec97f3e02913e3af8efa9da83405d61302112a551952ffd39f0a3370877e",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeContextPort",
@@ -3217,7 +3193,7 @@
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3241,7 +3217,7 @@
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3265,7 +3241,7 @@
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3289,7 +3265,7 @@
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3313,7 +3289,7 @@
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3337,7 +3313,7 @@
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3356,12 +3332,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3380,12 +3356,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3404,12 +3380,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "301c9c84eb43192e873297b345a06c94af65687c540fee221d3b88565e24c510",
+      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3817,7 +3793,7 @@
       }
     },
     {
-      "claim_hash": "cb101121cbae6a5872b17fe387cd28557e8a6153d4d004105ca8981ff18379f3",
+      "claim_hash": "4477edf18da4aa64392ec715ebdb6ecab5a64c966a01d7d72d6279d93954ecab",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashPort",
@@ -3841,7 +3817,7 @@
       }
     },
     {
-      "claim_hash": "cb101121cbae6a5872b17fe387cd28557e8a6153d4d004105ca8981ff18379f3",
+      "claim_hash": "4477edf18da4aa64392ec715ebdb6ecab5a64c966a01d7d72d6279d93954ecab",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashPort",
@@ -3860,7 +3836,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"through the `bin/sotp git stash` command path\"",
+        "citation": "a successful guarded stash-pop restores them through the `bin/sotp git stash` command path",
         "kind": "pass"
       }
     },
@@ -3913,146 +3889,266 @@
       }
     },
     {
-      "claim_hash": "42273125a9fc590438c43fb9cc8e2731bc468c0db091a18ffd001478ffe4da6c",
+      "claim_hash": "e91b265f9b43c1c9ce764ef43236a17df6092461cf8c64b3a5075dc66b80c072",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsExecutorPort",
+          "entry_key": "TrackBlobReader",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "817b72909e99cba8c63ea6783688c285d7a31b1b957ac27e383020deabd3d2e4",
+      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
       "evidence_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes."
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries using catalogue declaration, implementation input, and actual baseline hashes.",
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "42273125a9fc590438c43fb9cc8e2731bc468c0db091a18ffd001478ffe4da6c",
+      "claim_hash": "e91b265f9b43c1c9ce764ef43236a17df6092461cf8c64b3a5075dc66b80c072",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsExecutorPort",
+          "entry_key": "TrackBlobReader",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "be0e4f36c9a55e0674c479938e51a0160b52d5398c63aa8438a14586d168f92f",
+      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
       "evidence_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values."
+          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A type-signals cache may be reused only when its catalogue declaration hash, implementation input hash, and actual baseline hash all equal the current authoritative values.",
+        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "42273125a9fc590438c43fb9cc8e2731bc468c0db091a18ffd001478ffe4da6c",
+      "claim_hash": "e91b265f9b43c1c9ce764ef43236a17df6092461cf8c64b3a5075dc66b80c072",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsExecutorPort",
+          "entry_key": "TrackBlobReader",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2c9b19622c3a0e2132e20416f8a2daea82bc3ee0d9fb04093e62f80c1db9eb47",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-04",
-          "section": "constraint",
-          "text_label": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "Cache misses caused by hash mismatch or any cache decode failure must reevaluate and atomically overwrite only after success; missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures must fail closed.",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "42273125a9fc590438c43fb9cc8e2731bc468c0db091a18ffd001478ffe4da6c",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsExecutorPort",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "7b54404cb71772b0ba0fb9dba8a139fb332f9fbbfd5df060512546c80aa23e09",
+      "evidence_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record."
+          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "For the active track, a type-signals cache is reused only when all three current hashes—catalogue declaration, implementation input, and actual baseline—match the cache record.",
+        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace;",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "42273125a9fc590438c43fb9cc8e2731bc468c0db091a18ffd001478ffe4da6c",
+      "claim_hash": "e91b265f9b43c1c9ce764ef43236a17df6092461cf8c64b3a5075dc66b80c072",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsExecutorPort",
+          "entry_key": "TrackBlobReader",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "6db977ec88a955486c701792d79190a537792e0c8f40534a9f7c5006d4f1a05e",
+      "evidence_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
       "evidence_origin": {
         "data": {
-          "element_id": "AC-08",
-          "section": "acceptance_criteria",
-          "text_label": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Any hash mismatch, missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
+        "citation": "a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "42273125a9fc590438c43fb9cc8e2731bc468c0db091a18ffd001478ffe4da6c",
+      "claim_hash": "e91b265f9b43c1c9ce764ef43236a17df6092461cf8c64b3a5075dc66b80c072",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsExecutorPort",
+          "entry_key": "TrackBlobReader",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d508f9ad6e631d86ac123e28064377878b68c60a1c537d96963226b756b08915",
+      "evidence_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
       "evidence_origin": {
         "data": {
           "element_id": "AC-09",
           "section": "acceptance_criteria",
-          "text_label": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Missing or unreadable baselines, other authoritative-input failures, evaluation failures, and cache-write failures fail closed; inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture.",
+        "citation": "\"During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66e60dfa4b261a21e54a30bb0622667f9c351e460003f9754e8b382f3793cce8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66e60dfa4b261a21e54a30bb0622667f9c351e460003f9754e8b382f3793cce8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66e60dfa4b261a21e54a30bb0622667f9c351e460003f9754e8b382f3793cce8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66e60dfa4b261a21e54a30bb0622667f9c351e460003f9754e8b382f3793cce8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66e60dfa4b261a21e54a30bb0622667f9c351e460003f9754e8b382f3793cce8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66e60dfa4b261a21e54a30bb0622667f9c351e460003f9754e8b382f3793cce8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsExecutorPort",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"evaluation failures ... fail closed without evaluator repair\"",
         "kind": "pass"
       }
     }

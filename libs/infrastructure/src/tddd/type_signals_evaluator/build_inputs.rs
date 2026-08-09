@@ -33,6 +33,7 @@ pub(super) static PROCESS_ENVIRONMENT_LOCK: Mutex<()> = Mutex::new(());
 ///
 /// Returns an error when any required input cannot be read. Callers must then
 /// re-extract rather than reuse an existing rustdoc result.
+#[cfg(test)]
 pub(super) fn hash_implementation_inputs(
     workspace_root: &Path,
     target_crate: &str,
@@ -45,7 +46,7 @@ pub(super) fn hash_implementation_inputs(
     )
 }
 
-fn hash_implementation_inputs_with_toolchain_identifier(
+pub(crate) fn hash_implementation_inputs_with_toolchain_identifier(
     workspace_root: &Path,
     target_crate: &str,
     toolchain_identifier: &[u8],
@@ -62,7 +63,7 @@ fn hash_implementation_inputs_with_toolchain_identifier(
     collect_source_files(&source_root, 0, &mut visited_entries, &mut source_files)?;
     source_files.sort();
 
-    let mut hasher = sha2::Sha256::new();
+    let mut source_components = Vec::with_capacity(source_files.len());
     let mut remaining_budget = MAX_TOTAL_SOURCE_BYTES;
     for path in source_files {
         let relative = path.strip_prefix(workspace_root).map_err(|_| {
@@ -71,55 +72,80 @@ fn hash_implementation_inputs_with_toolchain_identifier(
                 path.display()
             ))
         })?;
-        append_component(&mut hasher, b"source-path", relative.as_os_str().as_encoded_bytes());
-        append_component(
-            &mut hasher,
-            b"source-content",
-            &read_regular_source_file(&path, MAX_SOURCE_FILE_BYTES, &mut remaining_budget)?,
-        );
+        source_components.push((
+            relative.as_os_str().as_encoded_bytes().to_vec(),
+            read_regular_source_file(&path, MAX_SOURCE_FILE_BYTES, &mut remaining_budget)?,
+        ));
     }
-    append_component(
-        &mut hasher,
-        b"crate-manifest",
-        &read_regular_source_file(
-            &crate_root.join("Cargo.toml"),
+    let crate_manifest = read_regular_source_file(
+        &crate_root.join("Cargo.toml"),
+        MAX_SOURCE_FILE_BYTES,
+        &mut remaining_budget,
+    )?;
+    let build_script = crate_root.join("build.rs");
+    let build_script = match std::fs::symlink_metadata(&build_script) {
+        Ok(_) => Some(read_regular_source_file(
+            &build_script,
             MAX_SOURCE_FILE_BYTES,
             &mut remaining_budget,
-        )?,
-    );
-    let build_script = crate_root.join("build.rs");
-    match std::fs::symlink_metadata(&build_script) {
-        Ok(_) => append_component(
-            &mut hasher,
-            b"crate-build-script",
-            &read_regular_source_file(&build_script, MAX_SOURCE_FILE_BYTES, &mut remaining_budget)?,
-        ),
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        )?),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
         Err(error) => {
             return Err(EvaluateSignalsError::authoritative_input(format!(
                 "cannot stat optional crate build script '{}': {error}",
                 build_script.display()
             )));
         }
+    };
+    let workspace_manifest = read_regular_source_file(
+        &workspace_root.join("Cargo.toml"),
+        MAX_SOURCE_FILE_BYTES,
+        &mut remaining_budget,
+    )?;
+    let lockfile = read_regular_source_file(
+        &workspace_root.join("Cargo.lock"),
+        MAX_SOURCE_FILE_BYTES,
+        &mut remaining_budget,
+    )?;
+
+    hash_implementation_input_components(
+        &source_components,
+        &crate_manifest,
+        build_script.as_deref(),
+        &workspace_manifest,
+        &lockfile,
+        toolchain_identifier,
+    )
+}
+
+/// Hashes the implementation-input components after they have been acquired.
+///
+/// The filesystem evaluator and the merge-gate branch reader both use this
+/// function so the branch-side blob hash cannot drift from the local-path
+/// authority. `source_files` contains workspace-relative paths and their raw
+/// contents; paths are sorted here to match the filesystem traversal contract.
+pub(crate) fn hash_implementation_input_components(
+    source_files: &[(Vec<u8>, Vec<u8>)],
+    crate_manifest: &[u8],
+    build_script: Option<&[u8]>,
+    workspace_manifest: &[u8],
+    lockfile: &[u8],
+    toolchain_identifier: &[u8],
+) -> Result<Sha256Digest, EvaluateSignalsError> {
+    let mut source_files = source_files.iter().collect::<Vec<_>>();
+    source_files.sort_by(|(left, _), (right, _)| left.cmp(right));
+
+    let mut hasher = sha2::Sha256::new();
+    for (relative_path, content) in source_files {
+        append_component(&mut hasher, b"source-path", relative_path);
+        append_component(&mut hasher, b"source-content", content);
     }
-    append_component(
-        &mut hasher,
-        b"workspace-manifest",
-        &read_regular_source_file(
-            &workspace_root.join("Cargo.toml"),
-            MAX_SOURCE_FILE_BYTES,
-            &mut remaining_budget,
-        )?,
-    );
-    append_component(
-        &mut hasher,
-        b"lockfile",
-        &read_regular_source_file(
-            &workspace_root.join("Cargo.lock"),
-            MAX_SOURCE_FILE_BYTES,
-            &mut remaining_budget,
-        )?,
-    );
+    append_component(&mut hasher, b"crate-manifest", crate_manifest);
+    if let Some(build_script) = build_script {
+        append_component(&mut hasher, b"crate-build-script", build_script);
+    }
+    append_component(&mut hasher, b"workspace-manifest", workspace_manifest);
+    append_component(&mut hasher, b"lockfile", lockfile);
     append_component(&mut hasher, b"toolchain", toolchain_identifier);
 
     Sha256Digest::try_new(format!("{:x}", hasher.finalize())).map_err(|error| {
@@ -233,15 +259,59 @@ fn collect_source_files(
     Ok(())
 }
 
-fn nightly_toolchain_identifier(workspace_root: &Path) -> Result<Vec<u8>, EvaluateSignalsError> {
+/// Result of probing the local nightly toolchain authority.
+#[derive(Debug, PartialEq, Eq)]
+pub(crate) enum NightlyToolchainProbe {
+    /// A matching nightly is installed and its identity bytes are readable.
+    Installed(Vec<u8>),
+    /// Enumeration succeeded and found no matching installed nightly.
+    Absent,
+}
+
+/// Enumerates the local toolchains and, when a matching nightly is installed,
+/// reads its compiler identity.
+///
+/// `Absent` is deliberately narrower than an unavailable probe: it is returned
+/// only after `rustup toolchain list` completed successfully and its output was
+/// parsed without finding a nightly. Every execution, decoding, or identity
+/// failure remains an authoritative-input error for fail-closed callers.
+pub(crate) fn probe_nightly_toolchain(
+    workspace_root: &Path,
+) -> Result<NightlyToolchainProbe, EvaluateSignalsError> {
     #[cfg(test)]
     {
         let fixture_identity = workspace_root.join(".test-nightly-toolchain-identity");
         if let Ok(identity) = std::fs::read(&fixture_identity) {
             if !identity.is_empty() {
-                return Ok(identity);
+                return Ok(NightlyToolchainProbe::Installed(identity));
             }
         }
+    }
+
+    let mut list_command = Command::new("rustup");
+    list_command.args(["toolchain", "list"]).current_dir(workspace_root);
+    let list_output = crate::capability_exec::process::run_command_with_bounded_output(
+        &mut list_command,
+        MAX_TOOLCHAIN_COMMAND_OUTPUT_BYTES,
+        MAX_TOOLCHAIN_COMMAND_DURATION,
+        "nightly toolchain enumeration",
+    )
+    .map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot enumerate nightly toolchains: {error}"
+        ))
+    })?;
+    if !list_output.status.success() {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "cannot enumerate nightly toolchains".to_owned(),
+        ));
+    }
+    if !toolchain_list_contains_nightly(&list_output.stdout).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot parse nightly toolchain enumeration: {error}"
+        ))
+    })? {
+        return Ok(NightlyToolchainProbe::Absent);
     }
 
     let mut command = Command::new("rustup");
@@ -257,12 +327,64 @@ fn nightly_toolchain_identifier(workspace_root: &Path) -> Result<Vec<u8>, Evalua
             "cannot identify nightly toolchain: {error}"
         ))
     })?;
-    if !output.status.success() || output.stdout.is_empty() {
+    if !output.status.success()
+        || output.stdout.is_empty()
+        || output.stdout.iter().all(u8::is_ascii_whitespace)
+    {
         return Err(EvaluateSignalsError::authoritative_input(
             "cannot identify nightly toolchain".to_owned(),
         ));
     }
-    Ok(output.stdout)
+    std::str::from_utf8(&output.stdout).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot read nightly toolchain identity: {error}"
+        ))
+    })?;
+    Ok(NightlyToolchainProbe::Installed(output.stdout))
+}
+
+pub(crate) fn nightly_toolchain_identifier(
+    workspace_root: &Path,
+) -> Result<Vec<u8>, EvaluateSignalsError> {
+    match probe_nightly_toolchain(workspace_root)? {
+        NightlyToolchainProbe::Installed(identity) => Ok(identity),
+        NightlyToolchainProbe::Absent => Err(EvaluateSignalsError::authoritative_input(
+            "nightly toolchain is not installed".to_owned(),
+        )),
+    }
+}
+
+fn toolchain_list_contains_nightly(output: &[u8]) -> Result<bool, String> {
+    let text = std::str::from_utf8(output).map_err(|error| error.to_string())?;
+    let mut contains_nightly = false;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let mut fields = line.split_whitespace();
+        let Some(name) = fields.next() else {
+            return Err("toolchain entry has no name".to_owned());
+        };
+        if !is_valid_toolchain_name(name) {
+            return Err(format!("invalid toolchain name '{name}'"));
+        }
+        let status = line[name.len()..].trim();
+        if !status.is_empty() && (!status.starts_with('(') || !status.ends_with(')')) {
+            return Err(format!("invalid status suffix for toolchain '{name}'"));
+        }
+        if name == "nightly" || name.starts_with("nightly-") {
+            contains_nightly = true;
+        }
+    }
+    Ok(contains_nightly)
+}
+
+fn is_valid_toolchain_name(name: &str) -> bool {
+    !name.is_empty()
+        && name
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
 }
 
 fn read_regular_source_file(
@@ -341,6 +463,7 @@ mod tests {
     use super::{
         crate_source_root, hash_implementation_inputs,
         hash_implementation_inputs_with_toolchain_identifier, read_regular_source_file,
+        toolchain_list_contains_nightly,
     };
     use std::path::{Path, PathBuf};
     #[test]
@@ -403,6 +526,26 @@ mod tests {
     #[test]
     fn test_crate_source_root_rejects_unknown_target() {
         assert!(crate_source_root(Path::new("/workspace"), "unknown").is_err());
+    }
+
+    #[test]
+    fn test_toolchain_list_with_malformed_entry_after_nightly_fails_closed() {
+        assert!(
+            !toolchain_list_contains_nightly(b"stable-x86_64-unknown-linux-gnu (default)\n")
+                .unwrap()
+        );
+        assert!(
+            toolchain_list_contains_nightly(
+                b"stable-x86_64-unknown-linux-gnu (default)\nnightly-x86_64-unknown-linux-gnu\n"
+            )
+            .unwrap()
+        );
+
+        let error = toolchain_list_contains_nightly(
+            b"nightly-x86_64-unknown-linux-gnu\nnot-a-toolchain!\n",
+        )
+        .unwrap_err();
+        assert!(error.contains("invalid toolchain name"), "got: {error}");
     }
 
     #[test]

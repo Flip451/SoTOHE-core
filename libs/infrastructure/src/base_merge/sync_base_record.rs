@@ -5,6 +5,12 @@ use domain::{CommitHash, TrackId};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use thiserror::Error;
 
+#[cfg(test)]
+use std::sync::atomic::{AtomicBool, Ordering};
+
+#[cfg(test)]
+static FORCE_NEXT_ENCODE_FAILURE: AtomicBool = AtomicBool::new(false);
+
 /// Persistence schema supported for a sync-base record.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -47,6 +53,10 @@ pub(crate) enum SyncBaseRecordCodecError {
     /// Base commit did not pass domain validation.
     #[error("invalid sync-base record base commit")]
     InvalidBaseCommit,
+    /// Test-only failure injection for the adapter's generation boundary.
+    #[cfg(test)]
+    #[error("forced sync-base record generation failure")]
+    ForcedGeneration,
 }
 
 #[derive(Serialize)]
@@ -111,7 +121,17 @@ impl<'de> Deserialize<'de> for SyncBaseRecord {
 
 /// Encodes a validated sync-base record using its declared schema version.
 pub(crate) fn encode(record: &SyncBaseRecord) -> Result<String, SyncBaseRecordCodecError> {
+    #[cfg(test)]
+    if FORCE_NEXT_ENCODE_FAILURE.swap(false, Ordering::SeqCst) {
+        return Err(SyncBaseRecordCodecError::ForcedGeneration);
+    }
     serde_json::to_string(record).map_err(SyncBaseRecordCodecError::Encode)
+}
+
+/// Forces the next encode call to exercise the generation-failure boundary.
+#[cfg(test)]
+pub(crate) fn force_next_encode_failure_for_test() {
+    FORCE_NEXT_ENCODE_FAILURE.store(true, Ordering::SeqCst);
 }
 
 /// Decodes a sync-base record, rejecting unsupported schemas and invalid fields.

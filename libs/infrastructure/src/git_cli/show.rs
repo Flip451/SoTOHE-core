@@ -21,8 +21,15 @@
 //! §D4, §D4.1, §D4.3, §D5.3.
 
 use std::path::Path;
+use std::process::{Output, Stdio};
 
-use super::guarded_git_command;
+use super::{collect_bounded_git_output, guarded_git_command, spawn_bounded_git_child};
+
+/// Retain at most this many bytes from either stream of a Git probe. The
+/// branch implementation-input reader applies the same 16 MiB per-blob limit
+/// after retrieval; keeping the subprocess bound here makes that limit real
+/// even when Git is asked to emit a larger blob or a very large tree listing.
+const MAX_GIT_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 
 /// Low-level result of running `git show origin/<ref>:<path>`.
 #[derive(Debug)]
@@ -72,14 +79,19 @@ pub(crate) fn is_path_not_found_stderr(stderr: &str) -> bool {
 /// `env_clear` is NOT used — we want to preserve PATH and git-specific
 /// env vars (e.g. `GIT_CONFIG`) — but `LANG`, `LC_ALL`, and `LANGUAGE`
 /// are explicitly overridden to `C`.
-fn spawn_git(repo_root: &Path, args: &[&str]) -> std::io::Result<std::process::Output> {
-    guarded_git_command()
+fn spawn_git(repo_root: &Path, args: &[&str]) -> std::io::Result<Output> {
+    let mut command = guarded_git_command();
+    command
         .env("LANG", "C")
         .env("LC_ALL", "C")
         .env("LANGUAGE", "C")
         .args(args)
         .current_dir(repo_root)
-        .output()
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let child = spawn_bounded_git_child(&mut command)?;
+    collect_bounded_git_output(child, MAX_GIT_OUTPUT_BYTES)
 }
 
 /// Inspects `git ls-tree origin/<branch> -- <path>` and returns the
@@ -263,6 +275,83 @@ pub(crate) fn git_ls_tree_dir(
     Ok(paths)
 }
 
+/// Lists every regular file below a directory in `origin/<branch>`.
+///
+/// The recursive listing is used when a caller must hash branch blobs rather
+/// than the checked-out worktree. Symlinks, submodules, unexpected modes, and
+/// non-UTF-8 paths are rejected so an unsafe or ambiguous tree cannot become a
+/// valid implementation-input identity.
+pub(crate) fn git_ls_tree_recursive_regular_files(
+    repo_root: &Path,
+    branch: &str,
+    dir_path: &str,
+) -> Result<Vec<String>, String> {
+    let git_ref = format!("origin/{branch}");
+    let dir_arg = format!("{dir_path}/");
+    let output = spawn_git(repo_root, &["ls-tree", "-r", "-z", &git_ref, "--", &dir_arg])
+        .map_err(|error| format!("failed to run git ls-tree for {dir_path}: {error}"))?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!(
+            "git ls-tree failed for {dir_path} (exit {}): {}",
+            output.status.code().unwrap_or(-1),
+            stderr.trim()
+        ));
+    }
+
+    let mut paths = Vec::new();
+    for record in output.stdout.split(|byte| *byte == 0) {
+        if record.is_empty() {
+            continue;
+        }
+        let tab = record
+            .iter()
+            .position(|byte| *byte == b'\t')
+            .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?;
+        let mode = record
+            .get(..tab)
+            .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?
+            .split(|byte| *byte == b' ')
+            .next()
+            .ok_or_else(|| format!("git ls-tree returned a missing mode below {dir_path}"))?;
+        let mode = std::str::from_utf8(mode)
+            .map_err(|_| format!("git ls-tree returned a non-UTF-8 mode below {dir_path}"))?;
+        let mode = u32::from_str_radix(mode, 8)
+            .map_err(|error| format!("failed to parse git tree mode '{mode}': {error}"))?;
+        match mode {
+            0o100_644 | 0o100_755 => {}
+            0o120_000 => {
+                return Err(format!(
+                    "symlink is not allowed below {dir_path} in origin/{branch} (fail-closed)"
+                ));
+            }
+            0o160_000 => {
+                return Err(format!(
+                    "submodule is not allowed below {dir_path} in origin/{branch} (fail-closed)"
+                ));
+            }
+            other => {
+                return Err(format!(
+                    "unexpected tree entry mode {other:06o} below {dir_path} in origin/{branch}"
+                ));
+            }
+        }
+        let path_start = tab
+            .checked_add(1)
+            .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?;
+        let path = String::from_utf8(
+            record
+                .get(path_start..)
+                .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?
+                .to_vec(),
+        )
+        .map_err(|_| format!("git ls-tree returned a non-UTF-8 path below {dir_path}"))?;
+        paths.push(path);
+    }
+    paths.sort();
+    Ok(paths)
+}
+
 /// Safely fetches a blob from `origin/<branch>:<path>` with fail-closed
 /// symlink and submodule rejection.
 ///
@@ -372,6 +461,14 @@ mod tests {
     fn test_git_show_blob_bad_branch_command_failed() {
         let dir = setup_repo_with_file("spec.json", b"{}");
         let result = git_show_blob(dir.path(), "does-not-exist", "spec.json");
+        assert!(matches!(result, BlobResult::CommandFailed(_)), "got {result:?}");
+    }
+
+    #[test]
+    fn test_git_show_blob_rejects_output_above_bound() {
+        let contents = vec![b'x'; MAX_GIT_OUTPUT_BYTES + 1];
+        let dir = setup_repo_with_file("large.bin", &contents);
+        let result = git_show_blob(dir.path(), "main", "large.bin");
         assert!(matches!(result, BlobResult::CommandFailed(_)), "got {result:?}");
     }
 

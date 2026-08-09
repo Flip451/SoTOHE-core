@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 #[path = "type_signals_evaluator/build_inputs.rs"]
-mod build_inputs;
+pub(crate) mod build_inputs;
 #[path = "type_signals_evaluator/freshness.rs"]
 mod freshness;
 #[path = "type_signals_evaluator/inputs.rs"]
@@ -404,14 +404,14 @@ mod tests {
         with_process_environment_lock(|| {
             let fake_bin = tempfile::tempdir().unwrap();
             let rustup = fake_bin.path().join("rustup");
-            std::fs::write(&rustup, "#!/bin/sh\nprintf 'test-nightly\\n'\n").unwrap();
+            std::fs::write(&rustup, "#!/bin/sh\nprintf 'nightly-test\\n'\n").unwrap();
             std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
             temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), action)
         })
     }
 
     #[cfg(unix)]
-    fn with_fake_rustup_mutating_file_on_second_call<T>(
+    fn with_fake_rustup_mutating_file_on_second_hash<T>(
         mutation_path: &Path,
         mutation: &str,
         action: impl FnOnce() -> T,
@@ -425,7 +425,7 @@ mod tests {
             std::fs::write(
                 &rustup,
                 format!(
-                    "#!/bin/sh\ncount=0\nif [ -r '{counter}' ]; then IFS= read -r count < '{counter}'; fi\ncount=$((count + 1))\nprintf '%s' \"$count\" > '{counter}'\nif [ \"$count\" -eq 2 ]; then printf '%s' '{mutation}' >> '{path}'; fi\nprintf 'test-nightly\\n'\n",
+                    "#!/bin/sh\ncount=0\nif [ -r '{counter}' ]; then IFS= read -r count < '{counter}'; fi\ncount=$((count + 1))\nprintf '%s' \"$count\" > '{counter}'\nif [ \"$count\" -eq 3 ]; then printf '%s' '{mutation}' >> '{path}'; fi\nprintf 'nightly-test\\n'\n",
                     counter = counter_path.display(),
                     mutation = mutation,
                     path = mutation_path.display(),
@@ -612,7 +612,7 @@ mod tests {
         let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
         let source_path = workspace.path().join("libs/infrastructure/src/lib.rs");
-        let error = with_fake_rustup_mutating_file_on_second_call(
+        let error = with_fake_rustup_mutating_file_on_second_hash(
             &source_path,
             "\\npub struct ChangedDuringCacheCheck;\\n",
             || {
@@ -646,7 +646,7 @@ mod tests {
         let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
         let catalogue_path = items_dir.join(track_id.as_ref()).join("infrastructure-types.json");
 
-        let error = with_fake_rustup_mutating_file_on_second_call(&catalogue_path, "\\n", || {
+        let error = with_fake_rustup_mutating_file_on_second_hash(&catalogue_path, "\\n", || {
             execute_type_signals_for_layer_with_launch_observer(
                 &items_dir,
                 &track_id,

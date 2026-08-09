@@ -155,3 +155,66 @@ merge が最終確認点になる。
   switch と merge-base が並走する経路はない。
 
 User が merge 裁定でこの 2 選択を却下する場合、本 track へ差し戻して該当設計を実装する。
+
+## 2026-08-05 — 三 hash 検証の権威可用性境界（infrastructure final P0×3 への設計裁定）
+
+レビューが、round-13/14 で拡張した baseline / feature-baseline 検証と artifact lifecycle の
+構造矛盾を 3 件の P0 として指摘した: `<layer>-types-baseline.json` と
+`tddd-features-baseline.json` は意図的に gitignored なローカル運用状態であり、(1) fresh CI
+checkout に存在せず track-aware CI が必ず落ちる、(2) `origin/<branch>` の blob としても存在せず
+merge gate が常に block する（さらに usecase baseline 18MB は blob 上限 16MiB 超）。
+
+裁定（継続方式・merge 裁定で User 確認）: **検証は「その場に committed / 計算可能な権威が
+存在する hash」にのみ張る**。
+
+- **ローカル gate（commit 前）**: baseline ファイルと nightly toolchain が存在する場所であり、
+  三 hash（declaration / implementation-input / baseline）の完全検証を行う。ここが唯一の
+  baseline 鮮度の強制点で、baseline-only recapture の隠蔽はコミット前に必ず検出される。
+- **fresh CI**: 権威（baseline ファイル・nightly toolchain）が構造的に不在。Makefile の既存
+  設計どおり committed signal artifacts を信頼する（commit gate が検証済みのものだけが
+  push される）。spec_states の baseline / impl-input 検証は「権威が存在する場合のみ実施、
+  不在なら宣言 hash 検証のみ」に条件化する。
+- **merge gate**: committed 権威のみで検証する — declaration（committed catalogue）と
+  implementation-input（committed source tree から branch blob で再計算。feature 選択は
+  gitignored な feature-baseline でなく committed な `tddd-features.json` を読む）。branch 側
+  baseline 比較は権威が存在しないため撤去する（cached doc の baseline_hash は self-attested
+  であり、branch 上で照合できる独立の権威はない）。
+- 却下時の代替案として記録: baseline hash の committed attestation artifact を導入して merge
+  gate でも baseline 鮮度を照合可能にする案（新 artifact lifecycle の設計拡張、別 track 規模）。
+
+### 是正（2026-08-05）: input-box ADR の in-place 改訂を delta ADR 起票へ差し替え
+
+rollback-diagnoser の「D4 を改訂」という recommended_next_action に従い、凍結済み input-box
+ADR（`2026-07-29-0839-base-merge-and-conflict-recovery.md`）の D4 を in-place で意味改訂し
+escalation 刻印まで行ったが、これは two-box モデル（Phase 0 境界後の input box 凍結・意味変更
+は track-born delta ADR の admission 経由）への違反だった（User 指摘）。是正として: (1) 該当
+ADR を HEAD 原文へ復元し、corrective escalation として再刻印（check-review / check-commit
+とも passed）、(2) 権威可用性境界の決定は新規 delta ADR
+`2026-08-05-1035-type-signals-authority-availability-boundary.md` として起票し、adr-diagnoser
+の admission 判定 → merge 裁定まで 🟡 で保持する。spec の変更 5 要素（IN-05 / CN-03 / CN-04 /
+AC-07 / AC-09）の adr_refs は delta ADR admission 後にそちらへ付け替える。
+
+adr-diagnoser の admission 判定（2026-08-05）: **modification-proposal（class c）**。候補 D1 は
+D4 の適用範囲を狭める decision-modifying 変更であり、保存的解消 3 経路（言い換え / downstream
+解消 / 起点却下）はいずれも不成立と論証された。判定に従い delta の関係記述を「modifies」へ
+正し、**D4 への修正提案として PR merge 段階の User 裁定材料に明示**する。実装側（
+`verify_freshness_against_local_authorities` / merge gate Step 4）は既にこの境界で動作して
+おり、merge 裁定が却下なら本 track へ差し戻して D4 準拠へ再設計する。
+
+### User 裁定（2026-08-05）: adr2pr 中の運転規則
+
+rollback-diagnoser の ADR routing を受けた D4 改訂の承認を User に求めたところ、次の裁定を
+受けた: **adr2pr の途中で User にエスカレーションしない**（merge 裁定が最終確認点）、および
+**ADR 決定文は簡潔に**（実装文書化された長文決定は不可）。以後の ADR 再収束は、簡潔な決定文
+への圧縮の上、この裁定を user_decision_ref として自走で進め、User は PR merge 裁定で全体を
+確認する。
+
+## 2026-08-09: codex 復帰後のレビュー波消化と可用性境界の第 2 再収束
+
+サンプル profile（default / claude-heavy）の claude 4 capability effort を frontmatter（high）に整合させ、harness-policy を approved 化。other final の cross-scope P1（複合回帰テスト不在）を implementer に routing したところ、production が type-baseline 不在時に implementation-input 検証を巻き添えスキップする実バグが露見し、両軸を独立化した。続く infrastructure final が「stable-only CI に nightly が無く、fallback が rustup run nightly を要求して CI が壊れる」P1 で blocked_cross_scope となり、rollback-diagnoser は ADR phase 起因と裁定した。
+
+これを受け delta ADR D1 を改訂（adr-editor）: implementation_input_hash を committed 成分 × local-only nightly toolchain identity の複合として明示分解し、「enumeration 成功かつ nightly 未導入」の場合に限る構造的不在判定（当該軸のみ縮退）、probe 失敗・identity 読取不能・計算可能な不一致の fail-closed、および local check と merge gate への同一適用を規定した。adr-diagnoser 再監査は同一 decision identity の class-c modification-proposal 維持・訂正不要。spec 5 要素（IN-05/CN-03/CN-04/AC-07/AC-09）と usecase catalogue（TrackBlobReader docs、NotFound=構造的不在の縮退 / FetchError=fail-closed）を整合させたのち、implementer が実装（u41f を unreadable fail-closed と u41g 構造的不在 skip に分割、adapter の absence→NotFound / probe 失敗→FetchError 写像、build_inputs の成分感度・malformed-enumeration テスト群）。
+
+test-obligation は verifier の理由シフト型振動が TypeSignalsError 系 voluntary edge で 3 巡続いたため、(1) AC-07 は error enum が cache 比較 promise を証明できないという categorical Substitution と判定し、type-designer が entry の spec_refs から AC-07 を除去・voluntary record を削除、(2) 残る record 群は「error channel + lifecycle + 成分感度」の同一 superset を全 record に一括適用して閉鎖した。TrackBlobReader 系 edge にも同じ成分感度 union を拡張し、evaluate 320/320 pass・check passed で収束。types scope の no-upstream-restatement P1 ×2 は type-designer が docs を citation 形式へ圧縮して解消。最終的に 8 scope すべて final zero_findings で approved。
+
+merge 裁定への追加確認事項: delta ADR D1 の第 2 改訂（nightly 可用性の probe 分解、旧 features-baseline proxy ゲートの置換）、TypeSignalsError の AC-07 spec_refs 除去。

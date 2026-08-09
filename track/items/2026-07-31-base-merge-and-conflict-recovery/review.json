@@ -94,6 +94,34 @@
           "hash": "rvw1:sha256:216fec7cdebca60210ad68b27d10ed6bb40466ee18100bea142055f42af24623",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:25:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acab4b434bc36c2585837739bbfea0efe21f91bfeb27dec1fa9e692a8ca4becd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:29:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acab4b434bc36c2585837739bbfea0efe21f91bfeb27dec1fa9e692a8ca4becd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:36:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:79e853a5ba5570b01ced19bfd8cee1d4a1889f45b2edf066310091eeca540fa4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:39:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:79e853a5ba5570b01ced19bfd8cee1d4a1889f45b2edf066310091eeca540fa4",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1118,6 +1146,122 @@
           "hash": "rvw1:sha256:bd570e6581a435ac84eeffea9154c59b84c9c7ca764a88ab0784ef2fb18fa9b0",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:24:20Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 49,
+              "message": "`impl-planner` は `reasoning_effort: high` に変更されていますが、Claude の delegate-in-host アダプター `.claude/agents/impl-planner.md` は `effort: medium` のままです。ホストによって実効 effort が変わるため、両方を同期してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 67,
+              "message": "`rollback-diagnoser` は `reasoning_effort: high` ですが、対応する `.claude/agents/rollback-diagnoser.md` は `effort: xhigh` のままです。delegate-in-host 時に設定値と実効 effort が不一致になります。",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 73,
+              "message": "`adr-diagnoser` は `reasoning_effort: high` ですが、対応する `.claude/agents/adr-diagnoser.md` は `effort: xhigh` のままです。delegate-in-host 時に設定値と実効 effort が不一致になります。",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 93,
+              "message": "`researcher` は `reasoning_effort: high` に変更されていますが、対応する `.claude/agents/researcher.md` は `effort: medium` のままです。ホストによって実効 effort が変わるため、両方を同期してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9a94d9bde105972efae6a605140d81aa5d4e628b82614e4b3df3e6ef63c26961",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T05:27:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:591a826696e973a6da28f7c786281ffc659b6c87ee48f426a360d6250ae872ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:32:41Z",
+          "findings": [
+            {
+              "category": "convention_contradiction",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 49,
+              "message": "The effort retune was not propagated to the shipped agent index. The config and four changed frontmatters now set impl-planner, researcher, rollback-diagnoser, and adr-diagnoser to `high`, while `.claude/agents/README.md` still advertises `medium`, `medium`, `xhigh`, and `xhigh` and still describes two xhigh judgment lanes. That README explicitly requires the delegate-in-host frontmatter and routing configuration to remain synchronized, so the distribution now contains contradictory routing guidance. Update its table and explanation with this retune.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:591a826696e973a6da28f7c786281ffc659b6c87ee48f426a360d6250ae872ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T05:38:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5557de9dab64d44f3e35e594f1a46b134ab2faba71cba2d672dd3ade23241eb1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:26:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b635c00b80e89b963c2166fd1f9f49c01297ff3f7008d6186142cdbf440f57ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:30:03Z",
+          "findings": [
+            {
+              "category": "capability_routing_mismatch",
+              "file": ".claude/agents/impl-planner.md",
+              "line": 4,
+              "message": "The four frontmatter retunes are not synchronized with the shipped profiles that activate these Claude adapters. Both `agent-profiles.default.json` and `agent-profiles.claude-heavy.json` still configure impl-planner as `medium` and both diagnosers as `xhigh`; claude-heavy also configures researcher as `medium`. On a Claude host, `capability exec` returns `delegate-in-host`, so the frontmatter—not the profile—sets the effective effort, producing exactly the cross-host behavior mismatch described in `.claude/agents/README.md`. Update the activating sample profiles to `high` or keep these frontmatters aligned with them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b635c00b80e89b963c2166fd1f9f49c01297ff3f7008d6186142cdbf440f57ef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:37:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0161172b4a0f449a5afaf7ae5a7b8b27c71b60d8178cb41708cea1e2e3fd3c9e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:39:52Z",
+          "findings": [
+            {
+              "category": "convention_contradiction",
+              "file": ".claude/agents/README.md",
+              "line": 27,
+              "message": "The new blanket statement that delegate-in-host Claude lanes use `high` effort contradicts both the table and the shipped profiles: `implementer` remains Claude/`medium` in both samples, and `review-fix-lead` remains Claude/`medium` as well. These are legitimate Claude-host delegation lanes, so the README now gives two incompatible effort contracts. Narrow this prose to the four retuned capabilities (and avoid describing all such lanes as verdict-producing).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0161172b4a0f449a5afaf7ae5a7b8b27c71b60d8178cb41708cea1e2e3fd3c9e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:50:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e53eeffc7f12c0d86d1d805bf30064a1a7592f59ea3ad12729a1a52dcd61381",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1575,6 +1719,115 @@
           "at": "2026-08-04T04:29:42Z",
           "findings": [],
           "hash": "rvw1:sha256:d20da6ac37792574b79c9eec02078bb3a03bc0f47ac342099ae4e9f2c32db1a1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:25:23Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 97,
+              "message": "T012’s description includes the unbounded clause “together with the guarded-surface fixes raised by the PR review cycle” without naming the target files/symbols or operations. An executor cannot determine that portion’s implementation boundary; enumerate the fixes explicitly or remove the clause.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 97,
+              "message": "T012 begins with “Enforce baseline freshness,” restating the IN-05/CN-03 behavior contract in prose. Per `.harness/policies/no-upstream-restatement.md`, retain only concrete targets, operations, and anchors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2967a9bfb5056945aecfa2ae8c85e5912ba983cf53379e4f1f249902b39accf6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T05:28:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bbd7db07a7fc18fd8be83824040ad5b6e4b5a0d0fd1f0fa2acfb84f4fd74c99d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:35:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bbd7db07a7fc18fd8be83824040ad5b6e4b5a0d0fd1f0fa2acfb84f4fd74c99d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:26:04Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 97,
+              "message": "T012’s description restates the D4/AC-07–AC-09 behavior contract in prose: “the only context holding baseline authority,” the fresh-CI authority boundary, conditional local-authority verification, symlink guarding, fail-closed behavior, and “no branch-side baseline comparison.” Per `.harness/policies/no-upstream-restatement.md`, keep the description to concrete targets, operations, and anchor cites; the design rationale and behavioral contract belong upstream.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6f32aebfb008d2fcea36b5afbc480fe38adf06ef35fb620777d08a03bf5b43cd",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:28:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6b1120066948a9a60d284c344490001e807d85d1a3a8069db97240d41fc777b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:32:50Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 142,
+              "message": "Section S3 says T012 extends “the same baseline-freshness enforcement” into the merge gate, but the current IN-05/CN-03/AC-07/AC-09 contract makes baseline freshness local-pre-commit-only; the merge gate verifies committed declaration and implementation-input hashes. This stale upstream restatement could direct implementation back toward the structurally unavailable branch-baseline check. Replace it with target + operation + anchor cites per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6b1120066948a9a60d284c344490001e807d85d1a3a8069db97240d41fc777b9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:37:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:39b720c4efcfae1f8604092fde4678058e1acaa6898bcb6b15c290aac4e7e8e7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T08:34:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:125ce6c969d2d425b05575d13c9444a9c003ec98a1629bff2e4eabcf56aac4b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T08:37:10Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 33,
+              "message": "T012 is mapped to AC-08, but the current AC-08 is limited to evaluator-side cache-miss handling, reevaluation, and atomic replacement. T012 targets freshness-validation consumers (`check_impl_catalog_from_signals_file`, merge-gate readers, and the check command), and both catalogue entries attributed to T012 omit AC-08. Remove T012 from this mapping and its task-description cite; T007–T009 already provide AC-08 coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:125ce6c969d2d425b05575d13c9444a9c003ec98a1629bff2e4eabcf56aac4b9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T08:40:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c5ace95ccc6fb9cacbd0147b12613878cfd124103d74a18d95ac2d217caf56b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3538,6 +3791,180 @@
           "hash": "rvw1:sha256:7c44f4e08ea2028f961dcb7e349b982192acb5836129ab639de92f268ba2955b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:24:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e5307a5efb152fda2d941a0b385efc28ca3a8e704bbe6e6cad4a7bf91e99c26",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:27:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e5307a5efb152fda2d941a0b385efc28ca3a8e704bbe6e6cad4a7bf91e99c26",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T06:31:25Z",
+          "findings": [
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/git_cli/show.rs",
+              "line": 279,
+              "message": "The new branch implementation-input hashing performs unbounded subprocess collection: `git_ls_tree_recursive_regular_files` calls `Command::output()` for the entire recursive `git ls-tree` result before enforcing `MAX_SOURCE_FILES`, and each listed blob is likewise fully buffered by `git_show_blob` before `required_blob_limited` applies its size/budget checks. A branch containing many source paths or an oversized blob can therefore exhaust memory or block the merge gate before the intended limits take effect. Stream the git output or enforce bounded subprocess output before collecting it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9e419632bcefd1c1baf788afd6aa1c9eb4f123b55c2eba69f9b21271076bccaa",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T06:40:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f93ccdde907a82826e88c623054966d7c9daff267902d9846106aa9b86601d89",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:18:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:799d1f3d5a3459ab3543e8aa87634c59040382be774a51300d2cce57e7b8c59f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:38:22Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/signal.rs",
+              "line": 230,
+              "message": "The explicit `signal check-impl-catalog` path now requires local layer baselines, and `current_implementation_input_hash` additionally requires `tddd-features-baseline.json`. All `track/items/**/*-baseline.json` files are intentionally gitignored, and this active track has none tracked. A fresh PR checkout therefore fails the track-aware CI gate before any hash comparison. The workflow must provision the authoritative baselines before this gate or use an authority available in fresh CI without trusting the cache itself.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 244,
+              "message": "`read_type_baseline_hash` fetches `<layer>-types-baseline.json` from `origin/<branch>`, but these snapshots are explicitly not version-controlled. New tracks therefore return `NotFound` and are always blocked by the merge gate. Force-tracking is not sufficient: Git output is capped at 16 MiB while the current usecase baseline is 18,065,236 bytes and local baseline readers permit 64 MiB. Read the authoritative local baseline with trusted-root, symlink, and compatible size guards, or coherently change the artifact lifecycle.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 163,
+              "message": "`branch_features` requires `tddd-features-baseline.json` from the remote branch, although the repository's baseline ignore rule prevents that file from being pushed. Consequently `read_type_implementation_input_hash` always returns `FetchError` for normal new tracks even if the type-baseline reader is fixed. Obtain the feature baseline from its actual authoritative location or introduce a committed attestation while preserving the declaration/baseline equality check.",
+              "severity": "P0"
+            },
+            {
+              "category": "fingerprint/hash drift",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 363,
+              "message": "`evaluate_layer_catalogue` accepts the cached document after checking only declaration and baseline hashes. A source, manifest, lockfile, toolchain, or feature-selection change can therefore leave this public Stage-2 verifier green on stale Blue signals, violating the three-hash freshness contract. Compute and compare the current implementation-input hash here before returning the document, failing closed on acquisition errors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:799d1f3d5a3459ab3543e8aa87634c59040382be774a51300d2cce57e7b8c59f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:26:53Z",
+          "findings": [
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 444,
+              "message": "A malformed present feature-authority path is treated as structural absence: `is_file()` returns false for a directory or broken symlink, so the implementation-input freshness check is skipped and a stale cached signal document can pass. Probe the path with the symlink/regular-file boundary and fail closed for any present-but-invalid authority.",
+              "severity": "P1"
+            },
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 451,
+              "message": "Any failure from `nightly_toolchain_identifier` is treated as authority absence and silently skips implementation-input freshness validation. This includes unreadable/failed toolchain acquisition in a local workspace, allowing stale cached signals to pass; only genuine structural absence should downgrade the check, while acquisition failures must fail closed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:df5f5047e2523ff8d4348ac8fbcb32e2c9016dbcdf1a6a1d102e75829ad4e7cc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:50:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e6f03ad8bdee1cac82731494a25ca09cd82804d09b0be64703ce6cd38a828845",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T04:13:02Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 410,
+              "message": "`check_impl_catalog_from_signals_file` accepts `baseline_path` but only rejects symlinks; it does not verify the path is contained within `workspace_root`, allowing an outside regular file to influence freshness checks. Normalize and enforce trusted-root containment before reading it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:71588abb22673fc4040448b211e11ed989e9a855b1aa06a505c48743e0967718",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T04:20:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71c8d1fe14eb3bdc935501e7a9eeda90d4caea322c6f829edcf368679367261e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T04:28:03Z",
+          "findings": [
+            {
+              "category": "fingerprint/hash drift",
+              "file": "libs/infrastructure/src/verify/implementation_input_hash.rs",
+              "line": 203,
+              "message": "When `tddd-features-baseline.json` is absent, this early return skips `implementation_input_hash` verification entirely. Fresh CI checkouts intentionally lack baseline files, but AC-07/AC-09 require such contexts to verify both committed authorities; the committed feature declaration still permits recomputing the implementation hash, as the branch-side helper already does. Consequently, source, Cargo, lockfile, toolchain, or committed feature changes can leave stale type signals while this validation gate passes. Recompute from the committed feature declaration when the local feature baseline is structurally absent, and fail closed if another required input cannot be read.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:71c8d1fe14eb3bdc935501e7a9eeda90d4caea322c6f829edcf368679367261e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T04:47:42Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/verify/implementation_input_hash.rs",
+              "line": 138,
+              "message": "The fresh-checkout fallback still unconditionally calls `hash_workspace_inputs`, which requires `rustup run nightly rustc -Vv`. Track CI runs `signal check-impl-catalog` inside the stable-only container that explicitly lacks the nightly toolchain, so production CI will fail with an indeterminate implementation-input hash even when all committed authorities match; the unit tests mask this via the `#[cfg(test)]` toolchain-identity fixture. Provision and pin the matching nightly toolchain for this gate, or provide a committed-authority hashing path that does not depend on unavailable local toolchain state.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a750fd3790686e56cca9b837cfbb52a9259d8baeec72fb67a0c1b0d8f0625cfc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T07:49:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f88bc85d300749b592a87ef71ae3d0d5190178f4a798914cbc2abdd34bb4fd67",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:54:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f88bc85d300749b592a87ef71ae3d0d5190178f4a798914cbc2abdd34bb4fd67",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4047,6 +4474,136 @@
           "hash": "rvw1:sha256:6be242d1de8adcfb9d5ae529e9aa10184836d25906935f54849ad4b10e64616f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:24:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:648ffd107c36604ffd4d089ba0dd0519c9ce9a951915f1208718048153153c39",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:30:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:648ffd107c36604ffd4d089ba0dd0519c9ce9a951915f1208718048153153c39",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T06:30:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7976e42dbaa27220dc0ae9e3a6ffbb77c43bc9c422b4f9522a2921a736b61dcb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T06:34:23Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 7,
+              "message": "The new fulfillment record does not actually verify the port's promised branch-side authority. `test_read_type_implementation_input_hash_matches_branch_blob_semantics` computes its expected value from the same clean worktree that was committed, so an implementation that incorrectly hashes local worktree inputs would also pass; the other bound tests either mock the port or cover only unavailable/mismatched inputs. Add and bind a test that makes committed branch inputs differ from uncommitted local inputs and asserts the returned hash follows the branch blobs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7976e42dbaa27220dc0ae9e3a6ffbb77c43bc9c422b4f9522a2921a736b61dcb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T09:18:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c1cca1a9237322ec10e1a6123f36ac0e2589cb9768172494e02b47419ce9dc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:21:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2c1cca1a9237322ec10e1a6123f36ac0e2589cb9768172494e02b47419ce9dc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:25:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:11c862b320136eee0bfce97fbc0e7292f81462fe61cd66bcfa2c5ec95c2d26f4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:30:45Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 14,
+              "message": "This fulfillment record does not test the revised no-baseline contract. AC-07/CN-03 require a context without baseline authority to verify both committed hashes, but the bound regression explicitly accepts a `declaration_only` fallback. The separate implementation-input mismatch test keeps the baseline present, so the suite would still pass if an absent baseline incorrectly bypassed implementation-input freshness. Add and bind a case with the baseline absent and a stale implementation-input hash that must fail.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:11c862b320136eee0bfce97fbc0e7292f81462fe61cd66bcfa2c5ec95c2d26f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T04:09:59Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 14,
+              "message": "The `check_impl_catalog_from_signals_file` fulfillment record omits the new regression test `test_check_impl_catalog_missing_baseline_with_implementation_input_mismatch_fails_closed`, so the combined authority-axis fail-closed behavior is not represented in the binding coverage. Add this test to the relevant record and re-run `bin/sotp test-obligation check`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:11c862b320136eee0bfce97fbc0e7292f81462fe61cd66bcfa2c5ec95c2d26f4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T04:14:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d4b68f3fb4c3f9b535d236807bf052e55b5e9b993cbb116ab70d2575598fdea",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:56:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:faac80f64465f00a7473ba4688913b19295a560c5f533b8f03e1d4ffc1cb659d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T08:03:21Z",
+          "findings": [
+            {
+              "category": "test_obligation_integrity",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 4,
+              "message": "These TrackBlobReader bindings are not validated against the current declarations. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with a stale obligations artifact (`changed=10`, including the TrackBlobReader methods), while `test-obligation results` reports 54 stale in-progress verdicts. Re-derive the obligations, repair/re-evaluate the affected bindings, and rerun the check before considering this scope green.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:faac80f64465f00a7473ba4688913b19295a560c5f533b8f03e1d4ffc1cb659d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T08:25:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:17e37096a34a18b950f95de65a1a94d6725f78d7afba05fecbc916472a8b0389",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T08:28:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:17e37096a34a18b950f95de65a1a94d6725f78d7afba05fecbc916472a8b0389",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4144,6 +4701,63 @@
           "at": "2026-08-01T23:13:17Z",
           "findings": [],
           "hash": "rvw1:sha256:d503c8c41ebe2072c29a376a70fcc3ff9bab869e78cd35d8e7c17a2d3e56d06f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:25:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aa5a591d3b495f67c606deb84e9481ba525312b3dbd0092283b184a8a37f1447",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:31:31Z",
+          "findings": [
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 199,
+              "message": "CN-04 says any hash mismatch must trigger reevaluation and atomic cache replacement, but then says a present mismatched baseline must fail closed; AC-08 and AC-09 repeat these incompatible outcomes. Because a baseline-hash mismatch satisfies both clauses and neither is qualified by operation, downstream tests cannot determine whether to self-heal or reject. Distinguish evaluator cache misses from validation-gate mismatches and define the outcome for each authority.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aa5a591d3b495f67c606deb84e9481ba525312b3dbd0092283b184a8a37f1447",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:38:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e6506c2a0b058fe01a6d28bd4d5641bf41cc9559b0514bbe146ede68d1ecc620",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:41:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0ded47c0e0f4b0f771e5b683174258fe889c837244e5558da29e39397b05c2b1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:44:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0ded47c0e0f4b0f771e5b683174258fe889c837244e5558da29e39397b05c2b1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T09:04:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fbb955135518a402f9dfd1008cd1d779e58aace58a8522ea9a49dc784fbf0fa8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T09:06:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fbb955135518a402f9dfd1008cd1d779e58aace58a8522ea9a49dc784fbf0fa8",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -4749,6 +5363,135 @@
           "hash": "rvw1:sha256:699ff309aae1262a8513fc560ccee016c796688528b4c6c2daca589c04b585b6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:25:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:16c63e481ba32c875298569591bdc645e9b1972c420a890fc6b5f4de086f406e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:35:25Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 677,
+              "message": "`TrackBlobReader` is an external blob-reading `SecondaryPort`, but every method is synchronous while the entry docs only mention the baseline-hash modification. The catalogue must acknowledge why blocking execution is intentional or declare an asynchronous boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "ownership signature smell",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 850,
+              "message": "`TrackBlobReader::read_adr_verify_report` consumes `_branch: String` even though callers hold `&str`; the current implementation then clones that owned value again for temporary adapter state. Accepting `&str` would avoid forcing unnecessary ownership and allocation at the port boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 880,
+              "message": "`TypeSignalsExecutorPort::evaluate_layer` represents blocking rustdoc/input/cache I/O, but its catalogue entry declares a synchronous method without documenting that execution-color choice. Add a concise blocking-boundary rationale or redesign the port as asynchronous.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:16c63e481ba32c875298569591bdc645e9b1972c420a890fc6b5f4de086f406e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T06:30:48Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 679,
+              "message": "`TrackBlobReader` の `docs` が、同期ポートを選んだ理由と実装挙動（blocking child-process、single-threaded CLI、async runtime 回避）を再記述している。`docs` は上流仕様を散文で再掲せず、アンカー参照に限定すべき。`.harness/policies/no-upstream-restatement.md` 違反。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 742,
+              "message": "`TrackBlobReader::read_type_implementation_input_hash` の method docs が、fail-closed と `FetchError` の挙動契約を再記述している。上流仕様の挙動はアンカーで参照し、カタログ docs に契約本文を複製すべきではない。`.harness/policies/no-upstream-restatement.md` 違反。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 904,
+              "message": "`TypeSignalsExecutorPort` の `docs` が、同期ポートの設計理由と blocking rustdoc 子プロセス・single-threaded CLI・async runtime 回避を再記述している。参照アンカーに置き換えるべき。`.harness/policies/no-upstream-restatement.md` 違反。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:23daf49a37c6ddc6b1b8d8e7f69a2013cf501b9336d7fe48b85be3a859bd05da",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T09:19:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8f98571142d991ffec6153e6be3fec655509a22936857be11675f4b6944bcfcf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:26:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8f98571142d991ffec6153e6be3fec655509a22936857be11675f4b6944bcfcf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:26:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bba6372a6d41eb1f1fb7ef7236c1046498a99dea098bda6ffda978ac0a7f8594",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:30:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bba6372a6d41eb1f1fb7ef7236c1046498a99dea098bda6ffda978ac0a7f8594",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:45:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 679,
+              "message": "`TrackBlobReader` の `docs` に「No branch-side baseline read」と記載され、上流で定義された境界・挙動を散文で再記述している。カタログ docs は変更対象とアンカー参照に限定し、挙動契約は `.harness/policies/no-upstream-restatement.md` に従って上流へ委譲すべき。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 721,
+              "message": "`TrackBlobReader::read_type_implementation_input_hash` の method docs が「fail-closed」という上流の失敗挙動を再記述している。挙動契約は `spec_refs` のアンカーに委ね、method docs から `fail-closed` を除去すべき。`.harness/policies/no-upstream-restatement.md` 違反。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2f54b9065a7b8226fef51354ce3afb0634453a8cc0919b8c17979e6650999e9e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T07:55:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4fd9fc42a3c602577016a1036041925662ef6e7acd9a737f566d76d3d1f363",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T08:00:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ce4fd9fc42a3c602577016a1036041925662ef6e7acd9a737f566d76d3d1f363",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4828,6 +5571,107 @@
           "at": "2026-08-03T12:44:38Z",
           "findings": [],
           "hash": "rvw1:sha256:094c867f62a57bd94c94cb94f8c0a2ad12573fabadd41a8c81dd81d3db4a95ff",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T05:24:07Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 474,
+              "message": "The merge gate validates only declaration_hash and baseline_hash; it never compares the cached implementation_input_hash with the current branch's implementation inputs. A branch whose source, lockfile, or toolchain inputs changed can therefore merge using stale type-signals. Extend TrackBlobReader to provide the authoritative implementation-input hash and fail closed on mismatch before evaluating cached signals.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:6354b5e587a59b89c748bdaf003c9f9a487208bcbe75f55475769f99ea6a026b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-05T06:30:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46239e4a0ad99d17639f992acde84bd35d907e4eb38ad30eea2f29d29b999887",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T06:37:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46239e4a0ad99d17639f992acde84bd35d907e4eb38ad30eea2f29d29b999887",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:18:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a1677b1df29ca198fb7fcde6c83ab4b7e3602d998c0da060ed6b54f151f48d78",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-05T09:21:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a1677b1df29ca198fb7fcde6c83ab4b7e3602d998c0da060ed6b54f151f48d78",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:25:29Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 508,
+              "message": "The merge gate explicitly skips comparing `signals_doc.cache_key().baseline_hash()` with the branch baseline and relies only on the local pre-commit gate. This regresses the required merge-time freshness check: a cached type-signals document can be accepted after the baseline is recaptured or otherwise changes while the catalogue and implementation inputs remain unchanged. The `TrackBlobReader` baseline-hash port and fail-closed comparison must be retained.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:56071b3c5f0d22c2fc30c6d51bd13566cfac766a3f7e27308e1515c013fd9a7c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:29:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56071b3c5f0d22c2fc30c6d51bd13566cfac766a3f7e27308e1515c013fd9a7c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:33:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:56071b3c5f0d22c2fc30c6d51bd13566cfac766a3f7e27308e1515c013fd9a7c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:36:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06fb4fc0d96784841038b78ba204e1142beb81f616ea85c880628a714934ec23",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T07:40:19Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/usecase/src/merge_gate.rs",
+              "line": 1387,
+              "message": "U41g returns an all-Blue signals document and only asserts that the outcome has no errors. The test would still pass if the `NotFound` arm were changed to `continue`, incorrectly skipping the entire layer instead of only the implementation-input comparison. Use a Yellow/Red signal or a recording assertion to prove that `check_type_signals` still executes after `NotFound`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:06fb4fc0d96784841038b78ba204e1142beb81f616ea85c880628a714934ec23",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T07:47:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e64ab34630ba844fed0be21dcf9df9cc810c7915edf7f98f4573a597a4a71c77",
           "type": "final",
           "verdict": "zero_findings"
         }

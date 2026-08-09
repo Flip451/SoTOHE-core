@@ -79,6 +79,10 @@
     ],
     "T011": [
       {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"}
+    ],
+    "T012": [
+      {"layer": "usecase", "entry_key": "TrackBlobReader"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file"}
     ]
   }
 }
