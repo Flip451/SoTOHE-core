@@ -297,9 +297,15 @@ fn comparable_alias_params<'generics>(
     generics
         .params
         .iter()
-        .filter(|param| {
-            !matches!(param.kind, rustdoc_types::GenericParamDefKind::Lifetime { .. })
-                || !target_lifetimes.contains(&param.name)
+        .filter(|param| match &param.kind {
+            // Only the plain `<'a>` declaration is representable by the
+            // lexical target convention: a lifetime parameter carrying
+            // outlives metadata (`<'a: 'static>`) holds unrecorded
+            // declaration information and stays in the comparison.
+            rustdoc_types::GenericParamDefKind::Lifetime { outlives } => {
+                !(outlives.is_empty() && target_lifetimes.contains(&param.name))
+            }
+            _ => true,
         })
         .collect()
 }
@@ -1191,6 +1197,31 @@ mod tests {
                 "my_crate",
             ),
             "a lifetime parameter the target does not carry must stay a mismatch"
+        );
+
+        // A target-carried lifetime with outlives metadata (`<'a: 'static>`)
+        // holds unrecorded declaration information: it must not compare equal
+        // to the catalogue's plain lexical convention.
+        let bounded_lifetime = make_type_alias_item(
+            Id(45),
+            target(),
+            vec![
+                GenericParamDef {
+                    name: "'a".to_string(),
+                    kind: GenericParamDefKind::Lifetime { outlives: vec!["'static".to_string()] },
+                },
+                make_type_param("T", vec![]),
+            ],
+        );
+        assert!(
+            !items_structurally_equal(
+                &a_alias,
+                &bounded_lifetime,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "a target-carried lifetime with outlives metadata must stay a mismatch"
         );
 
         // A genuine type-parameter arity difference stays a mismatch.
