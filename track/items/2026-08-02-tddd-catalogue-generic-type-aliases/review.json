@@ -4996,6 +4996,72 @@
           "hash": "rvw1:sha256:b512fb9bd83668c6d4c4481787aa3d3b5e0ab0ccfc8a15b1dd6d8b7525b5eff7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T11:06:41Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 500,
+              "message": "Bare-function parameter validation reuses `is_plain_generic_param_name`, whose `is_plain_identifier` accepts only ASCII characters. Valid Unicode Rust identifiers (for example `fn(値: u8)`) are therefore rejected at every alias lexical gate, causing false catalogue rejection/mismatch. Use Rust identifier/XID validation appropriate to function parameter names, or add regression coverage for Unicode names.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0c357908ee7cee4f4e15dde63ee7848bf2bac4d6d9005034645be11896a0de6b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T11:11:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e14d67ae655d352029f712d82d32d9f0b6004b6b8c327bb51887f6d16bbeadcc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T11:16:30Z",
+          "findings": [
+            {
+              "category": "input validation",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 502,
+              "message": "The new check delegates compiler-validity to `syn::Ident`, but syn 2.0.117 is not edition-aware and its keyword table omits the Rust 2024 reserved keyword `gen`. Consequently, `Outer<fn(gen: u8)>` passes the closed grammar even though this edition's rustc rejects it. Syn also preserves non-NFC Unicode spellings that rustc normalizes, allowing names that cannot appear verbatim in rustdoc. Validate current-edition keywords and NFC explicitly, with regression cases for `gen` and a decomposed Unicode identifier.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e14d67ae655d352029f712d82d32d9f0b6004b6b8c327bb51887f6d16bbeadcc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T11:30:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82a8a504e38103c925019b1b4602c563b90f0f3a27291a13df6dcb2bfc2aa706",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T11:33:02Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 514,
+              "message": "The shared `is_rust_keyword` predicate is too strict for bare-function parameter context: it includes weak/contextual keywords such as `raw`, `safe`, `union`, and `macro_rules`, all of which rustc 1.93 accepts as parameter names in edition 2024 (for example, `type A = fn(raw: u8);`). This therefore rejects compiler-valid, rustdoc-observable generic alias targets at every lexical gate. Use a context-specific strict/reserved-keyword check that still rejects `gen`, and add acceptance tests for weak keywords.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:82a8a504e38103c925019b1b4602c563b90f0f3a27291a13df6dcb2bfc2aa706",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T11:39:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c64cba036fc9bd73f9941b06cab59799e992be8f25cd6e20e21cbebd69794fe1",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -5197,6 +5263,20 @@
           "at": "2026-08-03T14:35:44Z",
           "findings": [],
           "hash": "rvw1:sha256:487b983c4244d839872daef9a8a7137156b305b7de8d4d423e75c4770706c4e0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T11:44:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:409aa0eff6974c424ae100679771f7bcb6419dfa0999a36c5eedd3aed2194a19",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T11:45:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:409aa0eff6974c424ae100679771f7bcb6419dfa0999a36c5eedd3aed2194a19",
           "type": "final",
           "verdict": "zero_findings"
         }

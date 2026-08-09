@@ -222,6 +222,66 @@ fn is_reserved_declared_lifetime_name(name: &str) -> bool {
     matches!(name, "_" | "self" | "Self" | "super" | "crate")
 }
 
+/// Whether a spelling is unavailable as a bare function-pointer parameter
+/// name in the current Rust edition. Weak keywords remain valid identifiers in
+/// this context (`raw`, `safe`, `union`, and `macro_rules`), so this must not
+/// reuse the generic-declaration predicate.
+fn is_bare_fn_parameter_reserved_keyword(name: &str) -> bool {
+    matches!(
+        name,
+        "as" | "async"
+            | "await"
+            | "break"
+            | "const"
+            | "continue"
+            | "crate"
+            | "dyn"
+            | "else"
+            | "enum"
+            | "extern"
+            | "false"
+            | "fn"
+            | "for"
+            | "if"
+            | "impl"
+            | "in"
+            | "let"
+            | "loop"
+            | "match"
+            | "mod"
+            | "move"
+            | "mut"
+            | "pub"
+            | "ref"
+            | "return"
+            | "self"
+            | "Self"
+            | "static"
+            | "struct"
+            | "super"
+            | "trait"
+            | "true"
+            | "type"
+            | "unsafe"
+            | "use"
+            | "where"
+            | "while"
+            | "abstract"
+            | "become"
+            | "box"
+            | "do"
+            | "final"
+            | "gen"
+            | "macro"
+            | "override"
+            | "priv"
+            | "typeof"
+            | "unsized"
+            | "virtual"
+            | "yield"
+    )
+}
+
 struct AllowlistVisitor<'params, 'names> {
     generic_params: &'params [&'names str],
     /// Lifetime names (without `'`) introduced by enclosing `for<>` binders.
@@ -255,15 +315,21 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
         }
     }
 
-    /// Rejects raw lifetime spellings: rustdoc normalizes `'r#async` to
-    /// `'async` in its output, so a raw spelling in the catalogue can never
-    /// match the observed representation. The normalized spelling is the one
-    /// accepted representation of a raw source declaration.
+    /// Rejects lifetime spellings that can never match rustdoc output: raw
+    /// spellings (`'r#async` normalizes to `'async`) and non-NFC Unicode
+    /// names (rustc normalizes identifiers to NFC). The normalized spelling
+    /// is the one accepted representation of such a source declaration.
     fn check_raw_lifetime_spelling(&mut self, name: &str) -> bool {
         if let Some(stripped) = name.strip_prefix("r#") {
             self.reject(&format!(
                 "raw lifetime `'{name}` never appears in rustdoc output (it normalizes to \
                  `'{stripped}`); use the normalized spelling"
+            ));
+            return true;
+        }
+        if !unicode_normalization::is_nfc(name) {
+            self.reject(&format!(
+                "lifetime `'{name}` is not NFC-normalized; rustdoc emits NFC identifiers"
             ));
             return true;
         }
@@ -489,6 +555,31 @@ impl<'ast, 'params, 'names> Visit<'ast> for AllowlistVisitor<'params, 'names> {
         for input in &node.inputs {
             if !input.attrs.is_empty() {
                 self.reject("attributes on bare-function parameters");
+            }
+            // Rustc allows `self` only in associated functions. Raw spellings
+            // never reach rustdoc, and strict / reserved keywords cannot name
+            // bare-function parameters. Weak keywords remain declarable in
+            // this context, so use its dedicated keyword set. Delegate
+            // identifier validity to syn so this admits the Unicode identifiers
+            // Rust accepts instead of applying the ASCII-only generic-name rule.
+            if let Some((name, _)) = &input.name {
+                let name = name.to_string();
+                // `syn::Ident` is not edition-aware (its keyword table omits
+                // the Rust 2024 reserved keyword `gen`) and preserves non-NFC
+                // Unicode spellings that rustc normalizes, so the keyword
+                // list and NFC form are validated explicitly. Raw spellings
+                // never appear in rustdoc output.
+                if name != "_"
+                    && (name.starts_with("r#")
+                        || is_bare_fn_parameter_reserved_keyword(&name)
+                        || syn::parse_str::<syn::Ident>(&name).is_err()
+                        || !unicode_normalization::is_nfc(&name))
+                {
+                    self.reject(&format!(
+                        "bare-function parameter name `{name}` is not valid in a function \
+                         pointer declaration"
+                    ));
+                }
             }
             self.visit_type(&input.ty);
         }

@@ -1125,6 +1125,45 @@ fn test_alias_lexical_gates_reject_original_lossy_spellings() {
 }
 
 #[test]
+fn test_alias_lexical_gates_reject_reserved_bare_fn_parameter_names() {
+    // Rustc allows a `self` parameter only in associated functions, strict and
+    // reserved keyword names (including Rust 2024's `gen`, absent from syn's
+    // edition-unaware table) are not declarable as bare-function parameters,
+    // and raw spellings never appear in rustdoc output.
+    for spelling in [
+        "Outer<fn(self: u8)>",
+        "Outer<fn(Self: u8)>",
+        "Outer<fn(r#type: u8)>",
+        "Outer<fn(gen: u8)>",
+    ] {
+        assert_alias_lexical_spelling_rejected_at_all_gates(spelling);
+    }
+    // Contextual keywords remain valid bare-function parameter names.
+    for spelling in [
+        "Outer<fn(value: u8)>",
+        "Outer<fn(\u{5024}: u8)>",
+        "Outer<fn(raw: u8)>",
+        "Outer<fn(safe: u8)>",
+        "Outer<fn(union: u8)>",
+        "Outer<fn(macro_rules: u8)>",
+    ] {
+        assert_alias_lexical_spelling_accepted_at_all_gates(spelling);
+    }
+}
+
+#[test]
+fn test_alias_lexical_gates_reject_non_nfc_identifier_spellings() {
+    // Rustc normalizes identifiers to NFC before they reach rustdoc, so a
+    // decomposed Unicode spelling in the catalogue can never match the
+    // observed representation; the precomposed (NFC) spelling stays valid.
+    assert_alias_lexical_spelling_rejected_at_all_gates("Outer<fn(e\u{0301}x: u8)>");
+    assert_alias_lexical_spelling_accepted_at_all_gates("Outer<fn(\u{00e9}x: u8)>");
+    // The same trap applies to lifetime names in alias targets.
+    assert!(validate_lexical_alias_target("&'e\u{0301}x T", &["T"]).is_err());
+    assert!(validate_lexical_alias_target("&'\u{00e9}x T", &["T"]).is_ok());
+}
+
+#[test]
 fn test_alias_lexical_gates_reject_self_in_trait_bound_paths() {
     for spelling in ["Self", "Outer<Item: Self>"] {
         assert_bound_spelling_rejected(spelling);

@@ -37,7 +37,7 @@ fn is_plain_identifier(name: &str) -> bool {
     }
 }
 
-fn is_rust_keyword(name: &str) -> bool {
+pub(super) fn is_rust_keyword(name: &str) -> bool {
     matches!(
         name,
         "as" | "async"

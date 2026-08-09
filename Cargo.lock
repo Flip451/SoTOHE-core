@@ -3007,6 +3007,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "toml",
+ "unicode-normalization",
  "usecase",
 ]
 

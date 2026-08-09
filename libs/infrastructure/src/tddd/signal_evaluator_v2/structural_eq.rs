@@ -48,7 +48,17 @@ pub(super) fn items_structurally_equal(
             enums_structurally_equal(ea, eb, a_index, b_index)
         }
         (ItemEnum::TypeAlias(ta), ItemEnum::TypeAlias(tb)) => {
-            type_alias_targets_lexically_equal(&ta.type_, &tb.type_)
+            // Non-generic aliases keep the legacy name-insensitive target
+            // comparison (Accepted Deviation 2 / CN-01 compatibility):
+            // rustdoc records bare-function parameter names (`_` vs `value`),
+            // which the legacy contract deliberately ignores. The lexical
+            // target comparison applies to the generic-alias contract only.
+            let targets_equal = if ta.generics.params.is_empty() && tb.generics.params.is_empty() {
+                format_type(&ta.type_) == format_type(&tb.type_)
+            } else {
+                type_alias_targets_lexically_equal(&ta.type_, &tb.type_)
+            };
+            targets_equal
                 && type_alias_generics_lexically_equal(
                     &ta.generics,
                     &ta.type_,
@@ -676,10 +686,11 @@ mod tests {
     use std::collections::HashMap;
 
     use rustdoc_types::{
-        AssocItemConstraint, AssocItemConstraintKind, DynTrait, FunctionHeader, FunctionSignature,
-        GenericArg, GenericArgs, GenericBound, GenericParamDef, GenericParamDefKind, Generics, Id,
-        Impl, Item, ItemEnum, Path, PolyTrait, PreciseCapturingArg, Struct, StructKind, Term,
-        TraitBoundModifier, Type, TypeAlias, Visibility,
+        Abi, AssocItemConstraint, AssocItemConstraintKind, DynTrait, FunctionHeader,
+        FunctionPointer, FunctionSignature, GenericArg, GenericArgs, GenericBound, GenericParamDef,
+        GenericParamDefKind, Generics, Id, Impl, Item, ItemEnum, Path, PolyTrait,
+        PreciseCapturingArg, Struct, StructKind, Term, TraitBoundModifier, Type, TypeAlias,
+        Visibility,
     };
 
     use super::{items_structurally_equal, structs_structurally_equal};
@@ -1146,6 +1157,57 @@ mod tests {
 
     /// A TypeAlias carrying the same ordered parameter names and bound notation on both
     /// sides must compare structurally equal.
+    #[test]
+    fn test_type_alias_non_generic_target_ignores_fn_parameter_names() {
+        // rustdoc records bare-function parameter names (`_` vs `value`),
+        // which the legacy non-generic alias contract deliberately ignores
+        // (Accepted Deviation 2 / CN-01 compatibility). The lexical target
+        // comparison applies to the generic-alias contract only.
+        let fn_pointer_target = |name: &str| {
+            Type::FunctionPointer(Box::new(FunctionPointer {
+                sig: FunctionSignature {
+                    inputs: vec![(name.to_string(), Type::Primitive("u8".to_string()))],
+                    output: None,
+                    is_c_variadic: false,
+                },
+                generic_params: vec![],
+                header: FunctionHeader {
+                    is_const: false,
+                    is_unsafe: false,
+                    is_async: false,
+                    abi: Abi::Rust,
+                },
+            }))
+        };
+        let a = make_type_alias_item(Id(10), fn_pointer_target("_"), vec![]);
+        let b = make_type_alias_item(Id(20), fn_pointer_target("value"), vec![]);
+        assert!(
+            items_structurally_equal(&a, &b, &HashMap::new(), &HashMap::new(), "my_crate"),
+            "non-generic aliases keep the name-insensitive legacy target comparison"
+        );
+
+        let a_generic = make_type_alias_item(
+            Id(30),
+            fn_pointer_target("_"),
+            vec![make_type_param("T", vec![])],
+        );
+        let b_generic = make_type_alias_item(
+            Id(40),
+            fn_pointer_target("value"),
+            vec![make_type_param("T", vec![])],
+        );
+        assert!(
+            !items_structurally_equal(
+                &a_generic,
+                &b_generic,
+                &HashMap::new(),
+                &HashMap::new(),
+                "my_crate",
+            ),
+            "generic aliases compare function-pointer parameter names lexically"
+        );
+    }
+
     #[test]
     fn test_type_alias_lifetime_parameters_excluded_from_generics_comparison() {
         // The catalogue schema cannot declare lifetime parameters: an alias
