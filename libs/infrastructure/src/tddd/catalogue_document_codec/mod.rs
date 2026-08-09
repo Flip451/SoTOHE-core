@@ -1202,13 +1202,12 @@ mod tests {
             "a single `?Sized` bound must stay decodable"
         );
 
-        // A supported non-relaxed `~const` bound is not part of the E0203
-        // count and must continue through both codec directions.
+        // `~const` requires the unstable `const_trait_impl` feature (and is
+        // not permitted on type aliases), so it fails at decode.
         let maybe_const = single.replace("\"?Sized\"", "\"~const Clone\"");
-        let document = CatalogueDocumentCodec::decode(&maybe_const, "domain").unwrap();
         assert!(
-            CatalogueDocumentCodec::encode(&document).is_ok(),
-            "a non-relaxed `~const` bound must stay encodable"
+            CatalogueDocumentCodec::decode(&maybe_const, "domain").is_err(),
+            "a `~const` alias bound must fail at decode (unstable const_trait_impl)"
         );
     }
 
@@ -3537,11 +3536,10 @@ mod tests {
     }
 
     #[test]
-    fn test_trait_with_keyword_generic_and_maybe_const_bound_decodes() {
-        // The shared `~const` shape check must not re-validate the declared
-        // context's spelling: a keyword generic name (rustdoc-normalized
-        // `r#type`) plus a `~const` bound on a sibling parameter stays
-        // decodable for non-alias entries (spec OUT-01).
+    fn test_trait_with_maybe_const_bound_is_rejected() {
+        // `~const` requires the unstable `const_trait_impl` feature, so no
+        // stable compiler-validated rustdoc output can carry it; the parent's
+        // syn-parse rejection is restored for non-alias entries too.
         let json = r#"{
   "schema_version": 5,
   "crate_name": "domain",
@@ -3557,12 +3555,10 @@ mod tests {
   },
   "functions": {}
 }"#;
-        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
-        let entry = doc.traits().values().next().unwrap();
-        assert_eq!(entry.generics()[1].bounds[0].as_str(), "~const Clone");
-        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
-        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
-        assert_eq!(doc, doc2, "keyword context with `~const` bound must round-trip");
+        assert!(
+            CatalogueDocumentCodec::decode(json, "domain").is_err(),
+            "a `~const` bound must fail at decode (unstable const_trait_impl)"
+        );
     }
 
     #[test]

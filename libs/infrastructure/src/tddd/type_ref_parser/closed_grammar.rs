@@ -51,16 +51,12 @@ const UNSUPPORTED_SYNTAX: &str = "unsupported syntax element: the alias lexical 
      rustdoc can emit for a generic type alias declaration";
 
 /// Rule A + Rule B for a bound string (a single `TypeParamBound`).
-///
-/// A supported `~const ` prefix is stripped before both rules; its deeper
-/// shape is validated separately by `validate_maybe_const_bound`.
 pub(crate) fn enforce_closed_bound_grammar(
     bound_str: &str,
     generic_params: &[&str],
 ) -> Result<(), String> {
-    let stripped = bound_str.strip_prefix("~const ").map_or(bound_str, str::trim_start);
-    let syn_bound: syn::TypeParamBound =
-        syn::parse_str(stripped).map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
+    let syn_bound: syn::TypeParamBound = syn::parse_str(bound_str)
+        .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
 
     let mut visitor = AllowlistVisitor::new(generic_params);
     // Rustc permits a relaxed bound only directly on a type parameter of the
@@ -72,7 +68,7 @@ pub(crate) fn enforce_closed_bound_grammar(
 
     let converted = convert_bound_with_dummy_context(&syn_bound, generic_params);
     let canonical = render_bound(&converted).ok_or_else(|| UNSUPPORTED_SYNTAX.to_owned())?;
-    if tokens_match(&canonical, stripped) {
+    if tokens_match(&canonical, bound_str) {
         Ok(())
     } else {
         Err(format!("{NON_CANONICAL}; expected `{canonical}`"))

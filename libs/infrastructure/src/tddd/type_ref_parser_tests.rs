@@ -454,7 +454,9 @@ fn test_parse_type_ref_preserving_spelling_keeps_ambiguous_argument_lexeme() {
             "unrepresentable const bound modifier must fail closed: {modifier}"
         );
     }
-    assert!(validate_lexical_generic_bound("~const Clone", &[]).is_ok());
+    // `~const` requires the unstable `const_trait_impl` feature, so no
+    // stable compiler-validated rustdoc output can carry it.
+    assert!(validate_lexical_generic_bound("~const Clone", &[]).is_err());
 }
 
 #[test]
@@ -1579,9 +1581,11 @@ fn test_pr234_findings_regression_corpus_acceptances() {
         assert_bound_spelling_accepted(spelling);
     }
 
-    // `~const Clone` (finding 22): accepted by the lexical bound validator;
-    // its deeper shape is owned by `validate_maybe_const_bound`.
-    assert!(validate_lexical_generic_bound("~const Clone", &[]).is_ok());
+    // `~const Clone` (finding 22's acceptance, superseded by a later PR
+    // round): `~const` requires the unstable `const_trait_impl` feature and
+    // is not permitted on type aliases, so the lexical validator now rejects
+    // it — no stable compiler-validated rustdoc output can carry it.
+    assert!(validate_lexical_generic_bound("~const Clone", &[]).is_err());
 }
 
 #[test]

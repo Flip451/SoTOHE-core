@@ -251,12 +251,16 @@ pub(crate) fn validate_lexical_generic_bound(
     generic_params: &[&str],
 ) -> Result<(), String> {
     validate_generic_identifier_ambiguities(bound_str, generic_params)?;
-    let syntax_str = bound_str.strip_prefix("~const ").map_or(bound_str, str::trim_start);
-    let syn_bound: syn::TypeParamBound = syn::parse_str(syntax_str)
-        .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
+    // `~const` trait bounds require the unstable `const_trait_impl` feature
+    // (and are not permitted on type aliases at all), so no stable
+    // compiler-validated rustdoc output can carry them.
     if bound_str.starts_with("~const ") {
-        validate_maybe_const_bound(bound_str, generic_params)?;
+        return Err("`~const` trait bounds require the unstable `const_trait_impl` feature and \
+             cannot appear in compiler-validated rustdoc output"
+            .to_owned());
     }
+    let syn_bound: syn::TypeParamBound = syn::parse_str(bound_str)
+        .map_err(|e| format!("invalid bound syntax '{bound_str}': {e}"))?;
     enforce_closed_bound_grammar(bound_str, generic_params)?;
     reject_anonymous_const_blocks_in_bound(&syn_bound)?;
     reject_unsupported_array_lengths_in_bound(&syn_bound)?;

@@ -8,7 +8,7 @@ use domain::tddd::catalogue_v2::{BoundOp, MethodGenericParam, WherePredicateDecl
 
 use crate::tddd::type_ref_parser::{
     is_plain_generic_param_name, validate_legacy_type_ref, validate_lexical_alias_target,
-    validate_lexical_generic_bound, validate_lexical_type_ref, validate_maybe_const_bound,
+    validate_lexical_generic_bound, validate_lexical_type_ref,
 };
 
 use super::CatalogueDocumentCodecError;
@@ -34,11 +34,11 @@ use super::CatalogueDocumentCodecError;
 /// the alias lexical gates run their own context validation.
 pub(super) fn validate_bound_str_with_generics(
     bound_str: &str,
-    generic_params: &[&str],
+    _generic_params: &[&str],
 ) -> Result<(), String> {
-    if bound_str.starts_with("~const ") {
-        return validate_maybe_const_bound(bound_str, generic_params);
-    }
+    // `~const` is not special-cased: the prefix fails the syn parse below,
+    // restoring the parent's rejection (const trait bounds are unstable and
+    // cannot appear in compiler-validated rustdoc output).
     syn::parse_str::<syn::TypeParamBound>(bound_str)
         .map(|_| ())
         .map_err(|e| format!("invalid bound syntax '{}': {e}", bound_str))
@@ -118,8 +118,7 @@ fn invalid_relaxed_bound_syntax(entry_name: &str, error: String) -> CatalogueDoc
 /// accepts token-equivalent comments and whitespace, neither of which may
 /// change whether `?Sized` counts toward rustc E0203.
 fn is_relaxed_bound(bound: &str) -> Result<bool, String> {
-    let syntax_str = bound.strip_prefix("~const ").map_or(bound, str::trim_start);
-    let parsed = syn::parse_str::<syn::TypeParamBound>(syntax_str)
+    let parsed = syn::parse_str::<syn::TypeParamBound>(bound)
         .map_err(|error| format!("invalid bound syntax '{bound}': {error}"))?;
     Ok(matches!(
         parsed,
