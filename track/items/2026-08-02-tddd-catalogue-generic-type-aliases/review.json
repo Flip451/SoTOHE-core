@@ -4515,6 +4515,64 @@
           "hash": "rvw1:sha256:6a6507bf15f0c8ea34a89ab552e698c7c85bdb9af97afd13e668e132141e32eb",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:20:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:de8f0afb077f55b1cf372733ae53fb25cf9207c4be53f0804f3c4da0fdc47d57",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T03:29:30Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 375,
+              "message": "The variadic ABI allowlist is too narrow. Rust 1.91—the workspace MSRV—stabilized C-style variadics for `sysv64`, `win64`, `efiapi`, and `aapcs`, while the existing converter and canonical renderer already preserve these ABIs. Consequently, valid and representable inputs such as `Outer<extern \"sysv64\" fn(u8, ...)>` are rejected. Accept the additional compiler-supported ABIs and add acceptance coverage. See the [Rust 1.91 release notes](https://github.com/rust-lang/rust/blob/main/RELEASES.md#version-1910-2025-10-30).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 385,
+              "message": "Rejecting variadics when `node.inputs.is_empty()` enforces an obsolete language restriction. Rust 1.80 added C23 variadics without a named parameter, so `extern \"C\" fn(...)` is valid under this workspace's MSRV and maps losslessly to empty inputs plus `is_c_variadic = true`. The new corpus incorrectly pins that valid declaration as rejected. Remove this check and cover it as an acceptance. See the [Rust 1.80 release notes](https://github.com/rust-lang/rust/blob/main/RELEASES.md#version-1800-2024-07-25).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 226,
+              "message": "`enter_binder` still accepts lifetime bounds such as `for<'a: 'static>` by treating them as ordinary lifetime uses, but rustc rejects bounds in an HRTB binder (`bounds cannot be used in this context`). This admits catalogue declarations that compiler-validated rustdoc cannot produce, contrary to the fail-closed grammar; the existing acceptance pin for this spelling should become a rejection. Reject non-empty `lifetime_param.bounds`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:de8f0afb077f55b1cf372733ae53fb25cf9207c4be53f0804f3c4da0fdc47d57",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T03:53:39Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_ref_parser/closed_grammar.rs",
+              "line": 383,
+              "message": "The revised ABI allowlist is still incomplete. It omits the supported unwind forms (`sysv64-unwind`, `win64-unwind`, and target-appropriate `aapcs-unwind`) and the `system`/`system-unwind` family stabilized in Rust 1.93. Valid inputs such as `Outer<extern \"sysv64-unwind\" fn(u8, ...)>` and `Outer<extern \"system\" fn(u8, ...)>` compile under the current/template toolchain and already round-trip through `parse_ctx` and `render_abi`, but this gate rejects them. Include those variants and add acceptance coverage. See the [Rust 1.93 release notes](https://github.com/rust-lang/rust/blob/main/RELEASES.md#version-1930-2026-01-22).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:98abc89da22441f2e2cf2ba626d9626fbf7683f561fb9b2dc2b61eea1fdaac44",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T04:00:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe75f98c4b032b593f2efab504015a65b6cf65316bcf057aa0b80e84188562a9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

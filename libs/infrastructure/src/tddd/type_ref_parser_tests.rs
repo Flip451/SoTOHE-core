@@ -752,7 +752,10 @@ fn test_validate_generic_bound_rejects_redundant_trailing_commas() {
     }
 
     // Semantic trailing commas — a one-element tuple and a variadic marker — stay accepted.
-    for spelling in ["Tr<u8>", "Outer<(u8,)>", "Outer<fn(u8, ...)>"] {
+    // The variadic comma stays a semantic (accepted) spelling, but only with a
+    // compatible calling convention (E0045): the plain `fn(u8, ...)` form is
+    // rejected by the closed grammar.
+    for spelling in ["Tr<u8>", "Outer<(u8,)>", "Outer<extern \"C\" fn(u8, ...)>"] {
         assert!(
             validate_lexical_generic_bound(spelling, &[]).is_ok(),
             "semantic or canonical bound spellings must stay accepted: {spelling}"
@@ -1139,6 +1142,10 @@ fn test_alias_lexical_gates_reject_additional_lossy_spellings() {
         "Outer<Item: Send +>",
         "Outer<for<'a: 'static +> fn(&'a ())>",
         "Outer<for<'a:> fn(&'a ())>",
+        // rustc rejects lifetime bounds inside an HRTB binder ("bounds cannot
+        // be used in this context"), so the spelling cannot round-trip through
+        // compiler-validated rustdoc output.
+        "Outer<for<'a: 'static> fn(&'a ())>",
         "Outer<extern \"Rust\" fn()>",
         r##"Outer<extern r#"C"# fn()>"##,
         "Outer<extern \"\\x43\" fn()>",
@@ -1149,12 +1156,20 @@ fn test_alias_lexical_gates_reject_additional_lossy_spellings() {
 
     for spelling in [
         "Outer<Item: Send>",
-        "Outer<for<'a: 'static> fn(&'a ())>",
         "Outer<for<'a> fn(&'a ())>",
         "Outer<fn()>",
         "Outer<extern \"C\" fn()>",
         "Outer<extern \"efiapi\" fn()>",
         "Outer<unsafe extern \"C\" fn(u8, ...)>",
+        // C23 variadics (Rust 1.80) and the supported variadic ABIs,
+        // including the Rust 1.93 `system` family.
+        "Outer<extern \"C\" fn(...)>",
+        "Outer<extern \"sysv64\" fn(u8, ...)>",
+        "Outer<extern \"sysv64-unwind\" fn(u8, ...)>",
+        "Outer<extern \"win64-unwind\" fn(u8, ...)>",
+        "Outer<extern \"aapcs-unwind\" fn(u8, ...)>",
+        "Outer<extern \"system\" fn(u8, ...)>",
+        "Outer<extern \"system-unwind\" fn(u8, ...)>",
     ] {
         assert_alias_lexical_spelling_accepted_at_all_gates(spelling);
     }
@@ -1281,6 +1296,14 @@ fn test_pr234_findings_regression_corpus_rejections() {
         "Outer<dyn Tr + 'static + 'static>",
         // explicitly empty argument list (finding 45)
         "Tr<>",
+        // round-34 additions: reserved / duplicate binder lifetimes
+        // (E0262 / E0403), binder lifetime bounds (invalid in HRTB context),
+        // and C-variadics without a compatible ABI (E0045)
+        "for<'static> Tr<&'static u8>",
+        "for<'a, 'a> Tr<&'a u8>",
+        "for<'a: 'static> Tr<&'a u8>",
+        "Outer<fn(u8, ...)>",
+        "Outer<extern \"Rust\" fn(u8, ...)>",
     ] {
         assert_alias_lexical_spelling_rejected_at_all_gates(spelling);
     }

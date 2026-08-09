@@ -24,6 +24,14 @@
 //! Expression-level limits for const arguments and array lengths remain in
 //! `parse_fns` (`is_simple_const_expr` / `is_supported_array_length_expr`);
 //! they are the same allowlist idea applied to expressions.
+//!
+//! The grammar governs the CATALOGUE side of the comparison. The
+//! implementation side is observed only through rustdoc's representation,
+//! which itself normalizes source-only spelling variance (turbofish,
+//! trailing commas, redundant parentheses, …) before this crate ever sees
+//! it. Those implementation-side distinctions are therefore contractually
+//! identified with their canonical form: the lexical contract is defined
+//! over the rustdoc representation, not over unobservable source bytes.
 
 use std::collections::HashMap;
 
@@ -215,10 +223,26 @@ impl<'params, 'names> AllowlistVisitor<'params, 'names> {
                     if !lifetime_param.attrs.is_empty() {
                         self.reject("attributes on binder parameters");
                     }
-                    for outlive in &lifetime_param.bounds {
-                        self.check_lifetime_use(outlive);
+                    // Rustc rejects lifetime bounds inside an HRTB binder
+                    // ("bounds cannot be used in this context"), so
+                    // `for<'a: 'static>` cannot appear in rustdoc output.
+                    if !lifetime_param.bounds.is_empty() {
+                        self.reject("lifetime bounds cannot appear in a `for<>` binder");
                     }
-                    self.lifetime_scope.push(lifetime_param.lifetime.ident.to_string());
+                    // A binder must DECLARE fresh names: reserved names are
+                    // rejected by rustc (E0262), and a name already in scope is
+                    // a duplicate or shadowing declaration (E0403 / E0496).
+                    let name = lifetime_param.lifetime.ident.to_string();
+                    if name == "static" || name == "_" {
+                        self.reject(&format!("`'{name}` cannot be declared by a `for<>` binder"));
+                    }
+                    if self.lifetime_scope.contains(&name) {
+                        self.reject(&format!(
+                            "binder lifetime `'{name}` duplicates or shadows a lifetime already \
+                             in scope"
+                        ));
+                    }
+                    self.lifetime_scope.push(name);
                     added += 1;
                 }
                 syn::GenericParam::Type(_) | syn::GenericParam::Const(_) => {
@@ -347,6 +371,37 @@ impl<'ast, 'params, 'names> Visit<'ast> for AllowlistVisitor<'params, 'names> {
             }
             if variadic.name.is_some() {
                 self.reject("named variadic parameters cannot be represented");
+            }
+            // Rustc rejects C-variadic function pointers without a compatible
+            // calling convention (E0045). The compatible set under the
+            // workspace toolchain is the C / cdecl families plus the
+            // compiler-supported platform conventions: `sysv64`, `win64`,
+            // `efiapi`, `aapcs`, their supported unwind forms, and `system`.
+            // C23 variadics (Rust 1.80) permit an empty named-parameter
+            // list, so no arity restriction applies.
+            let abi_compatible =
+                node.abi.as_ref().and_then(|abi| abi.name.as_ref()).is_some_and(|name| {
+                    matches!(
+                        name.value().as_str(),
+                        "C" | "C-unwind"
+                            | "cdecl"
+                            | "cdecl-unwind"
+                            | "sysv64"
+                            | "sysv64-unwind"
+                            | "win64"
+                            | "win64-unwind"
+                            | "efiapi"
+                            | "aapcs"
+                            | "aapcs-unwind"
+                            | "system"
+                            | "system-unwind"
+                    )
+                });
+            if !abi_compatible {
+                self.reject(
+                    "C-variadic function pointers require an explicit compatible calling \
+                     convention (the C / cdecl families or a supported platform ABI)",
+                );
             }
         }
         if let syn::ReturnType::Type(_, output) = &node.output {
