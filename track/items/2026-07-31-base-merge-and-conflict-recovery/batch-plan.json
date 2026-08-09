@@ -92,6 +92,13 @@
         {"scope": "infrastructure", "production_lines": 110, "test_lines": 130}
       ],
       "oversize_justification": null
+    },
+    {
+      "task_id": "T013",
+      "scope_estimates": [
+        {"scope": "infrastructure", "production_lines": 30, "test_lines": 75}
+      ],
+      "oversize_justification": null
     }
   ],
   "batches": [
@@ -100,6 +107,7 @@
     {"id": "B3", "task_ids": ["T010", "T003"]},
     {"id": "B4", "task_ids": ["T011", "T004", "T005"]},
     {"id": "B5", "task_ids": ["T006"]},
-    {"id": "B6", "task_ids": ["T012"]}
+    {"id": "B6", "task_ids": ["T012"]},
+    {"id": "B7", "task_ids": ["T013"]}
   ]
 }

@@ -141,10 +141,7 @@ impl BaseMergeGitPort for FsBaseMergeGitAdapter {
             ));
         }
 
-        // Only a conflict created by this guarded merge may authorize the
-        // recovery workflow: refuse to run over pre-existing merge state, so
-        // an interrupted earlier merge or unrelated unmerged entries are never
-        // adjudicated as this operation's Conflicted outcome.
+        // Only this merge may authorize recovery; reject pre-existing and unrelated conflicts.
         if merge_head_is_present(&repository_root)? {
             return Err(git_execution_error("a merge is already in progress"));
         }
@@ -397,10 +394,7 @@ fn replace_baselines_from_exact_commit(
     let removal = remove_commit_pinned_worktree(&repository_root, &worktree)
         .map_err(|error| format!("cannot unregister detached cleanup worktree: {error}"));
     let directory_cleanup = cleanup_directory(&worktree, "detached cleanup worktree");
-    // A publication error may have occurred only after the atomic exchange,
-    // leaving `replacement` as the complete prior track for recovery. Keep
-    // both trees when that happens; rolling back and deleting the replacement
-    // could discard writes made through either tree during publication.
+    // After exchange, retain both trees: rollback could discard concurrent writes.
     let replacement_cleanup = if result.is_err()
         && !published
         && !exchanged
@@ -483,12 +477,26 @@ fn create_unique_directory(parent: &Path, prefix: &str) -> std::io::Result<PathB
     ))
 }
 
+fn pin_current_repository_hooks(
+    command: &mut std::process::Command,
+    repository_root: &Path,
+) -> Result<(), String> {
+    let hooks_path = repository_root.join(".githooks");
+    if !hooks_path.is_absolute() {
+        return Err("repository root is not absolute".to_owned());
+    }
+    // Keep guard coverage on current shims; never execute historical worktree hooks.
+    command.arg("-c").arg(format!("core.hooksPath={}", hooks_path.display()));
+    Ok(())
+}
+
 fn add_commit_pinned_worktree(
     repository_root: &Path,
     worktree: &Path,
     base_commit: &CommitHash,
 ) -> Result<(), String> {
     let mut command = guarded_git_command();
+    pin_current_repository_hooks(&mut command, repository_root)?;
     command
         .args(["worktree", "add", "--detach", "--"])
         .arg(worktree)
@@ -513,6 +521,7 @@ fn add_commit_pinned_worktree(
 
 fn remove_commit_pinned_worktree(repository_root: &Path, worktree: &Path) -> Result<(), String> {
     let mut command = guarded_git_command();
+    pin_current_repository_hooks(&mut command, repository_root)?;
     command
         .args(["worktree", "remove", "--force", "--"])
         .arg(worktree)
@@ -589,9 +598,7 @@ fn resolve_base_commit(
     repository_root: &Path,
     source: &BaseBranchName,
 ) -> Result<CommitHash, BaseMergeGitError> {
-    // Qualify as a heads ref: the documented ambiguous-ref precedence checks
-    // refs/tags/<name> before refs/heads/<name>, so an unqualified name could
-    // resolve a same-named tag instead of the snapshot branch.
+    // Qualify as a heads ref; an unqualified name can resolve a same-named tag first.
     let revision = format!("refs/heads/{}^{{commit}}", source.as_str());
     let output = isolated_bounded_git_output(
         repository_root,
@@ -779,6 +786,33 @@ mod tests {
         git(root, &["commit", "--quiet", "-m", "base work"]);
         git(root, &["switch", "--quiet", &format!("track/{id}")]);
         write_metadata(root, id, base_branch);
+        fixture
+    }
+
+    #[cfg(unix)]
+    fn write_executable_hook(path: &Path, body: &str) {
+        use std::os::unix::fs::PermissionsExt;
+
+        std::fs::write(path, body).unwrap();
+        let mut permissions = std::fs::metadata(path).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(path, permissions).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn setup_historical_hook_repository() -> tempfile::TempDir {
+        let fixture = setup_repository("cleanup-hook-test", "develop");
+        let root = fixture.path();
+        let hooks = root.join(".githooks");
+        std::fs::create_dir_all(&hooks).unwrap();
+        write_executable_hook(&hooks.join("reference-transaction"), "#!/bin/sh\nexit 1\n");
+        git(root, &["switch", "--quiet", "develop"]);
+        git(root, &["add", ".githooks/reference-transaction"]);
+        git(root, &["commit", "--quiet", "-m", "historical rejecting hook"]);
+        git(root, &["switch", "--quiet", "track/cleanup-hook-test"]);
+        git(root, &["config", "core.hooksPath", ".githooks"]);
+        std::fs::create_dir_all(&hooks).unwrap();
+        write_executable_hook(&hooks.join("reference-transaction"), "#!/bin/sh\nexit 0\n");
         fixture
     }
 
@@ -1425,6 +1459,26 @@ mod tests {
         assert!(!replacement.exists(), "successful SyncBase must remove the recovery slot");
         remove_commit_pinned_worktree(root, &worktree).unwrap();
         let _ = std::fs::remove_dir_all(&worktree);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_commit_pinned_worktree_with_historical_hook_rejection_succeeds() {
+        let fixture = setup_historical_hook_repository();
+        let root = fixture.path();
+        let expected_commit = current_commit(root, "develop^{commit}");
+        let worktree = create_unique_directory(root, ".test-base-merge-worktree-").unwrap();
+
+        add_commit_pinned_worktree(
+            root,
+            &worktree,
+            &CommitHash::try_new(expected_commit.clone()).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(current_commit(&worktree, "HEAD^{commit}"), expected_commit);
+
+        remove_commit_pinned_worktree(root, &worktree).unwrap();
+        assert!(!worktree.exists(), "the detached cleanup worktree must be removed");
     }
 
     struct TelemetryAppendBaselineCapture {

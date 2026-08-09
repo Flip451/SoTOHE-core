@@ -1844,6 +1844,57 @@
           "hash": "rvw1:sha256:a046af39ee33c921f24af2443dd7d03c6bf7f1e4c3eed9eb91cdeb911e50932d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T09:58:51Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 55,
+              "message": "`T013` is not included in `plan.summary` under `GO-01`, leaving the newly added hook-safe base-merge work without goal traceability even though it implements the guarded merge objective. Add `T013` to the appropriate goal mapping.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4caf6c82b95176e8e33e44c555369eedbeb5f2f9570b429f83db7f075ecaf883",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T10:03:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f301ecb3efba6b9c071bfb42d4658e4f626981d1ac25e8d442380f01a9ec6b92",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T10:09:45Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 45,
+              "message": "Section S4 restates expected behavior in “preserving hook coverage while excluding historical checked-out shims.” This violates `.harness/policies/no-upstream-restatement.md`; retain only the target, pinning operation, and anchor citations.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 167,
+              "message": "Task T013 restates the expected regression behavior in “proving a historical checked-out hook shim cannot abort isolated baseline worktree creation.” Per `.harness/policies/no-upstream-restatement.md`, the task should say only to add regression coverage and cite IN-02/CN-05/AC-03/AC-10.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f301ecb3efba6b9c071bfb42d4658e4f626981d1ac25e8d442380f01a9ec6b92",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T10:13:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b504a71b87143fd908ede72e16b5c1c3483d6fe3a696a48a7507a97fd5f4144a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3977,6 +4028,27 @@
           "at": "2026-08-09T07:54:36Z",
           "findings": [],
           "hash": "rvw1:sha256:f88bc85d300749b592a87ef71ae3d0d5190178f4a798914cbc2abdd34bb4fd67",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T09:58:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2ffc187671ae24cfee7f2cac6ecca5259061138ddbf97964d7674812e0ca39ba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T10:10:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e61f4970aff38d39a5fe0d0609affb9afe68b1a1dc5253fbf32d0d4ebca135a5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T10:17:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e61f4970aff38d39a5fe0d0609affb9afe68b1a1dc5253fbf32d0d4ebca135a5",
           "type": "final",
           "verdict": "zero_findings"
         }

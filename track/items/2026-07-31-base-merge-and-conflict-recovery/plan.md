@@ -3,10 +3,10 @@
 
 ## Summary
 
-GO-01 → T001–T004, T010, and T011.
+GO-01 → T001–T004, T010, T011, and T013.
 GO-02 → T005–T009 and T012.
 
-## Tasks (12/12 resolved)
+## Tasks (12/13 resolved)
 
 ### S1 — Guarded base merge
 
@@ -34,3 +34,9 @@ GO-02 → T005–T009 and T012.
 - [x] **T008**: At the usecase boundary, modify `TypeSignalsError` in `libs/usecase/src/type_signals/service.rs`, `TypeSignalsExecutionError` and `TypeSignalsExecutorPort` in `ports.rs`, and `TypeSignalsInteractor` in `interactor.rs`; migrate every usecase constructor and caller, with regression coverage in `interactor/tests.rs`. T007 owns domain constructors and T009 owns adapter/codec callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09. (`daf758c60802d14be799f267826bec46a2cd8782`)
 - [x] **T009**: At the infrastructure boundary, modify `EvaluateSignalsError` and preserve the public `execute_type_signals_for_layer` evaluator entrypoint in `type_signals_evaluator.rs`, and modify `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs` and `baseline_hash`, `decode`, and `encode` in `type_signals_codec.rs`; migrate every adapter and codec constructor/caller, with evaluator/adapter/codec regression coverage. T007 owns domain constructors and T008 owns usecase port/interactor callers. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-08; AC-09. (`daf758c60802d14be799f267826bec46a2cd8782`)
 - [x] **T012**: Update `infrastructure::verify::spec_states::check_impl_catalog_from_signals_file` in `libs/infrastructure/src/verify/spec_states.rs` to accept explicit baseline-path and catalogue-hash inputs; update `TrackBlobReader` in `libs/usecase/src/merge_gate.rs` and `GitShowTrackBlobReader` in `libs/infrastructure/src/verify/merge_gate_adapter.rs` to read implementation-input hashes with catalogue declarations; update `SystemSignalCommandAdapter::run_catalogue_check` in `libs/infrastructure/src/signal.rs`, migrate callers, and add regression coverage. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-09. (`b307b114c7493685fa1514d6b4673cc98319dc6a`)
+
+### S4 — Hook-safe isolated baseline worktree
+
+> Pin isolated baseline-worktree git operations to the main repository's current absolute hook path. IN-02; CN-05; AC-03; AC-10.
+
+- [~] **T013**: Pin every ephemeral base-merge worktree git operation in `libs/infrastructure/src/base_merge.rs` to the main repository's absolute current `.githooks` path, and add regression coverage. IN-02; CN-05; AC-03; AC-10.

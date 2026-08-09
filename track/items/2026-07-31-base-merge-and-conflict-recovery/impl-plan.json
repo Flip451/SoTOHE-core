@@ -39,10 +39,20 @@
           "T012"
         ],
         "title": "Baseline-hash-aware type signals"
+      },
+      {
+        "description": [
+          "Pin isolated baseline-worktree git operations to the main repository's current absolute hook path. IN-02; CN-05; AC-03; AC-10."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T013"
+        ],
+        "title": "Hook-safe isolated baseline worktree"
       }
     ],
     "summary": [
-      "GO-01 → T001–T004, T010, and T011.",
+      "GO-01 → T001–T004, T010, T011, and T013.",
       "GO-02 → T005–T009 and T012."
     ]
   },
@@ -148,6 +158,15 @@
       "description": "Update `infrastructure::verify::spec_states::check_impl_catalog_from_signals_file` in `libs/infrastructure/src/verify/spec_states.rs` to accept explicit baseline-path and catalogue-hash inputs; update `TrackBlobReader` in `libs/usecase/src/merge_gate.rs` and `GitShowTrackBlobReader` in `libs/infrastructure/src/verify/merge_gate_adapter.rs` to read implementation-input hashes with catalogue declarations; update `SystemSignalCommandAdapter::run_catalogue_check` in `libs/infrastructure/src/signal.rs`, migrate callers, and add regression coverage. D4; IN-05; OS-03; CN-03; CN-04; AC-07; AC-09.",
       "id": "T012",
       "status": "done"
+    },
+    {
+      "commit_hash": null,
+      "depends_on": [
+        "T008"
+      ],
+      "description": "Pin every ephemeral base-merge worktree git operation in `libs/infrastructure/src/base_merge.rs` to the main repository's absolute current `.githooks` path, and add regression coverage. IN-02; CN-05; AC-03; AC-10.",
+      "id": "T013",
+      "status": "in_progress"
     }
   ]
 }
