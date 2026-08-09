@@ -24,9 +24,11 @@
 //!
 //! - `Struct(StructKind)`: any struct shape with an orthogonal typestate marker.
 //! - `Enum { variants }`: sum type (unchanged).
-//! - `TypeAlias { target }`: type alias (unchanged).
+//! - `TypeAlias { target, generics }`: type alias with an optional generic-parameter
+//!   declaration (an empty declaration preserves the pre-extension shape).
 
 use crate::tddd::catalogue_v2::identifiers::{MethodName, TypeName, TypeRef};
+use crate::tddd::catalogue_v2::methods::MethodGenericParam;
 use crate::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 
 // ---------------------------------------------------------------------------
@@ -209,7 +211,8 @@ impl StructKind {
 ///
 /// - `Struct(StructKind)`: any struct shape with an orthogonal typestate marker.
 /// - `Enum { variants }`: a sum / enum type.
-/// - `TypeAlias { target }`: a type alias.
+/// - `TypeAlias { target, generics }`: a type alias and its ordered generic-parameter
+///   declaration. An empty `generics` list represents an alias without a declaration.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TypeKindV2 {
     /// Any struct shape, with an optional orthogonal typestate membership marker.
@@ -227,6 +230,12 @@ pub enum TypeKindV2 {
     TypeAlias {
         /// The target type this alias refers to.
         target: TypeRef,
+        /// The ordered generic type-parameter declaration for this alias.
+        ///
+        /// An empty list preserves the behavior of aliases that do not declare
+        /// generic parameters. Each parameter carries its validated name and
+        /// bound references.
+        generics: Vec<MethodGenericParam>,
     },
 }
 
@@ -521,9 +530,12 @@ mod tests {
     #[test]
     fn test_type_kind_v2_type_alias_variant_holds_target() {
         let target = TypeRef::new("Result<User, DomainError>").unwrap();
-        let kind = TypeKindV2::TypeAlias { target: target.clone() };
+        let kind = TypeKindV2::TypeAlias { target: target.clone(), generics: vec![] };
         match &kind {
-            TypeKindV2::TypeAlias { target: k_target } => assert_eq!(k_target, &target),
+            TypeKindV2::TypeAlias { target: k_target, generics } => {
+                assert_eq!(k_target, &target);
+                assert!(generics.is_empty());
+            }
             _ => panic!("expected TypeAlias"),
         }
     }
@@ -559,7 +571,8 @@ mod tests {
     fn test_all_three_variants_are_distinct() {
         let struct_ = TypeKindV2::Struct(StructKind::new(StructShape::Unit, None));
         let enum_ = TypeKindV2::Enum { variants: vec![] };
-        let alias = TypeKindV2::TypeAlias { target: TypeRef::new("u32").unwrap() };
+        let alias =
+            TypeKindV2::TypeAlias { target: TypeRef::new("u32").unwrap(), generics: vec![] };
         assert_ne!(struct_, enum_);
         assert_ne!(struct_, alias);
         assert_ne!(enum_, alias);

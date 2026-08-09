@@ -244,7 +244,7 @@ pub(super) struct TypeEntryDto {
 /// { "kind": "struct", "shape": { "kind": "tuple", "fields": [...], "has_stripped_fields": true }, "typestate": { ... } }
 /// { "kind": "struct", "shape": { "kind": "plain", "fields": [...], "has_stripped_fields": false }, "typestate": { ... } }
 /// { "kind": "enum", "variants": [...] }
-/// { "kind": "type_alias", "target": "..." }
+/// { "kind": "type_alias", "target": "...", "generics": [{ "name": "T", "bounds": ["Clone"] }] }
 /// ```
 ///
 /// Breaking change (CN-02): the old `unit_struct` / `tuple_struct` / `plain_struct` wire tags
@@ -273,7 +273,16 @@ pub(super) enum TypeKindDto {
     },
     /// A type alias.
     #[serde(rename = "type_alias")]
-    TypeAlias { target: String },
+    TypeAlias {
+        /// The target type this alias refers to.
+        target: String,
+        /// Ordered generic type-parameter declarations for this alias.
+        ///
+        /// The field is additive and omitted for aliases without a declaration,
+        /// preserving the pre-extension wire shape.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        generics: Vec<MethodGenericParamDto>,
+    },
 }
 
 /// Wire format for `StructShape`.

@@ -286,8 +286,8 @@ impl Encoder {
                 TypeKindV2::Enum { variants } => {
                     state.encode_enum(type_id, type_name, entry, variants)?;
                 }
-                TypeKindV2::TypeAlias { target } => {
-                    state.encode_type_alias(type_id, type_name, entry, target)?;
+                TypeKindV2::TypeAlias { target, generics } => {
+                    state.encode_type_alias(type_id, type_name, entry, target, &generics)?;
                 }
             }
             item_actions.insert(type_id, action);

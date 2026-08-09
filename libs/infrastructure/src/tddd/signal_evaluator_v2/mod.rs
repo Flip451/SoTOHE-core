@@ -60,6 +60,7 @@ use crate::schema_export::{RustdocTargetResolution, resolve_rustdoc_root_name};
 // Sub-modules
 // ---------------------------------------------------------------------------
 
+pub(super) mod alias_lexical;
 pub(super) mod collect_refs;
 pub(super) mod external_crates;
 pub(crate) mod format;
@@ -70,6 +71,7 @@ pub(super) mod phase2;
 pub(super) mod resolution;
 pub(super) mod resolve_type;
 pub(super) mod structural_eq;
+pub(super) mod target_lifetimes;
 
 #[cfg(test)]
 pub(super) mod tests;

@@ -10,7 +10,10 @@ use rustdoc_types::{ExternalCrate, GenericArg, GenericArgs, GenericBound, Id, Pa
 
 use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCrateCodecError;
 use crate::tddd::type_ref_parser::{
-    UNRESOLVED_CRATE_ID, parse_generic_bound, parse_type_ref, parse_type_ref_with_generics,
+    STD_PRELUDE_TYPES, UNRESOLVED_CRATE_ID, parse_generic_bound_with_generics,
+    parse_generic_bound_with_generics_preserving_spelling, parse_type_ref,
+    parse_type_ref_with_generics, parse_type_ref_with_generics_preserving_spelling,
+    std_canonical_path,
 };
 
 use super::encoder::EncoderState;
@@ -112,17 +115,42 @@ impl EncoderState {
 
     /// Resolves external type ids inside a `Path` value (used for trait bound paths).
     pub(super) fn resolve_external_type_ids_in_path(&mut self, path: Path) -> Path {
+        // A preserving-spelling path may retain an absolute `::` prefix for
+        // lexical comparison.  Strip that prefix only for external-crate
+        // lookup and synthetic path registration; the emitted `Path.path`
+        // remains byte-for-byte faithful to the catalogue spelling.
+        let lookup_path = path.path.strip_prefix("::").unwrap_or(path.path.as_str());
+        // The preserving parser carries the std crate id as a temporary marker
+        // for a bare prelude spelling (`Clone`, `Iterator`, ...).  It must be
+        // converted to the same synthetic item id used by canonical paths;
+        // otherwise Phase 1 would treat the bare path as a local unresolved
+        // reference.  A catalogue item named like a prelude type is resolved
+        // before this marker is emitted, so the local-name guard avoids an id
+        // collision when a user declaration happens to reuse the spelling.
+        let is_preserved_std_marker = self.ext_name_to_id.get("std").is_some_and(|&std_id| {
+            path.id == Id(std_id)
+                && STD_PRELUDE_TYPES.contains(&lookup_path)
+                && !self.local_name_to_id.contains_key(lookup_path)
+        });
         let new_id = if path.id == Id(UNRESOLVED_CRATE_ID) {
-            if let Some(colon_pos) = path.path.find("::") {
-                let first_seg = &path.path[..colon_pos];
+            if let Some(colon_pos) = lookup_path.find("::") {
+                let first_seg = &lookup_path[..colon_pos];
                 if self.ext_name_to_id.contains_key(first_seg) {
-                    self.ensure_external_type_id(&path.path, first_seg)
+                    self.ensure_external_type_id(lookup_path, first_seg)
                 } else {
                     Id(UNRESOLVED_CRATE_ID)
                 }
+            } else if STD_PRELUDE_TYPES.contains(&lookup_path) {
+                // Alias bounds retain their catalogue spelling (for example,
+                // `Clone`) for lexical comparison.  Their bare spelling still
+                // denotes a known std external, so register the canonical path
+                // and retain the short spelling on the emitted `Path`.
+                self.ensure_external_type_id(&std_canonical_path(lookup_path), "std")
             } else {
                 Id(UNRESOLVED_CRATE_ID)
             }
+        } else if is_preserved_std_marker {
+            self.ensure_external_type_id(&std_canonical_path(lookup_path), "std")
         } else {
             path.id
         };
@@ -236,6 +264,15 @@ impl EncoderState {
         self.parse_type_ref_str_inner(type_ref_str, generic_params, &[])
     }
 
+    /// Parses a type reference while preserving the source spelling of std-prelude paths.
+    pub(super) fn parse_type_ref_str_with_generics_preserving_spelling(
+        &mut self,
+        type_ref_str: &str,
+        generic_params: &[&str],
+    ) -> Result<Type, CatalogueToExtendedCrateCodecError> {
+        self.parse_type_ref_str_inner_with_prelude_spelling(type_ref_str, generic_params, &[], true)
+    }
+
     pub(super) fn parse_type_ref_str_with_suppressed_external_prefixes(
         &mut self,
         type_ref_str: &str,
@@ -250,6 +287,21 @@ impl EncoderState {
         type_ref_str: &str,
         generic_params: &[&str],
         suppressed_external_prefixes: &[&str],
+    ) -> Result<Type, CatalogueToExtendedCrateCodecError> {
+        self.parse_type_ref_str_inner_with_prelude_spelling(
+            type_ref_str,
+            generic_params,
+            suppressed_external_prefixes,
+            false,
+        )
+    }
+
+    fn parse_type_ref_str_inner_with_prelude_spelling(
+        &mut self,
+        type_ref_str: &str,
+        generic_params: &[&str],
+        suppressed_external_prefixes: &[&str],
+        preserve_prelude_spelling: bool,
     ) -> Result<Type, CatalogueToExtendedCrateCodecError> {
         let std_crate_id = self
             .ext_name_to_id
@@ -277,6 +329,7 @@ impl EncoderState {
                 u32::MAX - 1 // placeholder; discarded
             },
             generic_params,
+            preserve_prelude_spelling,
         )
         .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
             type_ref: type_ref_str.to_string(),
@@ -305,6 +358,7 @@ impl EncoderState {
                 }
             },
             generic_params,
+            preserve_prelude_spelling,
         )
         .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
             type_ref: type_ref_str.to_string(),
@@ -326,12 +380,22 @@ impl EncoderState {
         external_crate_ids: &HashMap<String, u32>,
         emit_external_crate: &mut G,
         generic_params: &[&str],
+        preserve_prelude_spelling: bool,
     ) -> Result<Type, String>
     where
         F: Fn(&str) -> Option<Id>,
         G: FnMut(String) -> u32,
     {
-        if generic_params.is_empty() {
+        if preserve_prelude_spelling {
+            parse_type_ref_with_generics_preserving_spelling(
+                type_ref_str,
+                resolve_local,
+                std_crate_id,
+                external_crate_ids,
+                emit_external_crate,
+                generic_params,
+            )
+        } else if generic_params.is_empty() {
             parse_type_ref(
                 type_ref_str,
                 resolve_local,
@@ -396,7 +460,7 @@ impl EncoderState {
     /// Encodes a bound string (e.g. `"Into<String>"`, `"Send"`, `"?Sized"`,
     /// `"'static"`, `"for<'a> Fn(&'a str)"`) into a `rustdoc_types::GenericBound`.
     ///
-    /// Uses `parse_generic_bound` (which parses via `syn::TypeParamBound`) so that
+    /// Uses `parse_generic_bound_with_generics` (which parses via `syn::TypeParamBound`) so that
     /// the set of accepted strings is identical between the decode path
     /// (`validate_bound_str` in `catalogue_document_codec`) and this encode path.
     /// Both use the same `syn::TypeParamBound` grammar, closing the round-trip hole
@@ -411,39 +475,57 @@ impl EncoderState {
     /// - Plain trait or `~const Trait` → `GenericBound::TraitBound { modifier: None/MaybeConst, ... }`.
     ///   (`~const` is nightly-only; the string `"~const "` prefix maps to `MaybeConst`
     ///   but `syn` v2 stable does not recognise it as a `TraitBoundModifier` variant —
-    ///   the `parse_generic_bound` fallback covers this case via `Err` propagation.)
+    ///   the `parse_generic_bound_with_generics` fallback covers this case via `Err` propagation.)
     ///
     /// # Errors
     ///
     /// Returns `CatalogueToExtendedCrateCodecError` if the bound string cannot be
     /// parsed as a `TypeParamBound` by `syn`.
-    pub(super) fn encode_bound_str(
+    pub(super) fn encode_bound_str_with_generics(
         &mut self,
         bound_str: &str,
+        generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
-        self.encode_bound_str_inner(bound_str, &[])
+        self.encode_bound_str_inner(bound_str, &[], generic_names, false)
     }
 
-    pub(super) fn encode_bound_str_with_suppressed_external_prefixes(
+    pub(super) fn encode_bound_str_with_generics_preserving_spelling(
+        &mut self,
+        bound_str: &str,
+        generic_names: &[&str],
+    ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
+        self.encode_bound_str_inner(bound_str, &[], generic_names, true)
+    }
+
+    pub(super) fn encode_bound_str_with_suppressed_external_prefixes_and_generics(
         &mut self,
         bound_str: &str,
         suppressed_external_prefixes: &[&str],
+        generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
-        self.encode_bound_str_inner(bound_str, suppressed_external_prefixes)
+        self.encode_bound_str_inner(bound_str, suppressed_external_prefixes, generic_names, false)
     }
 
     fn encode_bound_str_inner(
         &mut self,
         bound_str: &str,
         suppressed_external_prefixes: &[&str],
+        generic_names: &[&str],
+        preserve_prelude_spelling: bool,
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
         // Handle `~const` prefix manually because stable syn v2 does not have a
         // `TraitBoundModifier::MaybeConst` variant.  Strip the prefix and encode
         // the remainder as a plain trait bound with MaybeConst modifier.
         if let Some(inner) = bound_str.strip_prefix("~const ") {
             let inner = inner.trim_start();
-            // Encode the inner trait path via parse_type_ref_str (no modifier prefix).
-            let ty = self.parse_type_ref_str_inner(inner, &[], suppressed_external_prefixes)?;
+            // Encode the inner trait path with the same spelling policy as an
+            // ordinary bound (no modifier prefix).
+            let ty = self.parse_type_ref_str_inner_with_prelude_spelling(
+                inner,
+                generic_names,
+                suppressed_external_prefixes,
+                preserve_prelude_spelling,
+            )?;
             let trait_path = match ty {
                 Type::ResolvedPath(p) => p,
                 other => {
@@ -475,9 +557,14 @@ impl EncoderState {
             let ext_snapshot =
                 self.external_crate_ids_without_prefixes(suppressed_external_prefixes);
             let mut new_crate_names: Vec<String> = vec![];
-            let _ = parse_generic_bound(
+            let parse_bound = if preserve_prelude_spelling {
+                parse_generic_bound_with_generics_preserving_spelling
+            } else {
+                parse_generic_bound_with_generics
+            };
+            let _ = parse_bound(
                 bound_str,
-                &|name: &str| local_snapshot.get(name).copied(),
+                &|name: &str| local_id_unless_generic(&local_snapshot, name, generic_names),
                 std_crate_id,
                 &ext_snapshot,
                 &mut |crate_name: String| {
@@ -489,6 +576,7 @@ impl EncoderState {
                     }
                     u32::MAX - 1
                 },
+                generic_names,
             )
             .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
                 type_ref: bound_str.to_string(),
@@ -502,9 +590,14 @@ impl EncoderState {
         // Pass 2: encode with complete crate-id map.
         let local_snapshot2: HashMap<String, Id> = self.local_name_to_id.clone();
         let ext_snapshot2 = self.external_crate_ids_without_prefixes(suppressed_external_prefixes);
-        parse_generic_bound(
+        let parse_bound = if preserve_prelude_spelling {
+            parse_generic_bound_with_generics_preserving_spelling
+        } else {
+            parse_generic_bound_with_generics
+        };
+        let bound = parse_bound(
             bound_str,
-            &|name: &str| local_snapshot2.get(name).copied(),
+            &|name: &str| local_id_unless_generic(&local_snapshot2, name, generic_names),
             std_crate_id,
             &ext_snapshot2,
             &mut |crate_name: String| {
@@ -514,11 +607,14 @@ impl EncoderState {
                     self.ensure_external_crate(crate_name)
                 }
             },
+            generic_names,
         )
         .map_err(|reason| CatalogueToExtendedCrateCodecError::InvalidTypeRef {
             type_ref: bound_str.to_string(),
             reason,
-        })
+        })?;
+
+        Ok(self.resolve_external_type_ids_in_generic_bound(bound))
     }
 
     /// Encodes a `MethodGenericParam.bounds[i]` or `WherePredicateDecl.bounds[i]` entry
@@ -533,13 +629,21 @@ impl EncoderState {
         bound_str: &str,
         generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
-        let raw = self.encode_bound_str(bound_str)?;
+        let raw = self.encode_bound_str_with_generics(bound_str, generic_names)?;
         let rewritten = if generic_names.is_empty() {
             raw
         } else {
             rewrite_generic_types_in_bound(raw, generic_names)
         };
         Ok(rewritten)
+    }
+
+    pub(super) fn encode_and_validate_bound_preserving_spelling(
+        &mut self,
+        bound_str: &str,
+        generic_names: &[&str],
+    ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
+        self.encode_bound_str_with_generics_preserving_spelling(bound_str, generic_names)
     }
 }
 
