@@ -236,13 +236,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "b193ed6b",
       "depends_on": [
         "T012"
       ],
       "description": "In `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs`, update `hash_implementation_inputs_with_toolchain_identifier` and `hash_implementation_input_components` to use the architecture-rules layer graph; update `libs/infrastructure/src/verify/branch_implementation_inputs.rs::hash_branch_implementation_inputs` and add component-sensitivity regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.",
       "id": "T017",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
