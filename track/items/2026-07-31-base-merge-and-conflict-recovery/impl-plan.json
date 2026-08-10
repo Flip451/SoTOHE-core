@@ -274,13 +274,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "0bef0db8",
       "depends_on": [
         "T018"
       ],
       "description": "Update `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs::{collect_local_tree_file_digests,collect_local_tree_paths}` and add regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.",
       "id": "T019",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
