@@ -16,7 +16,7 @@
 //! §D5.3.
 
 use std::collections::{BTreeMap, HashMap};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use domain::AdrVerifyReport;
@@ -34,9 +34,16 @@ use usecase::verify_adr_signals::{
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 
-use crate::git_cli::show::{BlobResult, fetch_blob_safe};
+use crate::git_cli::isolation::isolated_bounded_git_output;
+use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind_isolated};
 
 use super::branch_implementation_inputs::hash_branch_implementation_inputs;
+
+const MAX_ARCHITECTURE_RULES_BYTES: usize = 4 * 1024 * 1024;
+const MAX_SPEC_BYTES: usize = 16 * 1024 * 1024;
+const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
+const MAX_IMPL_PLAN_BYTES: usize = 16 * 1024 * 1024;
+const MAX_SIGNAL_BYTES: usize = 16 * 1024 * 1024;
 
 /// Adapter that reads track documents from the local git repository via
 /// `git show origin/<branch>:<path>`.
@@ -67,15 +74,20 @@ impl GitShowTrackBlobReader {
     /// error variant is already the final port outcome to return (NotFound
     /// or FetchError). Callers use `match` / `?`-style to chain into JSON
     /// decode.
-    fn fetch_string<T>(&self, branch: &str, blob_path: &str) -> Result<String, BlobFetchResult<T>> {
-        match fetch_blob_safe(&self.repo_root, branch, blob_path) {
-            BlobResult::Found(bytes) => String::from_utf8(bytes).map_err(|e| {
+    fn fetch_string<T>(
+        &self,
+        branch: &str,
+        blob_path: &str,
+        maximum_bytes: usize,
+    ) -> Result<String, BlobFetchResult<T>> {
+        match fetch_branch_blob_limited(&self.repo_root, branch, blob_path, maximum_bytes) {
+            Ok(Some(bytes)) => String::from_utf8(bytes).map_err(|e| {
                 BlobFetchResult::FetchError(format!(
                     "{blob_path}: non-UTF-8 bytes in blob contents: {e}"
                 ))
             }),
-            BlobResult::NotFound => Err(BlobFetchResult::NotFound),
-            BlobResult::CommandFailed(msg) => Err(BlobFetchResult::FetchError(msg)),
+            Ok(None) => Err(BlobFetchResult::NotFound),
+            Err(msg) => Err(BlobFetchResult::FetchError(msg)),
         }
     }
 
@@ -95,7 +107,11 @@ impl GitShowTrackBlobReader {
     /// filename lookup, so a generic error carrying those variants would
     /// force callers to handle impossible cases.
     fn resolve_catalogue_filename(&self, branch: &str, layer_id: &str) -> Result<String, String> {
-        let text = match self.fetch_string::<String>(branch, "architecture-rules.json") {
+        let text = match self.fetch_string::<String>(
+            branch,
+            "architecture-rules.json",
+            MAX_ARCHITECTURE_RULES_BYTES,
+        ) {
             Ok(s) => s,
             Err(BlobFetchResult::NotFound) => {
                 // Legacy fallback: no rules file on the branch → use the
@@ -143,10 +159,39 @@ fn signal_file_name_for(catalogue_filename: &str) -> String {
     format!("{signal_stem}.json")
 }
 
+pub(crate) fn fetch_branch_blob_limited(
+    repo_root: &Path,
+    branch: &str,
+    path: &str,
+    maximum_bytes: usize,
+) -> Result<Option<Vec<u8>>, String> {
+    match git_ls_tree_entry_kind_isolated(repo_root, branch, path)? {
+        TreeEntryKind::NotFound => Ok(None),
+        TreeEntryKind::Symlink => Err(format!("symlink is not allowed at {path}")),
+        TreeEntryKind::Submodule => Err(format!("submodule is not allowed at {path}")),
+        TreeEntryKind::Other(mode) => {
+            Err(format!("unexpected tree entry mode {mode:06o} at {path}"))
+        }
+        TreeEntryKind::RegularFile => {
+            let git_ref = format!("origin/{branch}:{path}");
+            let output = isolated_bounded_git_output(repo_root, &["show", &git_ref], maximum_bytes)
+                .map_err(|error| format!("failed to run bounded git show for {path}: {error}"))?;
+            if !output.status.success() {
+                return Err(format!(
+                    "git show failed for {path} (exit {}): {}",
+                    output.status.code().unwrap_or(-1),
+                    String::from_utf8_lossy(&output.stderr).trim()
+                ));
+            }
+            Ok(Some(output.stdout))
+        }
+    }
+}
+
 impl TrackBlobReader for GitShowTrackBlobReader {
     fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument> {
         let path = Self::blob_path(track_id, "spec.json");
-        let text = match self.fetch_string::<SpecDocument>(branch, &path) {
+        let text = match self.fetch_string::<SpecDocument>(branch, &path, MAX_SPEC_BYTES) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -178,11 +223,12 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Err(msg) => return BlobFetchResult::FetchError(msg),
         };
         let path = Self::blob_path(track_id, &filename);
-        let bytes = match fetch_blob_safe(&self.repo_root, branch, &path) {
-            BlobResult::Found(b) => b,
-            BlobResult::NotFound => return BlobFetchResult::NotFound,
-            BlobResult::CommandFailed(msg) => return BlobFetchResult::FetchError(msg),
-        };
+        let bytes =
+            match fetch_branch_blob_limited(&self.repo_root, branch, &path, MAX_CATALOGUE_BYTES) {
+                Ok(Some(bytes)) => bytes,
+                Ok(None) => return BlobFetchResult::NotFound,
+                Err(msg) => return BlobFetchResult::FetchError(msg),
+            };
         // Validate that the catalogue blob is well-formed before treating it as
         // present.  Without this guard, a malformed or non-UTF-8 `<layer>-types.json`
         // could pass Stage 2 as long as the committed type-signals file carries a
@@ -243,7 +289,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // binding list (legacy rules file, or a PR that disables every layer)
         // is returned verbatim — the usecase gate is the fail-closed authority
         // and will reject an empty set explicitly.
-        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
+        let text = match self.fetch_string::<Vec<String>>(
+            branch,
+            "architecture-rules.json",
+            MAX_ARCHITECTURE_RULES_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -267,7 +317,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // activation). The merge gate's Stage 3 loop uses this subset so that
         // a layer which flipped the flag to false after generating a signals
         // file is not accidentally re-evaluated on presence alone.
-        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
+        let text = match self.fetch_string::<Vec<String>>(
+            branch,
+            "architecture-rules.json",
+            MAX_ARCHITECTURE_RULES_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -290,7 +344,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
 
     fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument> {
         let path = Self::blob_path(track_id, "impl-plan.json");
-        let text = match self.fetch_string::<ImplPlanDocument>(branch, &path) {
+        let text = match self.fetch_string::<ImplPlanDocument>(branch, &path, MAX_IMPL_PLAN_BYTES) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -327,7 +381,9 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         let path = Self::blob_path(track_id, &filename);
         let text = match self
             .fetch_string::<(CatalogueDocument, String, HashMap<String, ContentHash>)>(
-                branch, &path,
+                branch,
+                &path,
+                MAX_CATALOGUE_BYTES,
             ) {
             Ok(s) => s,
             Err(result) => return result,
@@ -388,7 +444,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
     ) -> BlobFetchResult<CatalogueSpecSignalsDocument> {
         let filename = format!("{layer_id}-catalogue-spec-signals.json");
         let path = Self::blob_path(track_id, &filename);
-        let text = match self.fetch_string::<CatalogueSpecSignalsDocument>(branch, &path) {
+        let text = match self.fetch_string::<CatalogueSpecSignalsDocument>(
+            branch,
+            &path,
+            MAX_SIGNAL_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -423,7 +483,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         };
         let signal_filename = signal_file_name_for(&catalogue_filename);
         let path = Self::blob_path(track_id, &signal_filename);
-        let text = match self.fetch_string::<TypeSignalsDocument>(branch, &path) {
+        let text = match self.fetch_string::<TypeSignalsDocument>(branch, &path, MAX_SIGNAL_BYTES) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -472,9 +532,9 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // symlink and silently bypass chain ⓪. Fail-closed for non-tree modes
         // at every level; only the truly-absent case maps to NotFound (chain
         // ⓪ vacuously green for fresh tracks).
-        use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind};
+        use crate::git_cli::show::TreeEntryKind;
         for ancestor in ["knowledge"] {
-            match git_ls_tree_entry_kind(&self.repo_root, branch, ancestor) {
+            match git_ls_tree_entry_kind_isolated(&self.repo_root, branch, ancestor) {
                 Ok(TreeEntryKind::NotFound) => return BlobFetchResult::NotFound,
                 Ok(TreeEntryKind::Other(0o040_000)) => {}
                 Ok(TreeEntryKind::Symlink) => {
@@ -504,7 +564,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
                 }
             }
         }
-        match git_ls_tree_entry_kind(&self.repo_root, branch, "knowledge/adr") {
+        match git_ls_tree_entry_kind_isolated(&self.repo_root, branch, "knowledge/adr") {
             Ok(TreeEntryKind::NotFound) => return BlobFetchResult::NotFound,
             Ok(TreeEntryKind::Symlink) => {
                 return BlobFetchResult::FetchError(format!(
@@ -618,7 +678,11 @@ impl SpecElementHashReader for GitShowTrackBlobReader {
         track_id: &str,
     ) -> BlobFetchResult<BTreeMap<SpecElementId, ContentHash>> {
         let path = Self::blob_path(track_id, "spec.json");
-        let text = match self.fetch_string::<BTreeMap<SpecElementId, ContentHash>>(branch, &path) {
+        let text = match self.fetch_string::<BTreeMap<SpecElementId, ContentHash>>(
+            branch,
+            &path,
+            MAX_SPEC_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -721,6 +785,66 @@ mod tests {
         )
         .unwrap();
         std::fs::write(repo.join("libs/domain/src/lib.rs"), "pub struct BranchDomain;\n").unwrap();
+        let track_dir = repo.join("track/items/foo");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("tddd-features.json"), FEATURE_DECLARATION).unwrap();
+        std::fs::write(track_dir.join("tddd-features-baseline.json"), FEATURE_DECLARATION).unwrap();
+        git(repo, &["add", "."]);
+        git(repo, &["commit", "--quiet", "-m", "initial"]);
+        git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+        dir
+    }
+
+    fn setup_repo_with_usecase_path_dependency_inputs() -> tempfile::TempDir {
+        const ARCHITECTURE_RULES: &str = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": ""
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": ["domain"],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "schema_export": { "method": "rustdoc", "targets": ["usecase"] }
+      }
+    }
+  ]
+}"#;
+        const FEATURE_DECLARATION: &str = r#"{"schema_version":1,"layers":{"usecase":[]}}"#;
+        let dir = tempfile::tempdir().unwrap();
+        let repo = dir.path();
+        git(repo, &["init", "--quiet", "--initial-branch=main"]);
+        std::fs::write(repo.join("architecture-rules.json"), ARCHITECTURE_RULES).unwrap();
+        std::fs::write(
+            repo.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/domain\", \"libs/usecase\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        std::fs::write(repo.join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::write(repo.join(".test-nightly-toolchain-identity"), "nightly-fixture\n").unwrap();
+        std::fs::create_dir_all(repo.join("libs/domain/src")).unwrap();
+        std::fs::create_dir_all(repo.join("libs/usecase/src")).unwrap();
+        std::fs::write(
+            repo.join("libs/domain/Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            repo.join("libs/usecase/Cargo.toml"),
+            "[package]\nname = \"usecase\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\ndomain = { path = \"../domain\" }\n",
+        )
+        .unwrap();
+        std::fs::write(repo.join("libs/domain/src/lib.rs"), "pub struct BranchDomain;\n").unwrap();
+        std::fs::write(repo.join("libs/usecase/src/lib.rs"), "pub struct BranchUsecase;\n")
+            .unwrap();
         let track_dir = repo.join("track/items/foo");
         std::fs::create_dir_all(&track_dir).unwrap();
         std::fs::write(track_dir.join("tddd-features.json"), FEATURE_DECLARATION).unwrap();
@@ -971,6 +1095,56 @@ mod tests {
             }
             other => panic!("expected Found, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_read_type_implementation_input_hash_includes_committed_path_dependency_sources() {
+        let dir = setup_repo_with_usecase_path_dependency_inputs();
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        let expected = crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
+            dir.path(),
+            "usecase",
+            &[],
+        )
+        .unwrap();
+
+        let branch_hash = match reader.read_type_implementation_input_hash("main", "foo", "usecase")
+        {
+            BlobFetchResult::Found(hash_hex) => hash_hex,
+            other => panic!("expected Found, got {other:?}"),
+        };
+        assert_eq!(
+            branch_hash,
+            expected.as_digest().as_str(),
+            "local and branch hashes must agree for identical dependency closures"
+        );
+
+        std::fs::write(
+            dir.path().join("libs/domain/src/lib.rs"),
+            "pub struct WorktreeOnlyDomainChange;\n",
+        )
+        .unwrap();
+        let changed_local = crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
+            dir.path(),
+            "usecase",
+            &[],
+        )
+        .unwrap();
+        assert_ne!(
+            expected, changed_local,
+            "a dependency source change must invalidate the local usecase hash"
+        );
+
+        let unchanged_branch =
+            match reader.read_type_implementation_input_hash("main", "foo", "usecase") {
+                BlobFetchResult::Found(hash_hex) => hash_hex,
+                other => panic!("expected Found, got {other:?}"),
+            };
+        assert_eq!(
+            unchanged_branch,
+            expected.as_digest().as_str(),
+            "branch hashing must remain based on committed dependency blobs"
+        );
     }
 
     #[test]

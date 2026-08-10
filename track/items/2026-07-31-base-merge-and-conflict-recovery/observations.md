@@ -224,3 +224,9 @@ merge 裁定への追加確認事項: delta ADR D1 の第 2 改訂（nightly 可
 cli scope の final reviewer が、develop から取り込んだ tracing レーン（PR #238）の main.rs telemetry オーケストレーションを CLI thin-bin contract 違反として指摘した。これは originating lane で審査済みの設計であり、本 track の統合ラウンドの管轄外と裁定（briefing の Known Accepted Deviations に明記）。thin-bin contract との整合は follow-up track / merge 裁定の確認事項として記録する。
 
 cli_driver final も同 class の 3 P1（telemetry の context capture / archive routing / completion-eligibility の usecase 移設要求）を報告した。いずれも PR #238 の設計への再審理であり、cli main.rs の thin-bin 指摘と併せて follow-up track 候補として記録し、統合ラウンドでは Known Accepted Deviation とした。
+
+## 2026-08-10: implementation-input hash の手作りクロージャ撤退（艦隊処方箋）
+
+T017 の precision クロージャ実装は infrastructure final で 9 時間 77 findings・findings/round 増加の発散を示した（手書きトークン分類器 87R / retention 機構 115R に続く同型 3 例目）。艦隊処方箋 tmp/handoff/2026-08-10-impl-input-hash-prescription.md に従い、手作り Cargo/Rust 意味論再実装へのパッチ追加を即時停止した。
+
+**裁定: 案 2（保守的過大近似）を採択。** 判断基準への当てはめ: (1) 再評価コストは rustdoc + 評価で層あたり分オーダー・頻度低で許容範囲、(2) 過大側誤りはキャッシュヒット率のみに作用し fail-closed 方向に安全、(3) 「迷ったら案 2」、(4) module-size 超過も削除方向で同時解消。閉包の権威は cargo metadata ではなく committed SSoT の architecture-rules.json 層依存グラフを採用する（local/branch 同一・閉集合・テキスト解釈不要という点で処方箋の「閉じた過大近似」条件をより強く満たす。許可依存 ⊇ 実依存なので過大近似として健全）。crate ディレクトリツリー全体 + Cargo.lock + workspace manifest + toolchain identity + feature selection を hash する。precision スキャナ（dependency_closure の manifest 解釈・build script パス解析・include 走査）は全削除。77 findings は過大近似への包含確認例として回帰コーパス化する。

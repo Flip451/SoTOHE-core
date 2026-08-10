@@ -10,6 +10,8 @@ pub(crate) mod build_inputs;
 mod freshness;
 #[path = "type_signals_evaluator/inputs.rs"]
 pub(crate) mod inputs;
+#[path = "type_signals_evaluator/layer_graph.rs"]
+pub(crate) mod layer_graph;
 #[path = "type_signals_evaluator/signal_builder.rs"]
 mod signal_builder;
 #[path = "type_signals_evaluator/signal_tags.rs"]
@@ -482,6 +484,8 @@ mod tests {
             "version": 2,
             "layers": [{
                 "crate": "infrastructure",
+                "path": "libs/infrastructure",
+                "may_depend_on": [],
                 "tddd": {
                     "enabled": true,
                     "catalogue_file": "infrastructure-types.json",
@@ -489,6 +493,7 @@ mod tests {
                 }
             }]
         }"#;
+        std::fs::write(root.join("architecture-rules.json"), rules).unwrap();
         let binding = parse_tddd_layers(rules).unwrap().pop().unwrap();
 
         (workspace, items_dir, track_id, binding, rustdoc_path)

@@ -791,7 +791,7 @@ mod tests {
             .expect("fixture crate source must be written");
         fs::write(
             root.join("architecture-rules.json"),
-            r#"{"version":2,"layers":[{"crate":"infrastructure","tddd":{"enabled":true,"catalogue_file":"infrastructure-types.json","catalogue_spec_signal":{"enabled":true}}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"infrastructure","path":"libs/infrastructure","may_depend_on":[],"tddd":{"enabled":true,"catalogue_file":"infrastructure-types.json","catalogue_spec_signal":{"enabled":true}}}]}"#,
         )
         .expect("architecture rules fixture must be written");
         fs::write(track_dir.join("infrastructure-types.json"), catalogue)
@@ -1551,7 +1551,7 @@ mod tests {
         let track = TrackId::try_new("report-test").unwrap();
         fs::write(
             root.path().join("architecture-rules.json"),
-            r#"{"version":2,"layers":[{"crate":"infrastructure","tddd":{"enabled":true}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"infrastructure","path":"libs/infrastructure","may_depend_on":[],"tddd":{"enabled":true}}]}"#,
         )
         .unwrap();
 

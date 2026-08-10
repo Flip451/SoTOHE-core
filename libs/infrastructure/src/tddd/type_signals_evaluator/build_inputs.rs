@@ -1,7 +1,13 @@
-//! Per-layer implementation-input hashing for type-signal freshness.
+//! Bounded implementation-input hashing for type-signal freshness.
+//!
+//! The source closure is a conservative over-approximation: the committed
+//! architecture layer graph selects crate directories, and every regular file
+//! in those directories participates in the digest. The former Cargo-manifest
+//! and Rust-source precision scanner was intentionally removed; its open-set
+//! interpretation could not provide a stable local/branch contract.
 
 use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::Command;
 use std::time::Duration;
 
@@ -13,26 +19,59 @@ use sha2::Digest;
 use domain::tddd::type_signals_doc::Sha256Digest;
 
 use super::EvaluateSignalsError;
+use super::layer_graph::{LayerCrateRoot, LayerGraph};
 
-const MAX_SOURCE_FILES: usize = 10_000;
-const MAX_SOURCE_ENTRIES: usize = 20_000;
-const MAX_SOURCE_DEPTH: usize = 32;
-const MAX_SOURCE_FILE_BYTES: u64 = 16 * 1024 * 1024;
-const MAX_TOTAL_SOURCE_BYTES: u64 = 64 * 1024 * 1024;
+pub(crate) const MAX_ARCHITECTURE_RULES_BYTES: usize = 4 * 1024 * 1024;
+pub(crate) const MAX_SOURCE_FILE_BYTES: u64 = 16 * 1024 * 1024;
+pub(crate) const MAX_TOTAL_SOURCE_BYTES: u64 = 64 * 1024 * 1024;
+pub(crate) const MAX_SOURCE_ENTRIES: usize = 20_000;
+pub(crate) const MAX_SOURCE_FILES: usize = 10_000;
+pub(crate) const MAX_SOURCE_DEPTH: usize = 32;
+/// A regular file's canonical tree identity: repository-relative path,
+/// executable bit, and streamed content digest.
+pub(crate) type TreeFileDigest = (Vec<u8>, bool, [u8; 32]);
+const HASH_READ_BUFFER_BYTES: usize = 8 * 1024;
 const MAX_TOOLCHAIN_COMMAND_OUTPUT_BYTES: usize = 64 * 1024;
 const MAX_TOOLCHAIN_COMMAND_DURATION: Duration = Duration::from_secs(10);
-
 #[cfg(test)]
 pub(super) static PROCESS_ENVIRONMENT_LOCK: Mutex<()> = Mutex::new(());
 
-/// Hashes exactly one crate's source contents, its manifest, optional build
-/// script, the workspace manifest and lockfile, and the active nightly
-/// toolchain identifier.
+/// Hashes one layer's graph-selected crate trees, the workspace manifest and
+/// lockfile, and the active nightly toolchain identity.
 ///
-/// # Errors
-///
-/// Returns an error when any required input cannot be read. Callers must then
-/// re-extract rather than reuse an existing rustdoc result.
+/// `target` is either the architecture-rules layer crate name or the explicit
+/// schema-export target from that same document. The graph resolves the latter
+/// to its owning layer before selecting the closed crate-tree over-approximation.
+pub(crate) fn hash_implementation_inputs_with_toolchain_identifier(
+    workspace_root: &Path,
+    target: &str,
+    toolchain_identifier: &[u8],
+) -> Result<Sha256Digest, EvaluateSignalsError> {
+    let graph = load_layer_graph(workspace_root)?;
+    let roots = graph.crate_roots_for(target).map_err(EvaluateSignalsError::authoritative_input)?;
+    let mut remaining_budget = MAX_TOTAL_SOURCE_BYTES;
+    let workspace_manifest = read_regular_source_file(
+        &workspace_root.join("Cargo.toml"),
+        MAX_SOURCE_FILE_BYTES,
+        &mut remaining_budget,
+    )?;
+    let lockfile = read_regular_source_file(
+        &workspace_root.join("Cargo.lock"),
+        MAX_SOURCE_FILE_BYTES,
+        &mut remaining_budget,
+    )?;
+    let tree_files =
+        collect_local_tree_file_digests(workspace_root, &roots, &mut remaining_budget)?;
+    hash_implementation_input_components(
+        &tree_files,
+        &workspace_manifest,
+        &lockfile,
+        target,
+        toolchain_identifier,
+    )
+}
+
+/// Test-only wrapper retaining the real rustup authority boundary.
 #[cfg(test)]
 pub(super) fn hash_implementation_inputs(
     workspace_root: &Path,
@@ -46,103 +85,26 @@ pub(super) fn hash_implementation_inputs(
     )
 }
 
-pub(crate) fn hash_implementation_inputs_with_toolchain_identifier(
-    workspace_root: &Path,
-    target_crate: &str,
-    toolchain_identifier: &[u8],
-) -> Result<Sha256Digest, EvaluateSignalsError> {
-    let source_root = crate_source_root(workspace_root, target_crate)?;
-    let crate_root = source_root.parent().ok_or_else(|| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot determine crate root from source directory '{}'",
-            source_root.display()
-        ))
-    })?;
-    let mut source_files = Vec::new();
-    let mut visited_entries = 0usize;
-    collect_source_files(&source_root, 0, &mut visited_entries, &mut source_files)?;
-    source_files.sort();
-
-    let mut source_components = Vec::with_capacity(source_files.len());
-    let mut remaining_budget = MAX_TOTAL_SOURCE_BYTES;
-    for path in source_files {
-        let relative = path.strip_prefix(workspace_root).map_err(|_| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "crate source '{}' is outside the workspace",
-                path.display()
-            ))
-        })?;
-        source_components.push((
-            relative.as_os_str().as_encoded_bytes().to_vec(),
-            read_regular_source_file(&path, MAX_SOURCE_FILE_BYTES, &mut remaining_budget)?,
-        ));
-    }
-    let crate_manifest = read_regular_source_file(
-        &crate_root.join("Cargo.toml"),
-        MAX_SOURCE_FILE_BYTES,
-        &mut remaining_budget,
-    )?;
-    let build_script = crate_root.join("build.rs");
-    let build_script = match std::fs::symlink_metadata(&build_script) {
-        Ok(_) => Some(read_regular_source_file(
-            &build_script,
-            MAX_SOURCE_FILE_BYTES,
-            &mut remaining_budget,
-        )?),
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
-        Err(error) => {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "cannot stat optional crate build script '{}': {error}",
-                build_script.display()
-            )));
-        }
-    };
-    let workspace_manifest = read_regular_source_file(
-        &workspace_root.join("Cargo.toml"),
-        MAX_SOURCE_FILE_BYTES,
-        &mut remaining_budget,
-    )?;
-    let lockfile = read_regular_source_file(
-        &workspace_root.join("Cargo.lock"),
-        MAX_SOURCE_FILE_BYTES,
-        &mut remaining_budget,
-    )?;
-
-    hash_implementation_input_components(
-        &source_components,
-        &crate_manifest,
-        build_script.as_deref(),
-        &workspace_manifest,
-        &lockfile,
-        toolchain_identifier,
-    )
-}
-
-/// Hashes the implementation-input components after they have been acquired.
-///
-/// The filesystem evaluator and the merge-gate branch reader both use this
-/// function so the branch-side blob hash cannot drift from the local-path
-/// authority. `source_files` contains workspace-relative paths and their raw
-/// contents; paths are sorted here to match the filesystem traversal contract.
+/// Hashes the shared, already-acquired components used by both local and
+/// branch readers. Tree file content is represented by a streamed SHA-256
+/// digest, so neither side buffers an entire crate tree.
 pub(crate) fn hash_implementation_input_components(
-    source_files: &[(Vec<u8>, Vec<u8>)],
-    crate_manifest: &[u8],
-    build_script: Option<&[u8]>,
+    tree_files: &[TreeFileDigest],
     workspace_manifest: &[u8],
     lockfile: &[u8],
+    schema_export_target: &str,
     toolchain_identifier: &[u8],
 ) -> Result<Sha256Digest, EvaluateSignalsError> {
-    let mut source_files = source_files.iter().collect::<Vec<_>>();
-    source_files.sort_by(|(left, _), (right, _)| left.cmp(right));
+    let mut sorted_tree_files = tree_files.to_vec();
+    sorted_tree_files.sort_by(|(left, _, _), (right, _, _)| left.cmp(right));
 
     let mut hasher = sha2::Sha256::new();
-    for (relative_path, content) in source_files {
-        append_component(&mut hasher, b"source-path", relative_path);
-        append_component(&mut hasher, b"source-content", content);
-    }
-    append_component(&mut hasher, b"crate-manifest", crate_manifest);
-    if let Some(build_script) = build_script {
-        append_component(&mut hasher, b"crate-build-script", build_script);
+    hasher.update(b"sotohe-implementation-inputs-v4\0");
+    append_component(&mut hasher, b"schema-export-target", schema_export_target.as_bytes());
+    for (path, executable, content_digest) in sorted_tree_files {
+        append_component(&mut hasher, b"crate-file-path", &path);
+        append_component(&mut hasher, b"crate-file-executable", &[u8::from(executable)]);
+        append_component(&mut hasher, b"crate-file-content-sha256", &content_digest);
     }
     append_component(&mut hasher, b"workspace-manifest", workspace_manifest);
     append_component(&mut hasher, b"lockfile", lockfile);
@@ -155,126 +117,354 @@ pub(crate) fn hash_implementation_input_components(
     })
 }
 
-fn crate_source_root(
-    workspace_root: &Path,
-    target_crate: &str,
-) -> Result<PathBuf, EvaluateSignalsError> {
-    let crate_root = match target_crate {
-        "domain" | "usecase" | "infrastructure" => workspace_root.join("libs").join(target_crate),
-        "cli" => workspace_root.join("apps/cli"),
-        "cli_driver" => workspace_root.join("apps/cli-driver"),
-        "cli_composition" => workspace_root.join("apps/cli-composition"),
-        _ => {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "unsupported TDDD target crate '{target_crate}' for implementation-input hashing"
-            )));
-        }
-    };
-    let source_root = crate_root.join("src");
-    // Reject symlinks on EVERY component up to the root, not just the final
-    // `src` segment — a symlinked `libs/` or crate directory would otherwise
-    // let the traversal hash sources outside the trusted workspace.
-    crate::track::symlink_guard::reject_symlinks_up_to_root(&source_root).map_err(|error| {
+fn load_layer_graph(workspace_root: &Path) -> Result<LayerGraph, EvaluateSignalsError> {
+    let path = workspace_root.join("architecture-rules.json");
+    let bytes = read_bounded_bytes(&path, MAX_ARCHITECTURE_RULES_BYTES).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!(
-            "refusing crate source directory '{}': {error}",
-            source_root.display()
+            "cannot read architecture-rules.json: {error}"
         ))
     })?;
-    let metadata = std::fs::symlink_metadata(&source_root).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot stat crate source directory '{}': {error}",
-            source_root.display()
-        ))
-    })?;
-    if !metadata.is_dir() {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "crate source directory '{}' is unavailable",
-            source_root.display()
-        )));
-    }
-    Ok(source_root)
+    LayerGraph::parse(&bytes).map_err(EvaluateSignalsError::authoritative_input)
 }
 
-fn collect_source_files(
-    directory: &Path,
-    depth: usize,
-    visited_entries: &mut usize,
-    files: &mut Vec<PathBuf>,
-) -> Result<(), EvaluateSignalsError> {
-    for entry in std::fs::read_dir(directory).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot read source directory '{}': {error}",
-            directory.display()
-        ))
-    })? {
-        // Every visited entry counts against the budget — directories too, so
-        // a tree of empty directories cannot cause unbounded traversal work.
-        *visited_entries += 1;
-        if *visited_entries > MAX_SOURCE_ENTRIES {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "crate source traversal exceeds maximum of {MAX_SOURCE_ENTRIES} entries"
-            )));
-        }
-        let path = entry
-            .map_err(|error| {
-                EvaluateSignalsError::authoritative_input(format!(
-                    "cannot read source entry: {error}"
-                ))
-            })?
-            .path();
-        let metadata = std::fs::symlink_metadata(&path).map_err(|error| {
+fn collect_local_tree_file_digests(
+    workspace_root: &Path,
+    roots: &[LayerCrateRoot],
+    remaining_budget: &mut u64,
+) -> Result<Vec<TreeFileDigest>, EvaluateSignalsError> {
+    let mut files = Vec::new();
+    let mut visited_entries = 0usize;
+    for root in roots {
+        let crate_path = workspace_root.join(&root.path);
+        crate::track::symlink_guard::reject_symlinks_up_to_root(&crate_path).map_err(|error| {
             EvaluateSignalsError::authoritative_input(format!(
-                "cannot stat crate source '{}': {error}",
-                path.display()
+                "cannot inspect layer crate '{}' at '{}': {error}",
+                root.crate_name, root.path
+            ))
+        })?;
+        let metadata = std::fs::symlink_metadata(&crate_path).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot inspect layer crate '{}' at '{}': {error}",
+                root.crate_name, root.path
             ))
         })?;
         if metadata.file_type().is_symlink() {
             return Err(EvaluateSignalsError::authoritative_input(format!(
-                "cannot read crate source '{}': symlinks are unsupported",
-                path.display()
+                "layer crate '{}' at '{}' is a symlink",
+                root.crate_name, root.path
             )));
         }
+        if !metadata.is_dir() {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "layer crate '{}' at '{}' is not a directory",
+                root.crate_name, root.path
+            )));
+        }
+        collect_local_tree(
+            workspace_root,
+            &crate_path,
+            &root.path,
+            &mut visited_entries,
+            &mut files,
+            remaining_budget,
+        )?;
+    }
+    if files.is_empty() {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "architecture layer closure contains no regular files".to_owned(),
+        ));
+    }
+    Ok(files)
+}
+
+fn collect_local_tree(
+    workspace_root: &Path,
+    directory: &Path,
+    crate_root: &str,
+    visited_entries: &mut usize,
+    files: &mut Vec<TreeFileDigest>,
+    remaining_budget: &mut u64,
+) -> Result<(), EvaluateSignalsError> {
+    let mut entries = std::fs::read_dir(directory)
+        .map_err(|error| local_input_error(directory, format!("cannot read directory: {error}")))?;
+    let mut paths = Vec::new();
+    for entry in entries.by_ref() {
+        let entry = entry.map_err(|error| {
+            local_input_error(directory, format!("cannot enumerate directory: {error}"))
+        })?;
+        *visited_entries = visited_entries.checked_add(1).ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(
+                "implementation source entry count overflowed".to_owned(),
+            )
+        })?;
+        if *visited_entries > MAX_SOURCE_ENTRIES {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "implementation source traversal exceeds maximum of {MAX_SOURCE_ENTRIES} entries"
+            )));
+        }
+        paths.push(entry.path());
+    }
+    paths.sort();
+
+    for path in paths {
+        let relative = workspace_relative_path(workspace_root, &path)?;
+        if is_vcs_internal(&relative) {
+            continue;
+        }
+        let metadata = std::fs::symlink_metadata(&path).map_err(|error| {
+            local_input_error(&path, format!("cannot stat tree entry: {error}"))
+        })?;
         if metadata.is_dir() {
+            let depth = crate_relative_depth(crate_root, &relative);
             if depth >= MAX_SOURCE_DEPTH {
                 return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "crate source traversal exceeds maximum depth of {MAX_SOURCE_DEPTH} at '{}'",
-                    path.display()
+                    "implementation source traversal exceeds maximum depth of {MAX_SOURCE_DEPTH} at '{relative}'"
                 )));
             }
-            collect_source_files(&path, depth + 1, visited_entries, files)?;
-        } else if metadata.is_file() {
-            if files.len() >= MAX_SOURCE_FILES {
-                return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "crate source traversal exceeds maximum of {MAX_SOURCE_FILES} files"
-                )));
-            }
-            files.push(path);
-        } else {
+            collect_local_tree(
+                workspace_root,
+                &path,
+                crate_root,
+                visited_entries,
+                files,
+                remaining_budget,
+            )?;
+            continue;
+        }
+        if metadata.file_type().is_symlink() {
             return Err(EvaluateSignalsError::authoritative_input(format!(
-                "cannot read crate source '{}': not a regular file or directory",
-                path.display()
+                "implementation tree entry '{relative}' is a symlink"
             )));
         }
+        if !metadata.is_file() {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "implementation tree entry '{relative}' is not a regular file"
+            )));
+        }
+        if files.len() >= MAX_SOURCE_FILES {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "implementation source traversal exceeds maximum of {MAX_SOURCE_FILES} files"
+            )));
+        }
+        let (digest, _, executable) = digest_local_file(&path, &relative, remaining_budget)?;
+        files.push((relative.into_bytes(), executable, digest));
     }
     Ok(())
+}
+
+fn crate_relative_depth(crate_root: &str, relative: &str) -> usize {
+    relative.strip_prefix(crate_root).unwrap_or(relative).trim_start_matches('/').split('/').count()
+}
+
+fn workspace_relative_path(
+    workspace_root: &Path,
+    path: &Path,
+) -> Result<String, EvaluateSignalsError> {
+    let relative = path.strip_prefix(workspace_root).map_err(|_| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "implementation tree entry '{}' escaped the workspace root",
+            path.display()
+        ))
+    })?;
+    let relative = relative.to_str().ok_or_else(|| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "implementation tree entry '{}' is not valid UTF-8",
+            path.display()
+        ))
+    })?;
+    Ok(relative.replace(std::path::MAIN_SEPARATOR, "/"))
+}
+
+fn is_vcs_internal(path: &str) -> bool {
+    path.split('/').any(|component| component == ".git")
+}
+
+fn digest_local_file(
+    path: &Path,
+    relative: &str,
+    remaining_budget: &mut u64,
+) -> Result<([u8; 32], u64, bool), EvaluateSignalsError> {
+    let metadata = std::fs::metadata(path)
+        .map_err(|error| local_input_error(path, format!("cannot read file metadata: {error}")))?;
+    if metadata.len() > MAX_SOURCE_FILE_BYTES {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "implementation file '{relative}' exceeds the {MAX_SOURCE_FILE_BYTES}-byte limit"
+        )));
+    }
+    if metadata.len() > *remaining_budget {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "implementation files exceed the {MAX_TOTAL_SOURCE_BYTES}-byte cumulative limit at '{relative}'"
+        )));
+    }
+    let file = std::fs::File::open(path)
+        .map_err(|error| local_input_error(path, format!("cannot read file: {error}")))?;
+    let mut reader = file.take(MAX_SOURCE_FILE_BYTES.saturating_add(1));
+    let mut buffer = [0_u8; HASH_READ_BUFFER_BYTES];
+    let mut hasher = sha2::Sha256::new();
+    let mut bytes_seen = 0_u64;
+    loop {
+        let read = reader
+            .read(&mut buffer)
+            .map_err(|error| local_input_error(path, format!("cannot stream file: {error}")))?;
+        if read == 0 {
+            break;
+        }
+        bytes_seen = bytes_seen.saturating_add(read as u64);
+        if bytes_seen > MAX_SOURCE_FILE_BYTES {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "implementation file '{relative}' grew past the {MAX_SOURCE_FILE_BYTES}-byte limit"
+            )));
+        }
+        if bytes_seen > *remaining_budget {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "implementation files exceed the {MAX_TOTAL_SOURCE_BYTES}-byte cumulative limit at '{relative}'"
+            )));
+        }
+        let chunk = buffer.get(..read).ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input("file stream returned an invalid byte count")
+        })?;
+        hasher.update(chunk);
+    }
+    *remaining_budget -= bytes_seen;
+    let digest = hasher.finalize();
+    let mut bytes = [0_u8; 32];
+    bytes.copy_from_slice(&digest);
+    Ok((bytes, bytes_seen, is_executable(&metadata)?))
+}
+
+#[cfg(unix)]
+fn is_executable(metadata: &std::fs::Metadata) -> Result<bool, EvaluateSignalsError> {
+    use std::os::unix::fs::PermissionsExt;
+
+    Ok(metadata.permissions().mode() & 0o111 != 0)
+}
+
+#[cfg(not(unix))]
+fn is_executable(_metadata: &std::fs::Metadata) -> Result<bool, EvaluateSignalsError> {
+    Err(EvaluateSignalsError::authoritative_input(
+        "cannot determine the canonical Git executable bit on this platform".to_owned(),
+    ))
+}
+
+fn local_input_error(path: &Path, message: String) -> EvaluateSignalsError {
+    EvaluateSignalsError::authoritative_input(format!(
+        "implementation input '{}': {message}",
+        path.display()
+    ))
+}
+
+fn read_bounded_bytes(path: &Path, maximum_bytes: usize) -> Result<Vec<u8>, std::io::Error> {
+    crate::track::symlink_guard::reject_symlinks_up_to_root(path)
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    let metadata = std::fs::symlink_metadata(path)?;
+    if metadata.file_type().is_symlink() {
+        return Err(std::io::Error::other("symlinks are unsupported"));
+    }
+    if !metadata.is_file() {
+        return Err(std::io::Error::other("not a regular file"));
+    }
+    let mut bytes = Vec::new();
+    std::fs::File::open(path)?
+        .take((maximum_bytes as u64).saturating_add(1))
+        .read_to_end(&mut bytes)?;
+    if bytes.len() > maximum_bytes {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "file exceeds maximum size",
+        ));
+    }
+    Ok(bytes)
+}
+
+fn read_regular_source_file(
+    path: &Path,
+    per_file_limit: u64,
+    remaining_budget: &mut u64,
+) -> Result<Vec<u8>, EvaluateSignalsError> {
+    crate::track::symlink_guard::reject_symlinks_up_to_root(path).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot read implementation input '{}': {error}",
+            path.display()
+        ))
+    })?;
+    let metadata = std::fs::symlink_metadata(path).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot stat implementation input '{}': {error}",
+            path.display()
+        ))
+    })?;
+    if metadata.file_type().is_symlink() {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "cannot read implementation input '{}': symlinks are unsupported",
+            path.display()
+        )));
+    }
+    if !metadata.is_file() {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "cannot read implementation input '{}': not a regular file",
+            path.display()
+        )));
+    }
+    if metadata.len() > per_file_limit {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "implementation input '{}' exceeds the {per_file_limit}-byte per-file limit",
+            path.display()
+        )));
+    }
+    if metadata.len() > *remaining_budget {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "implementation inputs exceed the {MAX_TOTAL_SOURCE_BYTES}-byte cumulative limit at '{}'",
+            path.display()
+        )));
+    }
+    let mut bytes = Vec::new();
+    let file = std::fs::File::open(path).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot read implementation input '{}': {error}",
+            path.display()
+        ))
+    })?;
+    file.take(per_file_limit.saturating_add(1)).read_to_end(&mut bytes).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot read implementation input '{}': {error}",
+            path.display()
+        ))
+    })?;
+    if bytes.len() as u64 > per_file_limit {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "implementation input '{}' grew past the per-file limit",
+            path.display()
+        )));
+    }
+    if bytes.len() as u64 > *remaining_budget {
+        return Err(EvaluateSignalsError::authoritative_input(format!(
+            "implementation inputs exceed the {MAX_TOTAL_SOURCE_BYTES}-byte cumulative limit at '{}'",
+            path.display()
+        )));
+    }
+    *remaining_budget -= bytes.len() as u64;
+    Ok(bytes)
+}
+
+fn append_component(hasher: &mut sha2::Sha256, label: &[u8], content: &[u8]) {
+    hasher.update((label.len() as u64).to_be_bytes());
+    hasher.update(label);
+    hasher.update((content.len() as u64).to_be_bytes());
+    hasher.update(content);
 }
 
 /// Result of probing the local nightly toolchain authority.
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) enum NightlyToolchainProbe {
-    /// A matching nightly is installed and its identity bytes are readable.
     Installed(Vec<u8>),
-    /// Enumeration succeeded and found no matching installed nightly.
     Absent,
 }
 
-/// Enumerates the local toolchains and, when a matching nightly is installed,
-/// reads its compiler identity.
+/// Enumerates toolchains and reads the installed nightly identity.
 ///
-/// `Absent` is deliberately narrower than an unavailable probe: it is returned
-/// only after `rustup toolchain list` completed successfully and its output was
-/// parsed without finding a nightly. Every execution, decoding, or identity
-/// failure remains an authoritative-input error for fail-closed callers.
+/// Absent is returned only when enumeration succeeds, parses successfully, and
+/// finds no nightly. Probe, execution, decoding, and identity failures remain
+/// authoritative-input errors.
 pub(crate) fn probe_nightly_toolchain(
     workspace_root: &Path,
 ) -> Result<NightlyToolchainProbe, EvaluateSignalsError> {
@@ -387,120 +577,48 @@ fn is_valid_toolchain_name(name: &str) -> bool {
             .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
 }
 
-fn read_regular_source_file(
-    path: &Path,
-    per_file_limit: u64,
-    remaining_budget: &mut u64,
-) -> Result<Vec<u8>, EvaluateSignalsError> {
-    let metadata = std::fs::symlink_metadata(path).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot stat build input '{}': {error}",
-            path.display()
-        ))
-    })?;
-    if metadata.file_type().is_symlink() {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "cannot read build input '{}': symlinks are unsupported",
-            path.display()
-        )));
-    }
-    if !metadata.is_file() {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "cannot read build input '{}': not a regular file",
-            path.display()
-        )));
-    }
-    if metadata.len() > per_file_limit {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "build input '{}' exceeds the {per_file_limit}-byte per-file limit; the \
-             implementation-input hash is indeterminate",
-            path.display()
-        )));
-    }
-    // The take-bound caps the allocation even if the file grows between the
-    // stat above and this read; reading one extra byte detects that race.
-    let mut bytes = Vec::new();
-    let file = std::fs::File::open(path).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot read build input '{}': {error}",
-            path.display()
-        ))
-    })?;
-    file.take(per_file_limit.saturating_add(1)).read_to_end(&mut bytes).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot read build input '{}': {error}",
-            path.display()
-        ))
-    })?;
-    if bytes.len() as u64 > per_file_limit {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "build input '{}' grew past the {per_file_limit}-byte per-file limit during \
-             hashing; the implementation-input hash is indeterminate",
-            path.display()
-        )));
-    }
-    if bytes.len() as u64 > *remaining_budget {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "build inputs exceed the cumulative {MAX_TOTAL_SOURCE_BYTES}-byte budget at '{}'; \
-             the implementation-input hash is indeterminate",
-            path.display()
-        )));
-    }
-    *remaining_budget -= bytes.len() as u64;
-    Ok(bytes)
-}
-
-fn append_component(hasher: &mut sha2::Sha256, label: &[u8], content: &[u8]) {
-    hasher.update((label.len() as u64).to_be_bytes());
-    hasher.update(label);
-    hasher.update((content.len() as u64).to_be_bytes());
-    hasher.update(content);
-}
-
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::{
-        crate_source_root, hash_implementation_inputs,
-        hash_implementation_inputs_with_toolchain_identifier, read_regular_source_file,
-        toolchain_list_contains_nightly,
+        hash_implementation_inputs, hash_implementation_inputs_with_toolchain_identifier,
+        read_regular_source_file, toolchain_list_contains_nightly,
     };
     use std::path::{Path, PathBuf};
-    #[test]
-    fn test_read_regular_source_file_enforces_per_file_and_cumulative_limits() {
-        let directory = tempfile::tempdir().unwrap();
-        let input = directory.path().join("input.rs");
-        std::fs::write(&input, b"0123456789").unwrap();
 
-        let mut budget = 1024u64;
-        let oversized = read_regular_source_file(&input, 5, &mut budget).unwrap_err();
-        assert!(oversized.to_string().contains("per-file limit"), "got: {oversized}");
-
-        let mut exhausted = 5u64;
-        let over_budget = read_regular_source_file(&input, 64, &mut exhausted).unwrap_err();
-        assert!(over_budget.to_string().contains("cumulative"), "got: {over_budget}");
-
-        let mut remaining = 64u64;
-        assert_eq!(read_regular_source_file(&input, 64, &mut remaining).unwrap().len(), 10);
-        assert_eq!(remaining, 54, "successful reads consume the cumulative budget");
+    fn architecture_rules() -> &'static str {
+        r#"{
+          "version": 2,
+          "module_limits": {"exclude": ["vendor/", ".cache/", "target/", "tmp/"]},
+          "layers": [
+            {"crate":"domain","path":"libs/domain","may_depend_on":[]},
+            {"crate":"usecase","path":"libs/usecase","may_depend_on":["domain"]},
+            {"crate":"infrastructure","path":"libs/infrastructure","may_depend_on":["usecase"]},
+            {"crate":"outside","path":"libs/outside","may_depend_on":[]}
+          ]
+        }"#
     }
 
-    fn workspace_with_domain_source() -> tempfile::TempDir {
+    fn workspace_with_layer_graph() -> tempfile::TempDir {
         let workspace = tempfile::tempdir().unwrap();
-        std::fs::create_dir_all(workspace.path().join("libs/domain/src")).unwrap();
-        std::fs::write(workspace.path().join("libs/domain/src/lib.rs"), "pub struct First;\n")
+        let root = workspace.path();
+        std::fs::write(root.join("architecture-rules.json"), architecture_rules()).unwrap();
+        std::fs::write(root.join("Cargo.toml"), "[workspace]\nresolver = \"2\"\n").unwrap();
+        std::fs::write(root.join("Cargo.lock"), "version = 4\n").unwrap();
+        for crate_name in ["domain", "usecase", "infrastructure", "outside"] {
+            let crate_root = root.join("libs").join(crate_name);
+            std::fs::create_dir_all(crate_root.join("src")).unwrap();
+            std::fs::write(
+                crate_root.join("Cargo.toml"),
+                format!("[package]\nname = \"{crate_name}\"\nversion = \"0.1.0\"\n"),
+            )
             .unwrap();
-        std::fs::write(
-            workspace.path().join("libs/domain/Cargo.toml"),
-            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\n",
-        )
-        .unwrap();
-        std::fs::write(
-            workspace.path().join("Cargo.toml"),
-            "[workspace]\nmembers = [\"libs/domain\"]\n",
-        )
-        .unwrap();
-        std::fs::write(workspace.path().join("Cargo.lock"), "version = 4\n").unwrap();
+            std::fs::write(
+                crate_root.join("src/lib.rs"),
+                format!("pub struct {crate_name}Source;\n"),
+            )
+            .unwrap();
+        }
         workspace
     }
 
@@ -515,21 +633,26 @@ mod tests {
     }
 
     #[test]
-    fn test_crate_source_root_resolves_workspace_layers() {
-        let workspace = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap().parent().unwrap();
-        assert_eq!(
-            crate_source_root(workspace, "infrastructure").unwrap(),
-            workspace.join("libs/infrastructure/src")
-        );
+    fn test_read_regular_source_file_enforces_per_file_and_cumulative_limits() {
+        let directory = tempfile::tempdir().unwrap();
+        let input = directory.path().join("input.rs");
+        std::fs::write(&input, b"0123456789").unwrap();
+
+        let mut budget = 1024_u64;
+        let oversized = read_regular_source_file(&input, 5, &mut budget).unwrap_err();
+        assert!(oversized.to_string().contains("per-file limit"), "got: {oversized}");
+
+        let mut exhausted = 5_u64;
+        let over_budget = read_regular_source_file(&input, 64, &mut exhausted).unwrap_err();
+        assert!(over_budget.to_string().contains("cumulative"), "got: {over_budget}");
+
+        let mut remaining = 64_u64;
+        assert_eq!(read_regular_source_file(&input, 64, &mut remaining).unwrap().len(), 10);
+        assert_eq!(remaining, 54);
     }
 
     #[test]
-    fn test_crate_source_root_rejects_unknown_target() {
-        assert!(crate_source_root(Path::new("/workspace"), "unknown").is_err());
-    }
-
-    #[test]
-    fn test_toolchain_list_with_malformed_entry_after_nightly_fails_closed() {
+    fn test_toolchain_list_with_malformed_entry_fails_closed() {
         assert!(
             !toolchain_list_contains_nightly(b"stable-x86_64-unknown-linux-gnu (default)\n")
                 .unwrap()
@@ -540,139 +663,147 @@ mod tests {
             )
             .unwrap()
         );
-
-        let error = toolchain_list_contains_nightly(
-            b"nightly-x86_64-unknown-linux-gnu\nnot-a-toolchain!\n",
-        )
-        .unwrap_err();
+        let error =
+            toolchain_list_contains_nightly(b"nightly-x86_64-unknown-linux-gnu\nnot-valid!\n")
+                .unwrap_err();
         assert!(error.contains("invalid toolchain name"), "got: {error}");
     }
 
     #[test]
-    fn test_hash_implementation_inputs_includes_source_lockfile_and_toolchain_and_rejects_missing_required_input()
-     {
-        let workspace = workspace_with_domain_source();
+    fn test_hash_layer_graph_dependency_tree_changes_but_outside_tree_does_not() {
+        let workspace = workspace_with_layer_graph();
         let root = workspace.path();
         let initial =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly-a")
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
                 .unwrap();
 
-        std::fs::write(root.join("libs/domain/src/lib.rs"), "pub struct Second;\n").unwrap();
-        let changed_source =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly-a")
+        std::fs::write(root.join("libs/domain/README.md"), "dependency change\n").unwrap();
+        let changed_dependency =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
                 .unwrap();
-        assert_ne!(initial, changed_source, "source content must participate in the hash");
+        assert_ne!(initial, changed_dependency);
+
+        std::fs::write(root.join("libs/outside/README.md"), "outside change\n").unwrap();
+        let changed_outside =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap();
+        assert_eq!(
+            changed_dependency, changed_outside,
+            "a crate outside the target layer closure must not affect the hash"
+        );
+    }
+
+    #[test]
+    fn test_hash_layer_graph_hashes_every_regular_file_and_non_tree_components() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        let initial =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly-a")
+                .unwrap();
+
+        std::fs::write(root.join("libs/domain/generated.txt"), b"whole tree\n").unwrap();
+        let changed_tree =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly-a")
+                .unwrap();
+        assert_ne!(initial, changed_tree);
 
         std::fs::write(root.join("Cargo.lock"), "version = 4\n# changed\n").unwrap();
-        let changed_lockfile =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly-a")
+        let changed_lock =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly-a")
                 .unwrap();
-        assert_ne!(changed_source, changed_lockfile, "Cargo.lock must participate in the hash");
+        assert_ne!(changed_tree, changed_lock);
 
         let changed_toolchain =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly-b")
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly-b")
                 .unwrap();
-        assert_ne!(changed_lockfile, changed_toolchain, "toolchain identity must participate");
+        assert_ne!(changed_lock, changed_toolchain);
 
         std::fs::remove_file(root.join("Cargo.lock")).unwrap();
         assert!(
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly-b")
-                .is_err(),
-            "a missing required input must make the implementation hash indeterminate"
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly-b")
+                .is_err()
         );
     }
 
     #[test]
-    fn test_hash_implementation_inputs_includes_workspace_and_target_manifests_and_optional_build_script_only()
-     {
-        let workspace = workspace_with_domain_source();
+    fn test_hash_layer_graph_resolves_schema_export_target_alias() {
+        let workspace = workspace_with_layer_graph();
         let root = workspace.path();
-        let crate_root = root.join("libs/domain");
+        let rules = architecture_rules().replace(
+            "{\"crate\":\"usecase\",\"path\":\"libs/usecase\",\"may_depend_on\":[\"domain\"]}",
+            "{\"crate\":\"usecase\",\"path\":\"libs/usecase\",\"may_depend_on\":[\"domain\"],\"tddd\":{\"enabled\":true,\"schema_export\":{\"targets\":[\"application\"]}}}",
+        );
+        std::fs::write(root.join("architecture-rules.json"), rules).unwrap();
+
+        let first =
+            hash_implementation_inputs_with_toolchain_identifier(root, "application", b"nightly")
+                .unwrap();
+        let second =
+            hash_implementation_inputs_with_toolchain_identifier(root, "application", b"nightly")
+                .unwrap();
+        assert_eq!(first, second);
+    }
+
+    #[test]
+    fn test_crate_relative_depth_matches_branch_tree_definition() {
+        assert_eq!(super::crate_relative_depth("libs/domain", "libs/domain/src"), 1);
+        assert_eq!(super::crate_relative_depth("libs/domain", "libs/domain/src/nested/lib.rs"), 3);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_hash_layer_graph_changes_when_regular_file_executable_mode_changes() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        let path = root.join("libs/domain/README.md");
+        std::fs::write(&path, b"mode-sensitive\n").unwrap();
         let initial =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
                 .unwrap();
-
-        std::fs::create_dir_all(root.join("libs/usecase/src")).unwrap();
-        std::fs::write(root.join("libs/usecase/Cargo.toml"), "[package]\nname = \"usecase\"\n")
-            .unwrap();
-        std::fs::write(root.join("libs/usecase/src/lib.rs"), "pub struct Sibling;\n").unwrap();
-        let unchanged_by_sibling_crate =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let executable =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
                 .unwrap();
-        assert_eq!(
-            initial, unchanged_by_sibling_crate,
-            "sibling crate manifests and sources must stay outside the target crate boundary"
-        );
-
-        std::fs::write(
-            root.join("Cargo.toml"),
-            "[workspace]\nmembers = [\"libs/domain\", \"libs/usecase\"]\n",
-        )
-        .unwrap();
-        let changed_workspace_manifest =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
-                .unwrap();
-        assert_ne!(
-            initial, changed_workspace_manifest,
-            "workspace Cargo.toml must participate in the hash"
-        );
-
-        std::fs::write(
-            crate_root.join("Cargo.toml"),
-            "[package]\nname = \"domain\"\nversion = \"0.2.0\"\n",
-        )
-        .unwrap();
-        let changed_manifest =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
-                .unwrap();
-        assert_ne!(
-            changed_workspace_manifest, changed_manifest,
-            "target Cargo.toml must participate in the hash"
-        );
-
-        std::fs::write(crate_root.join("build.rs"), "fn main() { println!(\"first\"); }\n")
-            .unwrap();
-        let added_build_script =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
-                .unwrap();
-        std::fs::write(crate_root.join("build.rs"), "fn main() { println!(\"second\"); }\n")
-            .unwrap();
-        let changed_build_script =
-            hash_implementation_inputs_with_toolchain_identifier(root, "domain", b"nightly")
-                .unwrap();
-        assert_ne!(
-            added_build_script, changed_build_script,
-            "target build.rs must participate in the hash when present"
-        );
+        assert_ne!(initial, executable);
     }
 
     #[cfg(unix)]
     #[test]
-    fn test_hash_implementation_inputs_rejects_symlinked_source_file() {
-        let workspace = workspace_with_domain_source();
-        let source_path = workspace.path().join("libs/domain/src/external.rs");
-        let outside = workspace.path().join("outside.rs");
-        std::fs::write(&outside, "pub struct Outside;\n").unwrap();
-        std::os::unix::fs::symlink(&outside, &source_path).unwrap();
-
-        let error = hash_implementation_inputs_with_toolchain_identifier(
-            workspace.path(),
-            "domain",
-            b"nightly",
-        )
-        .unwrap_err();
-
-        assert!(error.to_string().contains("symlinks are unsupported"));
+    fn test_hash_layer_graph_rejects_symlinked_tree_entry() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        let outside = root.join("outside.txt");
+        std::fs::write(&outside, "outside\n").unwrap();
+        std::os::unix::fs::symlink(&outside, root.join("libs/domain/link.txt")).unwrap();
+        let error =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap_err();
+        assert!(error.to_string().contains("symlink"), "got: {error}");
     }
 
     #[cfg(unix)]
     #[test]
-    fn test_hash_implementation_inputs_uses_rustup_toolchain_identity_and_rejects_unavailable_rustup()
-     {
+    fn test_hash_layer_graph_rejects_symlinked_crate_ancestor() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        let real_libs = root.join("real-libs");
+        std::fs::rename(root.join("libs"), &real_libs).unwrap();
+        std::os::unix::fs::symlink(&real_libs, root.join("libs")).unwrap();
+
+        let error =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap_err();
+        assert!(error.to_string().contains("symlink"), "got: {error}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_hash_implementation_inputs_uses_rustup_identity_and_rejects_probe_failure() {
         super::super::with_process_environment_lock(|| {
-            let workspace = workspace_with_domain_source();
+            let workspace = workspace_with_layer_graph();
             let fake_bin = tempfile::tempdir().unwrap();
-
             let rustup = write_fake_rustup(fake_bin.path(), "#!/bin/sh\nprintf 'nightly-a\\n'\n");
             let first = temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
                 hash_implementation_inputs(workspace.path(), "domain")
@@ -684,27 +815,14 @@ mod tests {
                 hash_implementation_inputs(workspace.path(), "domain")
             })
             .unwrap();
-            assert_ne!(
-                first, second,
-                "the rustup-reported toolchain identity must affect the hash"
-            );
+            assert_ne!(first, second);
 
             std::fs::remove_file(&rustup).unwrap();
             assert!(
                 temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
                     hash_implementation_inputs(workspace.path(), "domain")
                 })
-                .is_err(),
-                "an unavailable rustup must make the implementation hash indeterminate"
-            );
-
-            write_fake_rustup(fake_bin.path(), "#!/bin/sh\nexit 1\n");
-            assert!(
-                temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
-                    hash_implementation_inputs(workspace.path(), "domain")
-                })
-                .is_err(),
-                "a failing rustup must make the implementation hash indeterminate"
+                .is_err()
             );
         });
     }

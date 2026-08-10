@@ -23,6 +23,9 @@
 use std::path::Path;
 use std::process::{Output, Stdio};
 
+use sha2::Digest;
+
+use super::isolation::isolated_git_command;
 use super::{collect_bounded_git_output, guarded_git_command, spawn_bounded_git_child};
 
 /// Retain at most this many bytes from either stream of a Git probe. The
@@ -94,6 +97,18 @@ fn spawn_git(repo_root: &Path, args: &[&str]) -> std::io::Result<Output> {
     collect_bounded_git_output(child, MAX_GIT_OUTPUT_BYTES)
 }
 
+/// Spawns a bounded Git subprocess for a verdict-bearing branch read.
+///
+/// This keeps the locale and output bound of [`spawn_git`] while also using the
+/// repository/history isolation contract required when the answer is hashed
+/// into implementation-input freshness.
+fn spawn_isolated_git(repo_root: &Path, args: &[&str]) -> std::io::Result<Output> {
+    let mut command = isolated_git_command(repo_root, args);
+    command.env("LANG", "C").env("LC_ALL", "C").env("LANGUAGE", "C");
+    let child = spawn_bounded_git_child(&mut command)?;
+    collect_bounded_git_output(child, MAX_GIT_OUTPUT_BYTES)
+}
+
 /// Inspects `git ls-tree origin/<branch> -- <path>` and returns the
 /// tree entry kind for the final path component.
 ///
@@ -109,6 +124,24 @@ pub(crate) fn git_ls_tree_entry_kind(
     let output = spawn_git(repo_root, &["ls-tree", &git_ref, "--", path])
         .map_err(|e| format!("failed to run git ls-tree for {path}: {e}"))?;
 
+    parse_tree_entry_kind(path, output)
+}
+
+/// Isolated counterpart of [`git_ls_tree_entry_kind`] for branch reads that
+/// contribute to an implementation-input digest.
+pub(crate) fn git_ls_tree_entry_kind_isolated(
+    repo_root: &Path,
+    branch: &str,
+    path: &str,
+) -> Result<TreeEntryKind, String> {
+    let git_ref = format!("origin/{branch}");
+    let output = spawn_isolated_git(repo_root, &["ls-tree", &git_ref, "--", path])
+        .map_err(|e| format!("failed to run git ls-tree for {path}: {e}"))?;
+
+    parse_tree_entry_kind(path, output)
+}
+
+fn parse_tree_entry_kind(path: &str, output: Output) -> Result<TreeEntryKind, String> {
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         return Err(format!(
@@ -154,6 +187,24 @@ pub(crate) fn git_show_blob(repo_root: &Path, branch: &str, path: &str) -> BlobR
         }
     };
 
+    classify_git_show_output(path, output)
+}
+
+fn git_show_blob_isolated(repo_root: &Path, branch: &str, path: &str) -> BlobResult {
+    let git_ref = format!("origin/{branch}:{path}");
+    let output = match spawn_isolated_git(repo_root, &["show", &git_ref]) {
+        Ok(output) => output,
+        Err(error) => {
+            return BlobResult::CommandFailed(format!(
+                "failed to run isolated git show for {path}: {error}"
+            ));
+        }
+    };
+
+    classify_git_show_output(path, output)
+}
+
+fn classify_git_show_output(path: &str, output: Output) -> BlobResult {
     if output.status.success() {
         return BlobResult::Found(output.stdout);
     }
@@ -168,6 +219,38 @@ pub(crate) fn git_show_blob(repo_root: &Path, branch: &str, path: &str) -> BlobR
             stderr.trim()
         ))
     }
+}
+
+/// Reads a bounded branch blob and computes its content digest in fixed-size
+/// chunks. The caller receives the byte count so the implementation-input
+/// walker can enforce its cumulative read budget without retaining a crate
+/// tree in memory.
+pub(crate) fn git_show_blob_sha256(
+    repo_root: &Path,
+    branch: &str,
+    path: &str,
+    maximum_bytes: usize,
+) -> Result<([u8; 32], u64), String> {
+    let bytes = match git_show_blob_isolated(repo_root, branch, path) {
+        BlobResult::Found(bytes) => bytes,
+        BlobResult::NotFound => {
+            return Err(format!("implementation input '{path}' not found on origin/{branch}"));
+        }
+        BlobResult::CommandFailed(error) => return Err(error),
+    };
+    if bytes.len() > maximum_bytes {
+        return Err(format!(
+            "implementation input '{path}' exceeds the {maximum_bytes}-byte per-file limit"
+        ));
+    }
+    let mut hasher = sha2::Sha256::new();
+    for chunk in bytes.chunks(8 * 1024) {
+        hasher.update(chunk);
+    }
+    let digest = hasher.finalize();
+    let mut output = [0_u8; 32];
+    output.copy_from_slice(&digest);
+    Ok((output, bytes.len() as u64))
 }
 
 /// Lists regular-file blob entries directly under `origin/<branch>:<dir_path>/`.
@@ -270,83 +353,6 @@ pub(crate) fn git_ls_tree_dir(
             None => continue,
         };
         paths.push(repo_path.to_owned());
-    }
-    paths.sort();
-    Ok(paths)
-}
-
-/// Lists every regular file below a directory in `origin/<branch>`.
-///
-/// The recursive listing is used when a caller must hash branch blobs rather
-/// than the checked-out worktree. Symlinks, submodules, unexpected modes, and
-/// non-UTF-8 paths are rejected so an unsafe or ambiguous tree cannot become a
-/// valid implementation-input identity.
-pub(crate) fn git_ls_tree_recursive_regular_files(
-    repo_root: &Path,
-    branch: &str,
-    dir_path: &str,
-) -> Result<Vec<String>, String> {
-    let git_ref = format!("origin/{branch}");
-    let dir_arg = format!("{dir_path}/");
-    let output = spawn_git(repo_root, &["ls-tree", "-r", "-z", &git_ref, "--", &dir_arg])
-        .map_err(|error| format!("failed to run git ls-tree for {dir_path}: {error}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!(
-            "git ls-tree failed for {dir_path} (exit {}): {}",
-            output.status.code().unwrap_or(-1),
-            stderr.trim()
-        ));
-    }
-
-    let mut paths = Vec::new();
-    for record in output.stdout.split(|byte| *byte == 0) {
-        if record.is_empty() {
-            continue;
-        }
-        let tab = record
-            .iter()
-            .position(|byte| *byte == b'\t')
-            .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?;
-        let mode = record
-            .get(..tab)
-            .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?
-            .split(|byte| *byte == b' ')
-            .next()
-            .ok_or_else(|| format!("git ls-tree returned a missing mode below {dir_path}"))?;
-        let mode = std::str::from_utf8(mode)
-            .map_err(|_| format!("git ls-tree returned a non-UTF-8 mode below {dir_path}"))?;
-        let mode = u32::from_str_radix(mode, 8)
-            .map_err(|error| format!("failed to parse git tree mode '{mode}': {error}"))?;
-        match mode {
-            0o100_644 | 0o100_755 => {}
-            0o120_000 => {
-                return Err(format!(
-                    "symlink is not allowed below {dir_path} in origin/{branch} (fail-closed)"
-                ));
-            }
-            0o160_000 => {
-                return Err(format!(
-                    "submodule is not allowed below {dir_path} in origin/{branch} (fail-closed)"
-                ));
-            }
-            other => {
-                return Err(format!(
-                    "unexpected tree entry mode {other:06o} below {dir_path} in origin/{branch}"
-                ));
-            }
-        }
-        let path_start = tab
-            .checked_add(1)
-            .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?;
-        let path = String::from_utf8(
-            record
-                .get(path_start..)
-                .ok_or_else(|| format!("git ls-tree returned a malformed record below {dir_path}"))?
-                .to_vec(),
-        )
-        .map_err(|_| format!("git ls-tree returned a non-UTF-8 path below {dir_path}"))?;
-        paths.push(path);
     }
     paths.sort();
     Ok(paths)
@@ -473,6 +479,29 @@ mod tests {
     }
 
     #[test]
+    fn test_git_show_blob_sha256_ignores_ambient_repository_selection() {
+        let target = setup_repo_with_file("target.txt", b"target repository");
+        let elsewhere = setup_repo_with_file("elsewhere.txt", b"ambient repository");
+        let expected = match git_show_blob(target.path(), "main", "target.txt") {
+            BlobResult::Found(bytes) => {
+                let digest = sha2::Sha256::digest(bytes);
+                let mut output = [0_u8; 32];
+                output.copy_from_slice(&digest);
+                output
+            }
+            other => panic!("expected target blob, got {other:?}"),
+        };
+
+        let actual =
+            temp_env::with_var("GIT_DIR", Some(elsewhere.path().join(".git").as_os_str()), || {
+                git_show_blob_sha256(target.path(), "main", "target.txt", MAX_GIT_OUTPUT_BYTES)
+            })
+            .unwrap()
+            .0;
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
     fn test_git_show_blob_invalid_repo_spawn_error_or_failure() {
         // repo_root is a directory that exists but is not a git repo.
         let dir = tempfile::tempdir().unwrap();
@@ -491,6 +520,18 @@ mod tests {
     fn test_git_ls_tree_entry_kind_not_found() {
         let dir = setup_repo_with_file("spec.json", b"{}");
         let kind = git_ls_tree_entry_kind(dir.path(), "main", "missing.json").unwrap();
+        assert_eq!(kind, TreeEntryKind::NotFound);
+    }
+
+    #[test]
+    fn test_isolated_git_ls_tree_entry_kind_ignores_ambient_repository_selection() {
+        let target = setup_repo_with_file("target.txt", b"target repository");
+        let elsewhere = setup_repo_with_file("elsewhere.txt", b"ambient repository");
+        let kind =
+            temp_env::with_var("GIT_DIR", Some(elsewhere.path().join(".git").as_os_str()), || {
+                git_ls_tree_entry_kind_isolated(target.path(), "main", "elsewhere.txt")
+            })
+            .unwrap();
         assert_eq!(kind, TreeEntryKind::NotFound);
     }
 

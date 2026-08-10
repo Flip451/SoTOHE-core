@@ -703,6 +703,14 @@ mod tests {
         .unwrap();
         std::fs::write(workspace_root.join("libs/domain/src/lib.rs"), "pub struct Fixture;\n")
             .unwrap();
+        let architecture_rules = workspace_root.join("architecture-rules.json");
+        if std::fs::symlink_metadata(&architecture_rules).is_err() {
+            std::fs::write(
+                architecture_rules,
+                r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","may_depend_on":[]}]}"#,
+            )
+            .unwrap();
+        }
         let feature_declaration =
             "{\n  \"schema_version\": 1,\n  \"layers\": {\n    \"domain\": []\n  }\n}\n";
         std::fs::write(workspace_root.join("tddd-features.json"), feature_declaration).unwrap();
@@ -894,6 +902,8 @@ mod tests {
   "layers": [
     {
       "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
       "tddd": { "enabled": true, "catalogue_file": "domain-types.json" }
     }
   ]
@@ -2085,7 +2095,7 @@ mod tests {
         std::fs::write(dir.path().join("libs/domain/src/lib.rs"), "pub struct Fixture;\n").unwrap();
         std::fs::write(
             dir.path().join("architecture-rules.json"),
-            r#"{"version":2,"layers":[{"crate":"domain","tddd":{"enabled":true,"schema_export":{"method":"rustdoc","targets":["domain"]}}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","may_depend_on":[],"tddd":{"enabled":true,"schema_export":{"method":"rustdoc","targets":["domain"]}}}]}"#,
         )
         .unwrap();
         let catalogue_bytes = MINIMAL_CATALOGUE_JSON.as_bytes();

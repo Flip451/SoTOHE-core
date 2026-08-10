@@ -2210,6 +2210,93 @@
           "hash": "rvw1:sha256:77334b4b9989beb85f736fa8f5267a1e042737849e5ef3f4f145bdb8d50bd0e8",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T03:20:47Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 243,
+              "message": "T017's description does not identify a target file or symbol. Add the concrete implementation-input hash target (for example, the relevant hash builder/readers) so an executor can determine the change boundary without inventing it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b604e7f0cc36ca92f7039a5a99878bed9631c7fedd4ddbc46012e3803b130a56",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T03:23:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f742d71d762e631f4f20b58b6713aeed58d4b82c46a834a30e1677711da903f6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T03:28:46Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 243,
+              "message": "T017 identifies `hash_implementation_inputs_with_toolchain_identifier` and `hash_implementation_input_components_with_dependencies` under `libs/infrastructure/src/tddd/type_signals_evaluator/inputs.rs`, but the former is defined—and the latter is being added—in `type_signals_evaluator/build_inputs.rs`. The incorrect target forces the executor to rediscover the implementation boundary; correct the path and state whether the second symbol is added or modified.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 85,
+              "message": "S8 restates the expected path-dependency hashing behavior in prose: “Hash each target crate with its transitive workspace path-dependency source closure in both local and branch freshness paths.” Per `.harness/policies/no-upstream-restatement.md`, replace this with the concrete target/operation and the existing anchor cites.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 243,
+              "message": "T017's clause “so local and branch implementation-input hashes are byte-compatible while including each target crate's transitive workspace path-dependency sources and manifests” repeats the upstream behavior contract after the target and operation are already named. Remove that clause and rely on IN-05/CN-03/CN-04/AC-07/AC-09 as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f742d71d762e631f4f20b58b6713aeed58d4b82c46a834a30e1677711da903f6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T03:32:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b529d769877d9b3cfeb2009400f78e27f44117feeb0e63d9a89eb40c46cb4ce",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T04:44:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d07544149906727224faceee106bd92ab2f0152b9b200a7f67c47b95e4964bb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T04:47:06Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 243,
+              "message": "T017 still instructs the executor to add `hash_implementation_input_components_with_dependencies`, but the recorded 2026-08-10 retreat removes the precision dependency scanner and the current replacement exposes `hash_implementation_input_components` instead. The task and S8 therefore retain the abandoned implementation boundary; update them to name the architecture-graph implementation’s actual target symbols so the remaining work is executable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2d07544149906727224faceee106bd92ab2f0152b9b200a7f67c47b95e4964bb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T04:52:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9a474e06e830215ac07087609880598bb0d56aba11016d60668ff27f34620cd4",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4475,6 +4562,925 @@
           "hash": "rvw1:sha256:94b086ed39d70b89b270d9eac5eb7cf94e4a06f5627aff5d84b4122d3cd416f6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T18:09:39Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 407,
+              "message": "Path dependencies that resolve outside the workspace (absolute paths or `..` traversal beyond the workspace root) are silently omitted from the implementation-input closure. A target can therefore depend on external source whose changes alter rustdoc semantics without changing the cached implementation hash, allowing stale signals to be reused. Reject such dependencies fail-closed instead of treating them as absent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:809c0611776ffbf890c421bb0168a18331dbe01a749c1d21323b271c5c671965",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T18:17:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:59c6dbe2b7cda96e0c69e61ad816ab06f5ddc207dfc79db6ed4850fce87ebf06",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T18:29:08Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 81,
+              "message": "Dependency manifests are read before their parent path is symlink-checked. `read_regular_source_file` rejects only a symlink at the final `Cargo.toml`; a symlinked crate directory can therefore make this loader read and parse a file outside the trusted workspace before `workspace_source_root` later rejects it. Run `reject_symlinks_up_to_root` before the first manifest read.",
+              "severity": "P0"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 253,
+              "message": "The closure ignores root `[patch.*]` and `[replace]` path overrides. This repository already resolves infrastructure's registry dependency on `conch-parser` through `vendor/conch-parser`; changing that vendor source leaves the current hash unchanged even though Cargo's compilation input changed. Include effective local overrides and their transitive sources/manifests. See the [Cargo override semantics](https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html).",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 368,
+              "message": "A path inherited with `workspace = true` is returned without retaining that it came from the root manifest, then always resolved relative to the consuming crate. For example, workspace `domain = { path = \"libs/domain\" }` inherited by usecase is incorrectly resolved as `libs/usecase/libs/domain`, blocking valid Cargo workspaces. Resolve inherited paths relative to the workspace root. See [Cargo path and workspace dependency semantics](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html).",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 237,
+              "message": "The added closure implementation raises the production portion of this module to 797 lines. `bin/sotp verify module-size` now fails because the repository maximum is 700 production lines. Extract the manifest/dependency-closure logic into a sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:59c6dbe2b7cda96e0c69e61ad816ab06f5ddc207dfc79db6ed4850fce87ebf06",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T19:02:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:096bc2429acda382b97bb8b4a973e28cd030b2f9a1b0a15921d73d85223f2258",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-09T19:13:03Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 127,
+              "message": "`queue_local_override_roots` only hashes overrides whose package is declared directly by the target or an already-loaded local manifest. Cargo patches/replacements can affect transitive registry dependencies, so a local `[patch.crates-io] bar = { path = \"vendor/bar\" }` used through registry dependency `foo` is never queued; edits under `vendor/bar` then leave the implementation hash unchanged. Aliased patch entries using `package = \"bar\"` are similarly indexed under the alias rather than the actual package. Conservatively queue every workspace-local override root or derive usage from Cargo's resolved graph.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:096bc2429acda382b97bb8b4a973e28cd030b2f9a1b0a15921d73d85223f2258",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T19:25:46Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 92,
+              "message": "The dependency manifests are parsed, but their declared source/build paths are ignored: every dependency is hashed only under `<root>/src` and at `<root>/build.rs`. Cargo permits inputs such as `[lib] path = \"api.rs\"` and `[package] build = \"tools/build.rs\"`; changing those compiled files after the manifest is stable can therefore leave both local and branch implementation hashes unchanged, allowing stale rustdoc signals to be reused. Derive these paths from each dependency manifest or hash a bounded, symlink-safe crate tree consistently on both paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7d7697b0097265ee4ba92e34a9967ec7f65492db35aab600cad9f4d4a1e7d1b6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T19:43:17Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 347,
+              "message": "`collect_declared_source_file` hashes only the manifest-declared crate-root file. A custom target such as `[lib] path = \"api.rs\"` can load sibling modules (`mod child;` → `child.rs`) outside `src/`; changing those modules leaves both local and branch implementation hashes unchanged, allowing stale rustdoc signals. Hash a bounded, symlink-safe source tree for custom targets rather than only the entry file.",
+              "severity": "P1"
+            },
+            {
+              "category": "non-fail-closed implementation input",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 115,
+              "message": "The `allow_missing_source_tree` argument is inverted relative to the local implementation. Passing `source_paths.is_empty()` means the branch reader silently accepts a missing `src/` when no alternate source is declared, but rejects a valid custom-path crate with no `src/`. This breaks fail-closed acquisition and local/branch compatibility; pass `!source_paths.is_empty()` for both target and dependency calls.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6a113153112b7569de9cf7db4f7f319ccb64705079fb0e580fa97cc67cfb2126",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T20:02:38Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 126,
+              "message": "Only the build-script entry file is hashed. Cargo compiles build scripts as Rust targets, so a normal `build.rs` may contain `mod helper;` with `helper.rs` beside it. Changing that helper can alter generated code or `rustc-cfg` output—and therefore rustdoc—without changing any currently hashed component. Collect each target and dependency build script's bounded, symlink-safe source tree in both local and branch paths.",
+              "severity": "P1"
+            },
+            {
+              "category": "non-fail-closed authoritative input",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 44,
+              "message": "`manifest_input_paths` represents both Cargo's optional auto-detected `build.rs` and an explicitly declared `package.build = \"tools/build.rs\"` identically, after which both readers treat NotFound as an optional absence. A missing explicitly declared build script is an unavailable authoritative input and must fail closed; preserve whether the path was explicit and use required-file acquisition for that case in both local and branch hashing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3466fe1b63ee6157141508553334a61efc74ad37868bb535d201b57280973b31",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T20:18:53Z",
+          "findings": [
+            {
+              "category": "fingerprint_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 424,
+              "message": "Custom build scripts only add their containing directory to the implementation-input hash. A valid `build = \"tools/build.rs\"` can compile `#[path = \"../build_support.rs\"] mod build_support;`; changing that helper can alter rustdoc output without changing either hash. Hash the crate-bounded build-script source closure, or conservatively the crate tree.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 369,
+              "message": "A workspace-root path dependency normalizes to an empty crate root, making its default build-script path `build.rs` and `source_dir` empty here. The git helper converts that to the invalid pathspec `/`, so even an absent optional build script makes branch hashing fail while local hashing succeeds. Handle root-directory traversal explicitly.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 712,
+              "message": "The production portion of this module is now 711 lines. Consequently, `bin/sotp verify module-size` fails against the repository's 700-line maximum. Split the new input-discovery or acquisition logic into a submodule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0257a035467ddd9f1a5fb2899832d85128ac55dd281dc3c5ebb21d28ca51a11a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T20:35:10Z",
+          "findings": [
+            {
+              "category": "fingerprint_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 56,
+              "message": "For a normal crate without an explicit target path or build script, only `<crate>/src` is collected. Valid Rust source can reference a crate-root module such as `#[path = \"../public.rs\"] mod public;`; changing `public.rs` can change the dependency's rustdoc API while leaving both implementation hashes unchanged. Collect the crate-bounded source closure for ordinary targets as well.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 162,
+              "message": "When a workspace-root package has a build script, `crate_directory` is the workspace root and this recursively hashes the raw filesystem, including `.git`, `target`, and ignored/untracked files. Branch hashing enumerates only committed Git entries, so a valid root path dependency with `build.rs` cannot produce byte-compatible local and branch hashes and may exceed traversal limits locally. Exclude repository metadata/build outputs or use an equivalent bounded input authority on both sides.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0915adc6fffbbfea87ebcadb4a6932c15597c3b1ba991f6089c453de8c6e447e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T20:53:46Z",
+          "findings": [
+            {
+              "category": "fingerprint/hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 69,
+              "message": "The local collector recursively hashes every regular file under each crate directory, whereas the branch collector sees only committed Git blobs. Git-ignored or unrelated untracked files therefore affect only the local hash; the current workspace already contains `libs/infrastructure/tmp/reviewer-runtime/*`, whose changing logs can both invalidate an evaluation mid-run and guarantee a merge-gate mismatch. Use the same authoritative source-file selection for local and branch hashing.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint/hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 69,
+              "message": "The compiled-source closure is bounded to the package directory without detecting sources loaded from outside it. Valid Rust such as `#[path = \"../../shared_api.rs\"] mod shared_api;` or an equivalent build-script module/include can affect rustdoc while residing elsewhere in the workspace; changing that file leaves this implementation hash unchanged and permits stale signals to be reused. Such referenced sources must be hashed or rejected fail-closed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4a852068efb1265f8d6d694a596d00ae5c8560ed01b4fdc17adcbdd522c7e3bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T21:23:22Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 50,
+              "message": "The reference scanner searches raw source text, so markers inside comments and string literals are treated as Rust syntax. For example, the current `build_inputs.rs` contains escaped `#[path = \\\"...\\\"]` fixture text; hashing the real infrastructure crate reaches that text and returns `source reference ... is not resolvable`, preventing both local and branch hashes from being produced. Parse Rust tokens and ignore non-code occurrences.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 103,
+              "message": "`rsplit_once(')')` selects the final closing parenthesis in the entire remaining source, not the matching end of `concat!`. A valid reference followed by code such as `println!(\"x\")` therefore appends later string literals to the path and loads a nonexistent/wrong input. The parser needs balanced token-tree parsing.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 42,
+              "message": "Reference traversal stops for every file whose name does not end in `.rs`. Rust permits `include!(\"generated.inc\")`; if that file contains another `include!`, the nested source is compiled but never added to the hash, allowing its changes to reuse stale signals.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 69,
+              "message": "A missing `src/` is nominally accepted when Cargo declares an explicit target path, but the code immediately calls `read_dir` on that missing directory anyway. The branch collector similarly hard-codes `allow_missing_source_tree = false` for the subsequent scan, so valid crates using `[lib] path = \"api.rs\"` without `src/` cannot produce either implementation hash.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0f0cdb58be3a919b1db8d3e56de9d3cb25ee7a248d121b2fd3ec927d09dc3241",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T21:40:03Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 76,
+              "message": "`source_marker_positions` is not token-correct for valid Rust: it treats the `\"` inside a character literal such as `const QUOTE: char = '\"';` as the start of a string and reports an unterminated string, and it can match `include!` inside a longer macro name such as `myinclude!`. Either case can make implementation-input hashing unavailable for a compilable crate; use a Rust-aware lexer or handle character literals and token boundaries explicitly.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 172,
+              "message": "Literal references written with raw strings are rejected because the argument parser accepts only a leading ordinary double quote. Valid forms such as `include!(r#\"generated.inc\"#)` or `#[path = r\"module.rs\"]` therefore return `source reference ... is not resolvable` and block both local and branch hashing.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 207,
+              "message": "The `concat!` parser silently concatenates only double-quoted fragments and ignores other supported literal tokens. For example, Rust resolves `concat!(\"..\", '/', \"config.toml\")` to `../config.toml`, while this code records `..config.toml`; if that wrong path exists, the actual external input can change without changing the implementation hash. Reject unsupported components or evaluate every supported literal exactly.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 226,
+              "message": "The crate-root scan still excludes every file without an `.rs` extension before validating manifest-declared target and build-script paths. Cargo target paths are filenames and may be extensionless, so valid declarations such as `[lib] path = \"api\"` or `build = \"tools/build\"` are reported as outside the bounded selection; the branch collector mirrors the same restriction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:36c9e878a08e954587ce6f5458ad9346128455f4bd634261a60fdfac0b7abbc1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T22:08:08Z",
+          "findings": [
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 255,
+              "message": "`concat!(env!(\"CARGO_MANIFEST_DIR\"), ...)` is not resolved with Rust's byte-concatenation semantics. The parser discards the manifest-directory component and resolves all remaining literals beneath `crate_root`; for example, a suffix `\"-data.bin\"` actually names a sibling of the crate directory, while this code hashes a child inside it. If both paths exist, changes to the file compiled by Rust do not change the implementation-input hash.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 647,
+              "message": "Source-reference resolution unconditionally converts backslashes to `/`. On Unix a backslash is a valid filename character, so a raw reference such as `r\"../../../shared\\asset.bin\"` can make rustc read `shared\\asset.bin` while the evaluator hashes `shared/asset.bin`. With both files present, the cache and merge gate can accept stale signals.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 297,
+              "message": "The collector infers `CARGO_MANIFEST_DIR` from each referenced file's physical path. Included Rust is expanded in the including crate's compilation context, even when the included file lies outside that crate or under another workspace crate. Such a file can therefore reference the target crate's asset while this lookup hashes the workspace root's or another crate's asset instead.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 304,
+              "message": "Every UTF-8 component is recursively parsed as Rust source, although the component set includes arbitrary files under `src` and opaque `include_str!`/`include_bytes!` targets. Valid assets containing an unmatched quote/comment or text resembling `include!(...)` can consequently make implementation-input acquisition fail or load an unrelated path. The closure needs to retain whether a component is executable Rust source versus opaque data.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 311,
+              "message": "The branch traversal materializes the complete recursive `git ls-tree` result before applying any entry bound, and the caller only limits files that survive the Rust/source filters. A branch can contain arbitrarily many non-Rust entries beneath a crate, causing unbounded output allocation and work while also diverging from the local collector's `MAX_SOURCE_ENTRIES` fail-closed behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 648,
+              "message": "The branch blob limits are enforced only after `required_blob`/`fetch_blob_safe` has buffered the complete `git show` output. Thus a blob far larger than `MAX_SOURCE_FILE_BYTES` or `MAX_DECLARATION_BYTES` can exhaust memory before the advertised cap is checked; the blob size must be bounded before or while reading.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5e0953402a4dab726e5e127b163231781968849dea13dfd4c19b09518257112a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T22:28:14Z",
+          "findings": [
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 46,
+              "message": "Source-reference discovery only recognizes the exact textual forms `include!`, `include_str!`, `include_bytes!`, and `#[path`. Valid Rust forms such as `include ! (\"../../../shared/generated.rs\")`, comments between tokens, or `#[cfg_attr(unix, path = \"../../../shared/module\")]` are missed entirely. Files outside the initially scanned crate trees can therefore change without affecting the implementation-input hash.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 356,
+              "message": "Path deduplication occurs before propagating the reference's executable flag and crate origin. Consequently, an extensionless `include!` target already collected under `src` is never scanned for its own references, and a shared included source reached from two crates is scanned under only one `CARGO_MANIFEST_DIR` origin. Either case can omit compiled nested inputs from the hash.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 255,
+              "message": "`concat!` records only a boolean indicating that `CARGO_MANIFEST_DIR` appeared and discards its position and multiplicity. The resolver is correct when a single `env!(\"CARGO_MANIFEST_DIR\")` is the first component, but valid expressions with a literal before it or multiple occurrences resolve to a different workspace path than rustc uses. If that incorrectly resolved path exists, the actual compiled input is omitted from the hash.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator.rs",
+              "line": 327,
+              "message": "Every escape in an ordinary string or character literal is rejected instead of decoded. On Windows, a normal valid reference such as `include_bytes!(\"..\\\\fixtures\\\\data.bin\")` necessarily contains escaped backslashes, so implementation-input acquisition fails for common native-path syntax even though the resolver otherwise contains Windows-specific path handling.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 315,
+              "message": "The recursive `git ls-tree` result is fully buffered before `MAX_SOURCE_ENTRIES` is checked; the preliminary source-tree presence probe does not check the count at all. A branch with a very large tree can therefore exhaust memory before the limit is applied. The entry limit is also reset for each crate traversal, unlike the local collector's cumulative bound.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 72,
+              "message": "The new bounded blob reader protects implementation-input blobs, but the general merge-gate adapter still obtains specifications, catalogues, plans, rules, and signal documents through unbounded `fetch_blob_safe` calls. Those calls buffer the complete `git show` output before UTF-8 or schema decoding, so a maliciously large branch artifact can exhaust memory. These reads should use artifact-specific limits through the bounded helper as well.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1a7344b8ebe869209a3427c299b0bb0b3aa768317587a17b9c8c0fdcce70c170",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T23:19:30Z",
+          "findings": [
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 24,
+              "message": "Source-reference discovery requires `(` after an include macro, but Rust also permits `[]` and `{}` delimiters. A valid `include_bytes![\"../../schema.bin\"]` is skipped, so an external asset can change without invalidating the implementation-input hash. Recognize all valid macro delimiters.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 232,
+              "message": "`raw_string_bounds` recognizes only an `r` prefix, so `source_tokens` mis-lexes valid raw byte strings such as `br#\"...\"#`. Quotes inside such a literal can cause the lexer to swallow a subsequent `include_str!` invocation, omitting its referenced file from the hash. Handle raw byte-string prefixes atomically.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 122,
+              "message": "Local source paths are hashed using native `OsStr` bytes, while branch paths come from Git with `/` separators. On Windows, identical inputs therefore hash `libs\\...` locally and `libs/...` on the branch; source-origin matching also fails for those native paths. Normalize local source and dependency-manifest paths to repository-style UTF-8 paths before hashing.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 193,
+              "message": "`char_literal_end` does not consume complete hexadecimal or Unicode escapes: for `'\\x2f'` it checks for the closing quote at the first hex digit, and for `'\\u{2f}'` it checks at `}` rather than after it. Valid references such as `include!(concat!(\"..\", '\\x2f', \"generated.rs\"))` are consequently rejected.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 43,
+              "message": "Every `path =` token nested anywhere in an attribute is treated as Rust's built-in module-path attribute. Valid procedural attributes such as `#[route(path = \"/health\")]` therefore produce an absolute-input error, and inactive `cfg_attr` alternatives are required unconditionally. Restrict discovery to the built-in `#[path = ...]` form and correctly adjudicate conditional path attributes.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 153,
+              "message": "Manifest-declared target and build-script paths are normalized against the workspace, but this additional crate-prefix check rejects valid workspace-local paths containing `..`, such as `[lib] path = \"../../shared_api.rs\"`. Both local and branch hashing then fail even though Cargo can compile the target. Retain the workspace-root boundary without requiring the file to remain under the package directory.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 285,
+              "message": "A textual include invocation whose argument is not immediately a literal or supported `concat!` is treated as an error. This rejects valid `macro_rules!` wrappers such as `($path:literal) => { include_str!($path) }`, where substitution makes the built-in invocation literal before expansion. Use expansion-aware dependency discovery or another conservative mechanism that supports include wrappers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:62ad5a720c857d7ce13baabbf0bc58c4dfb71feb33449afe0c73126d954f616f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-09T23:39:50Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 290,
+              "message": "`raw_string_bounds` recognizes `r` and `br` literals but not valid `cr` raw C-string literals. A raw C string containing an unescaped quote is consequently tokenized as ordinary Rust syntax, which can produce an authoritative-input error or hide later source references, preventing reliable hashing of valid crates.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 464,
+              "message": "Macro-wrapper candidates are always marked non-executable. For example, a wrapper expanding to `include!($path)` will hash the first included file but never scan that file for nested `include!` or `#[path]` inputs, so changes to transitively compiled files can leave the implementation-input digest unchanged.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 441,
+              "message": "The fallback interprets string literals from every non-built-in macro as optional file paths. Valid unrelated code such as `vec![\"..\"]` resolves to an existing directory, after which the optional reader fails because it is not a regular file; thus ordinary valid Rust can make local and branch input evaluation fail.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 450,
+              "message": "Macro literal candidates are neither deduplicated nor capped. Repeated missing literals do not increase `source_files`, so they bypass `MAX_SOURCE_FILES`; branch verification performs a separate Git lookup for each candidate, allowing one bounded source file to trigger hundreds of thousands of subprocesses and effectively exhaust the merge gate.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 300,
+              "message": "The newly accepted manifest-declared source paths outside their crate are assigned an origin from their physical location. A target such as `[lib] path = \"../../shared.rs\"` therefore receives the workspace root or another crate as its `CARGO_MANIFEST_DIR` origin, causing `concat!(env!(\"CARGO_MANIFEST_DIR\"), ...)` references to hash the wrong file or fail even though the crate builds.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e20520062dcda681fe1132dd39840857160f6dfb3a8f0325045f0a0ade55c12f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T00:02:31Z",
+          "findings": [
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 22,
+              "message": "Manifest-declared source files may now live outside their crate root, but reference discovery does not follow ordinary `mod child;` declarations. For `[lib] path = \"../../shared/lib.rs\"`, `shared/lib.rs` is selected while its implicitly loaded `shared/child.rs` is not, so changing that compiled module leaves the implementation-input hash unchanged.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 29,
+              "message": "When a built-in include has an unsupported but valid argument expression, `parse_reference_tokens` returns `None` and the caller silently ignores it. For example, an `include_str!(concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/assets/\", env!(\"SCHEMA_FILE\")))` input affects rustdoc but is neither hashed nor rejected, permitting stale cache reuse.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 487,
+              "message": "Macro-wrapper discovery is confined to definitions and invocations in the same file and assumes the invocation's literal is the final path. A wrapper defined in another module is missed entirely, while a same-file wrapper expanding to `include_str!(concat!(\"assets/\", $path))` hashes the call-site literal instead of `assets/<literal>`; changes to the actual included asset therefore do not invalidate the hash.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 38,
+              "message": "Every lexically encountered built-in include is emitted as required without accounting for cfg removal or whether a macro body is expanded. A valid target containing `#[cfg(test)] const DATA: &str = include_str!(\"missing\");` or an unused macro with such an include fails implementation-input evaluation even though rustdoc never accesses that path.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/dependency_closure.rs",
+              "line": 44,
+              "message": "Executable-source origins are stored as a single `path -> crate_root` value, so a later crate overwrites an earlier origin when two workspace crates declare the same source file. That file is scanned under only one `CARGO_MANIFEST_DIR`; references resolved for the other crate are omitted, allowing their compiled inputs to change without changing the digest.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:540be070524a0eb2eb86c44fbfc9b8bb9e570c8f909e76e8b8e8148183debe9d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T00:26:16Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/macro_candidates.rs",
+              "line": 124,
+              "message": "Every non-built-in macro invocation is treated as an include-wrapper candidate, even when its name is absent from `wrappers`, and nonexistent candidates still count toward the 256-entry limit. A valid source containing 257 unique `println!`, logging, or formatting literals therefore makes both local and branch implementation hashing fail. Restrict candidate collection and its limit to actual include wrappers, or count only successfully loaded references.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/macro_candidates.rs",
+              "line": 110,
+              "message": "Wrapper reconstruction concatenates each body literal independently with the invocation literal. For a wrapper such as `include_str!(concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/assets/\", $name, \".json\"))`, it never constructs the actual `assets/<name>.json` path. Assets outside the initially scanned source tree are consequently omitted from the implementation hash, allowing stale signals after they change.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_modules.rs",
+              "line": 46,
+              "message": "Recursive inline-module discovery discards the enclosing module names. When an executable source outside the recursively scanned crate roots contains `mod outer { mod child; }`, Rust resolves a path containing `outer/child`, while this code emits only paths for `child`. The actual module can therefore be omitted from both implementation hashes.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 42,
+              "message": "Whether an include is conditional is inferred from a file-wide substring search. An unrelated `#[cfg]`, `cfg_attr`, or `macro_rules` occurrence—even in a comment—causes every unresolved active include in the file to be silently skipped. For example, an active include using a second compile-time `env!` component is no longer rejected and its referenced input is never hashed. Conditionality must be determined per invocation; unresolved active references must fail closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 127,
+              "message": "All `.rs` files found anywhere under the crate directory are marked executable, including files unreachable from every Cargo target. The reference scanner consequently treats their includes as authoritative: an otherwise valid crate with an unreferenced `src/unused.rs` containing `include!(\"missing.rs\")` now fails implementation hashing even though Cargo and rustdoc never load that file. Seed execution from declared target roots and traverse reachable modules/includes instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:723ae09b21c6c8a0e65b050d716a8a5951207c501e944d20823d7fcab07a598a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T00:51:58Z",
+          "findings": [
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 62,
+              "message": "Every include inside a `cfg`-attributed item is treated as optional without evaluating the predicate. An always-active item such as `#[cfg(all())]` containing an otherwise unresolved `include_str!(concat!(..., env!(...)))` is silently skipped, so the referenced input never participates in either implementation hash. Active unresolved references must fail closed.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/conditional_references.rs",
+              "line": 44,
+              "message": "Conditional-range discovery visits only `syn::Item`. Rust permits `#[cfg]` on blocks, statements, impl members, and other non-Item nodes; an always-disabled block containing `include!(\"missing.rs\")` is therefore scanned as active and makes hashing fail even though rustc removes it. Traverse all attribute-bearing syntax nodes.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/executable_roots.rs",
+              "line": 15,
+              "message": "Default Cargo roots are seeded solely from path shape, ignoring explicit target paths and `auto*` manifest flags. With `[lib] path = \"src/actual.rs\"`, an otherwise-unused `src/lib.rs` is still treated as executable; a missing include in that ignored file blocks both local and branch hashing although Cargo never loads it. Derive automatic roots from the manifest's target-discovery semantics.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/macro_candidates.rs",
+              "line": 54,
+              "message": "Macro template extraction returns the first include found anywhere in the macro body and ignores arm selection. For a multi-arm wrapper whose first arm includes `a.json` and whose matching arm includes `assets/<argument>.json`, every invocation is resolved using the first arm, omitting the actual asset from the hash.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/macro_candidates.rs",
+              "line": 224,
+              "message": "Invocation resolution takes the first literal in the invocation rather than the literal bound to the metavariable used by the include template. A wrapper such as `($label:literal, $path:literal) => include_str!($path)` hashes the label as a path and omits the second argument's actual file.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_references.rs",
+              "line": 161,
+              "message": "Macro templates are collapsed into one global map keyed only by macro name, with the first definition winning. This ignores Rust macro scope and makes duplicate names select an unrelated template; local filesystem enumeration is also unsorted while branch enumeration is sorted, so identical trees can select different templates and produce incompatible or incomplete hashes. Preserve origin/scope or fail closed on ambiguity.",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded_io",
+              "file": "libs/infrastructure/src/verify/branch_source_tree.rs",
+              "line": 301,
+              "message": "The optional-source directory error path invokes `git_ls_tree_recursive_regular_files`, which captures recursive `git ls-tree` output without a byte or entry bound merely to report the entry count. Since the branch ref is not pinned between earlier probes and this call, a retargeted large tree can cause unbounded allocation. Reject the directory directly or use the bounded tree reader.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e00e02411ddaa51c8bdaecb672fce50302ca2721081480cad0b252ea03bc107",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T01:24:35Z",
+          "findings": [
+            {
+              "category": "implementation_input_hash",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/executable_roots.rs",
+              "line": 22,
+              "message": "A `[lib]` table without an explicit `path` still makes Cargo compile `src/lib.rs`, but this condition suppresses that default root. Its source-reference traversal never runs, so changes to non-Rust files outside `src` referenced by that library can leave the implementation-input hash unchanged and permit stale signal reuse. Seed the effective default path when `[lib].path` is absent.",
+              "severity": "P1"
+            },
+            {
+              "category": "implementation_input_hash",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/macro_candidates.rs",
+              "line": 307,
+              "message": "Each macro argument is reduced to the first string literal found anywhere inside it. For example, a wrapper invoked with `concat!(\"assets/\", \"schema.json\")` is recorded as `assets/`, while the compiler reads `assets/schema.json`; because the candidate is optional, the actual external asset can be omitted from the hash. Resolve supported nested expressions exactly or reject them as ambiguous.",
+              "severity": "P1"
+            },
+            {
+              "category": "implementation_input_hash",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 153,
+              "message": "Macro templates are snapshotted before source-reference closure expansion and never updated. If an executable source uses `include!` to load an outside-`src` file that defines a wrapper macro, then invokes that macro afterward, the defining file is discovered too late and the original caller is never reprocessed. Assets referenced by that invocation can therefore be omitted from both local and branch hashes.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/verify/branch_source_tree.rs",
+              "line": 301,
+              "message": "A branch-controlled directory at an optional build-script path triggers `git_ls_tree_recursive_regular_files` merely to format its entry count. That helper captures the complete recursive `git ls-tree` output without the new bounded collector, allowing a large tree to exhaust memory before the fail-closed directory error is returned. Reject the directory immediately or use bounded enumeration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:512b4eb3e4a2762f5e050eb8d8f02e1f73477ef39295a734422550caeba1fcc2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T01:42:25Z",
+          "findings": [
+            {
+              "category": "implementation_input_hash",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/executable_roots.rs",
+              "line": 96,
+              "message": "Pathless `[[bin]]` targets are always mapped to `src/bin/<name>.rs`, but Cargo can resolve a package-named explicit binary to `src/main.rs`. Since the presence of `[[bin]]` also disables automatic binary discovery here, `src/main.rs` is not queued for source-reference traversal. Consequently, external files referenced only by that binary can change without invalidating the implementation-input hash, allowing stale type signals through the merge gate.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/verify/branch_source_tree.rs",
+              "line": 301,
+              "message": "When an optional source such as the implicit `build.rs` is a directory, this branch invokes `git_ls_tree_recursive_regular_files` merely to count its entries. That helper captures the entire recursive `git ls-tree` output without the surrounding `MAX_TREE_OUTPUT_BYTES` or entry limits, so a large branch tree can consume unbounded memory before the request fails closed. Reject the directory immediately or use the bounded enumeration path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ae6a81e1d77c95850e9ce86fa7c8b59f340c2354d034cbe8742522e4a624aff4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T01:57:46Z",
+          "findings": [
+            {
+              "category": "bounded_io",
+              "file": "libs/infrastructure/src/verify/branch_source_tree.rs",
+              "line": 301,
+              "message": "When an optional source such as the implicit `build.rs` is a directory, this branch recursively enumerates it solely to count entries. `git_ls_tree_recursive_regular_files` captures the complete `git ls-tree` output through unbounded `spawn_git`, bypassing this module's output and entry limits. A large branch tree can therefore exhaust memory before the adapter fails closed; reject the directory immediately or use bounded enumeration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:35c2bdbd0452ed2510db1da18672d85f8b9d0027cc9393601653e4a2ebcb4f16",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T02:46:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a832ff7530c9a5ef49cb3a0cda52eb0cbb9162eba75dbfac7a9fbffa701c8358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T03:15:45Z",
+          "findings": [
+            {
+              "category": "implementation_input_hash",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/executable_roots.rs",
+              "line": 25,
+              "message": "For edition-2018+ packages, declaring one `[[bin]]` does not disable Cargo's automatic binary discovery; only `autobins = false` does. This condition therefore omits other real `src/main.rs` or `src/bin/*` roots whenever any explicit binary exists. External inputs referenced only by an omitted binary are not traversed and can change without invalidating the implementation-input hash. Derive this default from Cargo's edition and `autobins` semantics.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint_or_hash_drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_modules.rs",
+              "line": 13,
+              "message": "A `syn::parse_file` failure is silently interpreted as having no ordinary modules. The evaluator accepts nightly Rust, while the bundled `syn` does not parse every nightly construct such as gen blocks; a valid root using such syntax can therefore leave its `mod child;` files unqueued for reference traversal. Non-Rust or out-of-tree inputs referenced by those compiled modules are then omitted from the hash. Propagate parser failure as an authoritative-input error or use a parser covering the accepted language.",
+              "severity": "P1"
+            },
+            {
+              "category": "symlink_not_rejected_at_boundary",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 489,
+              "message": "`git ls-tree <ref> -- <path>` also returns no entry when an ancestor is a committed symlink or submodule, but this treats that result as an absent optional source. For optional module or conditional-reference paths outside the initially enumerated crate tree, the branch evaluator silently skips the unsafe boundary while local evaluation rejects it. Probe and reject every ancestor before accepting `NotFound`, as the existing ADR branch reader does.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a832ff7530c9a5ef49cb3a0cda52eb0cbb9162eba75dbfac7a9fbffa701c8358",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T03:20:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a832ff7530c9a5ef49cb3a0cda52eb0cbb9162eba75dbfac7a9fbffa701c8358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T03:28:42Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/executable_roots.rs",
+              "line": 25,
+              "message": "For edition-2018+ packages, declaring one `[[bin]]` does not disable Cargo's automatic binary discovery; only `autobins = false` does. This condition therefore omits other real `src/main.rs` or `src/bin/*` roots whenever any explicit binary exists. External inputs referenced only by an omitted binary can change without invalidating the implementation-input hash. Derive this default from Cargo's edition and `autobins` semantics.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/source_modules.rs",
+              "line": 13,
+              "message": "A `syn::parse_file` failure is silently interpreted as having no ordinary modules. The evaluator accepts nightly Rust, while `syn` does not parse every nightly construct; a valid root using such syntax can therefore leave its `mod child;` files unqueued for reference traversal. Non-Rust or out-of-tree inputs referenced by those compiled modules are then omitted from the hash. Propagate parser failure as an authoritative-input error or use a parser covering the accepted language.",
+              "severity": "P1"
+            },
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/verify/branch_implementation_inputs.rs",
+              "line": 489,
+              "message": "`git ls-tree <ref> -- <path>` also returns no entry when an ancestor is a committed symlink or submodule, but this treats that result as an absent optional source. For optional module or conditional-reference paths outside the initially enumerated crate tree, the branch evaluator silently skips the unsafe boundary while local evaluation rejects it. Probe and reject every ancestor before accepting `NotFound`, as the existing ADR branch reader does.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a832ff7530c9a5ef49cb3a0cda52eb0cbb9162eba75dbfac7a9fbffa701c8358",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T04:46:42Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/layer_graph.rs",
+              "line": 109,
+              "message": "The implementation-input hash passes `architecture-rules.json`'s `module_limits.exclude` entries into both tree walkers, so files excluded only for module-size measurement are omitted from the hash even though the adopted contract requires hashing each selected crate's entire directory tree. A change to (for example) a compiled/generated file under an excluded subtree can therefore reuse stale type signals.",
+              "severity": "P0"
+            },
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 137,
+              "message": "The local tree walker joins the configured crate path to `workspace_root` and only checks the final component with `symlink_metadata`; symlinked ancestors such as `libs -> /outside` are followed by `read_dir`, allowing implementation inputs outside the trusted workspace to influence the hash and breaking local/branch parity. Reject symlinks up to the trusted workspace root before traversing each configured crate root.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:d8a41776037e0a3c25bbf2bcec575ee0875e55884713abcfa0b7d109c08fc30b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T04:55:56Z",
+          "findings": [
+            {
+              "category": "git isolation",
+              "file": "libs/infrastructure/src/git_cli/show.rs",
+              "line": 185,
+              "message": "The new branch implementation-input digest path calls `git_show_blob`, which uses the non-isolated `spawn_git` and inherits repository-selecting environment variables and history rewrites. Consequently, `branch_source_tree` enumerates paths from the isolated repository but hashes their contents from an ambient Git view; replacement objects or `GIT_DIR` can produce a digest that does not represent the target branch and potentially allow stale signals to match.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:499374340aad951fda1e144956f925d57afc5a95aea1c08102260458a2b686fe",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T05:03:05Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 162,
+              "message": "`fetch_branch_blob_limited` performs the symlink/submodule mode check with non-isolated `git_ls_tree_entry_kind`, then fetches content from the isolated repository. Ambient Git configuration or replacement objects can make the probe report a regular file while the target branch contains a symlink, causing the adapter to accept that blob and bypass its fail-closed symlink rejection. Use `git_ls_tree_entry_kind_isolated` for this verdict-bearing probe.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ab7ede7e88e1a06078c3595a43fb9fe06f9eb0b81750ab1da918d06b842364de",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T05:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b93908bc521499c03d4a01e613d21a145a92c693f978b7ddd64735e88534d3c0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T05:19:24Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 49,
+              "message": "`hash_implementation_inputs_with_toolchain_identifier` now interprets `target_crate` as an architecture layer ID via `crate_roots_for`, but local callers still pass `binding.targets()[0]` (the schema-export target), while branch hashing passes `layer_id`. The binding contract allows those names to differ, so a valid configuration either fails local evaluation with “target layer not present” or hashes a different closure from the merge gate. Pass the binding's layer ID separately for graph selection and retain the schema-export target only for rustdoc invocation.",
+              "severity": "P1"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 99,
+              "message": "The canonical tree hash includes only each file's path and content digest, discarding the `100644` versus `100755` mode that branch enumeration already reads. That mode affects build semantics when a build script executes a checked-in helper: a mode-only change can make clean rustdoc extraction behave differently or fail while leaving `implementation_input_hash` unchanged and permitting stale signal reuse. Include the executable bit in `TreeFileDigest` and hash it identically on local and branch paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b93908bc521499c03d4a01e613d21a145a92c693f978b7ddd64735e88534d3c0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T05:41:03Z",
+          "findings": [
+            {
+              "category": "fingerprint/hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 99,
+              "message": "The v3 digest discards the rustdoc target after resolving it to a layer. Because architecture-rules.json is not itself hashed, changing a layer's sole schema_export target between two targets in the same crate tree leaves the cache key unchanged, allowing local cache reuse and branch-gate acceptance of signals generated for the old target. Include the canonical target identity in the shared hash and supply the binding target branch-side.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 336,
+              "message": "The non-Unix executable check always returns false, while branch hashing maps committed Git mode 100755 to true. A selected tree containing an executable file therefore produces incompatible local and branch hashes on Windows, permanently failing freshness checks. Derive the canonical Git executable bit or fail closed when it cannot be obtained.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 215,
+              "message": "The local depth calculation counts the leading slash left by strip_prefix, making every nested directory one level deeper than the branch calculation. With MAX_SOURCE_DEPTH=32, a file below 31 directories is rejected locally but accepted branch-side as exactly 32 components. Use the same file-relative depth definition on both paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:49544f0db771c9cbadee9dbc9f46ee988460d7d60c07eaf47e28e445578b39b0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T05:54:31Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/verify/branch_source_tree.rs",
+              "line": 57,
+              "message": "`crate_root` may end with `/` because `validate_layer_path` accepts trailing separators. For such a root, `git ls-tree ... -- libs/foo/` lists the directory's children instead of the directory entry, so this probe classifies the first child (normally `Cargo.toml`) as `RegularFile` and rejects the branch. Local hashing accepts and traverses the same path, breaking local/branch parity for an accepted architecture-rules configuration. Normalize or reject trailing separators before probing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8316d4124c145d7cc7d62cb8c38c9c3ade8b911539b6bc544c4aa7361d85ca9f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T06:00:40Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/layer_graph.rs",
+              "line": 230,
+              "message": "`Path::components()` collapses repeated separators, so a path such as `libs//domain` still passes validation and local traversal. Git emits canonical `libs/domain/...` paths, causing `branch_tree_paths` to reject them at its literal prefix check; the merge gate therefore fails for a configuration accepted locally. Canonicalize paths before storing and duplicate detection, or reject all non-canonical separators.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a755d0bebcb902097a06255c40428dd053ddf0521e6cd4cf661a90d50a2af24b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T06:07:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:466f5b62a1e34ebecf1f9e6e14e4147d869e5f11ab943dfa9e9e751dedcadb88",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -5214,6 +6220,48 @@
           "at": "2026-08-09T14:46:04Z",
           "findings": [],
           "hash": "rvw1:sha256:2ee85d7205eff360deec136a78a6b2b265fa1fec53ed361a005815afe09a5bed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T03:21:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28ea2a2f409a839933286639a1767915b05679dc9b886bbbc2dd01520c73707d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T03:28:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28ea2a2f409a839933286639a1767915b05679dc9b886bbbc2dd01520c73707d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T04:45:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6b970af3e113fab8e2fcd6c5e58b5fcadcc32c8bf82f31851c4c04f8d829171f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T04:49:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6b970af3e113fab8e2fcd6c5e58b5fcadcc32c8bf82f31851c4c04f8d829171f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T06:24:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5858263c97879682fc7522410c139c36e7d9bad108532ba485017b2bd3f50fc4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T06:28:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5858263c97879682fc7522410c139c36e7d9bad108532ba485017b2bd3f50fc4",
           "type": "final",
           "verdict": "zero_findings"
         }
