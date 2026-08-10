@@ -293,13 +293,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "34121a7e",
       "depends_on": [
         "T014"
       ],
       "description": "Update `libs/usecase/src/base_merge.rs::{BaseMergeInteractor,BaseMergeGitPort,BaseMergeError,BaseMergeGitError}` and `libs/infrastructure/src/base_merge.rs::FsBaseMergeGitAdapter` for the clean-worktree preflight; update `.harness/workflows/track/recover.md`; add focused regression coverage. IN-01; CN-01; AC-01; AC-02; AC-04.",
       "id": "T020",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
