@@ -1,4 +1,4 @@
-//! Bounded committed crate-tree enumeration for implementation-input hashing.
+//! Bounded committed source-tree enumeration for implementation-input hashing.
 
 use std::path::Path;
 
@@ -22,31 +22,64 @@ pub(super) fn collect_branch_tree_file_digests(
     let mut visited_entries = 0usize;
     for root in roots {
         ensure_branch_crate_directory(repo_root, branch, &root.path)?;
-        let paths = branch_tree_paths(repo_root, branch, &root.path, &mut visited_entries)?;
-        for path in paths {
-            if is_vcs_internal(&path) {
-                continue;
-            }
-            if files.len() >= MAX_SOURCE_FILES {
-                return Err(format!(
-                    "implementation source traversal exceeds maximum of {MAX_SOURCE_FILES} files"
-                ));
-            }
-            let (digest, bytes) =
-                git_show_blob_sha256(repo_root, branch, &path, MAX_SOURCE_FILE_BYTES)?;
-            if bytes > *remaining_budget as u64 {
-                return Err(format!(
-                    "implementation inputs exceed the {MAX_TOTAL_SOURCE_BYTES}-byte cumulative limit"
-                ));
-            }
-            *remaining_budget -= bytes as usize;
-            files.push((path.into_bytes(), digest));
-        }
+        append_branch_tree_file_digests(
+            repo_root,
+            branch,
+            &root.path,
+            &mut visited_entries,
+            &mut files,
+            remaining_budget,
+        )?;
     }
     if files.is_empty() {
         return Err("architecture layer closure contains no regular files".to_owned());
     }
+
+    // Cargo patch sources live outside the architecture graph. Include the
+    // committed vendor tree whenever the branch has one, without interpreting
+    // the workspace manifest or guessing which patch entries use it.
+    if ensure_optional_branch_vendor_directory(repo_root, branch)? {
+        append_branch_tree_file_digests(
+            repo_root,
+            branch,
+            "vendor",
+            &mut visited_entries,
+            &mut files,
+            remaining_budget,
+        )?;
+    }
     Ok(files)
+}
+
+fn append_branch_tree_file_digests(
+    repo_root: &Path,
+    branch: &str,
+    tree_root: &str,
+    visited_entries: &mut usize,
+    files: &mut Vec<TreeFileDigest>,
+    remaining_budget: &mut usize,
+) -> Result<(), String> {
+    let paths = branch_tree_paths(repo_root, branch, tree_root, visited_entries)?;
+    for path in paths {
+        if is_vcs_internal(&path) {
+            continue;
+        }
+        if files.len() >= MAX_SOURCE_FILES {
+            return Err(format!(
+                "implementation source traversal exceeds maximum of {MAX_SOURCE_FILES} files"
+            ));
+        }
+        let (digest, bytes) =
+            git_show_blob_sha256(repo_root, branch, &path, MAX_SOURCE_FILE_BYTES)?;
+        if bytes > *remaining_budget as u64 {
+            return Err(format!(
+                "implementation inputs exceed the {MAX_TOTAL_SOURCE_BYTES}-byte cumulative limit"
+            ));
+        }
+        *remaining_budget -= bytes as usize;
+        files.push((path.into_bytes(), digest));
+    }
+    Ok(())
 }
 
 fn ensure_branch_crate_directory(
@@ -68,6 +101,21 @@ fn ensure_branch_crate_directory(
         }
         TreeEntryKind::Other(mode) => {
             Err(format!("unexpected tree entry mode {mode:06o} at layer crate path '{crate_root}'"))
+        }
+    }
+}
+
+fn ensure_optional_branch_vendor_directory(repo_root: &Path, branch: &str) -> Result<bool, String> {
+    match git_ls_tree_entry_kind_isolated(repo_root, branch, "vendor")? {
+        TreeEntryKind::Other(0o040_000) => Ok(true),
+        TreeEntryKind::NotFound => Ok(false),
+        TreeEntryKind::RegularFile => Err("vendor path 'vendor' is a file".to_owned()),
+        TreeEntryKind::Symlink => Err("symlink is not allowed at vendor path 'vendor'".to_owned()),
+        TreeEntryKind::Submodule => {
+            Err("submodule is not allowed at vendor path 'vendor'".to_owned())
+        }
+        TreeEntryKind::Other(mode) => {
+            Err(format!("unexpected tree entry mode {mode:06o} at vendor path 'vendor'"))
         }
     }
 }
@@ -189,6 +237,44 @@ mod tests {
             .unwrap();
         assert!(files.iter().any(|(path, _)| path == b"libs/domain/README.md"));
         assert!(files.iter().any(|(path, _)| path == b"libs/domain/Cargo.toml"));
+    }
+
+    #[test]
+    fn test_collect_branch_tree_file_digests_includes_and_updates_vendor_blobs() {
+        let directory = setup_repo();
+        let repo = directory.path();
+        std::fs::create_dir_all(repo.join("vendor/conch-parser/src")).unwrap();
+        std::fs::write(
+            repo.join("vendor/conch-parser/Cargo.toml"),
+            b"[package]\nname = \"conch-parser\"\nversion = \"0.1.1\"\n",
+        )
+        .unwrap();
+        std::fs::write(repo.join("vendor/conch-parser/src/lib.rs"), b"pub struct Before;\n")
+            .unwrap();
+        git(repo, &["add", "vendor"]);
+        git(repo, &["commit", "--quiet", "-m", "vendor"]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+
+        let roots = vec![LayerCrateRoot {
+            crate_name: "domain".to_owned(),
+            path: "libs/domain".to_owned(),
+        }];
+        let mut budget = 64 * 1024 * 1024;
+        let initial = collect_branch_tree_file_digests(repo, "main", &roots, &mut budget).unwrap();
+        let (_, initial_digest) =
+            initial.iter().find(|(path, _)| path == b"vendor/conch-parser/src/lib.rs").unwrap();
+
+        std::fs::write(repo.join("vendor/conch-parser/src/lib.rs"), b"pub struct After;\n")
+            .unwrap();
+        git(repo, &["add", "vendor/conch-parser/src/lib.rs"]);
+        git(repo, &["commit", "--quiet", "-m", "vendor change"]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+        let mut budget = 64 * 1024 * 1024;
+        let changed = collect_branch_tree_file_digests(repo, "main", &roots, &mut budget).unwrap();
+        let (_, changed_digest) =
+            changed.iter().find(|(path, _)| path == b"vendor/conch-parser/src/lib.rs").unwrap();
+
+        assert_ne!(initial_digest, changed_digest, "vendor blob changes must affect branch inputs");
     }
 
     #[test]

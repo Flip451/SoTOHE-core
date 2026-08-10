@@ -309,6 +309,40 @@ mod tests {
         assert_eq!(branch, local);
     }
 
+    #[test]
+    fn test_branch_implementation_inputs_include_vendor_tree_and_track_changes() {
+        let directory = setup_repo();
+        let repo = directory.path();
+        std::fs::create_dir_all(repo.join("vendor/conch-parser/src")).unwrap();
+        std::fs::write(
+            repo.join("vendor/conch-parser/Cargo.toml"),
+            "[package]\nname = \"conch-parser\"\nversion = \"0.1.1\"\n",
+        )
+        .unwrap();
+        std::fs::write(repo.join("vendor/conch-parser/src/lib.rs"), "pub struct Before;\n")
+            .unwrap();
+        git(repo, &["add", "vendor"]);
+        git(repo, &["commit", "--quiet", "-m", "vendor"]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+
+        let initial_local = hash_workspace_inputs(repo, "usecase", &[]).unwrap();
+        let initial_branch =
+            hash_branch_implementation_inputs(repo, "main", "foo", "usecase").unwrap().unwrap();
+        assert_eq!(initial_branch, initial_local);
+
+        std::fs::write(repo.join("vendor/conch-parser/src/lib.rs"), "pub struct After;\n").unwrap();
+        let changed_local = hash_workspace_inputs(repo, "usecase", &[]).unwrap();
+        assert_ne!(changed_local, initial_local);
+
+        git(repo, &["add", "vendor/conch-parser/src/lib.rs"]);
+        git(repo, &["commit", "--quiet", "-m", "vendor change"]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+        let changed_branch =
+            hash_branch_implementation_inputs(repo, "main", "foo", "usecase").unwrap().unwrap();
+        assert_eq!(changed_branch, changed_local);
+        assert_ne!(changed_branch, initial_branch);
+    }
+
     #[cfg(unix)]
     #[test]
     fn test_branch_implementation_inputs_match_local_hash_when_tree_modes_differ() {

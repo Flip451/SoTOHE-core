@@ -1,15 +1,19 @@
 //! Bounded implementation-input hashing for type-signal freshness.
 //!
 //! The source closure is a conservative over-approximation: the committed
-//! architecture layer graph selects crate directories, and every regular file
-//! in those directories participates in the digest. The former Cargo-manifest
-//! and Rust-source precision scanner was intentionally removed; its open-set
-//! interpretation could not provide a stable local/branch contract.
+//! architecture layer graph selects crate directories, and an existing
+//! workspace-level `vendor/` tree is included as a whole. Git derives the
+//! regular-file set for each selected tree. The former raw filesystem walk was
+//! intentionally removed; its open-set interpretation could not provide a
+//! stable local/branch contract when ignored files were present.
 
 use std::io::Read;
 use std::path::Path;
 use std::process::Command;
 use std::time::Duration;
+
+#[cfg(unix)]
+use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
 
 #[cfg(test)]
 use std::sync::Mutex;
@@ -19,7 +23,11 @@ use sha2::Digest;
 use domain::tddd::type_signals_doc::Sha256Digest;
 
 use super::EvaluateSignalsError;
-use super::layer_graph::{LayerCrateRoot, LayerGraph};
+use super::layer_graph::LayerGraph;
+
+#[path = "vendor_inputs.rs"]
+mod vendor_inputs;
+pub(super) use vendor_inputs::{collect_local_tree_file_digests, rustdoc_input_paths};
 
 pub(crate) const MAX_ARCHITECTURE_RULES_BYTES: usize = 4 * 1024 * 1024;
 pub(crate) const MAX_SOURCE_FILE_BYTES: u64 = 16 * 1024 * 1024;
@@ -31,13 +39,15 @@ pub(crate) const MAX_SOURCE_DEPTH: usize = 32;
 /// streamed content digest.
 pub(crate) type TreeFileDigest = (Vec<u8>, [u8; 32]);
 const HASH_READ_BUFFER_BYTES: usize = 8 * 1024;
+const MAX_SOURCE_PATH_LIST_BYTES: usize = 16 * 1024 * 1024;
 const MAX_TOOLCHAIN_COMMAND_OUTPUT_BYTES: usize = 64 * 1024;
 const MAX_TOOLCHAIN_COMMAND_DURATION: Duration = Duration::from_secs(10);
 #[cfg(test)]
 pub(super) static PROCESS_ENVIRONMENT_LOCK: Mutex<()> = Mutex::new(());
 
-/// Hashes one layer's graph-selected crate trees, the workspace manifest and
-/// lockfile, and the active nightly toolchain identity.
+/// Hashes one layer's graph-selected crate trees, an existing workspace vendor
+/// tree, the workspace manifest and lockfile, and the active nightly toolchain
+/// identity.
 ///
 /// `target` is either the architecture-rules layer crate name or the explicit
 /// schema-export target from that same document. The graph resolves the latter
@@ -99,7 +109,7 @@ pub(crate) fn hash_implementation_input_components(
     sorted_tree_files.sort_by(|(left, _), (right, _)| left.cmp(right));
 
     let mut hasher = sha2::Sha256::new();
-    hasher.update(b"sotohe-implementation-inputs-v5\0");
+    hasher.update(b"sotohe-implementation-inputs-v6\0");
     append_component(&mut hasher, b"schema-export-target", schema_export_target.as_bytes());
     for (path, content_digest) in sorted_tree_files {
         append_component(&mut hasher, b"crate-file-path", &path);
@@ -124,158 +134,6 @@ fn load_layer_graph(workspace_root: &Path) -> Result<LayerGraph, EvaluateSignals
         ))
     })?;
     LayerGraph::parse(&bytes).map_err(EvaluateSignalsError::authoritative_input)
-}
-
-fn collect_local_tree_file_digests(
-    workspace_root: &Path,
-    roots: &[LayerCrateRoot],
-    remaining_budget: &mut u64,
-) -> Result<Vec<TreeFileDigest>, EvaluateSignalsError> {
-    let mut files = Vec::new();
-    let mut visited_entries = 0usize;
-    for root in roots {
-        let crate_path = workspace_root.join(&root.path);
-        crate::track::symlink_guard::reject_symlinks_up_to_root(&crate_path).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot inspect layer crate '{}' at '{}': {error}",
-                root.crate_name, root.path
-            ))
-        })?;
-        let metadata = std::fs::symlink_metadata(&crate_path).map_err(|error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot inspect layer crate '{}' at '{}': {error}",
-                root.crate_name, root.path
-            ))
-        })?;
-        if metadata.file_type().is_symlink() {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "layer crate '{}' at '{}' is a symlink",
-                root.crate_name, root.path
-            )));
-        }
-        if !metadata.is_dir() {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "layer crate '{}' at '{}' is not a directory",
-                root.crate_name, root.path
-            )));
-        }
-        collect_local_tree(
-            workspace_root,
-            &crate_path,
-            &root.path,
-            &mut visited_entries,
-            &mut files,
-            remaining_budget,
-        )?;
-    }
-    if files.is_empty() {
-        return Err(EvaluateSignalsError::authoritative_input(
-            "architecture layer closure contains no regular files".to_owned(),
-        ));
-    }
-    Ok(files)
-}
-
-fn collect_local_tree(
-    workspace_root: &Path,
-    directory: &Path,
-    crate_root: &str,
-    visited_entries: &mut usize,
-    files: &mut Vec<TreeFileDigest>,
-    remaining_budget: &mut u64,
-) -> Result<(), EvaluateSignalsError> {
-    let mut entries = std::fs::read_dir(directory)
-        .map_err(|error| local_input_error(directory, format!("cannot read directory: {error}")))?;
-    let mut paths = Vec::new();
-    for entry in entries.by_ref() {
-        let entry = entry.map_err(|error| {
-            local_input_error(directory, format!("cannot enumerate directory: {error}"))
-        })?;
-        *visited_entries = visited_entries.checked_add(1).ok_or_else(|| {
-            EvaluateSignalsError::authoritative_input(
-                "implementation source entry count overflowed".to_owned(),
-            )
-        })?;
-        if *visited_entries > MAX_SOURCE_ENTRIES {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "implementation source traversal exceeds maximum of {MAX_SOURCE_ENTRIES} entries"
-            )));
-        }
-        paths.push(entry.path());
-    }
-    paths.sort();
-
-    for path in paths {
-        let relative = workspace_relative_path(workspace_root, &path)?;
-        if is_vcs_internal(&relative) {
-            continue;
-        }
-        let metadata = std::fs::symlink_metadata(&path).map_err(|error| {
-            local_input_error(&path, format!("cannot stat tree entry: {error}"))
-        })?;
-        if metadata.is_dir() {
-            let depth = crate_relative_depth(crate_root, &relative);
-            if depth >= MAX_SOURCE_DEPTH {
-                return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "implementation source traversal exceeds maximum depth of {MAX_SOURCE_DEPTH} at '{relative}'"
-                )));
-            }
-            collect_local_tree(
-                workspace_root,
-                &path,
-                crate_root,
-                visited_entries,
-                files,
-                remaining_budget,
-            )?;
-            continue;
-        }
-        if metadata.file_type().is_symlink() {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "implementation tree entry '{relative}' is a symlink"
-            )));
-        }
-        if !metadata.is_file() {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "implementation tree entry '{relative}' is not a regular file"
-            )));
-        }
-        if files.len() >= MAX_SOURCE_FILES {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "implementation source traversal exceeds maximum of {MAX_SOURCE_FILES} files"
-            )));
-        }
-        let (digest, _) = digest_local_file(&path, &relative, remaining_budget)?;
-        files.push((relative.into_bytes(), digest));
-    }
-    Ok(())
-}
-
-fn crate_relative_depth(crate_root: &str, relative: &str) -> usize {
-    relative.strip_prefix(crate_root).unwrap_or(relative).trim_start_matches('/').split('/').count()
-}
-
-fn workspace_relative_path(
-    workspace_root: &Path,
-    path: &Path,
-) -> Result<String, EvaluateSignalsError> {
-    let relative = path.strip_prefix(workspace_root).map_err(|_| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "implementation tree entry '{}' escaped the workspace root",
-            path.display()
-        ))
-    })?;
-    let relative = relative.to_str().ok_or_else(|| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "implementation tree entry '{}' is not valid UTF-8",
-            path.display()
-        ))
-    })?;
-    Ok(relative.replace(std::path::MAIN_SEPARATOR, "/"))
-}
-
-fn is_vcs_internal(path: &str) -> bool {
-    path.split('/').any(|component| component == ".git")
 }
 
 fn digest_local_file(
@@ -361,7 +219,7 @@ fn read_bounded_bytes(path: &Path, maximum_bytes: usize) -> Result<Vec<u8>, std:
     Ok(bytes)
 }
 
-fn read_regular_source_file(
+pub(super) fn read_regular_source_file(
     path: &Path,
     per_file_limit: u64,
     remaining_budget: &mut u64,
@@ -429,6 +287,109 @@ fn read_regular_source_file(
     }
     *remaining_budget -= bytes.len() as u64;
     Ok(bytes)
+}
+
+pub(super) fn filtered_workspace_manifest(
+    bytes: &[u8],
+    members: &[String],
+) -> Result<Vec<u8>, EvaluateSignalsError> {
+    let text = std::str::from_utf8(bytes).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "workspace manifest is not UTF-8: {error}"
+        ))
+    })?;
+    let mut value: toml::Value = toml::from_str(text).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "workspace manifest parse failed: {error}"
+        ))
+    })?;
+    let workspace =
+        value.get_mut("workspace").and_then(toml::Value::as_table_mut).ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input("workspace manifest has no workspace table")
+        })?;
+    workspace.insert(
+        "members".to_owned(),
+        toml::Value::Array(members.iter().cloned().map(toml::Value::String).collect()),
+    );
+    workspace.remove("default-members");
+    toml::to_string(&value).map(|text| text.into_bytes()).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "workspace manifest encode failed: {error}"
+        ))
+    })
+}
+
+pub(super) fn create_private_dir(path: &Path) -> Result<(), std::io::Error> {
+    let mut builder = std::fs::DirBuilder::new();
+    #[cfg(unix)]
+    builder.mode(0o700);
+    builder.create(path)?;
+    #[cfg(unix)]
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o700))?;
+    Ok(())
+}
+
+pub(super) fn remove_workspace_tree(path: &Path) -> Result<(), EvaluateSignalsError> {
+    let mut entries = 0_usize;
+    remove_workspace_entry(path, 0, &mut entries)
+}
+
+fn remove_workspace_entry(
+    path: &Path,
+    depth: usize,
+    entries: &mut usize,
+) -> Result<(), EvaluateSignalsError> {
+    let metadata = match std::fs::symlink_metadata(path) {
+        Ok(metadata) => metadata,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(error) => {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "cannot inspect temporary rustdoc entry '{}': {error}",
+                path.display()
+            )));
+        }
+    };
+    if metadata.file_type().is_symlink() || !metadata.is_dir() {
+        std::fs::remove_file(path).map_err(|error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot remove temporary rustdoc entry '{}': {error}",
+                path.display()
+            ))
+        })?;
+        return Ok(());
+    }
+    if depth > super::MAX_RUSTDOC_WORKSPACE_DEPTH {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "temporary rustdoc cleanup exceeds maximum depth",
+        ));
+    }
+    for entry in std::fs::read_dir(path).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot enumerate temporary rustdoc directory '{}': {error}",
+            path.display()
+        ))
+    })? {
+        let child = entry
+            .map_err(|error| EvaluateSignalsError::authoritative_input(error.to_string()))?
+            .path();
+        *entries = entries.checked_add(1).ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(
+                "temporary rustdoc cleanup entry count overflowed",
+            )
+        })?;
+        if *entries > super::MAX_RUSTDOC_WORKSPACE_CLEANUP_ENTRIES {
+            return Err(EvaluateSignalsError::authoritative_input(
+                "temporary rustdoc cleanup exceeds maximum entries",
+            ));
+        }
+        remove_workspace_entry(&child, depth.saturating_add(1), entries)?;
+    }
+    std::fs::remove_dir(path).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot remove temporary rustdoc directory '{}': {error}",
+            path.display()
+        ))
+    })
 }
 
 fn append_component(hasher: &mut sha2::Sha256, label: &[u8], content: &[u8]) {
@@ -528,7 +489,6 @@ pub(crate) fn nightly_toolchain_identifier(
         )),
     }
 }
-
 fn toolchain_list_contains_nightly(output: &[u8]) -> Result<bool, String> {
     let text = std::str::from_utf8(output).map_err(|error| error.to_string())?;
     let mut contains_nightly = false;
@@ -587,9 +547,14 @@ mod tests {
     fn workspace_with_layer_graph() -> tempfile::TempDir {
         let workspace = tempfile::tempdir().unwrap();
         let root = workspace.path();
+        crate::verify::test_support::git_with_identity(
+            root,
+            &["init", "--quiet", "--initial-branch=main"],
+        );
         std::fs::write(root.join("architecture-rules.json"), architecture_rules()).unwrap();
         std::fs::write(root.join("Cargo.toml"), "[workspace]\nresolver = \"2\"\n").unwrap();
         std::fs::write(root.join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::write(root.join(".gitignore"), "libs/domain/ignored.rs\n").unwrap();
         for crate_name in ["domain", "usecase", "infrastructure", "outside"] {
             let crate_root = root.join("libs").join(crate_name);
             std::fs::create_dir_all(crate_root.join("src")).unwrap();
@@ -604,6 +569,11 @@ mod tests {
             )
             .unwrap();
         }
+        crate::verify::test_support::git_with_identity(root, &["add", "."]);
+        crate::verify::test_support::git_with_identity(
+            root,
+            &["commit", "--quiet", "-m", "initial"],
+        );
         workspace
     }
 
@@ -711,6 +681,101 @@ mod tests {
     }
 
     #[test]
+    fn test_hash_layer_graph_ignored_file_does_not_change_hash() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        let initial =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap();
+
+        std::fs::write(root.join("libs/domain/ignored.rs"), b"ignored source\n").unwrap();
+        let unchanged =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap();
+
+        assert_eq!(initial, unchanged, "Git-ignored files must not affect local hashes");
+    }
+
+    #[test]
+    fn test_hash_layer_graph_vendor_source_change_changes_hash() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        std::fs::create_dir_all(root.join("vendor/conch-parser/src")).unwrap();
+        std::fs::write(
+            root.join("vendor/conch-parser/Cargo.toml"),
+            "[package]\nname = \"conch-parser\"\nversion = \"0.1.1\"\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("vendor/conch-parser/src/lib.rs"), "pub struct Before;\n")
+            .unwrap();
+
+        let initial =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap();
+        std::fs::write(root.join("vendor/conch-parser/src/lib.rs"), "pub struct After;\n").unwrap();
+        let changed =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap();
+
+        assert_ne!(initial, changed, "vendor source changes must affect local hashes");
+    }
+
+    #[test]
+    fn test_materialized_rustdoc_workspace_excludes_ignored_files() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        std::fs::write(root.join("libs/domain/ignored.rs"), b"ignored source\n").unwrap();
+        std::fs::write(root.join("libs/domain/untracked.rs"), b"visible source\n").unwrap();
+
+        let snapshot = super::super::materialize_git_visible_workspace(root, "usecase").unwrap();
+        assert!(snapshot.path().unwrap().join("libs/domain/untracked.rs").is_file());
+        assert!(!snapshot.path().unwrap().join("libs/domain/ignored.rs").exists());
+        assert!(!snapshot.path().unwrap().join(".git").exists());
+        let snapshot_path = snapshot.path().unwrap().to_path_buf();
+        snapshot.cleanup().unwrap();
+        assert!(!snapshot_path.exists(), "the bounded snapshot cleanup must remove its root");
+    }
+
+    #[test]
+    fn test_materialized_rustdoc_workspace_includes_vendor_tree() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        std::fs::create_dir_all(root.join("vendor/conch-parser/src")).unwrap();
+        std::fs::write(
+            root.join("vendor/conch-parser/Cargo.toml"),
+            "[package]\nname = \"conch-parser\"\nversion = \"0.1.1\"\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("vendor/conch-parser/src/lib.rs"), "pub struct Vendor;\n")
+            .unwrap();
+
+        let snapshot = super::super::materialize_git_visible_workspace(root, "usecase").unwrap();
+        let snapshot_root = snapshot.path().unwrap();
+        assert!(snapshot_root.join("vendor/conch-parser/Cargo.toml").is_file());
+        assert!(snapshot_root.join("vendor/conch-parser/src/lib.rs").is_file());
+        assert_eq!(
+            std::fs::read(snapshot_root.join("vendor/conch-parser/src/lib.rs")).unwrap(),
+            b"pub struct Vendor;\n"
+        );
+    }
+
+    #[test]
+    fn test_hash_layer_graph_untracked_non_ignored_file_changes_hash() {
+        let workspace = workspace_with_layer_graph();
+        let root = workspace.path();
+        let initial =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap();
+
+        std::fs::write(root.join("libs/domain/untracked.rs"), b"untracked source\n").unwrap();
+        let changed =
+            hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
+                .unwrap();
+
+        assert_ne!(initial, changed, "untracked non-ignored files must affect local hashes");
+    }
+
+    #[test]
     fn test_hash_layer_graph_resolves_schema_export_target_alias() {
         let workspace = workspace_with_layer_graph();
         let root = workspace.path();
@@ -731,8 +796,14 @@ mod tests {
 
     #[test]
     fn test_crate_relative_depth_matches_branch_tree_definition() {
-        assert_eq!(super::crate_relative_depth("libs/domain", "libs/domain/src"), 1);
-        assert_eq!(super::crate_relative_depth("libs/domain", "libs/domain/src/nested/lib.rs"), 3);
+        assert_eq!(super::vendor_inputs::crate_relative_depth("libs/domain", "libs/domain/src"), 1);
+        assert_eq!(
+            super::vendor_inputs::crate_relative_depth(
+                "libs/domain",
+                "libs/domain/src/nested/lib.rs"
+            ),
+            3
+        );
     }
 
     #[cfg(unix)]
@@ -790,21 +861,26 @@ mod tests {
             let workspace = workspace_with_layer_graph();
             let fake_bin = tempfile::tempdir().unwrap();
             let rustup = write_fake_rustup(fake_bin.path(), "#!/bin/sh\nprintf 'nightly-a\\n'\n");
-            let first = temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
+            let mut path_entries = vec![fake_bin.path().to_owned()];
+            if let Some(path) = std::env::var_os("PATH") {
+                path_entries.extend(std::env::split_paths(&path));
+            }
+            let path = std::env::join_paths(path_entries).unwrap();
+            let first = temp_env::with_var("PATH", Some(path.as_os_str()), || {
                 hash_implementation_inputs(workspace.path(), "domain")
             })
             .unwrap();
 
             std::fs::write(&rustup, "#!/bin/sh\nprintf 'nightly-b\\n'\n").unwrap();
-            let second = temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
+            let second = temp_env::with_var("PATH", Some(path.as_os_str()), || {
                 hash_implementation_inputs(workspace.path(), "domain")
             })
             .unwrap();
             assert_ne!(first, second);
 
-            std::fs::remove_file(&rustup).unwrap();
+            std::fs::write(&rustup, "#!/bin/sh\nexit 1\n").unwrap();
             assert!(
-                temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), || {
+                temp_env::with_var("PATH", Some(path.as_os_str()), || {
                     hash_implementation_inputs(workspace.path(), "domain")
                 })
                 .is_err()

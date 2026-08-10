@@ -2361,6 +2361,57 @@
           "hash": "rvw1:sha256:0950eee09261ba2b1c1d7dddc19955a57f29521349f6e085923c7d74c9805e9f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T08:29:05Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 281,
+              "message": "T019’s description does not identify a concrete target file or symbol; name the implementation target (for example, the relevant `build_inputs.rs` function) so the task is executable without inventing its boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0b39ad9aa1a4da7e8cb838df8164924a145ac31922f4a5013b654919ded08515",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T08:37:15Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 105,
+              "message": "S10 restates design rationale in prose: “so ignored files cannot diverge local and branch hashes.” Keep only the target, operation, and anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 281,
+              "message": "T019 restates the upstream behavior contract in prose: “excluding ignored files while retaining untracked non-ignored sources.” Refer to that behavior through the existing anchors instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9464b71b26ac70ed87d8e0a349db58b53fd8653a54216e5383303be6037a85e4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T08:38:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0b2aee5440c68f3970cc2406f4fefc031038bf22d463d6901f6ffcb9f01d1fa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T08:44:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0b2aee5440c68f3970cc2406f4fefc031038bf22d463d6901f6ffcb9f01d1fa",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -5557,6 +5608,137 @@
           "at": "2026-08-10T07:22:09Z",
           "findings": [],
           "hash": "rvw1:sha256:05c9581a88231424e60b494b90d73a1722f65bf45611996518c39b26ef52a9b3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T08:29:20Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 265,
+              "message": "Local enumeration checks MAX_SOURCE_DEPTH before filtering `.git` paths, while branch enumeration filters `.git` entries first. A tracked nested `.git/...` path beyond depth 32 therefore fails the local hash but is ignored by the branch hash, breaking the required local/branch parity. Apply the VCS-internal filter before depth validation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8796ea8218fd4c2f8a96e9fe00eb91e1652e74b46bb2e33ee76216dee15f756e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T08:34:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e23df307e1c702c84d0716e06f849f5885720a4667e6d74ecf6b03d1e53e553",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T08:43:41Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 222,
+              "message": "`--exclude-standard` omits ignored files from the cache key even though rustdoc still runs against the unfiltered working tree. An ignored file under a selected crate can affect compilation (for example, an optional `build.rs` input); signals generated with that file can then be reused after it changes or on a fresh checkout where it is absent because the implementation-input hash remains identical. This breaks the closed-over-approximation/fingerprint contract. Evaluate rustdoc from the same Git-derived tree or retain all potentially semantic working-tree files in the local hash.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3e23df307e1c702c84d0716e06f849f5885720a4667e6d74ecf6b03d1e53e553",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T09:10:02Z",
+          "findings": [
+            {
+              "category": "temporary-workspace security",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 407,
+              "message": "The temporary workspace is created with `create_dir` and its files with default `OpenOptions` permissions, so confidentiality depends on the caller's umask. A common `022` umask produces a world-readable directory/files while the code copies the entire tracked and untracked-nonignored repository into it. Use a securely randomized private temporary directory with permissions enforced independently of ambient umask.",
+              "severity": "P0"
+            },
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 340,
+              "message": "The rustdoc snapshot includes every Git-visible repository file, but the implementation-input hash covers only the selected layer roots plus `Cargo.toml` and `Cargo.lock`. For example, a root `.cargo/config.toml` is copied and consumed by Cargo, and changing its rustflags/cfg can change rustdoc output without changing the cache key. Restrict the snapshot to keyed inputs or include every Cargo-consumed exposed file in both local and branch hashes.",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 460,
+              "message": "The cumulative snapshot budget is charged using the pre-open metadata length only. If a file grows afterward, the read loop enforces the per-file limit but never charges the additional bytes to `copied_bytes`, allowing concurrent changes to exceed the advertised 512 MiB aggregate bound. Charge each successfully read chunk against the remaining aggregate budget, as the digest path does.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 384,
+              "message": "`reject_symlinks_up_to_root(std::env::temp_dir())` rejects legitimate host-level symlinks. On macOS the standard `/var/folders/...` temporary path traverses `/var -> /private/var`, so every cache miss fails before creating the snapshot. Treat the canonical OS temporary directory as the trusted anchor and perform symlink checks below it.",
+              "severity": "P1"
+            },
+            {
+              "category": "error handling",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 90,
+              "message": "A failed copy silently discards any cleanup error. This can leave a partially copied, potentially sensitive workspace of up to the configured size in the system temporary directory, with no RAII cleanup remaining. Preserve and propagate both errors and retain a cleanup guard for all exit paths.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 335,
+              "message": "The current production portion of this module is 961 lines, exceeding the repository's 700-line maximum; `bin/sotp verify module-size` fails on this file. Extract the temporary-workspace materialization and cleanup implementation into a focused sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:db2136eaf7a3d2b439d2d62d015f0ce35c64561ddf5f1ce627e2345f8ed08723",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T09:45:36Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 291,
+              "message": "`rustdoc_input_paths` copies and hashes only `Cargo.toml`, `Cargo.lock`, and architecture-layer crate trees. The retained workspace manifest patches `conch-parser` to `vendor/conch-parser`, which is used by `libs/infrastructure` but is outside those roots. Consequently, a cache miss runs Cargo with a nonexistent patch path, while vendored-source changes do not alter an existing implementation-input hash and may reuse stale signals. Include bounded Git-visible local dependency/patch trees in both the snapshot and hash closure.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:02389caac5095264b90a1e8e74f7002b0d2b202183b70b6d9c4e05a5cc10642e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T10:05:18Z",
+          "findings": [
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs",
+              "line": 775,
+              "message": "The production portion of build_inputs.rs is 775 lines, exceeding the repository's 700-line module-size maximum. `bin/sotp verify module-size` fails on this file; extract the new vendor/materialization helpers into a sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:128092566a9b4cbbe5f7209f38e40e39626c73477de83db62a3dd988683c6b55",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T10:23:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0cdff64d8b46fa83d00ca75ae7b8851a4f546d0605a343bb68c047f11f48ecc1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T10:32:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0cdff64d8b46fa83d00ca75ae7b8851a4f546d0605a343bb68c047f11f48ecc1",
           "type": "final",
           "verdict": "zero_findings"
         }

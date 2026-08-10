@@ -770,6 +770,9 @@ mod tests {
         track_dir: &Path,
         catalogue: &str,
     ) -> String {
+        if !root.join(".git").exists() {
+            crate::verify::test_support::git_init(root);
+        }
         fs::create_dir_all(track_dir).expect("track fixture directory must exist");
         fs::create_dir_all(root.join("libs/infrastructure/src"))
             .expect("fixture crate source directory must exist");

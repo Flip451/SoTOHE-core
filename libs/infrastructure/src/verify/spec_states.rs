@@ -684,6 +684,9 @@ mod tests {
     }
 
     fn write_fixture_implementation_inputs(workspace_root: &Path) {
+        if !workspace_root.join(".git").exists() {
+            crate::verify::test_support::git_init(workspace_root);
+        }
         std::fs::create_dir_all(workspace_root.join("libs/domain/src")).unwrap();
         std::fs::write(
             workspace_root.join("Cargo.toml"),

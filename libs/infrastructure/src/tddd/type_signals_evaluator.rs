@@ -1,8 +1,15 @@
 //! Per-layer type-signal evaluation with conservative rustdoc reuse.
 
+use std::cell::RefCell;
 use std::collections::BTreeMap;
+use std::io::Write;
+use std::path::Component;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
+use std::sync::atomic::{AtomicU64, Ordering};
+
+#[cfg(unix)]
+use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 
 #[path = "type_signals_evaluator/build_inputs.rs"]
 pub(crate) mod build_inputs;
@@ -54,6 +61,10 @@ use crate::verify::tddd_layers::TdddLayerBinding;
 const MAX_TYPE_SIGNALS_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RUSTDOC_JSON_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
+const MAX_RUSTDOC_WORKSPACE_DEPTH: usize = 64;
+const MAX_RUSTDOC_WORKSPACE_CLEANUP_ENTRIES: usize = 100_000;
+const MAX_RUSTDOC_WORKSPACE_ATTEMPTS: u64 = 128;
+static RUSTDOC_WORKSPACE_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Error returned when a layer's type signals cannot be evaluated safely.
 #[derive(Debug)]
@@ -102,6 +113,285 @@ pub(crate) fn reject_symlinked_type_signals_anchor(path: &Path, label: &str) -> 
     })
 }
 
+/// Bounded private workspace containing the Git-visible inputs for one target.
+struct GitVisibleWorkspace {
+    path: Option<PathBuf>,
+}
+impl GitVisibleWorkspace {
+    fn path(&self) -> Result<&Path, EvaluateSignalsError> {
+        self.path.as_deref().ok_or_else(|| {
+            EvaluateSignalsError::authoritative_input(
+                "temporary rustdoc workspace has already been cleaned up",
+            )
+        })
+    }
+
+    fn cleanup(mut self) -> Result<(), EvaluateSignalsError> {
+        let Some(path) = self.path.as_deref() else {
+            return Ok(());
+        };
+        let result = build_inputs::remove_workspace_tree(path);
+        if result.is_ok() {
+            self.path = None;
+        }
+        result
+    }
+}
+
+impl Drop for GitVisibleWorkspace {
+    fn drop(&mut self) {
+        if let Some(path) = self.path.as_deref() {
+            let _ = build_inputs::remove_workspace_tree(path);
+        }
+    }
+}
+fn materialize_git_visible_workspace(
+    workspace_root: &Path,
+    target: &str,
+) -> Result<GitVisibleWorkspace, EvaluateSignalsError> {
+    reject_symlinked_type_signals_anchor(workspace_root, "workspace_root")
+        .map_err(EvaluateSignalsError::authoritative_input)?;
+    let (paths, members) = build_inputs::rustdoc_input_paths(workspace_root, target)?;
+    let path = create_workspace_root()?;
+    let workspace = GitVisibleWorkspace { path: Some(path) };
+    let result = materialize_workspace_files(workspace_root, &workspace, &paths, &members);
+    match result {
+        Ok(()) => Ok(workspace),
+        Err(error) => match workspace.cleanup() {
+            Ok(()) => Err(error),
+            Err(cleanup_error) => Err(EvaluateSignalsError::authoritative_input(format!(
+                "{error}; temporary rustdoc workspace cleanup failed: {cleanup_error}"
+            ))),
+        },
+    }
+}
+
+fn materialize_workspace_files(
+    workspace_root: &Path,
+    workspace: &GitVisibleWorkspace,
+    paths: &[String],
+    members: &[String],
+) -> Result<(), EvaluateSignalsError> {
+    let destination_root = workspace.path()?;
+    let mut remaining_budget = build_inputs::MAX_TOTAL_SOURCE_BYTES;
+    let manifest_path = workspace_root.join("Cargo.toml");
+    let manifest = build_inputs::read_regular_source_file(
+        &manifest_path,
+        build_inputs::MAX_SOURCE_FILE_BYTES,
+        &mut remaining_budget,
+    )?;
+    let manifest = build_inputs::filtered_workspace_manifest(&manifest, members)?;
+    write_snapshot_file(destination_root, "Cargo.toml", &manifest)?;
+
+    let lockfile_path = workspace_root.join("Cargo.lock");
+    let lockfile = build_inputs::read_regular_source_file(
+        &lockfile_path,
+        build_inputs::MAX_SOURCE_FILE_BYTES,
+        &mut remaining_budget,
+    )?;
+    write_snapshot_file(destination_root, "Cargo.lock", &lockfile)?;
+
+    for relative in paths {
+        if matches!(relative.as_str(), "Cargo.toml" | "Cargo.lock") {
+            continue;
+        }
+        let source = workspace_root.join(relative);
+        let metadata = match std::fs::symlink_metadata(&source) {
+            Ok(metadata) => metadata,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+            Err(error) => {
+                return Err(EvaluateSignalsError::authoritative_input(format!(
+                    "cannot inspect Git-visible rustdoc input '{}': {error}",
+                    source.display()
+                )));
+            }
+        };
+        if !metadata.is_file() || metadata.file_type().is_symlink() {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "Git-visible rustdoc input '{}' is not a regular file",
+                source.display()
+            )));
+        }
+        let bytes = build_inputs::read_regular_source_file(
+            &source,
+            build_inputs::MAX_SOURCE_FILE_BYTES,
+            &mut remaining_budget,
+        )?;
+        write_snapshot_file(destination_root, relative, &bytes)?;
+    }
+    Ok(())
+}
+
+fn create_workspace_root() -> Result<PathBuf, EvaluateSignalsError> {
+    let base = std::fs::canonicalize(std::env::temp_dir()).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot resolve temporary directory: {error}"
+        ))
+    })?;
+    let metadata = std::fs::symlink_metadata(&base).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot inspect temporary directory: {error}"
+        ))
+    })?;
+    if !metadata.is_dir() {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "temporary directory is not a directory",
+        ));
+    }
+    for _ in 0..MAX_RUSTDOC_WORKSPACE_ATTEMPTS {
+        let sequence = RUSTDOC_WORKSPACE_SEQUENCE.fetch_add(1, Ordering::Relaxed);
+        let candidate =
+            base.join(format!("sotp-rustdoc-visible-{}-{sequence}", std::process::id()));
+        match build_inputs::create_private_dir(&candidate) {
+            Ok(()) => return Ok(candidate),
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(error) => {
+                return Err(EvaluateSignalsError::authoritative_input(format!(
+                    "cannot create temporary rustdoc workspace '{}': {error}",
+                    candidate.display()
+                )));
+            }
+        }
+    }
+    Err(EvaluateSignalsError::authoritative_input(
+        "could not allocate a unique temporary rustdoc workspace",
+    ))
+}
+
+fn write_snapshot_file(
+    destination_root: &Path,
+    relative: &str,
+    bytes: &[u8],
+) -> Result<(), EvaluateSignalsError> {
+    let relative_path = Path::new(relative);
+    create_workspace_parent(destination_root, relative_path)?;
+    let destination = destination_root.join(relative_path);
+    crate::track::symlink_guard::reject_symlinks_below(&destination, destination_root).map_err(
+        |error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "temporary rustdoc path rejected: {error}"
+            ))
+        },
+    )?;
+    let mut options = std::fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    options.mode(0o600);
+    let mut output = options.open(&destination).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot create temporary rustdoc file '{}': {error}",
+            destination.display()
+        ))
+    })?;
+    output.write_all(bytes).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot write temporary rustdoc file '{}': {error}",
+            destination.display()
+        ))
+    })?;
+    #[cfg(unix)]
+    std::fs::set_permissions(&destination, std::fs::Permissions::from_mode(0o600)).map_err(
+        |error| {
+            EvaluateSignalsError::authoritative_input(format!(
+                "cannot secure temporary rustdoc file: {error}"
+            ))
+        },
+    )?;
+    Ok(())
+}
+
+fn create_workspace_parent(
+    destination_root: &Path,
+    relative: &Path,
+) -> Result<(), EvaluateSignalsError> {
+    let mut current = destination_root.to_path_buf();
+    let mut depth = 0_usize;
+    for component in relative.parent().unwrap_or_else(|| Path::new("")).components() {
+        let Component::Normal(name) = component else {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "temporary rustdoc path has an unsafe component: {}",
+                relative.display()
+            )));
+        };
+        depth = depth.saturating_add(1);
+        if depth > MAX_RUSTDOC_WORKSPACE_DEPTH {
+            return Err(EvaluateSignalsError::authoritative_input(format!(
+                "temporary rustdoc path exceeds maximum depth: {}",
+                relative.display()
+            )));
+        }
+        current.push(name);
+        match std::fs::symlink_metadata(&current) {
+            Ok(metadata) if metadata.file_type().is_symlink() || !metadata.is_dir() => {
+                return Err(EvaluateSignalsError::authoritative_input(format!(
+                    "temporary rustdoc parent is not a directory: {}",
+                    current.display()
+                )));
+            }
+            Ok(_) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                build_inputs::create_private_dir(&current).map_err(|error| {
+                    EvaluateSignalsError::authoritative_input(format!(
+                        "cannot create temporary rustdoc directory '{}': {error}",
+                        current.display()
+                    ))
+                })?;
+            }
+            Err(error) => {
+                return Err(EvaluateSignalsError::authoritative_input(format!(
+                    "cannot inspect temporary rustdoc directory '{}': {error}",
+                    current.display()
+                )));
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Supplies rustdoc from a lazily-created Git-visible implementation-input tree.
+struct GitVisibleRustdocProvider {
+    workspace_root: PathBuf,
+    snapshot: RefCell<Option<GitVisibleWorkspace>>,
+}
+impl GitVisibleRustdocProvider {
+    fn new(workspace_root: &Path) -> Self {
+        Self { workspace_root: workspace_root.to_path_buf(), snapshot: RefCell::new(None) }
+    }
+
+    fn cleanup(self) -> Result<(), EvaluateSignalsError> {
+        self.snapshot.into_inner().map_or(Ok(()), |snapshot| snapshot.cleanup())
+    }
+}
+
+impl RustdocJsonPathProvider for GitVisibleRustdocProvider {
+    fn export_rustdoc_json_path(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<PathBuf, domain::schema::SchemaExportError> {
+        let mut snapshot = self.snapshot.borrow_mut();
+        if snapshot.is_none() {
+            let workspace =
+                materialize_git_visible_workspace(&self.workspace_root, crate_name.as_str())
+                    .map_err(|error| {
+                        domain::schema::SchemaExportError::RustdocFailed(error.to_string())
+                    })?;
+            *snapshot = Some(workspace);
+        }
+        let workspace_root = snapshot
+            .as_ref()
+            .ok_or_else(|| {
+                domain::schema::SchemaExportError::RustdocFailed(
+                    "Git-visible rustdoc workspace was not created".to_owned(),
+                )
+            })?
+            .path()
+            .map_err(|error| domain::schema::SchemaExportError::RustdocFailed(error.to_string()))?;
+        RustdocSchemaExporter::new(workspace_root.to_path_buf())
+            .export_rustdoc_json_path_with_features(crate_name, features)
+    }
+}
+
 /// Evaluates and writes type signals for one TDDD-enabled layer.
 ///
 /// # Errors
@@ -115,8 +405,24 @@ pub fn execute_type_signals_for_layer(
     binding: &TdddLayerBinding,
     features: &[CargoFeatureName],
 ) -> Result<ExitCode, EvaluateSignalsError> {
-    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    execute_with_dependencies(items_dir, track_id, workspace_root, binding, features, &exporter)
+    let exporter = GitVisibleRustdocProvider::new(workspace_root);
+    let result = execute_with_dependencies(
+        items_dir,
+        track_id,
+        workspace_root,
+        binding,
+        features,
+        &exporter,
+    );
+    let cleanup = exporter.cleanup();
+    match (result, cleanup) {
+        (Ok(exit_code), Ok(())) => Ok(exit_code),
+        (Err(error), Ok(())) => Err(error),
+        (Ok(_), Err(error)) => Err(error),
+        (Err(error), Err(cleanup_error)) => Err(EvaluateSignalsError::authoritative_input(
+            format!("{error}; temporary rustdoc workspace cleanup failed: {cleanup_error}"),
+        )),
+    }
 }
 
 #[cfg(feature = "test-helpers")]
@@ -408,7 +714,12 @@ mod tests {
             let rustup = fake_bin.path().join("rustup");
             std::fs::write(&rustup, "#!/bin/sh\nprintf 'nightly-test\\n'\n").unwrap();
             std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
-            temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), action)
+            let mut path_entries = vec![fake_bin.path().to_owned()];
+            if let Some(path) = std::env::var_os("PATH") {
+                path_entries.extend(std::env::split_paths(&path));
+            }
+            let path = std::env::join_paths(path_entries).unwrap();
+            temp_env::with_var("PATH", Some(path.as_os_str()), action)
         })
     }
 
@@ -435,7 +746,12 @@ mod tests {
             )
             .unwrap();
             std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
-            temp_env::with_var("PATH", Some(fake_bin.path().as_os_str()), action)
+            let mut path_entries = vec![fake_bin.path().to_owned()];
+            if let Some(path) = std::env::var_os("PATH") {
+                path_entries.extend(std::env::split_paths(&path));
+            }
+            let path = std::env::join_paths(path_entries).unwrap();
+            temp_env::with_var("PATH", Some(path.as_os_str()), action)
         })
     }
 
@@ -449,6 +765,7 @@ mod tests {
     fn setup_workspace() -> (tempfile::TempDir, PathBuf, TrackId, TdddLayerBinding, PathBuf) {
         let workspace = tempfile::tempdir().unwrap();
         let root = workspace.path();
+        crate::verify::test_support::git_init(root);
         let track_id = TrackId::try_new("feature-input-track").unwrap();
         let items_dir = root.join("track/items");
         let track_dir = items_dir.join(track_id.as_ref());
