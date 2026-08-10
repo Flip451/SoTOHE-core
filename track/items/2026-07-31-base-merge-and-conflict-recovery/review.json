@@ -518,6 +518,20 @@
           "hash": "rvw1:sha256:ad4a90ad46281a37bd380b767cf0a799fc4dfd8ab8a52e2f70ed70a9740bcb5d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T14:46:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a035b459b4d754d9442cb8c677bee11bb9f92da807d50e0050f7a672c36c17f5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T14:52:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a035b459b4d754d9442cb8c677bee11bb9f92da807d50e0050f7a672c36c17f5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1389,6 +1403,57 @@
           "at": "2026-08-09T03:50:03Z",
           "findings": [],
           "hash": "rvw1:sha256:3e53eeffc7f12c0d86d1d805bf30064a1a7592f59ea3ad12729a1a52dcd61381",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T10:53:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:38940191c4f8d294884d0081276156dcd06eba9acc039d3bb246d9ec7ce54cc3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T10:58:18Z",
+          "findings": [
+            {
+              "category": "command_wiring_breakage",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 99,
+              "message": "The clean-worktree requirement is not wired into any pre-merge execution path. This workflow and both recovery adapters are entered only after `merge-base` has already conflicted, so checking this prerequisite in Step 4 is necessarily retrospective; `merge-base` still permits non-overlapping local edits, and the later repository-wide `add-all` can therefore stage them. Put the check in a path that executes before `bin/sotp track merge-base` (or make this workflow own that invocation), while retaining the pre-staging verification.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:38940191c4f8d294884d0081276156dcd06eba9acc039d3bb246d9ec7ce54cc3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T12:48:17Z",
+          "findings": [
+            {
+              "category": "responsibility-boundary cross",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 99,
+              "message": "Step 4 still presents the clean-worktree requirement only as a retrospective workflow obligation and does not identify the new mechanical `bin/sotp track merge-base` preflight as the enforcement point. Because recovery is entered only after that command has already conflicted, this leaves the SSoT inconsistent with the intended responsibility split and does not tell the operator where the precondition is actually enforced.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:38940191c4f8d294884d0081276156dcd06eba9acc039d3bb246d9ec7ce54cc3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T12:51:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0c6f158f842513bb952a40241844ceaf188602666cf7755e37444d304bb0f1c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T12:55:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c0c6f158f842513bb952a40241844ceaf188602666cf7755e37444d304bb0f1c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2424,6 +2489,65 @@
           "at": "2026-08-10T10:41:39Z",
           "findings": [],
           "hash": "rvw1:sha256:6fecc14dc1f0cbfad2088372fc7febb03ab77849051204050ac0eff149a9479f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T14:25:16Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 300,
+              "message": "S11/T020 repeats the behavioral contract (“Reject a dirty worktree before guarded base merge…returning the typed dirty-worktree outcome before merge”) instead of limiting the plan text to target + operation + anchor. Remove the restatement and retain the implementation target/operation with the existing AC/IN/CN references, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c63bf1036367362160de4e31ee209e2eb4cd7429dd035c1efe06f341b2058031",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T14:27:47Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 300,
+              "message": "T020 の task-contract attribution は `usecase / BaseMergeError` を割り当てていますが、T020 の説明は `BaseMergeInteractor`、`BaseMergeGitPort`、`FsBaseMergeGitAdapter` の更新しか明示しておらず、`BaseMergeError` を追加・変更する作業を主張していません。エラー型を変更するなら説明に対象シンボルを追加し、変更しないなら T020 の attribution から削除してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b7933b9a72afc890b66cb1270a46a1a33b1557f277791b8989a6fcda8797c49f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T14:29:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6c3990ccf5d77175cb90eb1e42a69bb9adeecfd17392153fd3d34a3b45a7b6b9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T14:34:18Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 94,
+              "message": "T020 omits the `usecase / BaseMergeGitError` catalogue entry. The clean-worktree refinement adds its `DirtyWorktree` variant, while T020 already attributes the other existing entries it refines. Add `BaseMergeGitError` to T020's description and task-contract attribution so the executable boundary matches the Phase 2 contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c3990ccf5d77175cb90eb1e42a69bb9adeecfd17392153fd3d34a3b45a7b6b9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T14:37:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5b4d6f0089e6c9bc6605fa82c95fa264937a4011f0e02866f920ad55064798fc",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -5755,6 +5879,50 @@
           "hash": "rvw1:sha256:0cdff64d8b46fa83d00ca75ae7b8851a4f546d0605a343bb68c047f11f48ecc1",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T12:49:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bda925903c7eb4519573429c61da6d06122a005bc9664aafa72ca052ae47567c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T12:57:00Z",
+          "findings": [
+            {
+              "category": "adapter correctness / TOCTOU",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 134,
+              "message": "The clean-worktree probe completes before `merge_base` acquires `metadata.json.lock`, and the adapter never rechecks after acquiring it. A cooperating writer can modify a non-overlapping tracked or untracked file between those operations; Git can then merge successfully and cleanup proceeds on a dirty tree. Re-run the bounded probe after acquiring `_merge_lock` and before resolving/running the merge, or hold the same lock across the initial probe.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bda925903c7eb4519573429c61da6d06122a005bc9664aafa72ca052ae47567c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T14:15:23Z",
+          "findings": [
+            {
+              "category": "adapter correctness / fail-open path filtering",
+              "file": "libs/infrastructure/src/base_merge/worktree_probe.rs",
+              "line": 16,
+              "message": "The recursive exclusion `track/items/**/metadata.json.lock` hides every same-named path below `track/items`, not only the active track’s root lock created by `merge_base`. Consequently, a modified tracked file such as `track/items/<id>/artifacts/metadata.json.lock` is reported clean even though this module’s cleanup tests treat nested lock-named files as ordinary preserved content. Exclude only the exact active lock path and add a nested-path regression so the cleanliness gate remains fail-closed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e1a053ddf2aabb0bccf895f8be7825bb6c09c617b3c6629c42cd7620f6020b8a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T14:22:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3e56ea59a6d98dfef65031f3e4d7e7f922cfc05036adef36b22e0095aa43e8ea",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -6550,6 +6718,56 @@
           "at": "2026-08-10T07:50:08Z",
           "findings": [],
           "hash": "rvw1:sha256:119f3958c606fb5efe5c5cb4dae04d02240650180d101ff0814dd445bf41af1b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T12:58:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89277abd18dd2b1238085957d234de72fc3154d631a0c4bc368dfa7202360e50",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T14:54:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89277abd18dd2b1238085957d234de72fc3154d631a0c4bc368dfa7202360e50",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T15:02:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89277abd18dd2b1238085957d234de72fc3154d631a0c4bc368dfa7202360e50",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T15:35:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54c67efce896112e68842d72b5aa23a109d8dc8810edc2e865c44b175a39d8bc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T15:40:13Z",
+          "findings": [
+            {
+              "category": "test-obligation binding coherence",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 111,
+              "message": "The IN-06 `BaseMergeError` binding adds seven success-path writer, adapter, and outcome tests that never exercise `BaseMergeError`. They verify the anchor through other entries, so they are substitution evidence rather than the required declaration×anchor intersection and can produce a false fulfillment verdict. Keep the two tests that assert `BaseMergeError::PostMergeCleanup` sync-stamp failures; remove the unrelated success-path additions from this record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:54c67efce896112e68842d72b5aa23a109d8dc8810edc2e865c44b175a39d8bc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T15:50:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89277abd18dd2b1238085957d234de72fc3154d631a0c4bc368dfa7202360e50",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -7468,6 +7686,49 @@
           "hash": "rvw1:sha256:96dc8c0a5a97d72680af95f796e31a7671d8020078fccfabe90b0b206ff9c798",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T12:48:39Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 437,
+              "message": "`BaseMergeGitPort` declares git I/O methods `ensure_worktree_clean` and `merge_base` as synchronous (`is_async: false`), but its docs contain only anchor references and do not acknowledge or justify the synchronous design. This is a sync/async color mismatch under the scope policy.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1295095ecb548bfe525c36ca0e8b3cdea1b4aa2da8df47b9d8e89e850c020239",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T12:58:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e80841f7af325ae9ce6962214de0b527d0af59e2a584936d50e3a22bd1fc86b2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T13:25:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e80841f7af325ae9ce6962214de0b527d0af59e2a584936d50e3a22bd1fc86b2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T15:34:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:61a8b34ae22519c9aa2fe9c17d8c934fd85142f62a12d69ab9624080974d64ff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T15:39:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:61a8b34ae22519c9aa2fe9c17d8c934fd85142f62a12d69ab9624080974d64ff",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -7669,6 +7930,20 @@
           "at": "2026-08-09T13:22:19Z",
           "findings": [],
           "hash": "rvw1:sha256:41e3bb7caa1a054a7e0f786e1264ceb9d9e18c33e4a5b6ae3e4b4e073a33c604",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T14:39:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1461b6d05a249590433f829e95265e4d0729d3d5768333c90b562df912c0a863",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T14:44:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1461b6d05a249590433f829e95265e4d0729d3d5768333c90b562df912c0a863",
           "type": "final",
           "verdict": "zero_findings"
         }

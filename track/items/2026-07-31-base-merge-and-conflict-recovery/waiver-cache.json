@@ -3,54 +3,6 @@
     {
       "edge_id": {
         "anchor_id": {
-          "element_id": "CN-01",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "BaseMergeGitPort"
-      },
-      "key": {
-        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34",
-        "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d",
-        "waived_reason_hash": "c1693f47bc315a8c7387bd2e8ad75a35c663cc39bea2b0c623a04ac74de6f35a"
-      },
-      "obligation_id": {
-        "entry_key": "BaseMergeGitPort",
-        "item_identifier": "trait_method:merge_base",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "TraitEntry ... params: [ParamDeclaration { name: ParamName(Identifier(\"direction\")), ty: TypeRef(\"&domain::branch_strategy::BaseMergeDirection\") }], returns: TypeRef(\"Result<BaseMergeAttemptOutcome, BaseMergeGitError>\")",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-02",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "BaseMergeGitPort"
-      },
-      "key": {
-        "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950",
-        "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d",
-        "waived_reason_hash": "c4e4f2d31ba9f4a24dc802174bbb0ec8fa068f0eaa38655b1d2ba7b2d7964db1"
-      },
-      "obligation_id": {
-        "entry_key": "BaseMergeGitPort",
-        "item_identifier": "trait_method:merge_base",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "\"rejected without performing the merge\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
           "element_id": "IN-01",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
@@ -130,7 +82,7 @@
       },
       "key": {
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5",
-        "declaration_hash": "e607701a4e54cf73d62f72c0400bfee63c7842771f21812e4f2b113055b427c0",
+        "declaration_hash": "1ba535091109714b1944d7fdcce98d0d8f94dd3f1611ed448d453c69f95e3a59",
         "waived_reason_hash": "e93900cb50b7586b8b1d5cb59c8e70e5933359b376f758818181e8abae005fc8"
       },
       "obligation_id": {
@@ -139,7 +91,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: []",
+        "citation": "VariantDecl { name: VariantName(Identifier(\"ActiveTrackMismatch\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"current\")), ty: TypeRef(\"domain::TrackBranch\") }, FieldDecl { name: FieldName(Identifier(\"expected\")), ty: TypeRef(\"domain::TrackBranch\") }]) }",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -154,7 +106,7 @@
       },
       "key": {
         "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
-        "declaration_hash": "e607701a4e54cf73d62f72c0400bfee63c7842771f21812e4f2b113055b427c0",
+        "declaration_hash": "1ba535091109714b1944d7fdcce98d0d8f94dd3f1611ed448d453c69f95e3a59",
         "waived_reason_hash": "c18a578e29299335039b40b3c25142adfa4016e3d539e78d5f718bdf54a20e2f"
       },
       "obligation_id": {
@@ -163,7 +115,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Error type returned by the guarded base-merge application service.",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -178,7 +130,7 @@
       },
       "key": {
         "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e",
-        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "declaration_hash": "60cfd9561889ccb4f6d4fad1126f8c51face183445e4a32d7d9222108981dded",
         "waived_reason_hash": "808d6cb66fce6109e55596fb700d296cd14d4b5e588feefae19bbb05c0032049"
       },
       "obligation_id": {
@@ -187,7 +139,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Git-process failure carrying opaque adapter diagnostics.",
+        "citation": "TypeEntry ... kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Execution\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }, VariantDecl { name: VariantName(Identifier(\"DirtyWorktree\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }] ...",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -202,7 +154,7 @@
       },
       "key": {
         "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34",
-        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "declaration_hash": "60cfd9561889ccb4f6d4fad1126f8c51face183445e4a32d7d9222108981dded",
         "waived_reason_hash": "983a0f27ec8dfc2ada5840af9094467f5755fcb62c4c3235bbbdc8ea0105ecc9"
       },
       "obligation_id": {
@@ -211,7 +163,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Execution\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"base_merge\")]), docs: Some(DocString(\"Git-process failure carrying opaque adapter diagnostics.\")), spec_refs: [SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"IN-01\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"CN-01\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"AC-01\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"AC-02\") }, SpecRef { file: \"track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json\", anchor: SpecElementId(\"AC-04\") }], informal_grounds: [] }",
+        "citation": "methods: [], generics: [], where_predicates: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -226,7 +178,7 @@
       },
       "key": {
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5",
-        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "declaration_hash": "60cfd9561889ccb4f6d4fad1126f8c51face183445e4a32d7d9222108981dded",
         "waived_reason_hash": "12209c4a2a90f034c70c0760a594870fadb05c1398c7e01c82a05b01f42c0caf"
       },
       "obligation_id": {
@@ -235,7 +187,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"Git-process failure carrying opaque adapter diagnostics.\"",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -250,7 +202,7 @@
       },
       "key": {
         "anchor_text_hash": "f18c851ca6bcb1742ea5111e940f5b4d764e8a3f5972d5c76b358096ed16f950",
-        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "declaration_hash": "60cfd9561889ccb4f6d4fad1126f8c51face183445e4a32d7d9222108981dded",
         "waived_reason_hash": "a056a73bceecde91d6ecaff22381dd4c09bd9313c66189df67526943f3a3a05f"
       },
       "obligation_id": {
@@ -274,7 +226,7 @@
       },
       "key": {
         "anchor_text_hash": "404eb1317e7a391b74093b947f2d7831350cfa502637d295daad934efc0c68c4",
-        "declaration_hash": "1fa1982e64b9150eaff67bda63fcd06cbe3086c44e4047508ea858c61016fae3",
+        "declaration_hash": "60cfd9561889ccb4f6d4fad1126f8c51face183445e4a32d7d9222108981dded",
         "waived_reason_hash": "6588159324fb7ab2bd190af6e3a0542f0c3af39166867239a9839aba922d30cb"
       },
       "obligation_id": {
@@ -283,7 +235,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "Git-process failure carrying opaque adapter diagnostics.",
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Execution\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }, VariantDecl { name: VariantName(Identifier(\"DirtyWorktree\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }]",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -884,30 +836,6 @@
       },
       "verdict": {
         "citation": "\"returns: TypeRef(\\\"Result<(), ViewsRegenerationError>\\\")\"",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-01",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "BaseMergeGitPort"
-      },
-      "key": {
-        "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e",
-        "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d",
-        "waived_reason_hash": "2c34a45400953264be24026cfaf8eec80e1f8b1a937965f970e373650626a099"
-      },
-      "obligation_id": {
-        "entry_key": "BaseMergeGitPort",
-        "item_identifier": "trait_method:merge_base",
-        "obligation_kind": "contract"
-      },
-      "verdict": {
-        "citation": "ParamDeclaration { name: ParamName(Identifier(\"direction\")), ty: TypeRef(\"&domain::branch_strategy::BaseMergeDirection\") }",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

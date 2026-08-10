@@ -560,6 +560,13 @@ mod tests {
     }
 
     impl BaseMergeGitPort for RecordingGitPort {
+        fn ensure_worktree_clean(
+            &self,
+            _workspace_root: &std::path::Path,
+        ) -> Result<(), BaseMergeGitError> {
+            Ok(())
+        }
+
         fn merge_base(
             &self,
             workspace_root: &std::path::Path,

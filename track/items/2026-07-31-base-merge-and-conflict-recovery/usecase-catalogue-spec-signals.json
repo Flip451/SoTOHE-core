@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "d6296bbdfb0c02e5a28fe49f0b44697f9e605f6b9af6a2b9706ca05f75785674",
+  "catalogue_declaration_hash": "e6c9b9ac3b8b0496c23c8342080698723dd0124da5dcccc7defcd09a08e9eaf4",
   "schema_version": 1,
   "signals": [
     {
@@ -23,12 +23,12 @@
       "type_name": "BaseMergeContextError"
     },
     {
-      "entry_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "entry_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "signal": "blue",
       "type_name": "BaseMergeError"
     },
     {
-      "entry_hash": "336c06823fe12f3c91f12eeab035c9e10f3f1669675d942fd8a5dc6fba4bc652",
+      "entry_hash": "043431269da2540a07fb37ae68549309b1fcf6ddd33e0b08e9925ce67f1e4138",
       "signal": "blue",
       "type_name": "BaseMergeGitError"
     },
@@ -103,7 +103,7 @@
       "type_name": "BaseMergeContextPort"
     },
     {
-      "entry_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "entry_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "signal": "blue",
       "type_name": "BaseMergeGitPort"
     },

@@ -90,6 +90,13 @@
     "T016": [],
     "T017": [],
     "T018": [],
-    "T019": []
+    "T019": [],
+    "T020": [
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeError"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitError"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeGitAdapter"}
+    ]
   }
 }

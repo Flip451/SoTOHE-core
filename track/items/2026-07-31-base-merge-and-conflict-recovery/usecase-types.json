@@ -434,11 +434,25 @@
     },
     "BaseMergeGitPort": {
       "action": "add",
-      "docs": "Base-merge git-process driven port. Synchronous by design.",
+      "docs": "Synchronous port by design. IN-01 / IN-02 / CN-01 / CN-06 / AC-01 / AC-02 / AC-03 / AC-04 / AC-11.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Git merge-base invocation. Synchronous by design.",
+          "docs": "IN-01 / CN-01 / AC-01 / AC-02 / AC-04.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "ensure_worktree_clean",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), BaseMergeGitError>"
+        },
+        {
+          "docs": "IN-01 / CN-01 / AC-01 / AC-02 / AC-04.",
           "has_default_impl": false,
           "is_async": false,
           "name": "merge_base",
@@ -1199,7 +1213,7 @@
     },
     "BaseMergeError": {
       "action": "add",
-      "docs": "Error type returned by the guarded base-merge application service.",
+      "docs": "IN-01 / IN-02 / IN-06 / CN-01 / CN-05 / CN-06 / CN-07 / AC-01 / AC-02 / AC-03 / AC-04 / AC-10 / AC-12.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1239,6 +1253,15 @@
             }
           },
           {
+            "name": "DirtyWorktree",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
             "name": "PostMergeCleanup",
             "payload": {
               "fields": [
@@ -1265,10 +1288,6 @@
         },
         {
           "anchor": "CN-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-02",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1308,10 +1327,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "AC-11",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-12",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
@@ -1319,13 +1334,22 @@
     },
     "BaseMergeGitError": {
       "action": "add",
-      "docs": "Git-process failure carrying opaque adapter diagnostics.",
+      "docs": "IN-01 / CN-01 / AC-01 / AC-02 / AC-04.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
             "name": "Execution",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DirtyWorktree",
             "payload": {
               "fields": [
                 "DiagnosticText"

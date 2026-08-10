@@ -93,7 +93,21 @@ If verification or review fails, repair the resolution and repeat this step. Do 
 
 **Step 4: Guarded commit (staging and commit)**
 
-After review is clean, stage the intended recovery scope through a guarded staging surface:
+Staging uses the repository-wide guarded surface, so its scope is only correct when the working
+tree contains recovery changes alone. Two obligations bound this:
+
+- **Precondition (at merge start):** `bin/sotp track merge-base` mechanically enforces a clean
+  worktree before attempting the merge, rejecting tracked or non-ignored untracked changes.
+  Begin it only from a clean working tree; unrelated local edits that Git would tolerate (because
+  they do not overlap the merge) must be committed, stashed through the guarded stash surface, or
+  otherwise cleared first. Starting a guarded merge over unrelated dirt forfeits the staging scope
+  guarantee below.
+- **Verification (before staging):** after review is clean and before staging, confirm the
+  working tree holds only the recovery scope (conflict resolution, regenerated artifacts, and
+  recovery records). If unrelated changes are present, stop and clear them through their own
+  lane instead of staging; do not bundle them into the recovery commit.
+
+Then stage the recovery scope through the guarded staging surface:
 
 ```
 bin/sotp git add-all

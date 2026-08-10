@@ -601,7 +601,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -625,7 +625,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -649,7 +649,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -673,31 +673,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
-      "claim_origin": {
-        "data": {
-          "entry_key": "BaseMergeError",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "1c4d4eda6a4a2dafa6178979f4e7ea21c499d9e8bb85d6284e8503b3c3db7e71",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-02",
-          "section": "constraint",
-          "text_label": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup.",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -721,7 +697,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -745,7 +721,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -769,7 +745,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -793,7 +769,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -817,7 +793,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -836,12 +812,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "every failure, including failed restoration, fails closed",
+        "citation": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -860,12 +836,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "fail closed on record generation, validation, write, or replacement failure",
+        "citation": "\"fail closed on record generation, validation, write, or replacement failure\"",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -884,12 +860,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
+        "citation": "\"conflict outcomes do not run that cleanup\"",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -913,31 +889,7 @@
       }
     },
     {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
-      "claim_origin": {
-        "data": {
-          "entry_key": "BaseMergeError",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-11",
-          "section": "acceptance_criteria",
-          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "b9dbceaab6524996da57e2fcd4705c30f81d27c280091175229c35afe0467cd0",
+      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -961,7 +913,7 @@
       }
     },
     {
-      "claim_hash": "336c06823fe12f3c91f12eeab035c9e10f3f1669675d942fd8a5dc6fba4bc652",
+      "claim_hash": "043431269da2540a07fb37ae68549309b1fcf6ddd33e0b08e9925ce67f1e4138",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitError",
@@ -985,7 +937,7 @@
       }
     },
     {
-      "claim_hash": "336c06823fe12f3c91f12eeab035c9e10f3f1669675d942fd8a5dc6fba4bc652",
+      "claim_hash": "043431269da2540a07fb37ae68549309b1fcf6ddd33e0b08e9925ce67f1e4138",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitError",
@@ -1009,7 +961,7 @@
       }
     },
     {
-      "claim_hash": "336c06823fe12f3c91f12eeab035c9e10f3f1669675d942fd8a5dc6fba4bc652",
+      "claim_hash": "043431269da2540a07fb37ae68549309b1fcf6ddd33e0b08e9925ce67f1e4138",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitError",
@@ -1033,7 +985,7 @@
       }
     },
     {
-      "claim_hash": "336c06823fe12f3c91f12eeab035c9e10f3f1669675d942fd8a5dc6fba4bc652",
+      "claim_hash": "043431269da2540a07fb37ae68549309b1fcf6ddd33e0b08e9925ce67f1e4138",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitError",
@@ -1057,7 +1009,7 @@
       }
     },
     {
-      "claim_hash": "336c06823fe12f3c91f12eeab035c9e10f3f1669675d942fd8a5dc6fba4bc652",
+      "claim_hash": "043431269da2540a07fb37ae68549309b1fcf6ddd33e0b08e9925ce67f1e4138",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitError",
@@ -3193,7 +3145,7 @@
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3217,7 +3169,7 @@
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3241,7 +3193,7 @@
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3265,7 +3217,7 @@
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3289,7 +3241,7 @@
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3308,12 +3260,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point.",
+        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3337,7 +3289,7 @@
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3356,12 +3308,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge",
+        "citation": "\"The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.\"",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3385,7 +3337,7 @@
       }
     },
     {
-      "claim_hash": "c9cc6018a7958a8318af05241bcd0fed40d2f95b5fe61f439f904223c986cd4c",
+      "claim_hash": "ab6ba7d65cccf5a2ec4a51f9cc3eba25f68fe2926837d8683fc274e5840ca5f6",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeGitPort",
@@ -3404,7 +3356,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"the exact merged base commit\"",
+        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
         "kind": "pass"
       }
     },

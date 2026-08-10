@@ -77,6 +77,9 @@ pub enum BaseMergeGitError {
     /// The git invocation could not complete.
     #[error("base merge git operation failed: {0}")]
     Execution(DiagnosticText),
+    /// The worktree contains tracked or non-ignored untracked changes.
+    #[error("base-merge rejected: working tree is not clean: {0}")]
+    DirtyWorktree(DiagnosticText),
 }
 
 /// Failures while regenerating derived views.
@@ -162,6 +165,11 @@ pub enum BaseMergeError {
     /// The guarded git merge failed.
     #[error("base-merge git failed: {0}")]
     Git(DiagnosticText),
+    /// The worktree was dirty before the guarded merge could start.
+    #[error(
+        "base-merge rejected: working tree is not clean ({0}); commit changes or use the guarded stash surface (`bin/sotp git stash`)"
+    )]
+    DirtyWorktree(DiagnosticText),
     /// A required clean-merge cleanup stage failed.
     #[error("base-merge cleanup failed: {0}")]
     PostMergeCleanup(PostMergeCleanupError),
@@ -183,6 +191,15 @@ pub trait BaseMergeContextPort: Send + Sync {
 
 /// Performs the guarded git merge using an already-derived direction.
 pub trait BaseMergeGitPort: Send + Sync {
+    /// Rejects a worktree that has tracked or non-ignored untracked changes.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`BaseMergeGitError::DirtyWorktree`] when the status probe finds
+    /// changes, or [`BaseMergeGitError::Execution`] when the probe cannot
+    /// complete.
+    fn ensure_worktree_clean(&self, workspace_root: &Path) -> Result<(), BaseMergeGitError>;
+
     /// Attempts the base-to-track merge.
     ///
     /// # Errors
@@ -235,8 +252,8 @@ pub trait BaseMergeService: Send + Sync {
     ///
     /// # Errors
     ///
-    /// Returns [`BaseMergeError`] when context loading, the git merge, or a
-    /// required clean-merge cleanup stage fails.
+    /// Returns [`BaseMergeError`] when context loading, the worktree probe, the
+    /// git merge, or a required clean-merge cleanup stage fails.
     fn execute(&self, command: BaseMergeCommand) -> Result<BaseMergeOutcome, BaseMergeError>;
 }
 
@@ -261,6 +278,8 @@ impl BaseMergeInteractor {
 
 impl BaseMergeService for BaseMergeInteractor {
     fn execute(&self, command: BaseMergeCommand) -> Result<BaseMergeOutcome, BaseMergeError> {
+        self.git.ensure_worktree_clean(&command.workspace_root).map_err(map_git_error)?;
+
         let direction =
             self.context.load_direction(&command.workspace_root).map_err(map_context_error)?;
 
@@ -300,6 +319,7 @@ fn map_context_error(error: BaseMergeContextError) -> BaseMergeError {
 fn map_git_error(error: BaseMergeGitError) -> BaseMergeError {
     match error {
         BaseMergeGitError::Execution(detail) => BaseMergeError::Git(detail),
+        BaseMergeGitError::DirtyWorktree(detail) => BaseMergeError::DirtyWorktree(detail),
     }
 }
 
@@ -431,6 +451,10 @@ mod tests {
     }
 
     impl BaseMergeGitPort for RecordingGit {
+        fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            Ok(())
+        }
+
         fn merge_base(
             &self,
             workspace_root: &Path,
@@ -459,6 +483,10 @@ mod tests {
     }
 
     impl BaseMergeGitPort for ExactCommitGit {
+        fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            Ok(())
+        }
+
         fn merge_base(
             &self,
             workspace_root: &Path,
@@ -470,6 +498,41 @@ mod tests {
                 target: direction.active_track().as_ref().to_owned(),
             });
             Ok(BaseMergeAttemptOutcome::Clean { base_commit: self.base_commit.clone() })
+        }
+    }
+
+    #[derive(Clone, Copy)]
+    enum PreflightResponse {
+        Dirty,
+        Failure,
+    }
+
+    struct PreflightGit {
+        response: PreflightResponse,
+        merge_calls: Arc<Mutex<usize>>,
+    }
+
+    impl BaseMergeGitPort for PreflightGit {
+        fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            match self.response {
+                PreflightResponse::Dirty => {
+                    Err(BaseMergeGitError::DirtyWorktree(DiagnosticText::new(" M tracked.txt")))
+                }
+                PreflightResponse::Failure => {
+                    Err(BaseMergeGitError::Execution(DiagnosticText::new("status probe failed")))
+                }
+            }
+        }
+
+        fn merge_base(
+            &self,
+            _workspace_root: &Path,
+            _direction: &BaseMergeDirection,
+        ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> {
+            *self.merge_calls.lock().unwrap() += 1;
+            Err(BaseMergeGitError::Execution(DiagnosticText::new(
+                "merge must not be attempted after a failed preflight",
+            )))
         }
     }
 
@@ -858,6 +921,55 @@ mod tests {
         assert!(matches!(error, BaseMergeError::Context(detail)
             if detail.as_str() == "non-track current branch context is rejected"));
         assert!(git_calls.lock().unwrap().is_empty());
+        assert!(cleanup_calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_base_merge_execute_dirty_worktree_rejection_precedes_merge_attempt() {
+        let merge_calls = Arc::new(Mutex::new(0));
+        let context_workspaces = Arc::new(Mutex::new(Vec::new()));
+        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::with_workspace_recording(
+                direction(),
+                Arc::clone(&context_workspaces),
+            )),
+            Arc::new(PreflightGit {
+                response: PreflightResponse::Dirty,
+                merge_calls: Arc::clone(&merge_calls),
+            }),
+            Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+        );
+
+        let error = interactor.execute(command()).unwrap_err();
+
+        assert!(matches!(&error, BaseMergeError::DirtyWorktree(detail)
+            if detail.as_str() == " M tracked.txt"));
+        assert!(error.to_string().contains("commit changes"));
+        assert!(error.to_string().contains("bin/sotp git stash"));
+        assert!(context_workspaces.lock().unwrap().is_empty());
+        assert_eq!(*merge_calls.lock().unwrap(), 0);
+        assert!(cleanup_calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_base_merge_execute_worktree_probe_failure_fails_closed_before_merge_attempt() {
+        let merge_calls = Arc::new(Mutex::new(0));
+        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::new(direction())),
+            Arc::new(PreflightGit {
+                response: PreflightResponse::Failure,
+                merge_calls: Arc::clone(&merge_calls),
+            }),
+            Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+        );
+
+        let error = interactor.execute(command()).unwrap_err();
+
+        assert!(matches!(&error, BaseMergeError::Git(detail)
+            if detail.as_str() == "status probe failed"));
+        assert_eq!(*merge_calls.lock().unwrap(), 0);
         assert!(cleanup_calls.lock().unwrap().is_empty());
     }
 
@@ -1315,6 +1427,10 @@ mod tests {
         assert!(matches!(
             BaseMergeError::Git(DiagnosticText::new("git failed")),
             BaseMergeError::Git(detail) if detail.as_str() == "git failed"
+        ));
+        assert!(matches!(
+            BaseMergeError::DirtyWorktree(DiagnosticText::new(" M tracked.txt")),
+            BaseMergeError::DirtyWorktree(detail) if detail.as_str() == " M tracked.txt"
         ));
         assert!(matches!(
             BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(

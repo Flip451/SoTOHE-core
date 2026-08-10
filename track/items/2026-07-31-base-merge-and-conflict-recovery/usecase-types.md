@@ -13,8 +13,8 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BaseMergeContextError | error_type | add | Unavailable, ActiveTrackMismatch | 🔵 | 🔵 |
-| BaseMergeError | error_type | add | Context, ActiveTrackMismatch, Git, PostMergeCleanup | 🔵 | 🔵 |
-| BaseMergeGitError | error_type | add | Execution | 🔵 | 🔵 |
+| BaseMergeError | error_type | add | Context, ActiveTrackMismatch, Git, DirtyWorktree, PostMergeCleanup | 🔵 | 🔵 |
+| BaseMergeGitError | error_type | add | Execution, DirtyWorktree | 🔵 | 🔵 |
 | BaselineReplacementError | error_type | add | Isolation, Generation, Validation, Publish, Restoration | 🔵 | 🔵 |
 | GitStashError | error_type | add | ForbiddenBranchRefUpdate, Unavailable | 🔵 | 🔵 |
 | PostMergeCleanupError | error_type | add | Views, Baseline, SyncBaseStamp | 🔵 | 🔵 |
@@ -29,7 +29,7 @@
 |------|------|--------|---------|--------|----------|
 | BaseMergeCleanupPort | secondary_port | add | fn regenerate_views(&self, request: &BaseMergeCleanupRequest) -> Result<(), ViewsRegenerationError>, fn replace_baselines(&self, request: &BaseMergeCleanupRequest) -> Result<(), BaselineReplacementError>, fn write_sync_base_record(&self, request: &BaseMergeCleanupRequest) -> Result<(), SyncBaseRecordError> | 🔵 | 🔵 |
 | BaseMergeContextPort | secondary_port | add | fn load_direction(&self, workspace_root: &std::path::Path) -> Result<domain::branch_strategy::BaseMergeDirection, BaseMergeContextError> | 🔵 | 🔵 |
-| BaseMergeGitPort | secondary_port | add | fn merge_base(&self, workspace_root: &std::path::Path, direction: &domain::branch_strategy::BaseMergeDirection) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> | 🔵 | 🔵 |
+| BaseMergeGitPort | secondary_port | add | fn ensure_worktree_clean(&self, workspace_root: &std::path::Path) -> Result<(), BaseMergeGitError>, fn merge_base(&self, workspace_root: &std::path::Path, direction: &domain::branch_strategy::BaseMergeDirection) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> | 🔵 | 🔵 |
 | GitStashPort | secondary_port | add | fn execute(&self, command: GitStashCommand) -> Result<(), GitStashError> | 🔵 | 🔵 |
 | TrackBlobReader | secondary_port | modify | fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<domain::spec::SpecDocument>, fn read_type_catalogue(&self, branch: &str, track_id: &str, layer_id: &str) -> BlobFetchResult<(Vec<u8>, String)>, fn read_type_implementation_input_hash(&self, _branch: &str, _track_id: &str, _layer_id: &str) -> BlobFetchResult<String>, fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<domain::ImplPlanDocument>, fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>>, fn read_catalogue_for_spec_ref_check(&self, _branch: &str, _track_id: &str, _layer_id: &str) -> BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String, std::collections::HashMap<String, domain::ContentHash>)>, fn read_catalogue_spec_signals_document(&self, _branch: &str, _track_id: &str, _layer_id: &str) -> BlobFetchResult<domain::CatalogueSpecSignalsDocument>, fn read_catalogue_spec_signal_opted_in_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>>, fn read_type_signals(&self, _branch: &str, _track_id: &str, _layer_id: &str) -> BlobFetchResult<domain::TypeSignalsDocument>, fn read_adr_verify_report(&self, _branch: &str) -> BlobFetchResult<domain::AdrVerifyReport> | 🔵 | 🔵 |
 | TypeSignalsExecutorPort | secondary_port | reference | fn evaluate_layer(&self, items_dir: &std::path::Path, track_id: &domain::TrackId, workspace_root: &std::path::Path, binding: &domain::tddd::catalogue_v2::TdddLayerBinding, features: &[domain::tddd::CargoFeatureName]) -> Result<(), TypeSignalsExecutionError> | 🔵 | 🔵 |

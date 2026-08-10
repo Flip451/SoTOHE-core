@@ -3,10 +3,10 @@
 
 ## Summary
 
-GO-01 → T001–T004, T010, T011, T013, and T014.
+GO-01 → T001–T004, T010, T011, T013, T014, and T020.
 GO-02 → T005–T009, T012, T015, T016, T017, T018, and T019.
 
-## Tasks (19/19 resolved)
+## Tasks (19/20 resolved)
 
 ### S1 — Guarded base merge
 
@@ -76,3 +76,9 @@ GO-02 → T005–T009, T012, T015, T016, T017, T018, and T019.
 > Update `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs::{collect_local_tree_file_digests,collect_local_tree_paths}` and add regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.
 
 - [x] **T019**: Update `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs::{collect_local_tree_file_digests,collect_local_tree_paths}` and add regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09. (`0bef0db8`)
+
+### S11 — Clean-worktree guarded base merge
+
+> Update `libs/usecase/src/base_merge.rs`, `libs/infrastructure/src/base_merge.rs`, and `.harness/workflows/track/recover.md` for the clean-worktree preflight. IN-01; CN-01; AC-01; AC-02; AC-04.
+
+- [~] **T020**: Update `libs/usecase/src/base_merge.rs::{BaseMergeInteractor,BaseMergeGitPort,BaseMergeError,BaseMergeGitError}` and `libs/infrastructure/src/base_merge.rs::FsBaseMergeGitAdapter` for the clean-worktree preflight; update `.harness/workflows/track/recover.md`; add focused regression coverage. IN-01; CN-01; AC-01; AC-02; AC-04.

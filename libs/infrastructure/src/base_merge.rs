@@ -40,19 +40,21 @@ pub(super) const BASELINE_REPLACEMENT_PHASE_MARKER: &str = ".sotp-baseline-repla
 pub(super) const TRACK_WRITER_LOCK_FILE: &str = "metadata.json.lock";
 
 mod cleanup_tree;
+mod errors;
 mod merge_state_probe;
 mod publication;
 mod sync_base;
 mod sync_base_record;
-
-use merge_state_probe::{
-    base_commit_is_merged_into_head, has_unmerged_paths, merge_head_is_present,
-    merge_head_matches_commit,
-};
+mod worktree_probe;
 
 use cleanup_tree::{
     capture_baselines_in_worktree, collect_validated_baselines, copy_cleanup_inputs_with_baselines,
     copy_tree_with_baselines, remove_tree_bounded,
+};
+use errors::{context_unavailable, git_execution_error};
+use merge_state_probe::{
+    base_commit_is_merged_into_head, has_unmerged_paths, merge_head_is_present,
+    merge_head_matches_commit,
 };
 #[cfg(test)]
 use publication::acquire_track_writer_lock;
@@ -113,6 +115,10 @@ impl FsBaseMergeGitAdapter {
 }
 
 impl BaseMergeGitPort for FsBaseMergeGitAdapter {
+    fn ensure_worktree_clean(&self, workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+        worktree_probe::ensure_worktree_clean(workspace_root)
+    }
+
     fn merge_base(
         &self,
         workspace_root: &Path,
@@ -148,6 +154,8 @@ impl BaseMergeGitPort for FsBaseMergeGitAdapter {
         if has_unmerged_paths(&repository_root)? {
             return Err(git_execution_error("worktree has pre-existing unmerged paths"));
         }
+
+        worktree_probe::ensure_worktree_clean(&repository_root)?;
 
         let base_commit = resolve_base_commit(&repository_root, authoritative_direction.source())?;
         let output = match run_guarded_merge(&repository_root, &base_commit) {
@@ -690,14 +698,6 @@ fn open_base_merge_lock_file(lock_path: &Path) -> std::io::Result<fs::File> {
     options.open(lock_path)
 }
 
-fn context_unavailable(detail: &'static str) -> BaseMergeContextError {
-    BaseMergeContextError::Unavailable(DiagnosticText::new(detail))
-}
-
-fn git_execution_error(detail: &'static str) -> BaseMergeGitError {
-    BaseMergeGitError::Execution(DiagnosticText::new(detail))
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
@@ -765,6 +765,8 @@ mod tests {
             ),
         )
         .unwrap();
+        git(root, &["add", "track/items"]);
+        git(root, &["commit", "--quiet", "-m", "track metadata"]);
     }
 
     fn setup_repository(id: &str, base_branch: &str) -> tempfile::TempDir {
@@ -912,6 +914,10 @@ mod tests {
     struct ConflictedCleanupGit;
 
     impl BaseMergeGitPort for ConflictedCleanupGit {
+        fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            Ok(())
+        }
+
         fn merge_base(
             &self,
             _workspace_root: &Path,
@@ -924,6 +930,10 @@ mod tests {
     struct CleanCleanupGit;
 
     impl BaseMergeGitPort for CleanCleanupGit {
+        fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            Ok(())
+        }
+
         fn merge_base(
             &self,
             _workspace_root: &Path,
@@ -940,6 +950,10 @@ mod tests {
     }
 
     impl BaseMergeGitPort for ExactCommitCleanupGit {
+        fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            Ok(())
+        }
+
         fn merge_base(
             &self,
             _workspace_root: &Path,
@@ -1071,6 +1085,86 @@ mod tests {
     }
 
     #[test]
+    fn test_fs_base_merge_git_dirty_tracked_worktree_returns_typed_rejection_before_merge() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        std::fs::write(root.join("shared.txt"), "changed\n").unwrap();
+
+        let result = FsBaseMergeGitAdapter::new().ensure_worktree_clean(root);
+
+        assert!(matches!(result, Err(BaseMergeGitError::DirtyWorktree(detail))
+            if detail.as_str().contains("shared.txt")));
+        assert!(!root.join("base.txt").exists(), "preflight must run before a merge attempt");
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_dirty_untracked_worktree_returns_typed_rejection() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        std::fs::write(root.join("untracked.txt"), "untracked\n").unwrap();
+
+        let result = FsBaseMergeGitAdapter::new().ensure_worktree_clean(root);
+
+        assert!(matches!(result, Err(BaseMergeGitError::DirtyWorktree(detail))
+            if detail.as_str().contains("untracked.txt")));
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_rechecks_dirty_worktree_before_merge() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+        std::fs::write(root.join("shared.txt"), "changed\n").unwrap();
+
+        let result = FsBaseMergeGitAdapter::new().merge_base(root, &direction);
+
+        assert!(matches!(result, Err(BaseMergeGitError::DirtyWorktree(detail))
+            if detail.as_str().contains("shared.txt")));
+        assert!(!root.join("base.txt").exists(), "the guarded merge must not start");
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_rejects_nested_metadata_lock_file() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+        let nested_lock = root.join("track/items/adapter-test/artifacts/metadata.json.lock");
+        std::fs::create_dir_all(nested_lock.parent().unwrap()).unwrap();
+        std::fs::write(&nested_lock, "user content\n").unwrap();
+
+        let result = FsBaseMergeGitAdapter::new().merge_base(root, &direction);
+
+        assert!(matches!(result, Err(BaseMergeGitError::DirtyWorktree(detail))
+            if detail.as_str().contains("artifacts/metadata.json.lock")));
+        assert!(!root.join("base.txt").exists(), "the guarded merge must not start");
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_ignored_worktree_proceeds_with_merge() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        std::fs::write(root.join(".git/info/exclude"), "ignored-only.txt\n").unwrap();
+        std::fs::write(root.join("ignored-only.txt"), "ignored\n").unwrap();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+        let adapter = FsBaseMergeGitAdapter::new();
+
+        adapter.ensure_worktree_clean(root).unwrap();
+        let outcome = adapter.merge_base(root, &direction).unwrap();
+
+        assert!(matches!(outcome, BaseMergeAttemptOutcome::Clean { .. }));
+        assert!(root.join("base.txt").is_file(), "ignored files must not block the merge");
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_worktree_status_probe_failure_fails_closed() {
+        let fixture = tempfile::tempdir().unwrap();
+
+        let result = FsBaseMergeGitAdapter::new().ensure_worktree_clean(fixture.path());
+
+        assert!(matches!(result, Err(BaseMergeGitError::Execution(_))));
+    }
+
+    #[test]
     fn test_fs_base_merge_git_resolves_snapshot_branch_when_tag_has_same_name() {
         let fixture = setup_repository("adapter-test", "develop");
         let root = fixture.path();
@@ -1107,6 +1201,48 @@ mod tests {
             }
         );
         assert!(root.join("base.txt").is_file(), "the base branch content must be merged");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_fs_base_merge_git_returns_incorporated_commit_before_source_branch_advances() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+        let expected_commit = current_commit(root, "refs/heads/develop^{commit}");
+        let hooks = root.join(".githooks");
+        std::fs::create_dir_all(&hooks).unwrap();
+        git(root, &["config", "core.hooksPath", ".githooks"]);
+        write_executable_hook(
+            &hooks.join("post-merge"),
+            r#"#!/bin/sh
+set -eu
+printf 'ran\n' > post-merge-hook-ran
+parent=$(git rev-parse 'refs/heads/develop^{commit}')
+tree=$(git rev-parse 'refs/heads/develop^{tree}')
+advanced=$(printf 'advance source after merge\n' | git commit-tree "$tree" -p "$parent")
+git update-ref refs/heads/develop "$advanced" "$parent"
+"#,
+        );
+        git(root, &["add", ".githooks/post-merge"]);
+        git(root, &["commit", "--quiet", "-m", "post-merge hook"]);
+
+        let outcome = FsBaseMergeGitAdapter::new().merge_base(root, &direction).unwrap();
+        let current_source_commit = current_commit(root, "refs/heads/develop^{commit}");
+
+        assert!(root.join("post-merge-hook-ran").is_file(), "the post-merge hook must run");
+        assert_ne!(
+            current_source_commit, expected_commit,
+            "the post-merge fixture must advance the source branch before the result is read"
+        );
+        assert_eq!(
+            outcome,
+            BaseMergeAttemptOutcome::Clean {
+                base_commit: CommitHash::try_new(expected_commit).unwrap()
+            },
+            "the adapter must return the commit incorporated by the guarded merge"
+        );
+        assert!(root.join("base.txt").is_file(), "the original base tip must be merged");
     }
 
     #[test]

@@ -397,8 +397,64 @@
       }
     },
     {
+      "brief": "Author a contract test covering 'trait_method:ensure_worktree_clean' of BaseMergeGitPort",
+      "declaration_hash": "23dd938ac74727fd4b9dd06b78689a807042de15b90f740730b674be877a5ea5",
+      "id": {
+        "entry_key": "BaseMergeGitPort",
+        "item_identifier": "trait_method:ensure_worktree_clean",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "CN-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-11",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "BaseMergeGitPort",
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
       "brief": "Author a contract test covering 'trait_method:merge_base' of BaseMergeGitPort",
-      "declaration_hash": "d97b65dbbee5dc01993a48ab1d7101de0315b654adffdb5c84e9e3d836ce0a2d",
+      "declaration_hash": "23dd938ac74727fd4b9dd06b78689a807042de15b90f740730b674be877a5ea5",
       "id": {
         "entry_key": "BaseMergeGitPort",
         "item_identifier": "trait_method:merge_base",
@@ -1098,7 +1154,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::base_merge::BaseMergeGitPort' of FsBaseMergeGitAdapter",
-      "declaration_hash": "38aab258620c13e291a84314901e6f9bef31c465e11b90baa75652ff01efc9b0",
+      "declaration_hash": "8b721adcf2022840f53453628fd8e17183e0bec551c095fb73fbf6ec0352e5e7",
       "id": {
         "entry_key": "FsBaseMergeGitAdapter",
         "item_identifier": "trait_impl:usecase::base_merge::BaseMergeGitPort",

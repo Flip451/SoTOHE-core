@@ -141,12 +141,14 @@ subgraph usecase["usecase"]
     T30_usecase_usecase_BaseMergeError_Context[Context]
     T30_usecase_usecase_BaseMergeError_ActiveTrackMismatch[ActiveTrackMismatch]
     T30_usecase_usecase_BaseMergeError_Git[Git]
+    T30_usecase_usecase_BaseMergeError_DirtyWorktree[DirtyWorktree]
     T30_usecase_usecase_BaseMergeError_PostMergeCleanup[PostMergeCleanup]
   end
   subgraph T33_usecase_usecase_BaseMergeGitError["base_merge::BaseMergeGitError"]
     direction TB
     T33_usecase_usecase_BaseMergeGitError__self[BaseMergeGitError]
     T33_usecase_usecase_BaseMergeGitError_Execution[Execution]
+    T33_usecase_usecase_BaseMergeGitError_DirtyWorktree[DirtyWorktree]
   end
   subgraph T35_usecase_usecase_BaseMergeInteractor["base_merge::BaseMergeInteractor"]
     direction TB
@@ -203,6 +205,7 @@ subgraph usecase["usecase"]
   subgraph R32_usecase_usecase_BaseMergeGitPort["base_merge::BaseMergeGitPort"]
     direction TB
     R32_usecase_usecase_BaseMergeGitPort__self[BaseMergeGitPort]
+    R32_usecase_usecase_BaseMergeGitPort_ensure_worktree_clean([ensure_worktree_clean])
     R32_usecase_usecase_BaseMergeGitPort_merge_base([merge_base])
   end
   subgraph R32_usecase_usecase_BaseMergeService["base_merge::BaseMergeService"]
@@ -486,6 +489,7 @@ R36_usecase_usecase_BaseMergeCleanupPort_write_sync_base_record --o T39_usecase_
 R36_usecase_usecase_BaseMergeCleanupPort_write_sync_base_record --> T35_usecase_usecase_SyncBaseRecordError__self
 R36_usecase_usecase_BaseMergeContextPort_load_direction --> T37_usecase_usecase_BaseMergeContextError__self
 R36_usecase_usecase_BaseMergeContextPort_load_direction --> T32_domain_domain_BaseMergeDirection__self
+R32_usecase_usecase_BaseMergeGitPort_ensure_worktree_clean --> T33_usecase_usecase_BaseMergeGitError__self
 R32_usecase_usecase_BaseMergeGitPort_merge_base --o T32_domain_domain_BaseMergeDirection__self
 R32_usecase_usecase_BaseMergeGitPort_merge_base --> T39_usecase_usecase_BaseMergeAttemptOutcome__self
 R32_usecase_usecase_BaseMergeGitPort_merge_base --> T33_usecase_usecase_BaseMergeGitError__self
@@ -585,9 +589,11 @@ class T37_usecase_usecase_BaseMergeContextError__self error_type
 class T30_usecase_usecase_BaseMergeError_Context variant_node
 class T30_usecase_usecase_BaseMergeError_ActiveTrackMismatch variant_node
 class T30_usecase_usecase_BaseMergeError_Git variant_node
+class T30_usecase_usecase_BaseMergeError_DirtyWorktree variant_node
 class T30_usecase_usecase_BaseMergeError_PostMergeCleanup variant_node
 class T30_usecase_usecase_BaseMergeError__self error_type
 class T33_usecase_usecase_BaseMergeGitError_Execution variant_node
+class T33_usecase_usecase_BaseMergeGitError_DirtyWorktree variant_node
 class T33_usecase_usecase_BaseMergeGitError__self error_type
 class T35_usecase_usecase_BaseMergeInteractor_new method_node
 class T35_usecase_usecase_BaseMergeInteractor__self interactor
@@ -617,6 +623,7 @@ class R36_usecase_usecase_BaseMergeCleanupPort_write_sync_base_record method_nod
 class R36_usecase_usecase_BaseMergeCleanupPort__self secondary_port
 class R36_usecase_usecase_BaseMergeContextPort_load_direction method_node
 class R36_usecase_usecase_BaseMergeContextPort__self secondary_port
+class R32_usecase_usecase_BaseMergeGitPort_ensure_worktree_clean method_node
 class R32_usecase_usecase_BaseMergeGitPort_merge_base method_node
 class R32_usecase_usecase_BaseMergeGitPort__self secondary_port
 class R32_usecase_usecase_BaseMergeService_execute method_node
