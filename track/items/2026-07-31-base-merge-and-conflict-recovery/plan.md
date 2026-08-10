@@ -6,7 +6,7 @@
 GO-01 → T001–T004, T010, T011, T013, and T014.
 GO-02 → T005–T009, T012, T015, T016, T017, and T018.
 
-## Tasks (17/18 resolved)
+## Tasks (18/18 resolved)
 
 ### S1 — Guarded base merge
 
@@ -69,4 +69,4 @@ GO-02 → T005–T009, T012, T015, T016, T017, and T018.
 
 > Update `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs::{hash_implementation_inputs_with_toolchain_identifier,hash_implementation_input_components}` and `libs/infrastructure/src/verify/branch_implementation_inputs.rs::hash_branch_implementation_inputs`; add focused regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.
 
-- [~] **T018**: Update `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs::{hash_implementation_inputs_with_toolchain_identifier,hash_implementation_input_components}` and `libs/infrastructure/src/verify/branch_implementation_inputs.rs::hash_branch_implementation_inputs`; add chmod-sensitivity and local/branch parity regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.
+- [x] **T018**: Update `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs::{hash_implementation_inputs_with_toolchain_identifier,hash_implementation_input_components}` and `libs/infrastructure/src/verify/branch_implementation_inputs.rs::hash_branch_implementation_inputs`; add chmod-sensitivity and local/branch parity regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09. (`5ba9b774`)

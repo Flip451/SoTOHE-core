@@ -255,13 +255,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "5ba9b774",
       "depends_on": [
         "T017"
       ],
       "description": "Update `libs/infrastructure/src/tddd/type_signals_evaluator/build_inputs.rs::{hash_implementation_inputs_with_toolchain_identifier,hash_implementation_input_components}` and `libs/infrastructure/src/verify/branch_implementation_inputs.rs::hash_branch_implementation_inputs`; add chmod-sensitivity and local/branch parity regression coverage. IN-05; CN-03; CN-04; AC-07; AC-09.",
       "id": "T018",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
