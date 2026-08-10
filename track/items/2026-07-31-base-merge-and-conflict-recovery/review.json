@@ -2311,6 +2311,42 @@
           "hash": "rvw1:sha256:96401c4276792fe6778966f992bbfeae230740a903b0d88b33fa37435f6c3fe2",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T07:14:17Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 267,
+              "message": "T018's task description is not executable: it names the operation and anchors, but not the target file or symbol for either digest implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 99,
+              "message": "T018 and S9 restate the upstream behavior contract (“content-identical source trees remain byte-compatible” and “excluding mode bits and hashing content plus path only”) instead of using only target, operation, and anchor cites. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6aa4c92dbdcc427c1a9470da84a781b2df6c4fed149fab2c41c3a3bfbbfb9dc5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T07:17:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:faa24da01ae1ef16dc21e50389ad125658f73abde52a4dc1c9f4969c0c56cddd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T07:22:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:faa24da01ae1ef16dc21e50389ad125658f73abde52a4dc1c9f4969c0c56cddd",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -5493,6 +5529,20 @@
           "at": "2026-08-10T06:07:05Z",
           "findings": [],
           "hash": "rvw1:sha256:466f5b62a1e34ebecf1f9e6e14e4147d869e5f11ab943dfa9e9e751dedcadb88",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T07:14:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05c9581a88231424e60b494b90d73a1722f65bf45611996518c39b26ef52a9b3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T07:22:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05c9581a88231424e60b494b90d73a1722f65bf45611996518c39b26ef52a9b3",
           "type": "final",
           "verdict": "zero_findings"
         }

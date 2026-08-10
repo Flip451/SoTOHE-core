@@ -23,7 +23,7 @@ pub(super) fn collect_branch_tree_file_digests(
     for root in roots {
         ensure_branch_crate_directory(repo_root, branch, &root.path)?;
         let paths = branch_tree_paths(repo_root, branch, &root.path, &mut visited_entries)?;
-        for (path, executable) in paths {
+        for path in paths {
             if is_vcs_internal(&path) {
                 continue;
             }
@@ -40,7 +40,7 @@ pub(super) fn collect_branch_tree_file_digests(
                 ));
             }
             *remaining_budget -= bytes as usize;
-            files.push((path.into_bytes(), executable, digest));
+            files.push((path.into_bytes(), digest));
         }
     }
     if files.is_empty() {
@@ -77,7 +77,7 @@ fn branch_tree_paths(
     branch: &str,
     crate_root: &str,
     visited_entries: &mut usize,
-) -> Result<Vec<(String, bool)>, String> {
+) -> Result<Vec<String>, String> {
     let git_ref = format!("origin/{branch}");
     let tree_path = format!("{crate_root}/");
     let output = isolated_bounded_git_output(
@@ -141,9 +141,9 @@ fn branch_tree_paths(
                 "implementation source traversal exceeds maximum depth of {MAX_SOURCE_DEPTH} at '{path}'"
             ));
         }
-        paths.push((path, mode == 0o100_755));
+        paths.push(path);
     }
-    paths.sort_by(|(left, _), (right, _)| left.cmp(right));
+    paths.sort();
     Ok(paths)
 }
 
@@ -187,8 +187,8 @@ mod tests {
         let mut budget = 64 * 1024 * 1024;
         let files = collect_branch_tree_file_digests(directory.path(), "main", &roots, &mut budget)
             .unwrap();
-        assert!(files.iter().any(|(path, _, _)| path == b"libs/domain/README.md"));
-        assert!(files.iter().any(|(path, _, _)| path == b"libs/domain/Cargo.toml"));
+        assert!(files.iter().any(|(path, _)| path == b"libs/domain/README.md"));
+        assert!(files.iter().any(|(path, _)| path == b"libs/domain/Cargo.toml"));
     }
 
     #[test]
@@ -206,7 +206,7 @@ mod tests {
         }];
         let mut budget = 64 * 1024 * 1024;
         let files = collect_branch_tree_file_digests(repo, "main", &roots, &mut budget).unwrap();
-        assert!(files.iter().any(|(path, _, _)| path.ends_with(b"generated")));
+        assert!(files.iter().any(|(path, _)| path.ends_with(b"generated")));
     }
 
     #[test]
@@ -224,7 +224,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_collect_branch_tree_file_digests_preserves_executable_mode() {
+    fn test_collect_branch_tree_file_digests_accepts_executable_mode() {
         use std::os::unix::fs::PermissionsExt;
 
         let directory = setup_repo();
@@ -241,8 +241,8 @@ mod tests {
         }];
         let mut budget = 64 * 1024 * 1024;
         let files = collect_branch_tree_file_digests(repo, "main", &roots, &mut budget).unwrap();
-        let (_, executable, _) =
-            files.iter().find(|(path, _, _)| path == b"libs/domain/README.md").unwrap();
-        assert!(*executable);
+        let (_, content_digest) =
+            files.iter().find(|(path, _)| path == b"libs/domain/README.md").unwrap();
+        assert_ne!(*content_digest, [0; 32]);
     }
 }

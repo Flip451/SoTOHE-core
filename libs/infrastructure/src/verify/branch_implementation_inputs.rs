@@ -309,6 +309,27 @@ mod tests {
         assert_eq!(branch, local);
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn test_branch_implementation_inputs_match_local_hash_when_tree_modes_differ() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let directory = setup_repo();
+        let source = directory.path().join("libs/domain/src/lib.rs");
+        std::fs::set_permissions(&source, std::fs::Permissions::from_mode(0o755)).unwrap();
+        git(directory.path(), &["add", "libs/domain/src/lib.rs"]);
+        git(directory.path(), &["commit", "--quiet", "-m", "make source executable"]);
+        git(directory.path(), &["fetch", "--quiet", "origin"]);
+        std::fs::set_permissions(&source, std::fs::Permissions::from_mode(0o644)).unwrap();
+
+        let local = hash_workspace_inputs(directory.path(), "usecase", &[]).unwrap();
+        let branch = hash_branch_implementation_inputs(directory.path(), "main", "foo", "usecase")
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(branch, local);
+    }
+
     #[test]
     fn test_branch_implementation_inputs_ignore_crate_outside_layer_closure() {
         let directory = setup_repo();

@@ -27,9 +27,9 @@ pub(crate) const MAX_TOTAL_SOURCE_BYTES: u64 = 64 * 1024 * 1024;
 pub(crate) const MAX_SOURCE_ENTRIES: usize = 20_000;
 pub(crate) const MAX_SOURCE_FILES: usize = 10_000;
 pub(crate) const MAX_SOURCE_DEPTH: usize = 32;
-/// A regular file's canonical tree identity: repository-relative path,
-/// executable bit, and streamed content digest.
-pub(crate) type TreeFileDigest = (Vec<u8>, bool, [u8; 32]);
+/// A regular file's canonical tree identity: repository-relative path and
+/// streamed content digest.
+pub(crate) type TreeFileDigest = (Vec<u8>, [u8; 32]);
 const HASH_READ_BUFFER_BYTES: usize = 8 * 1024;
 const MAX_TOOLCHAIN_COMMAND_OUTPUT_BYTES: usize = 64 * 1024;
 const MAX_TOOLCHAIN_COMMAND_DURATION: Duration = Duration::from_secs(10);
@@ -96,14 +96,13 @@ pub(crate) fn hash_implementation_input_components(
     toolchain_identifier: &[u8],
 ) -> Result<Sha256Digest, EvaluateSignalsError> {
     let mut sorted_tree_files = tree_files.to_vec();
-    sorted_tree_files.sort_by(|(left, _, _), (right, _, _)| left.cmp(right));
+    sorted_tree_files.sort_by(|(left, _), (right, _)| left.cmp(right));
 
     let mut hasher = sha2::Sha256::new();
-    hasher.update(b"sotohe-implementation-inputs-v4\0");
+    hasher.update(b"sotohe-implementation-inputs-v5\0");
     append_component(&mut hasher, b"schema-export-target", schema_export_target.as_bytes());
-    for (path, executable, content_digest) in sorted_tree_files {
+    for (path, content_digest) in sorted_tree_files {
         append_component(&mut hasher, b"crate-file-path", &path);
-        append_component(&mut hasher, b"crate-file-executable", &[u8::from(executable)]);
         append_component(&mut hasher, b"crate-file-content-sha256", &content_digest);
     }
     append_component(&mut hasher, b"workspace-manifest", workspace_manifest);
@@ -246,8 +245,8 @@ fn collect_local_tree(
                 "implementation source traversal exceeds maximum of {MAX_SOURCE_FILES} files"
             )));
         }
-        let (digest, _, executable) = digest_local_file(&path, &relative, remaining_budget)?;
-        files.push((relative.into_bytes(), executable, digest));
+        let (digest, _) = digest_local_file(&path, &relative, remaining_budget)?;
+        files.push((relative.into_bytes(), digest));
     }
     Ok(())
 }
@@ -283,7 +282,7 @@ fn digest_local_file(
     path: &Path,
     relative: &str,
     remaining_budget: &mut u64,
-) -> Result<([u8; 32], u64, bool), EvaluateSignalsError> {
+) -> Result<([u8; 32], u64), EvaluateSignalsError> {
     let metadata = std::fs::metadata(path)
         .map_err(|error| local_input_error(path, format!("cannot read file metadata: {error}")))?;
     if metadata.len() > MAX_SOURCE_FILE_BYTES {
@@ -329,21 +328,7 @@ fn digest_local_file(
     let digest = hasher.finalize();
     let mut bytes = [0_u8; 32];
     bytes.copy_from_slice(&digest);
-    Ok((bytes, bytes_seen, is_executable(&metadata)?))
-}
-
-#[cfg(unix)]
-fn is_executable(metadata: &std::fs::Metadata) -> Result<bool, EvaluateSignalsError> {
-    use std::os::unix::fs::PermissionsExt;
-
-    Ok(metadata.permissions().mode() & 0o111 != 0)
-}
-
-#[cfg(not(unix))]
-fn is_executable(_metadata: &std::fs::Metadata) -> Result<bool, EvaluateSignalsError> {
-    Err(EvaluateSignalsError::authoritative_input(
-        "cannot determine the canonical Git executable bit on this platform".to_owned(),
-    ))
+    Ok((bytes, bytes_seen))
 }
 
 fn local_input_error(path: &Path, message: String) -> EvaluateSignalsError {
@@ -752,7 +737,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_hash_layer_graph_changes_when_regular_file_executable_mode_changes() {
+    fn test_hash_layer_graph_ignores_regular_file_executable_mode_changes() {
         use std::os::unix::fs::PermissionsExt;
 
         let workspace = workspace_with_layer_graph();
@@ -766,7 +751,7 @@ mod tests {
         let executable =
             hash_implementation_inputs_with_toolchain_identifier(root, "usecase", b"nightly")
                 .unwrap();
-        assert_ne!(initial, executable);
+        assert_eq!(initial, executable);
     }
 
     #[cfg(unix)]
