@@ -350,13 +350,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "80c19882",
       "depends_on": [
         "T015"
       ],
       "description": "Update `libs/usecase/src/base_merge.rs` to re-render derived views during clean-merge cleanup; add focused regression coverage. IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11.",
       "id": "T023",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }

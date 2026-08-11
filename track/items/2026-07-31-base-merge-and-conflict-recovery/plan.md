@@ -6,7 +6,7 @@
 GO-01 → T001–T004, T010, T011, T013, T014, T020, and T023.
 GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, and T022.
 
-## Tasks (22/23 resolved)
+## Tasks (23/23 resolved)
 
 ### S1 — Guarded base merge
 
@@ -99,4 +99,4 @@ GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, and T022.
 
 > Update `libs/usecase/src/base_merge.rs` to re-render derived views during clean-merge cleanup; add focused regression coverage. IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11.
 
-- [~] **T023**: Update `libs/usecase/src/base_merge.rs` to re-render derived views during clean-merge cleanup; add focused regression coverage. IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11.
+- [x] **T023**: Update `libs/usecase/src/base_merge.rs` to re-render derived views during clean-merge cleanup; add focused regression coverage. IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11. (`80c19882`)
