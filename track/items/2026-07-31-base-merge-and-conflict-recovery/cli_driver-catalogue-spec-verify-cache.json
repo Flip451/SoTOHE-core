@@ -82,17 +82,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
       "evidence_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates.",
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
         "kind": "pass"
       }
     },
@@ -106,17 +106,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch",
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
         "kind": "pass"
       }
     },
@@ -130,17 +130,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
       "evidence_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates.",
+        "citation": "Provide guarded stash push and stash-pop support",
         "kind": "pass"
       }
     },
@@ -154,17 +154,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path",
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
         "kind": "pass"
       }
     },

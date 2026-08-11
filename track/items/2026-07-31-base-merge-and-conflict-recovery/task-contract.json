@@ -29,12 +29,14 @@
       {"layer": "cli", "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge"}
     ],
     "T005": [],
-    "T006": [
+    "T006": [],
+    "T021": [
       {"layer": "usecase", "entry_key": "GitStashPort"},
       {"layer": "usecase", "entry_key": "GitStashService"},
-      {"layer": "usecase", "entry_key": "GitStashCommand"},
-      {"layer": "usecase", "entry_key": "GitStashError"},
+      {"layer": "usecase", "entry_key": "GitStashPushError"},
+      {"layer": "usecase", "entry_key": "GitStashPopError"},
       {"layer": "usecase", "entry_key": "GitStashInteractor"},
+      {"layer": "usecase", "entry_key": "GitStashPushOutcome"},
       {"layer": "infrastructure", "entry_key": "FsGitStashAdapter"},
       {"layer": "cli_driver", "entry_key": "GitDriver"},
       {"layer": "cli_driver", "entry_key": "GitStashInput"},

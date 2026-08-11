@@ -323,12 +323,12 @@
       }
     },
     {
-      "claim_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
+      "claim_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
       "claim_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
         },
         "kind": "spec_element"
       },
@@ -342,6 +342,29 @@
       },
       "verdict": {
         "citation": "stash / stash pop の guarded wrapper を設ける。stash は履歴を汚さないため guard は軽くてよいが、untracked な track artifacts の扱い（-u 相当）を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7e7a3061abd32174c25f32754dfef5a0ca84e6109ed4480cf28bfd4e9ffd5db1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "guarded stash の push は、作成した stash の immutable な commit OID、または明示的な nothing-to-stash outcome のいずれかを返す。... pop はこの record を読み取る。... OID を指定して対象 stash だけを適用する。",
         "kind": "pass"
       }
     },
@@ -457,6 +480,29 @@
       },
       "verdict": {
         "citation": "inactive・archived track の既存成果物は走査・移行・検証しない。type-signals の手動削除を baseline 再取得の通常手順には含めない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "371198f173f95e1427c0a8cf17642eb2fabbf9c19ad819cf25844bdb16341ae7",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-04",
+          "section": "out_of_scope",
+          "text_label": "External-interference defenses beyond the guarded stash threat model are out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7e7a3061abd32174c25f32754dfef5a0ca84e6109ed4480cf28bfd4e9ffd5db1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "threat model は次で閉じる。guarded path は adapter lock で直列化し、unguarded な stash mutation は repository の reference-transaction hook layer が拒否する。token を保持する operator の manual intervention は operator responsibility とし、適用直前と削除直前の OID 再検証を誤適用に対する最後の防御とする。",
         "kind": "pass"
       }
     },
@@ -691,6 +737,29 @@
       }
     },
     {
+      "claim_hash": "3793f9236ea479dd220604a0cd0de01b65dd304b4b9cc1fff0e138551bb72a0a",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-08",
+          "section": "constraint",
+          "text_label": "The guarded stash threat model serializes the guarded path with the adapter lock, rejects unguarded stash mutations through the repository reference-transaction hook layer, assigns token-holding operator manual intervention to operator responsibility, and uses OID re-verification at application time as the final protection against misapplication."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7e7a3061abd32174c25f32754dfef5a0ca84e6109ed4480cf28bfd4e9ffd5db1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "threat model は次で閉じる。guarded path は adapter lock で直列化し、unguarded な stash mutation は repository の reference-transaction hook layer が拒否する。token を保持する operator の manual intervention は operator responsibility とし、適用直前と削除直前の OID 再検証を誤適用に対する最後の防御とする。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
       "claim_origin": {
         "data": {
@@ -921,12 +990,12 @@
       }
     },
     {
-      "claim_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
+      "claim_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
       "claim_origin": {
         "data": {
           "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
         },
         "kind": "spec_element"
       },
@@ -1101,6 +1170,29 @@
       },
       "verdict": {
         "citation": "いずれかの段階が失敗した場合、merge 操作は後始末を含む完了を報告してはならない。conflict outcome では、この clean-merge cleanup を実行しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7e7a3061abd32174c25f32754dfef5a0ca84e6109ed4480cf28bfd4e9ffd5db1",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "guarded stash surface は push outcome を、repository の local operational state 配下にある machine-owned、gitignored、repository-scoped な single-slot record へ永続化する。record が存在する間の次の guarded push は fail-closed とし、pending pop の解決を先に要求する。",
         "kind": "pass"
       }
     }

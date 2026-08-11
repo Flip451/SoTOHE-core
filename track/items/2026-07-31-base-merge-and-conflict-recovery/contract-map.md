@@ -216,32 +216,44 @@ subgraph usecase["usecase"]
   end
   subgraph usecase_usecase_module_git_stash["usecase::git_stash"]
     direction TB
-  subgraph T31_usecase_usecase_GitStashCommand["git_stash::GitStashCommand"]
-    direction TB
-    T31_usecase_usecase_GitStashCommand__self[GitStashCommand]
-    T31_usecase_usecase_GitStashCommand_Push[Push]
-    T31_usecase_usecase_GitStashCommand_Pop[Pop]
-  end
-  subgraph T29_usecase_usecase_GitStashError["git_stash::GitStashError"]
-    direction TB
-    T29_usecase_usecase_GitStashError__self[GitStashError]
-    T29_usecase_usecase_GitStashError_ForbiddenBranchRefUpdate[ForbiddenBranchRefUpdate]
-    T29_usecase_usecase_GitStashError_Unavailable[Unavailable]
-  end
   subgraph T34_usecase_usecase_GitStashInteractor["git_stash::GitStashInteractor"]
     direction TB
     T34_usecase_usecase_GitStashInteractor__self[GitStashInteractor]
     T34_usecase_usecase_GitStashInteractor_new([new])
   end
+  subgraph T32_usecase_usecase_GitStashPopError["git_stash::GitStashPopError"]
+    direction TB
+    T32_usecase_usecase_GitStashPopError__self[GitStashPopError]
+    T32_usecase_usecase_GitStashPopError_ForbiddenBranchRefUpdate[ForbiddenBranchRefUpdate]
+    T32_usecase_usecase_GitStashPopError_NoPendingGuardedStash[NoPendingGuardedStash]
+    T32_usecase_usecase_GitStashPopError_Unavailable[Unavailable]
+    T32_usecase_usecase_GitStashPopError_StashIdentityMissing[StashIdentityMissing]
+    T32_usecase_usecase_GitStashPopError_StashIdentityMismatch[StashIdentityMismatch]
+  end
+  subgraph T33_usecase_usecase_GitStashPushError["git_stash::GitStashPushError"]
+    direction TB
+    T33_usecase_usecase_GitStashPushError__self[GitStashPushError]
+    T33_usecase_usecase_GitStashPushError_ForbiddenBranchRefUpdate[ForbiddenBranchRefUpdate]
+    T33_usecase_usecase_GitStashPushError_PendingGuardedStashExists[PendingGuardedStashExists]
+    T33_usecase_usecase_GitStashPushError_Unavailable[Unavailable]
+  end
+  subgraph T35_usecase_usecase_GitStashPushOutcome["git_stash::GitStashPushOutcome"]
+    direction TB
+    T35_usecase_usecase_GitStashPushOutcome__self[GitStashPushOutcome]
+    T35_usecase_usecase_GitStashPushOutcome_Created[Created]
+    T35_usecase_usecase_GitStashPushOutcome_NothingToStash[NothingToStash]
+  end
   subgraph R28_usecase_usecase_GitStashPort["git_stash::GitStashPort"]
     direction TB
     R28_usecase_usecase_GitStashPort__self[GitStashPort]
-    R28_usecase_usecase_GitStashPort_execute([execute])
+    R28_usecase_usecase_GitStashPort_push([push])
+    R28_usecase_usecase_GitStashPort_pop([pop])
   end
   subgraph R31_usecase_usecase_GitStashService["git_stash::GitStashService"]
     direction TB
     R31_usecase_usecase_GitStashService__self[GitStashService]
-    R31_usecase_usecase_GitStashService_execute([execute])
+    R31_usecase_usecase_GitStashService_push([push])
+    R31_usecase_usecase_GitStashService_pop([pop])
   end
   end
   subgraph usecase_usecase_module_merge_gate["usecase::merge_gate"]
@@ -498,10 +510,16 @@ R32_usecase_usecase_BaseMergeService_execute --> T30_usecase_usecase_BaseMergeEr
 R32_usecase_usecase_BaseMergeService_execute --> T32_usecase_usecase_BaseMergeOutcome__self
 T34_usecase_usecase_GitStashInteractor_new --o R28_usecase_usecase_GitStashPort__self
 T34_usecase_usecase_GitStashInteractor_new --> T34_usecase_usecase_GitStashInteractor__self
-R28_usecase_usecase_GitStashPort_execute --o T31_usecase_usecase_GitStashCommand__self
-R28_usecase_usecase_GitStashPort_execute --> T29_usecase_usecase_GitStashError__self
-R31_usecase_usecase_GitStashService_execute --o T31_usecase_usecase_GitStashCommand__self
-R31_usecase_usecase_GitStashService_execute --> T29_usecase_usecase_GitStashError__self
+T32_usecase_usecase_GitStashPopError_StashIdentityMissing --o T24_domain_domain_CommitHash__self
+T32_usecase_usecase_GitStashPopError_StashIdentityMismatch --o|expected| T24_domain_domain_CommitHash__self
+T32_usecase_usecase_GitStashPopError_StashIdentityMismatch --o|actual| T24_domain_domain_CommitHash__self
+T35_usecase_usecase_GitStashPushOutcome_Created --o T24_domain_domain_CommitHash__self
+R28_usecase_usecase_GitStashPort_push --> T33_usecase_usecase_GitStashPushError__self
+R28_usecase_usecase_GitStashPort_push --> T35_usecase_usecase_GitStashPushOutcome__self
+R28_usecase_usecase_GitStashPort_pop --> T32_usecase_usecase_GitStashPopError__self
+R31_usecase_usecase_GitStashService_push --> T33_usecase_usecase_GitStashPushError__self
+R31_usecase_usecase_GitStashService_push --> T35_usecase_usecase_GitStashPushOutcome__self
+R31_usecase_usecase_GitStashService_pop --> T32_usecase_usecase_GitStashPopError__self
 R31_usecase_usecase_TrackBlobReader_read_type_signals --> T33_domain_domain_TypeSignalsDocument__self
 T37_usecase_usecase_TypeSignalsInteractor_new --o R39_usecase_usecase_TypeSignalsExecutorPort__self
 T37_usecase_usecase_TypeSignalsInteractor_new --> T37_usecase_usecase_TypeSignalsInteractor__self
@@ -628,17 +646,26 @@ class R32_usecase_usecase_BaseMergeGitPort_merge_base method_node
 class R32_usecase_usecase_BaseMergeGitPort__self secondary_port
 class R32_usecase_usecase_BaseMergeService_execute method_node
 class R32_usecase_usecase_BaseMergeService__self app_service
-class T31_usecase_usecase_GitStashCommand_Push variant_node
-class T31_usecase_usecase_GitStashCommand_Pop variant_node
-class T31_usecase_usecase_GitStashCommand__self command
-class T29_usecase_usecase_GitStashError_ForbiddenBranchRefUpdate variant_node
-class T29_usecase_usecase_GitStashError_Unavailable variant_node
-class T29_usecase_usecase_GitStashError__self error_type
 class T34_usecase_usecase_GitStashInteractor_new method_node
 class T34_usecase_usecase_GitStashInteractor__self interactor
-class R28_usecase_usecase_GitStashPort_execute method_node
+class T32_usecase_usecase_GitStashPopError_ForbiddenBranchRefUpdate variant_node
+class T32_usecase_usecase_GitStashPopError_NoPendingGuardedStash variant_node
+class T32_usecase_usecase_GitStashPopError_Unavailable variant_node
+class T32_usecase_usecase_GitStashPopError_StashIdentityMissing variant_node
+class T32_usecase_usecase_GitStashPopError_StashIdentityMismatch variant_node
+class T32_usecase_usecase_GitStashPopError__self error_type
+class T33_usecase_usecase_GitStashPushError_ForbiddenBranchRefUpdate variant_node
+class T33_usecase_usecase_GitStashPushError_PendingGuardedStashExists variant_node
+class T33_usecase_usecase_GitStashPushError_Unavailable variant_node
+class T33_usecase_usecase_GitStashPushError__self error_type
+class T35_usecase_usecase_GitStashPushOutcome_Created variant_node
+class T35_usecase_usecase_GitStashPushOutcome_NothingToStash variant_node
+class T35_usecase_usecase_GitStashPushOutcome__self value_object
+class R28_usecase_usecase_GitStashPort_push method_node
+class R28_usecase_usecase_GitStashPort_pop method_node
 class R28_usecase_usecase_GitStashPort__self secondary_port
-class R31_usecase_usecase_GitStashService_execute method_node
+class R31_usecase_usecase_GitStashService_push method_node
+class R31_usecase_usecase_GitStashService_pop method_node
 class R31_usecase_usecase_GitStashService__self app_service
 class R31_usecase_usecase_TrackBlobReader_read_spec_document method_node
 class R31_usecase_usecase_TrackBlobReader_read_type_catalogue method_node

@@ -103,6 +103,10 @@ track/items/**/.sotp-baseline-replacement-phase
 # adopted and cleaned up by a later cleanup run; never version-controlled).
 track/.sotp-baseline-recovery/
 
+# --- Guarded stash pairing (machine-owned repository-local single slot) ---
+/.sotp-guarded-stash.json
+/.tmp-.sotp-guarded-stash.json-*
+
 # --- Provider session resume cache (runtime session state, not version-controlled) ---
 track/items/**/.provider-sessions/
 

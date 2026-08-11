@@ -142,7 +142,7 @@
     },
     {
       "brief": "Author a result test covering 'entry' of GitStashInteractor",
-      "declaration_hash": "e562e4becadd7ea28f4b37b5b8370a2d74020cbd4a5d1b2b1c04ed20f3e9ac93",
+      "declaration_hash": "c1fabd6799458a70ae248f38e990675fbf3e5d41e9ef7692378c76351ec6f778",
       "id": {
         "entry_key": "GitStashInteractor",
         "item_identifier": "entry",
@@ -155,6 +155,10 @@
         },
         {
           "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-13",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],
@@ -593,11 +597,11 @@
       }
     },
     {
-      "brief": "Author a contract test covering 'trait_method:execute' of GitStashPort",
-      "declaration_hash": "ac46cc6f958a2ae81276f8b72db827f674eecdaa9467ce6a57a1aba1163397ee",
+      "brief": "Author a contract test covering 'trait_method:push' of GitStashPort",
+      "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c",
       "id": {
         "entry_key": "GitStashPort",
-        "item_identifier": "trait_method:execute",
+        "item_identifier": "trait_method:push",
         "obligation_kind": "contract"
       },
       "spec_refs": [
@@ -607,6 +611,10 @@
         },
         {
           "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-13",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],
@@ -621,11 +629,43 @@
       }
     },
     {
-      "brief": "Author a result test covering 'trait_method:execute' of GitStashService",
-      "declaration_hash": "8207b19f5741c65fa30a5198cddf17539cbd6ad9ee5fe5272474462e83149f35",
+      "brief": "Author a contract test covering 'trait_method:pop' of GitStashPort",
+      "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c",
+      "id": {
+        "entry_key": "GitStashPort",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GitStashPort",
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:push' of GitStashService",
+      "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48",
       "id": {
         "entry_key": "GitStashService",
-        "item_identifier": "trait_method:execute",
+        "item_identifier": "trait_method:push",
         "obligation_kind": "result"
       },
       "spec_refs": [
@@ -635,6 +675,42 @@
         },
         {
           "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GitStashService",
+        "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:pop' of GitStashService",
+      "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48",
+      "id": {
+        "entry_key": "GitStashService",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-13",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],
@@ -1274,7 +1350,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::git_stash::GitStashPort' of FsGitStashAdapter",
-      "declaration_hash": "a837ba66ccd9acc81c486c1c0203c4d5c737f982be3eacbc921a45454d19cc94",
+      "declaration_hash": "dc1dd19dbb7bc6664e99f9c056cb7de782f62859bdf3392c0eb18bdd07caffd7",
       "id": {
         "entry_key": "FsGitStashAdapter",
         "item_identifier": "trait_impl:usecase::git_stash::GitStashPort",
@@ -1287,6 +1363,10 @@
         },
         {
           "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "element_id": "AC-13",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],

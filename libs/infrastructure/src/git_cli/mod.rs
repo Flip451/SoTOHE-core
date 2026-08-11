@@ -11,6 +11,7 @@ pub(crate) mod bounded;
 pub(crate) mod isolation;
 pub(crate) mod show;
 pub mod stash_adapter;
+pub(crate) mod stash_record;
 pub mod workflow_adapter;
 
 // The bounded runner and the isolation helpers are this adapter's, and their

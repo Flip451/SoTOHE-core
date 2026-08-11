@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "e6c9b9ac3b8b0496c23c8342080698723dd0124da5dcccc7defcd09a08e9eaf4",
+  "catalogue_declaration_hash": "75b08407555f9e7f807095bc8c9716fb620cc567e5bb55a82353366b1f410261",
   "schema_version": 1,
   "signals": [
     {
@@ -48,19 +48,24 @@
       "type_name": "BaselineReplacementError"
     },
     {
-      "entry_hash": "5ec4490993e543f00b89b72bb5575d8fc9e6d6547b9df840826b9161eda86165",
-      "signal": "blue",
-      "type_name": "GitStashCommand"
-    },
-    {
-      "entry_hash": "fc10c918b826f832d43680e89950d6085c814862cad3120400899e7607117651",
-      "signal": "blue",
-      "type_name": "GitStashError"
-    },
-    {
-      "entry_hash": "4d517e8f56c91a9431ee0f4986c989e719d9f7fc7843823529a4d3fa86ee8edf",
+      "entry_hash": "0bd2be93fff5916a1f4df6639d1115ed139c50c8420474e362f4a9e6c9c7fb01",
       "signal": "blue",
       "type_name": "GitStashInteractor"
+    },
+    {
+      "entry_hash": "1e1310187323e27ce06e020a01fefeabde489fa00ab9510d9625aa64efea47b6",
+      "signal": "blue",
+      "type_name": "GitStashPopError"
+    },
+    {
+      "entry_hash": "1d7857e915e7d4582fdc374acb36e2db9f216e094d284ea1c5d53b72e69bf321",
+      "signal": "blue",
+      "type_name": "GitStashPushError"
+    },
+    {
+      "entry_hash": "2b92df5616f4048535557f6e88ea3387cbb9ccc77a551f1ac225f4df91758ac9",
+      "signal": "blue",
+      "type_name": "GitStashPushOutcome"
     },
     {
       "entry_hash": "f91a18059aa5f228a328ddfb31518d32174868e7f2d819473a401fea53461359",
@@ -113,12 +118,12 @@
       "type_name": "BaseMergeService"
     },
     {
-      "entry_hash": "4477edf18da4aa64392ec715ebdb6ecab5a64c966a01d7d72d6279d93954ecab",
+      "entry_hash": "7b69474d1b205f82851e2148d51aec59325e5bea214cc3ca9c411547e4a3ef05",
       "signal": "blue",
       "type_name": "GitStashPort"
     },
     {
-      "entry_hash": "756304c128e74b2c117cae55b042f12de70c38617487ccf2a31ed77b0420bc9a",
+      "entry_hash": "e8ad0f4d45d1a160c32b3e032e2a6ede7502d81b455777c062c6e92ca06f5742",
       "signal": "blue",
       "type_name": "GitStashService"
     },

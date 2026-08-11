@@ -6,7 +6,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use usecase::git_stash::{GitStashCommand, GitStashService};
+use usecase::git_stash::GitStashService;
 use usecase::git_workflow::GitWorkflowService;
 
 use crate::render::CommandOutcome;
@@ -85,13 +85,15 @@ impl GitDriver {
 
     /// Handle a guarded stash command.
     pub fn handle_stash(&self, input: GitStashInput) -> CommandOutcome {
-        let command = match input {
-            GitStashInput::Push => GitStashCommand::Push,
-            GitStashInput::Pop => GitStashCommand::Pop,
+        let result = match input {
+            GitStashInput::Push => {
+                self.stash_service.push().map(|_outcome| ()).map_err(|error| error.to_string())
+            }
+            GitStashInput::Pop => self.stash_service.pop().map_err(|error| error.to_string()),
         };
-        match self.stash_service.execute(command) {
+        match result {
             Ok(()) => CommandOutcome::success(None),
-            Err(error) => CommandOutcome::failure(Some(error.to_string())),
+            Err(error) => CommandOutcome::failure(Some(error)),
         }
     }
 
@@ -176,7 +178,9 @@ mod tests {
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex};
 
-    use usecase::git_stash::{GitStashCommand, GitStashError, GitStashService};
+    use usecase::git_stash::{
+        GitStashPopError, GitStashPushError, GitStashPushOutcome, GitStashService,
+    };
     use usecase::git_workflow::{DiagnosticText, GitWorkflowError, GitWorkflowService};
 
     use super::{GitDriver, GitStashInput};
@@ -225,24 +229,45 @@ mod tests {
     }
 
     struct RecordingStashService {
-        commands: Mutex<Vec<GitStashCommand>>,
+        inputs: Mutex<Vec<GitStashInput>>,
         fail: bool,
     }
 
     impl RecordingStashService {
         fn succeeding() -> Self {
-            Self { commands: Mutex::new(Vec::new()), fail: false }
+            Self { inputs: Mutex::new(Vec::new()), fail: false }
         }
 
         fn failing() -> Self {
-            Self { commands: Mutex::new(Vec::new()), fail: true }
+            Self { inputs: Mutex::new(Vec::new()), fail: true }
         }
     }
 
     impl GitStashService for RecordingStashService {
-        fn execute(&self, command: GitStashCommand) -> Result<(), GitStashError> {
-            self.commands.lock().unwrap().push(command);
-            if self.fail { Err(GitStashError::ForbiddenBranchRefUpdate) } else { Ok(()) }
+        fn push(&self) -> Result<GitStashPushOutcome, GitStashPushError> {
+            self.inputs.lock().unwrap().push(GitStashInput::Push);
+            if self.fail {
+                Err(GitStashPushError::ForbiddenBranchRefUpdate)
+            } else {
+                Ok(GitStashPushOutcome::NothingToStash)
+            }
+        }
+
+        fn pop(&self) -> Result<(), GitStashPopError> {
+            self.inputs.lock().unwrap().push(GitStashInput::Pop);
+            if self.fail { Err(GitStashPopError::ForbiddenBranchRefUpdate) } else { Ok(()) }
+        }
+    }
+
+    struct AbsentRecordStashService;
+
+    impl GitStashService for AbsentRecordStashService {
+        fn push(&self) -> Result<GitStashPushOutcome, GitStashPushError> {
+            Ok(GitStashPushOutcome::NothingToStash)
+        }
+
+        fn pop(&self) -> Result<(), GitStashPopError> {
+            Err(GitStashPopError::NoPendingGuardedStash)
         }
     }
 
@@ -265,8 +290,8 @@ mod tests {
         assert_eq!(pop.stderr, None);
         assert_eq!(pop.exit_code, 0);
         assert_eq!(
-            *stash_service.commands.lock().unwrap(),
-            vec![GitStashCommand::Push, GitStashCommand::Pop]
+            *stash_service.inputs.lock().unwrap(),
+            vec![GitStashInput::Push, GitStashInput::Pop]
         );
     }
 
@@ -281,6 +306,19 @@ mod tests {
             Some("guarded stash attempted a forbidden branch-ref update")
         );
         assert_eq!(outcome.exit_code, 1);
-        assert_eq!(*stash_service.commands.lock().unwrap(), vec![GitStashCommand::Push]);
+        assert_eq!(*stash_service.inputs.lock().unwrap(), vec![GitStashInput::Push]);
+    }
+
+    #[test]
+    fn test_handle_stash_absent_record_renders_recovery_guidance() {
+        let outcome = driver(Arc::new(AbsentRecordStashService)).handle_stash(GitStashInput::Pop);
+        let guidance = outcome.stderr.expect("absent-record guidance must be rendered");
+
+        assert!(guidance.contains("no pending guarded stash record"));
+        assert!(guidance.contains("git stash list"));
+        assert!(guidance.contains("expected entry or OID"));
+        assert!(guidance.contains("bin/sotp git stash push"));
+        assert!(guidance.contains("recover the orphaned stash"));
+        assert_eq!(outcome.exit_code, 1);
     }
 }

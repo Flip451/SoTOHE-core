@@ -561,7 +561,7 @@
     },
     "FsGitStashAdapter": {
       "action": "add",
-      "docs": "Unit secondary adapter implementing GitStashPort.",
+      "docs": "IN-04 / AC-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

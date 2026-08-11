@@ -151,6 +151,48 @@
           "hash": "rvw1:sha256:ea5bbb7cfb0a5b26dbed9bff35879c5e6b784f85b1c459d7dd30cd01e386acbc",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T16:28:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f81a77695ef15e94d51f2b3ee741a6ffca7c6a42f147aa0f2a90e3c59d50ac2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T16:32:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f81a77695ef15e94d51f2b3ee741a6ffca7c6a42f147aa0f2a90e3c59d50ac2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:14:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f029ba9e571e068ca0bb210a166816b3056be0ea09a94c4c277f9baafe4a50",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:17:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5f029ba9e571e068ca0bb210a166816b3056be0ea09a94c4c277f9baafe4a50",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:41:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2cb5dd2ec797ef7de94151d88fdea6361ef2a41e24ce1be1a1263f1d3279a712",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:44:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2cb5dd2ec797ef7de94151d88fdea6361ef2a41e24ce1be1a1263f1d3279a712",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -530,6 +572,62 @@
           "at": "2026-08-10T14:52:29Z",
           "findings": [],
           "hash": "rvw1:sha256:a035b459b4d754d9442cb8c677bee11bb9f92da807d50e0050f7a672c36c17f5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:14:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:47245e542abf09265b9ea2502bc2f0ea0a40a0c0b8a8f4eb2ad74ba307596c42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:17:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:47245e542abf09265b9ea2502bc2f0ea0a40a0c0b8a8f4eb2ad74ba307596c42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:41:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5c2d60aaae4f735bd6808d1d3f417d8d86bafb1f7aa41899624b4d64e57b39ff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:44:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5c2d60aaae4f735bd6808d1d3f417d8d86bafb1f7aa41899624b4d64e57b39ff",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:50:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1c783597fbe6d162ad5960b365aaf995a49ff4367c085e9704ab0d3cc92be911",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:51:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1c783597fbe6d162ad5960b365aaf995a49ff4367c085e9704ab0d3cc92be911",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:53:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1c783597fbe6d162ad5960b365aaf995a49ff4367c085e9704ab0d3cc92be911",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:56:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1c783597fbe6d162ad5960b365aaf995a49ff4367c085e9704ab0d3cc92be911",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2562,6 +2660,152 @@
           "at": "2026-08-10T16:01:34Z",
           "findings": [],
           "hash": "rvw1:sha256:4f864052e2e2828cfc7696c75db4b04a537c38243544ecade2d25fc2c14647ee",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:20:48Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 136,
+              "message": "`plan.summary` omits `T021` from `GO-02`, although T021 implements the guarded worktree-stashing portion of that goal (`IN-04`, `AC-06`, `AC-13`). Add `T021` to the `GO-02` mapping.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:14ac1dca48ed43e60908bd279dcf4ef086aa1ed71a8604e74265e654a00a5e16",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T18:23:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f23fb819fc53f080fa71f1127a08da01648f25d6ae86ee9ecb69a65be0b596",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:30:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f23fb819fc53f080fa71f1127a08da01648f25d6ae86ee9ecb69a65be0b596",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:46:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2cf218977748c63fcdfead81bc465d157a1094aa0639830667c9fddc1ba81653",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:50:53Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 14,
+              "message": "T021 has no mapping for the current spec's OS-04 (“External-interference defenses beyond the guarded stash threat model are out of scope”); the `out_of_scope` map stops at OS-03. Add OS-04 → T021 and cite OS-04 from T021/S12 so this boundary is executable and traceable.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 23,
+              "message": "T021 has no mapping for the current spec's CN-08 guarded-stash threat-model constraint; the `constraints` map stops at CN-07 even though the new observation explicitly assigns this work to T021. Add CN-08 → T021 and cite CN-08 from T021/S12.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2cf218977748c63fcdfead81bc465d157a1094aa0639830667c9fddc1ba81653",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T21:57:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:10c9a536136e4eccf104e6670bd942fa69edf891dfeed2c6c774012d0399ae4a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T22:00:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:10c9a536136e4eccf104e6670bd942fa69edf891dfeed2c6c774012d0399ae4a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T22:57:44Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 33,
+              "message": "`task-contract.json` no longer attributes the catalogue entry `usecase::GitStashCommand` to any task: `T006` is empty and `T021` omits it, even though T021 is the carrier for the existing guarded-stash surface in `libs/usecase/src/git_stash.rs`. This leaves the catalogue entry orphaned and breaks task-contract attribution.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b63fa9d920b5c135452926cec1fae8c7170bce58a013fe8e01e9f322444bd028",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:02:26Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 33,
+              "message": "`task-contract.json` still leaves `usecase::GitStashCommand` unattributed: `T006` is empty and `T021` omits the existing command entry, although T021 carries the guarded-stash implementation surface in `libs/usecase/src/git_stash.rs`. Restore a carrier attribution for this catalogue entry.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b63fa9d920b5c135452926cec1fae8c7170bce58a013fe8e01e9f322444bd028",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:11:54Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 33,
+              "message": "`task-contract.json` still omits the `usecase::GitStashCommand` catalogue entry from every task (`T006` is empty and `T021` does not carry it), leaving the existing guarded-stash command surface unattributed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b63fa9d920b5c135452926cec1fae8c7170bce58a013fe8e01e9f322444bd028",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:13:11Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 33,
+              "message": "`task-contract.json` omits the `usecase::GitStashCommand` catalogue entry from every task (`T006` is empty and `T021` does not carry it), leaving the existing guarded-stash command surface unattributed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b63fa9d920b5c135452926cec1fae8c7170bce58a013fe8e01e9f322444bd028",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:53:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b63fa9d920b5c135452926cec1fae8c7170bce58a013fe8e01e9f322444bd028",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:56:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b63fa9d920b5c135452926cec1fae8c7170bce58a013fe8e01e9f322444bd028",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -5937,6 +6181,275 @@
           "hash": "rvw1:sha256:3e56ea59a6d98dfef65031f3e4d7e7f922cfc05036adef36b22e0095aa43e8ea",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:23:20Z",
+          "findings": [
+            {
+              "category": "data corruption / concurrency",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 589,
+              "message": "`stash_entries` 取得後に別プロセスが stash を追加すると、保存済みインデックスがずれて `stash pop` が無関係なエントリを適用・削除します。事後検証は破壊的操作を取り消せないため、stash 操作を直列化するか、pop 直前に identity を再検証してください。",
+              "severity": "P0"
+            },
+            {
+              "category": "pairing integrity / concurrency",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 533,
+              "message": "pending record の確認から stash push・record 永続化まで排他されていません。並行 push により後続の single-slot record が先行 stash の identity を上書きし、先行 stash が pairing なしで残って通常の pop から復元できなくなります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0ccd01e45227a07df72c0b6865e1ca2dfe37902b1bae438a59e040423f51997f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T18:40:22Z",
+          "findings": [
+            {
+              "category": "data corruption / external concurrency",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 616,
+              "message": "The lock only serializes guarded adapter operations; an external `git stash` can still add/drop entries between `stash_entries` and `git stash pop stash@{index}`. The index can then target an unrelated stash. The post-pop comparison detects this only after the destructive operation, so it cannot prevent worktree/data corruption.",
+              "severity": "P0"
+            },
+            {
+              "category": "pairing integrity / error handling",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 582,
+              "message": "If `stash push` succeeds but `persist_record` fails (for example due to filesystem or disk errors), the worktree has already been cleared and the stash identity is known only in memory. The method returns an error without leaving a recoverable pairing record, so the adapter's subsequent `pop` cannot restore the user's changes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:57cb1b491a6354fbe3bce2f8a8ed221648d51e3abe88b5bb25f03aa1e0c0546a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T21:46:27Z",
+          "findings": [
+            {
+              "category": "data corruption / external concurrency",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 502,
+              "message": "The guarded lock does not coordinate with raw Git commands. An external `git stash push`/`drop` can change reflog indices between `verify_stash_reference` and `git stash drop target.reference`, causing the adapter to drop an unrelated stash; the later list comparison detects the damage only after it occurs.",
+              "severity": "P0"
+            },
+            {
+              "category": "recovery integrity / error handling",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 589,
+              "message": "`atomic_write_file` can rename the record successfully and then fail while fsyncing the parent directory. `persist_record` treats that as failure, rolls back and drops the stash, but leaves the newly installed record in place. Subsequent `pop` sees a pending record whose stash identity is gone, permanently blocking normal recovery.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f9bb90cb7b709b7755c43b921090fb23ac8c88ba9a81fb8f1e65a5e2b8d691a6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T22:18:19Z",
+          "findings": [
+            {
+              "category": "symlink boundary / trusted-root",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 195,
+              "message": "`read_record_bytes` performs a `symlink_metadata` check, then opens the path with `File::open`, which follows symlinks. A concurrent replacement between those calls can make the adapter read a file outside the repository despite the boundary check. Open the record with `O_NOFOLLOW` (or equivalent) and validate the opened file identity.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8288ffb69f74c754efb7e32d568da69d132eebdea8395c1360dafe43f6be2abc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T22:24:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5ecdd2def2ce140f119a3a0b07d55a65c6b9ca764dcf79547a0474118dffe55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T22:25:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5ecdd2def2ce140f119a3a0b07d55a65c6b9ca764dcf79547a0474118dffe55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T22:35:17Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 100,
+              "message": "`git_metadata_path` trusts the path emitted by Git, and the exact-drop path subsequently opens, renames, and removes it without establishing a trusted Git metadata root or checking canonical containment. Symlinked metadata components or redirected Git paths can therefore make guarded pop mutate files outside the intended common directory. Resolve an independent canonical Git common-dir root, reject symlinked components, and require every canonical ref/reflog/lock path to remain beneath it before I/O, following the fail-closed `is_safe_briefing_path` pattern.",
+              "severity": "P0"
+            },
+            {
+              "category": "data corruption risk",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 606,
+              "message": "Deleting the newest stash publishes the rewritten reflog first and updates/removes `refs/stash` in a separate operation. A crash between lines 606 and 614 leaves the ref pointing to an entry already removed from the reflog, corrupting the stash stack; the lockfiles prevent concurrency but do not make these filesystem changes atomic. Use Git's supported ref/reflog transaction machinery or a recoverable transaction protocol instead of publishing the two halves independently.",
+              "severity": "P0"
+            },
+            {
+              "category": "missing error handling",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 302,
+              "message": "`StashReflogLock::drop` silently discards failures removing both Git lockfiles; the partial-acquisition cleanup does the same. The exact drop can consequently return success and clear the pairing record while a stale `refs/stash.lock` or reflog lock permanently blocks later stash operations. Add an explicit fallible release that is checked before reporting success, retaining `Drop` only as best-effort fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "non-fail-closed persistence",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 656,
+              "message": "`clear` unlinks the pairing record before opening/fsyncing its parent, so a directory-open or fsync failure returns an error after the record has already vanished. This violates AC-13's fail-closed requirement that a failed pop retain its record and leaves a retry in the absent-record lane. Restore the expected record on persistence failure or use a recoverable atomic/tombstone transition whose error state preserves the pairing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c5ecdd2def2ce140f119a3a0b07d55a65c6b9ca764dcf79547a0474118dffe55",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T22:35:50Z",
+          "findings": [
+            {
+              "category": "adapter correctness / concurrency",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 105,
+              "message": "The operation lock and pairing record are worktree-local, but `refs/stash` is shared by linked worktrees. `--git-path .sotp-guarded-stash.lock` resolves beneath each worktree's `$GIT_DIR`, and record reads/writes use each `repo.root()`. Two guarded pushes from linked worktrees can therefore both pass the empty-slot check; if B updates `refs/stash` before A takes its post-push snapshot, A records B's OID and later applies/deletes B's stash. Anchor both the lock and single-slot record in shared repository state.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness / bounded I/O",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 520,
+              "message": "Exact removal reads the entire stash reflog with a 16 KiB cap only after `git stash apply` has succeeded. A valid stack of about 200 entries has `stash list --format=%H` below the existing 16 KiB pre-check while its reflog necessarily exceeds this cap, so pop modifies the worktree, then fails removal and retains a record that cannot be retried cleanly. Validate all bounded deletion prerequisites before applying, or use Git's bounded OID-to-reference deletion path instead of post-apply raw reflog loading.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c5ecdd2def2ce140f119a3a0b07d55a65c6b9ca764dcf79547a0474118dffe55",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T22:56:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2b375e953ba42abf7634e6c8e6d433d97ba5053ef05f6619b36a21667deeb5bd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T22:58:34Z",
+          "findings": [
+            {
+              "category": "adapter correctness / data loss",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 609,
+              "message": "The repository-common pairing slot can be consumed from any linked worktree, but pop applies the recorded stash to the current worktree and then deletes the stash and record without verifying that this is the worktree that created them. Thus a push in worktree A followed by pop in a compatible worktree B succeeds, leaves A clean, and makes A's saved changes recoverable only from B; deleting B then loses them. The added linked-worktree test exercises exactly this sequence. Keep the lock/single slot shared, but persist and validate the originating worktree identity before applying or dropping the stash.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:2b375e953ba42abf7634e6c8e6d433d97ba5053ef05f6619b36a21667deeb5bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:13:31Z",
+          "findings": [
+            {
+              "category": "bounded-io",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 173,
+              "message": "`stash_entries` retains the complete `git stash list --format=%H` response under the 16 KiB diagnostic limit. With 399 existing SHA-1 stash entries, guarded `push` succeeds and creates entry 400, but every subsequent guarded `pop` fails here before applying it because the valid 16,400-byte list exceeds the cap. Stream the semantic list with bounded memory, or preflight the same constraint before mutating the worktree.",
+              "severity": "P1"
+            },
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 340,
+              "message": "`write` silently ignores every `symlink_metadata` failure, not only `NotFound`, and proceeds without confirming that an existing record target is a regular non-symlink file. Match `NotFound` explicitly and propagate all other inspection errors, as the read and lock paths already do.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:22aed742e903b04b3dac8651d6bd1df49591dc6f798011e93a127b57ecb3330b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:13:44Z",
+          "findings": [
+            {
+              "category": "data-loss",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 117,
+              "message": "The persisted worktree identity is derived only from `--absolute-git-dir`. Two supported invocations using the same `GIT_DIR` but different `GIT_WORK_TREE` values both resolve to the same `main` identity, so a stash pushed from one physical worktree can be applied and deleted from the other. Bind the record to the actual worktree root or another non-reusable worktree-instance identity as well as the Git directory.",
+              "severity": "P0"
+            },
+            {
+              "category": "bounded-io",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 173,
+              "message": "`stash_entries` still retains the complete `git stash list --format=%H` output under the 16 KiB diagnostic cap. With 399 existing SHA-1 stash entries, guarded push can create and record entry 400, after which every guarded pop fails here before applying it because the valid list exceeds the cap. Stream the entries with bounded memory, or perform the same preflight before mutating the worktree.",
+              "severity": "P1"
+            },
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 340,
+              "message": "`write` still silently ignores every `symlink_metadata` error, not just `NotFound`, and proceeds without confirming that an existing record target is a regular non-symlink file. Match `NotFound` explicitly and propagate all other inspection failures, as the read and lock paths already do.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:22aed742e903b04b3dac8651d6bd1df49591dc6f798011e93a127b57ecb3330b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:39:41Z",
+          "findings": [
+            {
+              "category": "path-handling",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 325,
+              "message": "`StashWorktreeIdentity` rejects either canonical path once it exceeds 1024 bytes, although `SystemGitRepo` explicitly supports checkout roots longer than 1024 bytes and common filesystems permit them. Because identity creation occurs before `stash push`, every guarded stash operation is unavailable in such a valid repository. Use a fixed-size digest of the canonical path bytes or a limit consistent with supported filesystem paths.",
+              "severity": "P1"
+            },
+            {
+              "category": "bounded-io",
+              "file": "libs/infrastructure/src/git_cli/stash_record.rs",
+              "line": 503,
+              "message": "The encoded record is written without enforcing `MAX_STASH_RECORD_BYTES`, while every subsequent read rejects files over 4 KiB. Two accepted absolute paths containing JSON-escaped characters can produce an encoded record larger than 4 KiB even though each passes the 1024-byte field limit; push then returns success, but pop can never read its pairing record. Validate the encoded length before writing or persist fixed-size path identities.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3bf8ff47a14517f322667177beb0c25a977b7f2fe43113b1ea0a16dde0c0869a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:46:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4cea711ebce4b7225c473a0418232ab281b8f80e8a9cf58581dae8fcacde19f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:47:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4cea711ebce4b7225c473a0418232ab281b8f80e8a9cf58581dae8fcacde19f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:51:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b4cea711ebce4b7225c473a0418232ab281b8f80e8a9cf58581dae8fcacde19f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -6784,6 +7297,151 @@
           "hash": "rvw1:sha256:89277abd18dd2b1238085957d234de72fc3154d631a0c4bc368dfa7202360e50",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:34:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9c9838a79674523e1c1650935ac0d7339c89f77878362756fe1d09fdfa346fcf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:51:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:196aca3d4a5c459c7af8ceefb76d516d83f12a901e24f0844f81687fd00e025d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T22:29:07Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 175,
+              "message": "The `GitStashPort::pop` fulfillment row binds push-only tests (`test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed`, `test_fs_git_stash_adapter_push_handles_large_worktree_snapshot`, and `test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot`). These cannot evidence the `pop` contract and make the binding overclaim coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 177,
+              "message": "The `GitStashService::pop` fulfillment row likewise binds push-only tests, including the second-push and large-push-snapshot tests, so its `pop` result obligation is not coherently triangulated.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 174,
+              "message": "The `GitStashPort::push` fulfillment row includes pop-only failure tests such as `test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash` and `test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record`; these do not evidence the `push` contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 176,
+              "message": "The `GitStashService::push` fulfillment row includes pop-only failure tests, so its `push` result obligation overclaims evidence from the opposite operation.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 184,
+              "message": "The `GitStashPopError` binding uses `test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed`, which exercises a push error, while omitting the dedicated `test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record`. The pop-error edge is therefore bound to the wrong operation and lacks its direct regression evidence.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 183,
+              "message": "The `GitStashPushError` binding includes `test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash`, a pop-specific failure test, making the push-error edge's evidence set operation-incoherent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:16468a583acbaf70d9ee3f52bcd666e230cb9e0a17ecf67c69c56ab27b48c2aa",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T23:59:27Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 174,
+              "message": "The `GitStashPort::push` fulfillment row binds `test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert`, whose name and purpose are pop-only. It cannot evidence the push contract, so this row overclaims operation-specific coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e9f94f3b52a7f1d236b3286981b3cb83c89302a1d8cf4f654d2c5fda32839e2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T00:02:29Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 174,
+              "message": "The `GitStashPort::push` fulfillment row still binds `test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert`, which is a pop-only regression test and cannot evidence the push contract. Remove it from this push obligation (it remains appropriate for the pop obligation and adapter conformance row).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:93bc6d9cf3a233bff187c55ebfd5f9f408291f3a110adedd25f5782f74651577",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T00:08:16Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 174,
+              "message": "The `GitStashPort::push` fulfillment row still binds `test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert`, a pop-only regression test that cannot evidence the push contract. Remove it from the push obligation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:93bc6d9cf3a233bff187c55ebfd5f9f408291f3a110adedd25f5782f74651577",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T00:23:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93bc6d9cf3a233bff187c55ebfd5f9f408291f3a110adedd25f5782f74651577",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T00:26:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93bc6d9cf3a233bff187c55ebfd5f9f408291f3a110adedd25f5782f74651577",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T00:32:41Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 181,
+              "message": "The stash binding records leave five derived edges unresolved: GitStashPopError×IN-04, GitStashPopError×AC-13, GitStashPushError×AC-06, GitStashPushError×AC-13, and GitStashPushOutcome×AC-13. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails with these exact UnresolvedEdges, so the obligation gate cannot pass. Add coherent bindings or justified waivers for all five edges.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:93bc6d9cf3a233bff187c55ebfd5f9f408291f3a110adedd25f5782f74651577",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T00:51:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1aa4e0293c82e0f3d1df914023bca2dd84baedf2d4a620ed561d596866a53fb8",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -6952,6 +7610,63 @@
           "at": "2026-08-09T12:42:31Z",
           "findings": [],
           "hash": "rvw1:sha256:e1fdb5e432febab2a46abf24ba3dd65dfe41cd2310e14b1d6999733333823de0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T16:28:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a774ebc5d8973826db5d0b48a90ba2c25d4b702fb673b7ef465ee4189ac46826",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T16:31:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a774ebc5d8973826db5d0b48a90ba2c25d4b702fb673b7ef465ee4189ac46826",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:18:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1a1c8d458383786f0b4fb3f7dee5071c65398c6a71667d29c3d1b2575ed076c4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:21:13Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 155,
+              "message": "AC-13 requires an absent-record failure to include “recovery guidance,” but does not define any observable content or next action that qualifies as such. Downstream implementation and tests must invent that meaning, so this portion of the acceptance criterion cannot be adjudicated deterministically.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1a1c8d458383786f0b4fb3f7dee5071c65398c6a71667d29c3d1b2575ed076c4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T18:24:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:171c8c17704259f54dd493b749b07d2acd327abd9dd6c296deddc9be83e29a00",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:46:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4cf1d0190d7f27d41315c19a0bbafb8d4cf782f480cc518ac45b94cdba0e2973",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:48:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4cf1d0190d7f27d41315c19a0bbafb8d4cf782f480cc518ac45b94cdba0e2973",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -7743,6 +8458,180 @@
           "hash": "rvw1:sha256:61a8b34ae22519c9aa2fe9c17d8c934fd85142f62a12d69ab9624080974d64ff",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:26:48Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 564,
+              "message": "`FsGitStashAdapter` docs restate the upstream stash behavior and enforcement contract instead of only identifying the changed adapter and citing `IN-04`/`AC-06`; remove the prose behavior description per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 632,
+              "message": "`GitStashPort` docs restate ownership of identity inspection and fail-closed mismatch enforcement, which belongs in the spec; retain only the catalogue change and anchor citations per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1681,
+              "message": "`GitStashCommand` docs restate the paired push/pop result behavior rather than serving as an anchor-only catalogue reference; remove the behavioral contract prose per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1718,
+              "message": "`GitStashError` docs restate how the adapter constructs identity failures from inspected state, duplicating the upstream behavior contract; use an anchor-only description per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:83fd6a829d50f14d915e2caed964379386c9383010ee95aa231cfc49ff726805",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T18:37:37Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1811,
+              "message": "`GitStashPushOutcome`'s `docs` restates design rationale (application-boundary placement and reuse of `domain::CommitHash`) instead of only identifying the catalogue change with upstream anchors. Remove the prose rationale per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:49549ef9bb21fdc5ad08dec91b3b63d6dbd5911820e8a0844b8e893877737f51",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T18:46:39Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 564,
+              "message": "`FsGitStashAdapter` docs still restate the upstream stash behavior and enforcement contract (commit inspection/removal and mismatch handling) instead of using citation-form documentation. Remove the prose per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4f4c7802230e6b4e904fb7a9f1a0025d27cd2dcc66091cbee2abab7cbad46d7a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T18:54:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:369ed38028aab11e67f903a6753b1f23f61d9c4ef160f946a4b8ce7645ba3969",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T19:00:52Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1703,
+              "message": "`GitStashCommand` is declared as a usecase `Command`, but no declared usecase boundary accepts or returns it after `GitStashService` and `GitStashPort` were changed to separate `push`/`pop` methods. It is therefore not an input received by the usecase as required by the Command-role convention; restore it as the service input or remove/relocate the selector.",
+              "severity": "P1"
+            },
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 648,
+              "message": "`GitStashPort::pop` and `GitStashService::pop` accept `GitStashPushOutcome`, although the repository-local record is authoritative for pop. This overloads `NothingToStash` as both a real push outcome and a sentinel meaning “load the persisted outcome,” admitting `pop(NothingToStash)` when the persisted outcome is `Created`. Use a parameterless pop or a distinct request type so this contradictory state is unrepresentable.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 639,
+              "message": "`GitStashPort::push` and `GitStashService::push` return the shared `GitStashError`, including `StashIdentityMissing` and `StashIdentityMismatch`. Those variants require inspecting a previously recorded identity during pop and cannot structurally arise from push; neither method documents a producible subset or justifies the breadth. Declare operation-specific errors or explicitly constrain the push error subset.",
+              "severity": "P1"
+            },
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1730,
+              "message": "`GitStashError::Unavailable(DiagnosticText)` collapses the distinct absent-record condition required by `AC-13` into ordinary Git or record-I/O unavailability. Callers therefore cannot distinguish “no pending guarded stash; push first” from an operational failure. Add a typed absent-record variant and ground the entry in `AC-13`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:369ed38028aab11e67f903a6753b1f23f61d9c4ef160f946a4b8ce7645ba3969",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T21:50:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bee32b1e63d6ac2bc058eba29e96f13231bfee83432698816fde313523d616fa",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:54:41Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1723,
+              "message": "`usecase::GitStashCommand` is still declared as a `Command`, but neither `GitStashService` nor `GitStashPort` accepts or returns it; the catalogue contains no usecase-boundary edge to this type. It remains only a transient CLI-driver selector, so the usecase never receives it as required by the Command-role convention. Restore it as a service input or remove/relocate it.",
+              "severity": "P1"
+            },
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 660,
+              "message": "`GitStashPort::pop` and `GitStashService::pop` still accept `GitStashPushOutcome` even though `AC-13` makes the repository-local record authoritative. This overloads `NothingToStash` as both a real saved outcome and the sentinel meaning “load the persisted outcome,” admitting the contradictory state `pop(NothingToStash)` while the record contains `Created`. Make pop parameterless or use a distinct request type that represents these meanings separately.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bee32b1e63d6ac2bc058eba29e96f13231bfee83432698816fde313523d616fa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T22:25:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97606b4de636cdc3b6dc1d69a43eb283528ae2ff0c1460e86616aa5958bf6c70",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T22:28:15Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1713,
+              "message": "`usecase::GitStashCommand` remains declared as a `Command`, but the revised `GitStashService` and `GitStashPort` accept no command value; the catalogue has no usecase-boundary edge to this type. It is only a transient CLI-driver selector, so the usecase never receives it as required by the Command-role convention. Restore it as a service input or remove/relocate it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97606b4de636cdc3b6dc1d69a43eb283528ae2ff0c1460e86616aa5958bf6c70",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-10T22:57:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3915563dde4b612bb1fe4acd5d5ab1979ff55d1b79e1d17d34741e3611291c5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:03:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3915563dde4b612bb1fe4acd5d5ab1979ff55d1b79e1d17d34741e3611291c5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -7958,6 +8847,48 @@
           "at": "2026-08-10T14:44:10Z",
           "findings": [],
           "hash": "rvw1:sha256:1461b6d05a249590433f829e95265e4d0729d3d5768333c90b562df912c0a863",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:15:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fb63b589c661a5d7aadbd3f601f524f9c40a6ac7fdb68ca510e5d5b29b25072a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T18:19:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fb63b589c661a5d7aadbd3f601f524f9c40a6ac7fdb68ca510e5d5b29b25072a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:41:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54d3e59c35a3830d65fa541e701d18915a0a16529974a64ca274cbe6da4c4993",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T21:44:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54d3e59c35a3830d65fa541e701d18915a0a16529974a64ca274cbe6da4c4993",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:11:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69f08c8042cccc45f2315e62205b1272bea9ffdff6479a82fef85d71c3cad1d5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-10T23:13:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69f08c8042cccc45f2315e62205b1272bea9ffdff6479a82fef85d71c3cad1d5",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -179,6 +179,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [clean な base merge 後の baseline 再取得と同期状態の原子的 lifecycle を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
 | [type-signals の権威照合は権威が存在する文脈に限定する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
 | [conflict recovery 中の base-owned catalogue delta は exact merged base baseline で照合する](2026-08-09-1210-base-owned-catalogue-deltas-conflict-recovery.md) | Proposed | 2026-08-09 |
+| [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
 
 ### ADR 運用
 

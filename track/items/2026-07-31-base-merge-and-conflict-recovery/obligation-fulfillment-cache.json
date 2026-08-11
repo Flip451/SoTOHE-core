@@ -26706,12 +26706,27 @@
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
           "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
         },
         {
           "layer": "infrastructure",
@@ -26720,13 +26735,63 @@
         },
         {
           "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         },
         {
-          "layer": "cli",
-          "module_path": "cli::commands::git::tests",
-          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -26737,9 +26802,9 @@
         "entry_key": "GitStashInteractor"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
-        "declaration_hash": "e562e4becadd7ea28f4b37b5b8370a2d74020cbd4a5d1b2b1c04ed20f3e9ac93"
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "4b9689117114938554ee8599a2359dc19ecda105764f6dfed4ac7f50773410fe",
+        "declaration_hash": "c1fabd6799458a70ae248f38e990675fbf3e5d41e9ef7692378c76351ec6f778"
       },
       "obligation_id": {
         "entry_key": "GitStashInteractor",
@@ -26747,7 +26812,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n\n        adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );\n\n        assert_eq!(branch_state(repo.path()), before);",
+        "citation": "\"fs::write(repo.path().join(\\\"untracked.txt\\\"), \\\"saved\\\\n\\\")\"; \"adapter.push().expect(\\\"stash push must succeed\\\")\"; \"adapter.pop().expect(\\\"stash pop must succeed\\\")\"; \"assert_eq!(stash_identities(repo.path()).len(), 1)\"; \"assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists)))\"; \"assert!(matches!(interactor.push(), Err(GitStashPushError::ForbiddenBranchRefUpdate)))\"; \"assert!(matches!(interactor.pop(), Err(GitStashPopError::ForbiddenBranchRefUpdate)))\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -26757,12 +26822,27 @@
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
           "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
         },
         {
           "layer": "infrastructure",
@@ -26771,13 +26851,63 @@
         },
         {
           "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         },
         {
-          "layer": "cli",
-          "module_path": "cli::commands::git::tests",
-          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -26788,9 +26918,9 @@
         "entry_key": "GitStashInteractor"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
-        "declaration_hash": "e562e4becadd7ea28f4b37b5b8370a2d74020cbd4a5d1b2b1c04ed20f3e9ac93"
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "4b9689117114938554ee8599a2359dc19ecda105764f6dfed4ac7f50773410fe",
+        "declaration_hash": "c1fabd6799458a70ae248f38e990675fbf3e5d41e9ef7692378c76351ec6f778"
       },
       "obligation_id": {
         "entry_key": "GitStashInteractor",
@@ -26798,7 +26928,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "interactor.execute(GitStashCommand::Push).unwrap();\n        interactor.execute(GitStashCommand::Pop).unwrap();\n\n        assert_eq!(\n            *port.commands.lock().unwrap(),\n            vec![GitStashCommand::Push, GitStashCommand::Pop]\n        );",
+        "citation": "assert!(!repo.path().join(\"untracked.txt\").exists());\n...\nassert_eq!(\n    fs::read_to_string(repo.path().join(\"untracked.txt\"))\n        .expect(\"untracked file must be restored\"),\n    \"saved\\n\"\n);\n...\nlet before = branch_state(repo.path());\nadapter.push().expect(\"stash push must succeed\");\nassert_eq!(branch_state(repo.path()), before);\nadapter.pop().expect(\"stash pop must succeed\");\nassert_eq!(branch_state(repo.path()), before);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -26808,12 +26938,27 @@
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
           "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
         },
         {
           "layer": "infrastructure",
@@ -26822,13 +26967,169 @@
         },
         {
           "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         },
         {
-          "layer": "cli",
-          "module_path": "cli::commands::git::tests",
-          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "4b9689117114938554ee8599a2359dc19ecda105764f6dfed4ac7f50773410fe",
+        "declaration_hash": "c1fabd6799458a70ae248f38e990675fbf3e5d41e9ef7692378c76351ec6f778"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let error = interactor.pop().expect_err(\"pop without a pending record must fail closed\"); assert!(matches!(&error, GitStashPopError::NoPendingGuardedStash)); let guidance = error.to_string(); assert!(guidance.contains(\"no pending guarded stash record\")); assert!(guidance.contains(\"git stash list\")); assert!(guidance.contains(\"expected entry or OID\")); assert!(guidance.contains(\"bin/sotp git stash push\")); assert!(guidance.contains(\"recover the orphaned stash\")); assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -26839,17 +27140,17 @@
         "entry_key": "GitStashPort"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
-        "declaration_hash": "ac46cc6f958a2ae81276f8b72db827f674eecdaa9467ce6a57a1aba1163397ee"
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "4735b0978bad17c8be32421b522e448366a41ad9c11b7350d35c86ef35b2e857",
+        "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c"
       },
       "obligation_id": {
         "entry_key": "GitStashPort",
-        "item_identifier": "trait_method:execute",
+        "item_identifier": "trait_method:push",
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\").expect(\"untracked file must be written\"); ... adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\"); assert!(!repo.path().join(\"untracked.txt\").exists()); ... adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\"); ... fs::read_to_string(repo.path().join(\"untracked.txt\")) ... \"saved\\n\" ... assert_eq!(branch_state(repo.path()), before);",
+        "citation": "\"fs::write(repo.path().join(\\\"untracked.txt\\\"), \\\"saved\\\\n\\\")\"; \"adapter.push().expect(\\\"stash push must succeed\\\"); \"adapter.pop().expect(\\\"stash pop must succeed\\\"); \"fs::read_to_string(repo.path().join(\\\"untracked.txt\\\"))\"; \"assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists)))\"; \"assert!(matches!(interactor.pop(), Err(GitStashPopError::NoPendingGuardedStash)))\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -26859,12 +27160,27 @@
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
           "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
         },
         {
           "layer": "infrastructure",
@@ -26873,13 +27189,53 @@
         },
         {
           "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         },
         {
-          "layer": "cli",
-          "module_path": "cli::commands::git::tests",
-          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -26890,17 +27246,17 @@
         "entry_key": "GitStashPort"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
-        "declaration_hash": "ac46cc6f958a2ae81276f8b72db827f674eecdaa9467ce6a57a1aba1163397ee"
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "4735b0978bad17c8be32421b522e448366a41ad9c11b7350d35c86ef35b2e857",
+        "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c"
       },
       "obligation_id": {
         "entry_key": "GitStashPort",
-        "item_identifier": "trait_method:execute",
+        "item_identifier": "trait_method:push",
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "fs::write(dir.path().join(\"track-artifact.json\"), \"artifact\\n\").unwrap(); ... assert!(!dir.path().join(\"track-artifact.json\").exists()); ... assert_eq!(fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(), \"artifact\\n\"); ... assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before); ... assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(), \"main\");",
+        "citation": "let before = branch_state(repo.path());\nadapter.push().expect(\"stash push must succeed\");\nassert_eq!(branch_state(repo.path()), before);\nadapter.pop().expect(\"stash pop must succeed\");\nassert_eq!(branch_state(repo.path()), before);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -26910,12 +27266,27 @@
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
           "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
         },
         {
           "layer": "infrastructure",
@@ -26924,13 +27295,477 @@
         },
         {
           "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         },
         {
-          "layer": "cli",
-          "module_path": "cli::commands::git::tests",
-          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPort"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "4735b0978bad17c8be32421b522e448366a41ad9c11b7350d35c86ef35b2e857",
+        "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPort",
+        "item_identifier": "trait_method:push",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(&error, GitStashPopError::NoPendingGuardedStash)); assert!(guidance.contains(\"no pending guarded stash record\")); assert!(guidance.contains(\"git stash list\")); assert!(guidance.contains(\"expected entry or OID\")); assert!(guidance.contains(\"bin/sotp git stash push\")); assert!(guidance.contains(\"recover the orphaned stash\")); ... assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists))); ... assert!(!record_path(repo.path()).exists());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPort"
+      },
+      "key": {
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "f482b61fb72bc69db56ee31d99d363318917cb0648e03ed5337a5ff93a92a94c",
+        "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPort",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\").expect(\"untracked file must be written\"); ... adapter.push().expect(\"stash push must succeed\"); ... assert!(!repo.path().join(\"untracked.txt\").exists()); ... adapter.pop().expect(\"stash pop must succeed\"); ... fs::read_to_string(repo.path().join(\"untracked.txt\")) ... \"saved\\n\" ... interactor.push().unwrap(); assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists))); interactor.pop().unwrap(); ... assert!(matches!(error, GitStashPopError::StashIdentityMismatch { expected: found_expected, actual: found_actual } if found_expected == expected && found_actual == actual)); ... assert_eq!(branch_state(repo.path()), before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPort"
+      },
+      "key": {
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "f482b61fb72bc69db56ee31d99d363318917cb0648e03ed5337a5ff93a92a94c",
+        "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPort",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(!repo.path().join(\"untracked.txt\").exists());\n        assert_eq!(output(repo.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(), \"main\");\nadapter.pop().expect(\"stash pop must succeed\");\nassert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPort"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "f482b61fb72bc69db56ee31d99d363318917cb0648e03ed5337a5ff93a92a94c",
+        "declaration_hash": "eeb32bac810d5c2800df92fd260f01682e18b38d5d4f8bf54f14f081db81571c"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPort",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(interactor.pop(), Err(GitStashPopError::NoPendingGuardedStash))); ... assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists))); ... assert!(record_path(repo.path()).is_file()); ... assert!(!record_path(repo.path()).exists());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -26941,17 +27776,17 @@
         "entry_key": "GitStashService"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
-        "declaration_hash": "8207b19f5741c65fa30a5198cddf17539cbd6ad9ee5fe5272474462e83149f35"
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "4735b0978bad17c8be32421b522e448366a41ad9c11b7350d35c86ef35b2e857",
+        "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48"
       },
       "obligation_id": {
         "entry_key": "GitStashService",
-        "item_identifier": "trait_method:execute",
+        "item_identifier": "trait_method:push",
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\").expect(\"untracked file must be written\");\n\n        let _cwd = CurrentDirGuard::enter(repo.path());\n        let adapter = FsGitStashAdapter::new();\n        adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n\n        adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );\n\n        assert_eq!(branch_state(repo.path()), before);",
+        "citation": "\"fs::write(repo.path().join(\\\"untracked.txt\\\"), \\\"saved\\\\n\\\")\" ... \"adapter.push().expect(\\\"stash push must succeed\\\");\" ... \"adapter.pop().expect(\\\"stash pop must succeed\\\");\" ... \"fs::read_to_string(repo.path().join(\\\"untracked.txt\\\"))\" ... \"\\\"saved\\\\n\\\"\"; \"assert!(matches!(interactor.pop(), Err(GitStashPopError::NoPendingGuardedStash)))\"; \"assert!(matches!(error, GitStashPopError::StashIdentityMismatch { expected: found_expected, actual: found_actual }\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -26961,12 +27796,27 @@
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
           "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
         },
         {
           "layer": "infrastructure",
@@ -26975,13 +27825,53 @@
         },
         {
           "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         },
         {
-          "layer": "cli",
-          "module_path": "cli::commands::git::tests",
-          "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -26992,17 +27882,426 @@
         "entry_key": "GitStashService"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "528ebf4e2687f0b4e1197139cdbd01e8db0aa502a7ade260158f678f08ab47f9",
-        "declaration_hash": "8207b19f5741c65fa30a5198cddf17539cbd6ad9ee5fe5272474462e83149f35"
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "4735b0978bad17c8be32421b522e448366a41ad9c11b7350d35c86ef35b2e857",
+        "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48"
       },
       "obligation_id": {
         "entry_key": "GitStashService",
-        "item_identifier": "trait_method:execute",
+        "item_identifier": "trait_method:push",
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
+        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\").expect(\"untracked file must be written\"); ... assert!(!repo.path().join(\"untracked.txt\").exists()); ... assert_eq!(fs::read_to_string(repo.path().join(\"untracked.txt\")).expect(\"untracked file must be restored\"), \"saved\\n\"); ... let before = branch_state(repo.path()); ... assert_eq!(branch_state(repo.path()), before); ... adapter.pop().expect(\"stash pop must succeed\"); ... assert_eq!(branch_state(repo.path()), before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashService"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "4735b0978bad17c8be32421b522e448366a41ad9c11b7350d35c86ef35b2e857",
+        "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashService",
+        "item_identifier": "trait_method:push",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let outcome = adapter.push().expect(\"guarded stash push must succeed\");\nassert!(record_path(repo.path()).is_file());\nadapter.pop().expect(\"stash pop must succeed\");\nassert!(!record_path(repo.path()).exists());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashService"
+      },
+      "key": {
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "f123a4c866dad2bb2ea3d23b38abdc15172f545b3239a9379f9c5b2d0580d912",
+        "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashService",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\").expect(\"untracked file must be written\"); ... adapter.push().expect(\"stash push must succeed\"); ... adapter.pop().expect(\"stash pop must succeed\"); ... assert_eq!(fs::read_to_string(repo.path().join(\"untracked.txt\")).expect(\"untracked file must be restored\"), \"saved\\n\");\n\nassert!(matches!(interactor.pop(), Err(GitStashPopError::NoPendingGuardedStash)));\n\nassert!(matches!(error, GitStashPopError::StashIdentityMismatch { expected: found_expected, actual: found_actual } if found_expected == expected && found_actual == actual));\n\nassert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists)));\n\nassert!(matches!(interactor.push(), Err(GitStashPushError::ForbiddenBranchRefUpdate)));\nassert!(matches!(interactor.pop(), Err(GitStashPopError::ForbiddenBranchRefUpdate)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashService"
+      },
+      "key": {
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "f123a4c866dad2bb2ea3d23b38abdc15172f545b3239a9379f9c5b2d0580d912",
+        "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashService",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(!repo.path().join(\"untracked.txt\").exists());\n        assert_eq!(output(repo.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(), \"main\");\n        adapter.pop().expect(\"stash pop must succeed\");\n        assert!(!record_path(repo.path()).exists());\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );\n\n        let before = branch_state(repo.path());\n        adapter.push().expect(\"stash push must succeed\");\n        assert_eq!(branch_state(repo.path()), before);\n        adapter.pop().expect(\"stash pop must succeed\");\n        assert_eq!(branch_state(repo.path()), before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashService"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "f123a4c866dad2bb2ea3d23b38abdc15172f545b3239a9379f9c5b2d0580d912",
+        "declaration_hash": "7446a8375c7f59d86a0df3f7f231567eb428fe6594424c5b7e417e2a75f9fb48"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashService",
+        "item_identifier": "trait_method:pop",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(interactor.pop(), Err(GitStashPopError::NoPendingGuardedStash))); ... assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists))); ... assert!(record_path(repo.path()).is_file()); ... assert_eq!(stash_identities(repo.path()), unrelated); ... assert!(!record_path(repo.path()).exists());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27017,7 +28316,77 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -27028,9 +28397,9 @@
         "entry_key": "FsGitStashAdapter"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "116735cff3b94828dcbcd1a64edd26d98d2b79ed50c2d09e4aa6f713c8c242dc",
-        "declaration_hash": "a837ba66ccd9acc81c486c1c0203c4d5c737f982be3eacbc921a45454d19cc94"
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "6c1cb207f1b1ff94cccad12d6bdbda0af3571e02907370bd604d03ff1d7c6fa5",
+        "declaration_hash": "dc1dd19dbb7bc6664e99f9c056cb7de782f62859bdf3392c0eb18bdd07caffd7"
       },
       "obligation_id": {
         "entry_key": "FsGitStashAdapter",
@@ -27038,7 +28407,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\"); ... adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\"); ... assert!(!repo.path().join(\"untracked.txt\").exists()); ... adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\"); ... assert_eq!(fs::read_to_string(repo.path().join(\"untracked.txt\")).expect(\"untracked file must be restored\"), \"saved\\n\"); ... assert_eq!(branch_state(repo.path()), before);",
+        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\"); ... assert!(!repo.path().join(\"untracked.txt\").exists()); ... adapter.pop().expect(\"stash pop must succeed\"); ... assert_eq!(fs::read_to_string(repo.path().join(\"untracked.txt\")).expect(\"untracked file must be restored\"), \"saved\\n\"); ... let error = adapter.push().expect_err(\"pending pairing must block a second push\"); assert!(matches!(error, GitStashPushError::PendingGuardedStashExists)); ... assert!(record_path(repo.path()).is_file());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27053,7 +28422,77 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
         }
       ],
       "edge_id": {
@@ -27064,9 +28503,9 @@
         "entry_key": "FsGitStashAdapter"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "116735cff3b94828dcbcd1a64edd26d98d2b79ed50c2d09e4aa6f713c8c242dc",
-        "declaration_hash": "a837ba66ccd9acc81c486c1c0203c4d5c737f982be3eacbc921a45454d19cc94"
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "6c1cb207f1b1ff94cccad12d6bdbda0af3571e02907370bd604d03ff1d7c6fa5",
+        "declaration_hash": "dc1dd19dbb7bc6664e99f9c056cb7de782f62859bdf3392c0eb18bdd07caffd7"
       },
       "obligation_id": {
         "entry_key": "FsGitStashAdapter",
@@ -27074,7 +28513,113 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n\n        adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );\n\n        let before = branch_state(repo.path());\n\n        adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\n        assert_eq!(branch_state(repo.path()), before);\n\n        adapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\n        assert_eq!(branch_state(repo.path()), before);",
+        "citation": "assert!(!repo.path().join(\"untracked.txt\").exists()); ... fs::read_to_string(repo.path().join(\"untracked.txt\")) ... \"saved\\n\" ... assert_eq!(branch_state(repo.path()), before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_worktree_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_handles_large_branch_ref_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_snapshot_detects_symbolic_branch_retarget"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "FsGitStashAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "6c1cb207f1b1ff94cccad12d6bdbda0af3571e02907370bd604d03ff1d7c6fa5",
+        "declaration_hash": "dc1dd19dbb7bc6664e99f9c056cb7de782f62859bdf3392c0eb18bdd07caffd7"
+      },
+      "obligation_id": {
+        "entry_key": "FsGitStashAdapter",
+        "item_identifier": "trait_impl:usecase::git_stash::GitStashPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "adapter.push().expect(\"stash push must succeed\"); ... adapter.pop().expect(\"stash pop must succeed\"); ... let error = adapter.push().expect_err(\"pending pairing must block a second push\"); assert!(matches!(error, GitStashPushError::PendingGuardedStashExists)); ... let error = adapter.pop().expect_err(\"pop without a saved stash must fail closed\"); assert!(matches!(&error, GitStashPopError::NoPendingGuardedStash)); ... let error = adapter.pop().expect_err(\"a dropped recorded stash must fail closed\"); assert!(matches!(error, GitStashPopError::StashIdentityMissing(identity) if identity == expected_identity)); ... let error = adapter.pop().expect_err(\"a conflicting stash pop must fail closed\"); assert!(matches!(error, GitStashPopError::Unavailable(_)));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27084,7 +28629,47 @@
         {
           "layer": "usecase",
           "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_push_and_pop_delegate_to_port"
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         }
       ],
       "edge_id": {
@@ -27092,20 +28677,20 @@
           "element_id": "IN-04",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
-        "entry_key": "GitStashCommand"
+        "entry_key": "GitStashPushOutcome"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "1d843112732f47629228ae3c480b6dc2bae2fbb04eba3bc1ddd2127035874c5d",
-        "declaration_hash": "54b034826e199ed3a9d79505eaf17892f66fec0edfcebaace9a89c2f39e58867"
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "7f4ae59c782e51a874fd70193adaf8570542c1acf608465ba8ad9c4336047281",
+        "declaration_hash": "02c8df932deec4a1890fc9b5a4a1267045bcadc6228bee8f9b685f968edd241b"
       },
       "obligation_id": {
-        "entry_key": "GitStashCommand",
+        "entry_key": "GitStashPushOutcome",
         "item_identifier": "voluntary:IN-04",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "interactor.execute(GitStashCommand::Push).unwrap();\n        interactor.execute(GitStashCommand::Pop).unwrap();\n\n        assert_eq!(\n            *port.commands.lock().unwrap(),\n            vec![GitStashCommand::Push, GitStashCommand::Pop]\n        );",
+        "citation": "let outcome = adapter.push().expect(\"stash push must succeed\");\nassert!(!repo.path().join(\"untracked.txt\").exists());\nadapter.pop().expect(\"stash pop must succeed\");\nassert_eq!(fs::read_to_string(repo.path().join(\"untracked.txt\")).expect(\"untracked file must be restored\"), \"saved\\n\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27113,19 +28698,49 @@
     {
       "bound_tests": [
         {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::git_cli::stash_adapter::tests",
-          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
-          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_unavailable"
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         }
       ],
       "edge_id": {
@@ -27133,51 +28748,20 @@
           "element_id": "AC-06",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
-        "entry_key": "GitStashCommand"
+        "entry_key": "GitStashPushOutcome"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "c81186024ffb7016752c244a9fd5580a38ae82dc0165fb8f8fa4024e859d9124",
-        "declaration_hash": "54b034826e199ed3a9d79505eaf17892f66fec0edfcebaace9a89c2f39e58867"
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "7f4ae59c782e51a874fd70193adaf8570542c1acf608465ba8ad9c4336047281",
+        "declaration_hash": "02c8df932deec4a1890fc9b5a4a1267045bcadc6228bee8f9b685f968edd241b"
       },
       "obligation_id": {
-        "entry_key": "GitStashCommand",
+        "entry_key": "GitStashPushOutcome",
         "item_identifier": "voluntary:AC-06",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "adapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\nassert!(!repo.path().join(\"untracked.txt\").exists());\n\nadapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\nassert_eq!(\n    fs::read_to_string(repo.path().join(\"untracked.txt\"))\n        .expect(\"untracked file must be restored\"),\n    \"saved\\n\"\n);\n\nlet before = branch_state(repo.path());\n\nadapter.execute(GitStashCommand::Push).expect(\"stash push must succeed\");\nassert_eq!(branch_state(repo.path()), before);\n\nadapter.execute(GitStashCommand::Pop).expect(\"stash pop must succeed\");\nassert_eq!(branch_state(repo.path()), before);",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::git_stash::tests",
-          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-04",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "GitStashError"
-      },
-      "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "af5175e6e25364b7d49c6235d7c9dd520000e4bb0cc3e1e7300034c38af62941",
-        "declaration_hash": "6ae245db93084adc4b93f12af23136dfc7ff80845b6aab0d6b4270ce58bf9582"
-      },
-      "obligation_id": {
-        "entry_key": "GitStashError",
-        "item_identifier": "voluntary:IN-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert!(matches!(\n            interactor.execute(GitStashCommand::Push),\n            Err(GitStashError::ForbiddenBranchRefUpdate)\n        ));",
+        "citation": "adapter.push().expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n        assert_eq!(output(repo.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(), \"main\");\n        adapter.pop().expect(\"stash pop must succeed\");\n        assert!(!record_path(repo.path()).exists());\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27192,12 +28776,93 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
-          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_unavailable"
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPushError"
+      },
+      "key": {
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "1a499d008bf7fd31ed1b4c62b4eba87731a8661e3b35d55d8b1999e1acaf7696",
+        "declaration_hash": "d8ae3ccf2d9757bcb1b428951070f4e54eb02f3291418915dd4f4318d8ebd9c0"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPushError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(interactor.push(), Err(GitStashPushError::ForbiddenBranchRefUpdate))); assert!(matches!(interactor.pop(), Err(GitStashPopError::ForbiddenBranchRefUpdate))); ... let error = adapter.push().expect_err(\"pending pairing must block a second push\"); assert!(matches!(error, GitStashPushError::PendingGuardedStashExists)); ... assert!(matches!(error, super::StashOperationError::Unavailable(_)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
         },
         {
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
           "test_name": "stash_pop_without_saved_worktree_returns_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_absent_record_renders_recovery_guidance"
         }
       ],
       "edge_id": {
@@ -27205,20 +28870,360 @@
           "element_id": "AC-06",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
-        "entry_key": "GitStashError"
+        "entry_key": "GitStashPopError"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "6a3b0df674437535a4ad68c70d9c7a7be7e4f5a68e5ac20c71587f7b67ec2920",
-        "declaration_hash": "6ae245db93084adc4b93f12af23136dfc7ff80845b6aab0d6b4270ce58bf9582"
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "3aea2bc813ea8555a752aea534c87d9719052ee12d80f2fe44c0b3157a1cd165",
+        "declaration_hash": "34d01240fef7732836594b23c3cb563ec64d42c03b1f590be5e91a2da44b76a4"
       },
       "obligation_id": {
-        "entry_key": "GitStashError",
+        "entry_key": "GitStashPopError",
         "item_identifier": "voluntary:AC-06",
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            interactor.execute(GitStashCommand::Push),\n            Err(GitStashError::ForbiddenBranchRefUpdate)\n        ));",
+        "citation": "        assert_eq!(branch_state(repo.path()), before);\n        adapter.pop().expect(\"stash pop must succeed\");\n        assert_eq!(branch_state(repo.path()), before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_push_and_parameterless_pop_delegate_to_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_round_trip_and_clear_preserves_typed_outcome"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pairing_record_refuses_cross_worktree_pop"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPushOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "8e94cdd1f51ef488d4ec2a706161eb0ea1172a41bcc8290945769e2f41bdf81f",
+        "declaration_hash": "02c8df932deec4a1890fc9b5a4a1267045bcadc6228bee8f9b685f968edd241b"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPushOutcome",
+        "item_identifier": "voluntary:AC-13",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(outcome, GitStashPushOutcome::NothingToStash); ... assert!(record_path(repo.path()).is_file()); ... assert!(!record_path(repo.path()).exists()); ... assert_eq!(stored, Some(GitStashPushOutcome::Created(expected_commit)), \"record must persist the commit created by the guarded push\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_and_pop_preserve_head_and_branch_refs"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPushError"
+      },
+      "key": {
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "42d52f83c915277d8855e80bb36c376a552d5fbd2f19290103ee192a0a615fc8",
+        "declaration_hash": "d8ae3ccf2d9757bcb1b428951070f4e54eb02f3291418915dd4f4318d8ebd9c0"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPushError",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let before = branch_state(repo.path());\n        adapter.push().expect(\"stash push must succeed\");\n        assert_eq!(branch_state(repo.path()), before);\n        adapter.pop().expect(\"stash pop must succeed\");\n        assert_eq!(branch_state(repo.path()), before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_second_push_while_record_exists_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_uncertain_operation_detects_changed_worktree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_record::tests",
+          "test_name": "test_stash_record_rejects_malformed_content_without_silently_clearing_it"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPushError"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "eb8943d48f7bf26cf28139d26ccdfbffa7e0a0a2cd690a1eb3aa1d701d92ed28",
+        "declaration_hash": "d8ae3ccf2d9757bcb1b428951070f4e54eb02f3291418915dd4f4318d8ebd9c0"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPushError",
+        "item_identifier": "voluntary:AC-13",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(interactor.push(), Err(GitStashPushError::ForbiddenBranchRefUpdate))); ... assert!(matches!(interactor.pop(), Err(GitStashPopError::ForbiddenBranchRefUpdate))); ... assert!(matches!(&error, GitStashPopError::NoPendingGuardedStash)); ... assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists))); ... assert!(matches!(error, super::StashOperationError::Unavailable(_)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_propagates_forbidden_ref_update"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_push_includes_untracked_and_pop_restores_it"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pairing_record_refuses_cross_worktree_pop"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_absent_record_renders_recovery_guidance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPopError"
+      },
+      "key": {
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "104387eccabfe84a86736e376e42e5ad8ef1a285256a7c3af0ab2a893f8c48f6",
+        "declaration_hash": "34d01240fef7732836594b23c3cb563ec64d42c03b1f590be5e91a2da44b76a4"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPopError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(!repo.path().join(\"untracked.txt\").exists()); ... adapter.pop().expect(\"stash pop must succeed\"); ... assert_eq!(fs::read_to_string(repo.path().join(\"untracked.txt\")).expect(\"untracked file must be restored\"), \"saved\\n\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::git_stash::tests",
+          "test_name": "test_git_stash_interactor_rejects_second_push_and_propagates_absent_record_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_git_stash_pop_oid_targets_recorded_entry_after_stack_insert"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pairing_record_refuses_cross_worktree_pop"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_missing_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_mismatched_identity_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_failure_fails_closed_and_retains_record"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_pop_without_saved_worktree_returns_no_pending_guarded_stash"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_absent_record_renders_recovery_guidance"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-13",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "GitStashPopError"
+      },
+      "key": {
+        "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
+        "bound_tests_set_hash": "c071b031466d507632d970018e9e90be85d90297cfb71f5fb543bad628cd46a9",
+        "declaration_hash": "34d01240fef7732836594b23c3cb563ec64d42c03b1f590be5e91a2da44b76a4"
+      },
+      "obligation_id": {
+        "entry_key": "GitStashPopError",
+        "item_identifier": "voluntary:AC-13",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(&error, GitStashPopError::NoPendingGuardedStash)); ... assert!(guidance.contains(\"no pending guarded stash record\")); ... assert!(matches!(interactor.push(), Err(GitStashPushError::PendingGuardedStashExists))); ... assert!(record_path(repo.path()).is_file()); ... assert!(matches!(error, GitStashPopError::StashIdentityMissing(identity) if identity == expected_identity)); ... assert!(matches!(error, GitStashPopError::StashIdentityMismatch { expected: found_expected, actual: found_actual } if found_expected == expected && found_actual == actual)); ... assert!(stash_identities(repo.path()).len(), 1); ... assert!(!record_path(repo.path()).exists());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27239,6 +29244,11 @@
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
           "test_name": "stash_pop_without_saved_worktree_returns_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_absent_record_renders_recovery_guidance"
         }
       ],
       "edge_id": {
@@ -27249,8 +29259,8 @@
         "entry_key": "GitDriver"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "de96d049373903f0d23cc28a0704db47cfdbd594a499d8e93c7dd2a926e54b64",
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "df47f6cdc0102ef1e94536558e28a5e37c6fa18cbe27abfcf38ca07cce4c35f6",
         "declaration_hash": "5a8e6a968a339169828a760f5fa77fc305a4970b6bb53258e2be075e5dad4067"
       },
       "obligation_id": {
@@ -27259,7 +29269,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n...\nassert_eq!(\n    fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n    \"artifact\\n\"\n);",
+        "citation": "fs::write(dir.path().join(\"track-artifact.json\"), \"artifact\\n\").unwrap();\n        ...\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        ...\n        fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n\nassert_ne!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n\nassert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]),\n            before\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27285,6 +29295,11 @@
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
           "test_name": "stash_pop_without_saved_worktree_returns_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_absent_record_renders_recovery_guidance"
         }
       ],
       "edge_id": {
@@ -27295,8 +29310,8 @@
         "entry_key": "GitDriver"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "f39061a311ecff5be35e49889688a18188337ef09858d21b96617506ae2d929a",
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "3fb1c15a86a1a2905a76966cbc48fb6878cb53e71bb17261f9e3a44828fc26a7",
         "declaration_hash": "5a8e6a968a339169828a760f5fa77fc305a4970b6bb53258e2be075e5dad4067"
       },
       "obligation_id": {
@@ -27305,13 +29320,18 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
     {
       "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_push_and_pop_translate_and_render_success"
+        },
         {
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
@@ -27326,8 +29346,8 @@
         "entry_key": "GitStashInput"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "efe5d501d199e61f38d695b9f822cc6d74dfcc16dbdb7050cc09dcc285f0b90c",
         "declaration_hash": "cade63c8a351ba5b2856438211642e80bec089b82a01cd48f2e81f287e9fbd88"
       },
       "obligation_id": {
@@ -27336,13 +29356,18 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );",
+        "citation": "let push = driver.handle_stash(GitStashInput::Push);\n        let pop = driver.handle_stash(GitStashInput::Pop);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
     {
       "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::git::tests",
+          "test_name": "test_handle_stash_push_and_pop_translate_and_render_success"
+        },
         {
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
@@ -27357,8 +29382,8 @@
         "entry_key": "GitStashInput"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "efe5d501d199e61f38d695b9f822cc6d74dfcc16dbdb7050cc09dcc285f0b90c",
         "declaration_hash": "cade63c8a351ba5b2856438211642e80bec089b82a01cd48f2e81f287e9fbd88"
       },
       "obligation_id": {
@@ -27367,7 +29392,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27378,6 +29403,11 @@
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
           "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
         }
       ],
       "edge_id": {
@@ -27388,8 +29418,8 @@
         "entry_key": "GitCommand"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "ef634c5fbfa1b1be93f5501dd987a7187aa4cc9c68c5c0927717701233643fb7",
         "declaration_hash": "b3fb002a2d30f2ce25aea88c778ddacffd69d9b4a3fcd51c9069e51bbf2e0df8"
       },
       "obligation_id": {
@@ -27398,7 +29428,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists()); ... fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(), \"artifact\\n\" ... assert_ne!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27409,6 +29439,11 @@
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
           "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
         }
       ],
       "edge_id": {
@@ -27419,8 +29454,8 @@
         "entry_key": "GitCommand"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "ef634c5fbfa1b1be93f5501dd987a7187aa4cc9c68c5c0927717701233643fb7",
         "declaration_hash": "b3fb002a2d30f2ce25aea88c778ddacffd69d9b4a3fcd51c9069e51bbf2e0df8"
       },
       "obligation_id": {
@@ -27429,7 +29464,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n        ...\n        fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        ...\n        \"main\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27440,6 +29475,11 @@
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
           "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
         }
       ],
       "edge_id": {
@@ -27450,8 +29490,8 @@
         "entry_key": "GitStashAction"
       },
       "key": {
-        "anchor_text_hash": "b5d163e91e323fd07ab964864063be407546f503d16ce8629b8e240169f2e0aa",
-        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
+        "bound_tests_set_hash": "ef634c5fbfa1b1be93f5501dd987a7187aa4cc9c68c5c0927717701233643fb7",
         "declaration_hash": "b91c0c216c9cebe862711613951fb02bb42130573f31626c548c6f2c50a6d621"
       },
       "obligation_id": {
@@ -27460,7 +29500,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\nassert_eq!(\n    super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n    ExitCode::SUCCESS\n);\nassert_eq!(\n    fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n    \"artifact\\n\"\n);",
+        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -27471,6 +29511,11 @@
           "layer": "cli",
           "module_path": "cli::commands::git::tests",
           "test_name": "stash_push_and_pop_round_trip_untracked_artifact_without_branch_change"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::git::tests",
+          "test_name": "stash_pop_without_saved_worktree_returns_failure"
         }
       ],
       "edge_id": {
@@ -27481,8 +29526,8 @@
         "entry_key": "GitStashAction"
       },
       "key": {
-        "anchor_text_hash": "47cc60b9f722a6b03d4c5c5f1343d68f83028cd4462e2680fbd1abd399403cea",
-        "bound_tests_set_hash": "cfb57e08feab645aaba5b754c1a0213a41fbc692da6f30c4d6588a92bbf669d5",
+        "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
+        "bound_tests_set_hash": "ef634c5fbfa1b1be93f5501dd987a7187aa4cc9c68c5c0927717701233643fb7",
         "declaration_hash": "b91c0c216c9cebe862711613951fb02bb42130573f31626c548c6f2c50a6d621"
       },
       "obligation_id": {
@@ -27491,7 +29536,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\nassert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n...\nassert_eq!(\n    fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n    \"artifact\\n\"\n);\nassert_eq!(\n    run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n    \"main\"\n);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

@@ -1,8 +1,8 @@
 {
   "baseline_hash": "8307ad589103a552342ad00a1ad6ec6cdfc00136cdeed0d34ab10da714168e9f",
-  "declaration_hash": "e6c9b9ac3b8b0496c23c8342080698723dd0124da5dcccc7defcd09a08e9eaf4",
-  "generated_at": "2026-08-10T15:17:15Z",
-  "implementation_input_hash": "6e1deaa61f24f749400e971829275885d454565e906a31595f32a53c897179f9",
+  "declaration_hash": "75b08407555f9e7f807095bc8c9716fb620cc567e5bb55a82353366b1f410261",
+  "generated_at": "2026-08-10T22:41:50Z",
+  "implementation_input_hash": "f26eca17bbdb804217af5034b5f965992518fe959a835f20b89ad0e828a761ee",
   "schema_version": 4,
   "signals": [
     {
@@ -133,16 +133,12 @@
     },
     {
       "found_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Eq",
-        "PartialEq"
+        "GitStashService"
       ],
       "found_type": true,
-      "kind_tag": "enum",
+      "kind_tag": "interactor",
       "signal": "blue",
-      "type_name": "GitStashCommand"
+      "type_name": "GitStashInteractor"
     },
     {
       "found_items": [
@@ -153,22 +149,36 @@
       "found_type": true,
       "kind_tag": "error_type",
       "signal": "blue",
-      "type_name": "GitStashError"
-    },
-    {
-      "found_items": [
-        "GitStashService"
-      ],
-      "found_type": true,
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "type_name": "GitStashInteractor"
+      "type_name": "GitStashPopError"
     },
     {
       "found_type": true,
       "kind_tag": "secondary_port",
       "signal": "blue",
       "type_name": "GitStashPort"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "GitStashPushError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "GitStashPushOutcome"
     },
     {
       "found_type": true,

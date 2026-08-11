@@ -20,7 +20,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
         "kind": "pass"
       }
     },
@@ -68,7 +68,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution",
         "kind": "pass"
       }
     },
@@ -116,7 +116,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
         "kind": "pass"
       }
     },
@@ -140,7 +140,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome",
+        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point.",
         "kind": "pass"
       }
     },
@@ -164,7 +164,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
+        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
         "kind": "pass"
       }
     },
@@ -260,7 +260,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit",
+        "citation": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed.",
         "kind": "pass"
       }
     },
@@ -284,7 +284,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution",
         "kind": "pass"
       }
     },
@@ -380,7 +380,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit",
+        "citation": "\"the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit\"",
         "kind": "pass"
       }
     },
@@ -476,7 +476,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch.",
+        "citation": "only when the requested source equals its branch-strategy snapshot base branch",
         "kind": "pass"
       }
     },
@@ -524,7 +524,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "runs only when the current branch is the active `track/<id>` branch",
+        "citation": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch.",
         "kind": "pass"
       }
     },
@@ -836,7 +836,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"fail closed on record generation, validation, write, or replacement failure\"",
+        "citation": "fail closed on record generation, validation, write, or replacement failure.",
         "kind": "pass"
       }
     },
@@ -860,7 +860,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"conflict outcomes do not run that cleanup\"",
+        "citation": "conflict outcomes do not run that cleanup",
         "kind": "pass"
       }
     },
@@ -1484,7 +1484,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow, with both `/track:recover` and `$track-recover` adapters shipping as provider-framing-only entry points.",
+        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow",
         "kind": "pass"
       }
     },
@@ -1532,7 +1532,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point.",
+        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome",
         "kind": "pass"
       }
     },
@@ -1556,7 +1556,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "the exact base commit incorporated by a successful guarded merge",
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge.",
         "kind": "pass"
       }
     },
@@ -1604,7 +1604,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
         "kind": "pass"
       }
     },
@@ -1724,7 +1724,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
         "kind": "pass"
       }
     },
@@ -1772,7 +1772,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "baseline replacement does not delete the type-signals cache",
+        "citation": "conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
         "kind": "pass"
       }
     },
@@ -1796,7 +1796,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
         "kind": "pass"
       }
     },
@@ -1844,108 +1844,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result.",
+        "citation": "\"a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result\"",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5ec4490993e543f00b89b72bb5575d8fc9e6d6547b9df840826b9161eda86165",
-      "claim_origin": {
-        "data": {
-          "entry_key": "GitStashCommand",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-04",
-          "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "Provide guarded stash and stash-pop support",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "5ec4490993e543f00b89b72bb5575d8fc9e6d6547b9df840826b9161eda86165",
-      "claim_origin": {
-        "data": {
-          "entry_key": "GitStashCommand",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-06",
-          "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "\"through the `bin/sotp git stash` command path\"",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "fc10c918b826f832d43680e89950d6085c814862cad3120400899e7607117651",
-      "claim_origin": {
-        "data": {
-          "entry_key": "GitStashError",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-04",
-          "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates.",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "fc10c918b826f832d43680e89950d6085c814862cad3120400899e7607117651",
-      "claim_origin": {
-        "data": {
-          "entry_key": "GitStashError",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-06",
-          "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "\"without changing branch history, updating branch refs, or changing the active track branch\"",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "4d517e8f56c91a9431ee0f4986c989e719d9f7fc7843823529a4d3fa86ee8edf",
+      "claim_hash": "0bd2be93fff5916a1f4df6639d1115ed139c50c8420474e362f4a9e6c9c7fb01",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashInteractor",
@@ -1954,22 +1858,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
       "evidence_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates.",
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "4d517e8f56c91a9431ee0f4986c989e719d9f7fc7843823529a4d3fa86ee8edf",
+      "claim_hash": "0bd2be93fff5916a1f4df6639d1115ed139c50c8420474e362f4a9e6c9c7fb01",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashInteractor",
@@ -1978,17 +1882,257 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path",
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0bd2be93fff5916a1f4df6639d1115ed139c50c8420474e362f4a9e6c9c7fb01",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashInteractor",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e1310187323e27ce06e020a01fefeabde489fa00ab9510d9625aa64efea47b6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPopError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e1310187323e27ce06e020a01fefeabde489fa00ab9510d9625aa64efea47b6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPopError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e1310187323e27ce06e020a01fefeabde489fa00ab9510d9625aa64efea47b6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPopError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d7857e915e7d4582fdc374acb36e2db9f216e094d284ea1c5d53b72e69bf321",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPushError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d7857e915e7d4582fdc374acb36e2db9f216e094d284ea1c5d53b72e69bf321",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPushError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d7857e915e7d4582fdc374acb36e2db9f216e094d284ea1c5d53b72e69bf321",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPushError",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome ...; a second guarded push while that record exists fails closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b92df5616f4048535557f6e88ea3387cbb9ccc77a551f1ac225f4df91758ac9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPushOutcome",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b92df5616f4048535557f6e88ea3387cbb9ccc77a551f1ac225f4df91758ac9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPushOutcome",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push records untracked track artifacts.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b92df5616f4048535557f6e88ea3387cbb9ccc77a551f1ac225f4df91758ac9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPushOutcome",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome",
         "kind": "pass"
       }
     },
@@ -2108,7 +2252,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
         "kind": "pass"
       }
     },
@@ -2180,7 +2324,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result",
+        "citation": "a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result.",
         "kind": "pass"
       }
     },
@@ -2252,7 +2396,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"fail closed on record generation, validation, write, or replacement failure.\"",
+        "citation": "\"fail closed on record generation, validation, write, or replacement failure\"",
         "kind": "pass"
       }
     },
@@ -2276,7 +2420,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
+        "citation": "\"conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache\"",
         "kind": "pass"
       }
     },
@@ -2324,7 +2468,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.\"",
+        "citation": "\"Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.\"",
         "kind": "pass"
       }
     },
@@ -2348,7 +2492,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result.",
+        "citation": "\"a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result\"",
         "kind": "pass"
       }
     },
@@ -2372,7 +2516,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "evaluation failures and cache-write failures must also fail closed",
+        "citation": "\"evaluation failures and cache-write failures must also fail closed.\"",
         "kind": "pass"
       }
     },
@@ -2396,7 +2540,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.\"",
+        "citation": "a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
         "kind": "pass"
       }
     },
@@ -2492,7 +2636,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"evaluation failures and cache-write failures must also fail closed.\"",
+        "citation": "During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed.",
         "kind": "pass"
       }
     },
@@ -2516,7 +2660,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.",
+        "citation": "\"a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.\"",
         "kind": "pass"
       }
     },
@@ -2540,7 +2684,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"evaluation failures, and cache-write failures fail closed without evaluator repair\"",
+        "citation": "\"rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed\"",
         "kind": "pass"
       }
     },
@@ -2636,7 +2780,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace",
+        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace;",
         "kind": "pass"
       }
     },
@@ -2708,7 +2852,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge, regenerate derived views",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement",
         "kind": "pass"
       }
     },
@@ -2732,7 +2876,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
+        "citation": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp",
         "kind": "pass"
       }
     },
@@ -2756,7 +2900,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
+        "citation": "After a clean guarded base merge, derived views are regenerated;",
         "kind": "pass"
       }
     },
@@ -2828,7 +2972,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "conflict outcomes do not run clean-merge cleanup.",
+        "citation": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup.",
         "kind": "pass"
       }
     },
@@ -3044,7 +3188,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result",
+        "citation": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result.",
         "kind": "pass"
       }
     },
@@ -3260,7 +3404,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome",
+        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point.",
         "kind": "pass"
       }
     },
@@ -3308,7 +3452,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.\"",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
         "kind": "pass"
       }
     },
@@ -3428,7 +3572,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow, with both `/track:recover` and `$track-recover` adapters shipping as provider-framing-only entry points.",
+        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow",
         "kind": "pass"
       }
     },
@@ -3716,7 +3860,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
+        "citation": "\"Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.\"",
         "kind": "pass"
       }
     },
@@ -3745,7 +3889,7 @@
       }
     },
     {
-      "claim_hash": "4477edf18da4aa64392ec715ebdb6ecab5a64c966a01d7d72d6279d93954ecab",
+      "claim_hash": "7b69474d1b205f82851e2148d51aec59325e5bea214cc3ca9c411547e4a3ef05",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashPort",
@@ -3754,22 +3898,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
       "evidence_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates.",
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "4477edf18da4aa64392ec715ebdb6ecab5a64c966a01d7d72d6279d93954ecab",
+      "claim_hash": "7b69474d1b205f82851e2148d51aec59325e5bea214cc3ca9c411547e4a3ef05",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashPort",
@@ -3778,22 +3922,46 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a successful guarded stash-pop restores them through the `bin/sotp git stash` command path",
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "756304c128e74b2c117cae55b042f12de70c38617487ccf2a31ed77b0420bc9a",
+      "claim_hash": "7b69474d1b205f82851e2148d51aec59325e5bea214cc3ca9c411547e4a3ef05",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashPort",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome ... A guarded stash-pop reads that record",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8ad0f4d45d1a160c32b3e032e2a6ede7502d81b455777c062c6e92ca06f5742",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashService",
@@ -3802,22 +3970,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2706940b3c96469faf851e83a23fe38412526fdf9b6137fbacb76c3c280a89d9",
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
       "evidence_origin": {
         "data": {
           "element_id": "IN-04",
           "section": "in_scope",
-          "text_label": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates.",
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "756304c128e74b2c117cae55b042f12de70c38617487ccf2a31ed77b0420bc9a",
+      "claim_hash": "e8ad0f4d45d1a160c32b3e032e2a6ede7502d81b455777c062c6e92ca06f5742",
       "claim_origin": {
         "data": {
           "entry_key": "GitStashService",
@@ -3826,17 +3994,41 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "552679255e3570a7bdc446dc8d5a5aae5be794c21e81c4c1abaf23f6d1858c3b",
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch",
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8ad0f4d45d1a160c32b3e032e2a6ede7502d81b455777c062c6e92ca06f5742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashService",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed.",
         "kind": "pass"
       }
     },
@@ -3884,7 +4076,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
+        "citation": "\"A type-signals cache may be reused only when every applicable comparison equals the recorded value\"",
         "kind": "pass"
       }
     },
@@ -3908,7 +4100,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace;",
+        "citation": "\"a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace\"",
         "kind": "pass"
       }
     },
@@ -3932,7 +4124,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success.",
+        "citation": "\"a mismatch when the composite implementation-input hash is computable must fail closed without reevaluation\"",
         "kind": "pass"
       }
     },
@@ -3956,7 +4148,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification\"",
+        "citation": "\"During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact...\"",
         "kind": "pass"
       }
     },
@@ -4004,7 +4196,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness.",
+        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
         "kind": "pass"
       }
     },
@@ -4100,7 +4292,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"evaluation failures ... fail closed without evaluator repair\"",
+        "citation": "\"evaluation failures, and cache-write failures fail closed without evaluator repair\"",
         "kind": "pass"
       }
     }

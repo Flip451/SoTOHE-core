@@ -230,3 +230,7 @@ cli_driver final も同 class の 3 P1（telemetry の context capture / archive
 T017 の precision クロージャ実装は infrastructure final で 9 時間 77 findings・findings/round 増加の発散を示した（手書きトークン分類器 87R / retention 機構 115R に続く同型 3 例目）。艦隊処方箋 tmp/handoff/2026-08-10-impl-input-hash-prescription.md に従い、手作り Cargo/Rust 意味論再実装へのパッチ追加を即時停止した。
 
 **裁定: 案 2（保守的過大近似）を採択。** 判断基準への当てはめ: (1) 再評価コストは rustdoc + 評価で層あたり分オーダー・頻度低で許容範囲、(2) 過大側誤りはキャッシュヒット率のみに作用し fail-closed 方向に安全、(3) 「迷ったら案 2」、(4) module-size 超過も削除方向で同時解消。閉包の権威は cargo metadata ではなく committed SSoT の architecture-rules.json 層依存グラフを採用する（local/branch 同一・閉集合・テキスト解釈不要という点で処方箋の「閉じた過大近似」条件をより強く満たす。許可依存 ⊇ 実依存なので過大近似として健全）。crate ディレクトリツリー全体 + Cargo.lock + workspace manifest + toolchain identity + feature selection を hash する。precision スキャナ（dependency_closure の manifest 解釈・build script パス解析・include 走査）は全削除。77 findings は過大近似への包含確認例として回帰コーパス化する。
+
+## 2026-08-11: guarded stash 並行性 — 艦隊処方箋 v2 採択
+
+tmp/handoff/2026-08-11-stash-concurrency-prescription.md に従い、T021 の並行性 findings を閉集合として処理する: (1) index 参照(`stash@{N}`)を全廃し OID アドレッシング(apply 直前に OID 実在を再検証、drop はその場で OID→参照を再解決)へ、(2) push→record 永続化のクラッシュ窓は AC-13 の absent-record 回復レーンへ写像されることを spec/docs に明文化、(3) 脅威モデルを宣言して閉じる(guarded 経路は adapter ロックで直列化 / unguarded は reference-transaction hook が遮断 / token 保持者の手動介入は operator 責任、OID 再検証が最後の網)、(4) 型モデル・再記述は機械的修正。新規防御機構の追加はゼロ。宣言の外から防御要求が来た場合は実装せず裁定へ上げる。

@@ -101,38 +101,6 @@
       "trait_ref": "BaseMergeService"
     },
     {
-      "for_type": "GitStashCommand",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "GitStashCommand",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "GitStashCommand",
-      "trait_ref": "core::marker::Copy"
-    },
-    {
-      "for_type": "GitStashCommand",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "GitStashCommand",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "GitStashError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "GitStashError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "GitStashError",
-      "trait_ref": "core::error::Error"
-    },
-    {
       "for_type": "GitStashInteractor",
       "trait_ref": "GitStashService"
     },
@@ -279,6 +247,46 @@
     {
       "for_type": "BaseMergeAttemptOutcome",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GitStashPushError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitStashPushError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GitStashPushError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GitStashPopError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitStashPopError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GitStashPopError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
@@ -613,22 +621,26 @@
     },
     "GitStashPort": {
       "action": "add",
-      "docs": "Git-stash process driven port. Synchronous by design.",
+      "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Stash command invocation. Synchronous by design.",
+          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
-          "name": "execute",
-          "params": [
-            {
-              "name": "command",
-              "ty": "GitStashCommand"
-            }
-          ],
+          "name": "push",
+          "params": [],
           "receiver": "&self",
-          "returns": "Result<(), GitStashError>"
+          "returns": "Result<GitStashPushOutcome, GitStashPushError>"
+        },
+        {
+          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pop",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<(), GitStashPopError>"
         }
       ],
       "module_path": "git_stash",
@@ -643,6 +655,10 @@
         {
           "anchor": "AC-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],
       "supertrait_bounds": [
@@ -652,21 +668,26 @@
     },
     "GitStashService": {
       "action": "add",
-      "docs": "Application-service boundary for GitStashCommand values.",
+      "docs": "IN-04 / AC-06 / AC-13.",
       "informal_grounds": [],
       "methods": [
         {
+          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
-          "name": "execute",
-          "params": [
-            {
-              "name": "command",
-              "ty": "GitStashCommand"
-            }
-          ],
+          "name": "push",
+          "params": [],
           "receiver": "&self",
-          "returns": "Result<(), GitStashError>"
+          "returns": "Result<GitStashPushOutcome, GitStashPushError>"
+        },
+        {
+          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pop",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<(), GitStashPopError>"
         }
       ],
       "module_path": "git_stash",
@@ -680,6 +701,10 @@
         },
         {
           "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],
@@ -1641,31 +1666,22 @@
         }
       ]
     },
-    "GitStashCommand": {
+    "GitStashInteractor": {
       "action": "add",
-      "docs": "Finite application command for stash push and pop requests.",
+      "docs": "IN-04 / AC-06 / AC-13.",
       "informal_grounds": [],
       "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Push",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "Pop",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
       },
       "methods": [],
       "module_path": "git_stash",
       "role": {
-        "Command": {}
+        "Interactor": {}
       },
       "spec_refs": [
         {
@@ -1675,18 +1691,103 @@
         {
           "anchor": "AC-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
     },
-    "GitStashError": {
+    "GitStashPopError": {
       "action": "add",
-      "docs": "Stash failure enum whose forbidden-ref variant can represent only branch-ref mutation.",
+      "docs": "IN-04 / AC-06 / AC-13.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
             "name": "ForbiddenBranchRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NoPendingGuardedStash",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unavailable",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "StashIdentityMissing",
+            "payload": {
+              "fields": [
+                "domain::CommitHash"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "StashIdentityMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "expected",
+                  "ty": "domain::CommitHash"
+                },
+                {
+                  "name": "actual",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_stash",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "GitStashPushError": {
+      "action": "add",
+      "docs": "IN-04 / AC-06 / AC-13.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ForbiddenBranchRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PendingGuardedStashExists",
             "payload": {
               "kind": "unit"
             }
@@ -1715,25 +1816,41 @@
         {
           "anchor": "AC-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
     },
-    "GitStashInteractor": {
+    "GitStashPushOutcome": {
       "action": "add",
-      "docs": "Dependency-injected interactor implementing GitStashService.",
+      "docs": "IN-04 / AC-06 / AC-13.",
       "informal_grounds": [],
       "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Created",
+            "payload": {
+              "fields": [
+                "domain::CommitHash"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NothingToStash",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
       },
       "methods": [],
       "module_path": "git_stash",
       "role": {
-        "Interactor": {}
+        "ValueObject": {}
       },
       "spec_refs": [
         {
@@ -1742,6 +1859,10 @@
         },
         {
           "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]

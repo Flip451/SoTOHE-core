@@ -78,7 +78,7 @@
         }
       ],
       "id": "AC-06",
-      "text": "A guarded stash records untracked track artifacts, and a successful guarded stash-pop restores them through the `bin/sotp git stash` command path without changing branch history, updating branch refs, or changing the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+      "text": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
     },
     {
       "adr_refs": [
@@ -143,6 +143,16 @@
       ],
       "id": "AC-12",
       "text": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
+        }
+      ],
+      "id": "AC-13",
+      "text": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
     }
   ],
   "constraints": [
@@ -227,6 +237,16 @@
       ],
       "id": "CN-07",
       "text": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
+        }
+      ],
+      "id": "CN-08",
+      "text": "The guarded stash threat model serializes the guarded path with the adapter lock, rejects unguarded stash mutations through the repository reference-transaction hook layer, assigns token-holding operator manual intervention to operator responsibility, and uses OID re-verification at application time as the final protection against misapplication."
     }
   ],
   "goal": [
@@ -341,10 +361,14 @@
           {
             "anchor": "D3",
             "file": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
           }
         ],
         "id": "IN-04",
-        "text": "Provide guarded stash and stash-pop support that explicitly includes untracked track artifacts while preserving repository safety gates."
+        "text": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
       },
       {
         "adr_refs": [
@@ -391,11 +415,21 @@
         ],
         "id": "OS-03",
         "text": "Scanning, migrating, or validating type-signals caches for inactive or archived tracks, and routine manual deletion of type-signals artifacts during baseline recapture, are out of scope."
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
+          }
+        ],
+        "id": "OS-04",
+        "text": "External-interference defenses beyond the guarded stash threat model are out of scope."
       }
     ]
   },
   "signals": {
-    "blue": 30,
+    "blue": 33,
     "red": 0,
     "yellow": 0
   },
