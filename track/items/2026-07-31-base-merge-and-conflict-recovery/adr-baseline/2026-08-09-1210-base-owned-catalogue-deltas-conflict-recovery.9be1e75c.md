@@ -9,7 +9,7 @@ decisions:
 
 ## Context
 
-`2026-07-29-0839-base-merge-and-conflict-recovery.md` D2 は、ガード付き base merge が conflict した場合に、オーケストレーターが conflict の解消から指摘がなくなるまでの review、ガード付き commit までを進めると定めた。`2026-08-02-0715-base-merge-cleanup-state.md` D3 は、conflict になった場合は clean-merge cleanup を実行しないと定めた。
+`2026-07-29-0839-base-merge-and-conflict-recovery.md` D2 は、guarded base merge が conflict した場合に、統括役が conflict の解消から指摘がなくなるまでの review、guarded commit までを進めると定めた。`2026-08-02-0715-base-merge-cleanup-state.md` D3 は、conflict になった場合は clean-merge cleanup を実行しないと定めた。
 
 一方、実際に merge した base commit から取り込まれた catalogue entry が、取り込み元の merge 済み track ですでに所有と帰属を持ち、Chain ③ が青信号であっても、回復側の型 baseline が merge 前の base を比較権威としている間は赤信号の差分と評価される。これらを回復側の catalogue に複製すると所有が二重化し、merge 統合作業への帰属だけでは比較権威のずれを解消できない。
 
@@ -37,7 +37,7 @@ conflict 後の回復では、影響する信号連鎖に限定した review が
 ## Consequences
 
 - 良: 実際に merge した base commit 由来の承認済み catalogue 変更と、回復側で新たに生じた catalogue の差分を、正しい比較権威に基づいて区別できる。
-- 良: clean-merge cleanup 禁止と、conflict 後の回復をガード付き commit まで進める要求を両立できる。
+- 良: clean-merge cleanup 禁止と、conflict 後の回復を guarded commit まで進める要求を両立できる。
 - 良: 取り込んだ entry の所有を取り込み元に保ち、catalogue の重複を避けられる。
 - 負: conflict 後の回復に、影響する信号連鎖に限定した review 後の baseline 再取得が追加される。
 

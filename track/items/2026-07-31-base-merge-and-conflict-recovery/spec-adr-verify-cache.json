@@ -976,7 +976,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "7eef99013cfe6dd9c1dd9088b417d1b9479259ff9862300e22cd2b62c81b2030",
+      "evidence_hash": "be127fa966f86c502c2836f00189646818ed032056bc9275d50611eeb7c7f54f",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -985,7 +985,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "conflicted recovery では、chain-limited review の通過後、exact merged base commit の disposable clone に対する sanctioned baseline-capture により type baseline の現在性を回復してよい。これは clean-merge cleanup ではなく、sync-base stamp の更新、retained tree への publish、view の再生成を含まない。incoming entry の ownership は取り込み元の merged track に残し、回復を実行する track は coverage completeness のための merge-integration attribution だけを記録して、同じ catalogue entry を複製しない。",
+        "citation": "conflict 後の回復では、影響する信号連鎖に限定した review が指摘なしで完了した後、実際に merge した base commit の使い捨ての複製に対する正規の baseline 取得コマンドにより、型 baseline を現在の base に合わせ直してよい。\n\nこれは clean-merge cleanup ではなく、`.sync-base.json` の更新、保持用作業領域の公開、表示用ファイルの再生成を含まない。\n\n取り込んだ entry の所有は取り込み元の merge 済み track に残し、回復を実行する track は帰属の網羅性を満たすための merge 統合作業への帰属だけを記録して、同じ catalogue entry を複製しない。",
         "kind": "pass"
       }
     },
