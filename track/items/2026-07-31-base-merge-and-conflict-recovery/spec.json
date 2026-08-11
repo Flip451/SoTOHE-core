@@ -40,7 +40,7 @@
         }
       ],
       "id": "AC-03",
-      "text": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+      "text": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
     },
     {
       "adr_refs": [
@@ -129,10 +129,14 @@
         {
           "anchor": "D2",
           "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
         }
       ],
       "id": "AC-11",
-      "text": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+      "text": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
     },
     {
       "adr_refs": [
@@ -226,7 +230,7 @@
         }
       ],
       "id": "CN-06",
-      "text": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+      "text": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
     },
     {
       "adr_refs": [
@@ -236,7 +240,7 @@
         }
       ],
       "id": "CN-07",
-      "text": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
+      "text": "Clean-merge cleanup may complete only in the order Views, Baseline, ViewsAfterBaseline, then SyncBaseStamp; post-baseline rendering failure fails closed while preserving the prior rendered-view state, conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
     },
     {
       "adr_refs": [
@@ -334,17 +338,21 @@
           }
         ],
         "id": "IN-02",
-        "text": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+        "text": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
       },
       {
         "adr_refs": [
           {
             "anchor": "D2",
             "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+          },
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
           }
         ],
         "id": "IN-06",
-        "text": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+        "text": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed."
       },
       {
         "adr_refs": [

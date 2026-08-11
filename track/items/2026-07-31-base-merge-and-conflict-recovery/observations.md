@@ -234,3 +234,5 @@ T017 の precision クロージャ実装は infrastructure final で 9 時間 77
 ## 2026-08-11: guarded stash 並行性 — 艦隊処方箋 v2 採択
 
 tmp/handoff/2026-08-11-stash-concurrency-prescription.md に従い、T021 の並行性 findings を閉集合として処理する: (1) index 参照(`stash@{N}`)を全廃し OID アドレッシング(apply 直前に OID 実在を再検証、drop はその場で OID→参照を再解決)へ、(2) push→record 永続化のクラッシュ窓は AC-13 の absent-record 回復レーンへ写像されることを spec/docs に明文化、(3) 脅威モデルを宣言して閉じる(guarded 経路は adapter ロックで直列化 / unguarded は reference-transaction hook が遮断 / token 保持者の手動介入は operator 責任、OID 再検証が最後の網)、(4) 型モデル・再記述は機械的修正。新規防御機構の追加はゼロ。宣言の外から防御要求が来た場合は実装せず裁定へ上げる。
+
+merge-3 統合レビューで、取り込んだ PR #234（generic-type-aliases レーン）自身の normalize_alias_target_paths 設計（最終セグメント正規化による過剰一致の懸念）が P1 として指摘された。tracing レーンの telemetry 配置指摘と同 class の originating-lane 再審理であり、統合ラウンドでは Known Accepted Deviation とし、follow-up 裁定事項に追加する。

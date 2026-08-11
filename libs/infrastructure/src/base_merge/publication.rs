@@ -145,10 +145,11 @@ pub(super) fn acquire_track_writer_lock(
         .map_err(|error| format!("cannot inspect track writer lock: {error}"))?;
     let lock_file = super::open_base_merge_lock_file(&lock_path)
         .map_err(|error| format!("cannot open track writer lock: {error}"))?;
-    lock_file
-        .try_lock_exclusive()
-        .map_err(|error| format!("another track writer holds the lock: {error}"))?;
-    Ok(lock_file)
+    match lock_file.try_lock_exclusive() {
+        Ok(true) => Ok(lock_file),
+        Ok(false) => Err("another track writer holds the lock".to_owned()),
+        Err(error) => Err(format!("another track writer holds the lock: {error}")),
+    }
 }
 
 pub(super) fn publish_baseline_replacements(

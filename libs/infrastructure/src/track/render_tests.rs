@@ -587,6 +587,34 @@ fn sync_rendered_views_writes_plan_and_registry() {
     assert!(dir.path().join("track/registry.md").is_file());
 }
 
+#[test]
+fn sync_rendered_views_serializes_concurrent_registry_writers() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join("track/items")).unwrap();
+    let registry_path = dir.path().join("track/registry.md");
+    let first_lock =
+        crate::track::registry_lock::acquire_registry_lock(&registry_path, dir.path()).unwrap();
+    let (started_tx, started_rx) = std::sync::mpsc::channel();
+    let (finished_tx, finished_rx) = std::sync::mpsc::channel();
+    let root = dir.path().to_path_buf();
+    let handle = std::thread::spawn(move || {
+        started_tx.send(()).unwrap();
+        let result = sync_rendered_views(&root, None).is_ok();
+        finished_tx.send(result).unwrap();
+    });
+
+    started_rx.recv_timeout(std::time::Duration::from_secs(1)).unwrap();
+    assert!(
+        finished_rx.recv_timeout(std::time::Duration::from_millis(100)).is_err(),
+        "the normal registry writer must wait for the shared lock"
+    );
+    drop(first_lock);
+
+    assert!(finished_rx.recv_timeout(std::time::Duration::from_secs(1)).unwrap());
+    handle.join().unwrap();
+    assert!(registry_path.is_file());
+}
+
 // --- registry / snapshot boundary tests ---
 
 #[test]

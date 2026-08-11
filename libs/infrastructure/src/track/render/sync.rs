@@ -18,6 +18,7 @@ use crate::git_cli::SystemGitRepo;
 use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::type_signals_codec;
+use crate::track::registry_lock::acquire_registry_lock;
 use crate::track::symlink_guard::reject_symlinks_below;
 use crate::track_artifact::{TrackArtifactReadError, read_track_artifact};
 use crate::type_catalogue_render;
@@ -507,6 +508,9 @@ pub fn sync_rendered_views(
     if let Some(parent) = registry_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
+    let _registry_lock = acquire_registry_lock(&registry_path, root)
+        .map_err(std::io::Error::other)
+        .map_err(RenderError::Io)?;
     let old = read_optional_guarded_file(&registry_path, root, "registry.md")?;
     if old
         .as_deref()

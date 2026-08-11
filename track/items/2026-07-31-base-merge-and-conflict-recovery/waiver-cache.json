@@ -417,7 +417,7 @@
         "entry_key": "BaseMergeInteractor"
       },
       "key": {
-        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a",
+        "anchor_text_hash": "fdccb82f827cb897de9a3014978e2aa55cb636e6ff9e66fc85b2c757b6f2de08",
         "declaration_hash": "a32eca11e5762fdf6def09788dc2c7992c0841b913ae400f83a450d17002b662",
         "waived_reason_hash": "12f748ca9c402759def88cf90160522d2ac9cc5a28dac0da0f1b93de6a98cbcf"
       },
@@ -427,7 +427,7 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "\"Dependency-injected interactor implementing BaseMergeService.\"",
+        "citation": "Dependency-injected interactor implementing BaseMergeService.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -561,7 +561,7 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a",
+        "anchor_text_hash": "fdccb82f827cb897de9a3014978e2aa55cb636e6ff9e66fc85b2c757b6f2de08",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073",
         "waived_reason_hash": "7918e080a4e6ffaa32cf3c4598eede1b907f2c076fb1946c4528ad32a32ba172"
       },
@@ -571,7 +571,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"Sync-base record-write operation. Synchronous by design.\"",
+        "citation": "TraitEntry ... methods: [MethodDeclaration { name: MethodName(Identifier(\"write_sync_base_record\")), ... }]",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -585,7 +585,7 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a",
+        "anchor_text_hash": "fdccb82f827cb897de9a3014978e2aa55cb636e6ff9e66fc85b2c757b6f2de08",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073",
         "waived_reason_hash": "7918e080a4e6ffaa32cf3c4598eede1b907f2c076fb1946c4528ad32a32ba172"
       },
@@ -595,7 +595,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"write_sync_base_record\"",
+        "citation": "Sync-base record-write operation. Synchronous by design.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -609,7 +609,7 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "92a7601808ae36e0d63a8e8e4e46f7ae285b3e663bc9b63579db5ea2ff17841a",
+        "anchor_text_hash": "fdccb82f827cb897de9a3014978e2aa55cb636e6ff9e66fc85b2c757b6f2de08",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073",
         "waived_reason_hash": "7918e080a4e6ffaa32cf3c4598eede1b907f2c076fb1946c4528ad32a32ba172"
       },
@@ -619,7 +619,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"Sync-base record-write operation. Synchronous by design.\"",
+        "citation": "Post-merge cleanup driven port. Synchronous by design.",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -705,7 +705,7 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843",
+        "anchor_text_hash": "951d08e26a4fdf0fdac1bb05e1a48208124bfa72ff2bf8fb163e6a26ed9e4b18",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073",
         "waived_reason_hash": "fdbad2601eedbe77f3827ad81de441fc9da14a93c4cdd6234aee0189ff909089"
       },
@@ -715,7 +715,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"TraitEntry ... methods ... write_sync_base_record ... returns: TypeRef(\\\"Result<(), SyncBaseRecordError>\\\") ...\"",
+        "citation": "\"Record contents, idempotency, and atomic replacement are codec and concrete-adapter behavior outside this port entry.\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -729,7 +729,7 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843",
+        "anchor_text_hash": "951d08e26a4fdf0fdac1bb05e1a48208124bfa72ff2bf8fb163e6a26ed9e4b18",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073",
         "waived_reason_hash": "fdbad2601eedbe77f3827ad81de441fc9da14a93c4cdd6234aee0189ff909089"
       },
@@ -739,7 +739,7 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "\"Post-merge cleanup driven port. Synchronous by design.\"",
+        "citation": "\"Record contents, idempotency, and atomic replacement are codec and concrete-adapter behavior outside this port entry.\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -753,7 +753,7 @@
         "entry_key": "BaseMergeCleanupPort"
       },
       "key": {
-        "anchor_text_hash": "8f72df7566d25066016278de5e0f6d20ef327f95a6f72e7f2d2de2b00cc5e843",
+        "anchor_text_hash": "951d08e26a4fdf0fdac1bb05e1a48208124bfa72ff2bf8fb163e6a26ed9e4b18",
         "declaration_hash": "97c07519443c0bc67f584ffa7ad9a8a0f2e15fa4a57b6c5d7db574a11c1b2073",
         "waived_reason_hash": "fdbad2601eedbe77f3827ad81de441fc9da14a93c4cdd6234aee0189ff909089"
       },

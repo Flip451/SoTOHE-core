@@ -298,6 +298,12 @@ impl BaseMergeService for BaseMergeInteractor {
                 self.cleanup.replace_baselines(&request).map_err(|error| {
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(error))
                 })?;
+                // Baseline publication can change the authority without changing the
+                // catalogue. Re-sync the tracked type views against that new authority
+                // before recording the merge as synchronized.
+                self.cleanup.regenerate_views(&request).map_err(|error| {
+                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error))
+                })?;
                 self.cleanup.write_sync_base_record(&request).map_err(|error| {
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(error))
                 })?;
@@ -336,6 +342,7 @@ mod tests {
     enum CleanupStage {
         Views,
         Baseline,
+        ViewsAfterBaseline,
         SyncBaseStamp,
     }
 
@@ -553,7 +560,15 @@ mod tests {
             stage: CleanupStage,
             request: &BaseMergeCleanupRequest,
         ) -> Result<(), DiagnosticText> {
-            self.calls.lock().unwrap().push(CleanupCall { stage, request: request.clone() });
+            let mut calls = self.calls.lock().unwrap();
+            let stage = if stage == CleanupStage::Views
+                && calls.iter().any(|call| call.stage == CleanupStage::Baseline)
+            {
+                CleanupStage::ViewsAfterBaseline
+            } else {
+                stage
+            };
+            calls.push(CleanupCall { stage, request: request.clone() });
             if self.failure == Some(stage) {
                 return Err(DiagnosticText::new("cleanup failed"));
             }
@@ -619,7 +634,15 @@ mod tests {
 
     impl StatefulCleanup {
         fn record_call(&self, stage: CleanupStage, request: &BaseMergeCleanupRequest) {
-            self.state.lock().unwrap().calls.push(CleanupCall { stage, request: request.clone() });
+            let mut state = self.state.lock().unwrap();
+            let stage = if stage == CleanupStage::Views
+                && state.calls.iter().any(|call| call.stage == CleanupStage::Baseline)
+            {
+                CleanupStage::ViewsAfterBaseline
+            } else {
+                stage
+            };
+            state.calls.push(CleanupCall { stage, request: request.clone() });
         }
     }
 
@@ -776,6 +799,7 @@ mod tests {
             vec![
                 CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
                 CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },
+                CleanupCall { stage: CleanupStage::ViewsAfterBaseline, request: cleanup_request() },
                 CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },
             ]
         );
@@ -800,10 +824,15 @@ mod tests {
         assert_eq!(outcome, BaseMergeOutcome::Completed);
         assert_eq!(git_calls.lock().unwrap().len(), 1);
         let cleanup_calls = cleanup_calls.lock().unwrap();
-        assert_eq!(cleanup_calls.len(), 3);
+        assert_eq!(cleanup_calls.len(), 4);
         assert_eq!(
             cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]
+            vec![
+                CleanupStage::Views,
+                CleanupStage::Baseline,
+                CleanupStage::ViewsAfterBaseline,
+                CleanupStage::SyncBaseStamp,
+            ]
         );
         for call in cleanup_calls.iter() {
             assert_eq!(call.request.workspace_root, PathBuf::from("/workspace"));
@@ -999,8 +1028,17 @@ mod tests {
             (CleanupStage::Views, vec![CleanupStage::Views]),
             (CleanupStage::Baseline, vec![CleanupStage::Views, CleanupStage::Baseline]),
             (
+                CleanupStage::ViewsAfterBaseline,
+                vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::ViewsAfterBaseline],
+            ),
+            (
                 CleanupStage::SyncBaseStamp,
-                vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp],
+                vec![
+                    CleanupStage::Views,
+                    CleanupStage::Baseline,
+                    CleanupStage::ViewsAfterBaseline,
+                    CleanupStage::SyncBaseStamp,
+                ],
             ),
         ] {
             let git_calls = Arc::new(Mutex::new(Vec::new()));
@@ -1022,6 +1060,12 @@ mod tests {
             assert!(match (failure, error) {
                 (
                     CleanupStage::Views,
+                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error)),
+                ) => {
+                    matches!(error, ViewsRegenerationError::Regeneration(detail) if detail.as_str() == "cleanup failed")
+                }
+                (
+                    CleanupStage::ViewsAfterBaseline,
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error)),
                 ) => {
                     matches!(error, ViewsRegenerationError::Regeneration(detail) if detail.as_str() == "cleanup failed")
@@ -1273,7 +1317,12 @@ mod tests {
         assert!(state.sync_base_record.is_none());
         assert_eq!(
             state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]
+            vec![
+                CleanupStage::Views,
+                CleanupStage::Baseline,
+                CleanupStage::ViewsAfterBaseline,
+                CleanupStage::SyncBaseStamp,
+            ]
         );
     }
 
@@ -1326,7 +1375,12 @@ mod tests {
             assert!(state.sync_base_record.is_none());
             assert_eq!(
                 state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-                vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]
+                vec![
+                    CleanupStage::Views,
+                    CleanupStage::Baseline,
+                    CleanupStage::ViewsAfterBaseline,
+                    CleanupStage::SyncBaseStamp,
+                ]
             );
         }
     }
@@ -1354,7 +1408,12 @@ mod tests {
         assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit));
         assert_eq!(
             state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]
+            vec![
+                CleanupStage::Views,
+                CleanupStage::Baseline,
+                CleanupStage::ViewsAfterBaseline,
+                CleanupStage::SyncBaseStamp,
+            ]
         );
         assert!(state.calls.iter().all(|call| call.request.base_commit == exact_base_commit));
     }
@@ -1443,7 +1502,7 @@ mod tests {
     }
 
     #[test]
-    fn test_base_merge_outcome_completed_after_all_three_cleanup_successes() {
+    fn test_base_merge_outcome_completed_after_all_ordered_cleanup_successes() {
         let state = stateful_cleanup_state();
         let interactor = BaseMergeInteractor::new(
             Arc::new(SuccessfulContext::new(direction())),
@@ -1459,7 +1518,12 @@ mod tests {
         assert!(matches!(outcome, BaseMergeOutcome::Completed));
         assert_eq!(
             state.lock().unwrap().calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]
+            vec![
+                CleanupStage::Views,
+                CleanupStage::Baseline,
+                CleanupStage::ViewsAfterBaseline,
+                CleanupStage::SyncBaseStamp,
+            ]
         );
     }
 
@@ -1564,7 +1628,12 @@ mod tests {
         assert_eq!(success_state.sync_base_record.as_ref(), Some(&exact_base_commit));
         assert_eq!(
             success_state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::SyncBaseStamp]
+            vec![
+                CleanupStage::Views,
+                CleanupStage::Baseline,
+                CleanupStage::ViewsAfterBaseline,
+                CleanupStage::SyncBaseStamp,
+            ]
         );
     }
 }

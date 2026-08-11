@@ -47,6 +47,9 @@
     "T022": [
       {"layer": "infrastructure", "entry_key": "FsGitStashAdapter"}
     ],
+    "T023": [
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"}
+    ],
     "T007": [
       {"layer": "domain", "entry_key": "BaselineHash"},
       {"layer": "domain", "entry_key": "TypeSignalsCacheKey"},

@@ -25,17 +25,23 @@ compile input の要約 hash（`implementation_input_hash`）、rustdoc baseline
 
 ### D1: 権威照合の適用範囲を、その権威が存在する文脈に限定する
 
-権威照合は、その権威が存在する文脈にのみ適用する。存在する権威の読み取り不能または不一致は常に
-fail-closed とし、照合の縮退は権威の構造的不在に限る。取得失敗は構造的不在に含めない。
+D4 の 3 hash 照合と baseline の fail-closed 扱いは、baseline 権威が存在する文脈、すなわち local pre-commit workspace に適用する。この workspace が baseline 新鮮度の唯一の enforcement point である。
 
-`implementation_input_hash` は committed 成分と local-only の nightly toolchain identity の複合とする。
-nightly の構造的不在は toolchain enumeration が成功し、かつ一致する nightly が導入されていない場合に
-限り、この場合だけ implementation-input 照合を縮退させる。
+baseline 権威が構造的に存在しない文脈（fresh CI checkout、merge gate）は、commit された権威のみを照合する。
 
-この意味論を local freshness check と merge gate の双方に適用する。
+規則は非対称とする。存在する権威が読み取り不能または不一致であれば、文脈を問わず常に fail-closed とする。照合を縮退させるのは権威の構造的不在だけであり、取得失敗をこれに含めない。
 
-- **pinned nightly を tools image に provision する**: 重い provisioning contract となるため採用しない。
-- **committed 成分だけの hash を別途永続化する**: 新たな artifact contract となるため採用しない。
+`implementation_input_hash` は、commit された成分（source tree、Cargo manifests、`Cargo.lock`、commit された `tddd-features.json` の feature selection）と、local-only 権威である nightly toolchain identity（`rustup run nightly rustc -Vv`）の積として構成する。
+
+nightly toolchain が構造的に不在であると判定できるのは、toolchain enumeration（例: `rustup toolchain list`）自体が成功し、かつ一致する nightly toolchain が install されていない場合に限る。この場合に限り、既存の非対称規則に従って implementation-input の照合だけを skip する。rustup または probe の実行失敗、install 済み nightly の identity 読み取り失敗、および hash を計算できる場合の不一致は、すべて fail-closed とする。存在する権威の読み取り不能を構造的不在へ格下げしない。
+
+この意味論は、catalogue 宣言と実装の一致および cache freshness を local pre-commit で確認する
+`signal check-impl-catalog` と、merge gate の branch implementation-input verification の両方に同一に
+適用する。両 consumer は commit された declaration 権威を照合し、baseline が local に存在する場合は
+既存の baseline 照合も維持する。stable-only CI tools image では、nightly の構造的不在が上記 probe で
+確定した場合だけ toolchain-dependent な implementation-input 照合を縮退させる。
+
+代替案として、stable-only tools image に pinned nightly を provision する案と、composite hash を分割して commit 成分だけの hash を永続化する案を検討した。いずれも toolchain provisioning または永続 artifact の contract 追加を要する重い変更であるため採用せず、将来の独立した判断で再検討可能とする。
 
 ### Existing decision relationship
 

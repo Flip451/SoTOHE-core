@@ -193,6 +193,91 @@
           "hash": "rvw1:sha256:2cb5dd2ec797ef7de94151d88fdea6361ef2a41e24ce1be1a1263f1d3279a712",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:17:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:219d5b73ea2f362225668c38903139bb091e0c158fef9c380669ee8a6b514854",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:21:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:219d5b73ea2f362225668c38903139bb091e0c158fef9c380669ee8a6b514854",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:20:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5308be468c4fb51e6e312432091135bd2cbd1fec4b81e0748916b4d36798ed3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:22:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5308be468c4fb51e6e312432091135bd2cbd1fec4b81e0748916b4d36798ed3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:55:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a1445b57c703e0ac0b25403dde8871d7d93bc3abb175113982968e67eba1f0b6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:58:20Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-05-1035-type-signals-authority-availability-boundary.md",
+              "line": 13,
+              "message": "Context states that the cache is reused only when all three hashes match, but D1 later permits skipping the implementation-input comparison when nightly is structurally absent and applies that rule to cache freshness. The ADR therefore contradicts itself about whether cache reuse may occur without all three hashes; scope the Context invariant or explicitly state the structural-absence exception.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a1445b57c703e0ac0b25403dde8871d7d93bc3abb175113982968e67eba1f0b6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T06:58:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a1445b57c703e0ac0b25403dde8871d7d93bc3abb175113982968e67eba1f0b6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T07:07:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:31f507a314ef6665974cc8d0c6812978289e96440c9a2eee2c5be79dafebfea8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T07:10:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:31f507a314ef6665974cc8d0c6812978289e96440c9a2eee2c5be79dafebfea8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T07:27:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b30638f36687a084bfd1d370d9a38ac91abbd59e1a0569b3c0907dd61f3c6132",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T07:29:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b30638f36687a084bfd1d370d9a38ac91abbd59e1a0569b3c0907dd61f3c6132",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -630,6 +715,34 @@
           "hash": "rvw1:sha256:1c783597fbe6d162ad5960b365aaf995a49ff4367c085e9704ab0d3cc92be911",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:20:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a62c7aeb2dcaacc1d4018663d338bdecc1e7c5ab7ef200322e3e6255901cfcb6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:24:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a62c7aeb2dcaacc1d4018663d338bdecc1e7c5ab7ef200322e3e6255901cfcb6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:55:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a62c7aeb2dcaacc1d4018663d338bdecc1e7c5ab7ef200322e3e6255901cfcb6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:58:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a62c7aeb2dcaacc1d4018663d338bdecc1e7c5ab7ef200322e3e6255901cfcb6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -690,6 +803,20 @@
           "at": "2026-08-03T12:34:18Z",
           "findings": [],
           "hash": "rvw1:sha256:72590ecb1637273aeab6c91c66857e364b51d47858d1469090d36bd4c1543201",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:25:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e57bfa136ad59dc7a75b4fc8d68595a9745d195c824df2228e836ac54cabbbec",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:32:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e57bfa136ad59dc7a75b4fc8d68595a9745d195c824df2228e836ac54cabbbec",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2870,6 +2997,85 @@
           "at": "2026-08-11T02:50:31Z",
           "findings": [],
           "hash": "rvw1:sha256:a8fd2c62eb06787d6f9758bf36fb92fa94466b25897dd06ba122401f85290949",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T04:12:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6657b80835ceab74c12f24deb48be79bcdbcc1c629d83c87385674e40aed3a12",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T04:16:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6657b80835ceab74c12f24deb48be79bcdbcc1c629d83c87385674e40aed3a12",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:27:02Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 145,
+              "message": "S14 の description は、`successful baseline publication` 後かつ `sync-base stamp` 前に再レンダーするという upstream の挙動契約を本文で再記述しています。impl-plan には target + operation + anchor cite のみを残してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 357,
+              "message": "T023 の description も、`successful baseline publication` 後かつ `sync-base stamp` 前に再レンダーするという upstream の挙動契約を再記述しています。target + operation + anchor cite に簡約してください（`.harness/policies/no-upstream-restatement.md`）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9fbe33220bb9468bf02b5cac8fd925c3f3fb8aae4cce0d3aa997f6b71ef95b3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T06:32:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5a2687e4e7b02c5ebe4baf0f43ab6fbd5c21b162594d846a8ac6d1f36dc8de86",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:39:44Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 9,
+              "message": "T023 implements the newly revised post-baseline-render-before-sync behavior, but IN-06 remains mapped only to completed tasks T010/T011 and T023 also omits the IN-06 cite from its description. Add T023 to IN-06 coverage and its plan citations so this load-bearing revision has a plausible implementing task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5a2687e4e7b02c5ebe4baf0f43ab6fbd5c21b162594d846a8ac6d1f36dc8de86",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T06:43:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0dd3cc08b673d8f9afe7a46348ce330cd05f583559983a2ea68833e14ba251f8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:49:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:265b06f5306beba2957e86e842bf4cbeb8ddce0db79696eed0d62fc564d01ee7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:52:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:265b06f5306beba2957e86e842bf4cbeb8ddce0db79696eed0d62fc564d01ee7",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -6543,6 +6749,313 @@
           "hash": "rvw1:sha256:6e63a38e80f04c5f88843392fcf93665a18d304a0dd0abcbe7baab669e3731be",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:26:52Z",
+          "findings": [
+            {
+              "category": "fingerprint or hash drift",
+              "file": "libs/infrastructure/src/tddd/signal_evaluator_v2/structural_eq.rs",
+              "line": 216,
+              "message": "`normalize_alias_target_paths` reduces every rustdoc path to its final segment, so generic aliases targeting distinct types such as `foo::Item<T>` and `bar::Item<T>` compare equal. This can emit a false structural match and accept stale/wrong catalogue signals; path normalization must preserve crate/module identity or be narrowly limited to the documented rustdoc-vs-catalogue representation case.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1878facf64b7234003aac56ee869f9d3c3719f0ac80157142f75bbb9e0fdeaae",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T03:50:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:abb44cc38d25ad55be6ea3042dac75935f621c7f77c02cb74511649f34fd97ea",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T04:01:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:abb44cc38d25ad55be6ea3042dac75935f621c7f77c02cb74511649f34fd97ea",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:26:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bbabf821e0cefe6f18bb6e1e724e372c044b8b09bdc249afd86208bc35793576",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:33:43Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 235,
+              "message": "The post-baseline path calls `sync_rendered_views` directly, but that routine publishes rendered files one at a time and can fail after earlier layer views have already been replaced. For example, one `<layer>-types.md` can be rewritten before a later invalid catalogue or catalogue-spec signal aborts the stage, leaving a partial new view set instead of the prior rendered-view state required by D3/CN-07. Stage the affected outputs transactionally or snapshot and reliably restore every affected view on error, and add a regression where failure occurs after an earlier layer has been written.",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded_io",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 22,
+              "message": "`snapshot_generated_baselines` collects every baseline's full contents into memory while enforcing only the 64 MiB per-file limit. The architecture configuration can define many generated baselines, so total reads and retained memory scale as `file_count × 64 MiB` and bypass the existing cleanup tree entry/byte bounds, allowing cleanup to exhaust memory before the bounded publication path runs. Enforce aggregate entry/byte limits consistent with `MAX_CLEANUP_TREE_ENTRIES`/`MAX_CLEANUP_TREE_BYTES`, preferably while streaming fixed-size digests rather than retaining all bytes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bbabf821e0cefe6f18bb6e1e724e372c044b8b09bdc249afd86208bc35793576",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T06:53:34Z",
+          "findings": [
+            {
+              "category": "data_integrity",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 198,
+              "message": "`snapshot_rendered_views` treats every top-level `.md` file as renderer-owned. Active tracks deliberately contain user-authored files such as `observations.md`, so any render failure makes `restore_rendered_views` unconditionally rewrite those unrelated files from the snapshot; a concurrent save or append during rendering is silently lost, and even an oversized/non-regular unrelated Markdown file can block cleanup although `sync_rendered_views` never touches it. Snapshot only the exact renderer outputs (`plan.md`, `spec.md`, `contract-map.md`, configured layer rendered files, and `track/registry.md`), propagate layer-binding configuration errors instead of falling back to arbitrary `.md` enumeration, and add a regression proving an `observations.md` update survives a late render failure.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b4588ed7191929d74f1b519cd4824d43ef5de5f46590c10dc4da42a729bcd531",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T07:02:11Z",
+          "findings": [
+            {
+              "category": "data_integrity",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 253,
+              "message": "The prior-view guarantee is still implemented as a best-effort, sequential rollback over live files. If restoring or deleting any later path fails after earlier paths were restored, the function returns with a mixed rendered-view set rather than the complete prior state required by D3/CN-07. It also rewrites every snapshotted output even when the failed render never touched it, so a concurrent update to a generated file such as `track/registry.md` can be rolled back. Render into an isolated staging area and publish only after every output succeeds (with concurrent-drift validation), or provide an equivalent transactional exchange; add regressions for a late restoration failure and a concurrent registry update.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:94b0ea3db1ce0ab5f100ea1418a1338ad31f21f65c08ce84c9de308b985f407f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T07:31:00Z",
+          "findings": [
+            {
+              "category": "atomicity",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 246,
+              "message": "`regenerate_views_transactionally` publishes `track/registry.md` before exchanging the per-track views, but there is no recovery protocol for the uniquely named `.sotp-view-replacement-*` directory. A crash before the exchange leaves a new registry with old views; an fsync, marker-removal, or cleanup error after the exchange returns `Err` with `exchanged == true`, so the prior track and registry are not restored. This violates the required PRIOR rendered-view preservation on ViewsAfterBaseline failure. Publish and recover the registry and track as one durable transaction.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 234,
+              "message": "The retained-writer path only snapshots `pending_writer_lock.is_some()`, drops the mutex guard, and then renders directly. It neither validates that the retained lock belongs to this request nor serializes the render with `write_sync_base_record`; because the adapter is `Send + Sync`, a concurrent stamp call can take and release the retained lock while rendering is still running, allowing SyncBase to be published before a later render failure. Run the retained-lock render while holding the transaction-state mutex and checking the pending request.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ff913ff3b2c6acd1c55af38300aafdd160a3f46530527537cf904ede896c98f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T08:08:10Z",
+          "findings": [
+            {
+              "category": "atomicity",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 266,
+              "message": "`publish_baseline_replacements` can fail after exchanging the directories—for example during verification, fsync, or marker cleanup—but this caller propagates the error while leaving the new rendered tree active. Recovery later commits the new registry forward, so a failed ViewsAfterBaseline stage exposes new views instead of preserving the prior rendered-view state required by the cleanup contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "recovery",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 353,
+              "message": "Recovery infers whether the exchange occurred solely from the replacement tree's baseline marker. If view regeneration starts after an interrupted baseline publication, the active track already has this marker, so the old tree still contains it after a successful view exchange. A crash before registry publication is then misclassified as unexchanged, causing recovery to delete the transaction and leave the active views inconsistent with the prior registry. Use an explicit durable exchange state or reconcile the baseline transaction before staging.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 228,
+              "message": "The no-change path consumes `post_baseline_rerender` without checking that its stored request matches the caller. A different request can therefore clear request A's state while A's retained writer lock remains; subsequent calls for A fail because the state is absent, and calls for B fail because the retained lock belongs to A, wedging cleanup until the adapter is dropped.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:13f358d89a66198a2eed2b2940bab56b1b4f19e7afd83db7b22d2ae967fccde3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T08:28:52Z",
+          "findings": [
+            {
+              "category": "atomicity",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 281,
+              "message": "Rollback is attempted only when `publish_baseline_replacements` itself returns an error. Once that helper succeeds, failures persisting `track-published`, publishing the registry, clearing the marker, writing `complete`, or cleaning the journal return `ViewsRegenerationError` with the new rendered tree already active; recovery then commits it forward. The failed ViewsAfterBaseline stage therefore still does not preserve the prior rendered-view state.",
+              "severity": "P1"
+            },
+            {
+              "category": "recovery",
+              "file": "libs/infrastructure/src/base_merge/view_transaction.rs",
+              "line": 86,
+              "message": "The rollback exchange is performed before the replacement marker is made durable. If publication failed after removing the active marker and the subsequent rollback parent fsync or marker write also fails, the prior tree is active but the prepared transaction's replacement has no marker. Recovery misclassifies that state as an outstanding exchange and publishes the new registry against the restored old views.",
+              "severity": "P1"
+            },
+            {
+              "category": "recovery",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 199,
+              "message": "Baseline-marker reconciliation runs before recovery of an existing view transaction. On a track without a baseline recovery slot, a crash after the initial Views directory exchange but before its active marker is removed leaves the shared marker on the active tree; this pre-check reports an unreconciled baseline publication and never reaches the view journal that could recover it, so every retry remains blocked.",
+              "severity": "P1"
+            },
+            {
+              "category": "recovery",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 354,
+              "message": "A `complete` transaction is already fully published, but recovery still requires `registry.previous` and `registry.next`. Because the preceding bounded removal can delete some journal files before returning an error, a retry can retain the `complete` phase while one registry file is gone and then fail permanently instead of simply removing the completed transaction.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:86bdd901d7a00e8aa313f144aec84ff8e4d7888512cbd4a6dbeeec5377c715be",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T08:39:26Z",
+          "findings": [
+            {
+              "category": "concurrent-write data loss",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 270,
+              "message": "The new transactional view publication still has a race: it validates rendered files before staging, then calls `publish_baseline_replacements` with `rendered_names` as the excluded set. That publisher therefore omits all rendered views from its pre/post-exchange drift checks. A concurrent writer can modify `domain-types.md`, `plan.md`, or another rendered view after validation but before the exchange; the exchange silently overwrites that update and returns success. The view transaction needs an exchange-window drift check for rendered files (or equivalent concurrency protection).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e9f5c6ae3c9c9fef5776ceed711abe27c00c99dcb505bbfd61208e354f4c52a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T08:54:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:284c1c6c4dcedef8c43cf962f78088c79448af5f8da40fe53679e95484ba2f3e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T09:02:29Z",
+          "findings": [
+            {
+              "category": "failure_recovery",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 301,
+              "message": "The transaction is deleted before the final recovery-root fsync. If that fsync fails, the error is passed to `rollback_if_published`, but the replacement containing the prior views has already been removed, so rollback also fails and the operation returns an error with the new views and registry still published. This violates the required prior-state preservation for a failed ViewsAfterBaseline stage; retain the rollback tree until no further error can be returned, or treat post-commit cleanup as recoverable success.",
+              "severity": "P1"
+            },
+            {
+              "category": "failure_recovery",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 394,
+              "message": "A partial rollback cannot recover on retry. `rollback_view_publication` exchanges the prior view tree back before restoring the registry; if that registry restoration fails transiently, the marker indicates `!exchanged` while the registry still equals `next`. This branch then permanently rejects that legitimate rollback state as “advanced registry before track publication” instead of restoring the saved prior registry, wedging subsequent cleanup attempts. Persist/recognize a rollback phase and complete the registry restoration here.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:284c1c6c4dcedef8c43cf962f78088c79448af5f8da40fe53679e95484ba2f3e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T09:21:28Z",
+          "findings": [
+            {
+              "category": "state_management",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 266,
+              "message": "A failed post-baseline rerender leaves both `post_baseline_rerender` and the retained `PendingWriterLock` populated because state is cleared only on success. Retrying `BaseMergeService::execute` on the same interactor first completes that pending rerender, but keeps the lock; the following `replace_baselines` then deterministically fails with “another active track cleanup transaction is still pending,” and persistent adapters also block other cleanup instances. Release/reset the retained transaction when the public cleanup sequence returns an error, or persist an explicit resumable stage that the service can continue.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency",
+              "file": "libs/infrastructure/src/base_merge/view_transaction.rs",
+              "line": 108,
+              "message": "Registry publication is a check-then-replace rather than an atomic compare-and-swap. Another renderer—especially one updating a different track and therefore not sharing this track’s writer lock—can replace the global registry after validation and before `atomic_write_file`; this write then silently overwrites the newer registry, and the post-read succeeds because it sees its own bytes. The rollback helper repeats the same stale-check/write pattern. Use a registry-wide lock or a true CAS covering validation and replacement to avoid losing concurrent updates.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fa95a0f7373e4c093cad61157db5e4919a96c2121fda87580dfa567df2823602",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T09:44:44Z",
+          "findings": [
+            {
+              "category": "crash-recovery",
+              "file": "libs/infrastructure/src/base_merge/baseline_support.rs",
+              "line": 436,
+              "message": "Recovery treats every exchanged non-rollback transaction as commit-ready, including phase `prepared`. That phase is persisted before the exchange, while retained-tree drift validation and `track-published` are recorded only afterward. If a view writer changes the live view after the pre-exchange snapshot and the process stops after EXCHANGE but before validation, recovery publishes the staged registry and removes the replacement, silently discarding the raced prior view that the normal path would restore. An exchanged `prepared` transaction must roll back or repeat persisted validation before completing.",
+              "severity": "P1"
+            },
+            {
+              "category": "concurrency",
+              "file": "libs/infrastructure/src/base_merge/view_transaction.rs",
+              "line": 106,
+              "message": "The registry lock does not close the check/write race because only this transaction module uses it; the public `track::render::sync_rendered_views` path still writes `track/registry.md` without acquiring `.registry.json.lock`. A concurrent normal view sync can write a newer registry after validation and have it overwritten by this transaction, whose post-read then reports success. All registry writers need the same lock or a real compare-and-swap mechanism.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:14add7a8cda38a97e2de2b051dfa68cade196f8e82010d3cd8978336af1a45ed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T09:54:47Z",
+          "findings": [
+            {
+              "category": "concurrency",
+              "file": "libs/infrastructure/src/base_merge/view_transaction.rs",
+              "line": 106,
+              "message": "The registry lock does not close the check/write race because only this transaction module uses it; the public `track::render::sync_rendered_views` path still writes `track/registry.md` without acquiring `.registry.json.lock`. A concurrent normal view sync can write a newer registry after validation and have it overwritten by this transaction, whose post-read then reports success. All registry writers need the same lock or a real compare-and-swap mechanism.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3f913fbe0a1363b869a38019120e8ca2b390375cc01ab94eb7cbc43c056b1a5a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T10:35:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5c7ca3e4afe1f18ed011057a437449342d05b0e4a0c24516cd62dd01766816f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T10:45:13Z",
+          "findings": [
+            {
+              "category": "concurrency",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 678,
+              "message": "`fs4::FileExt::try_lock_exclusive` returns `Ok(false)` when another process holds the lock, but this result is discarded here; only actual I/O errors are mapped. A second guarded base merge therefore proceeds without owning `metadata.json.lock`, allowing concurrent `git merge` operations against the same index and worktree. Reject `false` (or wait with a bounded timeout) before returning the lock file.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a5c7ca3e4afe1f18ed011057a437449342d05b0e4a0c24516cd62dd01766816f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T10:57:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f435a476a7d177a2a986e5e9487ce0ca4b0658a660b202f8b2a636ccb48e476c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -7549,6 +8062,34 @@
           "hash": "rvw1:sha256:421d27a34b295b9e22d5e6d963525e5dfbc0862b75a9e5270db455458b99996d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:18:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:409aa0eff6974c424ae100679771f7bcb6419dfa0999a36c5eedd3aed2194a19",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:21:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:409aa0eff6974c424ae100679771f7bcb6419dfa0999a36c5eedd3aed2194a19",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T07:01:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35bc5c7058a07255a3915e8331a2eae78d38dc1b575b9665a696f21c287da5fd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T07:07:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35bc5c7058a07255a3915e8331a2eae78d38dc1b575b9665a696f21c287da5fd",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -7774,6 +8315,20 @@
           "at": "2026-08-10T21:48:12Z",
           "findings": [],
           "hash": "rvw1:sha256:4cf1d0190d7f27d41315c19a0bbafb8d4cf782f480cc518ac45b94cdba0e2973",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:24:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:da69ffa2ec0bf64ee0e4dc58cd1d2420535b2316fbfaae45de05de09368e4c00",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:30:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:da69ffa2ec0bf64ee0e4dc58cd1d2420535b2316fbfaae45de05de09368e4c00",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -8996,6 +9551,34 @@
           "at": "2026-08-10T23:13:26Z",
           "findings": [],
           "hash": "rvw1:sha256:69f08c8042cccc45f2315e62205b1272bea9ffdff6479a82fef85d71c3cad1d5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:18:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a4a89c441ada799d2ab8c33805629c12b07c8e20a6a132009286315d4cc2b2c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T03:21:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a4a89c441ada799d2ab8c33805629c12b07c8e20a6a132009286315d4cc2b2c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:19:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5035d827c672f7603ca07bb82c1c3bc18ca3a79a81561981918010af4fba1201",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T06:23:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5035d827c672f7603ca07bb82c1c3bc18ca3a79a81561981918010af4fba1201",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -202,17 +202,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
+      "evidence_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit.",
         "kind": "pass"
       }
     },
@@ -298,17 +298,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
+      "evidence_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success.",
         "kind": "pass"
       }
     },

@@ -139,10 +139,20 @@
           "T022"
         ],
         "title": "Unique guarded stash identity"
+      },
+      {
+        "description": [
+          "Update `libs/usecase/src/base_merge.rs` to re-render derived views during clean-merge cleanup; add focused regression coverage. IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11."
+        ],
+        "id": "S14",
+        "task_ids": [
+          "T023"
+        ],
+        "title": "Baseline-fresh clean-merge views"
       }
     ],
     "summary": [
-      "GO-01 → T001–T004, T010, T011, T013, T014, and T020.",
+      "GO-01 → T001–T004, T010, T011, T013, T014, T020, and T023.",
       "GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, and T022."
     ]
   },
@@ -338,6 +348,15 @@
       "description": "Update `libs/infrastructure/src/git_cli/stash_adapter.rs`; add focused regression coverage. IN-04; OS-04; CN-08; AC-06; AC-13.",
       "id": "T022",
       "status": "done"
+    },
+    {
+      "commit_hash": null,
+      "depends_on": [
+        "T015"
+      ],
+      "description": "Update `libs/usecase/src/base_merge.rs` to re-render derived views during clean-merge cleanup; add focused regression coverage. IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11.",
+      "id": "T023",
+      "status": "in_progress"
     }
   ]
 }

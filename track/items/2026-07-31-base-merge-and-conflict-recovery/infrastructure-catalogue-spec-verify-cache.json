@@ -82,17 +82,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
+      "evidence_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit.",
         "kind": "pass"
       }
     },
@@ -130,17 +130,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
+      "evidence_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success.",
         "kind": "pass"
       }
     },
@@ -178,17 +178,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "evidence_hash": "ceba9efdd0d217760ba3ffbea60d6f8e34b4182d342efb7838a4d27fee14fa09",
       "evidence_origin": {
         "data": {
           "element_id": "IN-06",
           "section": "in_scope",
-          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge.",
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed.",
         "kind": "pass"
       }
     },
@@ -226,17 +226,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_hash": "f2da6d4914d5cf5601dbe12239438ded42fb6368f6d2364f111f5f3b9aa1c8ee",
       "evidence_origin": {
         "data": {
           "element_id": "CN-06",
           "section": "constraint",
-          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure.",
         "kind": "pass"
       }
     },
@@ -250,17 +250,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "65ebff364d15b048f25f2ee5785481fd781016dfaf00df1feb36b5f9ff0d8706",
+      "evidence_hash": "99de888360329d69ebf1aa74eb3726a226841a6090143a344d4e001482459659",
       "evidence_origin": {
         "data": {
           "element_id": "CN-07",
           "section": "constraint",
-          "text_label": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
+          "text_label": "Clean-merge cleanup may complete only in the order Views, Baseline, ViewsAfterBaseline, then SyncBaseStamp; post-baseline rendering failure fails closed while preserving the prior rendered-view state, conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Clean-merge cleanup may complete only in the order Views, Baseline, then SyncBaseStamp; conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
+        "citation": "Clean-merge cleanup may complete only in the order Views, Baseline, ViewsAfterBaseline, then SyncBaseStamp; post-baseline rendering failure fails closed while preserving the prior rendered-view state, conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache.",
         "kind": "pass"
       }
     },
@@ -298,17 +298,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_hash": "378894138d56361386909e22fee0d4efd63c31c9b4613c4fad06ce1641acba72",
       "evidence_origin": {
         "data": {
           "element_id": "AC-11",
           "section": "acceptance_criteria",
-          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+          "text_label": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
+        "citation": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
         "kind": "pass"
       }
     },
@@ -562,17 +562,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "b1ebe6f4e3ef241cee3ab49ab127483a283048c40c19b452348de4ac09005a15",
+      "evidence_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, and then record synchronization of that exact merged base commit.",
+        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit.",
         "kind": "pass"
       }
     },
@@ -586,17 +586,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_hash": "f2da6d4914d5cf5601dbe12239438ded42fb6368f6d2364f111f5f3b9aa1c8ee",
       "evidence_origin": {
         "data": {
           "element_id": "CN-06",
           "section": "constraint",
-          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure.",
         "kind": "pass"
       }
     },
@@ -610,17 +610,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "c11596aa73c9d76385bd11d40c389db9cf0df6530af7fa89addda894842ed6c7",
+      "evidence_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; and only then is the sync-base record atomically written before the operation reports success.",
+        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success.",
         "kind": "pass"
       }
     },
@@ -634,17 +634,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_hash": "378894138d56361386909e22fee0d4efd63c31c9b4613c4fad06ce1641acba72",
       "evidence_origin": {
         "data": {
           "element_id": "AC-11",
           "section": "acceptance_criteria",
-          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+          "text_label": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
+        "citation": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit.",
         "kind": "pass"
       }
     },
@@ -706,17 +706,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "evidence_hash": "ceba9efdd0d217760ba3ffbea60d6f8e34b4182d342efb7838a4d27fee14fa09",
       "evidence_origin": {
         "data": {
           "element_id": "IN-06",
           "section": "in_scope",
-          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge.",
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge",
         "kind": "pass"
       }
     },
@@ -730,17 +730,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_hash": "f2da6d4914d5cf5601dbe12239438ded42fb6368f6d2364f111f5f3b9aa1c8ee",
       "evidence_origin": {
         "data": {
           "element_id": "CN-06",
           "section": "constraint",
-          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure.",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge",
         "kind": "pass"
       }
     },
@@ -754,12 +754,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_hash": "378894138d56361386909e22fee0d4efd63c31c9b4613c4fad06ce1641acba72",
       "evidence_origin": {
         "data": {
           "element_id": "AC-11",
           "section": "acceptance_criteria",
-          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+          "text_label": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
         },
         "kind": "spec_element"
       },
@@ -778,17 +778,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "afa25e34321fdb5da8f872a16ef1824d39af8f7cc621c064c6093d0ee631c5e5",
+      "evidence_hash": "ceba9efdd0d217760ba3ffbea60d6f8e34b4182d342efb7838a4d27fee14fa09",
       "evidence_origin": {
         "data": {
           "element_id": "IN-06",
           "section": "in_scope",
-          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge."
+          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "schema-versioned record",
+        "citation": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record",
         "kind": "pass"
       }
     },
@@ -802,17 +802,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d7421f665ec7a508d92f8962947fd4a3a43ba801fb68280a5dd6945a66f96bc8",
+      "evidence_hash": "f2da6d4914d5cf5601dbe12239438ded42fb6368f6d2364f111f5f3b9aa1c8ee",
       "evidence_origin": {
         "data": {
           "element_id": "CN-06",
           "section": "constraint",
-          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after views and baseline recapture succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, or replacement failure."
+          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution",
+        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge ... and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure.",
         "kind": "pass"
       }
     },
@@ -826,17 +826,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "84b79eec5107343a4c45d0108c7d1c022b92aa7eb54aa2e887aad4ad7fdf9dff",
+      "evidence_hash": "378894138d56361386909e22fee0d4efd63c31c9b4613c4fad06ce1641acba72",
       "evidence_origin": {
         "data": {
           "element_id": "AC-11",
           "section": "acceptance_criteria",
-          "text_label": "Following successful views and baseline steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+          "text_label": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "has a schema-versioned sync-base record",
+        "citation": "\"the active track has a schema-versioned sync-base record\"",
         "kind": "pass"
       }
     },
