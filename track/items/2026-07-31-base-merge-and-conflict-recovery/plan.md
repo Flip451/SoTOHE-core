@@ -6,7 +6,7 @@
 GO-01 → T001–T004, T010, T011, T013, T014, and T020.
 GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, and T022.
 
-## Tasks (21/22 resolved)
+## Tasks (22/22 resolved)
 
 ### S1 — Guarded base merge
 
@@ -93,4 +93,4 @@ GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, and T022.
 
 > Update `libs/infrastructure/src/git_cli/stash_adapter.rs`; add focused regression coverage. IN-04; OS-04; CN-08; AC-06; AC-13.
 
-- [~] **T022**: Update `libs/infrastructure/src/git_cli/stash_adapter.rs`; add focused regression coverage. IN-04; OS-04; CN-08; AC-06; AC-13.
+- [x] **T022**: Update `libs/infrastructure/src/git_cli/stash_adapter.rs`; add focused regression coverage. IN-04; OS-04; CN-08; AC-06; AC-13. (`eee3e647`)

@@ -331,13 +331,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "eee3e647",
       "depends_on": [
         "T021"
       ],
       "description": "Update `libs/infrastructure/src/git_cli/stash_adapter.rs`; add focused regression coverage. IN-04; OS-04; CN-08; AC-06; AC-13.",
       "id": "T022",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
