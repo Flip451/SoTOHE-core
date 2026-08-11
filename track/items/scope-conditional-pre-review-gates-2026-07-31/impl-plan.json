@@ -241,7 +241,8 @@
     {
       "id": "T043",
       "description": "usecase の review-results projection / read-port / stored-state boundary と review-fix resolution boundary を実装・更新する。`apps/cli-driver/src/review.rs` の results-input conversion と review / review-fix driver handoff、CLI callers / outcome emission tests を更新する。AC-20 の round/verdict 出力内容を検証するテストを実装する。composition の重複 input boundaries を削除し、pure-DI `ReviewCompositionRoot` の wire-only review / review-fix driver factories を更新する。`libs/infrastructure` の results scope/state/round port adapters、review-fix runner adapter、Git write-side track resolver を実装・更新する。IN-15、IN-16、IN-17、AC-18、CN-09、AC-19、AC-20。",
-      "status": "in_progress",
+      "status": "done",
+      "commit_hash": "1e5ecec7f826f815141c25106ad8ddbf9bf18c74",
       "depends_on": [
         "T042"
       ]
