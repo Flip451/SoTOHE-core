@@ -1,6 +1,7 @@
 //! Filesystem/Git adapter for the guarded stash boundary.
 use std::path::PathBuf;
 use std::process::{ExitStatus, Output, Stdio};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Instant;
 
 use domain::CommitHash;
@@ -21,6 +22,8 @@ use super::{
 pub(crate) use super::stash_record::MAX_STASH_OUTPUT_BYTES;
 /// Concrete Git adapter for [`GitStashPort`].
 pub struct FsGitStashAdapter;
+static NEXT_GUARDED_STASH_TOKEN: AtomicU64 = AtomicU64::new(0);
+
 impl FsGitStashAdapter {
     /// Construct a guarded stash adapter.
     #[must_use]
@@ -408,23 +411,36 @@ fn guarded_stash_snapshot(
         worktree: worktree_snapshot(repo)?,
     })
 }
-fn push_outcome(
-    before: &GuardedStashSnapshot,
-    after: &GuardedStashSnapshot,
-) -> Result<GitStashPushOutcome, StashOperationError> {
-    if before.stash == after.stash {
-        if before.worktree != after.worktree {
-            return Err(unavailable("git reported no new stash identity but changed the worktree"));
-        }
-        return Ok(GitStashPushOutcome::NothingToStash);
-    }
-    let identity = String::from_utf8_lossy(&after.stash).trim().to_owned();
+
+fn guarded_stash_message() -> String {
+    let sequence = NEXT_GUARDED_STASH_TOKEN.fetch_add(1, Ordering::Relaxed);
+    format!("guarded:{}-{sequence}", std::process::id())
+}
+
+fn created_stash_outcome(stash: &[u8]) -> Result<GitStashPushOutcome, StashOperationError> {
+    let identity = String::from_utf8_lossy(stash).trim().to_owned();
     if identity.is_empty() {
         return Err(unavailable("git created a stash without a commit identity"));
     }
     CommitHash::try_new(identity)
         .map(GitStashPushOutcome::Created)
         .map_err(|error| unavailable(format!("git created an invalid stash identity: {error}")))
+}
+
+fn push_outcome(
+    before: &GuardedStashSnapshot,
+    after: &GuardedStashSnapshot,
+) -> Result<GitStashPushOutcome, StashOperationError> {
+    if before.stash == after.stash {
+        if before.worktree != after.worktree {
+            // Git can reuse the same commit metadata for equivalent content.
+            // The cleaned worktree still identifies this invocation's stash;
+            // retain the top OID rather than losing the pairing record.
+            return created_stash_outcome(&after.stash);
+        }
+        return Ok(GitStashPushOutcome::NothingToStash);
+    }
+    created_stash_outcome(&after.stash)
 }
 fn verify_stash_identity(
     repo: &SystemGitRepo,
@@ -615,7 +631,9 @@ impl GitStashPort for FsGitStashAdapter {
         let before = guarded_stash_snapshot(&repo)?;
         // `--include-untracked` is the long form of the ADR's `-u`
         // requirement and captures untracked track artifacts.
-        let args: &[&str] = &["stash", "push", "--include-untracked"];
+        let message = guarded_stash_message();
+        let args: &[&str] =
+            &["stash", "push", "--include-untracked", "--message", message.as_str()];
         let output = match run_git_operation(&repo, args) {
             Ok(output) => output,
             Err(error) => {
@@ -675,8 +693,8 @@ impl GitStashPort for FsGitStashAdapter {
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
     use super::{
-        FsGitStashAdapter, MAX_STASH_OUTPUT_BYTES, guarded_stash_snapshot,
-        re_adjudicate_after_uncertain_operation,
+        BranchRefSnapshot, FsGitStashAdapter, GuardedStashSnapshot, MAX_STASH_OUTPUT_BYTES,
+        guarded_stash_snapshot, push_outcome, re_adjudicate_after_uncertain_operation,
     };
     use crate::git_cli::SystemGitRepo;
     use crate::git_cli::stash_record::{self, STASH_RECORD_FILE, StashRecord};
@@ -770,6 +788,80 @@ mod tests {
             "saved\n"
         );
     }
+    #[test]
+    fn test_fs_git_stash_adapter_repeated_identical_pushes_get_unique_identities_and_restore() {
+        let _lock = cwd_lock().lock().expect("CWD lock must not be poisoned");
+        let repo = init_repo();
+        fs::write(repo.path().join("tracked.txt"), "changed\n").expect("tracked file must change");
+        fs::write(repo.path().join("untracked.txt"), "saved\n")
+            .expect("untracked file must be written");
+        let _cwd = CurrentDirGuard::enter(repo.path());
+        let adapter = FsGitStashAdapter::new();
+        let first = match adapter.push().expect("first stash push must succeed") {
+            GitStashPushOutcome::Created(identity) => identity,
+            GitStashPushOutcome::NothingToStash => panic!("fixture must create a stash"),
+        };
+        let first_message = output(repo.path(), &["stash", "list", "--format=%gs"]);
+        assert!(
+            first_message.contains("guarded:"),
+            "the guarded stash message must reach Git: {first_message:?}"
+        );
+        adapter.pop().expect("first stash pop must restore the worktree");
+
+        let second = match adapter.push().expect("second stash push must succeed") {
+            GitStashPushOutcome::Created(identity) => identity,
+            GitStashPushOutcome::NothingToStash => panic!("fixture must create a stash"),
+        };
+        let second_message = output(repo.path(), &["stash", "list", "--format=%gs"]);
+        assert!(
+            second_message.contains("guarded:"),
+            "the guarded stash message must reach Git: {second_message:?}"
+        );
+        assert_ne!(
+            first_message, second_message,
+            "identical guarded pushes must receive distinct Git stash messages"
+        );
+        assert_ne!(first, second, "identical guarded pushes must receive unique identities");
+        adapter.pop().expect("second stash pop must restore the worktree");
+        assert_eq!(
+            fs::read_to_string(repo.path().join("tracked.txt"))
+                .expect("tracked file must be restored"),
+            "changed\n"
+        );
+        assert_eq!(
+            fs::read_to_string(repo.path().join("untracked.txt"))
+                .expect("untracked file must be restored"),
+            "saved\n"
+        );
+    }
+
+    #[test]
+    fn test_push_outcome_same_top_oid_after_worktree_change_returns_created_identity() {
+        let identity = "0123456789abcdef0123456789abcdef01234567";
+        let branch_refs = BranchRefSnapshot {
+            branch: b"main\n".to_vec(),
+            head: b"head\n".to_vec(),
+            branches: b"refs\n".to_vec(),
+        };
+        let before = GuardedStashSnapshot {
+            branch_refs: branch_refs.clone(),
+            stash: identity.as_bytes().to_vec(),
+            worktree: b"dirty".to_vec(),
+        };
+        let after = GuardedStashSnapshot {
+            branch_refs,
+            stash: identity.as_bytes().to_vec(),
+            worktree: b"clean".to_vec(),
+        };
+        let outcome = push_outcome(&before, &after).expect("same-OID push must be retained");
+        assert_eq!(
+            outcome,
+            GitStashPushOutcome::Created(
+                CommitHash::try_new(identity).expect("fixture identity must be valid")
+            )
+        );
+    }
+
     #[test]
     fn test_fs_git_stash_adapter_clean_push_and_pop_preserve_unrelated_stash() {
         let _lock = cwd_lock().lock().expect("CWD lock must not be poisoned");

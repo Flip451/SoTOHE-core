@@ -2822,6 +2822,42 @@
           "hash": "rvw1:sha256:c7040365674172c1e56ca59a4157d108bed6961ac9320e9a7c53605ebaeb7d5d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T02:06:48Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 350,
+              "message": "`T022` restates the upstream stash-pairing behavior contract (“receives a unique wrapper-owned identity and retains a correct pairing record when equivalent content is pushed again”) instead of limiting the description to target, operation, and anchors. Remove that behavioral restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 139,
+              "message": "Section `S13` repeats the upstream stash-pairing behavior contract in prose (“ensure each guarded stash push receives a unique wrapper-owned identity…”). Keep the section description to target/operation/anchors only, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:feae76b8195d159ba192ed73bb478031c4bdf2df6189bfe49afb89539142de6b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T02:09:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44049e6a9e73bdaef7c503939313c4ba6cd1ae85e89d5ee1424ad7653044aa70",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T02:16:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44049e6a9e73bdaef7c503939313c4ba6cd1ae85e89d5ee1424ad7653044aa70",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -6464,6 +6500,35 @@
           "hash": "rvw1:sha256:b4cea711ebce4b7225c473a0418232ab281b8f80e8a9cf58581dae8fcacde19f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T02:06:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48c1697879bec5f023f0f283bee9dac0934bb3b54f318445b029b3944991c1e7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T02:16:54Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 792,
+              "message": "The repeated-identical-push regression is time-dependent. Git stash commit OIDs also incorporate commit timestamps, but the fixture neither fixes those timestamps nor asserts that distinct `guarded:<pid>-<sequence>` messages reached Git. If the two pushes straddle a timestamp tick, the pre-fix implementation without `--message` also produces different OIDs, leaving this test green. Freeze the Git dates or directly verify distinct guarded stash messages so the regression deterministically fails without the uniqueness mechanism.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:48c1697879bec5f023f0f283bee9dac0934bb3b54f318445b029b3944991c1e7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T02:22:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6e63a38e80f04c5f88843392fcf93665a18d304a0dd0abcbe7baab669e3731be",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -7454,6 +7519,20 @@
           "at": "2026-08-11T00:51:28Z",
           "findings": [],
           "hash": "rvw1:sha256:1aa4e0293c82e0f3d1df914023bca2dd84baedf2d4a620ed561d596866a53fb8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T02:21:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:421d27a34b295b9e22d5e6d963525e5dfbc0862b75a9e5270db455458b99996d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T02:29:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:421d27a34b295b9e22d5e6d963525e5dfbc0862b75a9e5270db455458b99996d",
           "type": "final",
           "verdict": "zero_findings"
         }

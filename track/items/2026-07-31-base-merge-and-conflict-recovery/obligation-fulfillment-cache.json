@@ -28387,6 +28387,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_repeated_identical_pushes_get_unique_identities_and_restore"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_push_outcome_same_top_oid_after_worktree_change_returns_created_identity"
         }
       ],
       "edge_id": {
@@ -28398,7 +28408,7 @@
       },
       "key": {
         "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
-        "bound_tests_set_hash": "6c1cb207f1b1ff94cccad12d6bdbda0af3571e02907370bd604d03ff1d7c6fa5",
+        "bound_tests_set_hash": "e21fd42a65310faf2e2166cfa13995678e937bdf05c7455d573d1045c7c3a639",
         "declaration_hash": "dc1dd19dbb7bc6664e99f9c056cb7de782f62859bdf3392c0eb18bdd07caffd7"
       },
       "obligation_id": {
@@ -28407,7 +28417,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\"); ... assert!(!repo.path().join(\"untracked.txt\").exists()); ... adapter.pop().expect(\"stash pop must succeed\"); ... assert_eq!(fs::read_to_string(repo.path().join(\"untracked.txt\")).expect(\"untracked file must be restored\"), \"saved\\n\"); ... let error = adapter.push().expect_err(\"pending pairing must block a second push\"); assert!(matches!(error, GitStashPushError::PendingGuardedStashExists)); ... assert!(record_path(repo.path()).is_file());",
+        "citation": "fs::write(repo.path().join(\"untracked.txt\"), \"saved\\n\")\n            .expect(\"untracked file must be written\");\n        let _cwd = CurrentDirGuard::enter(repo.path());\n        let adapter = FsGitStashAdapter::new();\n        adapter.push().expect(\"stash push must succeed\");\n        assert!(!repo.path().join(\"untracked.txt\").exists());\n        adapter.pop().expect(\"stash pop must succeed\");\n        assert_eq!(\n            fs::read_to_string(repo.path().join(\"untracked.txt\"))\n                .expect(\"untracked file must be restored\"),\n            \"saved\\n\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -28493,6 +28503,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_repeated_identical_pushes_get_unique_identities_and_restore"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_push_outcome_same_top_oid_after_worktree_change_returns_created_identity"
         }
       ],
       "edge_id": {
@@ -28504,7 +28524,7 @@
       },
       "key": {
         "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
-        "bound_tests_set_hash": "6c1cb207f1b1ff94cccad12d6bdbda0af3571e02907370bd604d03ff1d7c6fa5",
+        "bound_tests_set_hash": "e21fd42a65310faf2e2166cfa13995678e937bdf05c7455d573d1045c7c3a639",
         "declaration_hash": "dc1dd19dbb7bc6664e99f9c056cb7de782f62859bdf3392c0eb18bdd07caffd7"
       },
       "obligation_id": {
@@ -28513,7 +28533,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert!(!repo.path().join(\"untracked.txt\").exists()); ... fs::read_to_string(repo.path().join(\"untracked.txt\")) ... \"saved\\n\" ... assert_eq!(branch_state(repo.path()), before);",
+        "citation": "assert!(!repo.path().join(\"untracked.txt\").exists());\nassert_eq!(output(repo.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(), \"main\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -28599,6 +28619,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::git_cli::stash_adapter::tests",
           "test_name": "test_fs_git_stash_adapter_crash_window_absent_record_leaves_orphaned_stash_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_fs_git_stash_adapter_repeated_identical_pushes_get_unique_identities_and_restore"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::git_cli::stash_adapter::tests",
+          "test_name": "test_push_outcome_same_top_oid_after_worktree_change_returns_created_identity"
         }
       ],
       "edge_id": {
@@ -28610,7 +28640,7 @@
       },
       "key": {
         "anchor_text_hash": "5439db803cba221ba4b90da9ba0e0a2948cc9a75e083a47e61970943ff18255c",
-        "bound_tests_set_hash": "6c1cb207f1b1ff94cccad12d6bdbda0af3571e02907370bd604d03ff1d7c6fa5",
+        "bound_tests_set_hash": "e21fd42a65310faf2e2166cfa13995678e937bdf05c7455d573d1045c7c3a639",
         "declaration_hash": "dc1dd19dbb7bc6664e99f9c056cb7de782f62859bdf3392c0eb18bdd07caffd7"
       },
       "obligation_id": {
@@ -28619,7 +28649,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "adapter.push().expect(\"stash push must succeed\"); ... adapter.pop().expect(\"stash pop must succeed\"); ... let error = adapter.push().expect_err(\"pending pairing must block a second push\"); assert!(matches!(error, GitStashPushError::PendingGuardedStashExists)); ... let error = adapter.pop().expect_err(\"pop without a saved stash must fail closed\"); assert!(matches!(&error, GitStashPopError::NoPendingGuardedStash)); ... let error = adapter.pop().expect_err(\"a dropped recorded stash must fail closed\"); assert!(matches!(error, GitStashPopError::StashIdentityMissing(identity) if identity == expected_identity)); ... let error = adapter.pop().expect_err(\"a conflicting stash pop must fail closed\"); assert!(matches!(error, GitStashPopError::Unavailable(_)));",
+        "citation": "assert_eq!(\n            stored,\n            Some(GitStashPushOutcome::Created(expected_commit)),\n            \"record must persist the commit created by the guarded push\"\n        );\n...\nassert!(matches!(error, GitStashPushError::PendingGuardedStashExists));\n...\nassert!(matches!(&error, GitStashPopError::NoPendingGuardedStash));\n...\nassert_eq!(stash_identities(repo.path()), vec![unrelated]);\nassert!(!record_path(repo.path()).exists());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

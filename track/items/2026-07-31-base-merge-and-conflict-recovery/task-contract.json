@@ -44,6 +44,9 @@
       {"layer": "cli", "entry_key": "GitStashAction"},
       {"layer": "cli", "entry_key": "cli::commands::git::execute"}
     ],
+    "T022": [
+      {"layer": "infrastructure", "entry_key": "FsGitStashAdapter"}
+    ],
     "T007": [
       {"layer": "domain", "entry_key": "BaselineHash"},
       {"layer": "domain", "entry_key": "TypeSignalsCacheKey"},

@@ -163,6 +163,13 @@
         {"scope": "cli", "production_lines": 55, "test_lines": 60}
       ],
       "oversize_justification": null
+    },
+    {
+      "task_id": "T022",
+      "scope_estimates": [
+        {"scope": "infrastructure", "production_lines": 80, "test_lines": 110}
+      ],
+      "oversize_justification": null
     }
   ],
   "batches": [
@@ -180,6 +187,7 @@
     {"id": "B12", "task_ids": ["T018"]},
     {"id": "B13", "task_ids": ["T019"]},
     {"id": "B14", "task_ids": ["T020"]},
-    {"id": "B15", "task_ids": ["T021"]}
+    {"id": "B15", "task_ids": ["T021"]},
+    {"id": "B16", "task_ids": ["T022"]}
   ]
 }
