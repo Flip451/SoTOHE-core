@@ -312,13 +312,13 @@
       "status": "done"
     },
     {
-      "commit_hash": null,
+      "commit_hash": "9bb06b65",
       "depends_on": [
         "T020"
       ],
       "description": "Update `libs/usecase/src/git_stash.rs`, `libs/infrastructure/src/git_cli/stash_adapter.rs`, and the catalogued CLI-driver and CLI stash wiring for typed guarded stash push/pop pairing with a repository-scoped single-slot outcome record; add focused regression coverage. D1; IN-04; OS-04; CN-08; AC-06; AC-13.",
       "id": "T021",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }

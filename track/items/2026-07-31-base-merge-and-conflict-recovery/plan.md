@@ -6,7 +6,7 @@
 GO-01 → T001–T004, T010, T011, T013, T014, and T020.
 GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, and T021.
 
-## Tasks (20/21 resolved)
+## Tasks (21/21 resolved)
 
 ### S1 — Guarded base merge
 
@@ -87,4 +87,4 @@ GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, and T021.
 
 > Update `libs/usecase/src/git_stash.rs`, `libs/infrastructure/src/git_cli/stash_adapter.rs`, and the catalogued CLI-driver and CLI stash wiring for typed guarded stash push/pop pairing with a repository-scoped single-slot outcome record; add focused regression coverage. D1; IN-04; OS-04; CN-08; AC-06; AC-13.
 
-- [~] **T021**: Update `libs/usecase/src/git_stash.rs`, `libs/infrastructure/src/git_cli/stash_adapter.rs`, and the catalogued CLI-driver and CLI stash wiring for typed guarded stash push/pop pairing with a repository-scoped single-slot outcome record; add focused regression coverage. D1; IN-04; OS-04; CN-08; AC-06; AC-13.
+- [x] **T021**: Update `libs/usecase/src/git_stash.rs`, `libs/infrastructure/src/git_cli/stash_adapter.rs`, and the catalogued CLI-driver and CLI stash wiring for typed guarded stash push/pop pairing with a repository-scoped single-slot outcome record; add focused regression coverage. D1; IN-04; OS-04; CN-08; AC-06; AC-13. (`9bb06b65`)
