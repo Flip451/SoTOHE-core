@@ -7,7 +7,7 @@
 | PhaseCommandInput | enum | add | Validate, Explain, Enter | 🔵 | 🔵 |
 | RefVerifyChainSelect | enum | reference | Chain1, Chain2, All | 🔵 | 🔵 |
 | ReviewCheckRoundSelect | enum | add | Final | 🔵 | 🔵 |
-| ReviewInput | enum | modify | RunCodex, RunClaude, RunLocal, CheckApproved, CheckZeroFindings, Results, Classify, Files, ValidateScope, GetBriefing, PersistCommitHash | 🟡 | 🔵 |
+| ReviewInput | enum | modify | RunCodex, RunClaude, RunLocal, CheckApproved, CheckZeroFindings, Results, Classify, Files, ValidateScope, GetBriefing, PersistCommitHash | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -18,7 +18,8 @@
 | PhaseIdArg | dto | add | — | 🔵 | 🔵 |
 | RefVerifyCheckApprovedInput | dto | modify | — | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsInput | dto | add | — | 🔵 | 🔵 |
-| ReviewResultsInput | dto | add | — | 🟡 | 🔵 |
+| ReviewFixInput | dto | add | — | 🔵 | 🔵 |
+| ReviewResultsInput | dto | add | — | 🔵 | 🔵 |
 
 ## Primary Adapters
 
@@ -28,4 +29,5 @@
 | PhaseCommandDriver | primary_adapter | add | — | 🔵 | 🔵 |
 | RefVerifyDriver | primary_adapter | reference | — | 🔵 | 🔵 |
 | ReviewDriver | primary_adapter | modify | — | 🔵 | 🔵 |
+| ReviewFixDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 

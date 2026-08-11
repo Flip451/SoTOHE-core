@@ -283,7 +283,7 @@ where
 // ---------------------------------------------------------------------------
 
 type ReviewDispatchParts<R, H, D> =
-    (ReviewCycle<R, H, D>, FsReviewStore, ReviewFindingsRecorder, PathBuf);
+    (ReviewCycle<R, H, D>, FsReviewStore, ReviewFindingsRecorder, PathBuf, Vec<String>);
 
 /// Runs the full Codex review cycle from string inputs.
 ///
@@ -342,12 +342,12 @@ fn build_review_dispatch_parts<R>(
 where
     R: Reviewer,
 {
-    let (scope_config, review_store, _commit_hash_store, base) =
+    let (scope_config, review_store, _commit_hash_store, base, diagnostics) =
         build_v2_shared(track_id, items_dir).map_err(|e| e.to_string())?;
     let repo_root = repo_root_from_items_dir(items_dir).map_err(|e| e.to_string())?;
     let (reviewer, findings_recorder) = FindingsCountReviewer::new(reviewer);
     let cycle = ReviewCycle::new(base, scope_config, reviewer, GitDiffGetter, SystemReviewHasher);
-    Ok((cycle, review_store, findings_recorder, repo_root))
+    Ok((cycle, review_store, findings_recorder, repo_root, diagnostics))
 }
 
 /// Shared implementation: parse `track_id`, invoke `builder` to obtain the
@@ -376,16 +376,21 @@ where
 
     let track_id =
         TrackId::try_new(track_id_str).map_err(|e| format!("[ERROR] invalid track id: {e}"))?;
-    let (cycle, review_store, findings_recorder, repo_root) =
+    let (cycle, review_store, findings_recorder, repo_root, diagnostics) =
         builder(&track_id).map_err(|e| format!("[ERROR] v2 composition failed: {e}"))?;
-    with_repo_cwd(&repo_root, || {
+    let outcome = with_repo_cwd(&repo_root, || {
         dispatch_review_cycle(group_str, round_type_str, cycle, review_store, findings_recorder)
             .map_err(|e: String| ReviewSharedError::Git(e))
     })
     .map_err(|e| {
         let s = e.to_string();
         if s.starts_with("[ERROR]") { s } else { format!("[ERROR] {s}") }
-    })
+    })?;
+    if diagnostics.is_empty() {
+        Ok(outcome)
+    } else {
+        Ok(CodexReviewOutcome::WithDiagnostics { diagnostics, outcome: Box::new(outcome) })
+    }
 }
 
 // ---------------------------------------------------------------------------

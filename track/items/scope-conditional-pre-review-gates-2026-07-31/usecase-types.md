@@ -11,8 +11,13 @@
 | ProgramRunOutcome | enum | add | Exited, TimedOut, OutputLimitExceeded | 🔵 | 🔵 |
 | RefVerifyChainFilter | enum | reference | Chain1, Chain2, All | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsOutcome | enum | add | CurrentFinalZeroFindings, MissingFinalVerdict, StaleFinalVerdict, FindingsRemain | 🔵 | 🔵 |
-| ReviewScopeSelection | enum | add | Named, All | 🟡 | 🔵 |
+| ReviewNotRequiredReason | enum | add | Empty, ZeroFindings | 🔵 | 🔵 |
+| ReviewRequiredReason | enum | add | NotStarted, FindingsRemain, StaleHash | 🔵 | 🔵 |
+| ReviewRoundResultVerdict | enum | add | ZeroFindings, FindingsRemain | 🔵 | 🔵 |
+| ReviewScopeResultState | enum | add | RequiredNotStarted, RequiredFindingsRemain, RequiredStaleHash, Empty, Approved | 🔵 | 🔵 |
+| ReviewScopeSelectionRequest | enum | add | NamedCandidate, All | 🔵 | 🔵 |
 | ReviewScopeSelector | enum | add | Named, Other | 🔵 | 🔵 |
+| ReviewStoredScopeState | enum | add | Required, NotRequired | 🔵 | 🔵 |
 | ReviewTrackSelector | enum | add | Explicit, CurrentBranch | 🔵 | 🔵 |
 
 ## Value Objects
@@ -27,12 +32,17 @@
 | CommandTimeoutSeconds | value_object | add | — | 🔵 | 🔵 |
 | ConfiguredCommand | value_object | add | — | 🔵 | 🔵 |
 | DiagnosticText | value_object | reference | — | 🔵 | 🔵 |
+| NonEmptyReviewerFindingsOutput | value_object | add | — | 🔵 | 🔵 |
 | OutputCaptureLimitBytes | value_object | add | — | 🔵 | 🔵 |
 | PhaseCommandConfig | value_object | add | — | 🔵 | 🔵 |
 | PhaseCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
 | PreReviewCommandConfig | value_object | add | — | 🔵 | 🔵 |
 | PreReviewScopeCommandDeclaration | value_object | add | — | 🔵 | 🔵 |
 | ProgramExitCode | value_object | add | — | 🔵 | 🔵 |
+| ReviewScopeName | value_object | add | — | 🔵 | 🔵 |
+| ReviewTrackId | value_object | add | — | 🔵 | 🔵 |
+| SubagentBriefingContent | value_object | add | — | 🔵 | 🔵 |
+| SubagentName | value_object | modify | — | 🔵 | 🔵 |
 | UnvalidatedTimeoutSeconds | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
@@ -54,7 +64,18 @@
 | ProgramRunnerError | error_type | add | SpawnFailed, WaitFailed, TerminateFailed | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsEvaluationError | error_type | add | EvaluationFailed | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsValidationError | error_type | add | InvalidTrackId, InvalidScope | 🔵 | 🔵 |
-| ReviewScopeSelectionValidationError | error_type | add | ScopeAndAll, InvalidScope | 🟡 | 🔵 |
+| ReviewFindingsOutputValidationError | error_type | add | Empty | 🔵 | 🔵 |
+| ReviewFixBriefingLoadError | error_type | add | UntrustedFile, ReadFailed, InvalidContent | 🔵 | 🔵 |
+| ReviewFixRunnerError | error_type | modify | SmokeTestFailed, SpawnFailed, SentinelNotFound, SubagentDispatchRequired, Unexpected | 🔵 | 🔵 |
+| ReviewFixTrackResolveError | error_type | add | BranchReadFailed, NonTrackBranch | 🔵 | 🔵 |
+| ReviewResultsError | error_type | add | Failed, UnknownScope, MissingScopeState | 🔵 | 🔵 |
+| ReviewScopeNameValidationError | error_type | add | Invalid | 🔵 | 🔵 |
+| ReviewScopeSelectionValidationError | error_type | add | ScopeAndAll, InvalidScope | 🔵 | 🔵 |
+| ReviewTrackIdValidationError | error_type | add | Invalid | 🔵 | 🔵 |
+| RunReviewFixCommandValidationError | error_type | add | InvalidScope, InvalidTrackId, InvalidRoundType, InvalidModel | 🔵 | 🔵 |
+| RunReviewFixError | error_type | modify | FixRunnerFailed, TrackResolution, BriefingLoad, TrackMismatch | 🔵 | 🔵 |
+| SubagentBriefingContentValidationError | error_type | add | ExceedsMaximumBytes | 🔵 | 🔵 |
+| SubagentNameValidationError | error_type | add | Invalid | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -65,6 +86,12 @@
 | PreReviewCommandConfigLoaderPort | secondary_port | add | fn load(&self, repository_root: &std::path::Path, track_id: &domain::TrackId) -> Result<PreReviewCommandConfig, CommandConfigLoadError> | 🔵 | 🔵 |
 | ProgramRunnerPort | secondary_port | add | fn run(&self, invocation: ProgramInvocation) -> Result<ProgramRunOutcome, ProgramRunnerError> | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsStatePort | secondary_port | add | fn state_for(&self, track_id: &domain::TrackId, items_dir: &std::path::Path, scope: &domain::review_v2::ScopeName) -> Result<Option<domain::review_v2::ReviewState>, domain::FreeText> | 🔵 | 🔵 |
+| ReviewFixBriefingLoaderPort | secondary_port | add | fn load_briefing_content(&self, repository_root: &std::path::Path, briefing_file: &std::path::Path) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> | 🔵 | 🔵 |
+| ReviewFixRunner | secondary_port | reference | fn run_fix(&self, command: RunReviewFixCommand) -> Result<RunReviewFixOutput, ReviewFixRunnerError> | 🔵 | 🔵 |
+| ReviewFixTrackResolverPort | secondary_port | add | fn resolve_current_track(&self, items_dir: &std::path::Path) -> Result<ReviewFixResolution, ReviewFixTrackResolveError> | 🔵 | 🔵 |
+| ReviewResultsRoundPort | secondary_port | add | fn load_scope_rounds(&self, track_id: Option<&str>, items_dir: &std::path::Path, scope: &ReviewScopeName) -> Result<Vec<ReviewStoredRound>, ReviewResultsError> | 🔵 | 🔵 |
+| ReviewResultsScopePort | secondary_port | add | fn load_scope_snapshot(&self, track_id: Option<&str>, items_dir: &std::path::Path) -> Result<ReviewResultsScopeSnapshot, ReviewResultsError> | 🔵 | 🔵 |
+| ReviewResultsStatePort | secondary_port | add | fn load_scope_states(&self, track_id: Option<&str>, items_dir: &std::path::Path) -> Result<Vec<ReviewStoredScopeStateEntry>, ReviewResultsError> | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -75,8 +102,12 @@
 | PreReviewCommandDispatchService | application_service | add | fn dispatch(&self, command: PreReviewCommandDispatchCommand) -> Result<PreReviewCommandDispatchOutcome, PreReviewCommandDispatchError> | 🔵 | 🔵 |
 | RefVerifyAggregateService | application_service | modify | fn run(&self, track_id: &str, items_dir: &std::path::Path) -> Result<RefVerifyRunOutcome, RefVerifyDriverError>, fn results(&self, track_id: &str, items_dir: &std::path::Path, chain: RefVerifyChainFilter, layer: RefVerifyLayerFilter, verdict: RefVerifyVerdictFilter) -> Result<RefVerifyResultsOutput, RefVerifyDriverError> | 🔵 | 🔵 |
 | RefVerifyCheckApprovedDriverService | application_service | modify | fn check_approved(&self, track_id: &str, items_dir: &std::path::Path, chain: RefVerifyChainFilter) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> | 🔵 | 🔵 |
+| ReviewCheckApprovedService | application_service | reference | fn check_approved(&self, track_id: String, items_dir: std::path::PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError> | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsService | application_service | add | fn check_zero_findings(&self, query: &ReviewCheckZeroFindingsQuery) -> Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError> | 🔵 | 🔵 |
-| ReviewService | application_service | modify | fn run_codex(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_claude(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_local(&self, model: Option<String>, timeout_seconds: u64, briefing_file: Option<std::path::PathBuf>, prompt: Option<String>, track_id: Option<String>, round_type: String, group: String, items_dir: std::path::PathBuf) -> ReviewRunLocalOutput, fn check_approved(&self, track_id: String, items_dir: std::path::PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>, fn results(&self, track_id: Option<String>, items_dir: std::path::PathBuf, selection: ReviewScopeSelection, limit: u32, round_type: String, no_hint: bool) -> Result<String, ReviewAuxError>, fn classify(&self, paths: Vec<String>, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<(String, String)>, ReviewAuxError>, fn files(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<String>, ReviewAuxError>, fn validate_scope(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<(), ReviewAuxError>, fn get_briefing(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Option<String>, ReviewAuxError>, fn persist_commit_hash(&self, track_id: String, workspace_root: std::path::PathBuf) -> Result<String, CommitHashPersistenceError> | 🟡 | 🔵 |
+| ReviewResultsService | application_service | modify | fn results(&self, track_id: Option<String>, items_dir: std::path::PathBuf, request: ReviewScopeSelectionRequest) -> Result<ReviewResultsOutput, ReviewResultsError> | 🔵 | 🔵 |
+| ReviewRunLocalService | application_service | reference | fn run_local(&self, model: Option<String>, timeout_seconds: u64, briefing_file: Option<std::path::PathBuf>, prompt: Option<String>, track_id: Option<String>, round_type: String, group: String, items_dir: std::path::PathBuf) -> ReviewRunLocalOutput | 🔵 | 🔵 |
+| ReviewService | application_service | modify | fn run_codex(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_claude(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError>, fn run_local(&self, model: Option<String>, timeout_seconds: u64, briefing_file: Option<std::path::PathBuf>, prompt: Option<String>, track_id: Option<String>, round_type: String, group: String, items_dir: std::path::PathBuf) -> ReviewRunLocalOutput, fn check_approved(&self, track_id: String, items_dir: std::path::PathBuf) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>, fn classify(&self, paths: Vec<String>, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<(String, String)>, ReviewAuxError>, fn files(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Vec<String>, ReviewAuxError>, fn validate_scope(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<(), ReviewAuxError>, fn get_briefing(&self, scope: String, track_id: Option<String>, items_dir: std::path::PathBuf) -> Result<Option<String>, ReviewAuxError>, fn persist_commit_hash(&self, track_id: String, workspace_root: std::path::PathBuf) -> Result<String, CommitHashPersistenceError> | 🔵 | 🔵 |
+| RunReviewFixService | application_service | modify | fn run(&self, request: RunReviewFixRequest) -> Result<RunReviewFixOutput, RunReviewFixError> | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -87,6 +118,8 @@
 | PreReviewCommandDispatchInteractor | interactor | add | — | 🔵 | 🔵 |
 | PreReviewCommandGatedReviewInteractor | interactor | add | — | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsInteractor | interactor | add | — | 🔵 | 🔵 |
+| ReviewResultsInteractor | interactor | modify | — | 🔵 | 🔵 |
+| RunReviewFixInteractor | interactor | modify | — | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -97,6 +130,18 @@
 | PhaseCommandExplanation | dto | add | — | 🔵 | 🔵 |
 | ProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
 | ProgramInvocation | dto | add | — | 🔵 | 🔵 |
+| ReviewFixResolution | dto | add | — | 🔵 | 🔵 |
+| ReviewResultsOutput | dto | add | — | 🔵 | 🔵 |
+| ReviewResultsScopeSnapshot | dto | add | — | 🔵 | 🔵 |
+| ReviewRoundResultOutput | dto | add | — | 🔵 | 🔵 |
+| ReviewRunLocalOutput | dto | modify | — | 🔵 | 🔵 |
+| ReviewScopeResultOutput | dto | add | — | 🔵 | 🔵 |
+| ReviewStoredRound | dto | add | — | 🔵 | 🔵 |
+| ReviewStoredRoundVerdict | dto | add | — | 🔵 | 🔵 |
+| ReviewStoredScopeStateEntry | dto | add | — | 🔵 | 🔵 |
+| ReviewerFindingOutput | dto | add | — | 🔵 | 🔵 |
+| RunReviewFixOutput | dto | reference | — | 🔵 | 🔵 |
+| SubagentDispatchInstruction | dto | modify | — | 🔵 | 🔵 |
 | SuccessfulProgramExecutionRecord | dto | add | — | 🔵 | 🔵 |
 
 ## Commands
@@ -107,6 +152,8 @@
 | PhaseEnterCommand | command | add | — | 🔵 | 🔵 |
 | PhaseValidateCommand | command | add | — | 🔵 | 🔵 |
 | PreReviewCommandDispatchCommand | command | add | — | 🔵 | 🔵 |
+| RunReviewFixCommand | command | modify | — | 🔵 | 🔵 |
+| RunReviewFixRequest | command | add | — | 🔵 | 🔵 |
 
 ## Queries
 

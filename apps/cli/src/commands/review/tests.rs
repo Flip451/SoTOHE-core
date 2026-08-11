@@ -154,15 +154,6 @@ impl Drop for CurrentDirGuard {
     }
 }
 
-/// Sets up a minimal git repo with v2 review-scope.json in the given directory.
-///
-/// Required for tests that change cwd to a tempdir and call infrastructure
-/// functions that need git discovery.
-fn setup_test_git_repo(root: &Path) {
-    // Minimal v2 review-scope.json (empty groups — only Other scope exists)
-    setup_git_repo_with_scope_json(root, r#"{"version": 2, "groups": {}}"#);
-}
-
 // ---------------------------------------------------------------------------
 // check-approved: T004 verdict mapping tests
 // ---------------------------------------------------------------------------
@@ -393,6 +384,26 @@ fn with_fake_codex_on_path<T>(bin_dir: &Path, action: impl FnOnce() -> T) -> T {
     temp_env::with_var("PATH", Some(path), action)
 }
 
+#[cfg(unix)]
+fn run_codex_review_via_driver(
+    repo: &ReviewCommandRouteRepo,
+    group: &str,
+    round_type: &str,
+) -> cli_driver::render::CommandOutcome {
+    use cli_driver::review::ReviewInput;
+
+    cli_composition::ReviewCompositionRoot::new().review_driver().handle(ReviewInput::RunCodex(
+        "test-codex".to_owned(),
+        10,
+        None,
+        Some("review".to_owned()),
+        Some(repo.track_id.clone()),
+        round_type.to_owned(),
+        group.to_owned(),
+        repo.items_dir.clone(),
+    ))
+}
+
 fn parse_review_command(args: &[&str]) -> super::ReviewCommand {
     use clap::Parser;
 
@@ -459,18 +470,7 @@ fn review_check_zero_findings_enum_route_selects_final_scope_state_for_exit_code
     let _cwd = CurrentDirGuard::change_to(&repo.root);
 
     with_fake_codex_on_path(&repo.fake_bin_dir, || {
-        let review = cli_composition::ReviewCompositionRoot::new()
-            .review_run_codex(cli_composition::review_v2::ReviewRunCodexInput {
-                model: "test-codex".to_owned(),
-                timeout_seconds: 10,
-                briefing_file: None,
-                prompt: Some("review".to_owned()),
-                track_id: Some(repo.track_id.clone()),
-                round_type: "final".to_owned(),
-                group: "cli".to_owned(),
-                items_dir: repo.items_dir.clone(),
-            })
-            .unwrap();
+        let review = run_codex_review_via_driver(&repo, "cli", "final");
         assert_eq!(review.exit_code, 0, "fixture must persist a final zero-findings verdict");
 
         let items_dir = repo.items_dir.to_str().unwrap();
@@ -503,18 +503,7 @@ fn review_check_zero_findings_enum_route_selects_other_scope_state_for_exit_code
     let _cwd = CurrentDirGuard::change_to(&repo.root);
 
     with_fake_codex_on_path(&repo.fake_bin_dir, || {
-        let review = cli_composition::ReviewCompositionRoot::new()
-            .review_run_codex(cli_composition::review_v2::ReviewRunCodexInput {
-                model: "test-codex".to_owned(),
-                timeout_seconds: 10,
-                briefing_file: None,
-                prompt: Some("review".to_owned()),
-                track_id: Some(repo.track_id.clone()),
-                round_type: "final".to_owned(),
-                group: "other".to_owned(),
-                items_dir: repo.items_dir.clone(),
-            })
-            .unwrap();
+        let review = run_codex_review_via_driver(&repo, "other", "final");
         assert_eq!(
             review.exit_code, 0,
             "fixture must persist an Other final zero-findings verdict"
@@ -542,6 +531,189 @@ fn review_check_zero_findings_enum_route_selects_other_scope_state_for_exit_code
         .unwrap();
         assert_eq!(super::execute(parse_review_command(&args)), std::process::ExitCode::FAILURE);
     });
+}
+
+/// A current fast zero-findings round is not a substitute for the required
+/// final verdict at the public `check-zero-findings` command boundary.
+#[cfg(unix)]
+#[test]
+fn review_check_zero_findings_enum_route_rejects_current_fast_verdict_for_final_check() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-check-zero-fast-not-final-enum-route");
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+
+    with_fake_codex_on_path(&repo.fake_bin_dir, || {
+        let review = run_codex_review_via_driver(&repo, "cli", "fast");
+        assert_eq!(review.exit_code, 0, "fixture must persist a current fast verdict");
+
+        let items_dir = repo.items_dir.to_str().unwrap();
+        let args = [
+            "sotp",
+            "check-zero-findings",
+            "--scope",
+            "cli",
+            "--round",
+            "final",
+            "--track-id",
+            repo.track_id.as_str(),
+            "--items-dir",
+            items_dir,
+        ];
+        assert_eq!(
+            super::execute(parse_review_command(&args)),
+            std::process::ExitCode::FAILURE,
+            "a current fast verdict must not satisfy a final-only check"
+        );
+    });
+}
+
+/// An unreviewed scope has no final verdict and must never pass the public
+/// convergence check merely because the track and scope resolve successfully.
+#[cfg(unix)]
+#[test]
+fn review_check_zero_findings_enum_route_rejects_absent_review_state() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-check-zero-absent-enum-route");
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+    let items_dir = repo.items_dir.to_str().unwrap();
+    let args = [
+        "sotp",
+        "check-zero-findings",
+        "--scope",
+        "cli",
+        "--round",
+        "final",
+        "--track-id",
+        repo.track_id.as_str(),
+        "--items-dir",
+        items_dir,
+    ];
+
+    assert_eq!(
+        super::execute(parse_review_command(&args)),
+        std::process::ExitCode::FAILURE,
+        "an absent review state must not pass the final-only check"
+    );
+}
+
+/// A current final verdict with findings remains is not admissible for the
+/// public final zero-findings convergence check.
+#[cfg(unix)]
+#[test]
+fn review_check_zero_findings_enum_route_rejects_current_final_findings_remain() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-check-zero-findings-enum-route");
+    fs::write(
+        repo.fake_bin_dir.join("codex"),
+        r#"#!/bin/sh
+case "$1" in
+  --version) echo "codex 0.125.0"; exit 0 ;;
+esac
+out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message) out="$2"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+printf '{"verdict":"findings_remain","findings":[{"message":"remaining finding","severity":"P1","file":null,"line":null,"category":null}]}\n' > "$out"
+"#,
+    )
+    .unwrap();
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+
+    with_fake_codex_on_path(&repo.fake_bin_dir, || {
+        let review = run_codex_review_via_driver(&repo, "cli", "final");
+        assert_eq!(
+            review.exit_code, 2,
+            "a completed review with findings must persist its final verdict"
+        );
+
+        let items_dir = repo.items_dir.to_str().unwrap();
+        let args = [
+            "sotp",
+            "check-zero-findings",
+            "--scope",
+            "cli",
+            "--round",
+            "final",
+            "--track-id",
+            repo.track_id.as_str(),
+            "--items-dir",
+            items_dir,
+        ];
+        assert_eq!(
+            super::execute(parse_review_command(&args)),
+            std::process::ExitCode::FAILURE,
+            "a final findings-remain verdict must not pass the check"
+        );
+    });
+}
+
+/// The `Results` enum route must preserve omitted, explicit-all, and named
+/// selections all the way through the review results service.
+#[cfg(unix)]
+#[test]
+fn review_results_enum_route_accepts_omitted_explicit_all_and_named_selection() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-results-enum-route");
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+    let args = |scope: Option<&str>, all| super::ResultsArgs {
+        items_dir: repo.items_dir.clone(),
+        track_id: Some(repo.track_id.clone()),
+        scope: scope.map(str::to_owned),
+        all,
+        limit: super::ResultsLimit::Zero,
+        round_type: super::RoundTypeFilter::Any,
+        no_hint: true,
+    };
+
+    assert_eq!(
+        super::execute(super::ReviewCommand::Results(args(None, false))),
+        std::process::ExitCode::SUCCESS,
+        "omitting selectors must select all configured scopes"
+    );
+    assert_eq!(
+        super::execute(super::ReviewCommand::Results(args(None, true))),
+        std::process::ExitCode::SUCCESS,
+        "--all must select all configured scopes"
+    );
+    assert_eq!(
+        super::execute(super::ReviewCommand::Results(args(Some("cli"), false))),
+        std::process::ExitCode::SUCCESS,
+        "a configured named scope must be accepted"
+    );
+}
+
+/// The `Results` enum route must fail closed before it can produce partial or
+/// ambiguous output from conflicting, malformed, or unconfigured selectors.
+#[cfg(unix)]
+#[test]
+fn review_results_enum_route_rejects_conflicting_invalid_and_nonmember_selectors() {
+    let _lock = process_env_lock().lock().unwrap();
+    let repo = setup_review_command_route_repo("review-results-invalid-enum-route");
+    let _cwd = CurrentDirGuard::change_to(&repo.root);
+    let args = |scope: Option<&str>, all| super::ResultsArgs {
+        items_dir: repo.items_dir.clone(),
+        track_id: Some(repo.track_id.clone()),
+        scope: scope.map(str::to_owned),
+        all,
+        limit: super::ResultsLimit::Zero,
+        round_type: super::RoundTypeFilter::Any,
+        no_hint: true,
+    };
+
+    for (scope, all, case) in [
+        (Some("cli"), true, "simultaneous --scope and --all"),
+        (Some(""), false, "invalid scope format"),
+        (Some("missing"), false, "unconfigured scope membership"),
+    ] {
+        assert_eq!(
+            super::execute(super::ReviewCommand::Results(args(scope, all))),
+            std::process::ExitCode::FAILURE,
+            "{case} must fail closed"
+        );
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -612,69 +784,6 @@ fn format_approval_verdict_blocked_has_blocked_prefix_and_lists_scopes() {
         "Blocked message must list required scope names; got: {msg:?}"
     );
     assert_eq!(code, std::process::ExitCode::FAILURE);
-}
-
-// ---------------------------------------------------------------------------
-// build_review_v2 items_dir path traversal guard tests
-// ---------------------------------------------------------------------------
-
-#[test]
-fn build_review_v2_rejects_items_dir_outside_repo_root() {
-    // Serialize with env_lock because build_review_v2_str uses SystemGitRepo::discover()
-    // (via infrastructure::review_v2::build_review_v2_str) which depends on cwd — other tests may change cwd concurrently.
-    let _lock = process_env_lock().lock().unwrap();
-    // Use /tmp as items_dir — this should always be outside the repo root.
-    let result =
-        cli_composition::review_v2::build_review_v2_str("test-track", std::path::Path::new("/tmp"));
-    assert!(result.is_err(), "build_review_v2_str should reject items_dir outside repo root");
-    let err = result.err().expect("checked is_err above").to_string();
-    assert!(
-        err.contains("outside the repository root") || err.contains("git discover"),
-        "error should mention path traversal guard: {err}"
-    );
-}
-
-#[test]
-fn build_review_v2_rejects_traversal_items_dir_outside_repo_root() {
-    // A relative path with ".." that resolves outside the repo root should be
-    // rejected by the canonicalize + starts_with containment check.
-    let _lock = process_env_lock().lock().unwrap();
-    let dir = tempfile::tempdir().unwrap();
-    setup_test_git_repo(dir.path());
-    let _cwd = CurrentDirGuard::change_to(dir.path());
-
-    // "items/../../../tmp" — resolves outside repo root
-    let traversal_path = PathBuf::from("items/../../../tmp");
-    let result = cli_composition::review_v2::build_review_v2_str("test-track", &traversal_path);
-    assert!(result.is_err(), "items_dir outside repo should be rejected");
-    let err = result.err().expect("checked is_err above").to_string();
-    assert!(
-        err.contains("outside the repository root"),
-        "error should mention containment violation: {err}"
-    );
-}
-
-/// Sets up a minimal git repo with a custom `.harness/config/review-scope.json` content.
-///
-/// Unlike `setup_test_git_repo` (which writes `{"version": 2, "groups": {}}`), this
-/// helper writes arbitrary JSON so tests can configure specific scope/briefing combos.
-fn setup_git_repo_with_scope_json(root: &Path, scope_json: &str) {
-    use std::process::Command;
-    Command::new("git").args(["init", "-b", "main"]).current_dir(root).output().unwrap();
-    Command::new("git")
-        .args(["config", "user.email", "test@test.com"])
-        .current_dir(root)
-        .output()
-        .unwrap();
-    Command::new("git").args(["config", "user.name", "Test"]).current_dir(root).output().unwrap();
-
-    let config_dir = root.join(".harness/config");
-    fs::create_dir_all(&config_dir).unwrap();
-    fs::write(config_dir.join("review-scope.json"), scope_json).unwrap();
-    fs::create_dir_all(root.join("track/items")).unwrap();
-
-    Command::new("git").args(["add", "."]).current_dir(root).output().unwrap();
-    Command::new("git").args(["commit", "-m", "init"]).current_dir(root).output().unwrap();
 }
 
 // ---------------------------------------------------------------------------

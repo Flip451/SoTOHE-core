@@ -3,7 +3,7 @@
 //!
 //! Resolves the `review-fix-lead` capability for the given round type and
 //! dispatches to the infrastructure adapter (currently: `codex` only) via
-//! `ReviewCompositionRoot::review_run_fix_local_resolve` (CN-02 / CN-03 /
+//! the dedicated review-fix driver factory (CN-02 / CN-03 /
 //! AC-03 / AC-04).
 //! Required flags: `--scope`, `--briefing-file`, `--round-type`.
 //! `--track-id` is optional: when omitted, the active track is auto-resolved
@@ -15,9 +15,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::Args;
-use cli_composition::ReviewCompositionRoot;
-#[cfg(test)]
-use cli_composition::RunReviewFixLocalInput;
+use cli_driver::review::ReviewFixInput;
 
 use super::CodexRoundTypeArg;
 
@@ -51,47 +49,19 @@ pub struct FixLocalArgs {
     pub(super) items_dir: PathBuf,
 }
 
-/// Build the driver input from already-resolved args.
-///
-/// Test-only helper retained for backwards-compatible parametric tests
-/// against the input shape. Production `execute_fix_local` delegates the
-/// resolve + dispatch to `cli_composition::ReviewCompositionRoot::review_run_fix_local_resolve`
-/// without constructing the input here (thin-bin policy).
-#[cfg(test)]
-fn build_review_fix_local_input(args: &FixLocalArgs, track_id: String) -> RunReviewFixLocalInput {
-    let round_type = match args.round_type {
-        CodexRoundTypeArg::Fast => "fast".to_owned(),
-        CodexRoundTypeArg::Final => "final".to_owned(),
-    };
-    RunReviewFixLocalInput {
-        scope: args.scope.clone(),
-        briefing_file: args.briefing_file.clone(),
-        track_id,
-        round_type,
-        model: args.model.clone(),
-    }
-}
-
 pub(super) fn execute_fix_local(args: &FixLocalArgs) -> ExitCode {
-    // Thin-bin: delegate auto-resolve + fail-closed to cli_composition.
-    let round_type = match args.round_type {
-        CodexRoundTypeArg::Fast => "fast".to_owned(),
-        CodexRoundTypeArg::Final => "final".to_owned(),
-    };
-    let outcome = match ReviewCompositionRoot::new().review_run_fix_local_resolve(
-        args.track_id.clone(),
+    let input = ReviewFixInput::new(
         args.scope.clone(),
         args.briefing_file.clone(),
-        round_type,
-        args.model.clone(),
+        args.track_id.clone(),
         args.items_dir.clone(),
-    ) {
-        Ok(o) => o,
-        Err(e) => {
-            eprintln!("{e}");
-            return ExitCode::FAILURE;
-        }
-    };
+        match args.round_type {
+            CodexRoundTypeArg::Fast => "fast".to_owned(),
+            CodexRoundTypeArg::Final => "final".to_owned(),
+        },
+        args.model.clone(),
+    );
+    let outcome = cli_composition::ReviewCompositionRoot::new().review_fix_driver().handle(input);
     match emit_fix_local_outcome(&outcome) {
         Ok(()) => ExitCode::from(outcome.exit_code),
         Err(e) => {
@@ -130,8 +100,22 @@ mod tests {
         args: FixLocalArgs,
     }
 
+    fn review_fix_input(args: &FixLocalArgs, track_id: String) -> ReviewFixInput {
+        ReviewFixInput::new(
+            args.scope.clone(),
+            args.briefing_file.clone(),
+            Some(track_id),
+            args.items_dir.clone(),
+            match args.round_type {
+                CodexRoundTypeArg::Fast => "fast".to_owned(),
+                CodexRoundTypeArg::Final => "final".to_owned(),
+            },
+            args.model.clone(),
+        )
+    }
+
     #[test]
-    fn test_fix_local_args_map_to_review_fix_local_input() {
+    fn test_fix_local_args_map_to_raw_review_fix_input() {
         let cli = <TestCli as clap::Parser>::parse_from([
             "test",
             "--scope",
@@ -146,13 +130,14 @@ mod tests {
             "gpt-5.5",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
+        let (scope, briefing_file, track_id, _items_dir, round_type, model) =
+            review_fix_input(&cli.args, "review-fix".to_owned()).into_parts();
 
-        assert_eq!(input.scope, "cli");
-        assert_eq!(input.briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
-        assert_eq!(input.track_id, "review-fix");
-        assert_eq!(input.round_type, "fast");
-        assert_eq!(input.model, Some("gpt-5.5".to_owned()));
+        assert_eq!(scope, "cli");
+        assert_eq!(briefing_file, PathBuf::from("tmp/reviewer runtime/briefing cli.md"));
+        assert_eq!(track_id.as_deref(), Some("review-fix"));
+        assert_eq!(round_type, "fast");
+        assert_eq!(model.as_deref(), Some("gpt-5.5"));
     }
 
     #[test]
@@ -169,10 +154,28 @@ mod tests {
             "final",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
+        let (_, _, _, _, round_type, model) =
+            review_fix_input(&cli.args, "review-fix".to_owned()).into_parts();
 
-        assert_eq!(input.round_type, "final");
-        assert_eq!(input.model, None);
+        assert_eq!(round_type, "final");
+        assert_eq!(model, None);
+    }
+
+    #[test]
+    fn test_fix_local_args_preserve_invalid_scope_for_driver_validation() {
+        let cli = <TestCli as clap::Parser>::parse_from([
+            "test",
+            "--scope",
+            "   ",
+            "--briefing-file",
+            "tmp/reviewer-runtime/briefing.md",
+            "--track-id",
+            "review-fix",
+            "--round-type",
+            "fast",
+        ]);
+
+        assert_eq!(review_fix_input(&cli.args, "review-fix".to_owned()).into_parts().0, "   ");
     }
 
     #[test]
@@ -208,10 +211,9 @@ mod tests {
         assert!(emit_fix_local_outcome(&outcome).is_ok());
     }
 
-    /// When --model is omitted, `model` is `None` (profile model will
-    /// be used as the default in run_fix.rs).
+    /// When --model is omitted, `model` stays absent for profile resolution.
     #[test]
-    fn test_model_absent_maps_to_none_in_input() {
+    fn test_model_absent_maps_to_none_in_command() {
         let cli = <TestCli as clap::Parser>::parse_from([
             "test",
             "--scope",
@@ -224,18 +226,18 @@ mod tests {
             "fast",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
+        let (_, _, _, _, _, model) =
+            review_fix_input(&cli.args, "review-fix".to_owned()).into_parts();
 
         assert_eq!(
-            input.model, None,
+            model, None,
             "omitted --model must produce None so the profile model is used as default"
         );
     }
 
-    /// When --model is explicitly provided, it is forwarded in `input.model`
-    /// so run_fix.rs can honor the override over the profile model.
+    /// When --model is explicitly provided, it becomes a validated model override.
     #[test]
-    fn test_explicit_model_is_forwarded_to_input() {
+    fn test_explicit_model_is_forwarded_to_command() {
         let cli = <TestCli as clap::Parser>::parse_from([
             "test",
             "--scope",
@@ -250,12 +252,13 @@ mod tests {
             "my-override-model",
         ]);
 
-        let input = build_review_fix_local_input(&cli.args, "review-fix".to_owned());
+        let (_, _, _, _, _, model) =
+            review_fix_input(&cli.args, "review-fix".to_owned()).into_parts();
 
         assert_eq!(
-            input.model,
-            Some("my-override-model".to_owned()),
-            "explicit --model must be forwarded as Some(...) to the input DTO"
+            model.as_deref(),
+            Some("my-override-model"),
+            "explicit --model must become a validated command override"
         );
     }
 
@@ -300,7 +303,7 @@ mod tests {
         );
     }
 
-    /// Explicit `--track-id` is forwarded unchanged through `build_review_fix_local_input`.
+    /// Explicit `--track-id` is forwarded unchanged through the validated command.
     #[test]
     fn test_fix_local_args_explicit_track_id_maps_to_run_fix_local_input() {
         let cli = <TestCli as clap::Parser>::parse_from([
@@ -317,9 +320,10 @@ mod tests {
 
         assert_eq!(cli.args.track_id, Some("my-feature-2026".to_owned()));
 
-        let input = build_review_fix_local_input(&cli.args, "my-feature-2026".to_owned());
+        let (_, _, track_id, _, _, _) =
+            review_fix_input(&cli.args, "my-feature-2026".to_owned()).into_parts();
 
-        assert_eq!(input.track_id, "my-feature-2026");
+        assert_eq!(track_id.as_deref(), Some("my-feature-2026"));
     }
 
     /// On a non-`track/*` branch, `execute_fix_local` with `track_id = None` must

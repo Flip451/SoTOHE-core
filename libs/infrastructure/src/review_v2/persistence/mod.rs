@@ -16,6 +16,9 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use domain::review_v2::{ReviewReaderError, ReviewWriterError};
+
+/// Review state is gate input and must remain small enough to decode safely.
+pub(super) const MAX_REVIEW_JSON_BYTES: u64 = 1024 * 1024;
 use fs4::fs_std::FileExt;
 
 use crate::track::atomic_write::atomic_write_file;
@@ -24,17 +27,20 @@ use crate::track::symlink_guard::reject_symlinks_below;
 // ── review.json v2 serde types ────────────────────────────────────────
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct ReviewJsonV2 {
     schema_version: u32,
     scopes: HashMap<String, ScopeEntry>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct ScopeEntry {
     rounds: Vec<RoundEntry>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct RoundEntry {
     #[serde(rename = "type")]
     round_type: String,
@@ -45,6 +51,7 @@ struct RoundEntry {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct FindingEntry {
     message: String,
     severity: Option<String>,
@@ -139,6 +146,17 @@ impl WriteGuard {
         }
 
         let lock_path = path.with_extension("json.lock");
+        reject_symlinks_below(&lock_path, trusted_root).map_err(|source| {
+            if source.kind() == std::io::ErrorKind::InvalidInput {
+                PersistenceError::Symlink { path: lock_path.clone() }
+            } else {
+                PersistenceError::Io {
+                    operation: "lock symlink check",
+                    path: lock_path.clone(),
+                    source,
+                }
+            }
+        })?;
         let lock_file = std::fs::OpenOptions::new()
             .create(true)
             .write(true)
@@ -168,6 +186,15 @@ fn write_atomic(path: &Path, doc: &ReviewJsonV2) -> Result<(), PersistenceError>
         path: None,
         detail: e.to_string(),
     })?;
+    if json.len() as u64 > MAX_REVIEW_JSON_BYTES {
+        return Err(PersistenceError::Codec {
+            operation: "serialize",
+            path: Some(path.to_path_buf()),
+            detail: format!(
+                "serialized review state exceeds the {MAX_REVIEW_JSON_BYTES}-byte limit"
+            ),
+        });
+    }
     atomic_write_file(path, json.as_bytes()).map_err(|source| PersistenceError::Io {
         operation: "atomic write",
         path: path.to_owned(),

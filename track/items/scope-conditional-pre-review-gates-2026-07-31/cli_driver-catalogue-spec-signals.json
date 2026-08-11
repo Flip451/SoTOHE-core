@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6fa42747316f61e889da9feaea6dbdffbfaa45e0ed3faff07763d0a8ab9e32b4",
+  "catalogue_declaration_hash": "c7441a30e99788704665f283637890129dd34fc0bc0934050e8a3465f4e22b1a",
   "signals": [
     {
       "type_name": "CapabilityDriver",
@@ -60,7 +60,17 @@
     {
       "type_name": "ReviewDriver",
       "signal": "blue",
-      "entry_hash": "f70580dcc5043463ebb985b96216cfa2f86ef9a86f8c27db682061a9b6fa9d0e"
+      "entry_hash": "6ad2297408a79d60512820a83ef856e351a2391e1b9cfd75b70e5819f3aeb8da"
+    },
+    {
+      "type_name": "ReviewFixDriver",
+      "signal": "blue",
+      "entry_hash": "54551b22cd6464497459c61867064e0184e46da8016396096b01cf0eeb40aab7"
+    },
+    {
+      "type_name": "ReviewFixInput",
+      "signal": "blue",
+      "entry_hash": "8d912374a2a062652229cff3d989e22d73f6cc3e6f8ea11537d49fe01f105c39"
     },
     {
       "type_name": "ReviewInput",
@@ -70,7 +80,7 @@
     {
       "type_name": "ReviewResultsInput",
       "signal": "blue",
-      "entry_hash": "8dc1b906b590e164c40f53d8d0823fd8c573164731f3d676537b0edfcc95c4a5"
+      "entry_hash": "d23ac0b0c60e754201c7d0fd616925e40dc95a1fe02f542a5e075d87b67783e3"
     }
   ]
 }

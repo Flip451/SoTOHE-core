@@ -144,15 +144,30 @@ Violations of the role statement above are always reportable. The following prio
   **Staged `check-zero-findings` registration (resolved)**: the staged-registration
   suppression previously recorded here has EXPIRED — the review CLI enum registration
   and execution path landed with task T042, and the driver dispatch / aggregate wiring
-  landed earlier; the former cli.md suppression note has been removed. What remains is
-  attribution semantics only: a T043 attribution on the cli_driver review entries
-  (`ReviewInput`, aggregate `ReviewService`) asserts convergence at that task's
-  completion, not pending change — the cli_driver.md note restates exactly that. It is
-  not an accepted deviation for any other track or consumer.
+  landed earlier; the former cli.md suppression note has been removed. The follow-on
+  attribution-semantics note has also EXPIRED — the T043 implementation landed, the
+  attributed cli_driver review entries converged with their declarations, and the
+  corresponding cli_driver.md note has been removed. No suppression remains under this
+  entry for any track or consumer.
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Unit-variant match premise error (cli_driver)**: a rollback-diagnoser adjudication
+  recorded that the review-results renderer's `match scope.state` /
+  `matches!(round.round_type, ...)` on borrowed places with unit-variant patterns binds
+  no payload and performs no move; the workspace passes `cargo make clippy`
+  (`-D warnings`) and `cargo make ci-rust` with this code. The cli_driver.md briefing
+  carries the matching track-limited note dismissing the repeated compile-error claim.
+  It is factual only and expires with this track.
 - **Conditional allowance — apply only when the review run's resolved Track ID is
   exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
   **Pre-existing review_v2 composition surface**: a user adjudication (2026-07-22)
   deferred the review_v2 composition wire-only/render remediation to a separate track.
+  A rollback-diagnoser adjudication on this track additionally recorded that the
+  T043 warning-transport rerouting (`eprintln!` → `RunReviewOutput.diagnostics`) is
+  transport-only and does not void the deferral; the run-lane findings
+  (`render_verdict_payload` rendering, composition-built `[WARN]` text / typed
+  diagnostic condition, `FindingsCountReviewer` placement) transfer to that deferred
+  remediation track. The cli_composition.md note carries the matching record.
   The cli_composition briefing carries a matching track-limited note: invoke-leak
   findings on the PRE-EXISTING review_v2 gated-entry surface
   (`ReviewCompositionRoot::review_run_local`, the interim `ReviewServiceImpl` shim) are

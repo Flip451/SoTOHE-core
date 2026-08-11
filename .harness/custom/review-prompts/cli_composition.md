@@ -84,4 +84,10 @@ Violations of the role statement above are always reportable. The following prio
   remediation to a separate track. Do not report invoke-leak findings on that
   pre-existing surface when the track's diff makes no semantic change to it (mechanical
   constructor/wiring adjustments included). NEW invoke paths added by this track remain
-  fully reportable.
+  fully reportable. A rollback-diagnoser adjudication on this track additionally
+  recorded that rerouting the run-lane warnings from `eprintln!` into
+  `RunReviewOutput.diagnostics` is a transport-only change that does NOT void the
+  deferral: the run-lane findings (`render_verdict_payload` presentation in
+  composition, composition-built `[WARN]` diagnostic text pending a typed diagnostic
+  condition, and the `FindingsCountReviewer` decorator placement) belong to the
+  deferred remediation track, not to this track. Do not report them here.

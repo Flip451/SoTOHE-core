@@ -56,7 +56,7 @@ impl ReviewCheckZeroFindingsStatePort for ReviewCheckZeroFindingsStateAdapter {
             )));
         }
 
-        let base_branch = load_base_branch(&canonical_items_dir, track_id)?;
+        let base = resolve_review_diff_base(track_id, items_dir)?;
         let scope_config = load_v2_scope_config(
             &canonical_root.join(".harness/config/review-scope.json"),
             track_id,
@@ -65,9 +65,6 @@ impl ReviewCheckZeroFindingsStatePort for ReviewCheckZeroFindingsStateAdapter {
         .map_err(|error| FreeText::new(format!("load review-scope.json: {error}")))?;
         let review_store =
             FsReviewStore::new(track_dir.join("review.json"), canonical_root.clone());
-        let commit_hash_store =
-            FsCommitHashStore::new(track_dir.join(".commit_hash"), canonical_root.clone());
-        let base = resolve_diff_base(&commit_hash_store, &base_branch, &git)?;
         let cycle = ReviewCycle::new(
             base,
             scope_config,
@@ -81,6 +78,39 @@ impl ReviewCheckZeroFindingsStatePort for ReviewCheckZeroFindingsStateAdapter {
 
         Ok(states.get(scope).cloned())
     }
+}
+
+/// Resolves the exact diff base that review-state evaluation uses.
+///
+/// Review-results must display this resolved commit, rather than the metadata
+/// branch label, because a valid `.commit_hash` can pin a different base.
+pub(crate) fn resolve_review_diff_base(
+    track_id: &TrackId,
+    items_dir: &Path,
+) -> Result<CommitHash, FreeText> {
+    let (git, canonical_items_dir) = crate::discover_isolated_repo_for_items_dir(items_dir)
+        .map_err(|error| FreeText::new(format!("git discover: {error}")))?;
+    let canonical_root = git
+        .root()
+        .canonicalize()
+        .map_err(|error| FreeText::new(format!("canonicalize repository root: {error}")))?;
+    if !canonical_items_dir.starts_with(&canonical_root) {
+        return Err(FreeText::new(
+            "the discovered repository does not enclose the items directory".to_owned(),
+        ));
+    }
+    let track_dir = canonical_items_dir.join(track_id.as_ref());
+    if !track_dir.is_dir() {
+        return Err(FreeText::new(format!(
+            "track directory '{}' does not exist. Check --track-id '{}' and --items-dir '{}'.",
+            track_dir.display(),
+            track_id.as_ref(),
+            items_dir.display(),
+        )));
+    }
+    let base_branch = load_base_branch(&canonical_items_dir, track_id)?;
+    let commit_hash_store = FsCommitHashStore::new(track_dir.join(".commit_hash"), canonical_root);
+    resolve_diff_base(&commit_hash_store, &base_branch, &git)
 }
 
 fn load_base_branch(items_dir: &Path, track_id: &TrackId) -> Result<String, FreeText> {

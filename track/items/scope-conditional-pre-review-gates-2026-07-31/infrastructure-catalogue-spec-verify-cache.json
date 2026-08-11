@@ -3,6 +3,78 @@
   "layer": "infrastructure",
   "entries": [
     {
+      "claim_hash": "25511014ebfe82a85b5aaa2819a4d85a3dbeeba57b36d080122ed948dafce0d1",
+      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexReviewFixRunner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-16",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "25511014ebfe82a85b5aaa2819a4d85a3dbeeba57b36d080122ed948dafce0d1",
+      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexReviewFixRunner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "25511014ebfe82a85b5aaa2819a4d85a3dbeeba57b36d080122ed948dafce0d1",
+      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodexReviewFixRunner"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-19",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        }
+      }
+    },
+    {
       "claim_hash": "53965b2bded41d104d5038c790fbfeb145bf55b3db89e6597eaaf7bc4779960f",
       "evidence_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
       "verdict": {
@@ -747,6 +819,78 @@
       }
     },
     {
+      "claim_hash": "d552ef540d1b5ddbe2f02bad581225dddf8d7d221cefcd3615d3a2f256db73b9",
+      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "GitReviewFixTrackResolver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-16",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d552ef540d1b5ddbe2f02bad581225dddf8d7d221cefcd3615d3a2f256db73b9",
+      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "GitReviewFixTrackResolver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d552ef540d1b5ddbe2f02bad581225dddf8d7d221cefcd3615d3a2f256db73b9",
+      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "GitReviewFixTrackResolver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-19",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        }
+      }
+    },
+    {
       "claim_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e",
       "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
       "verdict": {
@@ -1179,6 +1323,198 @@
       }
     },
     {
+      "claim_hash": "17b34b5b03019298b732ee4de39e2094a00ffa1d372134500f07f9c977330f61",
+      "evidence_hash": "7983a7ed6011d5c3afc0fbdad95b5fc3dc5a0a6ea754fdd915a50b736424498d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Loads stored review-round projections (IN-17, AC-20)."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsRoundAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-17",
+          "text_label": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "17b34b5b03019298b732ee4de39e2094a00ffa1d372134500f07f9c977330f61",
+      "evidence_hash": "107ab241ab1aaa1eb6e0fe6bf7546bc92c24594fbe9604447ff57b1a80205281",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsRoundAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "60f34827b075147670cd94fb0704ce6be5a3b89f0f046979351edfeef27cb4e5",
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsScopeAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-15",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "60f34827b075147670cd94fb0704ce6be5a3b89f0f046979351edfeef27cb4e5",
+      "evidence_hash": "7983a7ed6011d5c3afc0fbdad95b5fc3dc5a0a6ea754fdd915a50b736424498d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsScopeAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-17",
+          "text_label": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "60f34827b075147670cd94fb0704ce6be5a3b89f0f046979351edfeef27cb4e5",
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsScopeAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "60f34827b075147670cd94fb0704ce6be5a3b89f0f046979351edfeef27cb4e5",
+      "evidence_hash": "107ab241ab1aaa1eb6e0fe6bf7546bc92c24594fbe9604447ff57b1a80205281",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsScopeAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c0b2464d285d1d7704079f53e9ecac150d8b72e776f16a3c4621fff907b58830",
+      "evidence_hash": "7983a7ed6011d5c3afc0fbdad95b5fc3dc5a0a6ea754fdd915a50b736424498d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsStateAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-17",
+          "text_label": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c0b2464d285d1d7704079f53e9ecac150d8b72e776f16a3c4621fff907b58830",
+      "evidence_hash": "107ab241ab1aaa1eb6e0fe6bf7546bc92c24594fbe9604447ff57b1a80205281",
+      "verdict": {
+        "kind": "pass",
+        "citation": "state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ResultsStateAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-20",
+          "text_label": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。"
+        }
+      }
+    },
+    {
       "claim_hash": "73b64dafc079d17c0178083660c7cf23dc19a1d4dd88af376c62c7179f685c44",
       "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
       "verdict": {
@@ -1223,6 +1559,78 @@
           "section": "acceptance_criteria",
           "element_id": "AC-16",
           "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        }
+      }
+    },
+    {
+      "claim_hash": "eecce4952cea0fe9f44dedc957f5ec5c964ef812b4fea526ed96adc9e84d34c0",
+      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewFixRunnerAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-16",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eecce4952cea0fe9f44dedc957f5ec5c964ef812b4fea526ed96adc9e84d34c0",
+      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけ"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewFixRunnerAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "eecce4952cea0fe9f44dedc957f5ec5c964ef812b4fea526ed96adc9e84d34c0",
+      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewFixRunnerAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-19",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
         }
       }
     },
@@ -1487,6 +1895,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-08",
           "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "268274b5fa4d557e3eb959212eeba4a424d7390e215caa9eb026bcba444ef672",
+      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TrustedReviewFixBriefingLoader"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-16",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
         }
       }
     },

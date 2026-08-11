@@ -58,10 +58,7 @@ pub mod telemetry_wiring;
 
 pub use domain::ExportSchemaInput;
 pub use error::CompositionError;
-pub use review_v2::{
-    ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
-    RunReviewFixLocalInput,
-};
+pub use review_v2::{ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput};
 #[cfg(feature = "semantic-dup")]
 pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,

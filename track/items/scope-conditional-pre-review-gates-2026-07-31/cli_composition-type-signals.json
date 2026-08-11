@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T19:26:17Z",
-  "declaration_hash": "d6208f1b6a976ce3a678fb30533ba5310b353b8b8a3e071717bcae7d596cb30b",
-  "implementation_input_hash": "9d9fea9a900d38c837f1ba8a7ebb4b9c37c8f21d4091a4abeea53862bb526b4a",
+  "generated_at": "2026-08-11T08:56:28Z",
+  "declaration_hash": "7e212bd5334fb651854d188e4fe711ecc9e6520bc4807442c4ef2f3f1aa154d2",
+  "implementation_input_hash": "70406ab42a61e83f0fbdbf0750077a6de086944e3343a0de77083b43ad6898ad",
   "signals": [
     {
       "type_name": "PhaseCompositionRoot",
@@ -19,6 +19,18 @@
       "kind_tag": "composition_root",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "ReviewCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexReviewOutcome",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "RefVerifyChainFilter",
@@ -46,6 +58,54 @@
     },
     {
       "type_name": "RefVerifyVerdictFilter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewResultsInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewSharedError",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ReviewV2Composition",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "RunReviewFixLocalInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli_composition::review_v2::briefing::append_scope_briefing_reference_str",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli_composition::review_v2::scope::validate_review_group_name_str",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli_composition::review_v2::scope::validate_track_id_str",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli_composition::review_v2::shared::build_review_v2_str",
       "kind_tag": "unknown",
       "signal": "blue",
       "found_type": false

@@ -638,10 +638,88 @@
       "action": "add",
       "for_type": "ReviewCheckZeroFindingsStateAdapter",
       "trait_ref": "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
+    },
+    {
+      "for_type": "ResultsScopeAdapter",
+      "trait_ref": "usecase::review_v2::review_aux::ReviewResultsScopePort"
+    },
+    {
+      "for_type": "ResultsStateAdapter",
+      "trait_ref": "usecase::review_v2::review_aux::ReviewResultsStatePort"
+    },
+    {
+      "for_type": "ResultsRoundAdapter",
+      "trait_ref": "usecase::review_v2::review_aux::ReviewResultsRoundPort"
+    },
+    {
+      "for_type": "ReviewFixRunnerAdapter",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
+    },
+    {
+      "for_type": "GitReviewFixTrackResolver",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "CodexReviewFixRunner",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
+    },
+    {
+      "for_type": "TrustedReviewFixBriefingLoader",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort"
     }
   ],
   "traits": {},
   "types": {
+    "CodexReviewFixRunner": {
+      "action": "reference",
+      "docs": "Codex review-fix runner adapter (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "ReasoningEffort"
+            }
+          ],
+          "returns": "CodexReviewFixRunner"
+        }
+      ],
+      "module_path": "review_v2::review_fix_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "CommandArgumentDto": {
       "action": "add",
       "docs": "Serde mirror of an opaque command argument (IN-03, AC-04).",
@@ -1043,6 +1121,36 @@
         }
       ]
     },
+    "GitReviewFixTrackResolver": {
+      "action": "add",
+      "docs": "Git-backed current-branch review-track resolver (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_fix_track_resolver",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "LayerIdDto": {
       "action": "add",
       "docs": "Transparent serde mirror for a task-contract layer identifier (IN-07, AC-08).",
@@ -1275,6 +1383,92 @@
         }
       ]
     },
+    "ResultsRoundAdapter": {
+      "action": "add",
+      "docs": "Loads stored review-round projections (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::results",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ResultsScopeAdapter": {
+      "action": "add",
+      "docs": "Loads the review-results scope snapshot (IN-15, IN-17, AC-18, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::results",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ResultsStateAdapter": {
+      "action": "add",
+      "docs": "Loads stored review-state projections (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::results",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "ReviewCheckZeroFindingsStateAdapter": {
       "action": "add",
       "docs": "Review-state secondary adapter for check-zero-findings evaluation (CN-06, AC-16).",
@@ -1297,6 +1491,36 @@
         },
         {
           "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixRunnerAdapter": {
+      "action": "add",
+      "docs": "Review-fix runner secondary adapter (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_fix_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -1468,6 +1692,28 @@
         },
         {
           "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "TrustedReviewFixBriefingLoader": {
+      "action": "add",
+      "docs": "Review-fix briefing loader adapter (IN-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_fix_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

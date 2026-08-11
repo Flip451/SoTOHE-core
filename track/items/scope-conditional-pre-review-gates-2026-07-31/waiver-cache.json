@@ -2976,6 +2976,870 @@
         "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_codex"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_claude"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_local"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_approved"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:classify"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:files"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate_scope"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:get_briefing"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:persist_commit_hash"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_codex"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_claude"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_local"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_approved"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:classify"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:files"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate_scope"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:get_briefing"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:persist_commit_hash"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_codex"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_claude"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_local"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_approved"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:classify"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:files"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate_scope"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:get_briefing"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:persist_commit_hash"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_codex"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_claude"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run_local"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check_approved"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Modify, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"run_codex\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_local\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"model\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"timeout_seconds\")), ty: TypeRef(\"u64\") }, ParamDeclaration { name: ParamName(Identifier(\"briefing_file\")), ty: TypeRef(\"Option<std::path::PathBuf>\") }, ParamDeclaration { name: ParamName(Identifier(\"prompt\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"group\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf>\") }], returns: TypeRef(\"ReviewRunLocalOutput\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"check_approved\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<ReviewApprovalOutput, ReviewCheckApprovedError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"classify\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: MethodName(Identifier(\"paths\")), ty: TypeRef(\"Vec<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<(String, String)>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"files\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<String>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"review_v2\"), Identifier(\"aggregate_service\")]) }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:classify"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:files"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:validate_scope"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:get_briefing"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewService",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:persist_commit_hash"
+      },
+      "key": {
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

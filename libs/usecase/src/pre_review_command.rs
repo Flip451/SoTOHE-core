@@ -333,18 +333,6 @@ impl ReviewService for PreReviewCommandGatedReviewInteractor {
     ) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError> {
         self.inner.check_approved(track_id, items_dir)
     }
-    fn results(
-        &self,
-        track_id: Option<String>,
-        items_dir: PathBuf,
-        scope: Option<String>,
-        all: bool,
-        limit: u32,
-        round_type: String,
-        no_hint: bool,
-    ) -> Result<String, ReviewAuxError> {
-        self.inner.results(track_id, items_dir, scope, all, limit, round_type, no_hint)
-    }
     fn classify(
         &self,
         paths: Vec<String>,
@@ -387,7 +375,11 @@ impl ReviewService for PreReviewCommandGatedReviewInteractor {
 }
 
 fn blocked_output(message: &str) -> ReviewRunLocalOutput {
-    ReviewRunLocalOutput { stdout: None, stderr: Some(message.to_owned()), exit_code: 1 }
+    ReviewRunLocalOutput {
+        summary: None,
+        diagnostics: vec![crate::git_workflow::DiagnosticText::new(message)],
+        exit_code: 1,
+    }
 }
 
 #[cfg(test)]
@@ -843,7 +835,11 @@ mod tests {
             _items_dir: PathBuf,
         ) -> ReviewRunLocalOutput {
             self.0.fetch_add(1, Ordering::SeqCst);
-            ReviewRunLocalOutput { stdout: Some("reviewed".to_owned()), stderr: None, exit_code: 0 }
+            ReviewRunLocalOutput {
+                summary: Some("reviewed".to_owned()),
+                diagnostics: Vec::new(),
+                exit_code: 0,
+            }
         }
         fn check_approved(
             &self,
@@ -853,18 +849,6 @@ mod tests {
             crate::review_v2::ReviewApprovalOutput,
             crate::review_v2::ReviewCheckApprovedError,
         > {
-            panic!("not used")
-        }
-        fn results(
-            &self,
-            _track_id: Option<String>,
-            _items_dir: PathBuf,
-            _scope: Option<String>,
-            _all: bool,
-            _limit: u32,
-            _round_type: String,
-            _no_hint: bool,
-        ) -> Result<String, crate::review_v2::ReviewAuxError> {
             panic!("not used")
         }
         fn classify(
@@ -908,6 +892,18 @@ mod tests {
         }
     }
 
+    impl crate::review_v2::ReviewResultsService for CountingReview {
+        fn results(
+            &self,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+            _request: crate::review_v2::ReviewScopeSelectionRequest,
+        ) -> Result<crate::review_v2::ReviewResultsOutput, crate::review_v2::ReviewResultsError>
+        {
+            panic!("not used")
+        }
+    }
+
     struct GroupCapturingReview(Mutex<Vec<String>>);
     impl ReviewCheckZeroFindingsService for GroupCapturingReview {
         fn check_zero_findings(
@@ -939,7 +935,11 @@ mod tests {
             _items_dir: PathBuf,
         ) -> ReviewRunLocalOutput {
             self.0.lock().expect("received group lock is healthy").push(group);
-            ReviewRunLocalOutput { stdout: Some("reviewed".to_owned()), stderr: None, exit_code: 0 }
+            ReviewRunLocalOutput {
+                summary: Some("reviewed".to_owned()),
+                diagnostics: Vec::new(),
+                exit_code: 0,
+            }
         }
         fn check_approved(
             &self,
@@ -949,18 +949,6 @@ mod tests {
             crate::review_v2::ReviewApprovalOutput,
             crate::review_v2::ReviewCheckApprovedError,
         > {
-            panic!("not used")
-        }
-        fn results(
-            &self,
-            _track_id: Option<String>,
-            _items_dir: PathBuf,
-            _scope: Option<String>,
-            _all: bool,
-            _limit: u32,
-            _round_type: String,
-            _no_hint: bool,
-        ) -> Result<String, crate::review_v2::ReviewAuxError> {
             panic!("not used")
         }
         fn classify(
@@ -1000,6 +988,18 @@ mod tests {
             _track_id: String,
             _workspace_root: PathBuf,
         ) -> Result<String, crate::commit_hash_persistence::CommitHashPersistenceError> {
+            panic!("not used")
+        }
+    }
+
+    impl crate::review_v2::ReviewResultsService for GroupCapturingReview {
+        fn results(
+            &self,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+            _request: crate::review_v2::ReviewScopeSelectionRequest,
+        ) -> Result<crate::review_v2::ReviewResultsOutput, crate::review_v2::ReviewResultsError>
+        {
             panic!("not used")
         }
     }
@@ -1081,7 +1081,9 @@ mod tests {
         );
         assert_eq!(output.exit_code, 1);
         assert!(
-            output.stderr.as_deref().unwrap_or("").contains("canonical `track/items` directory")
+            output.diagnostics.iter().any(|diagnostic| diagnostic
+                .as_str()
+                .contains("canonical `track/items` directory"))
         );
         assert_eq!(review.0.load(Ordering::SeqCst), 0);
         assert!(dispatcher.0.lock().unwrap().is_empty());
@@ -1105,8 +1107,8 @@ mod tests {
             PathBuf::from("track/items"),
         );
         assert_eq!(output.exit_code, 1);
-        assert!(output.stderr.as_deref().unwrap_or("").contains("fail"));
-        assert!(output.stderr.as_deref().unwrap_or("").contains("Exited"));
+        assert!(output.diagnostics.iter().any(|diagnostic| diagnostic.as_str().contains("fail")));
+        assert!(output.diagnostics.iter().any(|diagnostic| diagnostic.as_str().contains("Exited")));
         assert_eq!(review.0.load(Ordering::SeqCst), 0);
     }
 
@@ -1158,7 +1160,12 @@ mod tests {
         );
 
         assert_eq!(output.exit_code, 1);
-        assert!(output.stderr.as_deref().unwrap_or("").contains("check-impl-catalog"));
+        assert!(
+            output
+                .diagnostics
+                .iter()
+                .any(|diagnostic| diagnostic.as_str().contains("check-impl-catalog"))
+        );
         assert_eq!(review.0.load(Ordering::SeqCst), 0);
         assert_eq!(
             *runner.invocations.lock().unwrap(),
@@ -1222,7 +1229,7 @@ mod tests {
         );
 
         assert_eq!(output.exit_code, 0);
-        assert_eq!(output.stdout.as_deref(), Some("reviewed"));
+        assert_eq!(output.summary.as_deref(), Some("reviewed"));
         assert_eq!(review.0.load(Ordering::SeqCst), 1);
         assert_eq!(
             *runner.invocations.lock().unwrap(),
@@ -1276,7 +1283,9 @@ mod tests {
 
         assert_eq!(output.exit_code, 1);
         assert!(
-            output.stderr.as_deref().unwrap_or("").contains("pre-review command dispatch failed")
+            output.diagnostics.iter().any(|diagnostic| diagnostic
+                .as_str()
+                .contains("pre-review command dispatch failed"))
         );
         assert_eq!(review.0.load(Ordering::SeqCst), 0);
         assert!(runner.0.lock().unwrap().is_empty());
@@ -1320,7 +1329,7 @@ mod tests {
         // configured command executed first — the planning scope required no
         // downstream implementation liveness and no task-contract artifact.
         assert_eq!(output.exit_code, 0);
-        assert_eq!(output.stdout.as_deref(), Some("reviewed"));
+        assert_eq!(output.summary.as_deref(), Some("reviewed"));
         assert_eq!(review.0.load(Ordering::SeqCst), 1);
         assert!(runner.0.lock().unwrap().is_empty());
     }

@@ -7,6 +7,31 @@
         {
           "has_default_impl": false,
           "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_resolver",
+              "ty": "std::sync::Arc<dyn ReviewFixTrackResolverPort>"
+            },
+            {
+              "name": "briefing_loader",
+              "ty": "std::sync::Arc<dyn ReviewFixBriefingLoaderPort>"
+            },
+            {
+              "name": "runner",
+              "ty": "std::sync::Arc<dyn ReviewFixRunner>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "RunReviewFixInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
           "name": "try_new",
           "params": [
             {
@@ -556,6 +581,129 @@
         {
           "has_default_impl": false,
           "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "state_port",
+              "ty": "Arc<dyn ReviewCheckZeroFindingsStatePort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "ReviewCheckZeroFindingsInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_resolved",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ReviewScopeName"
+            },
+            {
+              "name": "briefing_content",
+              "ty": "SubagentBriefingContent"
+            },
+            {
+              "name": "resolution",
+              "ty": "ReviewFixResolution"
+            },
+            {
+              "name": "round_type",
+              "ty": "ReviewRoundType"
+            },
+            {
+              "name": "model",
+              "ty": "Option<ModelName>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "briefing_content",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&SubagentBriefingContent"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "repository_root",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "round_type",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ReviewRoundType"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModelName>"
+        }
+      ],
+      "type_name": "RunReviewFixCommand"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "scope_port",
+              "ty": "std::sync::Arc<dyn ReviewResultsScopePort>"
+            },
+            {
+              "name": "state_port",
+              "ty": "std::sync::Arc<dyn ReviewResultsStatePort>"
+            },
+            {
+              "name": "round_port",
+              "ty": "std::sync::Arc<dyn ReviewResultsRoundPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "ReviewResultsInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
           "name": "try_new",
           "params": [
             {
@@ -570,7 +718,213 @@
           "returns": "Result<Self, ReviewScopeSelectionValidationError>"
         }
       ],
-      "type_name": "ReviewScopeSelection"
+      "type_name": "ReviewScopeSelectionRequest"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ReviewScopeNameValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "other",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ReviewScopeName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "findings",
+              "ty": "Vec<ReviewerFindingOutput>"
+            }
+          ],
+          "returns": "Result<Self, ReviewFindingsOutputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ReviewerFindingOutput]"
+        }
+      ],
+      "type_name": "NonEmptyReviewerFindingsOutput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ReviewTrackIdValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ReviewTrackId"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "explicit_track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Result<Self, RunReviewFixCommandValidationError>"
+        }
+      ],
+      "type_name": "RunReviewFixRequest"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "ReviewTrackId"
+            },
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ReviewTrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "repository_root",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        }
+      ],
+      "type_name": "ReviewFixResolution"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, SubagentNameValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "SubagentName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, SubagentBriefingContentValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "SubagentBriefingContent"
     }
   ],
   "layer": "usecase",
@@ -1298,6 +1652,61 @@
     },
     {
       "action": "add",
+      "for_type": "ReviewResultsOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeResultOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultVerdict",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultVerdict",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultVerdict",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRoundResultVerdict",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeResultState",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
       "for_type": "PhaseCommandExplainError",
       "trait_ref": "core::fmt::Debug"
     },
@@ -1535,6 +1944,11 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
+      "action": "reference",
+      "for_type": "RunReviewFixCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
       "action": "add",
       "for_type": "ReviewCheckZeroFindingsOutcome",
       "trait_ref": "core::fmt::Debug"
@@ -1555,22 +1969,6 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
-      "for_type": "ReviewScopeSelection",
-      "trait_ref": "Debug"
-    },
-    {
-      "for_type": "ReviewScopeSelection",
-      "trait_ref": "Clone"
-    },
-    {
-      "for_type": "ReviewScopeSelection",
-      "trait_ref": "PartialEq"
-    },
-    {
-      "for_type": "ReviewScopeSelection",
-      "trait_ref": "Eq"
-    },
-    {
       "action": "add",
       "for_type": "ReviewCheckZeroFindingsValidationError",
       "trait_ref": "core::fmt::Debug"
@@ -1607,6 +2005,429 @@
     },
     {
       "for_type": "ReviewScopeSelectionValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "ReviewResultsInteractor",
+      "trait_ref": "ReviewResultsService"
+    },
+    {
+      "action": "modify",
+      "for_type": "RunReviewFixInteractor",
+      "trait_ref": "RunReviewFixService"
+    },
+    {
+      "for_type": "RunReviewFixCommandValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "RunReviewFixCommandValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "RunReviewFixCommandValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReviewScopeSelectionRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewScopeSelectionRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewScopeSelectionRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewScopeSelectionRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyReviewerFindingsOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyReviewerFindingsOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewNotRequiredReason",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewNotRequiredReason",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRequiredReason",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRequiredReason",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewStoredScopeState",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewStoredScopeState",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyReviewerFindingsOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyReviewerFindingsOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewFindingsOutputValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewFindingsOutputValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewFindingsOutputValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewFixTrackResolveError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewFixTrackResolveError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewFixTrackResolveError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewNotRequiredReason",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewNotRequiredReason",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRequiredReason",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewRequiredReason",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewResultsScopeSnapshot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewResultsScopeSnapshot",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewScopeNameValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewStoredScopeState",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewStoredScopeState",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewStoredScopeStateEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewStoredScopeStateEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackIdValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackIdValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewTrackIdValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewerFindingOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewerFindingOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewerFindingOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewerFindingOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewFixRunnerError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewFixRunnerError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewFixRunnerError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::convert::From<ReviewFixTrackResolveError>"
+    },
+    {
+      "action": "add",
+      "for_type": "RunReviewFixError",
+      "trait_ref": "core::convert::From<ReviewFixBriefingLoadError>"
+    },
+    {
+      "for_type": "ReviewFixResolution",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewFixResolution",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewFixResolution",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewFixResolution",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentDispatchInstruction",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SubagentName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SubagentNameValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SubagentNameValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SubagentNameValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ReviewResultsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewResultsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ReviewResultsError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SubagentBriefingContentValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SubagentBriefingContentValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SubagentBriefingContentValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SubagentBriefingContent",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SubagentBriefingContent",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SubagentBriefingContent",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SubagentBriefingContent",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewFixBriefingLoadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewFixBriefingLoadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ReviewFixBriefingLoadError",
       "trait_ref": "core::error::Error"
     }
   ],
@@ -2073,6 +2894,52 @@
         "Sync"
       ]
     },
+    "ReviewCheckApprovedService": {
+      "action": "reference",
+      "docs": "Baseline-identical focused check-approved application contract preserving command arguments and approval exit semantics (IN-14, CN-07, AC-17).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check_approved",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ReviewApprovalOutput, ReviewCheckApprovedError>"
+        }
+      ],
+      "module_path": "review_v2::check_approved",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
     "ReviewCheckZeroFindingsService": {
       "action": "add",
       "docs": "Review check-zero-findings — synchronous (bounded I/O) (CN-06, AC-16).",
@@ -2157,9 +3024,393 @@
         "Sync"
       ]
     },
+    "ReviewFixBriefingLoaderPort": {
+      "action": "add",
+      "docs": "Bounded synchronous review-fix briefing loader port (IN-16).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_briefing_content",
+          "params": [
+            {
+              "name": "repository_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<SubagentBriefingContent, ReviewFixBriefingLoadError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewFixRunner": {
+      "action": "reference",
+      "docs": "Bounded synchronous resolved review-fix execution port (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_fix",
+          "params": [
+            {
+              "name": "command",
+              "ty": "RunReviewFixCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewFixOutput, ReviewFixRunnerError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewFixTrackResolverPort": {
+      "action": "add",
+      "docs": "Bounded synchronous review-fix track resolver port (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_current_track",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ReviewFixResolution, ReviewFixTrackResolveError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewResultsRoundPort": {
+      "action": "add",
+      "docs": "Bounded synchronous round loader; load_scope_rounds produces only ReviewResultsError::Failed (IN-17, AC-20).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_scope_rounds",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<&str>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "scope",
+              "ty": "&ReviewScopeName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<ReviewStoredRound>, ReviewResultsError>"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewResultsScopePort": {
+      "action": "add",
+      "docs": "Bounded synchronous scope loader; load_scope_snapshot produces only ReviewResultsError::Failed (IN-15, IN-17, AC-18, AC-20).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_scope_snapshot",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<&str>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ReviewResultsScopeSnapshot, ReviewResultsError>"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewResultsService": {
+      "action": "modify",
+      "docs": "Bounded synchronous review-results application port (IN-15, IN-17, AC-18, AC-20).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "results",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "request",
+              "ty": "ReviewScopeSelectionRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ReviewResultsOutput, ReviewResultsError>"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewResultsStatePort": {
+      "action": "add",
+      "docs": "Bounded synchronous state loader; load_scope_states produces only ReviewResultsError::Failed (IN-17, AC-20).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_scope_states",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<&str>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<ReviewStoredScopeStateEntry>, ReviewResultsError>"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewRunLocalService": {
+      "action": "reference",
+      "docs": "Baseline-identical focused review-local application contract; pre-review scope gates and fail-closed dispatch are grounded by IN-05, CN-03, and AC-05.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_local",
+          "params": [
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "u64"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "Option<std::path::PathBuf>"
+            },
+            {
+              "name": "prompt",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "group",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "ReviewRunLocalOutput"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
     "ReviewService": {
       "action": "modify",
-      "docs": "Aggregate review application service (IN-15, AC-18).",
+      "docs": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
       "informal_grounds": [],
       "methods": [
         {
@@ -2245,39 +3496,6 @@
           ],
           "receiver": "&self",
           "returns": "Result<ReviewApprovalOutput, ReviewCheckApprovedError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "results",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "Option<String>"
-            },
-            {
-              "name": "items_dir",
-              "ty": "std::path::PathBuf"
-            },
-            {
-              "name": "selection",
-              "ty": "ReviewScopeSelection"
-            },
-            {
-              "name": "limit",
-              "ty": "u32"
-            },
-            {
-              "name": "round_type",
-              "ty": "String"
-            },
-            {
-              "name": "no_hint",
-              "ty": "bool"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<String, ReviewAuxError>"
         },
         {
           "has_default_impl": false,
@@ -2392,6 +3610,56 @@
         },
         {
           "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "RunReviewFixService": {
+      "action": "modify",
+      "docs": "Review-fix application boundary (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run",
+          "params": [
+            {
+              "name": "request",
+              "ty": "RunReviewFixRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewFixOutput, RunReviewFixError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
@@ -3377,6 +4645,55 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "NonEmptyReviewerFindingsOutput": {
+      "action": "add",
+      "docs": "Nonempty review-finding output collection (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "findings",
+              "ty": "Vec<ReviewerFindingOutput>"
+            }
+          ],
+          "returns": "Result<Self, ReviewFindingsOutputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ReviewerFindingOutput]"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -4827,18 +6144,914 @@
         }
       ]
     },
-    "ReviewScopeSelection": {
+    "ReviewFindingsOutputValidationError": {
       "action": "add",
-      "docs": "Review results scope-selection boundary value (IN-15, AC-18).",
+      "docs": "Empty findings-output validation error (IN-17, AC-20).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Named",
+            "name": "Empty",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixBriefingLoadError": {
+      "action": "add",
+      "docs": "Review-fix briefing load error (IN-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UntrustedFile",
             "payload": {
               "fields": [
-                "domain::review_v2::ScopeName"
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidContent",
+            "payload": {
+              "fields": [
+                "SubagentBriefingContentValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixResolution": {
+      "action": "add",
+      "docs": "Review-fix resolution DTO (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "ReviewTrackId"
+            },
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ReviewTrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "repository_root",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixRunnerError": {
+      "action": "modify",
+      "docs": "Review-fix runner error (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SmokeTestFailed",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpawnFailed",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SentinelNotFound",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SubagentDispatchRequired",
+            "payload": {
+              "fields": [
+                "Box<SubagentDispatchInstruction>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Unexpected",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixTrackResolveError": {
+      "action": "add",
+      "docs": "Current-branch track-resolution error (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BranchReadFailed",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NonTrackBranch",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewNotRequiredReason": {
+      "action": "add",
+      "docs": "Usecase projection DTO for persisted non-required review-state reasons (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Empty",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ZeroFindings",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewRequiredReason": {
+      "action": "add",
+      "docs": "Usecase projection DTO for persisted required review-state reasons (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotStarted",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FindingsRemain",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "StaleHash",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewResultsError": {
+      "action": "add",
+      "docs": "Shared review-results error; loader ports produce only Failed (IN-15, AC-18, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Failed",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownScope",
+            "payload": {
+              "fields": [
+                "ReviewScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MissingScopeState",
+            "payload": {
+              "fields": [
+                "ReviewScopeName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewResultsInteractor": {
+      "action": "modify",
+      "docs": "Review-results application interactor (IN-15, AC-18, IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "scope_port",
+              "ty": "std::sync::Arc<dyn ReviewResultsScopePort>"
+            },
+            {
+              "name": "state_port",
+              "ty": "std::sync::Arc<dyn ReviewResultsStatePort>"
+            },
+            {
+              "name": "round_port",
+              "ty": "std::sync::Arc<dyn ReviewResultsRoundPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewResultsOutput": {
+      "action": "add",
+      "docs": "Review-results aggregate output DTO; base is opaque display text (IN-15, AC-18, IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "base",
+              "ty": "String"
+            },
+            {
+              "name": "scopes",
+              "ty": "Vec<ReviewScopeResultOutput>"
+            },
+            {
+              "name": "hint_should_emit",
+              "ty": "bool"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewResultsScopeSnapshot": {
+      "action": "add",
+      "docs": "Scope-universe snapshot; base is opaque display text (IN-15, AC-18, IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "base",
+              "ty": "String"
+            },
+            {
+              "name": "configured_scopes",
+              "ty": "Vec<ReviewScopeName>"
+            },
+            {
+              "name": "review_json_exists",
+              "ty": "bool"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewRoundResultOutput": {
+      "action": "add",
+      "docs": "Per-round review-results output DTO; at is opaque recorded display text (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "round_type",
+              "ty": "ReviewRoundType"
+            },
+            {
+              "name": "at",
+              "ty": "String"
+            },
+            {
+              "name": "verdict",
+              "ty": "ReviewRoundResultVerdict"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewRoundResultVerdict": {
+      "action": "add",
+      "docs": "Review-round verdict output (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ZeroFindings",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FindingsRemain",
+            "payload": {
+              "fields": [
+                "NonEmptyReviewerFindingsOutput"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewRunLocalOutput": {
+      "action": "modify",
+      "docs": "Review-run local output DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "summary",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "diagnostics",
+              "ty": "Vec<DiagnosticText>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeName": {
+      "action": "add",
+      "docs": "Usecase-owned review-scope boundary value (IN-15, AC-18, IN-16, CN-09, AC-19, IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ReviewScopeNameValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "other",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeNameValidationError": {
+      "action": "add",
+      "docs": "Review-scope boundary validation error (IN-15, AC-18).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Invalid",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeResultOutput": {
+      "action": "add",
+      "docs": "Per-scope review-results output DTO (IN-15, AC-18, IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "scope",
+              "ty": "ReviewScopeName"
+            },
+            {
+              "name": "state",
+              "ty": "ReviewScopeResultState"
+            },
+            {
+              "name": "rounds",
+              "ty": "Vec<ReviewRoundResultOutput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeResultState": {
+      "action": "add",
+      "docs": "Per-scope review state output (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RequiredNotStarted",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "RequiredFindingsRemain",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "RequiredStaleHash",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Empty",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Approved",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewScopeSelectionRequest": {
+      "action": "add",
+      "docs": "Review-results raw scope-selection boundary for named, implicit Other, or All requests (IN-15, AC-18).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NamedCandidate",
+            "payload": {
+              "fields": [
+                "ReviewScopeName"
               ],
               "kind": "tuple"
             }
@@ -4851,7 +7064,24 @@
           }
         ]
       },
-      "methods": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "all",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<Self, ReviewScopeSelectionValidationError>"
+        }
+      ],
       "module_path": "review_v2::review_aux",
       "role": {
         "ValueObject": {}
@@ -4869,7 +7099,7 @@
     },
     "ReviewScopeSelectionValidationError": {
       "action": "add",
-      "docs": "Review scope-selection validation error (IN-15, AC-18).",
+      "docs": "Review-results selector validation error (IN-15, AC-18).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -4947,6 +7177,225 @@
         }
       ]
     },
+    "ReviewStoredRound": {
+      "action": "add",
+      "docs": "Stored-round projection alias reusing the shared review-round output DTO (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "type_alias",
+        "target": "ReviewRoundResultOutput"
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewStoredRoundVerdict": {
+      "action": "add",
+      "docs": "Stored-round verdict alias reusing the shared review-round verdict DTO (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "type_alias",
+        "target": "ReviewRoundResultVerdict"
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewStoredScopeState": {
+      "action": "add",
+      "docs": "Usecase projection DTO for persisted per-scope review state (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Required",
+            "payload": {
+              "fields": [
+                "ReviewRequiredReason"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NotRequired",
+            "payload": {
+              "fields": [
+                "ReviewNotRequiredReason"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewStoredScopeStateEntry": {
+      "action": "add",
+      "docs": "Stored per-scope review-state entry for results content (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "scope",
+              "ty": "ReviewScopeName"
+            },
+            {
+              "name": "state",
+              "ty": "ReviewStoredScopeState"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewTrackId": {
+      "action": "add",
+      "docs": "Usecase-owned review-track boundary value (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ReviewTrackIdValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewTrackIdValidationError": {
+      "action": "add",
+      "docs": "Review-track boundary validation error (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Invalid",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
     "ReviewTrackSelector": {
       "action": "add",
       "docs": "Review-track selector (IN-05, AC-05).",
@@ -4983,6 +7432,679 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewerFindingOutput": {
+      "action": "add",
+      "docs": "Review-finding output DTO with opaque presentation metadata (IN-17, AC-20).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "message",
+              "ty": "DiagnosticText"
+            },
+            {
+              "name": "severity",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "file",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "line",
+              "ty": "Option<u64>"
+            },
+            {
+              "name": "category",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_aux",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-20",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixCommand": {
+      "action": "modify",
+      "docs": "Review-fix command (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_resolved",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "ReviewScopeName"
+            },
+            {
+              "name": "briefing_content",
+              "ty": "SubagentBriefingContent"
+            },
+            {
+              "name": "resolution",
+              "ty": "ReviewFixResolution"
+            },
+            {
+              "name": "round_type",
+              "ty": "ReviewRoundType"
+            },
+            {
+              "name": "model",
+              "ty": "Option<ModelName>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "briefing_content",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&SubagentBriefingContent"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "repository_root",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "round_type",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ReviewRoundType"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModelName>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixCommandValidationError": {
+      "action": "add",
+      "docs": "Review-fix request validation error (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidScope",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidRoundType",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidModel",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixError": {
+      "action": "modify",
+      "docs": "Review-fix application error (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FixRunnerFailed",
+            "payload": {
+              "fields": [
+                "ReviewFixRunnerError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackResolution",
+            "payload": {
+              "fields": [
+                "ReviewFixTrackResolveError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BriefingLoad",
+            "payload": {
+              "fields": [
+                "ReviewFixBriefingLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "explicit",
+                  "ty": "ReviewTrackId"
+                },
+                {
+                  "name": "resolved",
+                  "ty": "ReviewTrackId"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixInteractor": {
+      "action": "modify",
+      "docs": "Review-fix application interactor (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_resolver",
+              "ty": "std::sync::Arc<dyn ReviewFixTrackResolverPort>"
+            },
+            {
+              "name": "briefing_loader",
+              "ty": "std::sync::Arc<dyn ReviewFixBriefingLoaderPort>"
+            },
+            {
+              "name": "runner",
+              "ty": "std::sync::Arc<dyn ReviewFixRunner>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixOutput": {
+      "action": "reference",
+      "docs": "Review-fix execution output DTO (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "status",
+              "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixRequest": {
+      "action": "add",
+      "docs": "Review-fix request (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "explicit_track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Result<Self, RunReviewFixCommandValidationError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SubagentBriefingContent": {
+      "action": "add",
+      "docs": "Validated review-fix briefing content (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SubagentBriefingContentValidationError": {
+      "action": "add",
+      "docs": "Review-fix briefing content validation error (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ExceedsMaximumBytes",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SubagentDispatchInstruction": {
+      "action": "modify",
+      "docs": "In-host review-fix dispatch instruction (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "agent",
+              "ty": "SubagentName"
+            },
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "ReasoningEffort"
+            },
+            {
+              "name": "scope",
+              "ty": "ReviewScopeName"
+            },
+            {
+              "name": "briefing_content",
+              "ty": "SubagentBriefingContent"
+            },
+            {
+              "name": "track_id",
+              "ty": "ReviewTrackId"
+            },
+            {
+              "name": "repository_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "round_type",
+              "ty": "ReviewRoundType"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SubagentName": {
+      "action": "modify",
+      "docs": "Review-fix subagent name (IN-16, AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, SubagentNameValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "SubagentNameValidationError": {
+      "action": "add",
+      "docs": "Subagent-name validation failure (IN-16, AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Invalid",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

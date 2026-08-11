@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T23:02:30Z",
-  "declaration_hash": "0f24ff04358cfa9f11af3ca01b2505f3d97981499aa414ea3516bd0bd447239d",
-  "implementation_input_hash": "b773face90844508109c95c64224c3e945ba390a516470e682dc99740c274ae6",
+  "generated_at": "2026-08-11T11:42:51Z",
+  "declaration_hash": "cc7863af61f1c91af46055a33e6b38803b6f8e5122a30e725f2cd70f691d2ba2",
+  "implementation_input_hash": "f79130a5ef04d1ec7f80f93fb873d65c06028a8284811fd5f6bcdf9f46990613",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -145,6 +145,15 @@
       ]
     },
     {
+      "type_name": "GitReviewFixTrackResolver",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
+      ]
+    },
+    {
       "type_name": "LayerIdDto",
       "kind_tag": "dto",
       "signal": "blue",
@@ -222,12 +231,48 @@
       ]
     },
     {
+      "type_name": "ResultsRoundAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::review_v2::review_aux::ReviewResultsRoundPort"
+      ]
+    },
+    {
+      "type_name": "ResultsScopeAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::review_v2::review_aux::ReviewResultsScopePort"
+      ]
+    },
+    {
+      "type_name": "ResultsStateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::review_v2::review_aux::ReviewResultsStatePort"
+      ]
+    },
+    {
       "type_name": "ReviewCheckZeroFindingsStateAdapter",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true,
       "found_items": [
         "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
+      ]
+    },
+    {
+      "type_name": "ReviewFixRunnerAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::review_v2::run_review_fix::ReviewFixRunner"
       ]
     },
     {
@@ -295,6 +340,15 @@
       ]
     },
     {
+      "type_name": "TrustedReviewFixBriefingLoader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort"
+      ]
+    },
+    {
       "type_name": "infrastructure::operator_command_config::decode_phase_command_config",
       "kind_tag": "free_function",
       "signal": "blue",
@@ -303,6 +357,12 @@
     {
       "type_name": "infrastructure::operator_command_config::decode_pre_review_command_config",
       "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexReviewFixRunner",
+      "kind_tag": "secondary_adapter",
       "signal": "blue",
       "found_type": true
     }

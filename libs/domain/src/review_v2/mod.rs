@@ -22,5 +22,6 @@ pub use types::{
     FastVerdict, FilePath, LogInfo, MainScopeName, NonEmptyReviewerFindings, NotRequiredReason,
     RequiredReason, ReviewApprovalVerdict, ReviewHash, ReviewHashValue, ReviewOutcome, ReviewState,
     ReviewTarget, ReviewerFinding, RoundType, ScopeName, ScopeRound, Verdict,
-    extract_verdict_json_candidates_compact, extract_verdict_json_candidates_multiline,
+    derive_review_approval_verdict, extract_verdict_json_candidates_compact,
+    extract_verdict_json_candidates_multiline,
 };

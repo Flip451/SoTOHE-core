@@ -505,6 +505,54 @@
           "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
         }
       }
+    },
+    {
+      "claim_hash": "104337cb9c11234ff8ef1ec9902db18a2470ed208c8fdfa4a736a07201c7d969",
+      "evidence_hash": "7f9ae50549ced0880c35614fc920b8e9fd0d3aef53822e0e5ce81d29cb859856",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::review_v2::types::derive_review_approval_verdict"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-14",
+          "text_label": "catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "104337cb9c11234ff8ef1ec9902db18a2470ed208c8fdfa4a736a07201c7d969",
+      "evidence_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::review_v2::types::derive_review_approval_verdict"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-17",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
+        }
+      }
     }
   ]
 }

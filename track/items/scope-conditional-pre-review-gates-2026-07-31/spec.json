@@ -265,6 +265,42 @@
             "anchor": "D1"
           }
         ]
+      },
+      {
+        "id": "IN-16",
+        "text": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-17",
+        "text": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+            "anchor": "D6"
+          }
+        ]
       }
     ],
     "out_of_scope": [
@@ -420,6 +456,32 @@
         {
           "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
           "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-09",
+      "text": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
         }
       ]
     }
@@ -656,6 +718,50 @@
           "anchor": "D1"
         }
       ]
+    },
+    {
+      "id": "AC-19",
+      "text": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
+          "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-20",
+      "text": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-04-28-1905-review-results-command.md",
+          "anchor": "D6"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -669,7 +775,7 @@
     }
   ],
   "signals": {
-    "blue": 50,
+    "blue": 55,
     "yellow": 0,
     "red": 0
   }

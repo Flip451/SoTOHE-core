@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0f24ff04358cfa9f11af3ca01b2505f3d97981499aa414ea3516bd0bd447239d",
+  "catalogue_declaration_hash": "cc7863af61f1c91af46055a33e6b38803b6f8e5122a30e725f2cd70f691d2ba2",
   "signals": [
+    {
+      "type_name": "CodexReviewFixRunner",
+      "signal": "blue",
+      "entry_hash": "25511014ebfe82a85b5aaa2819a4d85a3dbeeba57b36d080122ed948dafce0d1"
+    },
     {
       "type_name": "CommandArgumentDto",
       "signal": "blue",
@@ -63,6 +68,11 @@
       "entry_hash": "4dfaa606c2957affa2a296791f53ab5d783b7cd943506fd446a29f0e39c6d853"
     },
     {
+      "type_name": "GitReviewFixTrackResolver",
+      "signal": "blue",
+      "entry_hash": "d552ef540d1b5ddbe2f02bad581225dddf8d7d221cefcd3615d3a2f256db73b9"
+    },
+    {
       "type_name": "LayerIdDto",
       "signal": "blue",
       "entry_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e"
@@ -93,9 +103,29 @@
       "entry_hash": "5c49961aa67d03c8ec521e30c0867442ea951b7aa31ee3bb87a7c88b5bce8a88"
     },
     {
+      "type_name": "ResultsRoundAdapter",
+      "signal": "blue",
+      "entry_hash": "17b34b5b03019298b732ee4de39e2094a00ffa1d372134500f07f9c977330f61"
+    },
+    {
+      "type_name": "ResultsScopeAdapter",
+      "signal": "blue",
+      "entry_hash": "60f34827b075147670cd94fb0704ce6be5a3b89f0f046979351edfeef27cb4e5"
+    },
+    {
+      "type_name": "ResultsStateAdapter",
+      "signal": "blue",
+      "entry_hash": "c0b2464d285d1d7704079f53e9ecac150d8b72e776f16a3c4621fff907b58830"
+    },
+    {
       "type_name": "ReviewCheckZeroFindingsStateAdapter",
       "signal": "blue",
       "entry_hash": "73b64dafc079d17c0178083660c7cf23dc19a1d4dd88af376c62c7179f685c44"
+    },
+    {
+      "type_name": "ReviewFixRunnerAdapter",
+      "signal": "blue",
+      "entry_hash": "eecce4952cea0fe9f44dedc957f5ec5c964ef812b4fea526ed96adc9e84d34c0"
     },
     {
       "type_name": "ReviewScopeNameDto",
@@ -121,6 +151,11 @@
       "type_name": "TrackIdDto",
       "signal": "blue",
       "entry_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b"
+    },
+    {
+      "type_name": "TrustedReviewFixBriefingLoader",
+      "signal": "blue",
+      "entry_hash": "268274b5fa4d557e3eb959212eeba4a424d7390e215caa9eb026bcba444ef672"
     },
     {
       "type_name": "infrastructure::operator_command_config::decode_phase_command_config",

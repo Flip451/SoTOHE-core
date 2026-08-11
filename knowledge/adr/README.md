@@ -284,3 +284,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [レビュー指示書のカテゴリ閉列挙を半開形式へ改める](2026-07-23-0109-review-briefing-open-category-format.md) | Proposed | 2026-07-23 |
 | [機械導出される義務成果物を review 運用成果物として扱う](2026-07-25-0715-derived-obligation-artifact-review-scope.md) | Proposed | 2026-07-25 |
 | [`sotp review results` の scope selector と列挙範囲を一致させる](2026-08-10-0814-review-results-scope-selection.md) | Proposed | 2026-08-10 |
+| [review-fix コマンド群の delivery boundary と briefing の信頼境界](2026-08-11-1857-review-fix-delivery-boundary.md) | Proposed | 2026-08-11 |

@@ -27,12 +27,19 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| CodexReviewFixRunner | secondary_adapter | reference | impl ReviewFixRunner | 🔵 | 🔵 |
 | FsPhaseCommandConfigLoader | secondary_adapter | add | impl Debug, impl Default, impl PhaseCommandConfigLoaderPort | 🔵 | 🔵 |
 | FsPreReviewCommandConfigLoader | secondary_adapter | add | impl Debug, impl Default, impl PreReviewCommandConfigLoaderPort | 🔵 | 🔵 |
 | FsRefVerifyAggregateAdapter | secondary_adapter | modify | impl Default, impl RefVerifyAggregateService, impl RefVerifyCheckApprovedDriverService | 🔵 | 🔵 |
 | GitCurrentReviewTrackResolver | secondary_adapter | add | impl Debug, impl Default, impl CurrentReviewTrackResolverPort | 🔵 | 🔵 |
+| GitReviewFixTrackResolver | secondary_adapter | add | impl ReviewFixTrackResolverPort | 🔵 | 🔵 |
 | ProcessProgramRunner | secondary_adapter | add | impl Debug, impl Default, impl ProgramRunnerPort | 🔵 | 🔵 |
+| ResultsRoundAdapter | secondary_adapter | add | impl ReviewResultsRoundPort | 🔵 | 🔵 |
+| ResultsScopeAdapter | secondary_adapter | add | impl ReviewResultsScopePort | 🔵 | 🔵 |
+| ResultsStateAdapter | secondary_adapter | add | impl ReviewResultsStatePort | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsStateAdapter | secondary_adapter | add | impl ReviewCheckZeroFindingsStatePort | 🔵 | 🔵 |
+| ReviewFixRunnerAdapter | secondary_adapter | add | impl ReviewFixRunner | 🔵 | 🔵 |
+| TrustedReviewFixBriefingLoader | secondary_adapter | add | impl ReviewFixBriefingLoaderPort | 🔵 | 🔵 |
 
 ## Free Functions
 

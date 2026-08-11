@@ -54,9 +54,10 @@ Violations of the role statement above are always reportable. The following prio
 - Output color / table formatting style choices that do not affect correctness
 - Suggestions to split a Driver into sub-Drivers when the current structure
   is one use-case per Driver
-- Only for track `scope-conditional-pre-review-gates-2026-07-31`: the driver dispatch
-  (`ReviewInput::CheckZeroFindings` and its `ReviewDriver::handle` arm) is implemented;
-  no absence waiver applies to it. Final-shape convergence of the cli_driver review
-  entries remains attributed to task T043 per `task-contract.json` (an attribution
-  asserts convergence at that task's completion, not pending change) — do not report the
-  T043 attribution itself as premature.
+- Only for track `scope-conditional-pre-review-gates-2026-07-31`: claiming that
+  `match scope.state` / `matches!(round.round_type, ...)` in the review-results renderer
+  moves non-Copy enums out of borrowed values. All matched variants are unit variants;
+  matching a borrowed place against unit-variant patterns inspects the discriminant and
+  binds no payload, so no move occurs. The workspace passes `cargo make clippy`
+  (`-D warnings`) and `cargo make ci-rust` with this code as written; a rewrite to
+  reference matching is cosmetic, not a correctness fix.

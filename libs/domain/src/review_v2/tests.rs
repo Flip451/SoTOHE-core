@@ -782,6 +782,37 @@ fn test_review_approval_verdict_approved_with_bypass_zero_count() {
     assert!(matches!(verdict, ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 0 }));
 }
 
+#[test]
+fn test_derive_review_approval_verdict_uses_bypass_only_for_absent_unstarted_review() {
+    let scope = ScopeName::Main(MainScopeName::new("domain").unwrap());
+    let states = vec![(scope.clone(), ReviewState::Required(RequiredReason::NotStarted))];
+
+    assert_eq!(
+        derive_review_approval_verdict(states.clone(), false),
+        ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: 1 }
+    );
+    assert_eq!(
+        derive_review_approval_verdict(states, true),
+        ReviewApprovalVerdict::Blocked { required_scopes: vec![scope] }
+    );
+}
+
+#[test]
+fn test_derive_review_approval_verdict_approves_current_zero_findings_scopes() {
+    let states = vec![
+        (
+            ScopeName::Main(MainScopeName::new("domain").unwrap()),
+            ReviewState::NotRequired(NotRequiredReason::ZeroFindings),
+        ),
+        (
+            ScopeName::Main(MainScopeName::new("usecase").unwrap()),
+            ReviewState::NotRequired(NotRequiredReason::ZeroFindings),
+        ),
+    ];
+
+    assert_eq!(derive_review_approval_verdict(states, true), ReviewApprovalVerdict::Approved);
+}
+
 // ── group pattern <track-id> expansion (T001 regression) ──────────────
 
 #[test]

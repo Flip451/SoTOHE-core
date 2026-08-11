@@ -247,7 +247,7 @@ fn execute_check_approved(args: &ReviewCheckApprovedArgs) -> ExitCode {
         };
     let outcome = cli_composition::ReviewCompositionRoot::new()
         .review_driver()
-        .handle(ReviewInput::CheckApproved { track_id, items_dir: args.items_dir.clone() });
+        .handle(ReviewInput::CheckApproved(track_id, args.items_dir.clone()));
     if let Some(msg) = &outcome.stdout {
         println!("{msg}");
     }

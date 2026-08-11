@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "871d0f8d65cad4efd92ed2f644f09c39b3637df564d1ffbcdb77a5d34e86a30a",
+  "catalogue_declaration_hash": "697ea228feec246da00b8d9cee66e2d00a6c8aa4907cd85063fa65f2c110d090",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -101,6 +101,11 @@
       "type_name": "FailedProgramExecutionRecord",
       "signal": "blue",
       "entry_hash": "27a57f7100fcf056c17b12b91996493881cb6918bdc44530c8dd7dd9b588eed8"
+    },
+    {
+      "type_name": "NonEmptyReviewerFindingsOutput",
+      "signal": "blue",
+      "entry_hash": "dcc8e57adfbb342d23598982704596ae353a2e55f2d19583e9bf033b30f274ec"
     },
     {
       "type_name": "OutputCaptureLimitBytes",
@@ -263,14 +268,104 @@
       "entry_hash": "4dfffefbf7e0d15c4a002c5486bbf8732c0612d109083be27c352367fc28af96"
     },
     {
-      "type_name": "ReviewScopeSelection",
+      "type_name": "ReviewFindingsOutputValidationError",
       "signal": "blue",
-      "entry_hash": "431f96e973bf466ec26ddfe0a55a2626963684bdff0073e91f01c1f7724bc1f9"
+      "entry_hash": "4882c5d00ac1392714f157667f08113510b0af7ff44bf4227b35b3b3d48a97d4"
+    },
+    {
+      "type_name": "ReviewFixBriefingLoadError",
+      "signal": "blue",
+      "entry_hash": "22daca581cdc9efdf98a0d96413193d0343731f6542628c1f02b1995eec5b3dc"
+    },
+    {
+      "type_name": "ReviewFixResolution",
+      "signal": "blue",
+      "entry_hash": "c7674e9a5984b50d0f01a795fe90677814267bfb3402935b44e3fd02c5adc32f"
+    },
+    {
+      "type_name": "ReviewFixRunnerError",
+      "signal": "blue",
+      "entry_hash": "134f086202caa2c08b759f98846be6731a09937c07bb142351b77762ed038c91"
+    },
+    {
+      "type_name": "ReviewFixTrackResolveError",
+      "signal": "blue",
+      "entry_hash": "2e3cbe28c1f79a2f7e6aff1ef6e4c82f8286a1c9be93376eeeaccb1cd42a60a4"
+    },
+    {
+      "type_name": "ReviewNotRequiredReason",
+      "signal": "blue",
+      "entry_hash": "f393877b71175e4a865200dd2d0f1b636bd57ea984c35cfa21a95dbb1cfda661"
+    },
+    {
+      "type_name": "ReviewRequiredReason",
+      "signal": "blue",
+      "entry_hash": "bb8ae5466effe4ff49f853565163f79a40a24e7fe0a15fb233f9366925a03d08"
+    },
+    {
+      "type_name": "ReviewResultsError",
+      "signal": "blue",
+      "entry_hash": "7f920e0e5646ea4df19ecf309146cce9c8b705a0abf161532879df1f41f71fe5"
+    },
+    {
+      "type_name": "ReviewResultsInteractor",
+      "signal": "blue",
+      "entry_hash": "4908ea405595d591c63ddd9a4ea0336049bf62609d417b3ec430e26bf235708c"
+    },
+    {
+      "type_name": "ReviewResultsOutput",
+      "signal": "blue",
+      "entry_hash": "5a2ae5abdae41df44bf6bc9032147cff59319bec1a0656bf762ce63f64527a8b"
+    },
+    {
+      "type_name": "ReviewResultsScopeSnapshot",
+      "signal": "blue",
+      "entry_hash": "c3f3bd3590e6c7f977f9cd2ef504e82f7acc072ae0552b642941fa7c2c52c17e"
+    },
+    {
+      "type_name": "ReviewRoundResultOutput",
+      "signal": "blue",
+      "entry_hash": "4f8a408781c32a78d065b0df60458fafc51155549ea8c0ae93faaf25797b9dd9"
+    },
+    {
+      "type_name": "ReviewRoundResultVerdict",
+      "signal": "blue",
+      "entry_hash": "0ecf57eca5909fe89e325b1115b1a6b477be9b22c9b23b898b7cdabf1d24f780"
+    },
+    {
+      "type_name": "ReviewRunLocalOutput",
+      "signal": "blue",
+      "entry_hash": "bb571fb730d85afe62d766b66582628b639c81474a7beeec2ebbe454efdd4859"
+    },
+    {
+      "type_name": "ReviewScopeName",
+      "signal": "blue",
+      "entry_hash": "6586ba58329416121f62ba4930904517571ecf76f2cffccf1a786271d64b8ced"
+    },
+    {
+      "type_name": "ReviewScopeNameValidationError",
+      "signal": "blue",
+      "entry_hash": "821dab81051b1f5132dffaca603de4931de7880399b2df24333dba21b7e0d95a"
+    },
+    {
+      "type_name": "ReviewScopeResultOutput",
+      "signal": "blue",
+      "entry_hash": "e36820508cdd497cfd7323d42ca78ae8c8bf517e95bb6f53a23139b82383a2c0"
+    },
+    {
+      "type_name": "ReviewScopeResultState",
+      "signal": "blue",
+      "entry_hash": "d276370d4d47833cc8d0b497ab3a39f4c981d0bab27914a498435305cd0445a0"
+    },
+    {
+      "type_name": "ReviewScopeSelectionRequest",
+      "signal": "blue",
+      "entry_hash": "749714a27a97e92787f715855482e4531a38cde1918fe37987ed16074c5aff31"
     },
     {
       "type_name": "ReviewScopeSelectionValidationError",
       "signal": "blue",
-      "entry_hash": "5355163152d493aacf07d8958f8c9bd45fb4bb112f991e29367f6c0fd99ecf9e"
+      "entry_hash": "3c62bcf7f236bc6d682d258d834c1fdf3ef70dd329361524980eb0ac03aa8cfc"
     },
     {
       "type_name": "ReviewScopeSelector",
@@ -278,9 +373,99 @@
       "entry_hash": "9867b51315ba84d48b11e322cc8844020fa5ec21ee3362711c9c2a4155d91e8e"
     },
     {
+      "type_name": "ReviewStoredRound",
+      "signal": "blue",
+      "entry_hash": "32e6f17ac5186b0a33c8f7ccf8c321ce21b14eced0e78f8c9fca9703a6e71424"
+    },
+    {
+      "type_name": "ReviewStoredRoundVerdict",
+      "signal": "blue",
+      "entry_hash": "20ed4ecef3733f903ebbba8a419f8da02bde8c9f07a40fde9d0314b12b1309a0"
+    },
+    {
+      "type_name": "ReviewStoredScopeState",
+      "signal": "blue",
+      "entry_hash": "6aa3b09fd6361f018fae6b05a1f9fdf38b00d3584afddf8b017ef6bf9fcef173"
+    },
+    {
+      "type_name": "ReviewStoredScopeStateEntry",
+      "signal": "blue",
+      "entry_hash": "aaea720a4f9b7a1572607108cf9c58cd1cedb3acfe0f5fc74c6c1dc13be9492c"
+    },
+    {
+      "type_name": "ReviewTrackId",
+      "signal": "blue",
+      "entry_hash": "d37646041e997217eb6bafb99b514494252ef61320e0eef3c38c8a64ee0afb86"
+    },
+    {
+      "type_name": "ReviewTrackIdValidationError",
+      "signal": "blue",
+      "entry_hash": "fe03471204d0f7103e877bc9d4220af695d58b355fecebca837fcc3c0b82e2ef"
+    },
+    {
       "type_name": "ReviewTrackSelector",
       "signal": "blue",
       "entry_hash": "313abe779b325a79a9e08a32868b5785af23b60274a452f581521c33e8c05f39"
+    },
+    {
+      "type_name": "ReviewerFindingOutput",
+      "signal": "blue",
+      "entry_hash": "d34ad60ef03b29f06459aeea458bb12d46eab3db2a90b863649257ac3a20a55a"
+    },
+    {
+      "type_name": "RunReviewFixCommand",
+      "signal": "blue",
+      "entry_hash": "9e9ad15345ab8b12beaa4d36866e4ef21f5824fbf6efa860970a7daa530aa7ac"
+    },
+    {
+      "type_name": "RunReviewFixCommandValidationError",
+      "signal": "blue",
+      "entry_hash": "55c2871c2786e52f08bcc89a7fa09cbddc3236cc9c58f88698977602c568279a"
+    },
+    {
+      "type_name": "RunReviewFixError",
+      "signal": "blue",
+      "entry_hash": "d707714b54ce05dcc9306eb43949d6a6d49032b733e7d645caf4e91b5bc67c7d"
+    },
+    {
+      "type_name": "RunReviewFixInteractor",
+      "signal": "blue",
+      "entry_hash": "6a1ad0357581b15c9939aa5de1e642603e96b5e89f2dada615e15269f5af5673"
+    },
+    {
+      "type_name": "RunReviewFixOutput",
+      "signal": "blue",
+      "entry_hash": "54416081a913fb0a67cac47c47e0c36dd797269b246024abc6c1009904197a99"
+    },
+    {
+      "type_name": "RunReviewFixRequest",
+      "signal": "blue",
+      "entry_hash": "f27778630bd20e74f64ff92415f750a0c8f7edb5a27eb423ffa52932b1ac9180"
+    },
+    {
+      "type_name": "SubagentBriefingContent",
+      "signal": "blue",
+      "entry_hash": "0c16610ee2af6679409c94325e56f89117fcf71e956c4581e711b71f05c2116b"
+    },
+    {
+      "type_name": "SubagentBriefingContentValidationError",
+      "signal": "blue",
+      "entry_hash": "d8e9baf30395cac43d5598139cf60baa4385f15eda163a7aa9382cf1da579992"
+    },
+    {
+      "type_name": "SubagentDispatchInstruction",
+      "signal": "blue",
+      "entry_hash": "fb70fbd7b1010bee13714bd5acd3f4e8752928c83682d54dc105fbd28518e48b"
+    },
+    {
+      "type_name": "SubagentName",
+      "signal": "blue",
+      "entry_hash": "159a3b7c1ffdb3662fb7356c1b930540c4706edd8ce5eb94e0d175c8ebf19238"
+    },
+    {
+      "type_name": "SubagentNameValidationError",
+      "signal": "blue",
+      "entry_hash": "be981a7fedf001c06bfdb4c624552398b0974fc4624f2350d6d8d0b8007b5359"
     },
     {
       "type_name": "SuccessfulProgramExecutionRecord",
@@ -338,6 +523,11 @@
       "entry_hash": "945ab4a1dde7228e33d3e16ddb627212de3179b20cc67731d92945e91e82a528"
     },
     {
+      "type_name": "ReviewCheckApprovedService",
+      "signal": "blue",
+      "entry_hash": "5fcd05f7730260d8435dad450ba1950be1e9e64895dcfee7533dc2186756f34e"
+    },
+    {
       "type_name": "ReviewCheckZeroFindingsService",
       "signal": "blue",
       "entry_hash": "57ea7e3e9b046ce0726bb8569fa0ebb408889abf4177db9212e32b330bde7f79"
@@ -348,9 +538,54 @@
       "entry_hash": "9bc48797051224999871b072189ed56e79a116e9e367f4a29b5f933250803101"
     },
     {
+      "type_name": "ReviewFixBriefingLoaderPort",
+      "signal": "blue",
+      "entry_hash": "a1194dbf3dd93297a3b90ad61cc36559fe4b63fe378a174f9b74d7650b41cc44"
+    },
+    {
+      "type_name": "ReviewFixRunner",
+      "signal": "blue",
+      "entry_hash": "1030beede158c5762b5129158153aa0c3ef19b78727ee75d0dd9222f0345b302"
+    },
+    {
+      "type_name": "ReviewFixTrackResolverPort",
+      "signal": "blue",
+      "entry_hash": "e23d0ec81a634f8bfdf5f121d80bea18c8c4c647ae30075b172d9e92fd8b9053"
+    },
+    {
+      "type_name": "ReviewResultsRoundPort",
+      "signal": "blue",
+      "entry_hash": "65f7195a2791481473e22a4b2d34752ae9720be1779075e27b1bb3d8f40f6392"
+    },
+    {
+      "type_name": "ReviewResultsScopePort",
+      "signal": "blue",
+      "entry_hash": "f16feaf442ce318f34db9055e0ac23e0c3b6e3cc3380b3c21c3f808ced227488"
+    },
+    {
+      "type_name": "ReviewResultsService",
+      "signal": "blue",
+      "entry_hash": "ace548f1c26f4d5c45257bd7809d9afd03107bff521129ffc334a289ce471185"
+    },
+    {
+      "type_name": "ReviewResultsStatePort",
+      "signal": "blue",
+      "entry_hash": "91cf5453503b463fa98350a28b822aafa07222662a4cbe5bea2b6c9888a6cc18"
+    },
+    {
+      "type_name": "ReviewRunLocalService",
+      "signal": "blue",
+      "entry_hash": "df42d1b2e75b19803e1f8aa6758f4c0c1725bc8e6606fd77ce849a25af3060a6"
+    },
+    {
       "type_name": "ReviewService",
       "signal": "blue",
-      "entry_hash": "96a7fa349b09a2b317342d701ae7c3418452eda4bc9cc700f55fede91947bb81"
+      "entry_hash": "4d96290ad026ebc5908bb83620cf4f52c3af06679df91a4a56711ac54481e612"
+    },
+    {
+      "type_name": "RunReviewFixService",
+      "signal": "blue",
+      "entry_hash": "2bbbf3f670302fb29508127d89f5b5b25a15f491795039c8bd88fe87afdd57d4"
     }
   ]
 }

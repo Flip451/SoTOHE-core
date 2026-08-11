@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-09T21:47:31Z",
-  "declaration_hash": "6fa42747316f61e889da9feaea6dbdffbfaa45e0ed3faff07763d0a8ab9e32b4",
-  "implementation_input_hash": "59ea3142ddb2b3a486ec7269a360a4b785b704801c5fa164721e879c56ee68f8",
+  "generated_at": "2026-08-11T11:42:55Z",
+  "declaration_hash": "c7441a30e99788704665f283637890129dd34fc0bc0934050e8a3465f4e22b1a",
+  "implementation_input_hash": "56d0ba8a855a1be13eb4705c27011175c5092344293b3199ef8a1a4b13450f19",
   "signals": [
     {
       "type_name": "CapabilityExecDriverInput",
@@ -79,17 +79,33 @@
       "found_type": true
     },
     {
+      "type_name": "ReviewFixDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ReviewFixInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug"
+      ]
+    },
+    {
       "type_name": "ReviewInput",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "ReviewResultsInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug"
       ]

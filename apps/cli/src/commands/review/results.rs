@@ -6,7 +6,7 @@
 
 use std::process::ExitCode;
 
-use cli_driver::review::ReviewInput;
+use cli_driver::review::{ReviewInput, ReviewResultsInput};
 
 use super::{ResultsArgs, ResultsLimit, RoundTypeFilter};
 
@@ -42,17 +42,20 @@ fn run_results(args: &ResultsArgs) -> Result<String, crate::CliError> {
         RoundTypeFilter::Any => "any".to_owned(),
     };
 
-    let input = ReviewInput::Results {
-        track_id: Some(track_id),
-        items_dir: args.items_dir.clone(),
-        scope: args.scope.clone(),
-        all: args.all,
+    let input = ReviewResultsInput::try_new(
+        Some(track_id),
+        args.items_dir.clone(),
+        args.scope.clone(),
+        args.all,
         limit,
         round_type,
-        no_hint: args.no_hint,
-    };
+        args.no_hint,
+    )
+    .map_err(|error| crate::CliError::Message(error.to_string()))?;
 
-    let outcome = cli_composition::ReviewCompositionRoot::new().review_driver().handle(input);
+    let outcome = cli_composition::ReviewCompositionRoot::new()
+        .review_driver()
+        .handle(ReviewInput::Results(input));
     if outcome.exit_code != 0 {
         return Err(crate::CliError::Message(
             outcome.stderr.unwrap_or_else(|| "review results failed".to_owned()),

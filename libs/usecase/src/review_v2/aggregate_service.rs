@@ -68,19 +68,6 @@ pub trait ReviewService: Send + Sync {
         items_dir: PathBuf,
     ) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError>;
 
-    /// Render review results output.
-    #[allow(clippy::too_many_arguments)]
-    fn results(
-        &self,
-        track_id: Option<String>,
-        items_dir: PathBuf,
-        scope: Option<String>,
-        all: bool,
-        limit: u32,
-        round_type: String,
-        no_hint: bool,
-    ) -> Result<String, ReviewAuxError>;
-
     /// Classify each path string into its review scope(s).
     fn classify(
         &self,

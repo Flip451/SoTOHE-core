@@ -56,6 +56,7 @@ subgraph domain["domain"]
     T28_domain_domain_ScopeNameError_NotAscii[NotAscii]
     T28_domain_domain_ScopeNameError_Reserved[Reserved]
   end
+  F70_domain_domain_domain__review_v2__types__derive_review_approval_verdict[[derive_review_approval_verdict]]
   end
   subgraph domain_domain_module_task_contract["domain::task_contract"]
     direction TB
@@ -479,6 +480,14 @@ subgraph usecase["usecase"]
   end
   subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
     direction TB
+  subgraph T46_usecase_usecase_NonEmptyReviewerFindingsOutput["review_v2::review_aux::NonEmptyReviewerFindingsOutput"]
+    direction TB
+    T46_usecase_usecase_NonEmptyReviewerFindingsOutput__self[NonEmptyReviewerFindingsOutput]
+    T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new([try_new])
+    T46_usecase_usecase_NonEmptyReviewerFindingsOutput_as_slice([as_slice])
+    T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new([try_new])
+    T46_usecase_usecase_NonEmptyReviewerFindingsOutput_as_slice([as_slice])
+  end
   subgraph T54_usecase_usecase_ReviewCheckZeroFindingsEvaluationError["review_v2::check_zero_findings::ReviewCheckZeroFindingsEvaluationError"]
     direction TB
     T54_usecase_usecase_ReviewCheckZeroFindingsEvaluationError__self[ReviewCheckZeroFindingsEvaluationError]
@@ -487,6 +496,7 @@ subgraph usecase["usecase"]
   subgraph T49_usecase_usecase_ReviewCheckZeroFindingsInteractor["review_v2::check_zero_findings::ReviewCheckZeroFindingsInteractor"]
     direction TB
     T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self[ReviewCheckZeroFindingsInteractor]
+    T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new([new])
     T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new([new])
   end
   subgraph T46_usecase_usecase_ReviewCheckZeroFindingsOutcome["review_v2::check_zero_findings::ReviewCheckZeroFindingsOutcome"]
@@ -508,18 +518,250 @@ subgraph usecase["usecase"]
     T54_usecase_usecase_ReviewCheckZeroFindingsValidationError_InvalidTrackId[InvalidTrackId]
     T54_usecase_usecase_ReviewCheckZeroFindingsValidationError_InvalidScope[InvalidScope]
   end
-  subgraph T36_usecase_usecase_ReviewScopeSelection["review_v2::review_aux::ReviewScopeSelection"]
+  subgraph T51_usecase_usecase_ReviewFindingsOutputValidationError["review_v2::review_aux::ReviewFindingsOutputValidationError"]
     direction TB
-    T36_usecase_usecase_ReviewScopeSelection__self[ReviewScopeSelection]
-    T36_usecase_usecase_ReviewScopeSelection_Named[Named]
-    T36_usecase_usecase_ReviewScopeSelection_All[All]
-    T36_usecase_usecase_ReviewScopeSelection_try_new([try_new])
+    T51_usecase_usecase_ReviewFindingsOutputValidationError__self[ReviewFindingsOutputValidationError]
+    T51_usecase_usecase_ReviewFindingsOutputValidationError_Empty[Empty]
+  end
+  subgraph T42_usecase_usecase_ReviewFixBriefingLoadError["review_v2::run_review_fix::ReviewFixBriefingLoadError"]
+    direction TB
+    T42_usecase_usecase_ReviewFixBriefingLoadError__self[ReviewFixBriefingLoadError]
+    T42_usecase_usecase_ReviewFixBriefingLoadError_UntrustedFile[UntrustedFile]
+    T42_usecase_usecase_ReviewFixBriefingLoadError_ReadFailed[ReadFailed]
+    T42_usecase_usecase_ReviewFixBriefingLoadError_InvalidContent[InvalidContent]
+  end
+  subgraph T35_usecase_usecase_ReviewFixResolution["review_v2::run_review_fix::ReviewFixResolution"]
+    direction TB
+    T35_usecase_usecase_ReviewFixResolution__self[ReviewFixResolution]
+    T35_usecase_usecase_ReviewFixResolution_new([new])
+    T35_usecase_usecase_ReviewFixResolution_track_id([track_id])
+    T35_usecase_usecase_ReviewFixResolution_repository_root([repository_root])
+    T35_usecase_usecase_ReviewFixResolution_new([new])
+    T35_usecase_usecase_ReviewFixResolution_track_id([track_id])
+    T35_usecase_usecase_ReviewFixResolution_repository_root([repository_root])
+  end
+  subgraph T36_usecase_usecase_ReviewFixRunnerError["review_v2::run_review_fix::ReviewFixRunnerError"]
+    direction TB
+    T36_usecase_usecase_ReviewFixRunnerError__self[ReviewFixRunnerError]
+    T36_usecase_usecase_ReviewFixRunnerError_SmokeTestFailed[SmokeTestFailed]
+    T36_usecase_usecase_ReviewFixRunnerError_SpawnFailed[SpawnFailed]
+    T36_usecase_usecase_ReviewFixRunnerError_SentinelNotFound[SentinelNotFound]
+    T36_usecase_usecase_ReviewFixRunnerError_SubagentDispatchRequired[SubagentDispatchRequired]
+    T36_usecase_usecase_ReviewFixRunnerError_Unexpected[Unexpected]
+  end
+  subgraph T42_usecase_usecase_ReviewFixTrackResolveError["review_v2::run_review_fix::ReviewFixTrackResolveError"]
+    direction TB
+    T42_usecase_usecase_ReviewFixTrackResolveError__self[ReviewFixTrackResolveError]
+    T42_usecase_usecase_ReviewFixTrackResolveError_BranchReadFailed[BranchReadFailed]
+    T42_usecase_usecase_ReviewFixTrackResolveError_NonTrackBranch[NonTrackBranch]
+  end
+  subgraph T39_usecase_usecase_ReviewNotRequiredReason["review_v2::review_aux::ReviewNotRequiredReason"]
+    direction TB
+    T39_usecase_usecase_ReviewNotRequiredReason__self[ReviewNotRequiredReason]
+    T39_usecase_usecase_ReviewNotRequiredReason_Empty[Empty]
+    T39_usecase_usecase_ReviewNotRequiredReason_ZeroFindings[ZeroFindings]
+  end
+  subgraph T36_usecase_usecase_ReviewRequiredReason["review_v2::review_aux::ReviewRequiredReason"]
+    direction TB
+    T36_usecase_usecase_ReviewRequiredReason__self[ReviewRequiredReason]
+    T36_usecase_usecase_ReviewRequiredReason_NotStarted[NotStarted]
+    T36_usecase_usecase_ReviewRequiredReason_FindingsRemain[FindingsRemain]
+    T36_usecase_usecase_ReviewRequiredReason_StaleHash[StaleHash]
+  end
+  subgraph T34_usecase_usecase_ReviewResultsError["review_v2::review_aux::ReviewResultsError"]
+    direction TB
+    T34_usecase_usecase_ReviewResultsError__self[ReviewResultsError]
+    T34_usecase_usecase_ReviewResultsError_Failed[Failed]
+    T34_usecase_usecase_ReviewResultsError_UnknownScope[UnknownScope]
+    T34_usecase_usecase_ReviewResultsError_MissingScopeState[MissingScopeState]
+  end
+  subgraph T39_usecase_usecase_ReviewResultsInteractor["review_v2::review_aux::ReviewResultsInteractor"]
+    direction TB
+    T39_usecase_usecase_ReviewResultsInteractor__self[ReviewResultsInteractor]
+    T39_usecase_usecase_ReviewResultsInteractor_new([new])
+    T39_usecase_usecase_ReviewResultsInteractor_new([new])
+  end
+  subgraph T35_usecase_usecase_ReviewResultsOutput["review_v2::review_aux::ReviewResultsOutput"]
+    direction TB
+    T35_usecase_usecase_ReviewResultsOutput__self[ReviewResultsOutput]
+  end
+  subgraph T42_usecase_usecase_ReviewResultsScopeSnapshot["review_v2::review_aux::ReviewResultsScopeSnapshot"]
+    direction TB
+    T42_usecase_usecase_ReviewResultsScopeSnapshot__self[ReviewResultsScopeSnapshot]
+  end
+  subgraph T39_usecase_usecase_ReviewRoundResultOutput["review_v2::review_aux::ReviewRoundResultOutput"]
+    direction TB
+    T39_usecase_usecase_ReviewRoundResultOutput__self[ReviewRoundResultOutput]
+  end
+  subgraph T40_usecase_usecase_ReviewRoundResultVerdict["review_v2::review_aux::ReviewRoundResultVerdict"]
+    direction TB
+    T40_usecase_usecase_ReviewRoundResultVerdict__self[ReviewRoundResultVerdict]
+    T40_usecase_usecase_ReviewRoundResultVerdict_ZeroFindings[ZeroFindings]
+    T40_usecase_usecase_ReviewRoundResultVerdict_FindingsRemain[FindingsRemain]
+  end
+  subgraph T36_usecase_usecase_ReviewRunLocalOutput["review_v2::review_aux::ReviewRunLocalOutput"]
+    direction TB
+    T36_usecase_usecase_ReviewRunLocalOutput__self[ReviewRunLocalOutput]
+  end
+  subgraph T31_usecase_usecase_ReviewScopeName["review_v2::review_aux::ReviewScopeName"]
+    direction TB
+    T31_usecase_usecase_ReviewScopeName__self[ReviewScopeName]
+    T31_usecase_usecase_ReviewScopeName_try_new([try_new])
+    T31_usecase_usecase_ReviewScopeName_other([other])
+    T31_usecase_usecase_ReviewScopeName_as_str([as_str])
+    T31_usecase_usecase_ReviewScopeName_try_new([try_new])
+    T31_usecase_usecase_ReviewScopeName_other([other])
+    T31_usecase_usecase_ReviewScopeName_as_str([as_str])
+  end
+  subgraph T46_usecase_usecase_ReviewScopeNameValidationError["review_v2::review_aux::ReviewScopeNameValidationError"]
+    direction TB
+    T46_usecase_usecase_ReviewScopeNameValidationError__self[ReviewScopeNameValidationError]
+    T46_usecase_usecase_ReviewScopeNameValidationError_Invalid[Invalid]
+  end
+  subgraph T39_usecase_usecase_ReviewScopeResultOutput["review_v2::review_aux::ReviewScopeResultOutput"]
+    direction TB
+    T39_usecase_usecase_ReviewScopeResultOutput__self[ReviewScopeResultOutput]
+  end
+  subgraph T38_usecase_usecase_ReviewScopeResultState["review_v2::review_aux::ReviewScopeResultState"]
+    direction TB
+    T38_usecase_usecase_ReviewScopeResultState__self[ReviewScopeResultState]
+    T38_usecase_usecase_ReviewScopeResultState_RequiredNotStarted[RequiredNotStarted]
+    T38_usecase_usecase_ReviewScopeResultState_RequiredFindingsRemain[RequiredFindingsRemain]
+    T38_usecase_usecase_ReviewScopeResultState_RequiredStaleHash[RequiredStaleHash]
+    T38_usecase_usecase_ReviewScopeResultState_Empty[Empty]
+    T38_usecase_usecase_ReviewScopeResultState_Approved[Approved]
+  end
+  subgraph T43_usecase_usecase_ReviewScopeSelectionRequest["review_v2::review_aux::ReviewScopeSelectionRequest"]
+    direction TB
+    T43_usecase_usecase_ReviewScopeSelectionRequest__self[ReviewScopeSelectionRequest]
+    T43_usecase_usecase_ReviewScopeSelectionRequest_NamedCandidate[NamedCandidate]
+    T43_usecase_usecase_ReviewScopeSelectionRequest_All[All]
+    T43_usecase_usecase_ReviewScopeSelectionRequest_try_new([try_new])
+    T43_usecase_usecase_ReviewScopeSelectionRequest_try_new([try_new])
   end
   subgraph T51_usecase_usecase_ReviewScopeSelectionValidationError["review_v2::review_aux::ReviewScopeSelectionValidationError"]
     direction TB
     T51_usecase_usecase_ReviewScopeSelectionValidationError__self[ReviewScopeSelectionValidationError]
     T51_usecase_usecase_ReviewScopeSelectionValidationError_ScopeAndAll[ScopeAndAll]
     T51_usecase_usecase_ReviewScopeSelectionValidationError_InvalidScope[InvalidScope]
+  end
+  subgraph T33_usecase_usecase_ReviewStoredRound["review_v2::review_aux::ReviewStoredRound"]
+    direction TB
+    T33_usecase_usecase_ReviewStoredRound__self[ReviewStoredRound]
+  end
+  subgraph T40_usecase_usecase_ReviewStoredRoundVerdict["review_v2::review_aux::ReviewStoredRoundVerdict"]
+    direction TB
+    T40_usecase_usecase_ReviewStoredRoundVerdict__self[ReviewStoredRoundVerdict]
+  end
+  subgraph T38_usecase_usecase_ReviewStoredScopeState["review_v2::review_aux::ReviewStoredScopeState"]
+    direction TB
+    T38_usecase_usecase_ReviewStoredScopeState__self[ReviewStoredScopeState]
+    T38_usecase_usecase_ReviewStoredScopeState_Required[Required]
+    T38_usecase_usecase_ReviewStoredScopeState_NotRequired[NotRequired]
+  end
+  subgraph T43_usecase_usecase_ReviewStoredScopeStateEntry["review_v2::review_aux::ReviewStoredScopeStateEntry"]
+    direction TB
+    T43_usecase_usecase_ReviewStoredScopeStateEntry__self[ReviewStoredScopeStateEntry]
+  end
+  subgraph T29_usecase_usecase_ReviewTrackId["review_v2::run_review_fix::ReviewTrackId"]
+    direction TB
+    T29_usecase_usecase_ReviewTrackId__self[ReviewTrackId]
+    T29_usecase_usecase_ReviewTrackId_try_new([try_new])
+    T29_usecase_usecase_ReviewTrackId_as_str([as_str])
+    T29_usecase_usecase_ReviewTrackId_try_new([try_new])
+    T29_usecase_usecase_ReviewTrackId_as_str([as_str])
+  end
+  subgraph T44_usecase_usecase_ReviewTrackIdValidationError["review_v2::run_review_fix::ReviewTrackIdValidationError"]
+    direction TB
+    T44_usecase_usecase_ReviewTrackIdValidationError__self[ReviewTrackIdValidationError]
+    T44_usecase_usecase_ReviewTrackIdValidationError_Invalid[Invalid]
+  end
+  subgraph T37_usecase_usecase_ReviewerFindingOutput["review_v2::review_aux::ReviewerFindingOutput"]
+    direction TB
+    T37_usecase_usecase_ReviewerFindingOutput__self[ReviewerFindingOutput]
+  end
+  subgraph T35_usecase_usecase_RunReviewFixCommand["review_v2::run_review_fix::RunReviewFixCommand"]
+    direction TB
+    T35_usecase_usecase_RunReviewFixCommand__self[RunReviewFixCommand]
+    T35_usecase_usecase_RunReviewFixCommand_new_resolved([new_resolved])
+    T35_usecase_usecase_RunReviewFixCommand_scope([scope])
+    T35_usecase_usecase_RunReviewFixCommand_briefing_content([briefing_content])
+    T35_usecase_usecase_RunReviewFixCommand_track_id([track_id])
+    T35_usecase_usecase_RunReviewFixCommand_repository_root([repository_root])
+    T35_usecase_usecase_RunReviewFixCommand_round_type([round_type])
+    T35_usecase_usecase_RunReviewFixCommand_model([model])
+    T35_usecase_usecase_RunReviewFixCommand_new_resolved([new_resolved])
+    T35_usecase_usecase_RunReviewFixCommand_scope([scope])
+    T35_usecase_usecase_RunReviewFixCommand_briefing_content([briefing_content])
+    T35_usecase_usecase_RunReviewFixCommand_track_id([track_id])
+    T35_usecase_usecase_RunReviewFixCommand_repository_root([repository_root])
+    T35_usecase_usecase_RunReviewFixCommand_round_type([round_type])
+    T35_usecase_usecase_RunReviewFixCommand_model([model])
+  end
+  subgraph T50_usecase_usecase_RunReviewFixCommandValidationError["review_v2::run_review_fix::RunReviewFixCommandValidationError"]
+    direction TB
+    T50_usecase_usecase_RunReviewFixCommandValidationError__self[RunReviewFixCommandValidationError]
+    T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidScope[InvalidScope]
+    T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidTrackId[InvalidTrackId]
+    T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidRoundType[InvalidRoundType]
+    T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidModel[InvalidModel]
+  end
+  subgraph T33_usecase_usecase_RunReviewFixError["review_v2::run_review_fix::RunReviewFixError"]
+    direction TB
+    T33_usecase_usecase_RunReviewFixError__self[RunReviewFixError]
+    T33_usecase_usecase_RunReviewFixError_FixRunnerFailed[FixRunnerFailed]
+    T33_usecase_usecase_RunReviewFixError_TrackResolution[TrackResolution]
+    T33_usecase_usecase_RunReviewFixError_BriefingLoad[BriefingLoad]
+    T33_usecase_usecase_RunReviewFixError_TrackMismatch[TrackMismatch]
+  end
+  subgraph T38_usecase_usecase_RunReviewFixInteractor["review_v2::run_review_fix::RunReviewFixInteractor"]
+    direction TB
+    T38_usecase_usecase_RunReviewFixInteractor__self[RunReviewFixInteractor]
+    T38_usecase_usecase_RunReviewFixInteractor_new([new])
+    T38_usecase_usecase_RunReviewFixInteractor_new([new])
+  end
+  subgraph T34_usecase_usecase_RunReviewFixOutput["review_v2::run_review_fix::RunReviewFixOutput"]
+    direction TB
+    T34_usecase_usecase_RunReviewFixOutput__self[RunReviewFixOutput]
+  end
+  subgraph T35_usecase_usecase_RunReviewFixRequest["review_v2::run_review_fix::RunReviewFixRequest"]
+    direction TB
+    T35_usecase_usecase_RunReviewFixRequest__self[RunReviewFixRequest]
+    T35_usecase_usecase_RunReviewFixRequest_try_new([try_new])
+    T35_usecase_usecase_RunReviewFixRequest_try_new([try_new])
+  end
+  subgraph T39_usecase_usecase_SubagentBriefingContent["review_v2::run_review_fix::SubagentBriefingContent"]
+    direction TB
+    T39_usecase_usecase_SubagentBriefingContent__self[SubagentBriefingContent]
+    T39_usecase_usecase_SubagentBriefingContent_try_new([try_new])
+    T39_usecase_usecase_SubagentBriefingContent_as_str([as_str])
+  end
+  subgraph T54_usecase_usecase_SubagentBriefingContentValidationError["review_v2::run_review_fix::SubagentBriefingContentValidationError"]
+    direction TB
+    T54_usecase_usecase_SubagentBriefingContentValidationError__self[SubagentBriefingContentValidationError]
+    T54_usecase_usecase_SubagentBriefingContentValidationError_ExceedsMaximumBytes[ExceedsMaximumBytes]
+  end
+  subgraph T43_usecase_usecase_SubagentDispatchInstruction["review_v2::run_review_fix::SubagentDispatchInstruction"]
+    direction TB
+    T43_usecase_usecase_SubagentDispatchInstruction__self[SubagentDispatchInstruction]
+  end
+  subgraph T28_usecase_usecase_SubagentName["review_v2::run_review_fix::SubagentName"]
+    direction TB
+    T28_usecase_usecase_SubagentName__self[SubagentName]
+    T28_usecase_usecase_SubagentName_try_new([try_new])
+    T28_usecase_usecase_SubagentName_as_str([as_str])
+    T28_usecase_usecase_SubagentName_try_new([try_new])
+    T28_usecase_usecase_SubagentName_as_str([as_str])
+  end
+  subgraph T43_usecase_usecase_SubagentNameValidationError["review_v2::run_review_fix::SubagentNameValidationError"]
+    direction TB
+    T43_usecase_usecase_SubagentNameValidationError__self[SubagentNameValidationError]
+    T43_usecase_usecase_SubagentNameValidationError_Invalid[Invalid]
+  end
+  subgraph R42_usecase_usecase_ReviewCheckApprovedService["review_v2::check_approved::ReviewCheckApprovedService"]
+    direction TB
+    R42_usecase_usecase_ReviewCheckApprovedService__self[ReviewCheckApprovedService]
+    R42_usecase_usecase_ReviewCheckApprovedService_check_approved([check_approved])
   end
   subgraph R46_usecase_usecase_ReviewCheckZeroFindingsService["review_v2::check_zero_findings::ReviewCheckZeroFindingsService"]
     direction TB
@@ -531,6 +773,46 @@ subgraph usecase["usecase"]
     R48_usecase_usecase_ReviewCheckZeroFindingsStatePort__self[ReviewCheckZeroFindingsStatePort]
     R48_usecase_usecase_ReviewCheckZeroFindingsStatePort_state_for([state_for])
   end
+  subgraph R43_usecase_usecase_ReviewFixBriefingLoaderPort["review_v2::run_review_fix::ReviewFixBriefingLoaderPort"]
+    direction TB
+    R43_usecase_usecase_ReviewFixBriefingLoaderPort__self[ReviewFixBriefingLoaderPort]
+    R43_usecase_usecase_ReviewFixBriefingLoaderPort_load_briefing_content([load_briefing_content])
+  end
+  subgraph R31_usecase_usecase_ReviewFixRunner["review_v2::run_review_fix::ReviewFixRunner"]
+    direction TB
+    R31_usecase_usecase_ReviewFixRunner__self[ReviewFixRunner]
+    R31_usecase_usecase_ReviewFixRunner_run_fix([run_fix])
+  end
+  subgraph R42_usecase_usecase_ReviewFixTrackResolverPort["review_v2::run_review_fix::ReviewFixTrackResolverPort"]
+    direction TB
+    R42_usecase_usecase_ReviewFixTrackResolverPort__self[ReviewFixTrackResolverPort]
+    R42_usecase_usecase_ReviewFixTrackResolverPort_resolve_current_track([resolve_current_track])
+  end
+  subgraph R38_usecase_usecase_ReviewResultsRoundPort["review_v2::review_aux::ReviewResultsRoundPort"]
+    direction TB
+    R38_usecase_usecase_ReviewResultsRoundPort__self[ReviewResultsRoundPort]
+    R38_usecase_usecase_ReviewResultsRoundPort_load_scope_rounds([load_scope_rounds])
+  end
+  subgraph R38_usecase_usecase_ReviewResultsScopePort["review_v2::review_aux::ReviewResultsScopePort"]
+    direction TB
+    R38_usecase_usecase_ReviewResultsScopePort__self[ReviewResultsScopePort]
+    R38_usecase_usecase_ReviewResultsScopePort_load_scope_snapshot([load_scope_snapshot])
+  end
+  subgraph R36_usecase_usecase_ReviewResultsService["review_v2::review_aux::ReviewResultsService"]
+    direction TB
+    R36_usecase_usecase_ReviewResultsService__self[ReviewResultsService]
+    R36_usecase_usecase_ReviewResultsService_results([results])
+  end
+  subgraph R38_usecase_usecase_ReviewResultsStatePort["review_v2::review_aux::ReviewResultsStatePort"]
+    direction TB
+    R38_usecase_usecase_ReviewResultsStatePort__self[ReviewResultsStatePort]
+    R38_usecase_usecase_ReviewResultsStatePort_load_scope_states([load_scope_states])
+  end
+  subgraph R37_usecase_usecase_ReviewRunLocalService["review_v2::review_aux::ReviewRunLocalService"]
+    direction TB
+    R37_usecase_usecase_ReviewRunLocalService__self[ReviewRunLocalService]
+    R37_usecase_usecase_ReviewRunLocalService_run_local([run_local])
+  end
   subgraph R29_usecase_usecase_ReviewService["review_v2::aggregate_service::ReviewService"]
     direction TB
     R29_usecase_usecase_ReviewService__self[ReviewService]
@@ -538,12 +820,16 @@ subgraph usecase["usecase"]
     R29_usecase_usecase_ReviewService_run_claude([run_claude])
     R29_usecase_usecase_ReviewService_run_local([run_local])
     R29_usecase_usecase_ReviewService_check_approved([check_approved])
-    R29_usecase_usecase_ReviewService_results([results])
     R29_usecase_usecase_ReviewService_classify([classify])
     R29_usecase_usecase_ReviewService_files([files])
     R29_usecase_usecase_ReviewService_validate_scope([validate_scope])
     R29_usecase_usecase_ReviewService_get_briefing([get_briefing])
     R29_usecase_usecase_ReviewService_persist_commit_hash([persist_commit_hash])
+  end
+  subgraph R35_usecase_usecase_RunReviewFixService["review_v2::run_review_fix::RunReviewFixService"]
+    direction TB
+    R35_usecase_usecase_RunReviewFixService__self[RunReviewFixService]
+    R35_usecase_usecase_RunReviewFixService_run([run])
   end
   end
 end
@@ -631,9 +917,38 @@ subgraph infrastructure["infrastructure"]
   end
   subgraph infrastructure_infrastructure_module_review_v2["infrastructure::review_v2"]
     direction TB
+  subgraph T50_infrastructure_infrastructure_CodexReviewFixRunner["review_v2::review_fix_runner::CodexReviewFixRunner"]
+    direction TB
+    T50_infrastructure_infrastructure_CodexReviewFixRunner__self[CodexReviewFixRunner]
+    T50_infrastructure_infrastructure_CodexReviewFixRunner_new([new])
+  end
+  subgraph T55_infrastructure_infrastructure_GitReviewFixTrackResolver["review_v2::review_fix_track_resolver::GitReviewFixTrackResolver"]
+    direction TB
+    T55_infrastructure_infrastructure_GitReviewFixTrackResolver__self[GitReviewFixTrackResolver]
+  end
+  subgraph T49_infrastructure_infrastructure_ResultsRoundAdapter["review_v2::results::ResultsRoundAdapter"]
+    direction TB
+    T49_infrastructure_infrastructure_ResultsRoundAdapter__self[ResultsRoundAdapter]
+  end
+  subgraph T49_infrastructure_infrastructure_ResultsScopeAdapter["review_v2::results::ResultsScopeAdapter"]
+    direction TB
+    T49_infrastructure_infrastructure_ResultsScopeAdapter__self[ResultsScopeAdapter]
+  end
+  subgraph T49_infrastructure_infrastructure_ResultsStateAdapter["review_v2::results::ResultsStateAdapter"]
+    direction TB
+    T49_infrastructure_infrastructure_ResultsStateAdapter__self[ResultsStateAdapter]
+  end
   subgraph T65_infrastructure_infrastructure_ReviewCheckZeroFindingsStateAdapter["review_v2::check_zero_findings::ReviewCheckZeroFindingsStateAdapter"]
     direction TB
     T65_infrastructure_infrastructure_ReviewCheckZeroFindingsStateAdapter__self[ReviewCheckZeroFindingsStateAdapter]
+  end
+  subgraph T52_infrastructure_infrastructure_ReviewFixRunnerAdapter["review_v2::review_fix_runner::ReviewFixRunnerAdapter"]
+    direction TB
+    T52_infrastructure_infrastructure_ReviewFixRunnerAdapter__self[ReviewFixRunnerAdapter]
+  end
+  subgraph T60_infrastructure_infrastructure_TrustedReviewFixBriefingLoader["review_v2::review_fix_runner::TrustedReviewFixBriefingLoader"]
+    direction TB
+    T60_infrastructure_infrastructure_TrustedReviewFixBriefingLoader__self[TrustedReviewFixBriefingLoader]
   end
   end
   subgraph infrastructure_infrastructure_module_task_contract_codec["infrastructure::task_contract_codec"]
@@ -752,6 +1067,24 @@ subgraph cli_driver["cli_driver"]
     T34_cli_driver_cli_driver_ReviewDriver__self[ReviewDriver]
     T34_cli_driver_cli_driver_ReviewDriver_new([new])
     T34_cli_driver_cli_driver_ReviewDriver_handle([handle])
+    T34_cli_driver_cli_driver_ReviewDriver_new([new])
+    T34_cli_driver_cli_driver_ReviewDriver_handle([handle])
+  end
+  subgraph T37_cli_driver_cli_driver_ReviewFixDriver["review::ReviewFixDriver"]
+    direction TB
+    T37_cli_driver_cli_driver_ReviewFixDriver__self[ReviewFixDriver]
+    T37_cli_driver_cli_driver_ReviewFixDriver_new([new])
+    T37_cli_driver_cli_driver_ReviewFixDriver_handle([handle])
+    T37_cli_driver_cli_driver_ReviewFixDriver_new([new])
+    T37_cli_driver_cli_driver_ReviewFixDriver_handle([handle])
+  end
+  subgraph T36_cli_driver_cli_driver_ReviewFixInput["review::ReviewFixInput"]
+    direction TB
+    T36_cli_driver_cli_driver_ReviewFixInput__self[ReviewFixInput]
+    T36_cli_driver_cli_driver_ReviewFixInput_new([new])
+    T36_cli_driver_cli_driver_ReviewFixInput_into_parts([into_parts])
+    T36_cli_driver_cli_driver_ReviewFixInput_new([new])
+    T36_cli_driver_cli_driver_ReviewFixInput_into_parts([into_parts])
   end
   subgraph T33_cli_driver_cli_driver_ReviewInput["review::ReviewInput"]
     direction TB
@@ -771,6 +1104,8 @@ subgraph cli_driver["cli_driver"]
   subgraph T40_cli_driver_cli_driver_ReviewResultsInput["review::ReviewResultsInput"]
     direction TB
     T40_cli_driver_cli_driver_ReviewResultsInput__self[ReviewResultsInput]
+    T40_cli_driver_cli_driver_ReviewResultsInput_try_new([try_new])
+    T40_cli_driver_cli_driver_ReviewResultsInput_into_parts([into_parts])
     T40_cli_driver_cli_driver_ReviewResultsInput_try_new([try_new])
     T40_cli_driver_cli_driver_ReviewResultsInput_into_parts([into_parts])
   end
@@ -803,6 +1138,19 @@ subgraph cli_composition["cli_composition"]
     T56_cli_composition_cli_composition_RefVerifyCompositionRoot__self[RefVerifyCompositionRoot]
     T56_cli_composition_cli_composition_RefVerifyCompositionRoot_new([new])
     T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_driver([ref_verify_driver])
+  end
+  end
+  subgraph cli_composition_cli_composition_module_review_v2["cli_composition::review_v2"]
+    direction TB
+  subgraph T53_cli_composition_cli_composition_ReviewCompositionRoot["review_v2::shim::ReviewCompositionRoot"]
+    direction TB
+    T53_cli_composition_cli_composition_ReviewCompositionRoot__self[ReviewCompositionRoot]
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_new([new])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver([review_driver])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_fix_driver([review_fix_driver])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_new([new])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver([review_driver])
+    T53_cli_composition_cli_composition_ReviewCompositionRoot_review_fix_driver([review_fix_driver])
   end
   end
 end
@@ -1066,27 +1414,158 @@ R33_usecase_usecase_ProgramRunnerPort_run --> T33_usecase_usecase_ProgramRunOutc
 R33_usecase_usecase_ProgramRunnerPort_run --> T34_usecase_usecase_ProgramRunnerError__self
 R41_usecase_usecase_RefVerifyAggregateService_results --o T36_usecase_usecase_RefVerifyChainFilter__self
 R51_usecase_usecase_RefVerifyCheckApprovedDriverService_check_approved --o T36_usecase_usecase_RefVerifyChainFilter__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new --o T37_usecase_usecase_ReviewerFindingOutput__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new --> T51_usecase_usecase_ReviewFindingsOutputValidationError__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new --> T46_usecase_usecase_NonEmptyReviewerFindingsOutput__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_as_slice --> T37_usecase_usecase_ReviewerFindingOutput__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new --o T37_usecase_usecase_ReviewerFindingOutput__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new --> T51_usecase_usecase_ReviewFindingsOutputValidationError__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new --> T46_usecase_usecase_NonEmptyReviewerFindingsOutput__self
+T46_usecase_usecase_NonEmptyReviewerFindingsOutput_as_slice --> T37_usecase_usecase_ReviewerFindingOutput__self
 T54_usecase_usecase_ReviewCheckZeroFindingsEvaluationError_EvaluationFailed --o T30_usecase_usecase_DiagnosticText__self
+T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new --o R48_usecase_usecase_ReviewCheckZeroFindingsStatePort__self
+T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new --> T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self
 T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new --o R48_usecase_usecase_ReviewCheckZeroFindingsStatePort__self
 T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new --> T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self
 T44_usecase_usecase_ReviewCheckZeroFindingsQuery_try_new --> T54_usecase_usecase_ReviewCheckZeroFindingsValidationError__self
 T44_usecase_usecase_ReviewCheckZeroFindingsQuery_try_new --> T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self
 T54_usecase_usecase_ReviewCheckZeroFindingsValidationError_InvalidTrackId --o T30_usecase_usecase_DiagnosticText__self
 T54_usecase_usecase_ReviewCheckZeroFindingsValidationError_InvalidScope --o T30_usecase_usecase_DiagnosticText__self
-T36_usecase_usecase_ReviewScopeSelection_Named --o T23_domain_domain_ScopeName__self
-T36_usecase_usecase_ReviewScopeSelection_try_new --> T51_usecase_usecase_ReviewScopeSelectionValidationError__self
-T36_usecase_usecase_ReviewScopeSelection_try_new --> T36_usecase_usecase_ReviewScopeSelection__self
+T42_usecase_usecase_ReviewFixBriefingLoadError_UntrustedFile --o T30_usecase_usecase_DiagnosticText__self
+T42_usecase_usecase_ReviewFixBriefingLoadError_ReadFailed --o T30_usecase_usecase_DiagnosticText__self
+T42_usecase_usecase_ReviewFixBriefingLoadError_InvalidContent --o T54_usecase_usecase_SubagentBriefingContentValidationError__self
+T35_usecase_usecase_ReviewFixResolution_new --o T29_usecase_usecase_ReviewTrackId__self
+T35_usecase_usecase_ReviewFixResolution_new --> T35_usecase_usecase_ReviewFixResolution__self
+T35_usecase_usecase_ReviewFixResolution_track_id --> T29_usecase_usecase_ReviewTrackId__self
+T35_usecase_usecase_ReviewFixResolution_new --o T29_usecase_usecase_ReviewTrackId__self
+T35_usecase_usecase_ReviewFixResolution_new --> T35_usecase_usecase_ReviewFixResolution__self
+T35_usecase_usecase_ReviewFixResolution_track_id --> T29_usecase_usecase_ReviewTrackId__self
+T36_usecase_usecase_ReviewFixRunnerError_SmokeTestFailed --o T30_usecase_usecase_DiagnosticText__self
+T36_usecase_usecase_ReviewFixRunnerError_SpawnFailed --o T30_usecase_usecase_DiagnosticText__self
+T36_usecase_usecase_ReviewFixRunnerError_SentinelNotFound --o T30_usecase_usecase_DiagnosticText__self
+T36_usecase_usecase_ReviewFixRunnerError_SubagentDispatchRequired --o T43_usecase_usecase_SubagentDispatchInstruction__self
+T36_usecase_usecase_ReviewFixRunnerError_Unexpected --o T30_usecase_usecase_DiagnosticText__self
+T42_usecase_usecase_ReviewFixTrackResolveError_BranchReadFailed --o T30_usecase_usecase_DiagnosticText__self
+T42_usecase_usecase_ReviewFixTrackResolveError_NonTrackBranch --o T30_usecase_usecase_DiagnosticText__self
+T34_usecase_usecase_ReviewResultsError_Failed --o T30_usecase_usecase_DiagnosticText__self
+T34_usecase_usecase_ReviewResultsError_UnknownScope --o T31_usecase_usecase_ReviewScopeName__self
+T34_usecase_usecase_ReviewResultsError_MissingScopeState --o T31_usecase_usecase_ReviewScopeName__self
+T39_usecase_usecase_ReviewResultsInteractor_new --o R38_usecase_usecase_ReviewResultsScopePort__self
+T39_usecase_usecase_ReviewResultsInteractor_new --o R38_usecase_usecase_ReviewResultsStatePort__self
+T39_usecase_usecase_ReviewResultsInteractor_new --o R38_usecase_usecase_ReviewResultsRoundPort__self
+T39_usecase_usecase_ReviewResultsInteractor_new --> T39_usecase_usecase_ReviewResultsInteractor__self
+T39_usecase_usecase_ReviewResultsInteractor_new --o R38_usecase_usecase_ReviewResultsScopePort__self
+T39_usecase_usecase_ReviewResultsInteractor_new --o R38_usecase_usecase_ReviewResultsStatePort__self
+T39_usecase_usecase_ReviewResultsInteractor_new --o R38_usecase_usecase_ReviewResultsRoundPort__self
+T39_usecase_usecase_ReviewResultsInteractor_new --> T39_usecase_usecase_ReviewResultsInteractor__self
+T35_usecase_usecase_ReviewResultsOutput__self --o|scopes| T39_usecase_usecase_ReviewScopeResultOutput__self
+T42_usecase_usecase_ReviewResultsScopeSnapshot__self --o|configured_scopes| T31_usecase_usecase_ReviewScopeName__self
+T39_usecase_usecase_ReviewRoundResultOutput__self --o|verdict| T40_usecase_usecase_ReviewRoundResultVerdict__self
+T40_usecase_usecase_ReviewRoundResultVerdict_FindingsRemain --o T46_usecase_usecase_NonEmptyReviewerFindingsOutput__self
+T36_usecase_usecase_ReviewRunLocalOutput__self --o|diagnostics| T30_usecase_usecase_DiagnosticText__self
+T31_usecase_usecase_ReviewScopeName_try_new --> T46_usecase_usecase_ReviewScopeNameValidationError__self
+T31_usecase_usecase_ReviewScopeName_try_new --> T31_usecase_usecase_ReviewScopeName__self
+T31_usecase_usecase_ReviewScopeName_other --> T31_usecase_usecase_ReviewScopeName__self
+T31_usecase_usecase_ReviewScopeName_try_new --> T46_usecase_usecase_ReviewScopeNameValidationError__self
+T31_usecase_usecase_ReviewScopeName_try_new --> T31_usecase_usecase_ReviewScopeName__self
+T31_usecase_usecase_ReviewScopeName_other --> T31_usecase_usecase_ReviewScopeName__self
+T46_usecase_usecase_ReviewScopeNameValidationError_Invalid --o T30_usecase_usecase_DiagnosticText__self
+T39_usecase_usecase_ReviewScopeResultOutput__self --o|scope| T31_usecase_usecase_ReviewScopeName__self
+T39_usecase_usecase_ReviewScopeResultOutput__self --o|state| T38_usecase_usecase_ReviewScopeResultState__self
+T39_usecase_usecase_ReviewScopeResultOutput__self --o|rounds| T39_usecase_usecase_ReviewRoundResultOutput__self
+T43_usecase_usecase_ReviewScopeSelectionRequest_NamedCandidate --o T31_usecase_usecase_ReviewScopeName__self
+T43_usecase_usecase_ReviewScopeSelectionRequest_try_new --> T51_usecase_usecase_ReviewScopeSelectionValidationError__self
+T43_usecase_usecase_ReviewScopeSelectionRequest_try_new --> T43_usecase_usecase_ReviewScopeSelectionRequest__self
+T43_usecase_usecase_ReviewScopeSelectionRequest_try_new --> T51_usecase_usecase_ReviewScopeSelectionValidationError__self
+T43_usecase_usecase_ReviewScopeSelectionRequest_try_new --> T43_usecase_usecase_ReviewScopeSelectionRequest__self
 T51_usecase_usecase_ReviewScopeSelectionValidationError_InvalidScope --o T30_usecase_usecase_DiagnosticText__self
+T33_usecase_usecase_ReviewStoredRound__self ---|alias_of| T39_usecase_usecase_ReviewRoundResultOutput__self
+T40_usecase_usecase_ReviewStoredRoundVerdict__self ---|alias_of| T40_usecase_usecase_ReviewRoundResultVerdict__self
+T38_usecase_usecase_ReviewStoredScopeState_Required --o T36_usecase_usecase_ReviewRequiredReason__self
+T38_usecase_usecase_ReviewStoredScopeState_NotRequired --o T39_usecase_usecase_ReviewNotRequiredReason__self
+T43_usecase_usecase_ReviewStoredScopeStateEntry__self --o|scope| T31_usecase_usecase_ReviewScopeName__self
+T43_usecase_usecase_ReviewStoredScopeStateEntry__self --o|state| T38_usecase_usecase_ReviewStoredScopeState__self
+T29_usecase_usecase_ReviewTrackId_try_new --> T44_usecase_usecase_ReviewTrackIdValidationError__self
+T29_usecase_usecase_ReviewTrackId_try_new --> T29_usecase_usecase_ReviewTrackId__self
+T29_usecase_usecase_ReviewTrackId_try_new --> T44_usecase_usecase_ReviewTrackIdValidationError__self
+T29_usecase_usecase_ReviewTrackId_try_new --> T29_usecase_usecase_ReviewTrackId__self
+T44_usecase_usecase_ReviewTrackIdValidationError_Invalid --o T30_usecase_usecase_DiagnosticText__self
+T37_usecase_usecase_ReviewerFindingOutput__self --o|message| T30_usecase_usecase_DiagnosticText__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --o T31_usecase_usecase_ReviewScopeName__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --o T39_usecase_usecase_SubagentBriefingContent__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --o T35_usecase_usecase_ReviewFixResolution__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --> T35_usecase_usecase_RunReviewFixCommand__self
+T35_usecase_usecase_RunReviewFixCommand_briefing_content --> T39_usecase_usecase_SubagentBriefingContent__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --o T31_usecase_usecase_ReviewScopeName__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --o T39_usecase_usecase_SubagentBriefingContent__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --o T35_usecase_usecase_ReviewFixResolution__self
+T35_usecase_usecase_RunReviewFixCommand_new_resolved --> T35_usecase_usecase_RunReviewFixCommand__self
+T35_usecase_usecase_RunReviewFixCommand_briefing_content --> T39_usecase_usecase_SubagentBriefingContent__self
+T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidScope --o T30_usecase_usecase_DiagnosticText__self
+T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidTrackId --o T30_usecase_usecase_DiagnosticText__self
+T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidRoundType --o T30_usecase_usecase_DiagnosticText__self
+T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidModel --o T30_usecase_usecase_DiagnosticText__self
+T33_usecase_usecase_RunReviewFixError_FixRunnerFailed --o T36_usecase_usecase_ReviewFixRunnerError__self
+T33_usecase_usecase_RunReviewFixError_TrackResolution --o T42_usecase_usecase_ReviewFixTrackResolveError__self
+T33_usecase_usecase_RunReviewFixError_BriefingLoad --o T42_usecase_usecase_ReviewFixBriefingLoadError__self
+T33_usecase_usecase_RunReviewFixError_TrackMismatch --o|explicit| T29_usecase_usecase_ReviewTrackId__self
+T33_usecase_usecase_RunReviewFixError_TrackMismatch --o|resolved| T29_usecase_usecase_ReviewTrackId__self
+T38_usecase_usecase_RunReviewFixInteractor_new --o R42_usecase_usecase_ReviewFixTrackResolverPort__self
+T38_usecase_usecase_RunReviewFixInteractor_new --o R43_usecase_usecase_ReviewFixBriefingLoaderPort__self
+T38_usecase_usecase_RunReviewFixInteractor_new --o R31_usecase_usecase_ReviewFixRunner__self
+T38_usecase_usecase_RunReviewFixInteractor_new --> T38_usecase_usecase_RunReviewFixInteractor__self
+T38_usecase_usecase_RunReviewFixInteractor_new --o R42_usecase_usecase_ReviewFixTrackResolverPort__self
+T38_usecase_usecase_RunReviewFixInteractor_new --o R43_usecase_usecase_ReviewFixBriefingLoaderPort__self
+T38_usecase_usecase_RunReviewFixInteractor_new --o R31_usecase_usecase_ReviewFixRunner__self
+T38_usecase_usecase_RunReviewFixInteractor_new --> T38_usecase_usecase_RunReviewFixInteractor__self
+T35_usecase_usecase_RunReviewFixRequest_try_new --> T50_usecase_usecase_RunReviewFixCommandValidationError__self
+T35_usecase_usecase_RunReviewFixRequest_try_new --> T35_usecase_usecase_RunReviewFixRequest__self
+T35_usecase_usecase_RunReviewFixRequest_try_new --> T50_usecase_usecase_RunReviewFixCommandValidationError__self
+T35_usecase_usecase_RunReviewFixRequest_try_new --> T35_usecase_usecase_RunReviewFixRequest__self
+T39_usecase_usecase_SubagentBriefingContent_try_new --> T39_usecase_usecase_SubagentBriefingContent__self
+T39_usecase_usecase_SubagentBriefingContent_try_new --> T54_usecase_usecase_SubagentBriefingContentValidationError__self
+T43_usecase_usecase_SubagentDispatchInstruction__self --o|agent| T28_usecase_usecase_SubagentName__self
+T43_usecase_usecase_SubagentDispatchInstruction__self --o|scope| T31_usecase_usecase_ReviewScopeName__self
+T43_usecase_usecase_SubagentDispatchInstruction__self --o|briefing_content| T39_usecase_usecase_SubagentBriefingContent__self
+T43_usecase_usecase_SubagentDispatchInstruction__self --o|track_id| T29_usecase_usecase_ReviewTrackId__self
+T28_usecase_usecase_SubagentName_try_new --> T28_usecase_usecase_SubagentName__self
+T28_usecase_usecase_SubagentName_try_new --> T43_usecase_usecase_SubagentNameValidationError__self
+T28_usecase_usecase_SubagentName_try_new --> T28_usecase_usecase_SubagentName__self
+T28_usecase_usecase_SubagentName_try_new --> T43_usecase_usecase_SubagentNameValidationError__self
+T43_usecase_usecase_SubagentNameValidationError_Invalid --o T30_usecase_usecase_DiagnosticText__self
 R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings --o T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self
 R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings --> T54_usecase_usecase_ReviewCheckZeroFindingsEvaluationError__self
 R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings --> T46_usecase_usecase_ReviewCheckZeroFindingsOutcome__self
 R48_usecase_usecase_ReviewCheckZeroFindingsStatePort_state_for --o T23_domain_domain_ScopeName__self
-R29_usecase_usecase_ReviewService_results --o T36_usecase_usecase_ReviewScopeSelection__self
+R43_usecase_usecase_ReviewFixBriefingLoaderPort_load_briefing_content --> T42_usecase_usecase_ReviewFixBriefingLoadError__self
+R43_usecase_usecase_ReviewFixBriefingLoaderPort_load_briefing_content --> T39_usecase_usecase_SubagentBriefingContent__self
+R31_usecase_usecase_ReviewFixRunner_run_fix --o T35_usecase_usecase_RunReviewFixCommand__self
+R31_usecase_usecase_ReviewFixRunner_run_fix --> T36_usecase_usecase_ReviewFixRunnerError__self
+R31_usecase_usecase_ReviewFixRunner_run_fix --> T34_usecase_usecase_RunReviewFixOutput__self
+R42_usecase_usecase_ReviewFixTrackResolverPort_resolve_current_track --> T35_usecase_usecase_ReviewFixResolution__self
+R42_usecase_usecase_ReviewFixTrackResolverPort_resolve_current_track --> T42_usecase_usecase_ReviewFixTrackResolveError__self
+R38_usecase_usecase_ReviewResultsRoundPort_load_scope_rounds --o T31_usecase_usecase_ReviewScopeName__self
+R38_usecase_usecase_ReviewResultsRoundPort_load_scope_rounds --> T34_usecase_usecase_ReviewResultsError__self
+R38_usecase_usecase_ReviewResultsRoundPort_load_scope_rounds --> T33_usecase_usecase_ReviewStoredRound__self
+R38_usecase_usecase_ReviewResultsScopePort_load_scope_snapshot --> T34_usecase_usecase_ReviewResultsError__self
+R38_usecase_usecase_ReviewResultsScopePort_load_scope_snapshot --> T42_usecase_usecase_ReviewResultsScopeSnapshot__self
+R36_usecase_usecase_ReviewResultsService_results --o T43_usecase_usecase_ReviewScopeSelectionRequest__self
+R36_usecase_usecase_ReviewResultsService_results --> T34_usecase_usecase_ReviewResultsError__self
+R36_usecase_usecase_ReviewResultsService_results --> T35_usecase_usecase_ReviewResultsOutput__self
+R38_usecase_usecase_ReviewResultsStatePort_load_scope_states --> T34_usecase_usecase_ReviewResultsError__self
+R38_usecase_usecase_ReviewResultsStatePort_load_scope_states --> T43_usecase_usecase_ReviewStoredScopeStateEntry__self
+R37_usecase_usecase_ReviewRunLocalService_run_local --> T36_usecase_usecase_ReviewRunLocalOutput__self
+R29_usecase_usecase_ReviewService_run_local --> T36_usecase_usecase_ReviewRunLocalOutput__self
+R35_usecase_usecase_RunReviewFixService_run --o T35_usecase_usecase_RunReviewFixRequest__self
+R35_usecase_usecase_RunReviewFixService_run --> T33_usecase_usecase_RunReviewFixError__self
+R35_usecase_usecase_RunReviewFixService_run --> T34_usecase_usecase_RunReviewFixOutput__self
 T40_usecase_usecase_CapabilityExecInteractor__self -.impl.-> R37_usecase_usecase_CapabilityExecService__self
 T38_usecase_usecase_PhaseCommandInteractor__self -.impl.-> R35_usecase_usecase_PhaseCommandService__self
 T50_usecase_usecase_PreReviewCommandDispatchInteractor__self -.impl.-> R47_usecase_usecase_PreReviewCommandDispatchService__self
 T53_usecase_usecase_PreReviewCommandGatedReviewInteractor__self -.impl.-> R29_usecase_usecase_ReviewService__self
 T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self -.impl.-> R46_usecase_usecase_ReviewCheckZeroFindingsService__self
+T39_usecase_usecase_ReviewResultsInteractor__self -.impl.-> R36_usecase_usecase_ReviewResultsService__self
+T38_usecase_usecase_RunReviewFixInteractor__self -.impl.-> R35_usecase_usecase_RunReviewFixService__self
 T44_infrastructure_infrastructure_CommandArgvDto__self --o|arguments| T48_infrastructure_infrastructure_CommandArgumentDto__self
 T50_infrastructure_infrastructure_ConfiguredCommandDto__self --o|argv| T44_infrastructure_infrastructure_CommandArgvDto__self
 T50_infrastructure_infrastructure_ConfiguredCommandDto__self --o|timeout_seconds| T54_infrastructure_infrastructure_CommandTimeoutSecondsDto__self
@@ -1110,6 +1589,7 @@ F103_infrastructure_infrastructure_infrastructure__operator_command_config__deco
 F103_infrastructure_infrastructure_infrastructure__operator_command_config__decode_pre_review_command_config --> T38_usecase_usecase_PreReviewCommandConfig__self
 T50_infrastructure_infrastructure_ProcessProgramRunner_new --> T50_infrastructure_infrastructure_ProcessProgramRunner__self
 T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new --> T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self
+T50_infrastructure_infrastructure_CodexReviewFixRunner_new --> T50_infrastructure_infrastructure_CodexReviewFixRunner__self
 T51_infrastructure_infrastructure_ContractedEntryRefDto__self --o|layer| T40_infrastructure_infrastructure_LayerIdDto__self
 T51_infrastructure_infrastructure_ContractedEntryRefDto__self --o|entry_key| T41_infrastructure_infrastructure_EntryKeyDto__self
 T53_infrastructure_infrastructure_TaskContractDocumentDto__self --o|schema_version| T58_infrastructure_infrastructure_TaskContractSchemaVersionDto__self
@@ -1123,6 +1603,13 @@ T59_infrastructure_infrastructure_GitCurrentReviewTrackResolver__self -.impl.-> 
 T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self -.impl.-> R41_usecase_usecase_RefVerifyAggregateService__self
 T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self -.impl.-> R51_usecase_usecase_RefVerifyCheckApprovedDriverService__self
 T65_infrastructure_infrastructure_ReviewCheckZeroFindingsStateAdapter__self -.impl.-> R48_usecase_usecase_ReviewCheckZeroFindingsStatePort__self
+T49_infrastructure_infrastructure_ResultsScopeAdapter__self -.impl.-> R38_usecase_usecase_ReviewResultsScopePort__self
+T49_infrastructure_infrastructure_ResultsStateAdapter__self -.impl.-> R38_usecase_usecase_ReviewResultsStatePort__self
+T49_infrastructure_infrastructure_ResultsRoundAdapter__self -.impl.-> R38_usecase_usecase_ReviewResultsRoundPort__self
+T52_infrastructure_infrastructure_ReviewFixRunnerAdapter__self -.impl.-> R31_usecase_usecase_ReviewFixRunner__self
+T55_infrastructure_infrastructure_GitReviewFixTrackResolver__self -.impl.-> R42_usecase_usecase_ReviewFixTrackResolverPort__self
+T50_infrastructure_infrastructure_CodexReviewFixRunner__self -.impl.-> R31_usecase_usecase_ReviewFixRunner__self
+T60_infrastructure_infrastructure_TrustedReviewFixBriefingLoader__self -.impl.-> R43_usecase_usecase_ReviewFixBriefingLoaderPort__self
 T38_cli_driver_cli_driver_CapabilityDriver_new --o R37_usecase_usecase_CapabilityExecService__self
 T38_cli_driver_cli_driver_CapabilityDriver_new --> T38_cli_driver_cli_driver_CapabilityDriver__self
 T38_cli_driver_cli_driver_CapabilityDriver_handle --o T47_cli_driver_cli_driver_CapabilityExecDriverInput__self
@@ -1147,21 +1634,47 @@ T50_cli_driver_cli_driver_ReviewCheckZeroFindingsInput_try_new --> T50_cli_drive
 T50_cli_driver_cli_driver_ReviewCheckZeroFindingsInput_try_new --> T54_usecase_usecase_ReviewCheckZeroFindingsValidationError__self
 T50_cli_driver_cli_driver_ReviewCheckZeroFindingsInput_into_query --> T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self
 T34_cli_driver_cli_driver_ReviewDriver_new --o R29_usecase_usecase_ReviewService__self
+T34_cli_driver_cli_driver_ReviewDriver_new --o R36_usecase_usecase_ReviewResultsService__self
 T34_cli_driver_cli_driver_ReviewDriver_new --o R46_usecase_usecase_ReviewCheckZeroFindingsService__self
 T34_cli_driver_cli_driver_ReviewDriver_new --> T34_cli_driver_cli_driver_ReviewDriver__self
 T34_cli_driver_cli_driver_ReviewDriver_handle --o T33_cli_driver_cli_driver_ReviewInput__self
 T34_cli_driver_cli_driver_ReviewDriver_handle --> T36_cli_driver_cli_driver_CommandOutcome__self
+T34_cli_driver_cli_driver_ReviewDriver_new --o R29_usecase_usecase_ReviewService__self
+T34_cli_driver_cli_driver_ReviewDriver_new --o R36_usecase_usecase_ReviewResultsService__self
+T34_cli_driver_cli_driver_ReviewDriver_new --o R46_usecase_usecase_ReviewCheckZeroFindingsService__self
+T34_cli_driver_cli_driver_ReviewDriver_new --> T34_cli_driver_cli_driver_ReviewDriver__self
+T34_cli_driver_cli_driver_ReviewDriver_handle --o T33_cli_driver_cli_driver_ReviewInput__self
+T34_cli_driver_cli_driver_ReviewDriver_handle --> T36_cli_driver_cli_driver_CommandOutcome__self
+T37_cli_driver_cli_driver_ReviewFixDriver_new --o R35_usecase_usecase_RunReviewFixService__self
+T37_cli_driver_cli_driver_ReviewFixDriver_new --> T37_cli_driver_cli_driver_ReviewFixDriver__self
+T37_cli_driver_cli_driver_ReviewFixDriver_handle --o T36_cli_driver_cli_driver_ReviewFixInput__self
+T37_cli_driver_cli_driver_ReviewFixDriver_handle --> T36_cli_driver_cli_driver_CommandOutcome__self
+T37_cli_driver_cli_driver_ReviewFixDriver_new --o R35_usecase_usecase_RunReviewFixService__self
+T37_cli_driver_cli_driver_ReviewFixDriver_new --> T37_cli_driver_cli_driver_ReviewFixDriver__self
+T37_cli_driver_cli_driver_ReviewFixDriver_handle --o T36_cli_driver_cli_driver_ReviewFixInput__self
+T37_cli_driver_cli_driver_ReviewFixDriver_handle --> T36_cli_driver_cli_driver_CommandOutcome__self
+T36_cli_driver_cli_driver_ReviewFixInput_new --> T36_cli_driver_cli_driver_ReviewFixInput__self
+T36_cli_driver_cli_driver_ReviewFixInput_new --> T36_cli_driver_cli_driver_ReviewFixInput__self
 T33_cli_driver_cli_driver_ReviewInput_CheckZeroFindings --o T50_cli_driver_cli_driver_ReviewCheckZeroFindingsInput__self
 T33_cli_driver_cli_driver_ReviewInput_Results --o T40_cli_driver_cli_driver_ReviewResultsInput__self
 T40_cli_driver_cli_driver_ReviewResultsInput_try_new --> T40_cli_driver_cli_driver_ReviewResultsInput__self
 T40_cli_driver_cli_driver_ReviewResultsInput_try_new --> T51_usecase_usecase_ReviewScopeSelectionValidationError__self
-T40_cli_driver_cli_driver_ReviewResultsInput_into_parts --> T36_usecase_usecase_ReviewScopeSelection__self
+T40_cli_driver_cli_driver_ReviewResultsInput_into_parts --> T43_usecase_usecase_ReviewScopeSelectionRequest__self
+T40_cli_driver_cli_driver_ReviewResultsInput_try_new --> T40_cli_driver_cli_driver_ReviewResultsInput__self
+T40_cli_driver_cli_driver_ReviewResultsInput_try_new --> T51_usecase_usecase_ReviewScopeSelectionValidationError__self
+T40_cli_driver_cli_driver_ReviewResultsInput_into_parts --> T43_usecase_usecase_ReviewScopeSelectionRequest__self
 T57_cli_composition_cli_composition_CapabilityCompositionRoot_new --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
 T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
 T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver --> T38_cli_driver_cli_driver_CapabilityDriver__self
 T52_cli_composition_cli_composition_PhaseCompositionRoot_build --> T40_cli_driver_cli_driver_PhaseCommandDriver__self
 T56_cli_composition_cli_composition_RefVerifyCompositionRoot_new --> T56_cli_composition_cli_composition_RefVerifyCompositionRoot__self
 T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_driver --> T37_cli_driver_cli_driver_RefVerifyDriver__self
+T53_cli_composition_cli_composition_ReviewCompositionRoot_new --> T53_cli_composition_cli_composition_ReviewCompositionRoot__self
+T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver --> T34_cli_driver_cli_driver_ReviewDriver__self
+T53_cli_composition_cli_composition_ReviewCompositionRoot_review_fix_driver --> T37_cli_driver_cli_driver_ReviewFixDriver__self
+T53_cli_composition_cli_composition_ReviewCompositionRoot_new --> T53_cli_composition_cli_composition_ReviewCompositionRoot__self
+T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver --> T34_cli_driver_cli_driver_ReviewDriver__self
+T53_cli_composition_cli_composition_ReviewCompositionRoot_review_fix_driver --> T37_cli_driver_cli_driver_ReviewFixDriver__self
 T18_cli_cli_CliCommand_Phase --o|cmd| T20_cli_cli_PhaseCommand__self
 T18_cli_cli_CliCommand_Review --o|cmd| T21_cli_cli_ReviewCommand__self
 T25_cli_cli_CheckApprovedArgs__self --o|chain| T30_cli_cli_RefVerifyCheckChainArg__self
@@ -1195,6 +1708,8 @@ class T28_domain_domain_ScopeNameError_Empty variant_node
 class T28_domain_domain_ScopeNameError_NotAscii variant_node
 class T28_domain_domain_ScopeNameError_Reserved variant_node
 class T28_domain_domain_ScopeNameError__self error_type
+class F70_domain_domain_domain__review_v2__types__derive_review_approval_verdict free_function
+class F70_domain_domain_domain__review_v2__types__derive_review_approval_verdict function_node
 class T32_domain_domain_ContractedEntryRef_new method_node
 class T32_domain_domain_ContractedEntryRef_layer method_node
 class T32_domain_domain_ContractedEntryRef_entry_key method_node
@@ -1390,8 +1905,14 @@ class R41_usecase_usecase_RefVerifyAggregateService_results method_node
 class R41_usecase_usecase_RefVerifyAggregateService__self app_service
 class R51_usecase_usecase_RefVerifyCheckApprovedDriverService_check_approved method_node
 class R51_usecase_usecase_RefVerifyCheckApprovedDriverService__self app_service
+class T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new method_node
+class T46_usecase_usecase_NonEmptyReviewerFindingsOutput_as_slice method_node
+class T46_usecase_usecase_NonEmptyReviewerFindingsOutput_try_new method_node
+class T46_usecase_usecase_NonEmptyReviewerFindingsOutput_as_slice method_node
+class T46_usecase_usecase_NonEmptyReviewerFindingsOutput__self value_object
 class T54_usecase_usecase_ReviewCheckZeroFindingsEvaluationError_EvaluationFailed variant_node
 class T54_usecase_usecase_ReviewCheckZeroFindingsEvaluationError__self error_type
+class T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new method_node
 class T49_usecase_usecase_ReviewCheckZeroFindingsInteractor_new method_node
 class T49_usecase_usecase_ReviewCheckZeroFindingsInteractor__self interactor
 class T46_usecase_usecase_ReviewCheckZeroFindingsOutcome_CurrentFinalZeroFindings variant_node
@@ -1404,28 +1925,166 @@ class T44_usecase_usecase_ReviewCheckZeroFindingsQuery__self query
 class T54_usecase_usecase_ReviewCheckZeroFindingsValidationError_InvalidTrackId variant_node
 class T54_usecase_usecase_ReviewCheckZeroFindingsValidationError_InvalidScope variant_node
 class T54_usecase_usecase_ReviewCheckZeroFindingsValidationError__self error_type
-class T36_usecase_usecase_ReviewScopeSelection_Named variant_node
-class T36_usecase_usecase_ReviewScopeSelection_All variant_node
-class T36_usecase_usecase_ReviewScopeSelection_try_new method_node
-class T36_usecase_usecase_ReviewScopeSelection__self value_object
+class T51_usecase_usecase_ReviewFindingsOutputValidationError_Empty variant_node
+class T51_usecase_usecase_ReviewFindingsOutputValidationError__self error_type
+class T42_usecase_usecase_ReviewFixBriefingLoadError_UntrustedFile variant_node
+class T42_usecase_usecase_ReviewFixBriefingLoadError_ReadFailed variant_node
+class T42_usecase_usecase_ReviewFixBriefingLoadError_InvalidContent variant_node
+class T42_usecase_usecase_ReviewFixBriefingLoadError__self error_type
+class T35_usecase_usecase_ReviewFixResolution_new method_node
+class T35_usecase_usecase_ReviewFixResolution_track_id method_node
+class T35_usecase_usecase_ReviewFixResolution_repository_root method_node
+class T35_usecase_usecase_ReviewFixResolution_new method_node
+class T35_usecase_usecase_ReviewFixResolution_track_id method_node
+class T35_usecase_usecase_ReviewFixResolution_repository_root method_node
+class T35_usecase_usecase_ReviewFixResolution__self dto
+class T36_usecase_usecase_ReviewFixRunnerError_SmokeTestFailed variant_node
+class T36_usecase_usecase_ReviewFixRunnerError_SpawnFailed variant_node
+class T36_usecase_usecase_ReviewFixRunnerError_SentinelNotFound variant_node
+class T36_usecase_usecase_ReviewFixRunnerError_SubagentDispatchRequired variant_node
+class T36_usecase_usecase_ReviewFixRunnerError_Unexpected variant_node
+class T36_usecase_usecase_ReviewFixRunnerError__self error_type
+class T42_usecase_usecase_ReviewFixTrackResolveError_BranchReadFailed variant_node
+class T42_usecase_usecase_ReviewFixTrackResolveError_NonTrackBranch variant_node
+class T42_usecase_usecase_ReviewFixTrackResolveError__self error_type
+class T39_usecase_usecase_ReviewNotRequiredReason_Empty variant_node
+class T39_usecase_usecase_ReviewNotRequiredReason_ZeroFindings variant_node
+class T39_usecase_usecase_ReviewNotRequiredReason__self dto
+class T36_usecase_usecase_ReviewRequiredReason_NotStarted variant_node
+class T36_usecase_usecase_ReviewRequiredReason_FindingsRemain variant_node
+class T36_usecase_usecase_ReviewRequiredReason_StaleHash variant_node
+class T36_usecase_usecase_ReviewRequiredReason__self dto
+class T34_usecase_usecase_ReviewResultsError_Failed variant_node
+class T34_usecase_usecase_ReviewResultsError_UnknownScope variant_node
+class T34_usecase_usecase_ReviewResultsError_MissingScopeState variant_node
+class T34_usecase_usecase_ReviewResultsError__self error_type
+class T39_usecase_usecase_ReviewResultsInteractor_new method_node
+class T39_usecase_usecase_ReviewResultsInteractor_new method_node
+class T39_usecase_usecase_ReviewResultsInteractor__self interactor
+class T35_usecase_usecase_ReviewResultsOutput__self dto
+class T42_usecase_usecase_ReviewResultsScopeSnapshot__self dto
+class T39_usecase_usecase_ReviewRoundResultOutput__self dto
+class T40_usecase_usecase_ReviewRoundResultVerdict_ZeroFindings variant_node
+class T40_usecase_usecase_ReviewRoundResultVerdict_FindingsRemain variant_node
+class T40_usecase_usecase_ReviewRoundResultVerdict__self dto
+class T36_usecase_usecase_ReviewRunLocalOutput__self dto
+class T31_usecase_usecase_ReviewScopeName_try_new method_node
+class T31_usecase_usecase_ReviewScopeName_other method_node
+class T31_usecase_usecase_ReviewScopeName_as_str method_node
+class T31_usecase_usecase_ReviewScopeName_try_new method_node
+class T31_usecase_usecase_ReviewScopeName_other method_node
+class T31_usecase_usecase_ReviewScopeName_as_str method_node
+class T31_usecase_usecase_ReviewScopeName__self value_object
+class T46_usecase_usecase_ReviewScopeNameValidationError_Invalid variant_node
+class T46_usecase_usecase_ReviewScopeNameValidationError__self error_type
+class T39_usecase_usecase_ReviewScopeResultOutput__self dto
+class T38_usecase_usecase_ReviewScopeResultState_RequiredNotStarted variant_node
+class T38_usecase_usecase_ReviewScopeResultState_RequiredFindingsRemain variant_node
+class T38_usecase_usecase_ReviewScopeResultState_RequiredStaleHash variant_node
+class T38_usecase_usecase_ReviewScopeResultState_Empty variant_node
+class T38_usecase_usecase_ReviewScopeResultState_Approved variant_node
+class T38_usecase_usecase_ReviewScopeResultState__self dto
+class T43_usecase_usecase_ReviewScopeSelectionRequest_NamedCandidate variant_node
+class T43_usecase_usecase_ReviewScopeSelectionRequest_All variant_node
+class T43_usecase_usecase_ReviewScopeSelectionRequest_try_new method_node
+class T43_usecase_usecase_ReviewScopeSelectionRequest_try_new method_node
+class T43_usecase_usecase_ReviewScopeSelectionRequest__self value_object
 class T51_usecase_usecase_ReviewScopeSelectionValidationError_ScopeAndAll variant_node
 class T51_usecase_usecase_ReviewScopeSelectionValidationError_InvalidScope variant_node
 class T51_usecase_usecase_ReviewScopeSelectionValidationError__self error_type
+class T33_usecase_usecase_ReviewStoredRound__self dto
+class T40_usecase_usecase_ReviewStoredRoundVerdict__self dto
+class T38_usecase_usecase_ReviewStoredScopeState_Required variant_node
+class T38_usecase_usecase_ReviewStoredScopeState_NotRequired variant_node
+class T38_usecase_usecase_ReviewStoredScopeState__self dto
+class T43_usecase_usecase_ReviewStoredScopeStateEntry__self dto
+class T29_usecase_usecase_ReviewTrackId_try_new method_node
+class T29_usecase_usecase_ReviewTrackId_as_str method_node
+class T29_usecase_usecase_ReviewTrackId_try_new method_node
+class T29_usecase_usecase_ReviewTrackId_as_str method_node
+class T29_usecase_usecase_ReviewTrackId__self value_object
+class T44_usecase_usecase_ReviewTrackIdValidationError_Invalid variant_node
+class T44_usecase_usecase_ReviewTrackIdValidationError__self error_type
+class T37_usecase_usecase_ReviewerFindingOutput__self dto
+class T35_usecase_usecase_RunReviewFixCommand_new_resolved method_node
+class T35_usecase_usecase_RunReviewFixCommand_scope method_node
+class T35_usecase_usecase_RunReviewFixCommand_briefing_content method_node
+class T35_usecase_usecase_RunReviewFixCommand_track_id method_node
+class T35_usecase_usecase_RunReviewFixCommand_repository_root method_node
+class T35_usecase_usecase_RunReviewFixCommand_round_type method_node
+class T35_usecase_usecase_RunReviewFixCommand_model method_node
+class T35_usecase_usecase_RunReviewFixCommand_new_resolved method_node
+class T35_usecase_usecase_RunReviewFixCommand_scope method_node
+class T35_usecase_usecase_RunReviewFixCommand_briefing_content method_node
+class T35_usecase_usecase_RunReviewFixCommand_track_id method_node
+class T35_usecase_usecase_RunReviewFixCommand_repository_root method_node
+class T35_usecase_usecase_RunReviewFixCommand_round_type method_node
+class T35_usecase_usecase_RunReviewFixCommand_model method_node
+class T35_usecase_usecase_RunReviewFixCommand__self command
+class T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidScope variant_node
+class T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidTrackId variant_node
+class T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidRoundType variant_node
+class T50_usecase_usecase_RunReviewFixCommandValidationError_InvalidModel variant_node
+class T50_usecase_usecase_RunReviewFixCommandValidationError__self error_type
+class T33_usecase_usecase_RunReviewFixError_FixRunnerFailed variant_node
+class T33_usecase_usecase_RunReviewFixError_TrackResolution variant_node
+class T33_usecase_usecase_RunReviewFixError_BriefingLoad variant_node
+class T33_usecase_usecase_RunReviewFixError_TrackMismatch variant_node
+class T33_usecase_usecase_RunReviewFixError__self error_type
+class T38_usecase_usecase_RunReviewFixInteractor_new method_node
+class T38_usecase_usecase_RunReviewFixInteractor_new method_node
+class T38_usecase_usecase_RunReviewFixInteractor__self interactor
+class T34_usecase_usecase_RunReviewFixOutput__self dto
+class T35_usecase_usecase_RunReviewFixRequest_try_new method_node
+class T35_usecase_usecase_RunReviewFixRequest_try_new method_node
+class T35_usecase_usecase_RunReviewFixRequest__self command
+class T39_usecase_usecase_SubagentBriefingContent_try_new method_node
+class T39_usecase_usecase_SubagentBriefingContent_as_str method_node
+class T39_usecase_usecase_SubagentBriefingContent__self value_object
+class T54_usecase_usecase_SubagentBriefingContentValidationError_ExceedsMaximumBytes variant_node
+class T54_usecase_usecase_SubagentBriefingContentValidationError__self error_type
+class T43_usecase_usecase_SubagentDispatchInstruction__self dto
+class T28_usecase_usecase_SubagentName_try_new method_node
+class T28_usecase_usecase_SubagentName_as_str method_node
+class T28_usecase_usecase_SubagentName_try_new method_node
+class T28_usecase_usecase_SubagentName_as_str method_node
+class T28_usecase_usecase_SubagentName__self value_object
+class T43_usecase_usecase_SubagentNameValidationError_Invalid variant_node
+class T43_usecase_usecase_SubagentNameValidationError__self error_type
+class R42_usecase_usecase_ReviewCheckApprovedService_check_approved method_node
+class R42_usecase_usecase_ReviewCheckApprovedService__self app_service
 class R46_usecase_usecase_ReviewCheckZeroFindingsService_check_zero_findings method_node
 class R46_usecase_usecase_ReviewCheckZeroFindingsService__self app_service
 class R48_usecase_usecase_ReviewCheckZeroFindingsStatePort_state_for method_node
 class R48_usecase_usecase_ReviewCheckZeroFindingsStatePort__self secondary_port
+class R43_usecase_usecase_ReviewFixBriefingLoaderPort_load_briefing_content method_node
+class R43_usecase_usecase_ReviewFixBriefingLoaderPort__self secondary_port
+class R31_usecase_usecase_ReviewFixRunner_run_fix method_node
+class R31_usecase_usecase_ReviewFixRunner__self secondary_port
+class R42_usecase_usecase_ReviewFixTrackResolverPort_resolve_current_track method_node
+class R42_usecase_usecase_ReviewFixTrackResolverPort__self secondary_port
+class R38_usecase_usecase_ReviewResultsRoundPort_load_scope_rounds method_node
+class R38_usecase_usecase_ReviewResultsRoundPort__self secondary_port
+class R38_usecase_usecase_ReviewResultsScopePort_load_scope_snapshot method_node
+class R38_usecase_usecase_ReviewResultsScopePort__self secondary_port
+class R36_usecase_usecase_ReviewResultsService_results method_node
+class R36_usecase_usecase_ReviewResultsService__self app_service
+class R38_usecase_usecase_ReviewResultsStatePort_load_scope_states method_node
+class R38_usecase_usecase_ReviewResultsStatePort__self secondary_port
+class R37_usecase_usecase_ReviewRunLocalService_run_local method_node
+class R37_usecase_usecase_ReviewRunLocalService__self app_service
 class R29_usecase_usecase_ReviewService_run_codex method_node
 class R29_usecase_usecase_ReviewService_run_claude method_node
 class R29_usecase_usecase_ReviewService_run_local method_node
 class R29_usecase_usecase_ReviewService_check_approved method_node
-class R29_usecase_usecase_ReviewService_results method_node
 class R29_usecase_usecase_ReviewService_classify method_node
 class R29_usecase_usecase_ReviewService_files method_node
 class R29_usecase_usecase_ReviewService_validate_scope method_node
 class R29_usecase_usecase_ReviewService_get_briefing method_node
 class R29_usecase_usecase_ReviewService_persist_commit_hash method_node
 class R29_usecase_usecase_ReviewService__self app_service
+class R35_usecase_usecase_RunReviewFixService_run method_node
+class R35_usecase_usecase_RunReviewFixService__self app_service
 class T48_infrastructure_infrastructure_CommandArgumentDto__self dto
 class T44_infrastructure_infrastructure_CommandArgvDto__self dto
 class T59_infrastructure_infrastructure_CommandConfigSchemaVersionDto__self dto
@@ -1451,7 +2110,15 @@ class T50_infrastructure_infrastructure_ProcessProgramRunner_new method_node
 class T50_infrastructure_infrastructure_ProcessProgramRunner__self secondary_adapter
 class T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter_new method_node
 class T57_infrastructure_infrastructure_FsRefVerifyAggregateAdapter__self secondary_adapter
+class T50_infrastructure_infrastructure_CodexReviewFixRunner_new method_node
+class T50_infrastructure_infrastructure_CodexReviewFixRunner__self secondary_adapter
+class T55_infrastructure_infrastructure_GitReviewFixTrackResolver__self secondary_adapter
+class T49_infrastructure_infrastructure_ResultsRoundAdapter__self secondary_adapter
+class T49_infrastructure_infrastructure_ResultsScopeAdapter__self secondary_adapter
+class T49_infrastructure_infrastructure_ResultsStateAdapter__self secondary_adapter
 class T65_infrastructure_infrastructure_ReviewCheckZeroFindingsStateAdapter__self secondary_adapter
+class T52_infrastructure_infrastructure_ReviewFixRunnerAdapter__self secondary_adapter
+class T60_infrastructure_infrastructure_TrustedReviewFixBriefingLoader__self secondary_adapter
 class T51_infrastructure_infrastructure_ContractedEntryRefDto__self dto
 class T41_infrastructure_infrastructure_EntryKeyDto__self dto
 class T40_infrastructure_infrastructure_LayerIdDto__self dto
@@ -1491,7 +2158,19 @@ class T50_cli_driver_cli_driver_ReviewCheckZeroFindingsInput_into_query method_n
 class T50_cli_driver_cli_driver_ReviewCheckZeroFindingsInput__self dto
 class T34_cli_driver_cli_driver_ReviewDriver_new method_node
 class T34_cli_driver_cli_driver_ReviewDriver_handle method_node
+class T34_cli_driver_cli_driver_ReviewDriver_new method_node
+class T34_cli_driver_cli_driver_ReviewDriver_handle method_node
 class T34_cli_driver_cli_driver_ReviewDriver__self primary_adapter
+class T37_cli_driver_cli_driver_ReviewFixDriver_new method_node
+class T37_cli_driver_cli_driver_ReviewFixDriver_handle method_node
+class T37_cli_driver_cli_driver_ReviewFixDriver_new method_node
+class T37_cli_driver_cli_driver_ReviewFixDriver_handle method_node
+class T37_cli_driver_cli_driver_ReviewFixDriver__self primary_adapter
+class T36_cli_driver_cli_driver_ReviewFixInput_new method_node
+class T36_cli_driver_cli_driver_ReviewFixInput_into_parts method_node
+class T36_cli_driver_cli_driver_ReviewFixInput_new method_node
+class T36_cli_driver_cli_driver_ReviewFixInput_into_parts method_node
+class T36_cli_driver_cli_driver_ReviewFixInput__self dto
 class T33_cli_driver_cli_driver_ReviewInput_RunCodex variant_node
 class T33_cli_driver_cli_driver_ReviewInput_RunClaude variant_node
 class T33_cli_driver_cli_driver_ReviewInput_RunLocal variant_node
@@ -1506,6 +2185,8 @@ class T33_cli_driver_cli_driver_ReviewInput_PersistCommitHash variant_node
 class T33_cli_driver_cli_driver_ReviewInput__self dto
 class T40_cli_driver_cli_driver_ReviewResultsInput_try_new method_node
 class T40_cli_driver_cli_driver_ReviewResultsInput_into_parts method_node
+class T40_cli_driver_cli_driver_ReviewResultsInput_try_new method_node
+class T40_cli_driver_cli_driver_ReviewResultsInput_into_parts method_node
 class T40_cli_driver_cli_driver_ReviewResultsInput__self dto
 class T57_cli_composition_cli_composition_CapabilityCompositionRoot_new method_node
 class T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover method_node
@@ -1516,6 +2197,13 @@ class T52_cli_composition_cli_composition_PhaseCompositionRoot__self composition
 class T56_cli_composition_cli_composition_RefVerifyCompositionRoot_new method_node
 class T56_cli_composition_cli_composition_RefVerifyCompositionRoot_ref_verify_driver method_node
 class T56_cli_composition_cli_composition_RefVerifyCompositionRoot__self composition_root
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_new method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_fix_driver method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_new method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_driver method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot_review_fix_driver method_node
+class T53_cli_composition_cli_composition_ReviewCompositionRoot__self composition_root
 class T18_cli_cli_CliCommand_Arch variant_node
 class T18_cli_cli_CliCommand_AdrBaseline variant_node
 class T18_cli_cli_CliCommand_Conventions variant_node

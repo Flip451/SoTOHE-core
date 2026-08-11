@@ -11,15 +11,26 @@ use std::sync::Arc;
 use usecase::review_v2::SubagentDispatchInstruction;
 use usecase::review_v2::aggregate_service::ReviewRunInput;
 use usecase::review_v2::run_review_fix::{
-    RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
+    ReviewFixRunnerError, RunReviewFixError, RunReviewFixOutput, RunReviewFixRequest,
+    RunReviewFixService,
 };
 use usecase::review_v2::{
     ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsOutcome,
     ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsValidationError,
 };
-use usecase::review_v2::{ReviewCheckZeroFindingsService, ReviewService};
+use usecase::review_v2::{
+    ReviewCheckZeroFindingsService, ReviewResultsService, ReviewScopeSelectionRequest,
+    ReviewScopeSelectionValidationError, ReviewService,
+};
 
 use crate::render::CommandOutcome;
+
+#[path = "review_results_renderer.rs"]
+mod review_results_renderer;
+use review_results_renderer::render_review_results;
+#[path = "review_local_output_renderer.rs"]
+mod review_local_output_renderer;
+use review_local_output_renderer::review_run_local_output_to_outcome;
 
 /// First stdout line for a review-fix subagent dispatch.
 pub const SUBAGENT_DISPATCH_SENTINEL: &str = "SUBAGENT_DISPATCH_REQUIRED";
@@ -94,135 +105,86 @@ impl ReviewCheckZeroFindingsInput {
     }
 }
 
+/// Delivery input for `review results` that owns raw CLI values until the
+/// usecase selection constructor validates them.
+#[derive(Debug, Clone)]
+pub struct ReviewResultsInput {
+    track_id: Option<String>,
+    items_dir: PathBuf,
+    request: ReviewScopeSelectionRequest,
+    limit: u32,
+    round_type: String,
+    no_hint: bool,
+}
+
+impl ReviewResultsInput {
+    /// Converts raw delivery values into a format-valid usecase request.
+    #[allow(clippy::too_many_arguments)]
+    pub fn try_new(
+        track_id: Option<String>,
+        items_dir: PathBuf,
+        scope: Option<String>,
+        all: bool,
+        limit: u32,
+        round_type: String,
+        no_hint: bool,
+    ) -> Result<Self, ReviewScopeSelectionValidationError> {
+        let request = ReviewScopeSelectionRequest::try_new(scope, all)?;
+        Ok(Self { track_id, items_dir, request, limit, round_type, no_hint })
+    }
+
+    /// Decomposes the input for a single aggregate-service call.
+    #[must_use]
+    pub fn into_parts(
+        self,
+    ) -> (Option<String>, PathBuf, ReviewScopeSelectionRequest, u32, String, bool) {
+        (self.track_id, self.items_dir, self.request, self.limit, self.round_type, self.no_hint)
+    }
+}
+
 /// Typed input for the `review` command family.
 pub enum ReviewInput {
     /// Run the local Codex-backed reviewer and auto-record verdict to review.json.
-    RunCodex {
-        /// Model name for the Codex reviewer subprocess.
-        model: String,
-        /// Timeout for the reviewer subprocess in seconds.
-        timeout_seconds: u64,
-        /// Optional path to a briefing file for additional context.
-        briefing_file: Option<PathBuf>,
-        /// Optional inline prompt override.
-        prompt: Option<String>,
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Round type: `"fast"` or `"final"`.
-        round_type: String,
-        /// Scope name (e.g., `"cli"`, `"infrastructure"`).
-        group: String,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    RunCodex(String, u64, Option<PathBuf>, Option<String>, Option<String>, String, String, PathBuf),
     /// Run the Claude-backed reviewer and auto-record verdict to review.json.
-    RunClaude {
-        /// Model name for the Claude reviewer subprocess.
-        model: String,
-        /// Timeout for the reviewer subprocess in seconds.
-        timeout_seconds: u64,
-        /// Optional path to a briefing file for additional context.
-        briefing_file: Option<PathBuf>,
-        /// Optional inline prompt override.
-        prompt: Option<String>,
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Round type: `"fast"` or `"final"`.
-        round_type: String,
-        /// Scope name (e.g., `"cli"`, `"infrastructure"`).
-        group: String,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    RunClaude(
+        String,
+        u64,
+        Option<PathBuf>,
+        Option<String>,
+        Option<String>,
+        String,
+        String,
+        PathBuf,
+    ),
     /// Run the auto-dispatched local reviewer (provider resolved from agent-profiles.json).
-    RunLocal {
-        /// Optional model override (uses profile model when `None`).
-        model: Option<String>,
-        /// Timeout for the reviewer subprocess in seconds.
-        timeout_seconds: u64,
-        /// Optional path to a briefing file for additional context.
-        briefing_file: Option<PathBuf>,
-        /// Optional inline prompt override.
-        prompt: Option<String>,
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Round type: `"fast"` or `"final"`.
-        round_type: String,
-        /// Scope name (e.g., `"cli"`, `"infrastructure"`).
-        group: String,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    RunLocal(
+        Option<String>,
+        u64,
+        Option<PathBuf>,
+        Option<String>,
+        Option<String>,
+        String,
+        String,
+        PathBuf,
+    ),
     /// Check if the review state is approved and code hash is current.
-    CheckApproved {
-        /// Resolved track ID.
-        track_id: String,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    CheckApproved(String, PathBuf),
     /// Check whether one resolved track and scope have a current final
     /// zero-findings review verdict.
     CheckZeroFindings(ReviewCheckZeroFindingsInput),
     /// Show review results: per-scope state summary, optional round history.
-    Results {
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-        /// Optional scope name filter.
-        scope: Option<String>,
-        /// Show all rounds (equivalent to `--limit 0` when `false`).
-        all: bool,
-        /// Maximum number of rounds to display per scope; `0` = summary only.
-        limit: u32,
-        /// Round type filter: `"any"` | `"fast"` | `"final"`.
-        round_type: String,
-        /// Suppress the commit hint line.
-        no_hint: bool,
-    },
+    Results(ReviewResultsInput),
     /// Classify each given path into review scopes.
-    Classify {
-        /// Paths to classify.
-        paths: Vec<String>,
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    Classify(Vec<String>, Option<String>, PathBuf),
     /// List the diff files belonging to the given scope.
-    Files {
-        /// Scope name.
-        scope: String,
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    Files(String, Option<String>, PathBuf),
     /// Validate a scope name for the given track.
-    ValidateScope {
-        /// Scope name to validate.
-        scope: String,
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    ValidateScope(String, Option<String>, PathBuf),
     /// Get the briefing for a review scope.
-    GetBriefing {
-        /// Scope name.
-        scope: String,
-        /// Track ID (auto-detected from branch if `None`).
-        track_id: Option<String>,
-        /// Items directory (`track/items`).
-        items_dir: PathBuf,
-    },
+    GetBriefing(String, Option<String>, PathBuf),
     /// Persist a commit hash for the review cycle.
-    PersistCommitHash {
-        /// Resolved track ID.
-        track_id: String,
-        /// Workspace root (the repo root where `.git` lives).
-        workspace_root: PathBuf,
-    },
+    PersistCommitHash(String, PathBuf),
 }
 
 // ---------------------------------------------------------------------------
@@ -235,6 +197,7 @@ pub enum ReviewInput {
 /// exposes `handle(input) -> CommandOutcome`.
 pub struct ReviewDriver {
     service: Arc<dyn ReviewService>,
+    results: Arc<dyn ReviewResultsService>,
     check_zero_findings: Arc<dyn ReviewCheckZeroFindingsService>,
 }
 
@@ -242,15 +205,16 @@ impl ReviewDriver {
     /// Create a new `ReviewDriver` with its aggregate and focused services.
     pub fn new(
         service: Arc<dyn ReviewService>,
+        results: Arc<dyn ReviewResultsService>,
         check_zero_findings: Arc<dyn ReviewCheckZeroFindingsService>,
     ) -> Self {
-        Self { service, check_zero_findings }
+        Self { service, results, check_zero_findings }
     }
 
     /// Handle a review command.
     pub fn handle(&self, input: ReviewInput) -> CommandOutcome {
         match input {
-            ReviewInput::RunCodex {
+            ReviewInput::RunCodex(
                 model,
                 timeout_seconds,
                 briefing_file,
@@ -259,26 +223,7 @@ impl ReviewDriver {
                 round_type,
                 group,
                 items_dir,
-            } => self.review_run_codex(
-                model,
-                timeout_seconds,
-                briefing_file,
-                prompt,
-                track_id,
-                round_type,
-                group,
-                items_dir,
-            ),
-            ReviewInput::RunClaude {
-                model,
-                timeout_seconds,
-                briefing_file,
-                prompt,
-                track_id,
-                round_type,
-                group,
-                items_dir,
-            } => self.review_run_claude(
+            ) => self.review_run_codex(
                 model,
                 timeout_seconds,
                 briefing_file,
@@ -288,7 +233,7 @@ impl ReviewDriver {
                 group,
                 items_dir,
             ),
-            ReviewInput::RunLocal {
+            ReviewInput::RunClaude(
                 model,
                 timeout_seconds,
                 briefing_file,
@@ -297,7 +242,7 @@ impl ReviewDriver {
                 round_type,
                 group,
                 items_dir,
-            } => self.review_run_local(
+            ) => self.review_run_claude(
                 model,
                 timeout_seconds,
                 briefing_file,
@@ -307,34 +252,45 @@ impl ReviewDriver {
                 group,
                 items_dir,
             ),
-            ReviewInput::CheckApproved { track_id, items_dir } => {
+            ReviewInput::RunLocal(
+                model,
+                timeout_seconds,
+                briefing_file,
+                prompt,
+                track_id,
+                round_type,
+                group,
+                items_dir,
+            ) => self.review_run_local(
+                model,
+                timeout_seconds,
+                briefing_file,
+                prompt,
+                track_id,
+                round_type,
+                group,
+                items_dir,
+            ),
+            ReviewInput::CheckApproved(track_id, items_dir) => {
                 self.review_check_approved(track_id, items_dir)
             }
             ReviewInput::CheckZeroFindings(input) => {
                 self.review_check_zero_findings(input.into_query())
             }
-            ReviewInput::Results {
-                track_id,
-                items_dir,
-                scope,
-                all,
-                limit,
-                round_type,
-                no_hint,
-            } => self.review_results(track_id, items_dir, scope, all, limit, round_type, no_hint),
-            ReviewInput::Classify { paths, track_id, items_dir } => {
+            ReviewInput::Results(input) => self.review_results(input),
+            ReviewInput::Classify(paths, track_id, items_dir) => {
                 self.review_classify(paths, track_id, items_dir)
             }
-            ReviewInput::Files { scope, track_id, items_dir } => {
+            ReviewInput::Files(scope, track_id, items_dir) => {
                 self.review_files(scope, track_id, items_dir)
             }
-            ReviewInput::ValidateScope { scope, track_id, items_dir } => {
+            ReviewInput::ValidateScope(scope, track_id, items_dir) => {
                 self.review_validate_scope(scope, track_id, items_dir)
             }
-            ReviewInput::GetBriefing { scope, track_id, items_dir } => {
+            ReviewInput::GetBriefing(scope, track_id, items_dir) => {
                 self.review_get_briefing(scope, track_id, items_dir)
             }
-            ReviewInput::PersistCommitHash { track_id, workspace_root } => {
+            ReviewInput::PersistCommitHash(track_id, workspace_root) => {
                 self.review_persist_commit_hash(track_id, workspace_root)
             }
         }
@@ -427,7 +383,7 @@ impl ReviewDriver {
             group,
             items_dir,
         );
-        CommandOutcome { stdout: out.stdout, stderr: out.stderr, exit_code: out.exit_code }
+        review_run_local_output_to_outcome(out)
     }
 
     fn review_check_approved(&self, track_id: String, items_dir: PathBuf) -> CommandOutcome {
@@ -474,19 +430,15 @@ impl ReviewDriver {
         )
     }
 
-    #[allow(clippy::too_many_arguments)]
-    fn review_results(
-        &self,
-        track_id: Option<String>,
-        items_dir: PathBuf,
-        scope: Option<String>,
-        all: bool,
-        limit: u32,
-        round_type: String,
-        no_hint: bool,
-    ) -> CommandOutcome {
-        match self.service.results(track_id, items_dir, scope, all, limit, round_type, no_hint) {
-            Ok(output) => CommandOutcome::success(Some(output)),
+    fn review_results(&self, input: ReviewResultsInput) -> CommandOutcome {
+        let (track_id, items_dir, request, limit, round_type, no_hint) = input.into_parts();
+        match self.results.results(track_id, items_dir, request) {
+            Ok(output) => CommandOutcome::success(Some(render_review_results(
+                output,
+                limit,
+                &round_type,
+                no_hint,
+            ))),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
@@ -554,60 +506,103 @@ impl ReviewDriver {
         workspace_root: PathBuf,
     ) -> CommandOutcome {
         match self.service.persist_commit_hash(track_id, workspace_root) {
-            Ok(sha) => {
-                eprintln!("[review] Recorded .commit_hash: {sha}");
-                CommandOutcome::success(None)
-            }
+            Ok(sha) => CommandOutcome {
+                stdout: None,
+                stderr: Some(format!("[review] Recorded .commit_hash: {sha}")),
+                exit_code: 0,
+            },
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
 }
 
-/// Driving adapter for one fully-wired review-fix invocation.
+/// Driving adapter for review-fix invocations.
 ///
-/// Composition supplies the validated command and an injected
-/// [`RunReviewFixService`]. This driver owns the interactor invocation and all
-/// review-fix stdout/stderr and exit-code rendering.
+/// Composition supplies the injected [`RunReviewFixService`]. Callers supply
+/// raw delivery values, which this primary adapter validates through the
+/// usecase-owned command constructor.
 pub struct ReviewFixDriver {
     service: Arc<dyn RunReviewFixService>,
-    command: RunReviewFixCommand,
-    provider: String,
 }
 
 impl ReviewFixDriver {
     /// Creates a review-fix driver from composition-owned wiring.
     #[must_use]
-    pub fn new(
-        service: Arc<dyn RunReviewFixService>,
-        command: RunReviewFixCommand,
-        provider: String,
-    ) -> Self {
-        Self { service, command, provider }
+    pub fn new(service: Arc<dyn RunReviewFixService>) -> Self {
+        Self { service }
     }
 
-    /// Executes the injected interactor and renders the review-fix protocol.
+    /// Validates and executes the injected interactor, then renders its protocol.
     #[must_use]
-    pub fn handle(&self) -> CommandOutcome {
-        eprintln!(
-            "[sotp review fix-local] provider={} model={}",
-            self.provider, self.command.model
-        );
-        match self.service.run(self.command.clone()) {
+    pub fn handle(&self, input: ReviewFixInput) -> CommandOutcome {
+        let (scope, briefing_file, explicit_track_id, items_dir, round_type, model) =
+            input.into_parts();
+        let request = match RunReviewFixRequest::try_new(
+            scope,
+            briefing_file,
+            explicit_track_id,
+            items_dir,
+            round_type,
+            model,
+        ) {
+            Ok(request) => request,
+            Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+        };
+        match self.service.run(request) {
             Ok(output) => review_fix_output_to_outcome(output),
-            Err(RunReviewFixError::SubagentDispatchRequired(instruction)) => {
-                subagent_dispatch_to_outcome(*instruction)
-            }
-            // SmokeTestFailed is a preflight failure (not a review outcome).
+            Err(RunReviewFixError::FixRunnerFailed(
+                ReviewFixRunnerError::SubagentDispatchRequired(instruction),
+            )) => subagent_dispatch_to_outcome(*instruction),
+            // A wrapped smoke-test failure is a preflight failure (not a review outcome).
             // Preserve exit 2 + diagnostic on stderr without emitting a
             // `REVIEW_FIX_STATUS:` line so orchestrators do not classify it
             // as a normal review-fix outcome.
-            Err(RunReviewFixError::SmokeTestFailed(message)) => CommandOutcome {
+            Err(RunReviewFixError::FixRunnerFailed(ReviewFixRunnerError::SmokeTestFailed(
+                message,
+            ))) => CommandOutcome {
                 stdout: None,
                 stderr: Some(format!("[ERROR] smoke test failed: {}", message.as_str())),
                 exit_code: 2,
             },
             Err(error) => CommandOutcome::failure(Some(error.to_string())),
         }
+    }
+}
+
+/// Raw review-fix delivery values supplied by the CLI.
+#[derive(Debug, Clone)]
+pub struct ReviewFixInput {
+    scope: String,
+    briefing_file: PathBuf,
+    explicit_track_id: Option<String>,
+    items_dir: PathBuf,
+    round_type: String,
+    model: Option<String>,
+}
+
+impl ReviewFixInput {
+    #[must_use]
+    pub fn new(
+        scope: String,
+        briefing_file: PathBuf,
+        explicit_track_id: Option<String>,
+        items_dir: PathBuf,
+        round_type: String,
+        model: Option<String>,
+    ) -> Self {
+        Self { scope, briefing_file, explicit_track_id, items_dir, round_type, model }
+    }
+
+    #[must_use]
+    pub fn into_parts(self) -> (String, PathBuf, Option<String>, PathBuf, String, Option<String>) {
+        (
+            self.scope,
+            self.briefing_file,
+            self.explicit_track_id,
+            self.items_dir,
+            self.round_type,
+            self.model,
+        )
     }
 }
 
@@ -630,9 +625,11 @@ fn review_fix_output_to_outcome(output: RunReviewFixOutput) -> CommandOutcome {
 
 fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> CommandOutcome {
     if out.skipped {
-        return CommandOutcome::success(Some(
-            r#"{"verdict":"zero_findings","findings":[]}"#.to_owned(),
-        ));
+        return CommandOutcome {
+            stdout: Some(r#"{"verdict":"zero_findings","findings":[]}"#.to_owned()),
+            stderr: None,
+            exit_code: 0,
+        };
     }
     // Preserve the underlying reviewer's exit code so the convention that
     // `findings_remain` returns exit 2 (distinguishing review findings from
@@ -642,13 +639,14 @@ fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> Com
 
 fn subagent_dispatch_to_outcome(instruction: SubagentDispatchInstruction) -> CommandOutcome {
     let json = format!(
-        "{{\"agent\":{},\"model\":{},\"effort\":{},\"scope\":{},\"briefing_file\":{},\"track_id\":{},\"round_type\":{}}}",
+        "{{\"agent\":{},\"model\":{},\"effort\":{},\"scope\":{},\"briefing_content\":{},\"track_id\":{},\"repository_root\":{},\"round_type\":{}}}",
         json_str(instruction.agent.as_str()),
         json_str(instruction.model.as_str()),
         json_str(effort_value(instruction.effort)),
-        json_str(instruction.scope.as_ref()),
-        json_str(&instruction.briefing_file.display().to_string()),
-        json_str(instruction.track_id.as_ref()),
+        json_str(instruction.scope.as_str()),
+        json_str(instruction.briefing_content.as_str()),
+        json_str(instruction.track_id.as_str()),
+        json_str(&instruction.repository_root.display().to_string()),
         json_str(match instruction.round_type {
             usecase::review_v2::ReviewRoundType::Fast => "fast",
             usecase::review_v2::ReviewRoundType::Final => "final",
@@ -693,28 +691,43 @@ fn json_str(s: &str) -> String {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::fs;
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex};
 
-    use usecase::TrackId;
     use usecase::capability_exec::{ModelName, ReasoningEffort};
+    use usecase::git_workflow::DiagnosticText;
+    use usecase::review_v2::run_review_fix::ReviewFixResolution;
     use usecase::review_v2::run_review_fix::{
-        RunReviewFixCommand, RunReviewFixError, RunReviewFixOutput, RunReviewFixService,
+        ReviewFixBriefingLoadError, ReviewFixBriefingLoaderPort, ReviewFixRunner,
+        ReviewFixRunnerError, ReviewFixTrackResolveError, ReviewFixTrackResolverPort,
+        ReviewTrackId, RunReviewFixCommand, RunReviewFixError, RunReviewFixInteractor,
+        RunReviewFixOutput, RunReviewFixRequest, RunReviewFixService, SubagentBriefingContent,
+        SubagentBriefingContentValidationError,
     };
     use usecase::review_v2::{
+        NonEmptyReviewerFindingsOutput, ReviewApprovalOutput, ReviewCheckApprovedError,
         ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsOutcome,
         ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsService,
-        ReviewCheckZeroFindingsValidationError, ReviewGroupName, ReviewRoundType, ReviewService,
-        SubagentDispatchInstruction, SubagentName,
+        ReviewCheckZeroFindingsValidationError, ReviewRequiredReason, ReviewResultsError,
+        ReviewResultsInteractor, ReviewResultsRoundPort, ReviewResultsScopePort,
+        ReviewResultsScopeSnapshot, ReviewResultsService, ReviewResultsStatePort,
+        ReviewRoundResultOutput, ReviewRoundResultVerdict, ReviewRoundType, ReviewRunInput,
+        ReviewRunLocalOutput, ReviewScopeName, ReviewScopeSelectionRequest,
+        ReviewScopeSelectionValidationError, ReviewService, ReviewStoredRound,
+        ReviewStoredScopeState, ReviewStoredScopeStateEntry, ReviewerFindingOutput, RunReviewError,
+        RunReviewOutput, SubagentDispatchInstruction, SubagentName,
     };
 
     use super::{
         ReviewCheckRoundSelect, ReviewCheckZeroFindingsInput, ReviewDriver, ReviewFixDriver,
-        ReviewInput, SUBAGENT_DISPATCH_EXIT_CODE, SUBAGENT_DISPATCH_SENTINEL,
-        check_zero_findings_outcome_to_command_outcome,
-        check_zero_findings_result_to_command_outcome, subagent_dispatch_to_outcome,
+        ReviewFixInput, ReviewInput, ReviewResultsInput, SUBAGENT_DISPATCH_EXIT_CODE,
+        SUBAGENT_DISPATCH_SENTINEL, check_zero_findings_outcome_to_command_outcome,
+        check_zero_findings_result_to_command_outcome, review_run_local_output_to_outcome,
+        subagent_dispatch_to_outcome,
     };
-    struct UnusedReviewService;
+    struct UnusedReviewService {
+        results_service: Option<Arc<dyn ReviewResultsService>>,
+    }
 
     impl ReviewService for UnusedReviewService {
         fn run_codex(
@@ -755,19 +768,6 @@ mod tests {
             usecase::review_v2::ReviewApprovalOutput,
             usecase::review_v2::ReviewCheckApprovedError,
         > {
-            panic!("check-zero-findings must not call the aggregate review service")
-        }
-
-        fn results(
-            &self,
-            _track_id: Option<String>,
-            _items_dir: PathBuf,
-            _scope: Option<String>,
-            _all: bool,
-            _limit: u32,
-            _round_type: String,
-            _no_hint: bool,
-        ) -> Result<String, usecase::review_v2::ReviewAuxError> {
             panic!("check-zero-findings must not call the aggregate review service")
         }
 
@@ -813,6 +813,120 @@ mod tests {
             _workspace_root: PathBuf,
         ) -> Result<String, usecase::commit_hash_persistence::CommitHashPersistenceError> {
             panic!("check-zero-findings must not call the aggregate review service")
+        }
+    }
+
+    impl usecase::review_v2::ReviewResultsService for UnusedReviewService {
+        fn results(
+            &self,
+            track_id: Option<String>,
+            items_dir: PathBuf,
+            request: usecase::review_v2::ReviewScopeSelectionRequest,
+        ) -> Result<usecase::review_v2::ReviewResultsOutput, usecase::review_v2::ReviewResultsError>
+        {
+            self.results_service
+                .as_ref()
+                .expect("only the results test may invoke the aggregate service")
+                .results(track_id, items_dir, request)
+        }
+    }
+
+    struct CodexAggregateService {
+        received: Mutex<Option<ReviewRunInput>>,
+    }
+
+    impl ReviewService for CodexAggregateService {
+        fn run_codex(&self, input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError> {
+            *self.received.lock().expect("capture lock is healthy") = Some(input);
+            Ok(RunReviewOutput {
+                verdict_kind: "approved".to_owned(),
+                skipped: false,
+                finding_count: 0,
+                summary: Some("aggregate review completed".to_owned()),
+                exit_code: 0,
+            })
+        }
+
+        fn run_claude(&self, _input: ReviewRunInput) -> Result<RunReviewOutput, RunReviewError> {
+            panic!("Codex aggregate test must not invoke Claude")
+        }
+
+        fn run_local(
+            &self,
+            _model: Option<String>,
+            _timeout_seconds: u64,
+            _briefing_file: Option<PathBuf>,
+            _prompt: Option<String>,
+            _track_id: Option<String>,
+            _round_type: String,
+            _group: String,
+            _items_dir: PathBuf,
+        ) -> usecase::review_v2::ReviewRunLocalOutput {
+            panic!("Codex aggregate test must not invoke local review")
+        }
+
+        fn check_approved(
+            &self,
+            _track_id: String,
+            _items_dir: PathBuf,
+        ) -> Result<ReviewApprovalOutput, ReviewCheckApprovedError> {
+            panic!("Codex aggregate test must not check approval")
+        }
+
+        fn classify(
+            &self,
+            _paths: Vec<String>,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Vec<(String, String)>, usecase::review_v2::ReviewAuxError> {
+            panic!("Codex aggregate test must not classify")
+        }
+
+        fn files(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Vec<String>, usecase::review_v2::ReviewAuxError> {
+            panic!("Codex aggregate test must not list files")
+        }
+
+        fn validate_scope(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<(), usecase::review_v2::ReviewAuxError> {
+            panic!("Codex aggregate test must not validate a scope")
+        }
+
+        fn get_briefing(
+            &self,
+            _scope: String,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+        ) -> Result<Option<String>, usecase::review_v2::ReviewAuxError> {
+            panic!("Codex aggregate test must not load a briefing")
+        }
+
+        fn persist_commit_hash(
+            &self,
+            _track_id: String,
+            _workspace_root: PathBuf,
+        ) -> Result<String, usecase::commit_hash_persistence::CommitHashPersistenceError> {
+            panic!("Codex aggregate test must not persist a commit hash")
+        }
+    }
+
+    impl usecase::review_v2::ReviewResultsService for CodexAggregateService {
+        fn results(
+            &self,
+            _track_id: Option<String>,
+            _items_dir: PathBuf,
+            _request: usecase::review_v2::ReviewScopeSelectionRequest,
+        ) -> Result<usecase::review_v2::ReviewResultsOutput, usecase::review_v2::ReviewResultsError>
+        {
+            panic!("Codex aggregate test must not render results")
         }
     }
 
@@ -875,8 +989,84 @@ mod tests {
         result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>,
     ) -> (ReviewDriver, Arc<CapturingCheckZeroFindingsService>) {
         let focused_service = Arc::new(CapturingCheckZeroFindingsService::new(result));
-        let driver = ReviewDriver::new(Arc::new(UnusedReviewService), focused_service.clone());
+        let driver = ReviewDriver::new(
+            Arc::new(UnusedReviewService { results_service: None }),
+            Arc::new(UnusedReviewService { results_service: None }),
+            focused_service.clone(),
+        );
         (driver, focused_service)
+    }
+
+    #[test]
+    fn test_review_driver_hands_codex_input_to_injected_aggregate_service() {
+        let service = Arc::new(CodexAggregateService { received: Mutex::new(None) });
+        let driver = ReviewDriver::new(
+            service.clone(),
+            Arc::new(UnusedReviewService { results_service: None }),
+            Arc::new(CapturingCheckZeroFindingsService::new(Ok(
+                ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,
+            ))),
+        );
+
+        let outcome = driver.handle(ReviewInput::RunCodex(
+            "gpt-5.5".to_owned(),
+            90,
+            Some(PathBuf::from("briefing.md")),
+            Some("review the boundary".to_owned()),
+            Some("aggregate-handoff-2026".to_owned()),
+            "final".to_owned(),
+            "cli_driver".to_owned(),
+            PathBuf::from("track/items"),
+        ));
+
+        let received = service
+            .received
+            .lock()
+            .expect("capture lock is healthy")
+            .take()
+            .expect("driver must invoke the aggregate service once");
+        assert_eq!(received.model, "gpt-5.5");
+        assert_eq!(received.timeout_seconds, 90);
+        assert_eq!(received.briefing_file, Some(PathBuf::from("briefing.md")));
+        assert_eq!(received.prompt.as_deref(), Some("review the boundary"));
+        assert_eq!(received.track_id.as_deref(), Some("aggregate-handoff-2026"));
+        assert_eq!(received.round_type, "final");
+        assert_eq!(received.group, "cli_driver");
+        assert_eq!(received.items_dir, PathBuf::from("track/items"));
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("aggregate review completed"));
+    }
+
+    #[test]
+    fn test_review_run_local_output_renders_structured_diagnostics_to_stderr() {
+        let outcome = review_run_local_output_to_outcome(ReviewRunLocalOutput {
+            summary: Some("review completed".to_owned()),
+            diagnostics: vec![
+                DiagnosticText::new("[info] provider=codex"),
+                DiagnosticText::new("[warn] briefing omitted"),
+            ],
+            exit_code: 0,
+        });
+
+        assert_eq!(outcome.stdout.as_deref(), Some("review completed"));
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some("[info] provider=codex\n[warn] briefing omitted")
+        );
+        assert_eq!(outcome.exit_code, 0);
+    }
+
+    #[test]
+    fn test_review_run_local_output_with_empty_diagnostics_emits_no_stderr() {
+        let outcome = review_run_local_output_to_outcome(ReviewRunLocalOutput {
+            summary: None,
+            diagnostics: Vec::new(),
+            exit_code: 17,
+        });
+
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(outcome.exit_code, 17);
     }
 
     #[test]
@@ -1023,6 +1213,309 @@ mod tests {
     }
 
     #[test]
+    fn test_review_results_input_valid_selector_converts_to_usecase_selection() {
+        let input = ReviewResultsInput::try_new(
+            Some("review-driver-results-2026".to_owned()),
+            PathBuf::from("track/items"),
+            Some("cli_driver".to_owned()),
+            false,
+            0,
+            "any".to_owned(),
+            false,
+        )
+        .expect("valid delivery values must convert");
+
+        let (track_id, items_dir, selection, limit, round_type, no_hint) = input.into_parts();
+        assert_eq!(track_id.as_deref(), Some("review-driver-results-2026"));
+        assert_eq!(items_dir, PathBuf::from("track/items"));
+        assert!(
+            matches!(selection, ReviewScopeSelectionRequest::NamedCandidate(scope) if scope.as_str() == "cli_driver")
+        );
+        assert_eq!(limit, 0);
+        assert_eq!(round_type, "any");
+        assert!(!no_hint);
+    }
+
+    #[test]
+    fn test_review_results_input_omitted_and_explicit_all_convert_to_all_selection() {
+        let omitted = ReviewResultsInput::try_new(
+            None,
+            PathBuf::from("track/items"),
+            None,
+            false,
+            0,
+            "any".to_owned(),
+            false,
+        )
+        .expect("omitting both selectors must select all scopes");
+        let explicit_all = ReviewResultsInput::try_new(
+            None,
+            PathBuf::from("track/items"),
+            None,
+            true,
+            0,
+            "any".to_owned(),
+            false,
+        )
+        .expect("an explicit all selector must select all scopes");
+
+        assert!(matches!(omitted.into_parts().2, ReviewScopeSelectionRequest::All));
+        assert!(matches!(explicit_all.into_parts().2, ReviewScopeSelectionRequest::All));
+    }
+
+    #[test]
+    fn test_review_results_input_scope_and_all_returns_usecase_error() {
+        let result = ReviewResultsInput::try_new(
+            None,
+            PathBuf::from("track/items"),
+            Some("cli_driver".to_owned()),
+            true,
+            0,
+            "any".to_owned(),
+            false,
+        );
+
+        assert!(matches!(result, Err(ReviewScopeSelectionValidationError::ScopeAndAll)));
+    }
+
+    #[test]
+    fn test_review_results_input_invalid_scope_returns_usecase_error() {
+        let result = ReviewResultsInput::try_new(
+            None,
+            PathBuf::from("track/items"),
+            Some("".to_owned()),
+            false,
+            0,
+            "any".to_owned(),
+            false,
+        );
+
+        assert!(matches!(result, Err(ReviewScopeSelectionValidationError::InvalidScope(_))));
+    }
+
+    #[test]
+    fn test_review_results_driver_renders_real_interactor_round_details_and_limited_history() {
+        struct ScopePort;
+
+        impl ReviewResultsScopePort for ScopePort {
+            fn load_scope_snapshot(
+                &self,
+                _track_id: Option<&str>,
+                _items_dir: &std::path::Path,
+            ) -> Result<ReviewResultsScopeSnapshot, ReviewResultsError> {
+                Ok(ReviewResultsScopeSnapshot {
+                    base: "origin/main".to_owned(),
+                    configured_scopes: vec![
+                        ReviewScopeName::try_new("cli_driver".to_owned())
+                            .expect("fixed test scope must be valid"),
+                    ],
+                    review_json_exists: true,
+                })
+            }
+        }
+
+        struct StatePort;
+
+        impl ReviewResultsStatePort for StatePort {
+            fn load_scope_states(
+                &self,
+                _track_id: Option<&str>,
+                _items_dir: &std::path::Path,
+            ) -> Result<Vec<ReviewStoredScopeStateEntry>, ReviewResultsError> {
+                Ok(vec![ReviewStoredScopeStateEntry {
+                    scope: ReviewScopeName::try_new("cli_driver".to_owned())
+                        .expect("fixed test scope must be valid"),
+                    state: ReviewStoredScopeState::Required(ReviewRequiredReason::FindingsRemain),
+                }])
+            }
+        }
+
+        struct RoundPort;
+
+        impl ReviewResultsRoundPort for RoundPort {
+            fn load_scope_rounds(
+                &self,
+                _track_id: Option<&str>,
+                _items_dir: &std::path::Path,
+                scope: &ReviewScopeName,
+            ) -> Result<Vec<ReviewStoredRound>, ReviewResultsError> {
+                assert_eq!(scope.as_str(), "cli_driver");
+                Ok(vec![
+                    ReviewRoundResultOutput {
+                        round_type: ReviewRoundType::Fast,
+                        at: "2026-08-10T12:00:00Z".to_owned(),
+                        verdict: ReviewRoundResultVerdict::ZeroFindings,
+                    },
+                    ReviewRoundResultOutput {
+                        round_type: ReviewRoundType::Fast,
+                        at: "2026-08-10T12:01:00Z".to_owned(),
+                        verdict: ReviewRoundResultVerdict::ZeroFindings,
+                    },
+                    ReviewRoundResultOutput {
+                        round_type: ReviewRoundType::Final,
+                        at: "2026-08-10T12:02:00Z".to_owned(),
+                        verdict: ReviewRoundResultVerdict::FindingsRemain(
+                            NonEmptyReviewerFindingsOutput::try_new(vec![ReviewerFindingOutput {
+                                message: usecase::git_workflow::DiagnosticText::new(
+                                    "retained finding detail",
+                                ),
+                                severity: Some("P1".to_owned()),
+                                file: Some("apps/cli-driver/src/review.rs".to_owned()),
+                                line: Some(123),
+                                category: Some("correctness".to_owned()),
+                            }])
+                            .expect("one test finding is non-empty"),
+                        ),
+                    },
+                ])
+            }
+        }
+
+        let results_service: Arc<dyn ReviewResultsService> =
+            Arc::new(ReviewResultsInteractor::new(
+                Arc::new(ScopePort),
+                Arc::new(StatePort),
+                Arc::new(RoundPort),
+            ));
+        let driver = ReviewDriver::new(
+            Arc::new(UnusedReviewService { results_service: None }),
+            results_service,
+            Arc::new(CapturingCheckZeroFindingsService::new(Ok(
+                ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,
+            ))),
+        );
+        let input = ReviewResultsInput::try_new(
+            Some("results-render-2026".to_owned()),
+            PathBuf::from("track/items"),
+            None,
+            false,
+            2,
+            "any".to_owned(),
+            true,
+        )
+        .expect("valid results input");
+
+        let outcome = driver.handle(ReviewInput::Results(input));
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stderr, None);
+        let rendered = outcome.stdout.expect("results must render to stdout");
+        assert!(rendered.contains("final@2026-08-10T12:02:00Z findings_remain"));
+        assert!(rendered.contains("retained finding detail (apps/cli-driver/src/review.rs:123)"));
+        assert!(rendered.contains("history (newer first, up to --limit):"));
+        assert!(rendered.contains("fast@2026-08-10T12:01:00Z zero_findings"));
+        assert!(
+            !rendered.contains("2026-08-10T12:00:00Z"),
+            "--limit must truncate the oldest history round"
+        );
+    }
+
+    #[test]
+    fn test_review_results_driver_does_not_render_when_results_service_fails() {
+        struct FailingResultsService;
+
+        impl ReviewResultsService for FailingResultsService {
+            fn results(
+                &self,
+                _track_id: Option<String>,
+                _items_dir: PathBuf,
+                _request: ReviewScopeSelectionRequest,
+            ) -> Result<usecase::review_v2::ReviewResultsOutput, ReviewResultsError> {
+                Err(ReviewResultsError::Failed(DiagnosticText::new(
+                    "review results state could not be read",
+                )))
+            }
+        }
+
+        let driver = ReviewDriver::new(
+            Arc::new(UnusedReviewService { results_service: None }),
+            Arc::new(FailingResultsService),
+            Arc::new(CapturingCheckZeroFindingsService::new(Ok(
+                ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,
+            ))),
+        );
+        let input = ReviewResultsInput::try_new(
+            Some("results-render-failure-2026".to_owned()),
+            PathBuf::from("track/items"),
+            None,
+            false,
+            0,
+            "any".to_owned(),
+            true,
+        )
+        .expect("valid results input");
+
+        let outcome = driver.handle(ReviewInput::Results(input));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr.as_deref(), Some("review results state could not be read"));
+    }
+
+    #[test]
+    fn test_review_results_driver_renders_unknown_scope_membership_error() {
+        struct UnknownScopeResultsService;
+
+        impl ReviewResultsService for UnknownScopeResultsService {
+            fn results(
+                &self,
+                _track_id: Option<String>,
+                _items_dir: PathBuf,
+                _request: ReviewScopeSelectionRequest,
+            ) -> Result<usecase::review_v2::ReviewResultsOutput, ReviewResultsError> {
+                Err(ReviewResultsError::UnknownScope(
+                    ReviewScopeName::try_new("not-configured".to_owned())
+                        .expect("format-valid scope"),
+                ))
+            }
+        }
+
+        let driver = ReviewDriver::new(
+            Arc::new(UnusedReviewService { results_service: None }),
+            Arc::new(UnknownScopeResultsService),
+            Arc::new(CapturingCheckZeroFindingsService::new(Ok(
+                ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,
+            ))),
+        );
+        let input = ReviewResultsInput::try_new(
+            Some("results-unknown-scope-2026".to_owned()),
+            PathBuf::from("track/items"),
+            Some("not-configured".to_owned()),
+            false,
+            0,
+            "any".to_owned(),
+            true,
+        )
+        .expect("valid results input");
+
+        let outcome = driver.handle(ReviewInput::Results(input));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr.as_deref(), Some("unknown review results scope: not-configured"));
+    }
+
+    #[test]
+    fn test_review_fix_input_preserves_raw_values_until_usecase_validation() {
+        let input = ReviewFixInput::new(
+            "  invalid scope  ".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/raw briefing.md"),
+            Some(" Invalid Track Id ".to_owned()),
+            PathBuf::from("track/items"),
+            " later ".to_owned(),
+            Some(" ".to_owned()),
+        );
+
+        let (scope, briefing_file, track_id, items_dir, round_type, model) = input.into_parts();
+        assert_eq!(scope, "  invalid scope  ");
+        assert_eq!(briefing_file, PathBuf::from("tmp/reviewer-runtime/raw briefing.md"));
+        assert_eq!(track_id.as_deref(), Some(" Invalid Track Id "));
+        assert_eq!(items_dir, PathBuf::from("track/items"));
+        assert_eq!(round_type, " later ");
+        assert_eq!(model.as_deref(), Some(" "));
+    }
+
+    #[test]
     fn test_review_check_zero_findings_current_final_zero_findings_returns_success() {
         let outcome = check_zero_findings_outcome_to_command_outcome(
             ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,
@@ -1106,7 +1599,7 @@ mod tests {
     impl RunReviewFixService for CompletedFixService {
         fn run(
             &self,
-            _command: RunReviewFixCommand,
+            _command: RunReviewFixRequest,
         ) -> Result<RunReviewFixOutput, RunReviewFixError> {
             Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0, stderr: None })
         }
@@ -1114,34 +1607,839 @@ mod tests {
 
     #[test]
     fn test_review_fix_driver_completed_renders_status() {
-        let driver = ReviewFixDriver::new(
-            Arc::new(CompletedFixService),
-            RunReviewFixCommand {
-                scope: "cli_driver".to_owned(),
-                briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
-                track_id: "review-fix-driver-2026".to_owned(),
-                round_type: "fast".to_owned(),
-                model: "gpt-5.5".to_owned(),
-            },
-            "codex".to_owned(),
-        );
-
-        let outcome = driver.handle();
+        let driver = ReviewFixDriver::new(Arc::new(CompletedFixService));
+        let outcome = driver.handle(ReviewFixInput::new(
+            "cli_driver".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("review-fix-driver-2026".to_owned()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            Some("gpt-5.5".to_owned()),
+        ));
 
         assert_eq!(outcome.exit_code, 0);
         assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
         assert_eq!(outcome.stderr, None);
     }
 
+    struct DispatchingFixService;
+
+    impl RunReviewFixService for DispatchingFixService {
+        fn run(
+            &self,
+            _request: RunReviewFixRequest,
+        ) -> Result<RunReviewFixOutput, RunReviewFixError> {
+            Err(RunReviewFixError::FixRunnerFailed(ReviewFixRunnerError::SubagentDispatchRequired(
+                Box::new(SubagentDispatchInstruction {
+                    agent: SubagentName::try_new("review-fix-lead".to_owned())
+                        .expect("valid test subagent"),
+                    model: ModelName::try_new("gpt-5.5".to_owned()).expect("valid test model"),
+                    effort: ReasoningEffort::High,
+                    scope: ReviewScopeName::try_new("cli_driver".to_owned())
+                        .expect("valid test review scope"),
+                    briefing_content: SubagentBriefingContent::try_new(
+                        "validated briefing\ncontent".to_owned(),
+                    )
+                    .expect("valid briefing content"),
+                    track_id: ReviewTrackId::try_new("dispatch-driver-2026".to_owned())
+                        .expect("valid test track ID"),
+                    repository_root: PathBuf::from("/resolver-proven/root"),
+                    round_type: ReviewRoundType::Final,
+                }),
+            )))
+        }
+    }
+
+    #[test]
+    fn test_review_fix_driver_renders_validated_dispatch_instruction_protocol() {
+        let outcome =
+            ReviewFixDriver::new(Arc::new(DispatchingFixService)).handle(ReviewFixInput::new(
+                "cli_driver".to_owned(),
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                None,
+                PathBuf::from("track/items"),
+                "final".to_owned(),
+                None,
+            ));
+
+        assert_eq!(outcome.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "SUBAGENT_DISPATCH_REQUIRED\n{\"agent\":\"review-fix-lead\",\"model\":\"gpt-5.5\",\"effort\":\"high\",\"scope\":\"cli_driver\",\"briefing_content\":\"validated briefing\\ncontent\",\"track_id\":\"dispatch-driver-2026\",\"repository_root\":\"/resolver-proven/root\",\"round_type\":\"final\"}"
+            )
+        );
+    }
+
+    struct TrackMismatchFixService;
+
+    impl RunReviewFixService for TrackMismatchFixService {
+        fn run(
+            &self,
+            _request: RunReviewFixRequest,
+        ) -> Result<RunReviewFixOutput, RunReviewFixError> {
+            Err(RunReviewFixError::TrackMismatch {
+                explicit: ReviewTrackId::try_new("requested-track-2026".to_owned())
+                    .expect("fixed explicit track ID must be valid"),
+                resolved: ReviewTrackId::try_new("current-track-2026".to_owned())
+                    .expect("fixed resolved track ID must be valid"),
+            })
+        }
+    }
+
+    #[test]
+    fn test_review_fix_driver_renders_typed_track_mismatch_as_nonzero_outcome() {
+        let outcome =
+            ReviewFixDriver::new(Arc::new(TrackMismatchFixService)).handle(ReviewFixInput::new(
+                "cli_driver".to_owned(),
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                Some("requested-track-2026".to_owned()),
+                PathBuf::from("track/items"),
+                "fast".to_owned(),
+                None,
+            ));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stdout.is_none());
+        assert!(outcome.stderr.as_deref().is_some_and(|message| {
+            message.contains("explicit track 'requested-track-2026' does not match current branch track 'current-track-2026'")
+        }));
+    }
+
+    #[derive(Clone, Copy)]
+    enum BriefingLoadFailure {
+        UntrustedFile,
+        ReadFailed,
+        InvalidContent,
+    }
+
+    struct BriefingLoadFailingFixService {
+        failure: BriefingLoadFailure,
+    }
+
+    impl RunReviewFixService for BriefingLoadFailingFixService {
+        fn run(
+            &self,
+            _request: RunReviewFixRequest,
+        ) -> Result<RunReviewFixOutput, RunReviewFixError> {
+            let error = match self.failure {
+                BriefingLoadFailure::UntrustedFile => {
+                    ReviewFixBriefingLoadError::UntrustedFile(DiagnosticText::new("traversal"))
+                }
+                BriefingLoadFailure::ReadFailed => {
+                    ReviewFixBriefingLoadError::ReadFailed(DiagnosticText::new("missing"))
+                }
+                BriefingLoadFailure::InvalidContent => ReviewFixBriefingLoadError::InvalidContent(
+                    SubagentBriefingContentValidationError::ExceedsMaximumBytes,
+                ),
+            };
+            Err(RunReviewFixError::BriefingLoad(error))
+        }
+    }
+
+    #[test]
+    fn test_review_fix_driver_briefing_load_failures_render_nonzero_typed_diagnostics() {
+        let cases = [
+            (BriefingLoadFailure::UntrustedFile, &["not trusted: traversal"][..]),
+            (BriefingLoadFailure::ReadFailed, &["could not read review-fix briefing: missing"][..]),
+            (
+                BriefingLoadFailure::InvalidContent,
+                &[
+                    "review-fix briefing content is invalid",
+                    "review-fix briefing content exceeds the 65536-byte limit",
+                ][..],
+            ),
+        ];
+
+        for (failure, expected_details) in cases {
+            let outcome = ReviewFixDriver::new(Arc::new(BriefingLoadFailingFixService { failure }))
+                .handle(ReviewFixInput::new(
+                    "cli_driver".to_owned(),
+                    PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                    None,
+                    PathBuf::from("track/items"),
+                    "final".to_owned(),
+                    None,
+                ));
+
+            assert_ne!(outcome.exit_code, 0);
+            assert!(outcome.stdout.is_none());
+            assert!(outcome.stderr.as_deref().is_some_and(|message| {
+                message.contains("briefing load failed")
+                    && expected_details.iter().all(|detail| message.contains(detail))
+            }));
+        }
+    }
+
+    struct CapturingFixService {
+        received: Mutex<bool>,
+    }
+
+    impl RunReviewFixService for CapturingFixService {
+        fn run(
+            &self,
+            _request: RunReviewFixRequest,
+        ) -> Result<RunReviewFixOutput, RunReviewFixError> {
+            *self.received.lock().expect("test mutex must not be poisoned") = true;
+            Ok(RunReviewFixOutput {
+                status: "completed".to_owned(),
+                exit_code: 0,
+                stderr: Some("runner completed".to_owned()),
+            })
+        }
+    }
+
+    #[test]
+    fn test_review_fix_driver_validates_raw_input_invokes_service_and_renders_outcome() {
+        let service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let driver = ReviewFixDriver::new(service.clone());
+
+        let outcome = driver.handle(ReviewFixInput::new(
+            " cli_driver ".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("review-fix-driver-2026".to_owned()),
+            PathBuf::from("track/items"),
+            "final".to_owned(),
+            Some("gpt-5.5".to_owned()),
+        ));
+
+        assert!(*service.received.lock().expect("test mutex must not be poisoned"));
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(outcome.stderr.as_deref(), Some("runner completed"));
+    }
+
+    struct RealInteractorResolver {
+        received_items_dirs: Mutex<Vec<PathBuf>>,
+    }
+
+    struct FixedBriefingLoader;
+
+    impl ReviewFixBriefingLoaderPort for FixedBriefingLoader {
+        fn load_briefing_content(
+            &self,
+            _repository_root: &Path,
+            _briefing_file: &Path,
+        ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
+            SubagentBriefingContent::try_new("briefing".to_owned())
+                .map_err(ReviewFixBriefingLoadError::InvalidContent)
+        }
+    }
+
+    struct RecordingBriefingLoader {
+        received_requests: Mutex<Vec<(PathBuf, PathBuf)>>,
+        content: SubagentBriefingContent,
+    }
+
+    impl ReviewFixBriefingLoaderPort for RecordingBriefingLoader {
+        fn load_briefing_content(
+            &self,
+            repository_root: &Path,
+            briefing_file: &Path,
+        ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
+            self.received_requests
+                .lock()
+                .expect("test mutex must not be poisoned")
+                .push((repository_root.to_path_buf(), briefing_file.to_path_buf()));
+            Ok(self.content.clone())
+        }
+    }
+
+    impl ReviewFixTrackResolverPort for RealInteractorResolver {
+        fn resolve_current_track(
+            &self,
+            items_dir: &Path,
+        ) -> Result<ReviewFixResolution, ReviewFixTrackResolveError> {
+            self.received_items_dirs
+                .lock()
+                .expect("test mutex must not be poisoned")
+                .push(items_dir.to_path_buf());
+            Ok(ReviewFixResolution::new(
+                ReviewTrackId::try_new("driver-interactor-2026".to_owned())
+                    .expect("fixed test track ID must be valid"),
+                PathBuf::from("/test-repository"),
+            ))
+        }
+    }
+
+    struct RealInteractorRunner {
+        received_commands: Mutex<Vec<RunReviewFixCommand>>,
+    }
+
+    impl ReviewFixRunner for RealInteractorRunner {
+        fn run_fix(
+            &self,
+            command: RunReviewFixCommand,
+        ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
+            self.received_commands.lock().expect("test mutex must not be poisoned").push(command);
+            Ok(RunReviewFixOutput { status: "completed".to_owned(), exit_code: 0, stderr: None })
+        }
+    }
+
+    #[test]
+    fn test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome() {
+        let resolver =
+            Arc::new(RealInteractorResolver { received_items_dirs: Mutex::new(Vec::new()) });
+        let loader = Arc::new(RecordingBriefingLoader {
+            received_requests: Mutex::new(Vec::new()),
+            content: SubagentBriefingContent::try_new("trusted loader content".to_owned())
+                .expect("fixed test briefing must be valid"),
+        });
+        let runner = Arc::new(RealInteractorRunner { received_commands: Mutex::new(Vec::new()) });
+        let service: Arc<dyn RunReviewFixService> =
+            Arc::new(RunReviewFixInteractor::new(resolver.clone(), loader.clone(), runner.clone()));
+        let driver = ReviewFixDriver::new(service);
+
+        let outcome = driver.handle(ReviewFixInput::new(
+            " cli_driver ".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            None,
+            PathBuf::from("track/items/driver-interactor"),
+            "final".to_owned(),
+            Some("gpt-5.5".to_owned()),
+        ));
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(
+            *resolver.received_items_dirs.lock().expect("test mutex must not be poisoned"),
+            vec![PathBuf::from("track/items/driver-interactor")]
+        );
+        assert_eq!(
+            *loader.received_requests.lock().expect("test mutex must not be poisoned"),
+            vec![(
+                PathBuf::from("/test-repository"),
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            )]
+        );
+        let command = runner
+            .received_commands
+            .lock()
+            .expect("test mutex must not be poisoned")
+            .pop()
+            .expect("resolved command must reach the runner");
+        assert_eq!(command.scope(), " cli_driver ");
+        assert_eq!(command.track_id(), "driver-interactor-2026");
+        assert_eq!(command.repository_root(), PathBuf::from("/test-repository"));
+        assert_eq!(command.briefing_content().as_str(), "trusted loader content");
+        assert!(matches!(command.round_type(), ReviewRoundType::Final));
+        assert_eq!(command.model().map(ModelName::as_str), Some("gpt-5.5"));
+    }
+
+    #[test]
+    fn test_review_fix_driver_rejects_full_raw_validation_matrix_without_invoking_service() {
+        let accepted_service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let accepted = ReviewFixDriver::new(accepted_service.clone()).handle(ReviewFixInput::new(
+            "OtHeR".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("review-fix-driver-2026".to_owned()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            Some("gpt-5.5".to_owned()),
+        ));
+
+        assert_eq!(accepted.exit_code, 0);
+        assert!(
+            *accepted_service.received.lock().expect("test mutex must not be poisoned"),
+            "case-insensitive other must reach the usecase boundary"
+        );
+
+        let service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let driver = ReviewFixDriver::new(service.clone());
+        let cases = [
+            (
+                "empty scope",
+                "".to_owned(),
+                Some("review-fix-driver-2026".to_owned()),
+                "fast".to_owned(),
+                "invalid review-fix scope",
+            ),
+            (
+                "non-ASCII scope",
+                "非ASCII".to_owned(),
+                Some("review-fix-driver-2026".to_owned()),
+                "fast".to_owned(),
+                "invalid review-fix scope",
+            ),
+            (
+                "track ID outside the domain invariant",
+                "cli_driver".to_owned(),
+                Some("Invalid Track ID".to_owned()),
+                "fast".to_owned(),
+                "invalid review-fix track ID",
+            ),
+            (
+                "unknown round type",
+                "cli_driver".to_owned(),
+                Some("review-fix-driver-2026".to_owned()),
+                "later".to_owned(),
+                "invalid review-fix round type",
+            ),
+        ];
+        for (case, scope, track_id, round_type, expected_field) in cases {
+            let outcome = driver.handle(ReviewFixInput::new(
+                scope,
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                track_id,
+                PathBuf::from("track/items"),
+                round_type,
+                Some("gpt-5.5".to_owned()),
+            ));
+
+            assert_ne!(outcome.exit_code, 0, "{case} must return a non-zero outcome");
+            assert!(
+                outcome
+                    .stderr
+                    .as_deref()
+                    .is_some_and(|message| { message.contains(expected_field) }),
+                "{case} must identify its invalid field"
+            );
+        }
+        assert!(
+            !*service.received.lock().expect("test mutex must not be poisoned"),
+            "invalid raw input must be rejected before the injected service runs"
+        );
+    }
+
+    #[test]
+    fn test_review_fix_driver_renders_invalid_track_id_validation_error() {
+        let service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let outcome = ReviewFixDriver::new(service.clone()).handle(ReviewFixInput::new(
+            "cli_driver".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("Invalid Track ID".to_owned()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            None,
+        ));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stdout.is_none());
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("invalid review-fix track ID"))
+        );
+        assert!(
+            !*service.received.lock().expect("test mutex must not be poisoned"),
+            "the Invalid(DiagnosticText) track-ID error must be rendered before service invocation"
+        );
+    }
+
+    #[test]
+    fn test_review_fix_driver_renders_raw_validation_and_interactor_error_boundaries() {
+        let accepted_service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let accepted = ReviewFixDriver::new(accepted_service.clone()).handle(ReviewFixInput::new(
+            "OTHER".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("review-fix-driver-2026".to_owned()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            None,
+        ));
+        assert_eq!(accepted.exit_code, 0);
+        assert!(
+            *accepted_service.received.lock().expect("test mutex must not be poisoned"),
+            "catch-all other must not be a scope validation error"
+        );
+
+        let service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let driver = ReviewFixDriver::new(service.clone());
+
+        let invalid_scope = driver.handle(ReviewFixInput::new(
+            "".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("review-fix-driver-2026".to_owned()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            None,
+        ));
+        let invalid_track = driver.handle(ReviewFixInput::new(
+            "cli_driver".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("invalid track id".to_owned()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            None,
+        ));
+
+        assert_ne!(invalid_scope.exit_code, 0);
+        assert!(
+            invalid_scope
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("invalid review-fix scope"))
+        );
+        assert_ne!(invalid_track.exit_code, 0);
+        assert!(
+            invalid_track
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("invalid review-fix track ID"))
+        );
+        assert!(
+            !*service.received.lock().expect("test mutex must not be poisoned"),
+            "invalid raw values must not invoke the injected service"
+        );
+
+        struct ResolvingTrack;
+
+        impl ReviewFixTrackResolverPort for ResolvingTrack {
+            fn resolve_current_track(
+                &self,
+                _items_dir: &Path,
+            ) -> Result<ReviewFixResolution, ReviewFixTrackResolveError> {
+                Ok(ReviewFixResolution::new(
+                    ReviewTrackId::try_new("review-fix-driver-2026".to_owned())
+                        .expect("fixed test track ID must be valid"),
+                    PathBuf::from("/test-repository"),
+                ))
+            }
+        }
+
+        struct NonTrackBranch;
+
+        impl ReviewFixTrackResolverPort for NonTrackBranch {
+            fn resolve_current_track(
+                &self,
+                _items_dir: &Path,
+            ) -> Result<ReviewFixResolution, ReviewFixTrackResolveError> {
+                Err(ReviewFixTrackResolveError::NonTrackBranch(
+                    usecase::git_workflow::DiagnosticText::new("detached"),
+                ))
+            }
+        }
+
+        struct SpawnFailingRunner;
+
+        impl ReviewFixRunner for SpawnFailingRunner {
+            fn run_fix(
+                &self,
+                _command: RunReviewFixCommand,
+            ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
+                Err(ReviewFixRunnerError::SpawnFailed(usecase::git_workflow::DiagnosticText::new(
+                    "runner unavailable",
+                )))
+            }
+        }
+
+        struct UntrustedBriefingLoader;
+
+        impl ReviewFixBriefingLoaderPort for UntrustedBriefingLoader {
+            fn load_briefing_content(
+                &self,
+                _repository_root: &Path,
+                _briefing_file: &Path,
+            ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
+                Err(ReviewFixBriefingLoadError::UntrustedFile(DiagnosticText::new(
+                    "symlinked intermediate component",
+                )))
+            }
+        }
+
+        struct RootMismatchRunner;
+
+        impl ReviewFixRunner for RootMismatchRunner {
+            fn run_fix(
+                &self,
+                _command: RunReviewFixCommand,
+            ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
+                Err(ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(
+                    "resolver-proven repository root does not match the runner repository",
+                )))
+            }
+        }
+
+        struct DispatchRunner;
+
+        impl ReviewFixRunner for DispatchRunner {
+            fn run_fix(
+                &self,
+                _command: RunReviewFixCommand,
+            ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
+                Err(ReviewFixRunnerError::SubagentDispatchRequired(Box::new(
+                    SubagentDispatchInstruction {
+                        agent: SubagentName::try_new("review-fix-lead".to_owned())
+                            .expect("valid test subagent"),
+                        model: ModelName::try_new("gpt-5.5").expect("valid test model"),
+                        effort: ReasoningEffort::Low,
+                        scope: ReviewScopeName::try_new("cli_driver".to_owned())
+                            .expect("valid test review scope"),
+                        briefing_content: SubagentBriefingContent::try_new("briefing".to_owned())
+                            .expect("valid briefing"),
+                        track_id: ReviewTrackId::try_new("review-fix-driver-2026".to_owned())
+                            .expect("valid test track ID"),
+                        repository_root: PathBuf::from("/resolver-proven/root"),
+                        round_type: ReviewRoundType::Fast,
+                    },
+                )))
+            }
+        }
+
+        let input = || {
+            ReviewFixInput::new(
+                "cli_driver".to_owned(),
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                None,
+                PathBuf::from("track/items"),
+                "fast".to_owned(),
+                None,
+            )
+        };
+        let runner_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
+            Arc::new(ResolvingTrack),
+            Arc::new(FixedBriefingLoader),
+            Arc::new(SpawnFailingRunner),
+        )))
+        .handle(input());
+        let resolution_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
+            Arc::new(NonTrackBranch),
+            Arc::new(FixedBriefingLoader),
+            Arc::new(SpawnFailingRunner),
+        )))
+        .handle(input());
+        let briefing_load_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
+            Arc::new(ResolvingTrack),
+            Arc::new(UntrustedBriefingLoader),
+            Arc::new(SpawnFailingRunner),
+        )))
+        .handle(input());
+        let dispatch = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
+            Arc::new(ResolvingTrack),
+            Arc::new(FixedBriefingLoader),
+            Arc::new(DispatchRunner),
+        )))
+        .handle(input());
+        let root_mismatch = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
+            Arc::new(ResolvingTrack),
+            Arc::new(FixedBriefingLoader),
+            Arc::new(RootMismatchRunner),
+        )))
+        .handle(input());
+
+        assert_ne!(runner_failure.exit_code, 0);
+        assert!(runner_failure.stderr.as_deref().is_some_and(|message| {
+            message.contains("fix runner failed: spawn failed: runner unavailable")
+        }));
+        assert_ne!(resolution_failure.exit_code, 0);
+        assert!(
+            resolution_failure
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("track resolution failed"))
+        );
+        assert_ne!(briefing_load_failure.exit_code, 0);
+        assert!(briefing_load_failure.stderr.as_deref().is_some_and(|message| {
+            message.contains(
+                "briefing load failed: review-fix briefing file is not trusted: symlinked intermediate component",
+            )
+        }));
+        assert_eq!(dispatch.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);
+        assert!(
+            dispatch
+                .stdout
+                .as_deref()
+                .is_some_and(|output| output.starts_with(SUBAGENT_DISPATCH_SENTINEL))
+        );
+        assert_ne!(root_mismatch.exit_code, 0);
+        assert!(root_mismatch.stderr.as_deref().is_some_and(|message| {
+            message.contains("resolver-proven repository root does not match the runner repository")
+        }));
+    }
+
+    #[test]
+    fn test_review_fix_driver_renders_round_smoke_and_track_mismatch_errors() {
+        let service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let invalid_round_type = ReviewFixDriver::new(service.clone()).handle(ReviewFixInput::new(
+            "cli_driver".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            None,
+            PathBuf::from("track/items"),
+            "later".to_owned(),
+            None,
+        ));
+
+        assert_ne!(invalid_round_type.exit_code, 0);
+        assert!(
+            invalid_round_type
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("invalid review-fix round type"))
+        );
+        assert!(
+            !*service.received.lock().expect("test mutex must not be poisoned"),
+            "invalid round types must not invoke the injected service"
+        );
+
+        struct ResolvingTrack;
+
+        impl ReviewFixTrackResolverPort for ResolvingTrack {
+            fn resolve_current_track(
+                &self,
+                _items_dir: &Path,
+            ) -> Result<ReviewFixResolution, ReviewFixTrackResolveError> {
+                Ok(ReviewFixResolution::new(
+                    ReviewTrackId::try_new("review-fix-driver-2026".to_owned())
+                        .expect("fixed test track ID must be valid"),
+                    PathBuf::from("/test-repository"),
+                ))
+            }
+        }
+
+        struct SmokeFailingRunner;
+
+        impl ReviewFixRunner for SmokeFailingRunner {
+            fn run_fix(
+                &self,
+                _command: RunReviewFixCommand,
+            ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
+                Err(ReviewFixRunnerError::SmokeTestFailed(
+                    usecase::git_workflow::DiagnosticText::new("sandbox denied"),
+                ))
+            }
+        }
+
+        let input = |track_id| {
+            ReviewFixInput::new(
+                "cli_driver".to_owned(),
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                track_id,
+                PathBuf::from("track/items"),
+                "fast".to_owned(),
+                None,
+            )
+        };
+        let smoke_test_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
+            Arc::new(ResolvingTrack),
+            Arc::new(FixedBriefingLoader),
+            Arc::new(SmokeFailingRunner),
+        )))
+        .handle(input(None));
+        let track_mismatch = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
+            Arc::new(ResolvingTrack),
+            Arc::new(FixedBriefingLoader),
+            Arc::new(SmokeFailingRunner),
+        )))
+        .handle(input(Some("other-track-2026".to_owned())));
+
+        assert_eq!(smoke_test_failure.exit_code, 2);
+        assert_eq!(smoke_test_failure.stdout, None);
+        assert_eq!(
+            smoke_test_failure.stderr.as_deref(),
+            Some("[ERROR] smoke test failed: sandbox denied")
+        );
+        assert_ne!(track_mismatch.exit_code, 0);
+        assert!(
+            track_mismatch.stderr.as_deref().is_some_and(|message| message.contains(
+                "explicit track 'other-track-2026' does not match current branch track 'review-fix-driver-2026'"
+            ))
+        );
+    }
+
+    #[test]
+    fn test_review_fix_driver_renders_all_runner_error_variants() {
+        struct RunnerErrorService {
+            error: Mutex<Option<ReviewFixRunnerError>>,
+        }
+
+        impl RunReviewFixService for RunnerErrorService {
+            fn run(
+                &self,
+                _request: RunReviewFixRequest,
+            ) -> Result<RunReviewFixOutput, RunReviewFixError> {
+                let error = self
+                    .error
+                    .lock()
+                    .expect("test mutex must not be poisoned")
+                    .take()
+                    .expect("runner error service must be invoked once");
+                Err(RunReviewFixError::FixRunnerFailed(error))
+            }
+        }
+
+        let input = || {
+            ReviewFixInput::new(
+                "cli_driver".to_owned(),
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                None,
+                PathBuf::from("track/items"),
+                "fast".to_owned(),
+                None,
+            )
+        };
+        let render = |error: ReviewFixRunnerError| {
+            ReviewFixDriver::new(Arc::new(RunnerErrorService { error: Mutex::new(Some(error)) }))
+                .handle(input())
+        };
+
+        let smoke = render(ReviewFixRunnerError::SmokeTestFailed(DiagnosticText::new("sandbox")));
+        let spawn = render(ReviewFixRunnerError::SpawnFailed(DiagnosticText::new("spawn")));
+        let sentinel =
+            render(ReviewFixRunnerError::SentinelNotFound(DiagnosticText::new("sentinel")));
+        let dispatch = render(ReviewFixRunnerError::SubagentDispatchRequired(Box::new(
+            SubagentDispatchInstruction {
+                agent: SubagentName::try_new("review-fix-lead".to_owned())
+                    .expect("valid test subagent"),
+                model: ModelName::try_new("gpt-5.5").expect("valid test model"),
+                effort: ReasoningEffort::Low,
+                scope: ReviewScopeName::try_new("cli_driver".to_owned())
+                    .expect("valid test review scope"),
+                briefing_content: SubagentBriefingContent::try_new("briefing".to_owned())
+                    .expect("valid test briefing"),
+                track_id: ReviewTrackId::try_new("review-fix-driver-2026".to_owned())
+                    .expect("valid test track ID"),
+                repository_root: PathBuf::from("/resolver-proven/root"),
+                round_type: ReviewRoundType::Fast,
+            },
+        )));
+        let unexpected =
+            render(ReviewFixRunnerError::Unexpected(DiagnosticText::new("unexpected")));
+
+        assert_eq!(smoke.exit_code, 2);
+        assert_eq!(smoke.stdout, None);
+        assert_eq!(smoke.stderr.as_deref(), Some("[ERROR] smoke test failed: sandbox"));
+        assert_ne!(spawn.exit_code, 0);
+        assert!(spawn.stderr.as_deref().is_some_and(|message| message.contains("spawn failed")));
+        assert_ne!(sentinel.exit_code, 0);
+        assert!(
+            sentinel
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("sentinel not found in output"))
+        );
+        assert_eq!(dispatch.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);
+        assert!(
+            dispatch
+                .stdout
+                .as_deref()
+                .is_some_and(|output| output.starts_with(SUBAGENT_DISPATCH_SENTINEL))
+        );
+        assert_ne!(unexpected.exit_code, 0);
+        assert!(
+            unexpected
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("unexpected error"))
+        );
+    }
+
     #[test]
     fn test_subagent_dispatch_instruction_renders_sentinel_and_single_line_json() {
         let outcome = subagent_dispatch_to_outcome(SubagentDispatchInstruction {
-            agent: SubagentName::try_new("review-fix-lead").expect("valid test subagent"),
+            agent: SubagentName::try_new("review-fix-lead".to_owned())
+                .expect("valid test subagent"),
             model: ModelName::try_new("claude\"model").expect("valid test model"),
             effort: ReasoningEffort::Low,
-            scope: ReviewGroupName::try_new("cli_driver").expect("valid test review group"),
-            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing\\file.md"),
-            track_id: TrackId::try_new("dispatch-render-2026").expect("valid test track ID"),
+            scope: ReviewScopeName::try_new("cli_driver".to_owned())
+                .expect("valid test review scope"),
+            briefing_content: SubagentBriefingContent::try_new("briefing\\content".to_owned())
+                .expect("valid briefing"),
+            track_id: ReviewTrackId::try_new("dispatch-render-2026".to_owned())
+                .expect("valid test track ID"),
+            repository_root: PathBuf::from("/resolver-proven/root\\path"),
             round_type: ReviewRoundType::Fast,
         });
 
@@ -1152,7 +2450,7 @@ mod tests {
         assert_eq!(
             lines.next(),
             Some(
-                "{\"agent\":\"review-fix-lead\",\"model\":\"claude\\\"model\",\"effort\":\"low\",\"scope\":\"cli_driver\",\"briefing_file\":\"tmp/reviewer-runtime/briefing\\\\file.md\",\"track_id\":\"dispatch-render-2026\",\"round_type\":\"fast\"}"
+                "{\"agent\":\"review-fix-lead\",\"model\":\"claude\\\"model\",\"effort\":\"low\",\"scope\":\"cli_driver\",\"briefing_content\":\"briefing\\\\content\",\"track_id\":\"dispatch-render-2026\",\"repository_root\":\"/resolver-proven/root\\\\path\",\"round_type\":\"fast\"}"
             )
         );
         assert_eq!(lines.next(), None, "dispatch JSON must occupy one line");

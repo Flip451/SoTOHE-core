@@ -168,10 +168,123 @@
           "name": "into_parts",
           "params": [],
           "receiver": "self",
-          "returns": "(Option<String>, std::path::PathBuf, usecase::review_v2::review_aux::ReviewScopeSelection, u32, String, bool)"
+          "returns": "(Option<String>, std::path::PathBuf, usecase::review_v2::review_aux::ReviewScopeSelectionRequest, u32, String, bool)"
         }
       ],
       "type_name": "ReviewResultsInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "explicit_track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(String, std::path::PathBuf, Option<String>, std::path::PathBuf, String, Option<String>)"
+        }
+      ],
+      "type_name": "ReviewFixInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::run_review_fix::RunReviewFixService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewFixInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ReviewFixDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewService>"
+            },
+            {
+              "name": "results",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewResultsService>"
+            },
+            {
+              "name": "check_zero_findings",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewCheckZeroFindingsService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ReviewDriver"
     }
   ],
   "layer": "cli_driver",
@@ -319,6 +432,14 @@
     },
     {
       "for_type": "ReviewResultsInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewFixInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewFixInput",
       "trait_ref": "core::clone::Clone"
     }
   ],
@@ -827,7 +948,7 @@
     },
     "ReviewDriver": {
       "action": "modify",
-      "docs": "Primary review adapter (CN-06, AC-16).",
+      "docs": "Primary review adapter (CN-06, AC-16, IN-15, AC-18).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -846,6 +967,10 @@
             {
               "name": "service",
               "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewService>"
+            },
+            {
+              "name": "results",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewResultsService>"
             },
             {
               "name": "check_zero_findings",
@@ -879,6 +1004,127 @@
         },
         {
           "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixDriver": {
+      "action": "modify",
+      "docs": "Review-fix primary adapter (CN-09, AC-19, IN-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::run_review_fix::RunReviewFixService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewFixInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixInput": {
+      "action": "add",
+      "docs": "Raw CLI-spelling DTO for review-fix commands (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            { "name": "scope", "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "explicit_track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "round_type", "ty": "String" },
+            { "name": "model", "ty": "Option<String>" }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(String, std::path::PathBuf, Option<String>, std::path::PathBuf, String, Option<String>)"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -1048,7 +1294,7 @@
     },
     "ReviewResultsInput": {
       "action": "add",
-      "docs": "Review results driver input DTO (IN-15, AC-18).",
+      "docs": "Raw CLI-spelling DTO for review-results queries (IN-15, AC-18).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1058,7 +1304,52 @@
           "kind": "plain"
         }
       },
-      "methods": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "scope",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "all",
+              "ty": "bool"
+            },
+            {
+              "name": "limit",
+              "ty": "u32"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "no_hint",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<Self, usecase::review_v2::review_aux::ReviewScopeSelectionValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(Option<String>, std::path::PathBuf, usecase::review_v2::review_aux::ReviewScopeSelectionRequest, u32, String, bool)"
+        }
+      ],
       "module_path": "review",
       "role": {
         "Dto": {}

@@ -3,6 +3,34 @@
   "obligations": [
     {
       "id": {
+        "entry_key": "domain::review_v2::types::derive_review_approval_verdict",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+        "section_key": "functions",
+        "entry_key": "domain::review_v2::types::derive_review_approval_verdict"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of domain::review_v2::types::derive_review_approval_verdict",
+      "declaration_hash": "2d90ca06b7bf5840af084dde08b36c0e81eee1f1c516a128ab1fa6c323bfe814",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-14"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-17"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "PhaseCommandInteractor",
         "obligation_kind": "result",
         "item_identifier": "entry"
@@ -146,6 +174,74 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "ReviewResultsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of ReviewResultsInteractor",
+      "declaration_hash": "77f21041135dce4c0aa2cd3b2aa38d01de5754c7890de2c506f301cdf1e9525c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RunReviewFixInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "RunReviewFixInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of RunReviewFixInteractor",
+      "declaration_hash": "4a3dbe492c425a2d351592b67afd71fb29afeeaede9128dc746b452d51001159",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-16"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-19"
         }
       ]
     },
@@ -587,6 +683,190 @@
     },
     {
       "id": {
+        "entry_key": "ReviewFixBriefingLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_briefing_content"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewFixBriefingLoaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_briefing_content' of ReviewFixBriefingLoaderPort",
+      "declaration_hash": "da792da944ffbb67260f05bb5db01dfffbee0dff59d23b6d8b4238d837f93abc",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewFixTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_current_track"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewFixTrackResolverPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:resolve_current_track' of ReviewFixTrackResolverPort",
+      "declaration_hash": "e5a6e3b5db6cf639d8a4e21b8ad8c5579a942accbde79ace649822b644539be2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-16"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-19"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewResultsRoundPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_scope_rounds"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewResultsRoundPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_scope_rounds' of ReviewResultsRoundPort",
+      "declaration_hash": "0ea831f08a996cb5e437fad68a89969fc483257ef4a992998b1e6ddfa483c432",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewResultsScopePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_scope_snapshot"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewResultsScopePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_scope_snapshot' of ReviewResultsScopePort",
+      "declaration_hash": "a16859e2b3f75fc25e28893db457f090566fa4cbbc1b2f01d014d362548a148c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewResultsService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:results"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewResultsService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:results' of ReviewResultsService",
+      "declaration_hash": "86929edc38ac3224a5cb8d7b65803d8b79a8ed221cbfede4b894d01abd734184",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewResultsStatePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_scope_states"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewResultsStatePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_scope_states' of ReviewResultsStatePort",
+      "declaration_hash": "0793ddd77eebbbf49a1431399717e208c86f0438c13db457ccf0537a5560e48b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "ReviewService",
         "obligation_kind": "result",
         "item_identifier": "trait_method:run_codex"
@@ -601,7 +881,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_codex' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -610,6 +890,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -629,7 +917,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_claude' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -638,6 +926,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -657,7 +953,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:run_local' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -666,6 +962,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -685,7 +989,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:check_approved' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -694,34 +998,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:results"
-      },
-      "target_entry": {
-        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-        "section_key": "traits",
-        "entry_key": "ReviewService"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "ApplicationService"
-      },
-      "brief": "Author a result test covering 'trait_method:results' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
-      "spec_refs": [
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
         },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -741,7 +1025,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:classify' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -750,6 +1034,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -769,7 +1061,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:files' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -778,6 +1070,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -797,7 +1097,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:validate_scope' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -806,6 +1106,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -825,7 +1133,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:get_briefing' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -834,6 +1142,14 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
         }
       ]
     },
@@ -853,7 +1169,7 @@
         "role": "ApplicationService"
       },
       "brief": "Author a result test covering 'trait_method:persist_commit_hash' of ReviewService",
-      "declaration_hash": "93818802f0ec58fbefbb0920725c1ef0ae20c7e998447324c87c8318d8f60d47",
+      "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -862,6 +1178,46 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RunReviewFixService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:run"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "RunReviewFixService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:run' of RunReviewFixService",
+      "declaration_hash": "111c83b134a8093641a6c083ed304b9f3a79570b46cb7c9f9bb1def4c3239faa",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-16"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-19"
         }
       ]
     },
@@ -1074,6 +1430,186 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ResultsScopeAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::review_aux::ReviewResultsScopePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ResultsScopeAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::review_aux::ReviewResultsScopePort' of ResultsScopeAdapter",
+      "declaration_hash": "9d562861c215018dc74e8d2786a3184b5053fe8c97ad5c6214ba644aeb81ec73",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-15"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-18"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ResultsStateAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::review_aux::ReviewResultsStatePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ResultsStateAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::review_aux::ReviewResultsStatePort' of ResultsStateAdapter",
+      "declaration_hash": "3fc4d78f386350347c9e95a10521b4b878a31b54285e7cbb44b4344fbfbb2319",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ResultsRoundAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::review_aux::ReviewResultsRoundPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ResultsRoundAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::review_aux::ReviewResultsRoundPort' of ResultsRoundAdapter",
+      "declaration_hash": "cc506e3671d74cfff4f0e0903e1ce10409aa1a745b8f7ac6aa7119b6027d0818",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-20"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ReviewFixRunnerAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixRunner"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ReviewFixRunnerAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::run_review_fix::ReviewFixRunner' of ReviewFixRunnerAdapter",
+      "declaration_hash": "babb23ee1f82538f2d95178c7eef07c350426a5b1f61ff632fd87a49ae458e67",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-16"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-19"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "GitReviewFixTrackResolver",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "GitReviewFixTrackResolver"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort' of GitReviewFixTrackResolver",
+      "declaration_hash": "417dc28a5f240d1085375d48e73cd34395fb251996444a3a015762a2302708b7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-16"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-19"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TrustedReviewFixBriefingLoader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "TrustedReviewFixBriefingLoader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort' of TrustedReviewFixBriefingLoader",
+      "declaration_hash": "e9483b3225c5c87153bbee6ba4334c8a8a789a1bd35d0d6087dedb122ea8247c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-16"
         }
       ]
     },

@@ -499,6 +499,38 @@ pub enum ReviewApprovalVerdict {
     },
 }
 
+/// Derives the track-wide approval verdict from a complete review-state snapshot.
+///
+/// This is deliberately pure: callers supply whether persisted review state exists,
+/// while the domain owns the approval and bypass semantics shared by every adapter.
+#[must_use]
+pub fn derive_review_approval_verdict(
+    states: impl IntoIterator<Item = (ScopeName, ReviewState)>,
+    review_json_exists: bool,
+) -> ReviewApprovalVerdict {
+    let required: Vec<(ScopeName, RequiredReason)> = states
+        .into_iter()
+        .filter_map(|(scope, state)| match state {
+            ReviewState::Required(reason) => Some((scope, reason)),
+            ReviewState::NotRequired(_) => None,
+        })
+        .collect();
+
+    if required.is_empty() {
+        return ReviewApprovalVerdict::Approved;
+    }
+
+    if !review_json_exists
+        && required.iter().all(|(_, reason)| matches!(reason, RequiredReason::NotStarted))
+    {
+        return ReviewApprovalVerdict::ApprovedWithBypass { not_started_count: required.len() };
+    }
+
+    let mut required_scopes = required.into_iter().map(|(scope, _)| scope).collect::<Vec<_>>();
+    required_scopes.sort_by_key(|scope| scope.to_string());
+    ReviewApprovalVerdict::Blocked { required_scopes }
+}
+
 // ── Verdict JSON extraction ───────────────────────────────────────────────────
 
 /// Scans text content for a JSON verdict block. Pure function (no file I/O).

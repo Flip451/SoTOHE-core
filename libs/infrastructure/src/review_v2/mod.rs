@@ -8,11 +8,14 @@ pub mod codex_reviewer;
 pub mod diff_getter;
 pub mod hasher;
 pub mod persistence;
+pub mod results;
+pub mod review_fix_adapter;
 pub mod review_fix_runner;
 pub mod scope_config_loader;
 mod session;
 
 pub use check_zero_findings::ReviewCheckZeroFindingsStateAdapter;
+pub(crate) use check_zero_findings::resolve_review_diff_base;
 pub use claude_reviewer::ClaudeReviewer;
 pub use codex_reviewer::CodexReviewer;
 pub use diff_getter::GitDiffGetter;
@@ -20,5 +23,9 @@ pub(crate) use diff_getter::RootedGitDiffGetter;
 pub(crate) use hasher::RootedSystemReviewHasher;
 pub use hasher::SystemReviewHasher;
 pub use persistence::{FsCommitHashStore, FsReviewStore};
+pub use results::{ResultsRoundAdapter, ResultsScopeAdapter, ResultsStateAdapter};
+pub use review_fix_adapter::{
+    GitReviewFixTrackResolver, ReviewFixRunnerAdapter, TrustedReviewFixBriefingLoader,
+};
 pub use review_fix_runner::CodexReviewFixRunner;
 pub use scope_config_loader::load_v2_scope_config;

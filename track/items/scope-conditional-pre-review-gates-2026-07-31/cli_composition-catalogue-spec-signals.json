@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d6208f1b6a976ce3a678fb30533ba5310b353b8b8a3e071717bcae7d596cb30b",
+  "catalogue_declaration_hash": "7e212bd5334fb651854d188e4fe711ecc9e6520bc4807442c4ef2f3f1aa154d2",
   "signals": [
     {
       "type_name": "CapabilityCompositionRoot",
@@ -16,6 +16,16 @@
       "type_name": "RefVerifyCompositionRoot",
       "signal": "blue",
       "entry_hash": "ecaba0e448916267967f52d3c0c4f4e644087b780680da82025cf32231dd87b5"
+    },
+    {
+      "type_name": "ReviewCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "7591b6b86a5ed329e9c516601b97916c1835429616ff4b9ca776381a14b2efef"
+    },
+    {
+      "type_name": "CodexReviewOutcome",
+      "signal": "blue",
+      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5"
     },
     {
       "type_name": "RefVerifyChainFilter",
@@ -41,6 +51,46 @@
       "type_name": "RefVerifyVerdictFilter",
       "signal": "blue",
       "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+    },
+    {
+      "type_name": "ReviewResultsInput",
+      "signal": "blue",
+      "entry_hash": "50aadc06fa460e3ff1ebb3be29c9d3b9c8136263af27ebc3e4ceec6373bc8039"
+    },
+    {
+      "type_name": "ReviewSharedError",
+      "signal": "blue",
+      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5"
+    },
+    {
+      "type_name": "ReviewV2Composition",
+      "signal": "blue",
+      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5"
+    },
+    {
+      "type_name": "RunReviewFixLocalInput",
+      "signal": "blue",
+      "entry_hash": "ef4600434a50e7fad4474ae3d43b7cb5b592bf27d08f5491e5517a399371d78c"
+    },
+    {
+      "type_name": "cli_composition::review_v2::briefing::append_scope_briefing_reference_str",
+      "signal": "blue",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
+    },
+    {
+      "type_name": "cli_composition::review_v2::scope::validate_review_group_name_str",
+      "signal": "blue",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
+    },
+    {
+      "type_name": "cli_composition::review_v2::scope::validate_track_id_str",
+      "signal": "blue",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
+    },
+    {
+      "type_name": "cli_composition::review_v2::shared::build_review_v2_str",
+      "signal": "blue",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
     }
   ]
 }

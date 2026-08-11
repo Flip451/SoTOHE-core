@@ -1,6 +1,35 @@
 {
   "crate_name": "domain",
-  "functions": {},
+  "functions": {
+    "domain::review_v2::types::derive_review_approval_verdict": {
+      "action": "add",
+      "docs": "Pure domain helper for shared review-approval derivation (IN-14, AC-17).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "states",
+          "ty": "impl IntoIterator<Item = (ScopeName, ReviewState)>"
+        },
+        {
+          "name": "review_json_exists",
+          "ty": "bool"
+        }
+      ],
+      "returns": "ReviewApprovalVerdict",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  },
   "inherent_impls": [],
   "layer": "domain",
   "schema_version": 5,
@@ -381,7 +410,7 @@
           "params": [
             {
               "name": "s",
-            "ty": "impl Into<String>"
+              "ty": "impl Into<String>"
             }
           ],
           "returns": "Result<Self, ScopeNameError>"

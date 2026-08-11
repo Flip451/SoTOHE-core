@@ -24,3 +24,9 @@
 |------|------|--------|---------|--------|----------|
 | ScopeNameError | error_type | reference | Empty, NotAscii, Reserved | 🔵 | 🔵 |
 
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| domain::review_v2::types::derive_review_approval_verdict | free_function | add | fn(states: impl IntoIterator<Item = (ScopeName, ReviewState)>, review_json_exists: bool) -> ReviewApprovalVerdict | 🔵 | 🔵 |
+

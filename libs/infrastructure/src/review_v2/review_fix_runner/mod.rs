@@ -1,26 +1,29 @@
 mod env;
+mod launch_context;
 mod prompt;
 mod sentinel;
 mod session_log;
 mod smoke_test;
 mod spawn;
 
+pub(crate) use launch_context::TrustedLaunchContext;
+
+use crate::codex_common::resolve_codex_runtime;
+use env::{build_codex_fixer_invocation, build_safe_env, create_safe_home, resolve_codex_home};
+use prompt::build_prompt_with_context;
+use sentinel::{parse_sentinel, sentinel_to_exit_code};
+use session_log::{CREDENTIAL_VARS, SessionLogCleanup};
+use smoke_test::{is_forbidden_sandbox_value, parse_major_minor, parse_semver_from_text};
+use spawn::spawn_and_collect_codex;
 #[cfg(test)]
 use std::ffi::OsString;
-use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::path::PathBuf;
+#[cfg(test)]
+use std::process::Command;
 use usecase::capability_exec::{ModelName, ReasoningEffort};
 use usecase::review_v2::run_review_fix::{
     ReviewFixRunner, ReviewFixRunnerError, RunReviewFixCommand, RunReviewFixOutput,
 };
-
-use crate::codex_common::resolve_codex_runtime_for_current_repository;
-use env::{build_codex_fixer_invocation, build_safe_env, create_safe_home, resolve_codex_home};
-use prompt::build_prompt;
-use sentinel::{parse_sentinel, sentinel_to_exit_code};
-use session_log::SessionLogCleanup;
-use smoke_test::{is_forbidden_sandbox_value, parse_major_minor, parse_semver_from_text};
-use spawn::{fixer_runtime_path, spawn_and_collect_codex};
 
 pub struct CodexReviewFixRunner {
     model: ModelName,
@@ -41,6 +44,7 @@ impl CodexReviewFixRunner {
     }
 
     #[cfg(test)]
+    #[allow(dead_code)]
     pub(crate) fn with_bin(mut self, bin: impl Into<OsString>) -> Self {
         self.bin_override = Some(bin.into());
         self
@@ -49,12 +53,14 @@ impl CodexReviewFixRunner {
     fn smoke_test_forbidden_sandbox(&self) -> Result<(), ReviewFixRunnerError> {
         let val = std::env::var("CODEX_SANDBOX").unwrap_or_default();
         if is_forbidden_sandbox_value(&val) {
-            return Err(ReviewFixRunnerError::SmokeTestFailed(format!(
-                "forbidden sandbox override detected in environment: \
+            return Err(ReviewFixRunnerError::SmokeTestFailed(
+                usecase::git_workflow::DiagnosticText::new(format!(
+                    "forbidden sandbox override detected in environment: \
                  CODEX_SANDBOX={val} — danger-full-access and \
                  dangerously-bypass-approvals-and-sandbox are prohibited \
                  (ADR D3/CN-03)"
-            )));
+                )),
+            ));
         }
         Ok(())
     }
@@ -62,44 +68,51 @@ impl CodexReviewFixRunner {
     fn smoke_test_codex_version(
         &self,
         bin: &std::ffi::OsStr,
-        extra_path_prefix: Option<&Path>,
+        safe_env: &[(std::ffi::OsString, std::ffi::OsString)],
+        launch_context: &TrustedLaunchContext,
     ) -> Result<(), ReviewFixRunnerError> {
-        let mut cmd = Command::new(bin);
-        cmd.arg("--version").stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
-        if let Some(prefix) = extra_path_prefix {
-            let path = env::prepend_dir_to_path(prefix)?;
-            cmd.env("PATH", path);
+        let probe_env = safe_env
+            .iter()
+            .filter(|(key, _)| !CREDENTIAL_VARS.iter().any(|credential| key == credential))
+            .cloned()
+            .collect::<Vec<_>>();
+        let (status, combined) =
+            launch_context.run_version_probe(bin, &probe_env).map_err(|error| {
+                ReviewFixRunnerError::SmokeTestFailed(usecase::git_workflow::DiagnosticText::new(
+                    format!("codex CLI not found in PATH or failed to execute: {error}"),
+                ))
+            })?;
+        if !status.success() {
+            return Err(ReviewFixRunnerError::SmokeTestFailed(
+                usecase::git_workflow::DiagnosticText::new(format!(
+                    "codex --version failed with {status}: {combined}"
+                )),
+            ));
         }
-        let output = cmd.output().map_err(|e| {
-            ReviewFixRunnerError::SmokeTestFailed(format!(
-                "codex CLI not found in PATH or failed to execute: {e}"
+        let version_str = parse_semver_from_text(&combined).ok_or_else(|| {
+            ReviewFixRunnerError::SmokeTestFailed(usecase::git_workflow::DiagnosticText::new(
+                "cannot determine codex version from `codex --version` output",
             ))
         })?;
-        let combined = {
-            let mut s = String::from_utf8_lossy(&output.stdout).into_owned();
-            s.push_str(&String::from_utf8_lossy(&output.stderr));
-            s
-        };
-        let version_str = parse_semver_from_text(&combined).ok_or_else(|| {
-            ReviewFixRunnerError::SmokeTestFailed(
-                "cannot determine codex version from `codex --version` output".to_owned(),
-            )
-        })?;
         let (major, minor) = parse_major_minor(&version_str).ok_or_else(|| {
-            ReviewFixRunnerError::SmokeTestFailed(format!(
-                "cannot parse codex version components from '{version_str}'"
+            ReviewFixRunnerError::SmokeTestFailed(usecase::git_workflow::DiagnosticText::new(
+                format!("cannot parse codex version components from '{version_str}'"),
             ))
         })?;
         if major > 0 {
-            return Err(ReviewFixRunnerError::SmokeTestFailed(format!(
-                "codex version {version_str} is outside validated range (>= 0.115.0, < 1.0.0): \
+            return Err(ReviewFixRunnerError::SmokeTestFailed(
+                usecase::git_workflow::DiagnosticText::new(format!(
+                    "codex version {version_str} is outside validated range (>= 0.115.0, < 1.0.0): \
                  major version upgrade requires re-validation"
-            )));
+                )),
+            ));
         }
         if minor < 115 {
-            return Err(ReviewFixRunnerError::SmokeTestFailed(format!(
-                "codex version {version_str} is below minimum validated version 0.115.0"
-            )));
+            return Err(ReviewFixRunnerError::SmokeTestFailed(
+                usecase::git_workflow::DiagnosticText::new(format!(
+                    "codex version {version_str} is below minimum validated version 0.115.0"
+                )),
+            ));
         }
         Ok(())
     }
@@ -113,10 +126,11 @@ impl ReviewFixRunner for CodexReviewFixRunner {
         let codex_home = resolve_codex_home()?;
         #[cfg(test)]
         let runtime = if self.bin_override.is_none() {
-            Some(
-                resolve_codex_runtime_for_current_repository()
-                    .map_err(ReviewFixRunnerError::Unexpected)?,
-            )
+            Some(resolve_codex_runtime(command.repository_root()).map_err(|error| {
+                ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(
+                    error.to_string(),
+                ))
+            })?)
         } else {
             None
         };
@@ -128,50 +142,61 @@ impl ReviewFixRunner for CodexReviewFixRunner {
             }
             (None, None) => {
                 return Err(ReviewFixRunnerError::Unexpected(
-                    "test Codex runtime missing".to_owned(),
+                    usecase::git_workflow::DiagnosticText::new("test Codex runtime missing"),
                 ));
             }
         };
         #[cfg(not(test))]
-        let runtime = resolve_codex_runtime_for_current_repository()
-            .map_err(ReviewFixRunnerError::Unexpected)?;
+        let runtime = resolve_codex_runtime(command.repository_root()).map_err(|error| {
+            ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(
+                error.to_string(),
+            ))
+        })?;
         #[cfg(not(test))]
         let (bin, path_prefix, runtime_for_log) =
             (runtime.executable().to_os_string(), runtime.path_prefix(), Some(&runtime));
+        let launch_context = TrustedLaunchContext::for_repository(command.repository_root())?;
         self.smoke_test_forbidden_sandbox()?;
-        self.smoke_test_codex_version(&bin, path_prefix)?;
-        let prompt = build_prompt(&command.scope, &command.briefing_file, &command)?;
-        let output_last_message = fixer_runtime_path("review-fix-codex-last-message", "txt")?;
-        std::fs::write(&output_last_message, "").map_err(|e| {
-            ReviewFixRunnerError::Unexpected(format!(
-                "failed to initialize output-last-message {}: {e}",
-                output_last_message.display()
-            ))
-        })?;
-        let _last_message_cleanup = OutputLastMessageCleanup(output_last_message.clone());
         let safe_home = create_safe_home()?;
         let _home_cleanup = SafeHomeCleanup(safe_home.clone());
         let safe_env = build_safe_env(&safe_home, &codex_home, path_prefix)?;
+        self.smoke_test_codex_version(&bin, &safe_env, &launch_context)?;
+        let prompt = build_prompt_with_context(command.scope(), &command)?;
+        let output_last_message =
+            launch_context.create_runtime_file("review-fix-codex-last-message", "txt")?;
+        let output_last_message_path = output_last_message.path().to_path_buf();
+        let _last_message_cleanup = OutputLastMessageCleanup(output_last_message);
         let args = build_codex_fixer_invocation(
             self.model.as_str(),
             self.effort,
             &codex_home,
-            &output_last_message,
+            &output_last_message_path,
         );
-        let (stdout, child_status, log_path) =
-            spawn_and_collect_codex(&bin, &args, &safe_env, &prompt, runtime_for_log)?;
+        let (stdout, child_status, log_file) = spawn_and_collect_codex(
+            &bin,
+            &args,
+            &safe_env,
+            &prompt,
+            &launch_context,
+            runtime_for_log,
+        )?;
         // By default the guard removes the log on drop. Disarm it on failure
         // paths so the log is retained for diagnosis.
-        let log_cleanup = SessionLogCleanup::new(log_path.clone());
-        let last_message_content = match std::fs::read_to_string(&output_last_message) {
+        let log_path = log_file.path().to_path_buf();
+        let log_cleanup = SessionLogCleanup::new(log_file);
+        let last_message_content = match launch_context
+            .read_runtime_file_bounded(&_last_message_cleanup.0, MAX_OUTPUT_LAST_MESSAGE_BYTES)
+        {
             Ok(content) => content,
             Err(e) => {
                 log_cleanup.keep_for_diagnosis();
-                return Err(ReviewFixRunnerError::Unexpected(format!(
-                    "failed to read output-last-message {}: {e}; session log: {}",
-                    output_last_message.display(),
-                    log_path.display()
-                )));
+                return Err(ReviewFixRunnerError::Unexpected(
+                    usecase::git_workflow::DiagnosticText::new(format!(
+                        "failed to read output-last-message {}: {e}; session log: {}",
+                        output_last_message_path.display(),
+                        log_path.display()
+                    )),
+                ));
             }
         };
         let status = parse_sentinel(&last_message_content).or_else(|| parse_sentinel(&stdout));
@@ -184,10 +209,12 @@ impl ReviewFixRunner for CodexReviewFixRunner {
                     || format!("exit status {child_status}"),
                     |code| format!("exit code {code}"),
                 );
-                return Err(ReviewFixRunnerError::SentinelNotFound(format!(
-                    "no REVIEW_FIX_STATUS sentinel found; codex fixer {child_exit}; session log: {}",
-                    log_path.display()
-                )));
+                return Err(ReviewFixRunnerError::SentinelNotFound(
+                    usecase::git_workflow::DiagnosticText::new(format!(
+                        "no REVIEW_FIX_STATUS sentinel found; codex fixer {child_exit}; session log: {}",
+                        log_path.display()
+                    )),
+                ));
             }
         };
         if status != "completed" {
@@ -204,10 +231,12 @@ impl Drop for SafeHomeCleanup {
     fn drop(&mut self) { let _ = std::fs::remove_dir_all(&self.0); }
 }
 
-struct OutputLastMessageCleanup(PathBuf);
+const MAX_OUTPUT_LAST_MESSAGE_BYTES: u64 = 64 * 1024;
+
+struct OutputLastMessageCleanup(spawn::RuntimeFile);
 #[rustfmt::skip]
 impl Drop for OutputLastMessageCleanup {
-    fn drop(&mut self) { let _ = std::fs::remove_file(&self.0); }
+    fn drop(&mut self) { self.0.remove(); }
 }
 
 #[cfg(test)]
@@ -217,13 +246,49 @@ mod tests {
     use crate::codex_common::{REVIEW_RUNTIME_DIR, resolve_codex_runtime_for_repository_start};
 
     fn make_command() -> RunReviewFixCommand {
-        RunReviewFixCommand {
-            scope: "infrastructure".to_owned(),
-            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
-            track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
-            round_type: "fast".to_owned(),
-            model: "gpt-5.5".to_owned(),
-        }
+        make_command_with_briefing_file(PathBuf::from("tmp/reviewer-runtime/briefing.md"))
+    }
+
+    fn make_command_with_briefing_file(_briefing_file: PathBuf) -> RunReviewFixCommand {
+        RunReviewFixCommand::new_resolved(
+            usecase::review_v2::ReviewScopeName::try_new("infrastructure".to_owned())
+                .expect("valid scope"),
+            usecase::review_v2::SubagentBriefingContent::try_new("# Briefing\n".to_owned())
+                .expect("valid briefing"),
+            usecase::review_v2::run_review_fix::ReviewFixResolution::new(
+                usecase::review_v2::run_review_fix::ReviewTrackId::try_new(
+                    "review-fix-codex-rustify-2026-05-31".to_owned(),
+                )
+                .expect("valid track ID"),
+                std::env::current_dir().expect("repository root"),
+            ),
+            usecase::review_v2::ReviewRoundType::Fast,
+            Some(ModelName::try_new("gpt-5.5").expect("valid model")),
+        )
+    }
+
+    fn trusted_briefing_fixture() -> (tempfile::TempDir, PathBuf) {
+        let repository_root = std::env::current_dir().expect("repository root");
+        let fixture_root = repository_root.join("tmp");
+        std::fs::create_dir_all(&fixture_root).expect("create trusted fixture root");
+        let directory = tempfile::Builder::new()
+            .prefix("review-fix-runner-")
+            .tempdir_in(&fixture_root)
+            .expect("trusted briefing fixture directory");
+        let briefing_file = directory
+            .path()
+            .strip_prefix(&repository_root)
+            .expect("fixture must be beneath repository root")
+            .join("briefing.md");
+        std::fs::write(repository_root.join(&briefing_file), "# Briefing\n")
+            .expect("write trusted briefing fixture");
+        (directory, briefing_file)
+    }
+
+    fn prepared_launch_context() -> TrustedLaunchContext {
+        let (_directory, _) = trusted_briefing_fixture();
+        TrustedLaunchContext::for_repository(&std::env::current_dir().expect("repository root"))
+            .expect("repository root must prepare a launch context")
     }
 
     fn make_runner() -> CodexReviewFixRunner {
@@ -245,9 +310,18 @@ mod tests {
 
     #[cfg(unix)]
     fn write_fake_codex(dir: &std::path::Path, version_output: &str) -> PathBuf {
+        write_fake_codex_with_exit_status(dir, version_output, 0)
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_with_exit_status(
+        dir: &std::path::Path,
+        version_output: &str,
+        exit_status: i32,
+    ) -> PathBuf {
         let script = dir.join("fake-codex.sh");
         let script_content = format!(
-            "#!/bin/sh\nif [ \"$1\" = \"--version\" ]; then echo \"{version_output}\"; exit 0; fi\nexit 0\n"
+            "#!/bin/sh\nif [ \"$1\" = \"--version\" ]; then echo \"{version_output}\"; exit {exit_status}; fi\nexit 0\n"
         );
         std::fs::write(&script, script_content).unwrap();
         make_executable(&script);
@@ -286,6 +360,36 @@ if [ ! -s "$prompt_file" ]; then
 fi
 printf 'REVIEW_FIX_STATUS: completed\n' > "$out"
 printf 'fake stdout\n'
+exit 0
+"#;
+        std::fs::write(&script, script_content).unwrap();
+        make_executable(&script);
+        script
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_runner_capturing_working_directory(dir: &std::path::Path) -> PathBuf {
+        let script = dir.join("fake-codex-captures-working-directory.sh");
+        let script_content = r#"#!/bin/sh
+if [ "$1" = "--version" ]; then
+  echo "codex 0.125.0"
+  exit 0
+fi
+out=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --output-last-message)
+      out="$2"
+      shift 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+printf '%s\n' "$PWD" > "$(dirname "$0")/captured-working-directory.txt"
+cat >/dev/null
+printf 'REVIEW_FIX_STATUS: completed\n' > "$out"
 exit 0
 "#;
         std::fs::write(&script, script_content).unwrap();
@@ -388,6 +492,32 @@ exit 0
     }
 
     #[cfg(unix)]
+    fn write_fake_codex_runner_with_oversize_last_message(dir: &std::path::Path) -> PathBuf {
+        let script = dir.join("fake-codex-oversize-last-message.sh");
+        let script_content = r#"#!/bin/sh
+if [ "$1" = "--version" ]; then
+  echo "codex 0.125.0"
+  exit 0
+fi
+out=""
+while [ "$#" -gt 0 ]; do
+  if [ "$1" = "--output-last-message" ]; then
+    out="$2"
+    shift 2
+  else
+    shift
+  fi
+done
+cat >/dev/null
+head -c 65537 /dev/zero | tr '\000' x > "$out"
+exit 0
+"#;
+        std::fs::write(&script, script_content).unwrap();
+        make_executable(&script);
+        script
+    }
+
+    #[cfg(unix)]
     fn retained_session_log_containing(marker: &str) -> Option<PathBuf> {
         let entries = std::fs::read_dir(REVIEW_RUNTIME_DIR).ok()?;
         for entry in entries.flatten() {
@@ -412,7 +542,8 @@ exit 0
         let dir = tempfile::tempdir().unwrap();
         let fake = write_fake_codex(dir.path(), "codex 0.125.0");
         let runner = make_runner().with_bin(&fake);
-        let result = runner.smoke_test_codex_version(fake.as_os_str(), None);
+        let context = prepared_launch_context();
+        let result = runner.smoke_test_codex_version(fake.as_os_str(), &[], &context);
         assert!(result.is_ok(), "expected Ok for valid version 0.125.0, got: {result:?}");
     }
 
@@ -422,7 +553,8 @@ exit 0
         let dir = tempfile::tempdir().unwrap();
         let fake = write_fake_codex(dir.path(), "codex 0.114.9");
         let runner = make_runner().with_bin(&fake);
-        let result = runner.smoke_test_codex_version(fake.as_os_str(), None);
+        let context = prepared_launch_context();
+        let result = runner.smoke_test_codex_version(fake.as_os_str(), &[], &context);
         assert!(
             matches!(result, Err(ReviewFixRunnerError::SmokeTestFailed(_))),
             "expected SmokeTestFailed for version 0.114.9, got: {result:?}"
@@ -435,11 +567,25 @@ exit 0
         let dir = tempfile::tempdir().unwrap();
         let fake = write_fake_codex(dir.path(), "codex 1.0.0");
         let runner = make_runner().with_bin(&fake);
-        let result = runner.smoke_test_codex_version(fake.as_os_str(), None);
+        let context = prepared_launch_context();
+        let result = runner.smoke_test_codex_version(fake.as_os_str(), &[], &context);
         assert!(
             matches!(result, Err(ReviewFixRunnerError::SmokeTestFailed(_))),
             "expected SmokeTestFailed for major version 1.0.0, got: {result:?}"
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_smoke_test_codex_version_rejects_nonzero_status_with_valid_semver() {
+        let dir = tempfile::tempdir().unwrap();
+        let fake = write_fake_codex_with_exit_status(dir.path(), "codex 0.125.0", 17);
+        let runner = make_runner().with_bin(&fake);
+        let context = prepared_launch_context();
+
+        let result = runner.smoke_test_codex_version(fake.as_os_str(), &[], &context);
+
+        assert!(matches!(result, Err(ReviewFixRunnerError::SmokeTestFailed(_))));
     }
 
     #[cfg(unix)]
@@ -473,10 +619,8 @@ exit 0
     fn test_run_fix_fake_codex_completed_returns_completed() {
         let dir = tempfile::tempdir().unwrap();
         let fake = write_fake_codex_runner(dir.path());
-        let briefing = dir.path().join("briefing.md");
-        std::fs::write(&briefing, "# Briefing\n").unwrap();
-        let mut command = make_command();
-        command.briefing_file = briefing;
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
         let runner = make_runner().with_bin(&fake);
 
         let output = runner.run_fix(command).unwrap();
@@ -487,13 +631,55 @@ exit 0
 
     #[cfg(unix)]
     #[test]
+    fn test_run_fix_spawns_fake_codex_from_resolver_proven_repository_root() {
+        let process_cwd = std::env::current_dir().expect("process current directory");
+        let fixture_parent = process_cwd.join("tmp");
+        std::fs::create_dir_all(&fixture_parent).expect("fixture parent directory");
+        let fixture = tempfile::Builder::new()
+            .prefix("review-fix-trusted-root-")
+            .tempdir_in(&fixture_parent)
+            .expect("trusted root fixture directory");
+        let repository_root = fixture.path().join("repository");
+        std::fs::create_dir_all(&repository_root).expect("repository root directory");
+        std::fs::write(repository_root.join("briefing.md"), "# Briefing\n")
+            .expect("trusted briefing file");
+        let fake = write_fake_codex_runner_capturing_working_directory(fixture.path());
+        let command = RunReviewFixCommand::new_resolved(
+            usecase::review_v2::ReviewScopeName::try_new("infrastructure".to_owned())
+                .expect("valid scope"),
+            usecase::review_v2::SubagentBriefingContent::try_new("# Briefing\n".to_owned())
+                .expect("valid briefing"),
+            usecase::review_v2::run_review_fix::ReviewFixResolution::new(
+                usecase::review_v2::run_review_fix::ReviewTrackId::try_new(
+                    "review-fix-trusted-root-2026".to_owned(),
+                )
+                .expect("valid track ID"),
+                repository_root.clone(),
+            ),
+            usecase::review_v2::ReviewRoundType::Fast,
+            Some(ModelName::try_new("gpt-5.5").expect("valid model")),
+        );
+
+        assert_ne!(process_cwd, repository_root, "fixture must differ from process CWD");
+        let output = make_runner().with_bin(&fake).run_fix(command).expect("completed run");
+
+        assert_eq!(output.status, "completed");
+        let captured =
+            std::fs::read_to_string(fixture.path().join("captured-working-directory.txt"))
+                .expect("fake runner working-directory capture");
+        assert_eq!(
+            PathBuf::from(captured.trim()).canonicalize().expect("captured directory"),
+            repository_root.canonicalize().expect("repository root")
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn test_run_fix_fake_codex_without_sentinel_returns_sentinel_not_found() {
         let dir = tempfile::tempdir().unwrap();
         let fake = write_fake_codex_runner_without_sentinel(dir.path(), 0);
-        let briefing = dir.path().join("briefing.md");
-        std::fs::write(&briefing, "# Briefing\n").unwrap();
-        let mut command = make_command();
-        command.briefing_file = briefing;
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
         let runner = make_runner().with_bin(&fake);
 
         let result = runner.run_fix(command);
@@ -510,18 +696,16 @@ exit 0
     fn test_run_fix_without_sentinel_reports_child_exit_code_and_session_log() {
         let dir = tempfile::tempdir().unwrap();
         let fake = write_fake_codex_runner_without_sentinel(dir.path(), 126);
-        let briefing = dir.path().join("briefing.md");
-        std::fs::write(&briefing, "# Briefing\n").unwrap();
-        let mut command = make_command();
-        command.briefing_file = briefing;
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
         let runner = make_runner().with_bin(&fake);
 
         let result = runner.run_fix(command);
 
         match result {
             Err(ReviewFixRunnerError::SentinelNotFound(message)) => {
-                assert!(message.contains("exit code 126"));
-                assert!(message.contains("session log:"));
+                assert!(message.as_str().contains("exit code 126"));
+                assert!(message.as_str().contains("session log:"));
             }
             Err(other) => panic!("expected SentinelNotFound, got error: {other:?}"),
             Ok(output) => panic!("expected SentinelNotFound, got status: {}", output.status),
@@ -535,10 +719,8 @@ exit 0
         let marker =
             format!("failed-status-marker-{}", dir.path().file_name().unwrap().to_string_lossy());
         let fake = write_fake_codex_runner_with_status(dir.path(), "failed", &marker);
-        let briefing = dir.path().join("briefing.md");
-        std::fs::write(&briefing, "# Briefing\n").unwrap();
-        let mut command = make_command();
-        command.briefing_file = briefing;
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
         let runner = make_runner().with_bin(&fake);
 
         let output = runner.run_fix(command).unwrap();
@@ -559,17 +741,15 @@ exit 0
             dir.path().file_name().unwrap().to_string_lossy()
         );
         let fake = write_fake_codex_runner_removing_last_message(dir.path(), &marker);
-        let briefing = dir.path().join("briefing.md");
-        std::fs::write(&briefing, "# Briefing\n").unwrap();
-        let mut command = make_command();
-        command.briefing_file = briefing;
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
         let runner = make_runner().with_bin(&fake);
 
         let result = runner.run_fix(command);
 
         match result {
             Err(ReviewFixRunnerError::Unexpected(message)) => {
-                assert!(message.contains("failed to read output-last-message"));
+                assert!(message.as_str().contains("failed to read output-last-message"));
             }
             Err(other) => panic!("expected Unexpected read error, got error: {other:?}"),
             Ok(output) => panic!("expected read error, got status: {}", output.status),
@@ -577,6 +757,23 @@ exit 0
         let log_path = retained_session_log_containing(&marker)
             .expect("read error must retain the session log for diagnosis");
         std::fs::remove_file(log_path).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_fix_rejects_oversize_output_last_message() {
+        let directory = tempfile::tempdir().unwrap();
+        let fake = write_fake_codex_runner_with_oversize_last_message(directory.path());
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
+
+        let result = make_runner().with_bin(&fake).run_fix(command);
+
+        assert!(matches!(
+            result,
+            Err(ReviewFixRunnerError::Unexpected(message))
+                if message.as_str().contains("exceeds")
+        ));
     }
 
     // ── make_command and make_runner are needed for unused-variable lint ──────

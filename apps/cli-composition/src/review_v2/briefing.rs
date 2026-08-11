@@ -20,7 +20,7 @@ use super::scope::load_scope_config_only;
 /// # Errors
 /// Returns an error string if the track ID is invalid or the scope config
 /// cannot be loaded.
-pub fn append_scope_briefing_reference_str(
+pub(crate) fn append_scope_briefing_reference_str(
     prompt: &mut String,
     scope_name: &str,
     track_id_str: &str,

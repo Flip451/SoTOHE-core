@@ -3,7 +3,6 @@
 pub(crate) mod approved;
 pub(crate) mod briefing;
 pub(crate) mod commit_hash;
-mod gated_entry;
 mod helpers;
 #[cfg(test)]
 pub(crate) use helpers::process_guards;
@@ -11,7 +10,6 @@ pub(crate) use helpers::record_instant_once;
 mod inputs;
 pub(crate) mod null_reviewer;
 mod pre_review_command;
-pub(crate) mod results;
 pub(crate) mod run;
 pub mod run_fix;
 pub(crate) mod scope;
@@ -20,30 +18,26 @@ pub(crate) mod shared;
 mod shim;
 mod telemetry_support;
 
-pub use inputs::{
-    ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
-    RunReviewFixLocalInput,
-};
+pub use inputs::{ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput};
 
 // Public re-exports: only items consumed by external crates (e.g. apps/cli).
 // All composition builders, infrastructure-typed helpers, and internal DTOs are
 // pub(crate) — they do not appear on the cli_composition public face (CN-02).
-pub use briefing::append_scope_briefing_reference_str;
+pub(crate) use briefing::append_scope_briefing_reference_str;
 // Demoted to pub(crate) in T010/F3: the persist helper is consumed only by
 // in-crate callers (review_v2 shim + ReviewCompositionRoot + track set-commit-hash),
 // so it must not appear on the cli_composition public face (CN-02 / AC-04).
 pub(crate) use commit_hash::persist_commit_hash_for_track;
-pub use scope::{validate_review_group_name_str, validate_track_id_str};
-pub use shared::{CodexReviewOutcome, build_review_v2_str};
+pub(crate) use scope::{validate_review_group_name_str, validate_track_id_str};
+pub(crate) use shared::CodexReviewOutcome;
 
 // Crate-internal helpers used only by the CliApp impl methods in this file.
-use approved::check_approved_str;
 use briefing::get_briefing_for_scope_str;
 use helpers::{
-    build_base_prompt_from_input, is_safe_briefing_path, outcome_to_command_outcome,
-    resolve_track_id_or_branch, resolve_track_id_or_branch_write, validate_all_paths,
+    build_base_prompt_from_input, diagnostics_for_local_review, is_safe_briefing_path,
+    outcome_to_run_review_output, resolve_track_id_or_branch, resolve_track_id_or_branch_write,
+    validate_all_paths,
 };
-use results::render_review_results_str;
 use run::{run_claude_review_str, run_codex_review_str};
 use scope::validate_scope_for_track_str;
 use session_context::reviewer_session_context;
@@ -58,6 +52,8 @@ use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
 use usecase::{capability_exec::ReasoningEffort, dry_write_driver::CapabilityName};
 
 use crate::{CommandOutcome, error::CompositionError};
+use usecase::git_workflow::DiagnosticText;
+use usecase::review_v2::{ReviewRunLocalOutput, RunReviewOutput};
 
 pub use shim::ReviewCompositionRoot;
 
@@ -71,10 +67,10 @@ impl ReviewCompositionRoot {
     /// # Errors
     /// Returns `Err` when arg validation, composition build, or the review cycle
     /// fails.
-    pub fn review_run_codex(
+    pub(crate) fn review_run_codex(
         &self,
         input: ReviewRunCodexInput,
-    ) -> Result<CommandOutcome, CompositionError> {
+    ) -> Result<RunReviewOutput, CompositionError> {
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
         validate_track_id_str(&track_id)
@@ -83,17 +79,6 @@ impl ReviewCompositionRoot {
             .map_err(|e| CompositionError::WiringFailed(format!("invalid --group: {e}")))?;
 
         let group = input.group.trim().to_owned();
-
-        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)
-            .map_err(CompositionError::Infrastructure)?;
-        if let Some(path) = &maybe_briefing {
-            if !is_safe_briefing_path(path) {
-                eprintln!(
-                    "[WARN] briefing_file for scope '{group}' contains unsafe characters — \
-                     scope-specific severity policy injection skipped"
-                );
-            }
-        }
 
         let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)?;
         append_scope_briefing_reference_str(
@@ -161,7 +146,7 @@ impl ReviewCompositionRoot {
             }
         }
 
-        outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
+        outcome_to_run_review_output(run_result.map_err(CompositionError::Usecase)?)
     }
 
     /// Run the local Claude-backed reviewer and auto-record verdict to review.json.
@@ -173,10 +158,10 @@ impl ReviewCompositionRoot {
     /// # Errors
     /// Returns `Err` when arg validation, composition build, or the review cycle
     /// fails.
-    pub fn review_run_claude(
+    pub(crate) fn review_run_claude(
         &self,
         input: ReviewRunClaudeInput,
-    ) -> Result<CommandOutcome, CompositionError> {
+    ) -> Result<RunReviewOutput, CompositionError> {
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
 
         validate_track_id_str(&track_id)
@@ -185,17 +170,6 @@ impl ReviewCompositionRoot {
             .map_err(|e| CompositionError::WiringFailed(format!("invalid --group: {e}")))?;
 
         let group = input.group.trim().to_owned();
-
-        let maybe_briefing = get_briefing_for_scope_str(&group, &track_id, &input.items_dir)
-            .map_err(CompositionError::Infrastructure)?;
-        if let Some(path) = &maybe_briefing {
-            if !is_safe_briefing_path(path) {
-                eprintln!(
-                    "[WARN] briefing_file for scope '{group}' contains unsafe characters — \
-                     scope-specific severity policy injection skipped"
-                );
-            }
-        }
 
         let mut base_prompt = build_base_prompt_from_input(input.briefing_file, input.prompt)?;
         append_scope_briefing_reference_str(
@@ -260,7 +234,7 @@ impl ReviewCompositionRoot {
             }
         }
 
-        outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
+        outcome_to_run_review_output(run_result.map_err(CompositionError::Usecase)?)
     }
 
     /// Run the local reviewer with provider auto-resolved from agent-profiles.json.
@@ -280,7 +254,7 @@ impl ReviewCompositionRoot {
     pub(crate) fn review_run_local_ungated(
         &self,
         input: ReviewRunLocalInput,
-    ) -> Result<CommandOutcome, CompositionError> {
+    ) -> Result<ReviewRunLocalOutput, CompositionError> {
         let profiles = shared::load_agent_profiles_from_repo(Some(&input.items_dir))
             .map_err(|e| CompositionError::ConfigLoad(e.to_string()))?;
         let infra_round_type = shared::parse_round_type(&input.round_type)
@@ -298,7 +272,8 @@ impl ReviewCompositionRoot {
         };
         let model = input.model.unwrap_or_else(|| profile_model.as_str().to_owned());
 
-        eprintln!("[sotp review local] provider={} model={}", provider, model);
+        let mut diagnostics =
+            vec![format!("[sotp review local] provider={} model={}", provider, model)];
 
         let track_id = resolve_track_id_or_branch_write(input.track_id, &input.items_dir)?;
         let group = input.group.trim().to_owned();
@@ -312,10 +287,9 @@ impl ReviewCompositionRoot {
             .map_err(CompositionError::Infrastructure)?;
         if let Some(path) = &maybe_briefing {
             if !is_safe_briefing_path(path) {
-                eprintln!(
-                    "[WARN] briefing_file for scope '{group}' contains unsafe characters — \
-                     scope-specific severity policy injection skipped"
-                );
+                diagnostics.push(format!(
+                    "[WARN] briefing_file for scope '{group}' contains unsafe characters — scope-specific severity policy injection skipped"
+                ));
             }
         }
 
@@ -427,131 +401,14 @@ impl ReviewCompositionRoot {
             }
         }
 
-        outcome_to_command_outcome(run_result.map_err(CompositionError::Usecase)?)
-    }
-
-    /// Constructs the injected driver for one provider-resolved review-fix run.
-    ///
-    /// This crate owns profile resolution and infrastructure wiring. The returned
-    /// driver owns the interactor invocation and command-outcome rendering.
-    ///
-    /// # Errors
-    /// Returns `Err` when profile loading, provider resolution, or typed input
-    /// construction fails.
-    pub(crate) fn review_fix_driver(
-        &self,
-        input: RunReviewFixLocalInput,
-    ) -> Result<cli_driver::review::ReviewFixDriver, usecase::review_v2::RunReviewFixError> {
-        run_fix::review_fix_driver(input)
-    }
-
-    /// Run the review-fix-lead fixer, resolving `track_id` from the current
-    /// git branch when omitted.
-    ///
-    /// Accepts an optional `track_id`. When `None`, performs branch-driven
-    /// write-side resolution via `track_resolve_id_for_write` (fail-closed
-    /// when not on a `track/<id>` branch). The caller (CLI handler) does not
-    /// make the resolution / fail-closed decision — it is delegated here so
-    /// the thin-bin layer stays free of orchestration logic.
-    ///
-    /// # Errors
-    /// Returns `Err` when track ID resolution, profile loading, provider
-    /// resolution, arg validation, or the fix runner fails.
-    pub fn review_run_fix_local_resolve(
-        &self,
-        track_id_opt: Option<String>,
-        scope: String,
-        briefing_file: PathBuf,
-        round_type: String,
-        model: Option<String>,
-        items_dir: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch_write(track_id_opt, &items_dir)?;
-        let input = RunReviewFixLocalInput { scope, briefing_file, track_id, round_type, model };
-        let driver = self
-            .review_fix_driver(input)
-            .map_err(|error| CompositionError::Usecase(error.to_string()))?;
-        Ok(driver.handle())
-    }
-
-    /// Check if the review state is approved and code hash is current.
-    ///
-    /// Resolves `track_id` from the current git branch when `None`. Delegates to
-    /// `check_approved_str` for all domain type handling (CN-02).
-    ///
-    /// # Errors
-    /// Returns `Err` when track ID resolution, store access, or approval
-    /// evaluation fails.
-    pub fn review_check_approved(
-        &self,
-        track_id: Option<String>,
-        items_dir: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use usecase::review_v2::ReviewApprovalDecision;
-
-        let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
-        let output = check_approved_str(&track_id, &items_dir)
-            .map_err(|e| CompositionError::Usecase(format!("{e}")))?;
-
-        let (msg, exit_code) = match output.decision {
-            ReviewApprovalDecision::Approved => {
-                ("[OK] Review is approved and code hash is current".to_owned(), 0u8)
-            }
-            ReviewApprovalDecision::ApprovedWithBypass => {
-                let count = output.bypass_scope_count.unwrap_or(0);
-                (
-                    format!(
-                        "[WARN] No review.json found. Allowing commit for PR-based review \
-                         ({count} scope(s))."
-                    ),
-                    0u8,
-                )
-            }
-            ReviewApprovalDecision::Blocked => {
-                let mut display: Vec<_> =
-                    output.blocked_scopes.iter().map(|scope| format!("  {scope}")).collect();
-                display.sort();
-                (
-                    format!(
-                        "[BLOCKED] Review not approved. Required scopes:\n{}",
-                        display.join("\n")
-                    ),
-                    1u8,
-                )
-            }
-        };
-
-        Ok(CommandOutcome { stdout: None, stderr: Some(msg), exit_code })
-    }
-
-    /// Show review results: per-scope state summary, optional round history.
-    ///
-    /// Resolves `track_id` from the current git branch when `None`. The
-    /// `input.limit` field encodes: `0` = state summary only; `u32::MAX` = all
-    /// rounds; any other value = up to that many rounds. Delegates to
-    /// `render_review_results_str` for all domain type handling (CN-02).
-    ///
-    /// # Errors
-    /// Returns `Err` when track ID resolution or review store access fails.
-    pub fn review_results(
-        &self,
-        input: ReviewResultsInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let track_id = resolve_track_id_or_branch(input.track_id, &input.items_dir)?;
-
-        let limit = if input.limit == 0 { None } else { Some(input.limit) };
-
-        let output = render_review_results_str(
-            &track_id,
-            &input.items_dir,
-            input.scope.as_deref(),
-            limit,
-            &input.round_type,
-            input.no_hint,
-        )
-        .map_err(CompositionError::Usecase)?;
-
-        Ok(CommandOutcome::success(Some(output)))
+        let run_outcome = run_result.map_err(CompositionError::Usecase)?;
+        diagnostics.extend(diagnostics_for_local_review(&run_outcome));
+        let outcome = outcome_to_run_review_output(run_outcome)?;
+        Ok(ReviewRunLocalOutput {
+            summary: outcome.summary,
+            diagnostics: diagnostics.into_iter().map(DiagnosticText::new).collect(),
+            exit_code: outcome.exit_code,
+        })
     }
 
     /// Classify each given path into review scopes.
@@ -563,12 +420,12 @@ impl ReviewCompositionRoot {
     /// # Errors
     /// Returns `Err` when track ID resolution, path validation, scope config
     /// loading, or classification fails.
-    pub fn review_classify(
+    pub(crate) fn review_classify(
         &self,
         paths: Vec<String>,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
+    ) -> Result<Vec<(String, String)>, CompositionError> {
         use usecase::review_v2::ScopeQueryService as _;
 
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
@@ -582,14 +439,7 @@ impl ReviewCompositionRoot {
             .classify_by_strings(paths)
             .map_err(|e| CompositionError::Usecase(format!("classify failed: {e}")))?;
 
-        let mut out = String::new();
-        for entry in &classifications {
-            use std::fmt::Write as _;
-            let scope = entry.scopes.join(",");
-            let _ = writeln!(out, "{path}\t{scope}", path = entry.path);
-        }
-
-        Ok(CommandOutcome::success(Some(out)))
+        Ok(classifications.into_iter().map(|entry| (entry.path, entry.scopes.join(","))).collect())
     }
 
     /// List the diff files belonging to the given scope.
@@ -601,12 +451,12 @@ impl ReviewCompositionRoot {
     /// # Errors
     /// Returns `Err` when track ID resolution, scope validation, diff resolution,
     /// or file listing fails.
-    pub fn review_files(
+    pub(crate) fn review_files(
         &self,
         scope: String,
         track_id: Option<String>,
         items_dir: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
+    ) -> Result<Vec<String>, CompositionError> {
         use usecase::review_v2::{ScopeQueryError, ScopeQueryService as _};
 
         let track_id = resolve_track_id_or_branch(track_id, &items_dir)?;
@@ -631,13 +481,7 @@ impl ReviewCompositionRoot {
             }
         })?;
 
-        let mut out = String::new();
-        for file in &files {
-            use std::fmt::Write as _;
-            let _ = writeln!(out, "{file}");
-        }
-
-        Ok(CommandOutcome::success(Some(out)))
+        Ok(files)
     }
 
     /// Validate a scope name for the given track.
@@ -647,7 +491,7 @@ impl ReviewCompositionRoot {
     ///
     /// # Errors
     /// Returns `Err` when track ID resolution or scope validation fails.
-    pub fn review_validate_scope(
+    pub(crate) fn review_validate_scope(
         &self,
         scope: String,
         track_id: Option<String>,
@@ -667,7 +511,7 @@ impl ReviewCompositionRoot {
     ///
     /// # Errors
     /// Returns `Err` when track ID resolution or scope config loading fails.
-    pub fn review_get_briefing(
+    pub(crate) fn review_get_briefing(
         &self,
         scope: String,
         track_id: Option<String>,
@@ -689,11 +533,14 @@ impl ReviewCompositionRoot {
 mod tests {
     use std::ffi::OsString;
     use std::fs;
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
     use std::process::Command;
+    use std::sync::{Arc, Mutex};
 
     use super::{ReviewCompositionRoot, ReviewRunCodexInput};
-    use cli_driver::review::{ReviewCheckRoundSelect, ReviewCheckZeroFindingsInput, ReviewInput};
+    use cli_driver::review::{
+        ReviewCheckRoundSelect, ReviewCheckZeroFindingsInput, ReviewInput, ReviewResultsInput,
+    };
     use domain::{
         TrackId,
         review_v2::{MainScopeName, RoundType, ScopeName},
@@ -750,7 +597,7 @@ mod tests {
         fs::create_dir_all(&config_dir).unwrap();
         fs::write(
             config_dir.join("review-scope.json"),
-            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]}}}"#,
+            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]}},"review_operational":["track/items/<track-id>/**"]}"#,
         )
         .unwrap();
         fs::write(dir.path().join("README.md"), "init\n").unwrap();
@@ -1411,14 +1258,35 @@ exit 0
         );
     }
 
-    fn run_review_fix_input(briefing_file: PathBuf) -> crate::review_v2::RunReviewFixLocalInput {
-        crate::review_v2::RunReviewFixLocalInput {
-            scope: "cli_composition".to_owned(),
+    fn run_review_fix_input(
+        briefing_file: PathBuf,
+        round_type: usecase::review_v2::ReviewRoundType,
+    ) -> cli_driver::review::ReviewFixInput {
+        cli_driver::review::ReviewFixInput::new(
+            "cli_composition".to_owned(),
             briefing_file,
-            track_id: "review-fix-codex-rustify-2026-05-31".to_owned(),
-            round_type: "fast".to_owned(),
-            model: Some("gpt-5.5".to_owned()),
-        }
+            Some("review-fix-codex-rustify-2026-05-31".to_owned()),
+            PathBuf::from("track/items"),
+            match round_type {
+                usecase::review_v2::ReviewRoundType::Fast => "fast".to_owned(),
+                usecase::review_v2::ReviewRoundType::Final => "final".to_owned(),
+            },
+            Some("gpt-5.5".to_owned()),
+        )
+    }
+
+    fn activate_review_fix_track(dir: &Path) {
+        fs::write(dir.join("README.md"), "review-fix fixture\n").unwrap();
+        fs::create_dir_all(dir.join("track/items")).unwrap();
+        GitRunner::at(dir).assert_success(&["config", "user.email", "test@example.invalid"]);
+        GitRunner::at(dir).assert_success(&["config", "user.name", "Test User"]);
+        GitRunner::at(dir).assert_success(&["add", "README.md"]);
+        GitRunner::at(dir).assert_success(&["commit", "-m", "fixture"]);
+        GitRunner::at(dir).assert_success(&[
+            "checkout",
+            "-b",
+            "track/review-fix-codex-rustify-2026-05-31",
+        ]);
     }
 
     /// Pin the regression: `resolve_track_id_from_branch` must anchor git discovery
@@ -1482,7 +1350,7 @@ exit 0
             .unwrap();
 
         assert_eq!(outcome.exit_code, 0);
-        assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
         assert_review_telemetry(&repo.track_dir, "codex", "codex-review-model", "codex", "fast");
     }
@@ -1622,7 +1490,7 @@ exit 0
             .unwrap();
 
         assert_eq!(outcome.exit_code, 0);
-        assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
         assert_review_telemetry(&repo.track_dir, "claude", "claude-review-model", "claude", "fast");
     }
@@ -1655,7 +1523,7 @@ exit 0
             .unwrap();
 
         assert_eq!(outcome.exit_code, 0);
-        assert!(outcome.stdout.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
         assert_review_telemetry(&repo.track_dir, "claude", "review-fast", "claude", "fast");
     }
@@ -1667,6 +1535,7 @@ exit 0
 
         let dir = tempfile::tempdir().unwrap();
         GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        activate_review_fix_track(dir.path());
         write_agent_profiles(dir.path(), "codex");
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
@@ -1683,12 +1552,18 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let output = crate::review_v2::ReviewCompositionRoot::new()
-            .review_fix_driver(run_review_fix_input(briefing))
-            .unwrap()
-            .handle();
+        let output = crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(
+            run_review_fix_input(
+                PathBuf::from("briefing.md"),
+                usecase::review_v2::ReviewRoundType::Fast,
+            ),
+        );
 
-        assert_eq!(output.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(
+            output.stdout.as_deref(),
+            Some("REVIEW_FIX_STATUS: completed"),
+            "review-fix outcome: {output:?}"
+        );
         assert_eq!(output.stderr, None);
         assert_eq!(output.exit_code, 0);
     }
@@ -1699,6 +1574,7 @@ exit 0
         let _lock = cwd_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
         GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        activate_review_fix_track(dir.path());
         write_agent_profiles(dir.path(), "codex");
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
@@ -1711,17 +1587,17 @@ exit 0
         std::env::set_current_dir(dir.path()).unwrap();
 
         for (round_type, expected_effort) in [("fast", "low"), ("final", "high")] {
-            let output = crate::review_v2::ReviewCompositionRoot::new()
-                .review_fix_driver(crate::review_v2::RunReviewFixLocalInput {
-                    scope: "cli_composition".to_owned(),
-                    briefing_file: briefing.clone(),
-                    track_id: "review-fix-effort-2026".to_owned(),
-                    round_type: round_type.to_owned(),
-                    model: None,
-                })
-                .unwrap()
-                .handle();
-            assert_eq!(output.exit_code, 0, "{round_type} round must complete");
+            let command = run_review_fix_input(
+                PathBuf::from("briefing.md"),
+                if round_type == "fast" {
+                    usecase::review_v2::ReviewRoundType::Fast
+                } else {
+                    usecase::review_v2::ReviewRoundType::Final
+                },
+            );
+            let output =
+                crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(command);
+            assert_eq!(output.exit_code, 0, "{round_type} round must complete: {output:?}");
             let arguments = fs::read_to_string(&arguments_log).unwrap();
             let invocation = arguments.lines().last().unwrap_or_default();
             assert!(
@@ -1739,6 +1615,7 @@ exit 0
 
         let dir = tempfile::tempdir().unwrap();
         GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        activate_review_fix_track(dir.path());
         write_agent_profiles(dir.path(), "claude");
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
@@ -1746,21 +1623,112 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let outcome = crate::review_v2::ReviewCompositionRoot::new()
-            .review_fix_driver(run_review_fix_input(briefing.clone()))
-            .unwrap()
-            .handle();
+        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(
+            run_review_fix_input(
+                PathBuf::from("briefing.md"),
+                usecase::review_v2::ReviewRoundType::Fast,
+            ),
+        );
 
-        assert_eq!(outcome.exit_code, cli_driver::review::SUBAGENT_DISPATCH_EXIT_CODE);
+        assert_eq!(
+            outcome.exit_code,
+            cli_driver::review::SUBAGENT_DISPATCH_EXIT_CODE,
+            "review-fix outcome: {outcome:?}"
+        );
         let stdout = outcome.stdout.unwrap();
         assert!(stdout.starts_with(cli_driver::review::SUBAGENT_DISPATCH_SENTINEL));
         assert!(stdout.contains("\"agent\":\"review-fix-lead\""));
         assert!(stdout.contains("\"model\":\"gpt-5.5\""));
         assert!(stdout.contains("\"effort\":\"low\""));
         assert!(stdout.contains("\"scope\":\"cli_composition\""));
-        assert!(stdout.contains(&format!("\"briefing_file\":\"{}\"", briefing.display())));
+        assert!(stdout.contains("\"briefing_content\":\"# Briefing\\n\""));
         assert!(stdout.contains("\"track_id\":\"review-fix-codex-rustify-2026-05-31\""));
+        assert!(stdout.contains(&format!("\"repository_root\":\"{}\"", dir.path().display())));
         assert!(stdout.contains("\"round_type\":\"fast\""));
+    }
+
+    #[test]
+    fn test_review_fix_driver_real_runner_adapter_delivers_raw_input_to_claude_dispatch() {
+        let _lock = cwd_lock().lock().unwrap();
+        let directory = tempfile::tempdir().unwrap();
+        GitRunner::at(directory.path()).assert_success(&["init", "-b", "main"]);
+        activate_review_fix_track(directory.path());
+        write_agent_profiles(directory.path(), "claude");
+        let briefing = directory.path().join("briefing.md");
+        fs::write(&briefing, "# Briefing\n").unwrap();
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(directory.path()).unwrap();
+
+        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(
+            run_review_fix_input(
+                PathBuf::from("briefing.md"),
+                usecase::review_v2::ReviewRoundType::Fast,
+            ),
+        );
+
+        assert_eq!(outcome.exit_code, cli_driver::review::SUBAGENT_DISPATCH_EXIT_CODE);
+        assert_eq!(outcome.stderr, None);
+        let stdout = outcome.stdout.expect("the driver must render a dispatch outcome");
+        assert!(stdout.starts_with(cli_driver::review::SUBAGENT_DISPATCH_SENTINEL));
+        assert!(stdout.contains("\"agent\":\"review-fix-lead\""));
+        assert!(stdout.contains("\"briefing_content\":\"# Briefing\\n\""));
+        assert!(
+            stdout.contains(&format!("\"repository_root\":\"{}\"", directory.path().display()))
+        );
+    }
+
+    #[test]
+    fn test_review_fix_driver_configured_loader_delivers_briefing_content_to_runner() {
+        struct CapturingRunner {
+            command: Arc<Mutex<Option<usecase::review_v2::run_review_fix::RunReviewFixCommand>>>,
+        }
+
+        impl usecase::review_v2::run_review_fix::ReviewFixRunner for CapturingRunner {
+            fn run_fix(
+                &self,
+                command: usecase::review_v2::run_review_fix::RunReviewFixCommand,
+            ) -> Result<
+                usecase::review_v2::run_review_fix::RunReviewFixOutput,
+                usecase::review_v2::run_review_fix::ReviewFixRunnerError,
+            > {
+                *self.command.lock().unwrap() = Some(command);
+                Ok(usecase::review_v2::run_review_fix::RunReviewFixOutput {
+                    status: "completed".to_owned(),
+                    exit_code: 0,
+                    stderr: None,
+                })
+            }
+        }
+
+        let _lock = cwd_lock().lock().unwrap();
+        let directory = tempfile::tempdir().unwrap();
+        GitRunner::at(directory.path()).assert_success(&["init", "-b", "main"]);
+        activate_review_fix_track(directory.path());
+        let briefing_content = "# Configured briefing\nKeep this exact content.\n";
+        fs::write(directory.path().join("briefing.md"), briefing_content).unwrap();
+
+        let captured = Arc::new(Mutex::new(None));
+        let service =
+            super::run_fix::review_fix_service_with_capturing_runner(Arc::new(CapturingRunner {
+                command: Arc::clone(&captured),
+            }));
+        let driver = cli_driver::review::ReviewFixDriver::new(service);
+
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(directory.path()).unwrap();
+        let outcome = driver.handle(run_review_fix_input(
+            PathBuf::from("briefing.md"),
+            usecase::review_v2::ReviewRoundType::Fast,
+        ));
+
+        assert_eq!(outcome.exit_code, 0, "review-fix outcome: {outcome:?}");
+        let command = captured
+            .lock()
+            .unwrap()
+            .take()
+            .expect("the configured loader flow must invoke the runner");
+        assert_eq!(command.briefing_content().as_str(), briefing_content);
     }
 
     #[test]
@@ -1773,6 +1741,7 @@ exit 0
 
         let dir = tempfile::tempdir().unwrap();
         GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        activate_review_fix_track(dir.path());
         write_agent_profiles_missing_review_fix_fast_effort(dir.path());
         let briefing = dir.path().join("briefing.md");
         fs::write(&briefing, "# Briefing\n").unwrap();
@@ -1780,20 +1749,21 @@ exit 0
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let result = crate::review_v2::ReviewCompositionRoot::new()
-            .review_fix_driver(run_review_fix_input(briefing));
+        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(
+            run_review_fix_input(
+                PathBuf::from("briefing.md"),
+                usecase::review_v2::ReviewRoundType::Fast,
+            ),
+        );
 
-        match result {
-            Err(usecase::review_v2::RunReviewFixError::FixRunnerFailed(message)) => {
-                assert!(
-                    message.as_str().contains("no reasoning effort"),
-                    "rejection must cite the missing effort, got: {}",
-                    message.as_str()
-                );
-            }
-            Ok(_) => panic!("effort-less fast round must be rejected, not dispatched"),
-            Err(other) => panic!("expected fail-closed effort rejection, got {other:?}"),
-        }
+        assert_ne!(outcome.exit_code, 0, "effort-less fast round must be rejected");
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("no reasoning effort")),
+            "rejection must cite the missing effort, got: {outcome:?}"
+        );
     }
 
     #[test]
@@ -1862,48 +1832,582 @@ exit 0
     }
 
     #[test]
-    fn test_review_service_results_renders_summary_and_rejects_items_dir_outside_repo() {
+    fn test_review_service_check_approved_preserves_decision_and_exit_contract() {
+        use usecase::review_v2::{ReviewApprovalDecision, aggregate_service::ReviewService as _};
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-approved-contract-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        let service = super::shim::review_service_impl();
+        let driver = ReviewCompositionRoot::new().review_driver();
+
+        GitRunner::at(repo._dir.path()).assert_success(&["checkout", "main"]);
+        fs::write(
+            repo.track_dir.join(".commit_hash"),
+            git_stdout(repo._dir.path(), &["rev-parse", "HEAD"]),
+        )
+        .unwrap();
+        let approved = service
+            .check_approved(repo.track_id.clone(), repo.items_dir.clone())
+            .expect("current commit with no changed scopes must be approved");
+        assert_eq!(approved.decision, ReviewApprovalDecision::Approved);
+        assert_eq!(approved.bypass_scope_count, None);
+        assert!(approved.blocked_scopes.is_empty());
+        let approved_outcome = driver
+            .handle(ReviewInput::CheckApproved(repo.track_id.clone(), repo.items_dir.clone()));
+        assert_eq!(approved_outcome.exit_code, 0, "{approved_outcome:?}");
+        assert!(approved_outcome.stderr.as_deref().is_some_and(|message| message.contains("[OK]")));
+
+        GitRunner::at(repo._dir.path())
+            .assert_success(&["checkout", &format!("track/{}", repo.track_id)]);
+        fs::write(
+            repo.track_dir.join(".commit_hash"),
+            git_stdout(repo._dir.path(), &["rev-parse", "HEAD~1"]),
+        )
+        .unwrap();
+        let bypassed = service
+            .check_approved(repo.track_id.clone(), repo.items_dir.clone())
+            .expect("missing review state must use the approval bypass");
+        assert_eq!(bypassed.decision, ReviewApprovalDecision::ApprovedWithBypass);
+        assert_eq!(bypassed.bypass_scope_count, Some(1));
+        assert!(bypassed.blocked_scopes.is_empty());
+        let bypass_outcome = driver
+            .handle(ReviewInput::CheckApproved(repo.track_id.clone(), repo.items_dir.clone()));
+        assert_eq!(bypass_outcome.exit_code, 0, "{bypass_outcome:?}");
+        assert!(bypass_outcome
+            .stderr
+            .as_deref()
+            .is_some_and(|message| message.contains("[WARN]") && message.contains("1 scope(s)")));
+
+        fs::write(repo.track_dir.join("review.json"), r#"{"schema_version":2,"scopes":{}}"#)
+            .unwrap();
+        let blocked = service
+            .check_approved(repo.track_id.clone(), repo.items_dir.clone())
+            .expect("missing required review scope must yield a blocked DTO");
+        assert_eq!(blocked.decision, ReviewApprovalDecision::Blocked);
+        assert_eq!(blocked.bypass_scope_count, None);
+        assert_eq!(blocked.blocked_scopes, vec!["cli_composition"]);
+        let blocked_outcome = driver
+            .handle(ReviewInput::CheckApproved(repo.track_id.clone(), repo.items_dir.clone()));
+        assert_ne!(blocked_outcome.exit_code, 0, "{blocked_outcome:?}");
+        assert!(blocked_outcome.stderr.as_deref().is_some_and(|message| {
+            message.contains("[BLOCKED]") && message.contains("cli_composition")
+        }));
+    }
+
+    #[test]
+    fn test_review_service_provider_methods_reject_invalid_track_before_dispatch() {
         use usecase::review_v2::aggregate_service::ReviewService as _;
 
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-provider-2026");
+        write_agent_profiles(repo._dir.path(), "codex");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        let service = super::shim::review_service_impl();
+        let input = || usecase::review_v2::ReviewRunInput {
+            model: "test-model".to_owned(),
+            timeout_seconds: 1,
+            briefing_file: None,
+            prompt: None,
+            track_id: Some("Invalid Track Id!".to_owned()),
+            round_type: "fast".to_owned(),
+            group: "cli_composition".to_owned(),
+            items_dir: repo.items_dir.clone(),
+        };
+
+        assert!(service.run_codex(input()).is_err());
+        assert!(service.run_claude(input()).is_err());
+
+        let local = service.run_local(
+            None,
+            1,
+            None,
+            None,
+            Some("Invalid Track Id!".to_owned()),
+            "fast".to_owned(),
+            "cli_composition".to_owned(),
+            repo.items_dir.clone(),
+        );
+        assert_eq!(local.exit_code, 1);
+        assert!(
+            !local.diagnostics.is_empty(),
+            "local review must expose the rejected input as a diagnostic"
+        );
+    }
+
+    #[test]
+    fn test_review_service_auxiliary_methods_reject_invalid_track() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let repo = setup_review_entrypoint_repo("review-service-auxiliary-2026");
+        let service = super::shim::review_service_impl();
+        let invalid_track = Some("Invalid Track Id!".to_owned());
+
+        assert!(
+            service.check_approved("Invalid Track Id!".to_owned(), repo.items_dir.clone()).is_err()
+        );
+        assert!(
+            service
+                .classify(
+                    vec!["src/lib.rs".to_owned()],
+                    invalid_track.clone(),
+                    repo.items_dir.clone(),
+                )
+                .is_err()
+        );
+        assert!(
+            service.files("cli_composition".to_owned(), invalid_track, repo.items_dir,).is_err()
+        );
+    }
+
+    #[test]
+    fn test_review_service_classify_and_files_return_happy_outputs() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-auxiliary-happy-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        let service = super::shim::review_service_impl();
+
+        let classifications = service
+            .classify(
+                vec!["src/lib.rs".to_owned()],
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+            )
+            .expect("a changed configured path must classify successfully");
+        assert_eq!(classifications, vec![("src/lib.rs".to_owned(), "cli_composition".to_owned())]);
+
+        let files = service
+            .files("cli_composition".to_owned(), Some(repo.track_id.clone()), repo.items_dir)
+            .expect("a configured scope must list its changed files");
+        assert_eq!(files, vec!["src/lib.rs"]);
+    }
+
+    #[test]
+    fn test_review_service_persist_commit_hash_rejects_invalid_track() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let service = super::shim::review_service_impl();
+        assert!(service.persist_commit_hash("../invalid".to_owned(), PathBuf::from(".")).is_err());
+    }
+
+    #[test]
+    fn test_review_service_persist_commit_hash_records_current_head() {
+        use usecase::review_v2::aggregate_service::ReviewService as _;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-persist-happy-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+        let service = super::shim::review_service_impl();
+
+        let persisted = service
+            .persist_commit_hash(repo.track_id.clone(), repo._dir.path().to_path_buf())
+            .expect("the active track must persist its current head");
+        let head = git_stdout(repo._dir.path(), &["rev-parse", "HEAD"]);
+
+        assert_eq!(persisted, head);
+        assert_eq!(
+            fs::read_to_string(repo.track_dir.join(".commit_hash"))
+                .expect("persisted commit hash must be readable")
+                .trim(),
+            head
+        );
+    }
+
+    #[test]
+    fn test_review_service_results_all_enumerates_universe_and_named_displays_only_selected_scope()
+    {
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("review-service-aux-results-2026");
         let _cwd_guard = CwdGuard::save_current();
         std::env::set_current_dir(repo._dir.path()).unwrap();
 
-        let service = super::shim::review_service_impl();
+        fs::write(
+            repo._dir.path().join(".harness/config/review-scope.json"),
+            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]},"infra":{"patterns":["infra/**"]}}}"#,
+        )
+        .unwrap();
 
-        let rendered = service
+        let driver = ReviewCompositionRoot::new().review_driver();
+        let results_input = |scope: Option<&str>, all| {
+            ReviewResultsInput::try_new(
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+                scope.map(str::to_owned),
+                all,
+                0,
+                "fast".to_owned(),
+                true,
+            )
+            .expect("fixture selector must be valid")
+        };
+
+        for (description, all) in [("omitted selector", false), ("explicit --all", true)] {
+            let outcome = driver.handle(ReviewInput::Results(results_input(None, all)));
+            assert_eq!(outcome.exit_code, 0, "{description} must succeed: {outcome:?}");
+            let all_rendered = outcome.stdout.expect("successful results must render stdout");
+            assert!(
+                all_rendered.contains("Review results"),
+                "summary header must be rendered, got: {all_rendered}"
+            );
+            for scope in ["cli_composition", "infra", "other"] {
+                assert!(
+                    all_rendered.contains(&format!(" {scope}:")),
+                    "{description} must render configured scope {scope}; got: {all_rendered}"
+                );
+            }
+            assert!(
+                all_rendered.contains("3 total"),
+                "{description} must use the complete configured scope universe; got: {all_rendered}"
+            );
+        }
+
+        let outcome =
+            driver.handle(ReviewInput::Results(results_input(Some("cli_composition"), false)));
+        assert_eq!(outcome.exit_code, 0, "named selector must succeed: {outcome:?}");
+        let named_rendered = outcome.stdout.expect("successful results must render stdout");
+        assert!(
+            named_rendered.contains(" cli_composition:"),
+            "Named must render the selected scope; got: {named_rendered}"
+        );
+        for excluded_scope in ["infra", "other"] {
+            assert!(
+                !named_rendered.contains(&format!(" {excluded_scope}:")),
+                "Named must not render unselected scope {excluded_scope}; got: {named_rendered}"
+            );
+        }
+        assert!(
+            named_rendered.contains("1 total"),
+            "Named must render exactly one scope; got: {named_rendered}"
+        );
+    }
+
+    #[test]
+    fn test_review_results_service_returns_structured_named_and_all_universes() {
+        use usecase::review_v2::{
+            ReviewRoundResultVerdict, ReviewRoundType, ReviewScopeResultState,
+            ReviewScopeSelectionRequest,
+        };
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-results-service-structured-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        fs::write(
+            repo._dir.path().join(".harness/config/review-scope.json"),
+            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]},"infra":{"patterns":["infra/**"]}}}"#,
+        )
+        .unwrap();
+        fs::write(
+            repo.track_dir.join("review.json"),
+            r#"{
+  "schema_version": 2,
+  "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abcdef0123456789",
+          "at": "2026-08-10T12:34:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [{
+            "message": "preserved finding",
+            "severity": "medium",
+            "file": "src/lib.rs",
+            "line": 1,
+            "category": "correctness"
+          }],
+          "hash": "rvw1:sha256:abcdef0123456789",
+          "at": "2026-08-10T12:35:56Z"
+        }
+      ]
+    },
+    "infra": {
+      "rounds": [{
+        "type": "final",
+        "verdict": "zero_findings",
+        "findings": [],
+        "hash": "rvw1:sha256:abcdef0123456789",
+        "at": "2026-08-10T12:36:56Z"
+      }]
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let service = super::shim::review_results_service();
+        assert!(
+            ReviewScopeSelectionRequest::try_new(Some("cli_composition".to_owned()), true).is_err(),
+            "a named selector and --all must be rejected before results execution"
+        );
+        assert!(
+            ReviewScopeSelectionRequest::try_new(Some(String::new()), false).is_err(),
+            "an invalid scope spelling must be rejected before results execution"
+        );
+        let all_output = service
             .results(
                 Some(repo.track_id.clone()),
                 repo.items_dir.clone(),
-                None,
-                false,
-                0,
-                "fast".to_owned(),
-                true,
+                ReviewScopeSelectionRequest::All,
             )
-            .expect("results for a valid track must render");
-        assert!(
-            rendered.contains("Review results"),
-            "summary header must be rendered, got: {rendered}"
-        );
+            .expect("all selection must return structured results");
+        let all_scopes = all_output
+            .scopes
+            .iter()
+            .map(|output| output.scope.as_str().to_owned())
+            .collect::<Vec<_>>();
+        assert_eq!(all_scopes, vec!["cli_composition", "infra", "other"]);
+        let cli_scope = all_output
+            .scopes
+            .iter()
+            .find(|output| output.scope.as_str() == "cli_composition")
+            .expect("all selection must retain the configured cli_composition scope");
+        assert!(matches!(cli_scope.state, ReviewScopeResultState::RequiredFindingsRemain));
+        assert_eq!(cli_scope.rounds.len(), 2);
+        assert!(matches!(
+            cli_scope.rounds.first(),
+            Some(round)
+                if round.round_type == ReviewRoundType::Fast
+                    && round.at == "2026-08-10T12:34:56Z"
+                    && matches!(round.verdict, ReviewRoundResultVerdict::ZeroFindings)
+        ));
+        assert!(matches!(
+            cli_scope.rounds.get(1),
+            Some(round)
+                if round.round_type == ReviewRoundType::Final
+                    && round.at == "2026-08-10T12:35:56Z"
+                    && matches!(
+                        &round.verdict,
+                        ReviewRoundResultVerdict::FindingsRemain(findings)
+                            if findings.as_slice().len() == 1
+                                && findings
+                                    .as_slice()
+                                    .first()
+                                    .is_some_and(|finding| finding.message.as_str() == "preserved finding")
+                    )
+        ));
+        let infra_scope = all_output
+            .scopes
+            .iter()
+            .find(|output| output.scope.as_str() == "infra")
+            .expect("all selection must retain the configured infra scope");
+        assert!(matches!(infra_scope.state, ReviewScopeResultState::Empty));
+        assert!(matches!(
+            infra_scope.rounds.as_slice(),
+            [round]
+                if round.round_type == ReviewRoundType::Final
+                    && round.at == "2026-08-10T12:36:56Z"
+                    && matches!(round.verdict, ReviewRoundResultVerdict::ZeroFindings)
+        ));
+        let other_scope = all_output
+            .scopes
+            .iter()
+            .find(|output| output.scope.as_str() == "other")
+            .expect("all selection must retain the other scope");
+        assert!(matches!(other_scope.state, ReviewScopeResultState::RequiredNotStarted));
+        assert!(other_scope.rounds.is_empty());
 
-        let outside = tempfile::tempdir().unwrap();
-        let error = service
+        let named_output = service
             .results(
                 Some(repo.track_id.clone()),
-                outside.path().to_path_buf(),
-                None,
-                false,
-                0,
-                "fast".to_owned(),
-                true,
+                repo.items_dir.clone(),
+                ReviewScopeSelectionRequest::try_new(Some("cli_composition".to_owned()), false)
+                    .expect("configured name must form a request"),
             )
-            .expect_err("items_dir outside the repository must be rejected");
-        assert!(
-            error.to_string().contains("outside the repository root"),
-            "rejection must cite repo containment, got: {error}"
+            .expect("named selection must return structured results");
+        assert_eq!(named_output.scopes.len(), 1);
+        let named_scope =
+            named_output.scopes.first().expect("named selection must contain its configured scope");
+        assert_eq!(named_scope.scope.as_str(), "cli_composition");
+        assert!(matches!(named_scope.state, ReviewScopeResultState::RequiredFindingsRemain));
+        assert!(matches!(
+            named_scope.rounds.first(),
+            Some(round)
+                if round.round_type == ReviewRoundType::Fast
+                    && round.at == "2026-08-10T12:34:56Z"
+                    && matches!(round.verdict, ReviewRoundResultVerdict::ZeroFindings)
+        ));
+        assert!(matches!(
+            named_scope.rounds.get(1),
+            Some(round)
+                if round.round_type == ReviewRoundType::Final
+                    && round.at == "2026-08-10T12:35:56Z"
+                    && matches!(
+                        &round.verdict,
+                        ReviewRoundResultVerdict::FindingsRemain(findings)
+                            if findings.as_slice().len() == 1
+                                && findings
+                                    .as_slice()
+                                    .first()
+                                    .is_some_and(|finding| finding.message.as_str() == "preserved finding")
+                    )
+        ));
+
+        let unknown_scope =
+            ReviewScopeSelectionRequest::try_new(Some("not-configured".to_owned()), false)
+                .expect("format-valid unconfigured scope must form a named request");
+        let error = service
+            .results(Some(repo.track_id.clone()), repo.items_dir.clone(), unknown_scope)
+            .expect_err("an unconfigured named scope must be rejected by selection resolution");
+        assert!(matches!(
+            error,
+            usecase::review_v2::ReviewResultsError::UnknownScope(scope)
+                if scope.as_str() == "not-configured"
+        ));
+    }
+
+    #[test]
+    fn test_review_results_driver_renders_real_adapter_fixture_round_history_and_findings() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-results-rendered-fixture-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        fs::write(
+            repo.track_dir.join("review.json"),
+            r#"{
+  "schema_version": 2,
+  "scopes": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abcdef0123456789",
+          "at": "2026-08-11T12:00:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abcdef0123456789",
+          "at": "2026-08-11T12:01:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [{
+            "message": "fixture finding detail",
+            "severity": "P1",
+            "file": "src/lib.rs",
+            "line": 27,
+            "category": "correctness"
+          }],
+          "hash": "rvw1:sha256:abcdef0123456789",
+          "at": "2026-08-11T12:02:00Z"
+        }
+      ]
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let input = ReviewResultsInput::try_new(
+            Some(repo.track_id.clone()),
+            repo.items_dir.clone(),
+            Some("cli_composition".to_owned()),
+            false,
+            3,
+            "any".to_owned(),
+            true,
+        )
+        .expect("fixture results input must be valid");
+        let outcome =
+            ReviewCompositionRoot::new().review_driver().handle(ReviewInput::Results(input));
+
+        assert_eq!(outcome.exit_code, 0, "results fixture must render: {outcome:?}");
+        let rendered = outcome.stdout.expect("results fixture must render stdout");
+        assert!(rendered.contains("final@2026-08-11T12:02:00Z findings_remain"));
+        assert!(rendered.contains("fixture finding detail (src/lib.rs:27)"));
+        assert!(rendered.contains("history (newer first, up to --limit):"));
+        assert!(rendered.contains("final@2026-08-11T12:01:00Z zero_findings"));
+        assert!(rendered.contains("fast@2026-08-11T12:00:00Z zero_findings"));
+    }
+
+    #[test]
+    fn test_review_results_service_exposes_named_and_all_results() {
+        use usecase::review_v2::ReviewScopeSelectionRequest;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-aggregate-results-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        fs::write(
+            repo._dir.path().join(".harness/config/review-scope.json"),
+            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]},"infra":{"patterns":["infra/**"]}}}"#,
+        )
+        .unwrap();
+
+        let service = super::shim::review_results_service();
+        let all_output = service
+            .results(
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+                ReviewScopeSelectionRequest::All,
+            )
+            .expect("results port must expose all-selection results");
+        let all_scopes = all_output
+            .scopes
+            .iter()
+            .map(|output| output.scope.as_str().to_owned())
+            .collect::<Vec<_>>();
+        assert_eq!(all_scopes, vec!["cli_composition", "infra", "other"]);
+
+        let named_output = service
+            .results(
+                Some(repo.track_id.clone()),
+                repo.items_dir.clone(),
+                ReviewScopeSelectionRequest::try_new(Some("cli_composition".to_owned()), false)
+                    .expect("configured name must form a request"),
+            )
+            .expect("results port must expose named-selection results");
+        assert_eq!(named_output.scopes.len(), 1);
+        assert_eq!(
+            named_output
+                .scopes
+                .first()
+                .expect("aggregate named selection must contain its configured scope")
+                .scope
+                .as_str(),
+            "cli_composition"
         );
+    }
+
+    #[test]
+    fn test_review_service_results_unknown_named_scope_returns_membership_error() {
+        use usecase::review_v2::ReviewScopeSelectionRequest;
+
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-service-results-unknown-scope-2026");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let request = ReviewScopeSelectionRequest::try_new(Some("no-such-scope".to_owned()), false)
+            .expect("format-valid but unconfigured scope must form a named request");
+        let error = super::shim::review_results_service()
+            .results(Some(repo.track_id.clone()), repo.items_dir.clone(), request)
+            .expect_err("an unconfigured named scope must be rejected");
+
+        assert!(matches!(
+            error,
+            usecase::review_v2::ReviewResultsError::UnknownScope(scope)
+                if scope.as_str() == "no-such-scope"
+        ));
     }
 
     #[test]
@@ -1932,7 +2436,10 @@ exit 0
         );
 
         assert!(result.is_err(), "expected Err on non-track branch, got Ok");
-        let msg = result.unwrap_err().to_string();
+        let msg = match result {
+            Err(error) => error.to_string(),
+            Ok(_) => panic!("expected Err on non-track branch"),
+        };
         assert!(
             msg.contains("not a track branch") || msg.contains("main"),
             "expected branch error, got: {msg}"
@@ -1960,8 +2467,11 @@ exit 0
             },
         );
 
-        assert!(result.is_err(), "expected unsupported provider error, got: {result:?}");
-        let msg = result.unwrap_err().to_string();
+        assert!(result.is_err(), "expected unsupported provider error");
+        let msg = match result {
+            Err(error) => error.to_string(),
+            Ok(_) => panic!("expected unsupported provider error"),
+        };
         assert!(
             msg.contains("unsupported reviewer provider 'gemini'"),
             "expected unsupported provider error, got: {msg}"
@@ -1997,18 +2507,18 @@ exit 0
         GitRunner::at(dir.path()).assert_success(&["commit", "--allow-empty", "-qm", "initial"]);
         GitRunner::at(dir.path()).assert_success(&["checkout", "-qb", "track/gate-block-track"]);
 
-        let outcome = crate::review_v2::ReviewCompositionRoot::new()
-            .review_run_local(crate::review_v2::ReviewRunLocalInput {
-                model: None,
-                timeout_seconds: 10,
-                briefing_file: None,
-                prompt: Some("Review.".to_owned()),
-                track_id: Some("gate-block-track".to_owned()),
-                round_type: "fast".to_owned(),
-                group: "cli_composition".to_owned(),
+        let outcome = crate::review_v2::ReviewCompositionRoot::new().review_driver().handle(
+            cli_driver::review::ReviewInput::RunLocal(
+                None,
+                10,
+                None,
+                Some("Review.".to_owned()),
+                Some("gate-block-track".to_owned()),
+                "fast".to_owned(),
+                "cli_composition".to_owned(),
                 items_dir,
-            })
-            .unwrap();
+            ),
+        );
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.as_deref().unwrap_or("");
@@ -2031,7 +2541,10 @@ exit 0
         let result =
             super::helpers::resolve_track_id_from_branch(std::path::Path::new("wrong/path"));
         assert!(result.is_err(), "expected error for non-canonical items_dir, got: {result:?}");
-        let msg = result.unwrap_err().to_string();
+        let msg = match result {
+            Err(error) => error.to_string(),
+            Ok(_) => panic!("expected Err on non-track branch"),
+        };
         assert!(msg.contains("track/items"), "error should mention 'track/items', got: {msg}");
     }
 
@@ -2071,7 +2584,10 @@ exit 0
         let result = super::helpers::resolve_track_id_from_branch(&items_dir);
 
         assert!(result.is_err());
-        let msg = result.unwrap_err().to_string();
+        let msg = match result {
+            Err(error) => error.to_string(),
+            Ok(_) => panic!("expected Err on non-track branch"),
+        };
         // The error must mention the branch name, not a git-discovery failure.
         assert!(
             msg.contains("not a track branch") || msg.contains("main"),
@@ -2196,7 +2712,10 @@ exit 0
         let result = app.review_run_codex(input);
 
         assert!(result.is_err(), "expected Err on non-track branch, got Ok");
-        let msg = result.unwrap_err().to_string();
+        let msg = match result {
+            Err(error) => error.to_string(),
+            Ok(_) => panic!("expected Err on non-track branch"),
+        };
         // The error must be a branch error ("not a track branch", "main", or similar)
         // rather than a git-discovery error ("failed to run git", "No such file", etc.).
         assert!(

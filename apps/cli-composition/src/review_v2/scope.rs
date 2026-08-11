@@ -99,7 +99,7 @@ pub(crate) fn validate_scope_for_track_str(
 ///
 /// # Errors
 /// Returns a string describing why the track ID is invalid.
-pub fn validate_track_id_str(track_id_str: &str) -> Result<(), String> {
+pub(crate) fn validate_track_id_str(track_id_str: &str) -> Result<(), String> {
     TrackId::try_new(track_id_str).map(|_| ()).map_err(|e| e.to_string())
 }
 
@@ -111,6 +111,6 @@ pub fn validate_track_id_str(track_id_str: &str) -> Result<(), String> {
 ///
 /// # Errors
 /// Returns a string describing why the group name is invalid.
-pub fn validate_review_group_name_str(group_name: &str) -> Result<(), String> {
+pub(crate) fn validate_review_group_name_str(group_name: &str) -> Result<(), String> {
     domain::ReviewGroupName::try_new(group_name).map(|_| ()).map_err(|e| e.to_string())
 }

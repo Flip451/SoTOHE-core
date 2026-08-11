@@ -4,6 +4,7 @@ use domain::CommitHash;
 use domain::review_v2::{
     FastVerdict, FilePath, NotRequiredReason, RequiredReason, ReviewApprovalVerdict, ReviewHash,
     ReviewOutcome, ReviewReader, ReviewScopeConfig, ReviewState, ReviewTarget, ScopeName, Verdict,
+    derive_review_approval_verdict,
 };
 
 use super::error::ReviewCycleError;
@@ -192,33 +193,7 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
     ) -> Result<ReviewApprovalVerdict, ReviewCycleError> {
         let states = self.get_review_states(reader)?;
 
-        // Collect Required(*) scopes as (ScopeName, RequiredReason) pairs.
-        let required: Vec<(ScopeName, RequiredReason)> = states
-            .into_iter()
-            .filter_map(|(name, state)| match state {
-                ReviewState::Required(reason) => Some((name, reason)),
-                ReviewState::NotRequired(_) => None,
-            })
-            .collect();
-
-        if required.is_empty() {
-            return Ok(ReviewApprovalVerdict::Approved);
-        }
-
-        // Bypass: all Required scopes are NotStarted AND review.json is absent.
-        let all_not_started =
-            required.iter().all(|(_, reason)| matches!(reason, RequiredReason::NotStarted));
-        if all_not_started && !review_json_exists {
-            return Ok(ReviewApprovalVerdict::ApprovedWithBypass {
-                not_started_count: required.len(),
-            });
-        }
-
-        let mut required_scopes: Vec<ScopeName> =
-            required.into_iter().map(|(name, _)| name).collect();
-        // Sort by display representation for deterministic output across HashMap iteration.
-        required_scopes.sort_by_key(|a| a.to_string());
-        Ok(ReviewApprovalVerdict::Blocked { required_scopes })
+        Ok(derive_review_approval_verdict(states, review_json_exists))
     }
 
     /// Helper: gets the classified files for a single scope from the current diff.
