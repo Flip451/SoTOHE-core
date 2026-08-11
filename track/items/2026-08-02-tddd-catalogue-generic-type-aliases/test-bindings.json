@@ -1,0 +1,758 @@
+{
+  "track_id": "2026-08-02-tddd-catalogue-generic-type-aliases",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_generic_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_alias_generic_declaration_round_trips"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::composite::tests",
+          "test_name": "test_type_kind_v2_type_alias_variant_holds_target"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_generic_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_without_generics_defaults_to_empty_and_encode_omits_field"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_alias_generic_declaration_round_trips"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_accepts_ordered_generic_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_keyword_generic_name_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_generic_projection_emits_qualified_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_keyword_generic_projection_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_lifetime_dyn_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_invalid_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_reserved_path_keyword_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter_names"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_duplicate_generic_names_returns_invalid_entry_error"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "reason": "TypeKindV2 is a declaration-only catalogue entry. The same-generic-parameter catalogue-to-implementation comparison required by AC-03 is intentionally owned by later task T003, which will provide the comparison test target; no truthful T001 declaration or codec test can establish implementation-side agreement."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_order_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_name_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "reason": "TypeKindV2 is a passive declaration and cannot compare a pre-extension matching result with the extended implementation. The required existing-alias regression comparison is intentionally owned by later task T004, which will provide the regression test target; T001 has no truthful implementation-side evidence for AC-05."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_without_generics_defaults_to_empty_and_encode_omits_field"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_alias_generic_declaration_round_trips"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_order_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_name_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_order_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_name_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_without_generics_defaults_to_empty_and_encode_omits_field"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_generic_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_decode_type_alias_generic_declaration_round_trips"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_accepts_ordered_generic_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_keyword_generic_name_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_generic_projection_emits_qualified_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_keyword_generic_projection_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_lifetime_dyn_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_invalid_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_reserved_path_keyword_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter_names"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_duplicate_generic_names_returns_invalid_entry_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeKindV2",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_order_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_name_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::catalogue_linter::evaluate_catalogue_lint",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter_names"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_invalid_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_generic_projection_emits_qualified_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_keyword_generic_projection_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_to_extended_crate_codec_tests",
+          "test_name": "test_encode_type_alias_target_with_lifetime_dyn_syntax_and_keyword_generic_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_keyword_generic_name_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_reserved_path_keyword_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_same_ordered_generic_name_and_bound_notation_compares_equal"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_order_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_name_difference_is_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::signal_evaluator_v2::structural_eq::tests",
+          "test_name": "test_type_alias_generic_parameter_bound_spelling_difference_is_mismatch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter_names"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_bound_only_type_alias_generic_parameter_is_accepted"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_malformed_type_alias_generic_bounds_before_rules"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_ref_parser::parse_fns::tests",
+          "test_name": "test_raw_generic_name_is_rejected_lexically"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter_names"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::identifiers_tests",
+          "test_name": "test_param_name_with_empty_string_returns_empty_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_blank_type_alias_generic_bound"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_preserves_non_generic_type_alias_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_duplicate_type_alias_generic_parameter_in_any_catalogue"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_keyword_type_alias_generic_parameter_names"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_wildcard_type_alias_generic_parameter"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_accepts_ordered_unique_type_alias_generic_parameters"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_evaluate_catalogue_lint_rejects_type_alias_generics_in_both_payloads"
+        }
+      ]
+    }
+  ]
+}

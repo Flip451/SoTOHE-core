@@ -2992,6 +2992,7 @@ dependencies = [
  "lancedb",
  "libc",
  "proc-macro2",
+ "quote",
  "regex",
  "rstest",
  "rustdoc-types",
@@ -3006,6 +3007,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "toml",
+ "unicode-normalization",
  "usecase",
 ]
 

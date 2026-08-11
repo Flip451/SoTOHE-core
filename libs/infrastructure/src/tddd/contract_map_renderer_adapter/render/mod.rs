@@ -20,7 +20,9 @@ pub(crate) use node_index::{NodeIndex, build_node_index, build_trait_index};
 pub(crate) use style_config::{
     StyleConfig, apply_shape, class_def_line, edge_arrow_label, edge_line,
 };
-pub(crate) use type_ref::{resolve_trait_subgraph, resolve_type_ref_node_ids};
+pub(crate) use type_ref::{
+    resolve_trait_subgraph, resolve_type_ref_node_ids, resolve_type_ref_node_ids_with_generics,
+};
 
 use emit::{EntryKind, emit_entry};
 
