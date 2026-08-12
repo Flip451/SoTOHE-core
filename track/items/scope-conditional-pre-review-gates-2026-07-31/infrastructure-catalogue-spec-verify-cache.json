@@ -124,10 +124,10 @@
     },
     {
       "claim_hash": "d585f4c32fe00b487b73ce77d3e6bc8cd2e4d1552bcdf2b6bb37bdbe3edb0965",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "literal かつ non-empty な argv 配列"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -142,7 +142,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -172,10 +172,10 @@
     },
     {
       "claim_hash": "d585f4c32fe00b487b73ce77d3e6bc8cd2e4d1552bcdf2b6bb37bdbe3edb0965",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -190,7 +190,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -244,10 +244,10 @@
     },
     {
       "claim_hash": "eee730bed1793ebec8362244f22ade7c49d604b8ac2e49d5029d537c6bd7ea16",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -262,7 +262,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -292,10 +292,10 @@
     },
     {
       "claim_hash": "708f984cde4c23b04d76983ee9b544fe1d6f3905840143bdeaaf916b5ef73fc7",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "各 phase の一意な id"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -310,7 +310,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -340,10 +340,10 @@
     },
     {
       "claim_hash": "708f984cde4c23b04d76983ee9b544fe1d6f3905840143bdeaaf916b5ef73fc7",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -358,7 +358,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -436,10 +436,10 @@
     },
     {
       "claim_hash": "df6c8ee361e5761910a9ca55da7f69bbe52f1c8dc14e6754a66c40e50c5d0856",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -454,7 +454,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -484,10 +484,10 @@
     },
     {
       "claim_hash": "df6c8ee361e5761910a9ca55da7f69bbe52f1c8dc14e6754a66c40e50c5d0856",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -502,7 +502,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -532,10 +532,10 @@
     },
     {
       "claim_hash": "d05a0cd39814f68580ea84dd25927dbff460575c74f441ccfca20cf51e8056ea",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -550,16 +550,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "d05a0cd39814f68580ea84dd25927dbff460575c74f441ccfca20cf51e8056ea",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -574,16 +574,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "1c22726a358b865b8482f8225b9ad7089cefb56c906b3877b1f6076c69b3d7c4",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -598,16 +598,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "1c22726a358b865b8482f8225b9ad7089cefb56c906b3877b1f6076c69b3d7c4",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "catalogue-entry attribution だけを受理し"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -622,16 +622,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "27036fd07e5aa58f43de624a0aa31ddeb539d4c3d829e4471618625d8dd325a4",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase-command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -646,16 +646,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
     {
       "claim_hash": "27036fd07e5aa58f43de624a0aa31ddeb539d4c3d829e4471618625d8dd325a4",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -670,7 +670,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -892,10 +892,10 @@
     },
     {
       "claim_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -910,16 +910,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -934,16 +934,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "ebc7239851062b20f2c7d35000169f1c75c146eb250ad3fd422dd315d61e8df2",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase command config"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -958,7 +958,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -988,10 +988,10 @@
     },
     {
       "claim_hash": "ebc7239851062b20f2c7d35000169f1c75c146eb250ad3fd422dd315d61e8df2",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1006,16 +1006,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
     {
       "claim_hash": "94aea2a91b9d0aaaa8068caf3368d96ff8f05b9c023b28056c5f10eb65aa4bc4",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1030,7 +1030,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -1060,10 +1060,10 @@
     },
     {
       "claim_hash": "94aea2a91b9d0aaaa8068caf3368d96ff8f05b9c023b28056c5f10eb65aa4bc4",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1078,7 +1078,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -1684,10 +1684,10 @@
     },
     {
       "claim_hash": "0c1dc61b295314653a4b12c225ee5483086a79f65fdab8a4224b5b1a64a1fb60",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1702,16 +1702,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "0c1dc61b295314653a4b12c225ee5483086a79f65fdab8a4224b5b1a64a1fb60",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1726,16 +1726,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "b13e5fe27ee5891b53e324b05be31b1a23a058b9940f4995dbf06502d1918c45",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1750,16 +1750,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "b13e5fe27ee5891b53e324b05be31b1a23a058b9940f4995dbf06502d1918c45",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1774,16 +1774,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "703d96db8273f7a37f9d2a55e1cee447ce1d1a167b48f6ab62054889fb2d6c38",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1798,16 +1798,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "703d96db8273f7a37f9d2a55e1cee447ce1d1a167b48f6ab62054889fb2d6c38",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1822,16 +1822,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1846,16 +1846,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1870,7 +1870,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
@@ -1900,10 +1900,10 @@
     },
     {
       "claim_hash": "5d8c1dfb9723cc5aee0eda850761aa7328bb426bbd6034f71c136dc2c2f16a3f",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1918,7 +1918,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },

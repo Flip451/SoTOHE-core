@@ -292,10 +292,10 @@
     },
     {
       "claim_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "literal かつ non-empty な argv 配列"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -310,7 +310,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -340,10 +340,10 @@
     },
     {
       "claim_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -358,7 +358,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -412,10 +412,10 @@
     },
     {
       "claim_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "literal かつ non-empty な argv 配列"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -430,7 +430,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -460,10 +460,10 @@
     },
     {
       "claim_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -478,7 +478,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -532,10 +532,10 @@
     },
     {
       "claim_hash": "f6ba4cfb5dfc9d76d9b1abe49a72830cf72fdd2c5cd13ee79566da59a912339b",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "empty argv、... executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -550,7 +550,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -652,7 +652,7 @@
     },
     {
       "claim_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
         "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
@@ -670,7 +670,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -748,10 +748,10 @@
     },
     {
       "claim_hash": "7962885f986e1e99411a7be69d38048bd94c27fcbfb66a7059e5fa29cbbff521",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -766,7 +766,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -868,10 +868,10 @@
     },
     {
       "claim_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -886,7 +886,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -940,10 +940,10 @@
     },
     {
       "claim_hash": "ba3b72d28bb7a609be27e6eef2a8c9aaa4807ef52ba128f99f8cb2f5f739f429",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "各 phase の一意な id"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -958,7 +958,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -988,10 +988,10 @@
     },
     {
       "claim_hash": "e0fbfdc8f3feaf17cc9523773d35aae2ff76c7a8de19a246e2d9e4c7436b83a6",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "各 phase の一意な id"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1006,7 +1006,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -1036,10 +1036,10 @@
     },
     {
       "claim_hash": "e0fbfdc8f3feaf17cc9523773d35aae2ff76c7a8de19a246e2d9e4c7436b83a6",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "fail-closed に non-zero で報告する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1054,7 +1054,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -1156,10 +1156,10 @@
     },
     {
       "claim_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1174,7 +1174,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -1228,7 +1228,7 @@
     },
     {
       "claim_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
         "citation": "positive integer でないまたは 3,600 seconds を超える timeout"
@@ -1246,7 +1246,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -1324,10 +1324,10 @@
     },
     {
       "claim_hash": "1a2e81e31a678387be86a89044737d80d74ba65d46d70c73ce66dba7d2d4c9ef",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "positive integer でないまたは 3,600 seconds を超える timeout"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1342,7 +1342,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -1372,10 +1372,10 @@
     },
     {
       "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
-      "evidence_hash": "a2dbdf2f0cad892e372d2d71fa987557ef6ce494a6c195ae71bd09280668a904",
+      "evidence_hash": "83f8c4210f5f62d388f63a0571a6c68e4dfe79a519376a9775efd14c24444696",
       "verdict": {
         "kind": "pass",
-        "citation": "phase の writer 前 prerequisite と scope 条件付き pre-review gate を、operator が公開 `bin/sotp` interface だけで監査できる literal argv 配列の宣言として管理する。"
+        "citation": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1390,16 +1390,16 @@
         "data": {
           "section": "goal",
           "element_id": "GO-01",
-          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate を、operator が公開 `bin/sotp` interface だけで監査できる literal argv 配列の宣言として管理する。"
+          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。"
         }
       }
     },
     {
       "claim_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1414,7 +1414,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -1516,10 +1516,10 @@
     },
     {
       "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1534,7 +1534,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -1612,7 +1612,7 @@
     },
     {
       "claim_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
         "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
@@ -1630,7 +1630,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -1924,10 +1924,10 @@
     },
     {
       "claim_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1942,7 +1942,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -1996,10 +1996,10 @@
     },
     {
       "claim_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2014,7 +2014,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -2068,7 +2068,7 @@
     },
     {
       "claim_hash": "783b11b2819065f10151970e0186da5e6f3100411e24683cc14285bf058fb421",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
         "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
@@ -2086,16 +2086,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
     {
       "claim_hash": "237095863bac08c2c0a2505b26d88edfefeb48da8fb3c6d9ffa0fa7e0f145148",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2110,16 +2110,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
     {
       "claim_hash": "237095863bac08c2c0a2505b26d88edfefeb48da8fb3c6d9ffa0fa7e0f145148",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
+        "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2134,7 +2134,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -6628,7 +6628,7 @@
     },
     {
       "claim_hash": "50b3041fba24708d09e12d5ef8b3f35b1e8132c9249b009a9912d6b5009aca2b",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
         "citation": "positive integer でないまたは 3,600 seconds を超える timeout"
@@ -6646,7 +6646,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -6820,10 +6820,10 @@
     },
     {
       "claim_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822",
-      "evidence_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
+      "evidence_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
       "verdict": {
         "kind": "pass",
-        "citation": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6838,7 +6838,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       }
     },
@@ -6868,10 +6868,10 @@
     },
     {
       "claim_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        "citation": "configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6886,7 +6886,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -7012,7 +7012,7 @@
     },
     {
       "claim_hash": "cca865e959713132e00aabd08881b12b67a2b7a62e5a0ece6e00dfd39a589794",
-      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
+      "evidence_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
       "verdict": {
         "kind": "pass",
         "citation": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
@@ -7030,7 +7030,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },

@@ -4,10 +4,10 @@
   "entries": [
     {
       "claim_hash": "72b0660d93c22e01bfa8a09a3c17607ccf9593e896658c3753dae0d06cd5bde0",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -22,16 +22,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "72b0660d93c22e01bfa8a09a3c17607ccf9593e896658c3753dae0d06cd5bde0",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -46,7 +46,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
@@ -100,10 +100,10 @@
     },
     {
       "claim_hash": "2cde2e471fd152df66d21a4ce543b8c76ba54697ca8765d8cd6c64f4d77bd088",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -118,16 +118,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "2cde2e471fd152df66d21a4ce543b8c76ba54697ca8765d8cd6c64f4d77bd088",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -142,7 +142,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },
@@ -460,10 +460,10 @@
     },
     {
       "claim_hash": "0559e68a790a150a6b95e90591b2d587dc665f29bc0f661323dca552f9dd1765",
-      "evidence_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -478,16 +478,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       }
     },
     {
       "claim_hash": "0559e68a790a150a6b95e90591b2d587dc665f29bc0f661323dca552f9dd1765",
-      "evidence_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
       "verdict": {
         "kind": "pass",
-        "citation": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -502,7 +502,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       }
     },

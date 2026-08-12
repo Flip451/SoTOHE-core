@@ -1529,16 +1529,31 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "f2da7eb7524b853d49a27337d43fa0b68bc16acad0754b39090f86eab743a7bf",
+        "bound_tests_set_hash": "f19d0ba3bf9f8edfbb5a770a66a23d1dfe2a2630d5626b87d7bcb58827e6544d",
         "declaration_hash": "af51184dcc26b2c7ce2b8257bf41413deb7e7dbff3078eeb9c50cf28c13c5b8d",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 1);\nassert!(\n    outcome\n        .stderr\n        .expect(\"validation failure is rendered\")\n        .contains(\"command timeout is outside the supported range: 3601\")\n);"
+        "citation": "assert!(runner.invocations().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_recursive_sotp_basename_variants_before_launch"
+        },
         {
           "layer": "cli",
           "module_path": "cli::commands::phase::tests",
@@ -1603,11 +1618,11 @@
       "key": {
         "bound_tests_set_hash": "eb987cd5bc51a7639b65f7681f7c48386d6ec40ed32550f6f5e5ab5ea7a7e3fb",
         "declaration_hash": "be236a996bb83f88af9ccd3465f6c58ad9bd2055a67c020c248d38d17eaf4aaa",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            declaration.writer().timeout().as_secs(), 3_600);\n        );\n        assert_eq!(\n            declaration\n                .pre_entry_commands()\n                .iter()\n                .filter_map(|command| command.argv().arguments().first())\n                .map(CommandArgument::as_str)\n                .collect::<Vec<_>>(),\n            vec![\"first-pre-entry\", \"second-pre-entry\"]\n        );"
+        "citation": "assert_eq!(\n            declaration.writer().argv().arguments().first().map(CommandArgument::as_str),\n            Some(\"second-writer\")\n        );\n        assert_eq!(\n            declaration\n                .pre_entry_commands()\n                .iter()\n                .filter_map(|command| command.argv().arguments().first())\n                .map(CommandArgument::as_str)\n                .collect::<Vec<_>>(),\n            vec![\"first-pre-entry\", \"second-pre-entry\"]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1695,11 +1710,11 @@
       "key": {
         "bound_tests_set_hash": "eb987cd5bc51a7639b65f7681f7c48386d6ec40ed32550f6f5e5ab5ea7a7e3fb",
         "declaration_hash": "be236a996bb83f88af9ccd3465f6c58ad9bd2055a67c020c248d38d17eaf4aaa",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(loader.load(Path::new(\"/duplicate\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_))))); ... assert_eq!(declaration.writer().argv().arguments().first().map(CommandArgument::as_str), Some(\"second-writer\")); ... .map(CommandArgument::as_str).collect::<Vec<_>>(), vec![\"first-pre-entry\", \"second-pre-entry\"] ... assert_eq!(declaration.writer().timeout().as_secs(), 3_600); ... Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })) ... for root in roots { assert!(matches!(loader.load(&root), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. })))); }"
+        "citation": "assert!(matches!(\n                loader.load(Path::new(root)),\n                Err(crate::operator_command::CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::RecursiveInvocation { .. }\n                ))\n            ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1739,13 +1754,13 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "2da4fb79b57f85f6008dcf9c60b7f82b20554ec173b9dd5da8b69c8a49e15f09",
+        "bound_tests_set_hash": "807b9038ba469d81bc2fc0bf14a0a6865286dff7de49164c43af4dfd7355e22c",
         "declaration_hash": "da0e77702ed7af76a59d5dd5b6b63fede79df0072798a00042b2b869d1a51c1b",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(declaration.id().as_str(), \"phase-one\");\n        assert_eq!(declaration.writer(), &writer);\n        assert_eq!(declaration.pre_entry_commands(), &[first, second]);\n        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);\n        assert_eq!(\n            declaration.pre_entry_commands().get(1).map(|command| command.timeout().as_secs()),\n            Some(45)\n        );"
+        "citation": "assert_eq!(declaration.writer(), &writer);\n        assert_eq!(declaration.pre_entry_commands(), &[first, second]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1753,6 +1768,21 @@
           "layer": "usecase",
           "module_path": "usecase::phase_command::tests",
           "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_recursive_sotp_basename_variants_before_launch"
         }
       ]
     },
@@ -2090,13 +2120,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "2da4fb79b57f85f6008dcf9c60b7f82b20554ec173b9dd5da8b69c8a49e15f09",
+        "bound_tests_set_hash": "603a5740743e9d66bd0842676a0355cb83440e8289466d4cb3658f5782e2f530",
         "declaration_hash": "da0e77702ed7af76a59d5dd5b6b63fede79df0072798a00042b2b869d1a51c1b",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(declaration.id().as_str(), \"phase-one\");\n        assert_eq!(declaration.writer(), &writer);\n        assert_eq!(declaration.pre_entry_commands(), &[first, second]);\n        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);"
+        "citation": "assert!(runner.invocations().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2104,6 +2134,26 @@
           "layer": "usecase",
           "module_path": "usecase::phase_command::tests",
           "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_recursive_sotp_basename_variants_before_launch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_declaration_dto_decode_rejects_invalid_declaration_id"
         }
       ]
     },
@@ -2123,11 +2173,11 @@
       "key": {
         "bound_tests_set_hash": "94532885cb6e1ae963dc1be42d7fec16ff1add2321e9afb53e9962f931064578",
         "declaration_hash": "ce90ee8781b4fca0b246dac625881302fe84fa8fba4d985a113fbcc3bd3603a6",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(declaration.writer().timeout().as_secs(), 3_600); ... assert_eq!(declaration.pre_entry_commands().first().map(|command| command.timeout().as_secs()), Some(3_600)); ... assert_eq!(declaration.pre_entry_commands().iter().filter_map(|command| command.argv().arguments().first()).map(CommandArgument::as_str).collect::<Vec<_>>(), vec![\"first-pre-entry\", \"second-pre-entry\"]); ... assert!(matches!(loader.load(Path::new(\"/empty-argv\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)))); ... assert!(matches!(loader.load(Path::new(\"/persisted-host-writer\")), Err(crate::operator_command::CommandConfigLoadError::Invalid(CommandConfigValidationError::PersistedHostArgument))))"
+        "citation": "assert_eq!(\n            declaration\n                .writer()\n                .argv()\n                .arguments()\n                .iter()\n                .map(CommandArgument::as_str)\n                .collect::<Vec<_>>(),\n            vec![\"writer\"]\n        );\n        assert_eq!(\n            declaration\n                .pre_entry_commands()\n                .iter()\n                .filter_map(|command| command.argv().arguments().first())\n                .map(CommandArgument::as_str)\n                .collect::<Vec<_>>(),\n            vec![\"first-pre-entry\", \"second-pre-entry\"]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2210,7 +2260,7 @@
       "key": {
         "bound_tests_set_hash": "2a823961580ef89f2fb776aa2980889eee9776f8523c0700028d438e9ce93904",
         "declaration_hash": "ce90ee8781b4fca0b246dac625881302fe84fa8fba4d985a113fbcc3bd3603a6",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -2292,7 +2342,7 @@
       "key": {
         "bound_tests_set_hash": "ff2bb8df1c8799796c8fe567cf418ca6fab42b10d64e1b34701c964a73d6beff",
         "declaration_hash": "09a3264098ded746f4881e9b2d7253b7d737fa1ffb5714957a0127a78254ab68",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -4154,13 +4204,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "5f3c2625f001e1c93b17e8398dedb99b6cf383c6549b8a7c5fce9e4eaa8397d6",
+        "bound_tests_set_hash": "f66e7cf5f142ff9275478b79a83fe912ecdb7abef42b05cded6e11204159321d",
         "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let argument = CommandArgument::try_new(\"--scope=implementation/日本語\".to_owned());\n\n        assert_eq!(argument.as_str(), \"--scope=implementation/日本語\");\n        assert_eq!(argument.as_ref(), \"--scope=implementation/日本語\");"
+        "citation": "assert_eq!(argument.as_str(), \"--scope=implementation/日本語\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4168,6 +4218,11 @@
           "layer": "usecase",
           "module_path": "usecase::operator_command::tests",
           "test_name": "test_command_argument_preserves_opaque_literal_value"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_configured_command_rejects_recursive_sotp_commands_by_normalized_basename"
         }
       ]
     },
@@ -4218,11 +4273,11 @@
       "key": {
         "bound_tests_set_hash": "5f3c2625f001e1c93b17e8398dedb99b6cf383c6549b8a7c5fce9e4eaa8397d6",
         "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(argument.as_str(), \"--scope=implementation/日本語\");\n        assert_eq!(argument.as_ref(), \"--scope=implementation/日本語\");"
+        "citation": "assert_eq!(argument.as_str(), \"--scope=implementation/日本語\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4249,11 +4304,11 @@
       "key": {
         "bound_tests_set_hash": "848b9fb9127df932dcb97ed48b5dd0bac310c4760920fa08702f545e6cde340b",
         "declaration_hash": "1e318b2ef3f9e477717337863147fa1c9f9c024745835af5bab31d8378098321",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(CommandArgv::try_new(empty_argv), Err(CommandArgvValidationError::Empty))); ... assert!(matches!(error, ConfiguredCommandValidationError::Argv(CommandArgvValidationError::RecursiveInvocation { .. }))); ... assert!(matches!(command_argv.with_appended_arguments(argv(&[\"review\", \"local\"])), Err(CommandArgvValidationError::RecursiveInvocation { .. })))"
+        "citation": "assert!(matches!(CommandArgv::try_new(Vec::new()), Err(CommandArgvValidationError::Empty)));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4370,25 +4425,25 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "35857e7d037102d48d61d71eead694cd12b3428a4c931faa117b1dd78db1b802",
+        "bound_tests_set_hash": "c274b6e80bd08275893e6c2f3b93962d86318e62376da4e170703d403b5f922e",
         "declaration_hash": "1e318b2ef3f9e477717337863147fa1c9f9c024745835af5bab31d8378098321",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(CommandArgv::try_new(empty_argv), Err(CommandArgvValidationError::Empty)));"
+        "citation": "assert_eq!(declaration.writer(), &writer);\n        assert_eq!(declaration.pre_entry_commands(), &[first, second]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
         {
           "layer": "usecase",
           "module_path": "usecase::operator_command::tests",
-          "test_name": "test_command_argument_preserves_opaque_literal_value"
+          "test_name": "test_command_argv_empty_array_is_rejected"
         },
         {
           "layer": "usecase",
-          "module_path": "usecase::operator_command::tests",
-          "test_name": "test_command_argv_empty_array_is_rejected"
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"
         }
       ]
     },
@@ -4406,13 +4461,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "35475b5071691a033f3db8dd2f8cc15c6e322ce08497eaab6bf51a15924d9ee5",
+        "bound_tests_set_hash": "6d3895019d49f2e466bc75b246a74f9fd9a65b16aa743dd5a59fb307b4bcc16b",
         "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let values: Vec<&str> =\n            dto.arguments.iter().map(|argument| argument.value.as_str()).collect();\n        assert_eq!(values, [\"bin/sotp\", \"task-contract\", \"check\"]);"
+        "citation": "let dto: CommandArgvDto =\n            serde_json::from_str(r#\"[\"bin/sotp\",\"task-contract\",\"check\"]\"#).unwrap();\n        let values: Vec<&str> =\n            dto.arguments.iter().map(|argument| argument.value.as_str()).collect();\n        assert_eq!(values, [\"bin/sotp\", \"task-contract\", \"check\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4420,6 +4475,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_command_argv_dto_deserialization_preserves_argument_order"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_invalid_schema_and_commands"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_duplicate_declarations_and_all_recursion_forms"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_preserves_literal_argv_order_and_timeouts"
         }
       ]
     },
@@ -4501,11 +4571,11 @@
       "key": {
         "bound_tests_set_hash": "f092d8d6d5fcea45b5ef8276ecc5cb24d408b2a71f783f6b2b19e9d48b313815",
         "declaration_hash": "1c354849d5aedc84d96e815cb013ef926583003309b60a04e94496089770a854",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n                    error,\n                    ConfiguredCommandValidationError::Argv(\n                        CommandArgvValidationError::RecursiveInvocation { .. }\n                    )\n                ));"
+        "citation": "CommandArgvValidationError::RecursiveInvocation { .. }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4594,11 +4664,11 @@
       "key": {
         "bound_tests_set_hash": "b90769a54c8c7c69feda9c126d264500a6b03160b538fb624b11bdf8256f5cf0",
         "declaration_hash": "4895fbdf76b681693eb3ec58185283853f1f911f1356d1f552c5fd55a68b90ec",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "Err(CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::RecursiveInvocation { .. }\n                ))\n            ));\n        }\n        assert!(runner.invocations().is_empty());"
+        "citation": "Err(CommandConfigLoadError::Invalid(\n                    CommandConfigValidationError::RecursiveInvocation { .. }\n                ))"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4687,11 +4757,11 @@
       "key": {
         "bound_tests_set_hash": "cd628ada02bbb513a2069a51ede33d421b12711fcd25837b23335274c2dff5bb",
         "declaration_hash": "22251b1402d1e1aed467a2bb513298c92fcfbe02417f7107e550104052d31c90",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(CommandConfigSchemaVersion::new(1).validate().is_ok());\n        assert!(matches!(\n            CommandConfigSchemaVersion::new(2).validate(),\n            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })\n        ));"
+        "citation": "assert!(matches!(\n            CommandConfigSchemaVersion::new(2).validate(),\n            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4780,11 +4850,11 @@
       "key": {
         "bound_tests_set_hash": "2d2e0331c00fdde2ac826d4eee6af73653d56dee31fb8b16cea8b9bcedd7d024",
         "declaration_hash": "9409ffdcad8cf2401352668b30946958f868e441f0b8106827a86c4c8c670f81",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let unsupported_schema = PhaseCommandConfigDto {\n            schema_version: CommandConfigSchemaVersionDto { version: 2 },\n            phases: Vec::new(),\n        };\n        assert!(matches!(\n            decode_phase_command_config(unsupported_schema),\n            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })\n        ));"
+        "citation": "assert!(matches!(\n            decode_phase_command_config(unsupported_schema),\n            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -4873,7 +4943,7 @@
       "key": {
         "bound_tests_set_hash": "b90769a54c8c7c69feda9c126d264500a6b03160b538fb624b11bdf8256f5cf0",
         "declaration_hash": "0fdfbc3a8fd6e5fd6698087a7cbc19ae96c11610e8934d3ca5d8836222017e6b",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -4997,7 +5067,7 @@
       "key": {
         "bound_tests_set_hash": "221160152f136cf5922e2497fa7959d62a5b54b970c6b0afb73247f6905397e4",
         "declaration_hash": "fcee672395c2970ad1741645dddb3958456bf1096b913de55d61c0322dad4da8",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -5059,7 +5129,7 @@
       "key": {
         "bound_tests_set_hash": "cd628ada02bbb513a2069a51ede33d421b12711fcd25837b23335274c2dff5bb",
         "declaration_hash": "3973c106cdcc28e493282680dd304584a1b0ab7dfca9148d05dbd6bb4c4a56d2",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -5102,6 +5172,47 @@
           "layer": "usecase",
           "module_path": "usecase::operator_command::tests",
           "test_name": "test_declaration_id_empty_value_and_schema_version_validation_are_explicit"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdValidationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "72a57c551b6ccdff8eb18b830bb4811411a155a1b5273920a76ed6226df2bb6f",
+        "declaration_hash": "3973c106cdcc28e493282680dd304584a1b0ab7dfca9148d05dbd6bb4c4a56d2",
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let declaration = PhaseCommandDeclaration::new(\n            CommandDeclarationId::try_new(\"phase-one\".to_owned()).unwrap(),\n            writer.clone(),\n            vec![first.clone(), second.clone()],\n        );\n\n        assert_eq!(declaration.writer(), &writer);\n        assert_eq!(declaration.pre_entry_commands(), &[first, second]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::operator_command::tests",
+          "test_name": "test_declaration_id_empty_value_and_schema_version_validation_are_explicit"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_declaration_preserves_writer_and_pre_entry_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_config_preserves_canonical_writer_order_and_default_timeout"
         }
       ]
     },
@@ -5152,7 +5263,7 @@
       "key": {
         "bound_tests_set_hash": "eca4b062a7f7d05f6c621c68d1ed4453a95c5bcb3965943b9383e57aeda12c11",
         "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -5281,11 +5392,11 @@
       "key": {
         "bound_tests_set_hash": "eca4b062a7f7d05f6c621c68d1ed4453a95c5bcb3965943b9383e57aeda12c11",
         "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }"
+        "citation": "let zero = CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(0));\n        assert!(matches!(zero, Err(CommandTimeoutValidationError::OutOfRange { .. })));\n        match CommandTimeoutSeconds::try_new(UnvalidatedTimeoutSeconds::new(3_601)) {\n            Err(CommandTimeoutValidationError::OutOfRange { seconds }) => {\n                assert_eq!(seconds.as_u64(), 3_601);\n            }\n            other => panic!(\"expected an out-of-range timeout error, got {other:?}\"),\n        }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5420,11 +5531,11 @@
       "key": {
         "bound_tests_set_hash": "3962304bebfd2b4d5c951f0e57a9016679d51a00c7ccf85eb361844e5e7ae7d9",
         "declaration_hash": "9a1815f059a46928d65101165749304522a8e8317db6e07d20e2c564faa4c30b",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let command = ConfiguredCommand::try_new(argv(&[\"bin/sotp\", \"signal\", \"calc\"]), None).unwrap();\n        assert_eq!(command.timeout().as_secs(), 3_600);"
+        "citation": "let command = ConfiguredCommand::try_new(\n            argv(&[\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]),\n            None,\n        )\n        .unwrap();\n\n        let actual: Vec<&str> =\n            command.argv().arguments().iter().map(CommandArgument::as_str).collect();\n        assert_eq!(actual, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\", \"briefing.md\"]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5515,13 +5626,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "015dc69c02330461701179b439d5a4c26f32e6b316ec10bf6269a8e9c136ec50",
+        "bound_tests_set_hash": "164f1cdb34d3d74857972e803c2b1d31df1f92879e56e460f8d9a70789da8158",
         "declaration_hash": "e7106f614838efabdf8796fca7f6763c45c76738e90a9edffe73de086e664756",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let argv: Vec<&str> =\n            dto.argv.arguments.iter().map(|argument| argument.value.as_str()).collect();\n        assert_eq!(argv, [\"bin/sotp\", \"signal\", \"check\"]);\n        assert_eq!(dto.timeout_seconds.map(|timeout| timeout.seconds), Some(12));"
+        "citation": "assert_eq!(argv, [\"bin/sotp\", \"signal\", \"check\"]);\n        assert_eq!(dto.timeout_seconds.map(|timeout| timeout.seconds), Some(12));\n        assert!(serde_json::from_str::<ConfiguredCommandDto>(\n                r#\"{\"argv\":[\"bin/sotp\",\"signal\"],\"timeout_seconds\":null,\"extra\":true}\"#,\n            )\n            .is_err());\n\n        for (writer, pre_entry_commands) in [\n            (command(&[], None), Vec::new()),\n            (command(&[\"bin/sotp\", \"phase\", \"enter\"], None), Vec::new()),\n            (command(&[\"bin/sotp\", \"review\", \"local\"], None), Vec::new()),\n            (command(&[\"bin/sotp\", \"review\", \"fix-local\"], None), Vec::new()),\n            (command(&[\"bin/sotp\", \"signal\"], Some(0)), Vec::new()),\n            (command(&[\"bin/sotp\", \"signal\"], Some(3_601)), Vec::new()),\n        ] {\n            assert!(decode_phase_command_config(config).is_err());\n        }\n\n        assert!(matches!(\n            decode_phase_command_config(duplicate),\n            Err(CommandConfigValidationError::DuplicateDeclaration(_))\n        ));\n\n                    assert!(matches!(\n                        decode_phase_command_config(phase_config(vec![declaration])),\n                        Err(CommandConfigValidationError::RecursiveInvocation { .. })\n                    ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5529,6 +5640,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_configured_command_dto_deserializes_command_shape_and_rejects_unknown_fields"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_invalid_schema_and_commands"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_duplicate_declarations_and_all_recursion_forms"
         }
       ]
     },
@@ -5610,11 +5731,11 @@
       "key": {
         "bound_tests_set_hash": "b42a636afe8e0ac15b594e178b375fbceb13a18cb25e40042499667f86e7a87f",
         "declaration_hash": "61bb4144685060fc926598ce5c79cda7fb14ffdf8452fbba35dfdc29801008f0",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "Err(ConfiguredCommandValidationError::Argv(CommandArgvValidationError::Empty))\nErr(ConfiguredCommandValidationError::Timeout(\n                CommandTimeoutValidationError::OutOfRange { .. }\n            ))\nassert!(matches!(error, ConfiguredCommandValidationError::PersistedHostArgument));"
+        "citation": "assert!(matches!(\n            ConfiguredCommand::try_new(Vec::new(), None),\n            Err(ConfiguredCommandValidationError::Argv(CommandArgvValidationError::Empty))\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -5742,16 +5863,21 @@
         "item_identifier": "voluntary:AC-08"
       },
       "key": {
-        "bound_tests_set_hash": "948c4f04dd5cf172a380320c722f93159b42b31063af8fb01f40b82256fa3e14",
+        "bound_tests_set_hash": "2d9f4bff361f012fbf08d3749c0bac0dd9ff3a49298fddf52f6cc495ab337716",
         "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
-        "anchor_text_hash": "c6e5c18bf5cad17887f4e549819d0397ade7094237ea54caea13553e8d0be0c6"
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(decode(json.as_bytes()), Err(TaskContractCodecError::Json(_))));"
+        "citation": "\"\"\".entries()\n                .get(&task_one)\n                .unwrap()\n                .iter()\n                .map(|entry| (entry.layer().as_ref(), entry.entry_key().as_str()))\n                .collect::<Vec<_>>(),\n            vec![\n                (\"usecase\", \"PhaseCommandInteractor\"),\n                (\"infrastructure\", \"TaskContractDocumentDto\"),\n            ]\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_task_attribution_preserves_task_entry_associations"
+        },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::task_contract_codec::tests",
@@ -5778,16 +5904,21 @@
         "item_identifier": "voluntary:IN-07"
       },
       "key": {
-        "bound_tests_set_hash": "948c4f04dd5cf172a380320c722f93159b42b31063af8fb01f40b82256fa3e14",
+        "bound_tests_set_hash": "2d9f4bff361f012fbf08d3749c0bac0dd9ff3a49298fddf52f6cc495ab337716",
         "declaration_hash": "0750e0530c006366b08c29a17ecd4a0c4370a3d587c815a7a556e1191407ba12",
-        "anchor_text_hash": "49ca0a9a32f87a071ed1596ecadc8dffc6f22a3356b5f7ac2972e8c40448c1a9"
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(decode(json.as_bytes()), Err(TaskContractCodecError::Json(_))));"
+        "citation": "\"entries\": {\\n    \"T001\": [\\n      {\"layer\": \"usecase\", \"entry_key\": \"PhaseCommandInteractor\"},\\n      {\"layer\": \"infrastructure\", \"entry_key\": \"TaskContractDocumentDto\"}\\n    ],\\n    \"T002\": [\\n      {\"layer\": \"domain\", \"entry_key\": \"TaskContractDocument\"}\\n    ]\\n  }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_task_attribution_preserves_task_entry_associations"
+        },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::task_contract_codec::tests",
@@ -6993,7 +7124,7 @@
       "key": {
         "bound_tests_set_hash": "684fdc3f3cb463a94dc549304ee484fe0cce1fd906a6f24fe7c6f85f491bcdcc",
         "declaration_hash": "b177882a06962c01dbe83ba84c07dcb519384248cc38f582642469035b4c69cc",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -7072,6 +7203,68 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_pre_review_scope_command_declaration_dto_rejects_invalid_command_argv_and_timeout"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "LayerIdDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LayerIdDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "aff5184eed5cd4cb75c067d09948ece7079627b2380ffbef1bc732e831e1b1d8",
+        "declaration_hash": "0cca728621486453520c134be88d587478a3e1e2d9dab7a60c248e04bbde896a",
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\".map(|entry| (entry.layer().as_ref(), entry.entry_key().as_str()))\\n                .collect::<Vec<_>>(),\\n            vec![\\n                (\\\"usecase\\\", \\\"PhaseCommandInteractor\\\"),\\n                (\\\"infrastructure\\\", \\\"TaskContractDocumentDto\\\"),\\n            ]\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_task_attribution_preserves_task_entry_associations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EntryKeyDto",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EntryKeyDto",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "aff5184eed5cd4cb75c067d09948ece7079627b2380ffbef1bc732e831e1b1d8",
+        "declaration_hash": "0e0bca880b2dbc2950950a3fa09c15614dd62a0a686893813b23116d660773cf",
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "{\"layer\": \"infrastructure\", \"entry_key\": \"TaskContractDocumentDto\"}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::task_contract_codec::tests",
+          "test_name": "test_decode_task_attribution_preserves_task_entry_associations"
         }
       ]
     },
@@ -7698,11 +7891,11 @@
       "key": {
         "bound_tests_set_hash": "ec639c0bd475c0f6337059e3b205802b6249cd6680a242855aa9d8b817dcfed0",
         "declaration_hash": "e58c952323eb901b80b1640d4ffd178a63927fb6d26ab614e31e53e2ef66f6eb",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]); ... assert_eq!(pre_entry, [ vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\", \"--gate\", \"commit\"], ]); ... assert_eq!( declaration .pre_entry_commands() .iter() .map(|configured| configured.timeout().as_secs()) .collect::<Vec<_>>(), [12, 3_600] ); ... Err(CommandConfigValidationError::InvalidSchemaVersion { .. }) ... Err(CommandConfigValidationError::DuplicateDeclaration(_)) ... Err(CommandConfigValidationError::RecursiveInvocation { .. })"
+        "citation": "assert!(matches!(decode_phase_command_config(config).is_err())); ... Err(CommandConfigValidationError::DuplicateDeclaration(_)) ... Err(CommandConfigValidationError::RecursiveInvocation { .. })"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7739,11 +7932,11 @@
       "key": {
         "bound_tests_set_hash": "cb0e1ef005c043b01b103e94ce50ab996b00f874723335742bf5c1aa432d47e9",
         "declaration_hash": "8e0c781c5865dc1f55870ccfb09fb7aa4b3fd03fd9d6bf6fdb1597a7a67001b9",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\"; \"assert_eq!(declaration.writer().timeout().as_secs(), 3_600);\"; \"assert_eq!(pre_entry, [ vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"] ]);\"; \"collect::<Vec<_>>(), [4, 12]\"; \"Err(CommandConfigValidationError::DuplicateDeclaration(_))\"; \"Err(CommandConfigValidationError::EmptyArgv)\""
+        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\n        assert_eq!(\n            pre_entry,\n            [\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"],\n            ]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7851,11 +8044,11 @@
       "key": {
         "bound_tests_set_hash": "cb0e1ef005c043b01b103e94ce50ab996b00f874723335742bf5c1aa432d47e9",
         "declaration_hash": "8e0c781c5865dc1f55870ccfb09fb7aa4b3fd03fd9d6bf6fdb1597a7a67001b9",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]); ... assert_eq!(declaration.writer().timeout().as_secs(), 3_600); ... assert_eq!(pre_entry, [ vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"], vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"] ]); ... Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_))) ... Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)) ... Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })) ... Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. }))"
+        "citation": "Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. }))\nErr(CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_)))\nErr(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv))\nErr(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. }))\nErr(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. }))"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7907,11 +8100,11 @@
       "key": {
         "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
         "declaration_hash": "33d6c4c74bb97f2e122eca334c377956e1456d1dfd287ce2d962dcb5ed531a6d",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let config = FsPhaseCommandConfigLoader::new().load(repo.path()).unwrap();"
+        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\n        assert_eq!(\n            pre_entry,\n            [\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"],\n            ]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7967,13 +8160,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
+        "bound_tests_set_hash": "f328a09675b11f0d480faaabfb0372cb16ed1c067162f16c088a1dc5f4da4006",
         "declaration_hash": "33d6c4c74bb97f2e122eca334c377956e1456d1dfd287ce2d962dcb5ed531a6d",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\nassert_eq!(declaration.writer().timeout().as_secs(), 3_600);"
+        "citation": "assert!(matches!(decode_phase_command_config(unsupported_schema), Err(CommandConfigValidationError::InvalidSchemaVersion { .. }))) ... assert!(decode_phase_command_config(config).is_err()); ... Err(CommandConfigValidationError::DuplicateDeclaration(_)) ... Err(CommandConfigValidationError::RecursiveInvocation { .. })"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -7981,6 +8174,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_invalid_schema_and_commands"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_duplicate_declarations_and_all_recursion_forms"
         }
       ]
     },
@@ -8000,11 +8203,11 @@
       "key": {
         "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
         "declaration_hash": "a4cd53ba655b9d3264f2cd5d4daafb43b39970c8fe611febe19e379093e49f3a",
-        "anchor_text_hash": "eb3acd9bc2b70f70d7e5b103ad0b2255c300e50456aaeadfd2f50815b79ff6cf"
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\nassert_eq!(declaration.writer().timeout().as_secs(), 3_600);\nassert_eq!(pre_entry, [\n    vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n    vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"],\n]);\nassert_eq!(\n    declaration\n        .pre_entry_commands()\n        .iter()\n        .map(|command| command.timeout().as_secs())\n        .collect::<Vec<_>>(),\n    [4, 12]\n);"
+        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\n        assert_eq!(\n            pre_entry,\n            [\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"],\n            ]\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -8080,13 +8283,13 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "7853a2c6c79cc869eb80e62b4d77d93bf59cc671299d7d58612c36f8dac5bc91",
+        "bound_tests_set_hash": "b60815e8ae6e99a9b81a9c577808f73f71330ecffe30692996a110fe40ca52fb",
         "declaration_hash": "a4cd53ba655b9d3264f2cd5d4daafb43b39970c8fe611febe19e379093e49f3a",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(writer, [\"bin/sotp\", \"capability\", \"exec\", \"implementer\"]);\n        assert_eq!(declaration.writer().timeout().as_secs(), 3_600);\n        assert_eq!(\n            pre_entry,\n            [\n                vec![\"bin/sotp\", \"signal\", \"calc-impl-catalog\"],\n                vec![\"bin/sotp\", \"signal\", \"check-impl-catalog\"],\n            ]\n        );\n        assert_eq!(\n            declaration\n                .pre_entry_commands()\n                .iter()\n                .map(|command| command.timeout().as_secs())\n                .collect::<Vec<_>>(),\n            [4, 12]\n        );"
+        "citation": "assert!(matches!(decode_phase_command_config(unsupported_schema), Err(CommandConfigValidationError::InvalidSchemaVersion { .. }))) ... assert!(decode_phase_command_config(config).is_err()); ... Err(CommandConfigValidationError::DuplicateDeclaration(_)) ... Err(CommandConfigValidationError::RecursiveInvocation { .. })"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -8094,6 +8297,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::operator_command_config::tests",
           "test_name": "test_phase_loader_decodes_valid_configuration_into_usecase_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_invalid_schema_and_commands"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_decode_phase_config_rejects_duplicate_declarations_and_all_recursion_forms"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::operator_command_config::tests",
+          "test_name": "test_phase_declaration_dto_decode_rejects_invalid_declaration_id"
         }
       ]
     },
@@ -9038,11 +9256,11 @@
       "key": {
         "bound_tests_set_hash": "4df9a623e7b0314525c47267d35444326f87333eef11e14c040ba9af9f3f33ad",
         "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(validate(\"/invalid-schema\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. })))); ... assert!(matches!(validate(\"/duplicate\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_))))); ... assert!(matches!(validate(\"/empty-argv\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)))); ... assert!(matches!(validate(\"/excessive-timeout\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })))); ... for root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] { ... Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. })) ... } assert!(runner.invocations().is_empty());"
+        "citation": "assert!(runner.invocations().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -9584,11 +9802,11 @@
       "key": {
         "bound_tests_set_hash": "4df9a623e7b0314525c47267d35444326f87333eef11e14c040ba9af9f3f33ad",
         "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(validate(\"/invalid-schema\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. })))); assert!(matches!(validate(\"/duplicate\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_)))); assert!(matches!(validate(\"/empty-argv\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)))); assert!(matches!(validate(\"/excessive-timeout\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })))); for root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] { let result = validate(root); assert!(matches!(result, Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. })))); } assert!(runner.invocations().is_empty());"
+        "citation": "assert!(runner.invocations().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -10130,11 +10348,11 @@
       "key": {
         "bound_tests_set_hash": "4df9a623e7b0314525c47267d35444326f87333eef11e14c040ba9af9f3f33ad",
         "declaration_hash": "d06d763b8e510b16d00c63de1a2f1d1d3d90fd0b3ae5d4c6ee416e0661cf3227",
-        "anchor_text_hash": "01ac1290f7acb7d0fdaabeab5af98375049973e8960c982581c8120c8693e8e5"
+        "anchor_text_hash": "af7ae5beef1e305a3bf917d662fc24b453463783bb42f0f95865f3fa5aad9ffe"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(validate(\"/invalid-schema\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. })))); ... assert!(matches!(validate(\"/duplicate\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_))))); ... assert!(matches!(validate(\"/empty-argv\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv)))); ... assert!(matches!(validate(\"/excessive-timeout\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. })))); ... assert!(runner.invocations().is_empty());"
+        "citation": "assert!(matches!(validate(\"/invalid-schema\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::InvalidSchemaVersion { .. }))));\nassert!(matches!(validate(\"/duplicate\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::DuplicateDeclaration(_))));\nassert!(matches!(validate(\"/empty-argv\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::EmptyArgv))));\nassert!(matches!(validate(\"/excessive-timeout\"), Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::TimeoutOutOfRange { .. }))));\nfor root in [\"/recursive-writer\", \"/recursive-pre-entry\", \"/recursive-fix-local\"] { ... Err(CommandConfigLoadError::Invalid(CommandConfigValidationError::RecursiveInvocation { .. })) ... }\nassert!(runner.invocations().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [

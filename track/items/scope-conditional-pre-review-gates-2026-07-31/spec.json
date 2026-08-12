@@ -5,7 +5,7 @@
   "goal": [
     {
       "id": "GO-01",
-      "text": "phase の writer 前 prerequisite と scope 条件付き pre-review gate を、operator が公開 `bin/sotp` interface だけで監査できる literal argv 配列の宣言として管理する。",
+      "text": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
@@ -53,11 +53,15 @@
     },
     {
       "id": "GO-05",
-      "text": "task-contract を catalogue entry の task attribution に戻し、baseline 復元の source-only Red は implementation review の直接的な impl-catalog 再計算・検査で検出する。",
+      "text": "task-contract は catalogue entry の task attribution を記録し、baseline 復元の source-only Red は implementation review の scope-resolved ordered argv sequence における直接的な impl-catalog 再計算・検査で reviewer dispatch 前に検出する。",
       "adr_refs": [
         {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
+        },
+        {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "anchor": "D6"
+          "anchor": "D4"
         }
       ]
     }
@@ -66,16 +70,28 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。",
+        "text": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-19",
+        "text": "phase command config は command を literal な per-argument argv 配列で宣言し、command 全体を一つの文字列として受理しない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
             "anchor": "D1"
-          },
-          {
-            "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-            "anchor": "D2"
-          },
+          }
+        ]
+      },
+      {
+        "id": "IN-20",
+        "text": "phase command config は declaration id の一意性、各 argv の non-empty、command ごとの明示 timeout または約 60 分の既定 timeout を fail-closed に検証する。",
+        "adr_refs": [
           {
             "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
             "anchor": "D5"
@@ -162,11 +178,11 @@
       },
       {
         "id": "IN-07",
-        "text": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。",
+        "text": "task-contract は task と catalogue entry の attribution を記録する。",
         "adr_refs": [
           {
-            "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-            "anchor": "D6"
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D1"
           }
         ]
       },
@@ -352,11 +368,11 @@
       },
       {
         "id": "OS-03",
-        "text": "catalogue entry ではない task-contract carrier で source-only Red を attribution、coverage、liveness、または task settlement から除外することは含まない。",
+        "text": "task-contract の task-to-catalogue-entry attribution を `task-coverage.json` に統合することは含まない。",
         "adr_refs": [
           {
-            "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-            "anchor": "D6"
+            "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+            "anchor": "D1"
           }
         ]
       },
@@ -427,11 +443,15 @@
     },
     {
       "id": "CN-05",
-      "text": "implementation review で task-contract check を実行する前に impl-catalog signal を再計算して検査し、task-contract は catalogue-entry attribution の structural contract に限定する。",
+      "text": "implementation review では、scope-resolved ordered argv sequence が task-contract coverage/check を実行する前に impl-catalog signal を再計算して検査する。task-contract は catalogue-entry attribution を記録する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "anchor": "D6"
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
         }
       ]
     },
@@ -495,15 +515,31 @@
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。",
+      "text": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-21",
+      "text": "phase command config は canonical writer 一件と ordered pre-entry command 群を machine-readable に表す。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
           "anchor": "D2"
-        },
+        }
+      ]
+    },
+    {
+      "id": "AC-22",
+      "text": "phase command config は command を literal な per-argument argv 配列として machine-readable に表す。",
+      "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "anchor": "D5"
+          "anchor": "D1"
         }
       ]
     },
@@ -597,21 +633,21 @@
     },
     {
       "id": "AC-08",
-      "text": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。",
+      "text": "task-contract は task-to-catalogue-entry attribution を記録する。",
       "adr_refs": [
         {
-          "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "anchor": "D6"
+          "file": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "anchor": "D1"
         }
       ]
     },
     {
       "id": "AC-09",
-      "text": "source-only Red が残る implementation review は direct impl-catalog recalculation/check で検出され、task-contract carrier、signal override、gate skip、または settlement exception では回避できない。",
+      "text": "source-only Red が残る implementation review は、reviewer dispatch 前の scope-resolved ordered argv sequence における direct impl-catalog recalculation/check で検出される。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "anchor": "D6"
+          "anchor": "D4"
         }
       ]
     },
@@ -777,7 +813,7 @@
     }
   ],
   "signals": {
-    "blue": 56,
+    "blue": 60,
     "yellow": 0,
     "red": 0
   }

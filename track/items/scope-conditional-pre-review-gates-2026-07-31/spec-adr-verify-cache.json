@@ -2,18 +2,18 @@
   "schema_version": 1,
   "entries": [
     {
-      "claim_hash": "a2dbdf2f0cad892e372d2d71fa987557ef6ce494a6c195ae71bd09280668a904",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "83f8c4210f5f62d388f63a0571a6c68e4dfe79a519376a9775efd14c24444696",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は Rust predicate enum、semantic gate ID、または hidden typed predicate registry の key ではなく、公開された `bin/sotp` command の literal argv 配列を保持する。shell string は受理しない。"
+        "citation": "config を書くテンプレート利用者は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "goal",
           "element_id": "GO-01",
-          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate を、operator が公開 `bin/sotp` interface だけで監査できる literal argv 配列の宣言として管理する。"
+          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。"
         }
       },
       "evidence_origin": {
@@ -25,18 +25,18 @@
       }
     },
     {
-      "claim_hash": "a2dbdf2f0cad892e372d2d71fa987557ef6ce494a6c195ae71bd09280668a904",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "83f8c4210f5f62d388f63a0571a6c68e4dfe79a519376a9775efd14c24444696",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "`pre-review-gates.json` は各 review scope に適用する `bin/sotp` command argv 配列を実行順に宣言する。"
+        "citation": "argv 配列にする理由は D1 と同じである。gate-kind から内部処理への見えない対応表を置かず、config を読めば実行する command と順序を監査できるようにする。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "goal",
           "element_id": "GO-01",
-          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate を、operator が公開 `bin/sotp` interface だけで監査できる literal argv 配列の宣言として管理する。"
+          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。"
         }
       },
       "evidence_origin": {
@@ -49,10 +49,10 @@
     },
     {
       "claim_hash": "5f06457592cbea35eca821280789c39a156cb9dbfbc96ac3cb37d83239bba370",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase engine は pre-entry を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
+        "citation": "phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -72,10 +72,10 @@
     },
     {
       "claim_hash": "2d1947e7251b3b41bd334fd9a540772c7a828fc41758b05a4aeccc4aebb29fcb",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config と pre-review gate config は、少なくとも schema version、各 argv の非空、phase または scope declaration の一意性、repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout、および phase engine の再帰呼び出しを検証する。検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。"
+        "citation": "テンプレート利用者の config は疑ってから実行する。検証できなければ実行前に non-zero で止まり、黙って続行しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -118,10 +118,10 @@
     },
     {
       "claim_hash": "c5c354a53a8bb35d22102c5fceb5a1a9c4d09371c531ad0bcc494426712ebd29",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "coverage-before-check の順序は維持するが、その所有を scope-blind な cargo-make `dependencies` から、`sotp review local` が scope 解決後に dispatch する operator-owned ordered argv sequence へ移す。"
+        "citation": "scope ごとに宣言するのは、必要な検査が scope によって異なるためである。cargo-make の `dependencies` は CLI が scope を解決する前に動くため、planning / SoT scope で downstream liveness の検査だけを省けない。そこで coverage-before-check の順序は保ったまま、その所有を scope-blind な cargo-make `dependencies` から、`sotp review local` が scope を解決した後のテンプレート利用者所有の argv 実行へ移す。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -140,64 +140,64 @@
       }
     },
     {
-      "claim_hash": "01a0c9b4521f5be10735d5925cebfd7bb1ac49e47d54ade1205dd5e085f6f68e",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "555f1ff3f1156133f1c7f54fe732292035d1c47f180eaa2ca5f324328934fb02",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
       "verdict": {
         "kind": "pass",
-        "citation": "`task-contract` は型カタログの実在 entry を task に帰属させる artifact に留め、恒久的な source-only baseline-restoration target または carrier variant を追加しない。"
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "goal",
           "element_id": "GO-05",
-          "text_label": "task-contract を catalogue entry の task attribution に戻し、baseline 復元の source-only Red は implementation review の直接的な impl-catalog 再計算・検査で検出する。"
+          "text_label": "task-contract は catalogue entry の task attribution を記録し、baseline 復元の source-only Red は implementation review の scope-resolved ordered argv sequence における直接的な impl-catalog 再計算・検査で reviewer dispatch 前に検出する。"
         }
       },
       "evidence_origin": {
         "kind": "adr_decision",
         "data": {
-          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "decision_id": "D6"
-        }
-      }
-    },
-    {
-      "claim_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
-      "verdict": {
-        "kind": "pass",
-        "citation": "phase command config は Rust predicate enum、semantic gate ID、または hidden typed predicate registry の key ではなく、公開された `bin/sotp` command の literal argv 配列を保持する。shell string は受理しない。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
           "decision_id": "D1"
         }
       }
     },
     {
-      "claim_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "555f1ff3f1156133f1c7f54fe732292035d1c47f180eaa2ca5f324328934fb02",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき pre-entry command の ordered list を持つ。"
+        "citation": "「sotp review local」は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-05",
+          "text_label": "task-contract は catalogue entry の task attribution を記録し、baseline 復元の source-only Red は implementation review の scope-resolved ordered argv sequence における直接的な impl-catalog 再計算・検査で reviewer dispatch 前に検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき事前 command の順序付き list を持つ。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
         }
       },
       "evidence_origin": {
@@ -209,18 +209,41 @@
       }
     },
     {
-      "claim_hash": "d28cfa0cdb5eccf03844e008251a5e68fbc935d47cda27a0637e5834c472873d",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "643eaff95d4192a37dcf476f6db92b77ce2f2e75996b92d97b3038c022fd3fa0",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config と pre-review gate config は、少なくとも schema version、各 argv の非空、phase または scope declaration の一意性、repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout、および phase engine の再帰呼び出しを検証する。"
+        "citation": "command 全体を一つの文字列で書く形式は受理しない。引数ごとに分けた配列だけを受理する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "machine-readable phase command config は、各 phase の一意な id、literal かつ non-empty な argv 配列で表す canonical writer 一件、同形式の ordered pre-entry command 群、ならびに command ごとの明示 timeout または約 60 分の既定 timeout を宣言する。"
+          "element_id": "IN-19",
+          "text_label": "phase command config は command を literal な per-argument argv 配列で宣言し、command 全体を一つの文字列として受理しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ec134a27109dbccbdd2de01147ddba5c911e0a92cfccdaf89eb1854d9b3bddc",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 各 argv の非空 — 空の宣言が「何もせず成功」として通過しないため。\n- phase または scope declaration の一意性 — 同じ対象の宣言が重複し、どれを使うか曖昧にならないため。\n- 明示 timeout または約 60 分の既定 timeout — 終わらない command が phase や review 全体を止め続けないため。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-20",
+          "text_label": "phase command config は declaration id の一意性、各 argv の non-empty、command ごとの明示 timeout または約 60 分の既定 timeout を fail-closed に検証する。"
         }
       },
       "evidence_origin": {
@@ -233,10 +256,10 @@
     },
     {
       "claim_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase engine は pre-entry を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
+        "citation": "phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -256,10 +279,10 @@
     },
     {
       "claim_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "orchestration/usecase layer は phase declaration の解決、pre-entry の順次処理、first-failure stop、writer dispatchを所有する。infrastructure は argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよい"
+        "citation": "phase declaration を解決し、事前 command を一つずつ順に実行して、最初の non-zero exit で残りを止める。すべて成功した場合だけ writer を一度起動する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -279,10 +302,10 @@
     },
     {
       "claim_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout"
+        "citation": "- repository-root 固定 cwd — command を呼び出した場所によって結果が変わらないため。\n- bounded output — command の出力が上限なく増え続けないため。\n\n判定できない場合は拒否に倒す。検証不能、重複、再帰、または上限超過は、実行前または検出時に non-zero で停止し、\nその結果を D2 / D4 の first-failure stop へ渡す。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -302,10 +325,10 @@
     },
     {
       "claim_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。"
+        "citation": "config を書くテンプレート利用者は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -325,10 +348,10 @@
     },
     {
       "claim_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "orchestration/usecase layer は phase declaration の解決、pre-entry の順次処理、first-failure stop、writer dispatch を所有する。infrastructure は argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよいが、CLI subcommand を解釈せず Clap/CLI grammar に依存しない。"
+        "citation": "「個々の command の意味は知らず、argv を順に runner へ渡す。」また、「infrastructure layer は…argv…を受け取る汎用の `ProgramInvocation` runner を実装してよい。CLI subcommand を解釈せず、Clap/CLI grammar に依存しない。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -348,10 +371,10 @@
     },
     {
       "claim_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
-        "citation": "config に保存・解決された literal argv 自体は変更せず、invocation surface が dispatch boundary で caller-supplied optional `--host` だけを実行時 argv に追加できる。それ以外の argv を書き換えたり意味解釈したりしないという D1 の規則と、config が provider-neutral な literal argv を宣言する決定は維持する。"
+        "citation": "invocation surface は dispatch boundary で、caller-supplied optional `--host` 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。それ以外の argv を書き換えたり意味解釈したりしない規則と、config が provider-neutral な literal argv を宣言する決定も維持する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -371,10 +394,10 @@
     },
     {
       "claim_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "orchestration/usecase layer は phase declaration の解決、pre-entry の順次処理、first-failure stop、writer dispatch を所有する。infrastructure は argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよいが、CLI subcommand を解釈せず Clap/CLI grammar に依存しない。CLI layer は phase の enter / explain / validate surface を公開し、command semantics の重複実装を持たない。"
+        "citation": "CLI layer は phase の enter / explain / validate の表玄関だけを公開し、宣言された実行体が持つ command の意味を重複して実装しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -440,10 +463,10 @@
     },
     {
       "claim_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "`pre-review-gates.json` は各 review scope に適用する `bin/sotp` command argv 配列を実行順に宣言する。gate-kind から内部 operation への不可視な mapping は置かない。`sotp review local` が scope を解決して該当 command を順次 dispatch し、最初の non-zero exit で review 入口を閉じる。Makefile wrapper は薄い委譲に留め、scope 条件分岐や gate dependency を所有しない。"
+        "citation": "review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -486,10 +509,10 @@
     },
     {
       "claim_hash": "5ccee94b62a5a40f8395ace1a7c7439c5b16e0481a55242983887e902558159e",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "Makefile dependencies are scope-blind ... existing D6's ownership ... cannot ... satisfy the scope-aware rule"
+        "citation": "scope ごとに宣言するのは、必要な検査が scope によって異なるためである。cargo-make の `dependencies` は CLI が scope を解決する前に動くため、planning / SoT scope で downstream liveness の検査だけを省けない。そこで coverage-before-check の順序は保ったまま、その所有を scope-blind な cargo-make `dependencies` から、`sotp review local` が scope を解決した後のテンプレート利用者所有の argv 実行へ移す。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -508,25 +531,25 @@
       }
     },
     {
-      "claim_hash": "29d445cbda3b29cd7e70298aa5416d506e4c65526b0b46e78232d518bfab6d15",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
       "verdict": {
         "kind": "pass",
-        "citation": "`task-contract` は型カタログの実在 entry を task に帰属させる artifact に留め、恒久的な source-only baseline-restoration target または carrier variant を追加しない。"
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-07",
-          "text_label": "task-contract の attribution target は catalogue entry のみとし、source-only baseline restoration、evidence/inspector eligibility、coverage/liveness carrier variant、および stale-carrier lifecycle を持ち込まない。"
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
         }
       },
       "evidence_origin": {
         "kind": "adr_decision",
         "data": {
-          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "decision_id": "D6"
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
         }
       }
     },
@@ -555,7 +578,7 @@
     },
     {
       "claim_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
         "citation": "`--host` が omitted の場合、caller の runtime host は未申告である。この dispatch は provider の一致判定を行わず、in-host 委譲を選ばず、常に subprocess dispatch する。実際に起動する provider は既存の capability routing を維持し、`.harness/config/agent-profiles.json` にある requested capability の `capabilities.<name>.provider` から解決する。`capabilities.orchestrator.provider` は subprocess target の選択には使わない。"
@@ -578,7 +601,7 @@
     },
     {
       "claim_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
         "citation": "`--host` が supplied の場合、その値は caller が自己申告した実際の runtime host として扱う。"
@@ -601,7 +624,7 @@
     },
     {
       "claim_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
         "citation": "明示された `--host` と `capabilities.orchestrator.provider` が異なっても、明示値を profile 値へ正規化しない。supplied 値は D1 の runtime-host 自己申告として D7 の分岐に使う。"
@@ -624,10 +647,10 @@
     },
     {
       "claim_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
-        "citation": "phase writer argv などの operator-owned command config 自体は provider host を固定せず、`--host` を保持しない。\nその config を消費する phase-engine entry command などの invocation surface は、caller が指定できる optional host\nparameter を受け取り、値がある場合だけ configured writer の `capability exec` invocation へ転送する。"
+        "citation": "このため、テンプレート利用者所有の command config は provider host を固定せず、`--host` を保持しない。保存する literal argv は provider-neutral のままにする。phase-engine entry command など、その config を使う invocation surface が caller-supplied optional host parameter を受け取る。値がある場合だけ、configured writer の `capability exec` 呼び出しへその値を転送する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -647,10 +670,10 @@
     },
     {
       "claim_hash": "7b4c3f4734549516874260aadc28ec779f4da1cff3af16248bd52eca0c9521e0",
-      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
       "verdict": {
         "kind": "pass",
-        "citation": "shipped `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を direct-upstream signal gate、適用される chain-scoped semantic verification、upstream scope の current final `zero_findings` review check の順で宣言する。意味論検証が適用されない phase ではその要素だけを省く。"
+        "citation": "配布する `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を次の順で宣言する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -670,10 +693,10 @@
     },
     {
       "claim_hash": "b9705a31f7c0d6d796d41b0f16651e18fe9eb97a5af9351e05a5e089d15a5ee8",
-      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
       "verdict": {
         "kind": "pass",
-        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` を唯一の入口として使う。複合 workflow がこれらの phase へ入る場合も同じ入口を使い、workflow SSoT または provider adapter から `bin/sotp capability exec` で writer を直接起動しない。\n\nphase engine は pre-entry command がすべて zero の場合だけ configured writer を一度起動する。"
+        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` だけを入口に使う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -785,10 +808,10 @@
     },
     {
       "claim_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
-      "evidence_hash": "900d7f24b56a8e6fa3286287a980b24dbe2cc6b9914ba62861f7c06a83e1d1bc",
+      "evidence_hash": "2cf461e5c3cb1998d9090b7500d538182058c3e75d1fd4a4b64ae8077f69f890",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review results` の scope selection は `All | Named(validated ScopeName)` とする。"
+        "citation": "「sotp review results」の scope selection は `All | Named(validated ScopeName)` とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -969,10 +992,10 @@
     },
     {
       "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。"
+        "citation": "実行体に固有の制限は、sotp basename と phase enter / review local / review fix-local の組み合わせを拒否する再帰呼び出し denylist、および D5 の fail-closed validation だけである。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -992,10 +1015,10 @@
     },
     {
       "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "gate-kind から内部 operation への不可視な mapping は置かない。"
+        "citation": "argv 配列にする理由は D1 と同じである。gate-kind から内部処理への見えない対応表を置かず、config を読めば実行する command と順序を監査できるようにする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1015,10 +1038,10 @@
     },
     {
       "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "「検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。shell interpolation、pipe、暗黙の `sh -c` は提供しない。」"
+        "citation": "phase engine の再帰呼び出し — config が sotp を宣言し、sotp が sotp を繰り返し起動しないため。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1038,10 +1061,10 @@
     },
     {
       "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
-        "citation": "config に保存・解決された literal argv 自体は変更せず、invocation surface が dispatch boundary で caller-supplied optional `--host` だけを実行時 argv に追加できる。それ以外の argv を書き換えたり意味解釈したりしない"
+        "citation": "\"invocation surface は dispatch boundary で、caller-supplied optional `--host` 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。それ以外の argv を書き換えたり意味解釈したりしない規則\""
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1061,10 +1084,10 @@
     },
     {
       "claim_hash": "c29d9e39ed0557b2ecc7970c60dafadad75eeb0cc90ddd31e2170735becb87e6",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "shell string は受理しない。"
+        "citation": "command 全体を一つの文字列で書く形式は受理しない。引数ごとに分けた配列だけを受理する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1084,10 +1107,10 @@
     },
     {
       "claim_hash": "c29d9e39ed0557b2ecc7970c60dafadad75eeb0cc90ddd31e2170735becb87e6",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "shell interpolation、pipe、暗黙の `sh -c` は提供しない。"
+        "citation": "argv は shell を経由せず、そのまま実行する。機構は shell interpolation、pipe、暗黙の `sh -c` を提供しないため、config の文字列を暗黙に展開・分解・注入する経路を作らない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1106,25 +1129,25 @@
       }
     },
     {
-      "claim_hash": "da9e703da5922086e167206f520220d13056725c3730acdd123acec1c0ad9f09",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "9da26c616a5dec37a12d189a012a20fcc06769cd38113045d5d1868eb170b655",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
       "verdict": {
         "kind": "pass",
-        "citation": "この phase-correct な direct signal check により、source-only の 🔴 が残っていれば review 入口を閉じる一方、宣言先行の 🟡 は既存の commit-gate semantics に従って許容する。"
+        "citation": "型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-03",
-          "text_label": "catalogue entry ではない task-contract carrier で source-only Red を attribution、coverage、liveness、または task settlement から除外することは含まない。"
+          "text_label": "task-contract の task-to-catalogue-entry attribution を `task-coverage.json` に統合することは含まない。"
         }
       },
       "evidence_origin": {
         "kind": "adr_decision",
         "data": {
-          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "decision_id": "D6"
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
         }
       }
     },
@@ -1153,10 +1176,10 @@
     },
     {
       "claim_hash": "cc4c36c0b12e3f599b6d91ae80da50311b0c5a96e833d1f935e384c85e1c9cdf",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config と pre-review gate config は、少なくとも schema version、各 argv の非空、phase または scope declaration の一意性、repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout、および phase engine の再帰呼び出しを検証する。検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。"
+        "citation": "「phase command config と pre-review gate config は、少なくとも次を検証する。」および「明示 timeout または約 60 分の既定 timeout」ならびに「phase engine の再帰呼び出し — config が sotp を宣言し、sotp が sotp を繰り返し起動しないため。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1176,10 +1199,10 @@
     },
     {
       "claim_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "infrastructure は argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよい"
+        "citation": "infrastructure layer は、「一つのプロセスを制限付きで安全に最後まで動かすこと」を受け持つ。argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよい。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1199,10 +1222,10 @@
     },
     {
       "claim_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout"
+        "citation": "- repository-root 固定 cwd — command を呼び出した場所によって結果が変わらないため。\n- bounded output — command の出力が上限なく増え続けないため。\n- 明示 timeout または約 60 分の既定 timeout — 終わらない command が phase や review 全体を止め続けないため。\nargv は shell を経由せず、そのまま実行する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1222,10 +1245,10 @@
     },
     {
       "claim_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase engine は pre-entry を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。"
+        "citation": "phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して\n残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1245,10 +1268,10 @@
     },
     {
       "claim_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review local` が scope を解決して該当 command を順次 dispatch し、最初の non-zero exit で review 入口を閉じる。"
+        "citation": "`sotp review local` は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1291,10 +1314,10 @@
     },
     {
       "claim_hash": "7df184c579178c5464a18299e832ea77e1d6ce6de6cb72fdf00b4162e21c5dea",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "Makefile wrapper は薄い委譲に留め、scope 条件分岐や gate dependency を所有しない。"
+        "citation": "Makefile wrapper は薄い委譲に留め、scope 条件分岐や gate dependency を重複して所有しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1313,34 +1336,57 @@
       }
     },
     {
-      "claim_hash": "5ddb53893624aa011d6d24c9d57efb082392360951c8dedfa9f911811ce22d15",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "c4317bf2926f72cef14651149b43dec1b5a7460c08763b1cb0717114de93d2f3",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "`task-contract` は型カタログの実在 entry を task に帰属させる artifact に留め、恒久的な source-only baseline-restoration target または carrier variant を追加しない。"
+        "citation": "たとえば usecase scope では、`bin/sotp signal calc-impl-catalog` → `bin/sotp signal check-impl-catalog --gate commit` → `bin/sotp task-contract coverage` → `bin/sotp task-contract check` の順に宣言する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "constraint",
           "element_id": "CN-05",
-          "text_label": "implementation review で task-contract check を実行する前に impl-catalog signal を再計算して検査し、task-contract は catalogue-entry attribution の structural contract に限定する。"
+          "text_label": "implementation review では、scope-resolved ordered argv sequence が task-contract coverage/check を実行する前に impl-catalog signal を再計算して検査する。task-contract は catalogue-entry attribution を記録する。"
         }
       },
       "evidence_origin": {
         "kind": "adr_decision",
         "data": {
           "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "decision_id": "D6"
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4317bf2926f72cef14651149b43dec1b5a7460c08763b1cb0717114de93d2f3",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`task-contract.json` は「pre-review ゲートに見せたい信号を漏れなくタスクに紐付けたか」だけを言う契約。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "implementation review では、scope-resolved ordered argv sequence が task-contract coverage/check を実行する前に impl-catalog signal を再計算して検査する。task-contract は catalogue-entry attribution を記録する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
         }
       }
     },
     {
       "claim_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
-      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
       "verdict": {
         "kind": "pass",
-        "citation": "final review 収束には、対象 scope の current final verdict を検査する公開 `bin/sotp` check command を設ける。対象 scope の current final verdict が `zero_findings` の場合だけ exit zero とし、verdict の欠如、final 未完了、`findings_remain`、current artifact と対応しない verdict、入力不正は non-zero とする。"
+        "citation": "収束を終了コードで判定できるように、公開 `bin/sotp` check command を二つ設ける。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1520,41 +1566,18 @@
       }
     },
     {
-      "claim_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき pre-entry command の ordered list を持つ。phase engine は pre-entry を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
+        "citation": "「検証できなければ実行前に non-zero で止まり、黙って続行しない。」および「phase engine の再帰呼び出し — config が sotp を宣言し、sotp が sotp を繰り返し起動しないため。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "decision_id": "D2"
-        }
-      }
-    },
-    {
-      "claim_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
-      "verdict": {
-        "kind": "pass",
-        "citation": "phase command config と pre-review gate config は、少なくとも schema version、各 argv の非空、phase または scope declaration の一意性、repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout、および phase engine の再帰呼び出しを検証する。検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       },
       "evidence_origin": {
@@ -1566,11 +1589,57 @@
       }
     },
     {
-      "claim_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "71fe166aa9c3ec7cc54fe3d56ba5ccab000400d6165bc3e52637258498ce1f79",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき pre-entry command の ordered list を持つ。phase engine は pre-entry を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
+        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき事前 command の順序付き list を持つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-21",
+          "text_label": "phase command config は canonical writer 一件と ordered pre-entry command 群を machine-readable に表す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5773491ff90ff69467c60a27081f4daec5d77ce112a74edf22f8042cabe37d47",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "phase command config は、実行内容を表す Rust 内部の enum 値、検査を識別する内部 ID、または型付きの内部対応表を引く key ではなく、任意の実行体の literal argv 配列を保持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-22",
+          "text_label": "phase command config は command を literal な per-argument argv 配列として machine-readable に表す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき事前 command の順序付き list を持つ。phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1590,10 +1659,10 @@
     },
     {
       "claim_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "orchestration/usecase layer は phase declaration の解決、pre-entry の順次処理、first-failure stop、writer dispatch を所有する。"
+        "citation": "phase declaration を解決し、事前 command を一つずつ順に実行して、最初の non-zero exit で残りを止める。すべて成功した場合だけ writer を一度起動する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1613,10 +1682,10 @@
     },
     {
       "claim_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "orchestration/usecase layer は phase declaration の解決、pre-entry の順次処理、first-failure stop、writer dispatch を所有する。infrastructure は argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよい"
+        "citation": "CLI layer は phase の enter / explain / validate の表玄関だけを公開し、宣言された実行体が持つ command の意味を重複して実装しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1636,10 +1705,10 @@
     },
     {
       "claim_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config と pre-review gate config は、少なくとも schema version、各 argv の非空、phase または scope declaration の一意性、repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout、および phase engine の再帰呼び出しを検証する。検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。"
+        "citation": "「bounded output — command の出力が上限なく増え続けないため。」および「明示 timeout または約 60 分の既定 timeout — 終わらない command が phase や review 全体を止め続けないため。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1659,10 +1728,10 @@
     },
     {
       "claim_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "config author/operator は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。"
+        "citation": "config を書くテンプレート利用者は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1682,10 +1751,10 @@
     },
     {
       "claim_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "shell interpolation、pipe、暗黙の `sh -c` は提供しない。"
+        "citation": "argv は shell を経由せず、そのまま実行する。機構は shell interpolation、pipe、暗黙の `sh -c` を提供しないため、config の文字列を暗黙に展開・分解・注入する経路を作らない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1705,10 +1774,10 @@
     },
     {
       "claim_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
-        "citation": "config に保存・解決された literal argv 自体は変更せず、invocation surface が dispatch boundary で caller-supplied optional `--host` だけを実行時 argv に追加できる。それ以外の argv を書き換えたり意味解釈したりしないという D1 の規則と、config が provider-neutral な literal argv を宣言する決定は維持する。"
+        "citation": "`invocation surface は dispatch boundary で、caller-supplied optional --host 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。それ以外の argv を書き換えたり意味解釈したりしない規則も維持する。`"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1751,10 +1820,10 @@
     },
     {
       "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "`pre-review-gates.json` は各 review scope に適用する `bin/sotp` command argv 配列を実行順に宣言する。`sotp review local` が scope を解決して該当 command を順次 dispatch し、最初の non-zero exit で review 入口を閉じる。"
+        "citation": "「review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。」また、「`sotp review local` は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。すべてが zero の場合は reviewer を起動する。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1774,10 +1843,10 @@
     },
     {
       "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config と pre-review gate config は、少なくとも schema version、各 argv の非空、phase または scope declaration の一意性、repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout、および phase engine の再帰呼び出しを検証する。検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。"
+        "citation": "テンプレート利用者の config は疑ってから実行する。検証できなければ実行前に non-zero で止まり、黙って続行しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1843,10 +1912,10 @@
     },
     {
       "claim_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "`pre-review-gates.json` は各 review scope に適用する `bin/sotp` command argv 配列を実行順に宣言する。gate-kind から内部 operation への不可視な mapping は置かない。`sotp review local` が scope を解決して該当 command を順次 dispatch し、最初の non-zero exit で review 入口を閉じる。"
+        "citation": "「reviewer を起動する前に何を検査するかは、review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。」\n\n「`sotp review local` は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。」\n\n「たとえば usecase scope では、`bin/sotp signal calc-impl-catalog` → `bin/sotp signal check-impl-catalog --gate commit` → `bin/sotp task-contract coverage` → `bin/sotp task-contract check` の順に宣言する。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1865,48 +1934,48 @@
       }
     },
     {
-      "claim_hash": "86401aab231a908018e505096908217adba1bb1ae4b72a6a8fc42d24bfc234a9",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
       "verdict": {
         "kind": "pass",
-        "citation": "`task-contract` は型カタログの実在 entry を task に帰属させる artifact に留め、恒久的な source-only baseline-restoration target または carrier variant を追加しない。"
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "task-contract は catalogue-entry attribution だけを受理し、source-only baseline-restoration、evidence/inspector eligibility、coverage/liveness carrier variant、または stale-carrier lifecycle の入力を受理しない。"
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
         }
       },
       "evidence_origin": {
         "kind": "adr_decision",
         "data": {
-          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "decision_id": "D6"
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md",
+          "decision_id": "D1"
         }
       }
     },
     {
-      "claim_hash": "cc207353d2e83e164378184b7bb496dd1961f0cfed872377a9f15e9169133278",
-      "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
+      "claim_hash": "dcb8aaa72ad8e71f6ad83e5c468ae0c9da138e631c89c90199c5e6b3b399bb85",
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
       "verdict": {
         "kind": "pass",
-        "citation": "この phase-correct な direct signal check により、source-only の 🔴 が残っていれば review 入口を閉じる一方、宣言先行の 🟡 は既存の commit-gate semantics に従って許容する。"
+        "citation": "「reviewer を起動する前に何を検査するかは、review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。」また、「sotp review local は scope を解決し、その scope に宣言された argv を上から順に実行する。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-09",
-          "text_label": "source-only Red が残る implementation review は direct impl-catalog recalculation/check で検出され、task-contract carrier、signal override、gate skip、または settlement exception では回避できない。"
+          "text_label": "source-only Red が残る implementation review は、reviewer dispatch 前の scope-resolved ordered argv sequence における direct impl-catalog recalculation/check で検出される。"
         }
       },
       "evidence_origin": {
         "kind": "adr_decision",
         "data": {
           "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
-          "decision_id": "D6"
+          "decision_id": "D4"
         }
       }
     },
@@ -1935,7 +2004,7 @@
     },
     {
       "claim_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
         "citation": "`--host` が omitted の場合、caller の runtime host は未申告である。この dispatch は provider の一致判定を行わず、in-host 委譲を選ばず、常に subprocess dispatch する。実際に起動する provider は既存の capability routing を維持し、`.harness/config/agent-profiles.json` にある requested capability の `capabilities.<name>.provider` から解決する。`capabilities.orchestrator.provider` は subprocess target の選択には使わない。"
@@ -1958,10 +2027,10 @@
     },
     {
       "claim_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
-        "citation": "`--host` が supplied の場合、その値は caller が自己申告した実際の runtime host として扱う。`capability` 契約を保持できる provider の一致時だけ in-host 委譲の候補にできる。"
+        "citation": "`--host` が supplied の場合、その値は caller が自己申告した実際の runtime host として扱う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -1981,7 +2050,7 @@
     },
     {
       "claim_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
         "citation": "明示された `--host` と `capabilities.orchestrator.provider` が異なっても、明示値を profile 値へ正規化しない。supplied 値は D1 の runtime-host 自己申告として D7 の分岐に使う。"
@@ -2027,10 +2096,10 @@
     },
     {
       "claim_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
-      "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
       "verdict": {
         "kind": "pass",
-        "citation": "phase writer argv などの operator-owned command config 自体は provider host を固定せず、`--host` を保持しない。\nその config を消費する phase-engine entry command などの invocation surface は、caller が指定できる optional host\nparameter を受け取り、値がある場合だけ configured writer の `capability exec` invocation へ転送する。\ncaller が値を指定しない場合は `--host` を転送せず、D2 の profile 解決による subprocess dispatch を適用する。\n\nconfig に保存・解決された literal argv 自体は変更せず、\ninvocation surface が dispatch boundary で caller-supplied optional `--host` だけを実行時 argv に追加できる。\nそれ以外の argv を書き換えたり意味解釈したりしない"
+        "citation": "このため、テンプレート利用者所有の command config は provider host を固定せず、`--host` を保持しない。…その config を使う invocation surface が caller-supplied optional host parameter を受け取る。値がある場合だけ、configured writer の `capability exec` 呼び出しへその値を転送する。…invocation surface は dispatch boundary で、caller-supplied optional `--host` 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2050,10 +2119,10 @@
     },
     {
       "claim_hash": "78ce9c6a3c9eae40fed82c06eed1f9658d13d3326589ea804dbb7a34bd4155ed",
-      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
       "verdict": {
         "kind": "pass",
-        "citation": "shipped `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を direct-upstream signal gate、適用される chain-scoped semantic verification、upstream scope の current final `zero_findings` review check の順で宣言する。"
+        "citation": "配布する `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を次の順で宣言する。\n適用されない要素は省く。\n\n1. direct-upstream signal gate\n2. 適用される chain-scoped semantic verification check\n3. upstream scope の current final `zero_findings` review check。\n\n- `spec-design`: `adr_user` signal gate、ADR scope の current final `zero_findings` review check。\n- `type-design`: `spec_adr` signal gate、Chain ① semantic verification check、spec scope の current final\n  `zero_findings` review check。\n- `impl-plan`: `catalog_spec` signal gate、Chain ② semantic verification check、types scope の current final\n  `zero_findings` review check。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2073,10 +2142,10 @@
     },
     {
       "claim_hash": "d3c306763b47bf58494c816b4fba15046782f9b0f1ef03c6ad4ef5c10d321eda",
-      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
       "verdict": {
         "kind": "pass",
-        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` を唯一の入口として使う。複合 workflow がこれらの phase へ入る場合も同じ入口を使い、workflow SSoT または provider adapter から `bin/sotp capability exec` で writer を直接起動しない。"
+        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` だけを入口に使う。複合 workflow も同じ入口を使う。workflow SSoT や provider adapter から `bin/sotp capability exec` で writer を直接起動すると、宣言された pre-entry command を通らずに進めるため、この直接起動は行わない。\n\nphase engine は pre-entry command がすべて zero の場合に限り、configured writer を一度起動する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2096,10 +2165,10 @@
     },
     {
       "claim_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
-      "evidence_hash": "755b3e4e35b814561a80773314cad213ca4a9dceb84923a09099e6d8a80a0b4f",
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
       "verdict": {
         "kind": "pass",
-        "citation": "final review 収束には、対象 scope の current final verdict を検査する公開 `bin/sotp` check command を設ける。対象 scope の current final verdict が `zero_findings` の場合だけ exit zero とし、verdict の欠如、final 未完了、`findings_remain`、current artifact と対応しない verdict、入力不正は non-zero とする。\n\nsemantic verification 収束には、選択した chain の状態だけを検査する公開 `bin/sotp` check command を設ける。当該 chain の意味論検証要素が current effective convergence rule を満たす場合だけ exit zero とし、未解消、pending、必要な判定根拠の欠如、入力不正は non-zero とする。"
+        "citation": "review convergence check: 対象 scope の current final verdict が `zero_findings` の場合だけ exit zero とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -2211,10 +2280,10 @@
     },
     {
       "claim_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
-      "evidence_hash": "900d7f24b56a8e6fa3286287a980b24dbe2cc6b9914ba62861f7c06a83e1d1bc",
+      "evidence_hash": "2cf461e5c3cb1998d9090b7500d538182058c3e75d1fd4a4b64ae8077f69f890",
       "verdict": {
         "kind": "pass",
-        "citation": "`All` は明示的な `--all` または selector の省略で選ばれ、`scope_config.all_scope_names()` が返す scope universe を省略なく完全に列挙する。\\n- `Named(validated ScopeName)` は `--scope <name>` で選ばれ、検証済みの選択 scope だけを表示する。\\n- `--scope <name>` と `--all` の同時指定は、どちらかへ暗黙に優先順位を付けず拒否する。\\n- `--scope <name>` の値は query の前に `ScopeName` の形式を検証し、さらに検証済みの値が `scope_config.all_scope_names()` の返す scope universe に属することを検証する。"
+        "citation": "`All` は明示的な `--all` または selector の省略で選ばれ、`scope_config.all_scope_names()` が返す scope universe を省略なく完全に列挙する。"
       },
       "claim_origin": {
         "kind": "spec_element",

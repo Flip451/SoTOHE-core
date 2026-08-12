@@ -345,6 +345,49 @@ mod tests {
     }
 
     #[test]
+    fn test_decode_task_attribution_preserves_task_entry_associations() {
+        let json = r#"{
+  "schema_version": 1,
+  "track_id": "valid-track",
+  "entries": {
+    "T001": [
+      {"layer": "usecase", "entry_key": "PhaseCommandInteractor"},
+      {"layer": "infrastructure", "entry_key": "TaskContractDocumentDto"}
+    ],
+    "T002": [
+      {"layer": "domain", "entry_key": "TaskContractDocument"}
+    ]
+  }
+}"#;
+
+        let doc = decode(json.as_bytes()).unwrap();
+        let task_one = TaskId::try_new("T001").unwrap();
+        let task_two = TaskId::try_new("T002").unwrap();
+
+        assert_eq!(
+            doc.entries()
+                .get(&task_one)
+                .unwrap()
+                .iter()
+                .map(|entry| (entry.layer().as_ref(), entry.entry_key().as_str()))
+                .collect::<Vec<_>>(),
+            vec![
+                ("usecase", "PhaseCommandInteractor"),
+                ("infrastructure", "TaskContractDocumentDto"),
+            ]
+        );
+        assert_eq!(
+            doc.entries()
+                .get(&task_two)
+                .unwrap()
+                .iter()
+                .map(|entry| (entry.layer().as_ref(), entry.entry_key().as_str()))
+                .collect::<Vec<_>>(),
+            vec![("domain", "TaskContractDocument")]
+        );
+    }
+
+    #[test]
     fn decode_rejects_wrong_schema_version() {
         let json = r#"{"schema_version":2,"track_id":"t","entries":{"T001":[]}}"#;
         let err = decode(json.as_bytes()).unwrap_err();

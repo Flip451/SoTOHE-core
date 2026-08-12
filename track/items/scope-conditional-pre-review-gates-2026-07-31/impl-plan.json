@@ -94,7 +94,7 @@
     },
     {
       "id": "T023",
-      "description": "`.harness/config/phase-commands.json` を追加し、`.harness/config/pre-review-gates.json` を literal argv declarations に置換し、`Makefile.toml` を thin delegation に保ち、`.harness/capabilities/impl-planner.md` と `.harness/custom/review-prompts/impl-plan.md` を更新する。IN-01、IN-05、IN-06、IN-08、OS-04、CN-01、CN-04、CN-05、AC-01、AC-05、AC-06、AC-07、AC-10。",
+      "description": "`.harness/config/phase-commands.json` を追加し、`.harness/config/pre-review-gates.json` を literal argv declarations に置換し、`Makefile.toml` を thin delegation に保ち、`.harness/capabilities/impl-planner.md` と `.harness/custom/review-prompts/impl-plan.md` を更新する。IN-01、IN-05、IN-06、IN-08、IN-19、OS-04、CN-01、CN-04、CN-05、AC-01、AC-05、AC-06、AC-07、AC-10、AC-21、AC-22。",
       "status": "done",
       "commit_hash": "cf20210b86e0d19fd452f014ba931bbeebf31483",
       "depends_on": [
@@ -116,13 +116,13 @@
     },
     {
       "id": "T026",
-      "description": "`libs/usecase/src/operator_command.rs` の validated argv value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、CN-01、AC-01、AC-04、AC-05。",
+      "description": "`libs/usecase/src/operator_command.rs` の validated argv value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、IN-20、CN-01、AC-01、AC-04、AC-05。",
       "status": "done",
       "commit_hash": "35b7c8833adc405a82b54b977169e1dc4f2d8d6b"
     },
     {
       "id": "T027",
-      "description": "`libs/usecase/src/operator_command.rs` の `ConfiguredCommand` construction と configuration/load error vocabulary、および `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、CN-01、AC-01、AC-13。",
+      "description": "`libs/usecase/src/operator_command.rs` の `ConfiguredCommand` construction と configuration/load error vocabulary、および `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、IN-19、IN-20、CN-01、AC-01、AC-13、AC-21、AC-22。",
       "status": "done",
       "commit_hash": "275cc9ee271ceeab0a9fa85967f1dd8d92e92602",
       "depends_on": [
@@ -158,7 +158,7 @@
     },
     {
       "id": "T029",
-      "description": "`libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を更新し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、AC-01。",
+      "description": "`libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を更新し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、IN-19、IN-20、AC-01、AC-21、AC-22。",
       "status": "done",
       "commit_hash": "22b098d16aa6ca63fd48ff24475501f06d57d791",
       "depends_on": [
@@ -249,7 +249,7 @@
     },
     {
       "id": "T044",
-      "description": "review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。`libs/usecase/src/operator_command.rs` と phase/pre-review config loaders の executable-basename recursion rejection および対応テストを更新する。IN-16、CN-02、CN-01、AC-01、AC-05。",
+      "description": "review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。`libs/usecase/src/operator_command.rs` と phase/pre-review config loaders の executable-basename recursion rejection および対応テストを更新する。IN-16、IN-20、CN-02、CN-01、AC-01、AC-05。",
       "status": "in_progress",
       "depends_on": [
         "T043"

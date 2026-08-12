@@ -31,10 +31,9 @@ interface を見ても、どの値で何が起きるのかを理解できず、�
 phase を進める順序を prompt の文章だけに持たせる形にも問題がある。どの writer の前にどの事前 command を
 通すかを機構が再現できない。そのため、正しい順序が守られる保証がない。
 
-template config はテンプレート利用者所有である。有効な command とその順序を選ぶ責任はテンプレート利用者にある。
-各 command が何を行い、どの条件で zero / non-zero を返すかという契約は、その command の提供者が所有する。
-`bin/sotp` command なら `bin/sotp` が所有し、それ以外は config に宣言された実行体が所有する。phase engine は
-どの実行体についても、その文法や意味を複製または解釈してはならない。
+template config はテンプレート利用者所有である。有効な公開 command とその順序を選ぶ責任はテンプレート利用者にある。
+一方、各 command が何を行い、いつ non-zero を返すかという意味は `bin/sotp` が所有する。
+phase engine は subcommand の文法や意味を複製してはならない。
 
 ## Decision
 
@@ -57,9 +56,8 @@ config を書くテンプレート利用者は有効な command と順序を選�
 残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。
 
 この機構は `2026-07-22-0400-sot-reentry-sequencing.md` D6 を refine し、prompt に書かれた phase を進める順序を
-テンプレート利用者所有の command 宣言によって機械実行可能にする。各事前 command の意味と zero / non-zero の契約は、
-その command の提供者が所有する。`bin/sotp` command では `bin/sotp`、それ以外では宣言された実行体が所有する。
-phase engine はその契約を複製または解釈せず、受け取った exit status だけで進行を制御する。
+テンプレート利用者所有の command 宣言によって機械実行可能にする。各事前 command の意味と
+zero/non-zero の契約は引き続き `bin/sotp` が所有する。
 
 ### D3: usecase が sequencing を、infrastructure が bounded process execution を所有する
 
@@ -70,8 +68,7 @@ phase engine はその契約を複製または解釈せず、受け取った exi
   argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよい。
   CLI subcommand を解釈せず、Clap/CLI grammar に依存しない。また、何個中の何個目かや、失敗後に次を
   実行するかどうかも知らない。
-- CLI layer は phase の enter / explain / validate の表玄関だけを公開し、宣言された実行体が持つ command の意味を
-  重複して実装しない。
+- CLI layer は phase の enter / explain / validate の表玄関だけを公開し、command の意味を重複して実装しない。
 
 infrastructure が進行まで知ると、runner が CLI の文法や意味を解釈し始め、D1 の「argv を意味解釈しない」
 という境界が壊れる。usecase がプロセス実行まで受け持つと、timeout、output bound など、OS に依存する処理が
@@ -151,9 +148,8 @@ D1 / D4 の範囲に含まれる。
 
 ### Positive
 
-- テンプレート利用者は config と、宣言した command の提供者が公開する interface から、phase の事前 command と
-  pre-review gate の実行内容と順序を監査できる。
-- phase engine は exit status による進行制御に限定され、各 command の提供者が持つ意味の二重実装を避けられる。
+- テンプレート利用者は config と公開 `bin/sotp` interface だけで phase の事前 command と pre-review gate の実行順を監査できる。
+- phase engine は exit status による進行制御に限定され、CLI が持つ意味の二重実装を避けられる。
 - argv、cwd、timeout、output、recursion の境界を、判定不能なら拒否する共通の実行契約として検証できる。
 - Makefile wrapper を薄く保ったまま、`sotp review local` と phase engine が実行を所有できる。
 
