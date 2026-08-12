@@ -663,10 +663,6 @@
       "action": "reference",
       "for_type": "CodexReviewFixRunner",
       "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
-    },
-    {
-      "for_type": "TrustedReviewFixBriefingLoader",
-      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort"
     }
   ],
   "traits": {},
@@ -1123,7 +1119,7 @@
     },
     "GitReviewFixTrackResolver": {
       "action": "add",
-      "docs": "Git-backed current-branch review-track resolver (IN-16, CN-09, AC-19).",
+    "docs": "Git-backed current-branch review-track resolver (IN-18, CN-09, AC-19).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1138,15 +1134,15 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-09",
+        "anchor": "CN-09",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-18",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -1497,7 +1493,7 @@
     },
     "ReviewFixRunnerAdapter": {
       "action": "add",
-      "docs": "Review-fix runner secondary adapter (IN-16, CN-09, AC-19).",
+    "docs": "Review-fix runner secondary adapter (CN-09, AC-19).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1512,11 +1508,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-09",
+        "anchor": "CN-09",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -1692,28 +1684,6 @@
         },
         {
           "anchor": "AC-08",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        }
-      ]
-    },
-    "TrustedReviewFixBriefingLoader": {
-      "action": "add",
-      "docs": "Review-fix briefing loader adapter (IN-16).",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "kind": "unit"
-        }
-      },
-      "methods": [],
-      "module_path": "review_v2::review_fix_runner",
-      "role": {
-        "SecondaryAdapter": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-16",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

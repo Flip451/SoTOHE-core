@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-11T11:42:51Z",
-  "declaration_hash": "cc7863af61f1c91af46055a33e6b38803b6f8e5122a30e725f2cd70f691d2ba2",
-  "implementation_input_hash": "f79130a5ef04d1ec7f80f93fb873d65c06028a8284811fd5f6bcdf9f46990613",
+  "generated_at": "2026-08-12T07:19:49Z",
+  "declaration_hash": "b7009eb9aa9026d774fc44618d5040763df80b2ef1458313f0441d5887475826",
+  "implementation_input_hash": "ddce7d33399681b5b48c2a86e60329b6f5faec5f50b05a66d92a3b641a4b5946",
   "signals": [
     {
       "type_name": "CommandArgumentDto",
@@ -337,15 +337,6 @@
         "Eq",
         "PartialEq",
         "Serialize"
-      ]
-    },
-    {
-      "type_name": "TrustedReviewFixBriefingLoader",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort"
       ]
     },
     {

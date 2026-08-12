@@ -268,20 +268,30 @@
       },
       {
         "id": "IN-16",
-        "text": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。",
+        "text": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。",
         "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
+            "anchor": "D3"
+          },
           {
             "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
             "anchor": "D5"
           },
           {
-            "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
-            "anchor": "D2"
-          },
-          {
-            "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
-            "anchor": "D3"
-          },
+            "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-18",
+        "text": "review-fix のように track artifact へ書き込む操作では、explicit track id がある場合に current `track/<id>` branch から導出した id との一致を要求し、不一致または non-track branch を fail-closed に拒否する。",
+        "adr_refs": [
           {
             "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
             "anchor": "D7"
@@ -470,10 +480,6 @@
         {
           "file": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md",
           "anchor": "D5"
-        },
-        {
-          "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
-          "anchor": "D1"
         },
         {
           "file": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md",
@@ -742,10 +748,6 @@
         {
           "file": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md",
           "anchor": "D7"
-        },
-        {
-          "file": "knowledge/adr/2026-08-11-1857-review-fix-delivery-boundary.md",
-          "anchor": "D1"
         }
       ]
     },
@@ -775,7 +777,7 @@
     }
   ],
   "signals": {
-    "blue": 55,
+    "blue": 56,
     "yellow": 0,
     "red": 0
   }

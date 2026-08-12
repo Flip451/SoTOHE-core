@@ -638,15 +638,25 @@ fn run_review_output_to_outcome(out: usecase::review_v2::RunReviewOutput) -> Com
 }
 
 fn subagent_dispatch_to_outcome(instruction: SubagentDispatchInstruction) -> CommandOutcome {
+    let Some(briefing_file) = instruction.briefing_file.to_str() else {
+        return CommandOutcome::failure(Some(
+            "review-fix dispatch briefing path is not valid UTF-8".to_owned(),
+        ));
+    };
+    let Some(repository_root) = instruction.repository_root.to_str() else {
+        return CommandOutcome::failure(Some(
+            "review-fix dispatch repository root is not valid UTF-8".to_owned(),
+        ));
+    };
     let json = format!(
-        "{{\"agent\":{},\"model\":{},\"effort\":{},\"scope\":{},\"briefing_content\":{},\"track_id\":{},\"repository_root\":{},\"round_type\":{}}}",
+        "{{\"agent\":{},\"model\":{},\"effort\":{},\"scope\":{},\"briefing_file\":{},\"track_id\":{},\"repository_root\":{},\"round_type\":{}}}",
         json_str(instruction.agent.as_str()),
         json_str(instruction.model.as_str()),
         json_str(effort_value(instruction.effort)),
         json_str(instruction.scope.as_str()),
-        json_str(instruction.briefing_content.as_str()),
+        json_str(briefing_file),
         json_str(instruction.track_id.as_str()),
-        json_str(&instruction.repository_root.display().to_string()),
+        json_str(repository_root),
         json_str(match instruction.round_type {
             usecase::review_v2::ReviewRoundType::Fast => "fast",
             usecase::review_v2::ReviewRoundType::Final => "final",
@@ -690,7 +700,11 @@ fn json_str(s: &str) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    #[cfg(unix)]
+    use std::ffi::OsString;
     use std::fs;
+    #[cfg(unix)]
+    use std::os::unix::ffi::OsStringExt;
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex};
 
@@ -698,11 +712,9 @@ mod tests {
     use usecase::git_workflow::DiagnosticText;
     use usecase::review_v2::run_review_fix::ReviewFixResolution;
     use usecase::review_v2::run_review_fix::{
-        ReviewFixBriefingLoadError, ReviewFixBriefingLoaderPort, ReviewFixRunner,
-        ReviewFixRunnerError, ReviewFixTrackResolveError, ReviewFixTrackResolverPort,
-        ReviewTrackId, RunReviewFixCommand, RunReviewFixError, RunReviewFixInteractor,
-        RunReviewFixOutput, RunReviewFixRequest, RunReviewFixService, SubagentBriefingContent,
-        SubagentBriefingContentValidationError,
+        ReviewFixRunner, ReviewFixRunnerError, ReviewFixTrackResolveError,
+        ReviewFixTrackResolverPort, ReviewTrackId, RunReviewFixCommand, RunReviewFixError,
+        RunReviewFixInteractor, RunReviewFixOutput, RunReviewFixRequest, RunReviewFixService,
     };
     use usecase::review_v2::{
         NonEmptyReviewerFindingsOutput, ReviewApprovalOutput, ReviewCheckApprovedError,
@@ -1637,10 +1649,7 @@ mod tests {
                     effort: ReasoningEffort::High,
                     scope: ReviewScopeName::try_new("cli_driver".to_owned())
                         .expect("valid test review scope"),
-                    briefing_content: SubagentBriefingContent::try_new(
-                        "validated briefing\ncontent".to_owned(),
-                    )
-                    .expect("valid briefing content"),
+                    briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing-cli_driver.md"),
                     track_id: ReviewTrackId::try_new("dispatch-driver-2026".to_owned())
                         .expect("valid test track ID"),
                     repository_root: PathBuf::from("/resolver-proven/root"),
@@ -1667,7 +1676,7 @@ mod tests {
         assert_eq!(
             outcome.stdout.as_deref(),
             Some(
-                "SUBAGENT_DISPATCH_REQUIRED\n{\"agent\":\"review-fix-lead\",\"model\":\"gpt-5.5\",\"effort\":\"high\",\"scope\":\"cli_driver\",\"briefing_content\":\"validated briefing\\ncontent\",\"track_id\":\"dispatch-driver-2026\",\"repository_root\":\"/resolver-proven/root\",\"round_type\":\"final\"}"
+                "SUBAGENT_DISPATCH_REQUIRED\n{\"agent\":\"review-fix-lead\",\"model\":\"gpt-5.5\",\"effort\":\"high\",\"scope\":\"cli_driver\",\"briefing_file\":\"tmp/reviewer-runtime/briefing-cli_driver.md\",\"track_id\":\"dispatch-driver-2026\",\"repository_root\":\"/resolver-proven/root\",\"round_type\":\"final\"}"
             )
         );
     }
@@ -1707,6 +1716,7 @@ mod tests {
         }));
     }
 
+    #[cfg(any())]
     #[derive(Clone, Copy)]
     enum BriefingLoadFailure {
         UntrustedFile,
@@ -1714,10 +1724,12 @@ mod tests {
         InvalidContent,
     }
 
+    #[cfg(any())]
     struct BriefingLoadFailingFixService {
         failure: BriefingLoadFailure,
     }
 
+    #[cfg(any())]
     impl RunReviewFixService for BriefingLoadFailingFixService {
         fn run(
             &self,
@@ -1738,6 +1750,7 @@ mod tests {
         }
     }
 
+    #[cfg(any())]
     #[test]
     fn test_review_fix_driver_briefing_load_failures_render_nonzero_typed_diagnostics() {
         let cases = [
@@ -1810,12 +1823,84 @@ mod tests {
         assert_eq!(outcome.stderr.as_deref(), Some("runner completed"));
     }
 
+    struct RecordingRenderFixService {
+        received_requests: Mutex<Vec<RunReviewFixRequest>>,
+    }
+
+    impl RunReviewFixService for RecordingRenderFixService {
+        fn run(
+            &self,
+            request: RunReviewFixRequest,
+        ) -> Result<RunReviewFixOutput, RunReviewFixError> {
+            let mut received_requests =
+                self.received_requests.lock().expect("test mutex must not be poisoned");
+            let first_request = received_requests.is_empty();
+            received_requests.push(request);
+
+            if first_request {
+                Ok(RunReviewFixOutput {
+                    status: "completed".to_owned(),
+                    exit_code: 0,
+                    stderr: Some("typed success diagnostic".to_owned()),
+                })
+            } else {
+                Err(RunReviewFixError::TrackMismatch {
+                    explicit: ReviewTrackId::try_new("requested-track-2026".to_owned())
+                        .expect("fixed explicit track ID must be valid"),
+                    resolved: ReviewTrackId::try_new("current-track-2026".to_owned())
+                        .expect("fixed resolved track ID must be valid"),
+                })
+            }
+        }
+    }
+
+    #[test]
+    fn test_review_fix_driver_forwards_raw_input_to_usecase_and_renders_typed_results() {
+        let service = Arc::new(RecordingRenderFixService { received_requests: Mutex::new(vec![]) });
+        let driver = ReviewFixDriver::new(service.clone());
+
+        let completed = driver.handle(ReviewFixInput::new(
+            "cli_driver".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some("requested-track-2026".to_owned()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            Some("gpt-5.5".to_owned()),
+        ));
+        let track_mismatch = driver.handle(ReviewFixInput::new(
+            "other".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/other-briefing.md"),
+            None,
+            PathBuf::from("track/items/other"),
+            "final".to_owned(),
+            None,
+        ));
+
+        assert_eq!(
+            service.received_requests.lock().expect("test mutex must not be poisoned").len(),
+            2,
+            "each valid raw delivery input must reach the usecase service"
+        );
+        assert_eq!(completed.exit_code, 0);
+        assert_eq!(completed.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        assert_eq!(completed.stderr.as_deref(), Some("typed success diagnostic"));
+        assert_ne!(track_mismatch.exit_code, 0);
+        assert!(track_mismatch.stdout.is_none());
+        assert!(track_mismatch.stderr.as_deref().is_some_and(|message| {
+            message.contains(
+                "explicit track 'requested-track-2026' does not match current branch track 'current-track-2026'",
+            )
+        }));
+    }
+
     struct RealInteractorResolver {
         received_items_dirs: Mutex<Vec<PathBuf>>,
     }
 
+    #[cfg(any())]
     struct FixedBriefingLoader;
 
+    #[cfg(any())]
     impl ReviewFixBriefingLoaderPort for FixedBriefingLoader {
         fn load_briefing_content(
             &self,
@@ -1827,11 +1912,13 @@ mod tests {
         }
     }
 
+    #[cfg(any())]
     struct RecordingBriefingLoader {
         received_requests: Mutex<Vec<(PathBuf, PathBuf)>>,
         content: SubagentBriefingContent,
     }
 
+    #[cfg(any())]
     impl ReviewFixBriefingLoaderPort for RecordingBriefingLoader {
         fn load_briefing_content(
             &self,
@@ -1878,17 +1965,12 @@ mod tests {
     }
 
     #[test]
-    fn test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome() {
+    fn test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome() {
         let resolver =
             Arc::new(RealInteractorResolver { received_items_dirs: Mutex::new(Vec::new()) });
-        let loader = Arc::new(RecordingBriefingLoader {
-            received_requests: Mutex::new(Vec::new()),
-            content: SubagentBriefingContent::try_new("trusted loader content".to_owned())
-                .expect("fixed test briefing must be valid"),
-        });
         let runner = Arc::new(RealInteractorRunner { received_commands: Mutex::new(Vec::new()) });
         let service: Arc<dyn RunReviewFixService> =
-            Arc::new(RunReviewFixInteractor::new(resolver.clone(), loader.clone(), runner.clone()));
+            Arc::new(RunReviewFixInteractor::new(resolver.clone(), runner.clone()));
         let driver = ReviewFixDriver::new(service);
 
         let outcome = driver.handle(ReviewFixInput::new(
@@ -1907,13 +1989,6 @@ mod tests {
             *resolver.received_items_dirs.lock().expect("test mutex must not be poisoned"),
             vec![PathBuf::from("track/items/driver-interactor")]
         );
-        assert_eq!(
-            *loader.received_requests.lock().expect("test mutex must not be poisoned"),
-            vec![(
-                PathBuf::from("/test-repository"),
-                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
-            )]
-        );
         let command = runner
             .received_commands
             .lock()
@@ -1923,7 +1998,7 @@ mod tests {
         assert_eq!(command.scope(), " cli_driver ");
         assert_eq!(command.track_id(), "driver-interactor-2026");
         assert_eq!(command.repository_root(), PathBuf::from("/test-repository"));
-        assert_eq!(command.briefing_content().as_str(), "trusted loader content");
+        assert_eq!(command.briefing_file(), Path::new("tmp/reviewer-runtime/briefing.md"));
         assert!(matches!(command.round_type(), ReviewRoundType::Final));
         assert_eq!(command.model().map(ModelName::as_str), Some("gpt-5.5"));
     }
@@ -2030,6 +2105,32 @@ mod tests {
     }
 
     #[test]
+    fn test_review_fix_driver_rejects_empty_explicit_track_id_with_focused_validation_error() {
+        let service = Arc::new(CapturingFixService { received: Mutex::new(false) });
+        let outcome = ReviewFixDriver::new(service.clone()).handle(ReviewFixInput::new(
+            "cli_driver".to_owned(),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            Some(String::new()),
+            PathBuf::from("track/items"),
+            "fast".to_owned(),
+            None,
+        ));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stdout.is_none());
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|message| { message.contains("invalid review-fix track ID") })
+        );
+        assert!(
+            !*service.received.lock().expect("test mutex must not be poisoned"),
+            "an empty explicit track ID must be rejected before service invocation"
+        );
+    }
+
+    #[test]
     fn test_review_fix_driver_renders_raw_validation_and_interactor_error_boundaries() {
         let accepted_service = Arc::new(CapturingFixService { received: Mutex::new(false) });
         let accepted = ReviewFixDriver::new(accepted_service.clone()).handle(ReviewFixInput::new(
@@ -2126,20 +2227,6 @@ mod tests {
             }
         }
 
-        struct UntrustedBriefingLoader;
-
-        impl ReviewFixBriefingLoaderPort for UntrustedBriefingLoader {
-            fn load_briefing_content(
-                &self,
-                _repository_root: &Path,
-                _briefing_file: &Path,
-            ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
-                Err(ReviewFixBriefingLoadError::UntrustedFile(DiagnosticText::new(
-                    "symlinked intermediate component",
-                )))
-            }
-        }
-
         struct RootMismatchRunner;
 
         impl ReviewFixRunner for RootMismatchRunner {
@@ -2168,8 +2255,7 @@ mod tests {
                         effort: ReasoningEffort::Low,
                         scope: ReviewScopeName::try_new("cli_driver".to_owned())
                             .expect("valid test review scope"),
-                        briefing_content: SubagentBriefingContent::try_new("briefing".to_owned())
-                            .expect("valid briefing"),
+                        briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
                         track_id: ReviewTrackId::try_new("review-fix-driver-2026".to_owned())
                             .expect("valid test track ID"),
                         repository_root: PathBuf::from("/resolver-proven/root"),
@@ -2191,31 +2277,21 @@ mod tests {
         };
         let runner_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
             Arc::new(ResolvingTrack),
-            Arc::new(FixedBriefingLoader),
             Arc::new(SpawnFailingRunner),
         )))
         .handle(input());
         let resolution_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
             Arc::new(NonTrackBranch),
-            Arc::new(FixedBriefingLoader),
-            Arc::new(SpawnFailingRunner),
-        )))
-        .handle(input());
-        let briefing_load_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
-            Arc::new(ResolvingTrack),
-            Arc::new(UntrustedBriefingLoader),
             Arc::new(SpawnFailingRunner),
         )))
         .handle(input());
         let dispatch = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
             Arc::new(ResolvingTrack),
-            Arc::new(FixedBriefingLoader),
             Arc::new(DispatchRunner),
         )))
         .handle(input());
         let root_mismatch = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
             Arc::new(ResolvingTrack),
-            Arc::new(FixedBriefingLoader),
             Arc::new(RootMismatchRunner),
         )))
         .handle(input());
@@ -2231,12 +2307,6 @@ mod tests {
                 .as_deref()
                 .is_some_and(|message| message.contains("track resolution failed"))
         );
-        assert_ne!(briefing_load_failure.exit_code, 0);
-        assert!(briefing_load_failure.stderr.as_deref().is_some_and(|message| {
-            message.contains(
-                "briefing load failed: review-fix briefing file is not trusted: symlinked intermediate component",
-            )
-        }));
         assert_eq!(dispatch.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);
         assert!(
             dispatch
@@ -2314,13 +2384,11 @@ mod tests {
         };
         let smoke_test_failure = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
             Arc::new(ResolvingTrack),
-            Arc::new(FixedBriefingLoader),
             Arc::new(SmokeFailingRunner),
         )))
         .handle(input(None));
         let track_mismatch = ReviewFixDriver::new(Arc::new(RunReviewFixInteractor::new(
             Arc::new(ResolvingTrack),
-            Arc::new(FixedBriefingLoader),
             Arc::new(SmokeFailingRunner),
         )))
         .handle(input(Some("other-track-2026".to_owned())));
@@ -2387,8 +2455,7 @@ mod tests {
                 effort: ReasoningEffort::Low,
                 scope: ReviewScopeName::try_new("cli_driver".to_owned())
                     .expect("valid test review scope"),
-                briefing_content: SubagentBriefingContent::try_new("briefing".to_owned())
-                    .expect("valid test briefing"),
+                briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
                 track_id: ReviewTrackId::try_new("review-fix-driver-2026".to_owned())
                     .expect("valid test track ID"),
                 repository_root: PathBuf::from("/resolver-proven/root"),
@@ -2435,8 +2502,7 @@ mod tests {
             effort: ReasoningEffort::Low,
             scope: ReviewScopeName::try_new("cli_driver".to_owned())
                 .expect("valid test review scope"),
-            briefing_content: SubagentBriefingContent::try_new("briefing\\content".to_owned())
-                .expect("valid briefing"),
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing\\path.md"),
             track_id: ReviewTrackId::try_new("dispatch-render-2026".to_owned())
                 .expect("valid test track ID"),
             repository_root: PathBuf::from("/resolver-proven/root\\path"),
@@ -2450,9 +2516,63 @@ mod tests {
         assert_eq!(
             lines.next(),
             Some(
-                "{\"agent\":\"review-fix-lead\",\"model\":\"claude\\\"model\",\"effort\":\"low\",\"scope\":\"cli_driver\",\"briefing_content\":\"briefing\\\\content\",\"track_id\":\"dispatch-render-2026\",\"repository_root\":\"/resolver-proven/root\\\\path\",\"round_type\":\"fast\"}"
+                "{\"agent\":\"review-fix-lead\",\"model\":\"claude\\\"model\",\"effort\":\"low\",\"scope\":\"cli_driver\",\"briefing_file\":\"tmp/reviewer-runtime/briefing\\\\path.md\",\"track_id\":\"dispatch-render-2026\",\"repository_root\":\"/resolver-proven/root\\\\path\",\"round_type\":\"fast\"}"
             )
         );
         assert_eq!(lines.next(), None, "dispatch JSON must occupy one line");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_subagent_dispatch_instruction_rejects_non_utf8_briefing_path() {
+        let outcome = subagent_dispatch_to_outcome(SubagentDispatchInstruction {
+            agent: SubagentName::try_new("review-fix-lead".to_owned())
+                .expect("valid test subagent"),
+            model: ModelName::try_new("gpt-5.5".to_owned()).expect("valid test model"),
+            effort: ReasoningEffort::Low,
+            scope: ReviewScopeName::try_new("cli_driver".to_owned())
+                .expect("valid test review scope"),
+            briefing_file: PathBuf::from(OsString::from_vec(vec![b'b', 0x80])),
+            track_id: ReviewTrackId::try_new("dispatch-render-2026".to_owned())
+                .expect("valid test track ID"),
+            repository_root: PathBuf::from("/resolver-proven/root"),
+            round_type: ReviewRoundType::Fast,
+        });
+
+        assert_ne!(outcome.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);
+        assert_eq!(outcome.stdout, None);
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|message| { message.contains("briefing path is not valid UTF-8") })
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_subagent_dispatch_instruction_rejects_non_utf8_repository_root() {
+        let outcome = subagent_dispatch_to_outcome(SubagentDispatchInstruction {
+            agent: SubagentName::try_new("review-fix-lead".to_owned())
+                .expect("valid test subagent"),
+            model: ModelName::try_new("gpt-5.5".to_owned()).expect("valid test model"),
+            effort: ReasoningEffort::Low,
+            scope: ReviewScopeName::try_new("cli_driver".to_owned())
+                .expect("valid test review scope"),
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+            track_id: ReviewTrackId::try_new("dispatch-render-2026".to_owned())
+                .expect("valid test track ID"),
+            repository_root: PathBuf::from(OsString::from_vec(vec![b'/', 0x80])),
+            round_type: ReviewRoundType::Fast,
+        });
+
+        assert_ne!(outcome.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);
+        assert_eq!(outcome.stdout, None);
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|message| { message.contains("repository root is not valid UTF-8") })
+        );
     }
 }

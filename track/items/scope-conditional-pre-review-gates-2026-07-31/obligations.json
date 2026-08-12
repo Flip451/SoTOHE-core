@@ -229,7 +229,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of RunReviewFixInteractor",
-      "declaration_hash": "4a3dbe492c425a2d351592b67afd71fb29afeeaede9128dc746b452d51001159",
+      "declaration_hash": "69d5576e14840c9b408b0bd1fc260f6a90f5477d0131349e939dd3fb8f83db16",
       "spec_refs": [
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -683,30 +683,6 @@
     },
     {
       "id": {
-        "entry_key": "ReviewFixBriefingLoaderPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:load_briefing_content"
-      },
-      "target_entry": {
-        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-        "section_key": "traits",
-        "entry_key": "ReviewFixBriefingLoaderPort"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract test covering 'trait_method:load_briefing_content' of ReviewFixBriefingLoaderPort",
-      "declaration_hash": "da792da944ffbb67260f05bb5db01dfffbee0dff59d23b6d8b4238d837f93abc",
-      "spec_refs": [
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      ]
-    },
-    {
-      "id": {
         "entry_key": "ReviewFixTrackResolverPort",
         "obligation_kind": "contract",
         "item_identifier": "trait_method:resolve_current_track"
@@ -721,12 +697,8 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:resolve_current_track' of ReviewFixTrackResolverPort",
-      "declaration_hash": "e5a6e3b5db6cf639d8a4e21b8ad8c5579a942accbde79ace649822b644539be2",
+      "declaration_hash": "61c5c749b5606308600d2bd1b1f279e3f62b85d923a8611372c3e312b9ba8bb0",
       "spec_refs": [
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "CN-09"
@@ -734,6 +706,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-19"
+        },
+        {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-18"
         }
       ]
     },
@@ -1573,12 +1549,8 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort' of GitReviewFixTrackResolver",
-      "declaration_hash": "417dc28a5f240d1085375d48e73cd34395fb251996444a3a015762a2302708b7",
+      "declaration_hash": "d7bae25beeba82473359fe90c0d55f1580204a8d43e90be080f9309fd5db3d2f",
       "spec_refs": [
-        {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "CN-09"
@@ -1586,30 +1558,10 @@
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-19"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "TrustedReviewFixBriefingLoader",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort"
-      },
-      "target_entry": {
-        "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/infrastructure-types.json",
-        "section_key": "traits",
-        "entry_key": "TrustedReviewFixBriefingLoader"
-      },
-      "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort' of TrustedReviewFixBriefingLoader",
-      "declaration_hash": "e9483b3225c5c87153bbee6ba4334c8a8a789a1bd35d0d6087dedb122ea8247c",
-      "spec_refs": [
+        },
         {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
+          "element_id": "IN-18"
         }
       ]
     },

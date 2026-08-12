@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-11T11:42:46Z",
-  "declaration_hash": "697ea228feec246da00b8d9cee66e2d00a6c8aa4907cd85063fa65f2c110d090",
-  "implementation_input_hash": "2b96a9ff6851d599e4d70b57f51e5be24e8b2fe40c0e7e9b636c3e8d663c85d7",
+  "generated_at": "2026-08-12T06:40:42Z",
+  "declaration_hash": "cb90c13c9f255dd8ac36cc5b8f783eb54536aebe9dcc6f79f252e3236cf7c34b",
+  "implementation_input_hash": "a91e4d7b2a1d3dda39ac4c24e798ee0d9cc71536d87c05fdde41b844cea15382",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",
@@ -660,23 +660,6 @@
       ]
     },
     {
-      "type_name": "ReviewFixBriefingLoadError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "ReviewFixBriefingLoaderPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
       "type_name": "ReviewFixResolution",
       "kind_tag": "dto",
       "signal": "blue",
@@ -1014,7 +997,6 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "From<ReviewFixBriefingLoadError>",
         "From<ReviewFixTrackResolveError>"
       ]
     },
@@ -1038,29 +1020,6 @@
       "kind_tag": "application_service",
       "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "SubagentBriefingContent",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "SubagentBriefingContentValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
     },
     {
       "type_name": "SubagentDispatchInstruction",

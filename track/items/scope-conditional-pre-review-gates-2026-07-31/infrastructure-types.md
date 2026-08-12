@@ -39,7 +39,6 @@
 | ResultsStateAdapter | secondary_adapter | add | impl ReviewResultsStatePort | 🔵 | 🔵 |
 | ReviewCheckZeroFindingsStateAdapter | secondary_adapter | add | impl ReviewCheckZeroFindingsStatePort | 🔵 | 🔵 |
 | ReviewFixRunnerAdapter | secondary_adapter | add | impl ReviewFixRunner | 🔵 | 🔵 |
-| TrustedReviewFixBriefingLoader | secondary_adapter | add | impl ReviewFixBriefingLoaderPort | 🔵 | 🔵 |
 
 ## Free Functions
 

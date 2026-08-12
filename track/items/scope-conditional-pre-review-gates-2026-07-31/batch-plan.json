@@ -26,6 +26,7 @@
     {"task_id": "T038", "scope_estimates": [{"scope": "usecase", "production_lines": 170, "test_lines": 100}, {"scope": "cli_driver", "production_lines": 85, "test_lines": 50}, {"scope": "cli", "production_lines": 115, "test_lines": 85}], "oversize_justification": null},
     {"task_id": "T042", "scope_estimates": [{"scope": "cli", "production_lines": 50, "test_lines": 40}], "oversize_justification": null},
     {"task_id": "T043", "scope_estimates": [{"scope": "usecase", "production_lines": 310, "test_lines": 210}, {"scope": "cli_driver", "production_lines": 180, "test_lines": 135}, {"scope": "cli", "production_lines": 45, "test_lines": 35}, {"scope": "infrastructure", "production_lines": 200, "test_lines": 145}, {"scope": "cli_composition", "production_lines": 50, "test_lines": 30}], "oversize_justification": "The results projection/read-port/stored-state boundary and the review-fix resolution boundary must move together with their consumers: splitting this in-progress usecase task would leave either drivers unable to render the returned result or services dependent on an incomplete boundary contract."},
+    {"task_id": "T044", "scope_estimates": [{"scope": "usecase", "production_lines": 120, "test_lines": 0}, {"scope": "infrastructure", "production_lines": 120, "test_lines": 0}, {"scope": "cli_driver", "production_lines": 50, "test_lines": 0}, {"scope": "cli", "production_lines": 35, "test_lines": 0}], "oversize_justification": null},
     {"task_id": "T039", "scope_estimates": [{"scope": "usecase", "production_lines": 100, "test_lines": 60}, {"scope": "cli_driver", "production_lines": 50, "test_lines": 35}, {"scope": "cli", "production_lines": 90, "test_lines": 60}], "oversize_justification": null},
     {"task_id": "T040", "scope_estimates": [{"scope": "harness-policy", "production_lines": 180, "test_lines": 60}], "oversize_justification": null},
     {"task_id": "T041", "scope_estimates": [{"scope": "harness-policy", "production_lines": 220, "test_lines": 0}], "oversize_justification": null}
@@ -38,6 +39,7 @@
     {"id": "B5", "task_ids": ["T035", "T030", "T036", "T031"]},
     {"id": "B6", "task_ids": ["T037", "T039"]},
     {"id": "B7", "task_ids": ["T038", "T042", "T040", "T041"]},
-    {"id": "B8", "task_ids": ["T043"]}
+    {"id": "B8", "task_ids": ["T043"]},
+    {"id": "B9", "task_ids": ["T044"]}
   ]
 }

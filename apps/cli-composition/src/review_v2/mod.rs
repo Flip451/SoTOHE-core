@@ -1641,7 +1641,7 @@ exit 0
         assert!(stdout.contains("\"model\":\"gpt-5.5\""));
         assert!(stdout.contains("\"effort\":\"low\""));
         assert!(stdout.contains("\"scope\":\"cli_composition\""));
-        assert!(stdout.contains("\"briefing_content\":\"# Briefing\\n\""));
+        assert!(stdout.contains("\"briefing_file\":\"briefing.md\""));
         assert!(stdout.contains("\"track_id\":\"review-fix-codex-rustify-2026-05-31\""));
         assert!(stdout.contains(&format!("\"repository_root\":\"{}\"", dir.path().display())));
         assert!(stdout.contains("\"round_type\":\"fast\""));
@@ -1672,14 +1672,14 @@ exit 0
         let stdout = outcome.stdout.expect("the driver must render a dispatch outcome");
         assert!(stdout.starts_with(cli_driver::review::SUBAGENT_DISPATCH_SENTINEL));
         assert!(stdout.contains("\"agent\":\"review-fix-lead\""));
-        assert!(stdout.contains("\"briefing_content\":\"# Briefing\\n\""));
+        assert!(stdout.contains("\"briefing_file\":\"briefing.md\""));
         assert!(
             stdout.contains(&format!("\"repository_root\":\"{}\"", directory.path().display()))
         );
     }
 
     #[test]
-    fn test_review_fix_driver_configured_loader_delivers_briefing_content_to_runner() {
+    fn test_review_fix_driver_delivers_briefing_path_to_runner() {
         struct CapturingRunner {
             command: Arc<Mutex<Option<usecase::review_v2::run_review_fix::RunReviewFixCommand>>>,
         }
@@ -1705,8 +1705,7 @@ exit 0
         let directory = tempfile::tempdir().unwrap();
         GitRunner::at(directory.path()).assert_success(&["init", "-b", "main"]);
         activate_review_fix_track(directory.path());
-        let briefing_content = "# Configured briefing\nKeep this exact content.\n";
-        fs::write(directory.path().join("briefing.md"), briefing_content).unwrap();
+        fs::write(directory.path().join("briefing.md"), "# Configured briefing\n").unwrap();
 
         let captured = Arc::new(Mutex::new(None));
         let service =
@@ -1723,12 +1722,9 @@ exit 0
         ));
 
         assert_eq!(outcome.exit_code, 0, "review-fix outcome: {outcome:?}");
-        let command = captured
-            .lock()
-            .unwrap()
-            .take()
-            .expect("the configured loader flow must invoke the runner");
-        assert_eq!(command.briefing_content().as_str(), briefing_content);
+        let command =
+            captured.lock().unwrap().take().expect("the path-delivery flow must invoke the runner");
+        assert_eq!(command.briefing_file(), Path::new("briefing.md"));
     }
 
     #[test]

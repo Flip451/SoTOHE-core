@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (31/31 resolved)
+## Tasks (31/32 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -66,3 +66,9 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 - [x] **T039**: `ref-verify check-approved` の Chain 1 / Chain 2 selector を usecase、CLI driver、`apps/cli/src/commands/ref_verify.rs` に実装し、CLI exit-code tests を追加する。`libs/infrastructure/src/ref_verify/driver_adapter.rs` の chain-scoped check-approved fail-closed path を更新し、`apps/cli-composition/src/{ref_verify.rs,lib.rs}` の pure-DI handoff を更新して wrapper / DTO re-export を削除する。CN-06、AC-16。 (`d6737bc396ffcd8dfd5e3af9e2cfd10c2605c30d`)
 - [x] **T040**: `.harness/config/phase-commands.json` を phase ごとの convergence matrix に更新し、`apps/cli/src/commands/phase.rs` に phase-entry fixture / integration tests を追加する。IN-12、CN-06、AC-14、AC-16。 (`3fa648d673b5d4d72853905f4c009f33819fbb7d`)
 - [x] **T041**: `.harness/workflows/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.claude/commands/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.agents/skills/track-{plan,spec-design,type-design,impl-plan,adr2pr}/SKILL.md` の phase-writer launch sites を `bin/sotp phase enter <phase-id>` に更新し、direct writer dispatch を除去する。workflow-level static regression check を追加する。IN-13、AC-15。 (`5c4a6ced03809ed91f1b2fce1c8b0192e901b91b`)
+
+### S5 — post-rejection review-fix restoration
+
+> T044 は path-carrying review-fix delivery と process-group containment を復元する。IN-16、CN-02。
+
+- [~] **T044**: review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。IN-16、CN-02。

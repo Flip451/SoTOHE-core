@@ -4203,35 +4203,11 @@
       }
     },
     {
-      "claim_hash": "22daca581cdc9efdf98a0d96413193d0343731f6542628c1f02b1995eec5b3dc",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
-      "verdict": {
-        "kind": "pass",
-        "citation": "review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "ReviewFixBriefingLoadError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
       "claim_hash": "c7674e9a5984b50d0f01a795fe90677814267bfb3402935b44e3fd02c5adc32f",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4246,16 +4222,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "c7674e9a5984b50d0f01a795fe90677814267bfb3402935b44e3fd02c5adc32f",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。"
+        "citation": "write-side resolver で current `track/<id>` を解決し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4276,7 +4252,7 @@
     },
     {
       "claim_hash": "c7674e9a5984b50d0f01a795fe90677814267bfb3402935b44e3fd02c5adc32f",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。"
@@ -4300,10 +4276,10 @@
     },
     {
       "claim_hash": "134f086202caa2c08b759f98846be6731a09937c07bb142351b77762ed038c91",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "「Review-fix runner error (IN-16, CN-09, AC-19).」"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4318,16 +4294,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "134f086202caa2c08b759f98846be6731a09937c07bb142351b77762ed038c91",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。"
+        "citation": "review-fix runner error (IN-16, CN-09, AC-19)."
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -4348,7 +4324,7 @@
     },
     {
       "claim_hash": "134f086202caa2c08b759f98846be6731a09937c07bb142351b77762ed038c91",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
@@ -4371,32 +4347,8 @@
       }
     },
     {
-      "claim_hash": "2e3cbe28c1f79a2f7e6aff1ef6e4c82f8286a1c9be93376eeeaccb1cd42a60a4",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "ReviewFixTrackResolveError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "2e3cbe28c1f79a2f7e6aff1ef6e4c82f8286a1c9be93376eeeaccb1cd42a60a4",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "claim_hash": "fcc287d117258546dfebe81cc0228b398214348ddf959298618a4bdd5d5fddbd",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
@@ -4419,8 +4371,8 @@
       }
     },
     {
-      "claim_hash": "2e3cbe28c1f79a2f7e6aff1ef6e4c82f8286a1c9be93376eeeaccb1cd42a60a4",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "claim_hash": "fcc287d117258546dfebe81cc0228b398214348ddf959298618a4bdd5d5fddbd",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し"
@@ -4439,6 +4391,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-19",
           "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fcc287d117258546dfebe81cc0228b398214348ddf959298618a4bdd5d5fddbd",
+      "evidence_hash": "7989adf055d6bce07b9fe79c3f52dd63820401b99e63252408d8377cf182ffda",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix のように track artifact へ書き込む操作では、explicit track id がある場合に current `track/<id>` branch から導出した id との一致を要求し、不一致または non-track branch を fail-closed に拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewFixTrackResolveError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-18",
+          "text_label": "review-fix のように track artifact へ書き込む操作では、explicit track id がある場合に current `track/<id>` branch から導出した id との一致を要求し、不一致または non-track branch を fail-closed に拒否する。"
         }
       }
     },
@@ -5116,10 +5092,10 @@
     },
     {
       "claim_hash": "6586ba58329416121f62ba4930904517571ecf76f2cffccf1a786271d64b8ced",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。"
+        "citation": "primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -5134,13 +5110,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "6586ba58329416121f62ba4930904517571ecf76f2cffccf1a786271d64b8ced",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。"
@@ -5164,7 +5140,7 @@
     },
     {
       "claim_hash": "6586ba58329416121f62ba4930904517571ecf76f2cffccf1a786271d64b8ced",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。"
@@ -5764,10 +5740,10 @@
     },
     {
       "claim_hash": "d37646041e997217eb6bafb99b514494252ef61320e0eef3c38c8a64ee0afb86",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -5782,13 +5758,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "d37646041e997217eb6bafb99b514494252ef61320e0eef3c38c8a64ee0afb86",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
@@ -5812,10 +5788,10 @@
     },
     {
       "claim_hash": "d37646041e997217eb6bafb99b514494252ef61320e0eef3c38c8a64ee0afb86",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
-        "citation": "空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
+        "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -5836,10 +5812,10 @@
     },
     {
       "claim_hash": "fe03471204d0f7103e877bc9d4220af695d58b355fecebca837fcc3c0b82e2ef",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。"
+        "citation": "primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -5854,13 +5830,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "fe03471204d0f7103e877bc9d4220af695d58b355fecebca837fcc3c0b82e2ef",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
@@ -5884,7 +5860,7 @@
     },
     {
       "claim_hash": "fe03471204d0f7103e877bc9d4220af695d58b355fecebca837fcc3c0b82e2ef",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
@@ -6003,8 +5979,8 @@
       }
     },
     {
-      "claim_hash": "9e9ad15345ab8b12beaa4d36866e4ef21f5824fbf6efa860970a7daa530aa7ac",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "claim_hash": "960a1776dabbcdcacb4712443c3e6d337e37be8cbbce9be39b88a9ddfa9427c8",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。"
@@ -6027,11 +6003,11 @@
       }
     },
     {
-      "claim_hash": "9e9ad15345ab8b12beaa4d36866e4ef21f5824fbf6efa860970a7daa530aa7ac",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "claim_hash": "960a1776dabbcdcacb4712443c3e6d337e37be8cbbce9be39b88a9ddfa9427c8",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
-        "citation": "driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
+        "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6051,11 +6027,11 @@
       }
     },
     {
-      "claim_hash": "9e9ad15345ab8b12beaa4d36866e4ef21f5824fbf6efa860970a7daa530aa7ac",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "claim_hash": "960a1776dabbcdcacb4712443c3e6d337e37be8cbbce9be39b88a9ddfa9427c8",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6070,16 +6046,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "55c2871c2786e52f08bcc89a7fa09cbddc3236cc9c58f88698977602c568279a",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6094,13 +6070,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "55c2871c2786e52f08bcc89a7fa09cbddc3236cc9c58f88698977602c568279a",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
@@ -6124,7 +6100,7 @@
     },
     {
       "claim_hash": "55c2871c2786e52f08bcc89a7fa09cbddc3236cc9c58f88698977602c568279a",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
@@ -6147,11 +6123,11 @@
       }
     },
     {
-      "claim_hash": "d707714b54ce05dcc9306eb43949d6a6d49032b733e7d645caf4e91b5bc67c7d",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "claim_hash": "13138307fcc8ebcbf94b0c8fe65c52526fa467588149c8148ba75d6af55daa9f",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6166,13 +6142,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
-      "claim_hash": "d707714b54ce05dcc9306eb43949d6a6d49032b733e7d645caf4e91b5bc67c7d",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "claim_hash": "13138307fcc8ebcbf94b0c8fe65c52526fa467588149c8148ba75d6af55daa9f",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
@@ -6195,11 +6171,11 @@
       }
     },
     {
-      "claim_hash": "d707714b54ce05dcc9306eb43949d6a6d49032b733e7d645caf4e91b5bc67c7d",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "claim_hash": "13138307fcc8ebcbf94b0c8fe65c52526fa467588149c8148ba75d6af55daa9f",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
-        "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し"
+        "citation": "valid request では RunReviewFixService が write-side resolver で current track/<id> を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して CommandOutcome として返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6219,11 +6195,11 @@
       }
     },
     {
-      "claim_hash": "6a1ad0357581b15c9939aa5de1e642603e96b5e89f2dada615e15269f5af5673",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "claim_hash": "39062c3411fbf2cebacbce6ee1be2dd2c113ff476270cc17517c52c5bac1a975",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6238,16 +6214,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
-      "claim_hash": "6a1ad0357581b15c9939aa5de1e642603e96b5e89f2dada615e15269f5af5673",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "claim_hash": "39062c3411fbf2cebacbce6ee1be2dd2c113ff476270cc17517c52c5bac1a975",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。"
+        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6267,11 +6243,11 @@
       }
     },
     {
-      "claim_hash": "6a1ad0357581b15c9939aa5de1e642603e96b5e89f2dada615e15269f5af5673",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "claim_hash": "39062c3411fbf2cebacbce6ee1be2dd2c113ff476270cc17517c52c5bac1a975",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
-        "citation": "\"valid requestでは `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke\""
+        "citation": "\"valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。\""
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6292,10 +6268,10 @@
     },
     {
       "claim_hash": "54416081a913fb0a67cac47c47e0c36dd797269b246024abc6c1009904197a99",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。"
+        "citation": "primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけ"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6310,16 +6286,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "54416081a913fb0a67cac47c47e0c36dd797269b246024abc6c1009904197a99",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。"
+        "citation": "driver は validation error を non-zero `CommandOutcome` として render する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6340,7 +6316,7 @@
     },
     {
       "claim_hash": "54416081a913fb0a67cac47c47e0c36dd797269b246024abc6c1009904197a99",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。"
@@ -6363,35 +6339,11 @@
       }
     },
     {
-      "claim_hash": "f27778630bd20e74f64ff92415f750a0c8f7edb5a27eb423ffa52932b1ac9180",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "claim_hash": "0f22f6b13aa5f1e868d229cc48b97b805db634d85aa4ed27323f73bd2a37a25e",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "RunReviewFixRequest"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "f27778630bd20e74f64ff92415f750a0c8f7edb5a27eb423ffa52932b1ac9180",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "「ReviewFixDriver」は driver-owned raw delivery DTO 「ReviewFixInput」を「handle(ReviewFixInput)」で受け、raw values を usecase-owned 「RunReviewFixRequest::try_new」に渡す。"
+        "citation": "`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6411,11 +6363,11 @@
       }
     },
     {
-      "claim_hash": "f27778630bd20e74f64ff92415f750a0c8f7edb5a27eb423ffa52932b1ac9180",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "claim_hash": "0f22f6b13aa5f1e868d229cc48b97b805db634d85aa4ed27323f73bd2a37a25e",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
-        "citation": "driver の handle(ReviewFixInput) は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
+        "citation": "driver の handle(ReviewFixInput) は raw values を usecase-owned RunReviewFixRequest::try_new へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または fast / final 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6435,155 +6387,11 @@
       }
     },
     {
-      "claim_hash": "0c16610ee2af6679409c94325e56f89117fcf71e956c4581e711b71f05c2116b",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "claim_hash": "fc34c50a4718b677b6e618515314961344657ca46daf4154c94a890364a144b1",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentBriefingContent"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "0c16610ee2af6679409c94325e56f89117fcf71e956c4581e711b71f05c2116b",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "Review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけ"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentBriefingContent"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-09",
-          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "0c16610ee2af6679409c94325e56f89117fcf71e956c4581e711b71f05c2116b",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
-      "verdict": {
-        "kind": "pass",
-        "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentBriefingContent"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-19",
-          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "d8e9baf30395cac43d5598139cf60baa4385f15eda163a7aa9382cf1da579992",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
-      "verdict": {
-        "kind": "pass",
-        "citation": "driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentBriefingContentValidationError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "d8e9baf30395cac43d5598139cf60baa4385f15eda163a7aa9382cf1da579992",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentBriefingContentValidationError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-09",
-          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "d8e9baf30395cac43d5598139cf60baa4385f15eda163a7aa9382cf1da579992",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
-      "verdict": {
-        "kind": "pass",
-        "citation": "boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentBriefingContentValidationError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-19",
-          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "fb70fbd7b1010bee13714bd5acd3f4e8752928c83682d54dc105fbd28518e48b",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
-      "verdict": {
-        "kind": "pass",
-        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -6598,13 +6406,13 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
-      "claim_hash": "fb70fbd7b1010bee13714bd5acd3f4e8752928c83682d54dc105fbd28518e48b",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "claim_hash": "fc34c50a4718b677b6e618515314961344657ca46daf4154c94a890364a144b1",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
         "citation": "`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。"
@@ -6627,8 +6435,8 @@
       }
     },
     {
-      "claim_hash": "fb70fbd7b1010bee13714bd5acd3f4e8752928c83682d54dc105fbd28518e48b",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "claim_hash": "fc34c50a4718b677b6e618515314961344657ca46daf4154c94a890364a144b1",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。"
@@ -6651,31 +6459,7 @@
       }
     },
     {
-      "claim_hash": "159a3b7c1ffdb3662fb7356c1b930540c4706edd8ce5eb94e0d175c8ebf19238",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
-      "verdict": {
-        "kind": "pass",
-        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentName"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "159a3b7c1ffdb3662fb7356c1b930540c4706edd8ce5eb94e0d175c8ebf19238",
+      "claim_hash": "4dda558e3821904e5fff1e194c608f28bf003fb6dfdb8ce7540a3096d69c9603",
       "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
       "verdict": {
         "kind": "pass",
@@ -6699,35 +6483,11 @@
       }
     },
     {
-      "claim_hash": "be981a7fedf001c06bfdb4c624552398b0974fc4624f2350d6d8d0b8007b5359",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
-      "verdict": {
-        "kind": "pass",
-        "citation": "driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "SubagentNameValidationError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "be981a7fedf001c06bfdb4c624552398b0974fc4624f2350d6d8d0b8007b5359",
+      "claim_hash": "81d384b95122c5867f1e34aa63609855b43b5ea9a69bcf5dd7b3bbfd2cdf99bb",
       "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
       "verdict": {
         "kind": "pass",
-        "citation": "definition/payload validation failure"
+        "citation": "definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -7803,35 +7563,11 @@
       }
     },
     {
-      "claim_hash": "a1194dbf3dd93297a3b90ad61cc36559fe4b63fe378a174f9b74d7650b41cc44",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
-      "verdict": {
-        "kind": "pass",
-        "citation": "review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "traits",
-          "entry_key": "ReviewFixBriefingLoaderPort"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
       "claim_hash": "1030beede158c5762b5129158153aa0c3ef19b78727ee75d0dd9222f0345b302",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -7846,16 +7582,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "1030beede158c5762b5129158153aa0c3ef19b78727ee75d0dd9222f0345b302",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。"
+        "citation": "format-level validationを通過したrequestに対して、`RunReviewFixService`はwrite-side resolverでcurrent `track/<id>`を解決し、optional explicit track idのmismatchとnon-track branchをfail-closedに拒否してからrunnerをinvokeし、typed usecase result/errorを返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -7876,7 +7612,7 @@
     },
     {
       "claim_hash": "1030beede158c5762b5129158153aa0c3ef19b78727ee75d0dd9222f0345b302",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
         "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。"
@@ -7899,35 +7635,11 @@
       }
     },
     {
-      "claim_hash": "e23d0ec81a634f8bfdf5f121d80bea18c8c4c647ae30075b172d9e92fd8b9053",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "claim_hash": "4ea6c3a230751de8c40d0d8fd43894b2010f63b13950cd929031c9931838a47d",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
-          "section_key": "traits",
-          "entry_key": "ReviewFixTrackResolverPort"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e23d0ec81a634f8bfdf5f121d80bea18c8c4c647ae30075b172d9e92fd8b9053",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
+        "citation": "`ReviewFixTrackResolverPort` は、format-level validation を通過した request に対して、`RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -7947,11 +7659,11 @@
       }
     },
     {
-      "claim_hash": "e23d0ec81a634f8bfdf5f121d80bea18c8c4c647ae30075b172d9e92fd8b9053",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "claim_hash": "4ea6c3a230751de8c40d0d8fd43894b2010f63b13950cd929031c9931838a47d",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
-        "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し"
+        "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -7967,6 +7679,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-19",
           "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ea6c3a230751de8c40d0d8fd43894b2010f63b13950cd929031c9931838a47d",
+      "evidence_hash": "7989adf055d6bce07b9fe79c3f52dd63820401b99e63252408d8377cf182ffda",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review-fix のように track artifact へ書き込む操作では、explicit track id がある場合に current `track/<id>` branch から導出した id との一致を要求し、不一致または non-track branch を fail-closed に拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ReviewFixTrackResolverPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-18",
+          "text_label": "review-fix のように track artifact へ書き込む操作では、explicit track id がある場合に current `track/<id>` branch から導出した id との一致を要求し、不一致または non-track branch を fail-closed に拒否する。"
         }
       }
     },
@@ -8428,10 +8164,10 @@
     },
     {
       "claim_hash": "2bbbf3f670302fb29508127d89f5b5b25a15f491795039c8bd88fe87afdd57d4",
-      "evidence_hash": "c5dfaf06120c1a03e5304d86d5ec0f50f41cb3e2bc2f2d2b13b821ca7c327829",
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
       "verdict": {
         "kind": "pass",
-        "citation": "`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
+        "citation": "primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -8446,16 +8182,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-16",
-          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、driver-owned raw delivery DTO `ReviewFixInput` を受ける `ReviewFixDriver`、および outcome の emit に限定する thin bin に分離する。composition root は driver を構築・返却するだけで invoke または render を行わない。driver は `handle(ReviewFixInput)` で raw values を usecase-owned `RunReviewFixRequest::try_new` に渡し focused validation error を返し得る boundary を通過させる。`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id がある場合は一致を要求して mismatch を拒否し、non-track branch も fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを driver に渡し、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。review-fix run が消費する briefing は、repository root 内 containment、path の各要素の symlink rejection、regular file、および bounded size を検証する trusted boundary で一度だけ読み取る。run が保持して dispatch するのは検証済み content であり、再度開ける path ではない。"
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
         }
       }
     },
     {
       "claim_hash": "2bbbf3f670302fb29508127d89f5b5b25a15f491795039c8bd88fe87afdd57d4",
-      "evidence_hash": "7a939d1653b4a70cab192c76bfab4c7c87d3ca1e6747e6e6b373bd67f099783a",
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
       "verdict": {
         "kind": "pass",
-        "citation": "「format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。」"
+        "citation": "format-level validationを通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -8476,10 +8212,10 @@
     },
     {
       "claim_hash": "2bbbf3f670302fb29508127d89f5b5b25a15f491795039c8bd88fe87afdd57d4",
-      "evidence_hash": "7d9af8cc8111d0577666199ebe424cf618cc3b3010c5eb7db1d277cf16df01d2",
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
       "verdict": {
         "kind": "pass",
-        "citation": "valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。"
+        "citation": "valid requestでは `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

@@ -16,7 +16,6 @@ fn review_fix_service_with_runner(
 ) -> Arc<dyn RunReviewFixService> {
     Arc::new(RunReviewFixInteractor::new(
         Arc::new(infrastructure::review_v2::GitReviewFixTrackResolver),
-        Arc::new(infrastructure::review_v2::TrustedReviewFixBriefingLoader),
         runner,
     ))
 }

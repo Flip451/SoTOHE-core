@@ -14,10 +14,6 @@
               "ty": "std::sync::Arc<dyn ReviewFixTrackResolverPort>"
             },
             {
-              "name": "briefing_loader",
-              "ty": "std::sync::Arc<dyn ReviewFixBriefingLoaderPort>"
-            },
-            {
               "name": "runner",
               "ty": "std::sync::Arc<dyn ReviewFixRunner>"
             }
@@ -605,8 +601,8 @@
               "ty": "ReviewScopeName"
             },
             {
-              "name": "briefing_content",
-              "ty": "SubagentBriefingContent"
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
             },
             {
               "name": "resolution",
@@ -634,10 +630,10 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "briefing_content",
+          "name": "briefing_file",
           "params": [],
           "receiver": "&self",
-          "returns": "&SubagentBriefingContent"
+          "returns": "&std::path::Path"
         },
         {
           "has_default_impl": false,
@@ -900,31 +896,6 @@
         }
       ],
       "type_name": "SubagentName"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "try_new",
-          "params": [
-            {
-              "name": "value",
-              "ty": "String"
-            }
-          ],
-          "returns": "Result<Self, SubagentBriefingContentValidationError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "as_str",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&str"
-        }
-      ],
-      "type_name": "SubagentBriefingContent"
     }
   ],
   "layer": "usecase",
@@ -2301,11 +2272,6 @@
       "trait_ref": "core::convert::From<ReviewFixTrackResolveError>"
     },
     {
-      "action": "add",
-      "for_type": "RunReviewFixError",
-      "trait_ref": "core::convert::From<ReviewFixBriefingLoadError>"
-    },
-    {
       "for_type": "ReviewFixResolution",
       "trait_ref": "core::fmt::Debug"
     },
@@ -2388,46 +2354,6 @@
     },
     {
       "for_type": "ReviewResultsError",
-      "trait_ref": "core::error::Error"
-    },
-    {
-      "for_type": "SubagentBriefingContentValidationError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "SubagentBriefingContentValidationError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "SubagentBriefingContentValidationError",
-      "trait_ref": "core::error::Error"
-    },
-    {
-      "for_type": "SubagentBriefingContent",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "SubagentBriefingContent",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "SubagentBriefingContent",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "SubagentBriefingContent",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "ReviewFixBriefingLoadError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "ReviewFixBriefingLoadError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "ReviewFixBriefingLoadError",
       "trait_ref": "core::error::Error"
     }
   ],
@@ -3024,44 +2950,6 @@
         "Sync"
       ]
     },
-    "ReviewFixBriefingLoaderPort": {
-      "action": "add",
-      "docs": "Bounded synchronous review-fix briefing loader port (IN-16).",
-      "informal_grounds": [],
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "load_briefing_content",
-          "params": [
-            {
-              "name": "repository_root",
-              "ty": "&std::path::Path"
-            },
-            {
-              "name": "briefing_file",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<SubagentBriefingContent, ReviewFixBriefingLoadError>"
-        }
-      ],
-      "module_path": "review_v2::run_review_fix",
-      "role": {
-        "SecondaryPort": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ]
-    },
     "ReviewFixRunner": {
       "action": "reference",
       "docs": "Bounded synchronous resolved review-fix execution port (IN-16, CN-09, AC-19).",
@@ -3106,7 +2994,7 @@
     },
     "ReviewFixTrackResolverPort": {
       "action": "add",
-      "docs": "Bounded synchronous review-fix track resolver port (IN-16, CN-09, AC-19).",
+    "docs": "Bounded synchronous review-fix track resolver port (IN-18, CN-09, AC-19).",
       "informal_grounds": [],
       "methods": [
         {
@@ -3129,15 +3017,15 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-09",
+        "anchor": "CN-09",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-18",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ],
@@ -6175,54 +6063,6 @@
         }
       ]
     },
-    "ReviewFixBriefingLoadError": {
-      "action": "add",
-      "docs": "Review-fix briefing load error (IN-16).",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "UntrustedFile",
-            "payload": {
-              "fields": [
-                "DiagnosticText"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "ReadFailed",
-            "payload": {
-              "fields": [
-                "DiagnosticText"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "InvalidContent",
-            "payload": {
-              "fields": [
-                "SubagentBriefingContentValidationError"
-              ],
-              "kind": "tuple"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "review_v2::run_review_fix",
-      "role": {
-        "ErrorType": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        }
-      ]
-    },
     "ReviewFixResolution": {
       "action": "add",
       "docs": "Review-fix resolution DTO (IN-16, CN-09, AC-19).",
@@ -6364,7 +6204,7 @@
     },
     "ReviewFixTrackResolveError": {
       "action": "add",
-      "docs": "Current-branch track-resolution error (IN-16, CN-09, AC-19).",
+      "docs": "Current-branch track-resolution error (IN-18, CN-09, AC-19).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -6396,15 +6236,15 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-09",
+        "anchor": "CN-09",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
           "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-18",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]
@@ -7508,8 +7348,8 @@
               "ty": "ReviewScopeName"
             },
             {
-              "name": "briefing_content",
-              "ty": "SubagentBriefingContent"
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
             },
             {
               "name": "resolution",
@@ -7537,10 +7377,10 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "briefing_content",
+          "name": "briefing_file",
           "params": [],
           "receiver": "&self",
-          "returns": "&SubagentBriefingContent"
+          "returns": "&std::path::Path"
         },
         {
           "has_default_impl": false,
@@ -7685,15 +7525,6 @@
             }
           },
           {
-            "name": "BriefingLoad",
-            "payload": {
-              "fields": [
-                "ReviewFixBriefingLoadError"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
             "name": "TrackMismatch",
             "payload": {
               "fields": [
@@ -7752,10 +7583,6 @@
             {
               "name": "track_resolver",
               "ty": "std::sync::Arc<dyn ReviewFixTrackResolverPort>"
-            },
-            {
-              "name": "briefing_loader",
-              "ty": "std::sync::Arc<dyn ReviewFixBriefingLoaderPort>"
             },
             {
               "name": "runner",
@@ -7831,7 +7658,7 @@
     },
     "RunReviewFixRequest": {
       "action": "add",
-      "docs": "Review-fix request (IN-16, CN-09, AC-19).",
+    "docs": "Review-fix request (CN-09, AC-19).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -7881,78 +7708,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-09",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-19",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        }
-      ]
-    },
-    "SubagentBriefingContent": {
-      "action": "add",
-      "docs": "Validated review-fix briefing content (IN-16, CN-09, AC-19).",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "tuple"
-        }
-      },
-      "methods": [],
-      "module_path": "review_v2::run_review_fix",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-09",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-19",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        }
-      ]
-    },
-    "SubagentBriefingContentValidationError": {
-      "action": "add",
-      "docs": "Review-fix briefing content validation error (IN-16, CN-09, AC-19).",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "ExceedsMaximumBytes",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "review_v2::run_review_fix",
-      "role": {
-        "ErrorType": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "CN-09",
+        "anchor": "CN-09",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         },
         {
@@ -7986,8 +7742,8 @@
               "ty": "ReviewScopeName"
             },
             {
-              "name": "briefing_content",
-              "ty": "SubagentBriefingContent"
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
             },
             {
               "name": "track_id",
@@ -8028,7 +7784,7 @@
     },
     "SubagentName": {
       "action": "modify",
-      "docs": "Review-fix subagent name (IN-16, AC-12).",
+    "docs": "Validated in-host review-fix delegation agent name (AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -8066,10 +7822,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
           "anchor": "AC-12",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
@@ -8077,7 +7829,7 @@
     },
     "SubagentNameValidationError": {
       "action": "add",
-      "docs": "Subagent-name validation failure (IN-16, AC-12).",
+    "docs": "Subagent-name validation failure (AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -8100,11 +7852,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-16",
-          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
-        },
-        {
-          "anchor": "AC-12",
+        "anchor": "AC-12",
           "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
         }
       ]

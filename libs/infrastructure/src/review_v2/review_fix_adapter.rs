@@ -6,10 +6,9 @@ use usecase::capability_exec::ModelName;
 use usecase::dry_write_driver::CapabilityName;
 use usecase::git_workflow::DiagnosticText;
 use usecase::review_v2::run_review_fix::{
-    ReviewFixBriefingLoadError, ReviewFixBriefingLoaderPort, ReviewFixResolution, ReviewFixRunner,
-    ReviewFixRunnerError, ReviewFixTrackResolveError, ReviewFixTrackResolverPort, ReviewTrackId,
-    RunReviewFixCommand, RunReviewFixOutput, SubagentBriefingContent, SubagentDispatchInstruction,
-    SubagentName,
+    ReviewFixResolution, ReviewFixRunner, ReviewFixRunnerError, ReviewFixTrackResolveError,
+    ReviewFixTrackResolverPort, ReviewTrackId, RunReviewFixCommand, RunReviewFixOutput,
+    SubagentDispatchInstruction, SubagentName,
 };
 use usecase::review_v2::{ReviewRoundType, ReviewScopeName};
 
@@ -17,21 +16,6 @@ use super::CodexReviewFixRunner;
 
 pub struct ReviewFixRunnerAdapter;
 pub struct GitReviewFixTrackResolver;
-pub struct TrustedReviewFixBriefingLoader;
-
-impl ReviewFixBriefingLoaderPort for TrustedReviewFixBriefingLoader {
-    fn load_briefing_content(
-        &self,
-        repository_root: &Path,
-        briefing_file: &Path,
-    ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
-        super::review_fix_runner::TrustedLaunchContext::load_briefing_content(
-            repository_root,
-            briefing_file,
-        )
-    }
-}
-
 impl ReviewFixTrackResolverPort for GitReviewFixTrackResolver {
     fn resolve_current_track(
         &self,
@@ -93,6 +77,8 @@ impl ReviewFixRunner for ReviewFixRunnerAdapter {
                 "resolver-proven repository root does not match the runner repository",
             )));
         }
+        let briefing_content =
+            crate::review_v2::review_fix_briefing::read_trusted_briefing(&command)?;
         let profiles_path = repository_root.join(crate::agent_profiles::AGENT_PROFILES_PATH);
         let profiles = crate::agent_profiles::AgentProfiles::load(&repository_root, &profiles_path)
             .map_err(|error| ReviewFixRunnerError::Unexpected(diagnostic(error.to_string())))?;
@@ -117,7 +103,8 @@ impl ReviewFixRunner for ReviewFixRunnerAdapter {
                 .map_err(|error| ReviewFixRunnerError::Unexpected(diagnostic(error.to_string())))?,
         };
         match provider.as_str() {
-            "codex" => CodexReviewFixRunner::new(model, effort).run_fix(command),
+            "codex" => CodexReviewFixRunner::new(model, effort)
+                .run_fix_with_briefing(command, briefing_content),
             "claude" => Err(ReviewFixRunnerError::SubagentDispatchRequired(Box::new(
                 SubagentDispatchInstruction {
                     agent: SubagentName::try_new("review-fix-lead".to_owned()).map_err(
@@ -128,7 +115,7 @@ impl ReviewFixRunner for ReviewFixRunnerAdapter {
                     scope: ReviewScopeName::try_new(command.scope().to_owned()).map_err(
                         |error| ReviewFixRunnerError::Unexpected(diagnostic(error.to_string())),
                     )?,
-                    briefing_content: command.briefing_content().clone(),
+                    briefing_file: command.briefing_file().to_path_buf(),
                     track_id: ReviewTrackId::try_new(command.track_id().to_owned()).map_err(
                         |error| ReviewFixRunnerError::Unexpected(diagnostic(error.to_string())),
                     )?,
@@ -153,7 +140,7 @@ fn diagnostic(value: impl Into<String>) -> DiagnosticText {
 }
 
 #[cfg(test)]
-#[allow(clippy::expect_used)]
+#[allow(clippy::expect_used, clippy::panic)]
 mod tests {
     use std::fs;
     use std::path::{Path, PathBuf};
@@ -163,14 +150,12 @@ mod tests {
     use usecase::capability_exec::ModelName;
     use usecase::review_v2::ReviewRoundType;
     use usecase::review_v2::run_review_fix::{
-        ReviewFixBriefingLoaderPort, ReviewFixResolution, ReviewFixRunner, ReviewFixRunnerError,
-        ReviewFixTrackResolverPort, ReviewTrackId, RunReviewFixCommand, RunReviewFixInteractor,
-        RunReviewFixOutput, RunReviewFixRequest, RunReviewFixService, SubagentBriefingContent,
+        ReviewFixResolution, ReviewFixRunner, ReviewFixRunnerError, ReviewFixTrackResolverPort,
+        ReviewTrackId, RunReviewFixCommand, RunReviewFixInteractor, RunReviewFixOutput,
+        RunReviewFixRequest, RunReviewFixService,
     };
 
-    use super::{
-        GitReviewFixTrackResolver, ReviewFixRunnerAdapter, TrustedReviewFixBriefingLoader,
-    };
+    use super::{GitReviewFixTrackResolver, ReviewFixRunnerAdapter};
 
     fn cwd_lock() -> &'static Mutex<()> {
         static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
@@ -274,9 +259,7 @@ mod tests {
         ));
     }
 
-    #[test]
-    fn test_review_fix_runner_adapter_dispatches_claude_through_runner_port() {
-        let _lock = cwd_lock().lock().expect("test mutex");
+    fn claude_adapter_fixture() -> tempfile::TempDir {
         let directory = tempfile::tempdir().expect("temporary repository");
         git_success(directory.path(), &["init", "-b", "main"]);
         fs::create_dir_all(directory.path().join(".harness/config")).expect("config directory");
@@ -285,6 +268,27 @@ mod tests {
             r#"{"schema_version":1,"providers":{"claude":{"label":"Claude"}},"capabilities":{"review-fix-lead":{"provider":"claude","model":"claude-test","fast_provider":"claude","fast_model":"claude-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
         )
         .expect("agent profiles");
+        directory
+    }
+
+    fn claude_command(repository_root: &Path, briefing_file: PathBuf) -> RunReviewFixCommand {
+        RunReviewFixCommand::new_resolved(
+            usecase::review_v2::ReviewScopeName::try_new("cli".to_owned()).expect("valid scope"),
+            briefing_file,
+            ReviewFixResolution::new(
+                ReviewTrackId::try_new("review-fix-adapter-2026".to_owned())
+                    .expect("valid track ID"),
+                repository_root.to_path_buf(),
+            ),
+            ReviewRoundType::Fast,
+            Some(ModelName::try_new("claude-override").expect("valid model")),
+        )
+    }
+
+    #[test]
+    fn test_review_fix_runner_adapter_dispatches_claude_through_runner_port() {
+        let _lock = cwd_lock().lock().expect("test mutex");
+        let directory = claude_adapter_fixture();
         fs::write(directory.path().join("briefing.md"), "# Briefing\n")
             .expect("trusted briefing file");
         let unrelated_directory = tempfile::tempdir().expect("unrelated working directory");
@@ -293,17 +297,7 @@ mod tests {
             .expect("unrelated working directory must be usable");
 
         let runner: &dyn ReviewFixRunner = &ReviewFixRunnerAdapter;
-        let result = runner.run_fix(RunReviewFixCommand::new_resolved(
-            usecase::review_v2::ReviewScopeName::try_new("cli".to_owned()).expect("valid scope"),
-            SubagentBriefingContent::try_new("# Briefing\n".to_owned()).expect("valid briefing"),
-            ReviewFixResolution::new(
-                ReviewTrackId::try_new("review-fix-adapter-2026".to_owned())
-                    .expect("valid track ID"),
-                directory.path().to_path_buf(),
-            ),
-            ReviewRoundType::Fast,
-            Some(ModelName::try_new("claude-override").expect("valid model")),
-        ));
+        let result = runner.run_fix(claude_command(directory.path(), PathBuf::from("briefing.md")));
 
         std::env::set_current_dir(original).expect("restore current directory");
         assert!(matches!(
@@ -316,6 +310,78 @@ mod tests {
     }
 
     #[test]
+    fn test_review_fix_runner_adapter_claude_rejects_absolute_briefing_path() {
+        let directory = claude_adapter_fixture();
+        let outside = tempfile::NamedTempFile::new().expect("outside briefing");
+
+        let result = ReviewFixRunnerAdapter
+            .run_fix(claude_command(directory.path(), outside.path().to_path_buf()));
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => {
+                panic!("absolute briefing must be rejected before Claude dispatch");
+            }
+        };
+
+        assert!(error.to_string().contains("relative path beneath the repository root"));
+    }
+
+    #[test]
+    fn test_review_fix_runner_adapter_claude_rejects_traversal_briefing_path() {
+        let directory = claude_adapter_fixture();
+
+        let result = ReviewFixRunnerAdapter
+            .run_fix(claude_command(directory.path(), PathBuf::from("../outside.md")));
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => {
+                panic!("traversal briefing must be rejected before Claude dispatch");
+            }
+        };
+
+        assert!(error.to_string().contains("relative path beneath the repository root"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_runner_adapter_claude_rejects_symlinked_briefing_path() {
+        let directory = claude_adapter_fixture();
+        let outside = tempfile::NamedTempFile::new().expect("outside briefing");
+        std::os::unix::fs::symlink(outside.path(), directory.path().join("briefing.md"))
+            .expect("briefing symlink");
+
+        let result = ReviewFixRunnerAdapter
+            .run_fix(claude_command(directory.path(), PathBuf::from("briefing.md")));
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => {
+                panic!("symlinked briefing must be rejected before Claude dispatch");
+            }
+        };
+
+        assert!(error.to_string().contains("not trusted"));
+    }
+
+    #[test]
+    fn test_review_fix_runner_adapter_claude_rejects_over_bound_briefing_path() {
+        let directory = claude_adapter_fixture();
+        let briefing = fs::File::create(directory.path().join("briefing.md"))
+            .expect("over-bound briefing fixture");
+        briefing.set_len(64 * 1024 + 1).expect("set briefing size");
+
+        let result = ReviewFixRunnerAdapter
+            .run_fix(claude_command(directory.path(), PathBuf::from("briefing.md")));
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => {
+                panic!("over-bound briefing must be rejected before Claude dispatch");
+            }
+        };
+
+        assert!(error.to_string().contains("larger than the configured bound"));
+    }
+
+    #[test]
     fn test_review_fix_runner_adapter_rejects_resolver_root_that_is_not_repository_root() {
         let directory = tempfile::tempdir().expect("temporary repository");
         git_success(directory.path(), &["init", "-b", "main"]);
@@ -324,7 +390,7 @@ mod tests {
 
         let result = ReviewFixRunnerAdapter.run_fix(RunReviewFixCommand::new_resolved(
             usecase::review_v2::ReviewScopeName::try_new("cli".to_owned()).expect("valid scope"),
-            SubagentBriefingContent::try_new("# Briefing\n".to_owned()).expect("valid briefing"),
+            PathBuf::from("briefing.md"),
             ReviewFixResolution::new(
                 ReviewTrackId::try_new("review-fix-root-mismatch-2026".to_owned())
                     .expect("valid track ID"),
@@ -341,6 +407,7 @@ mod tests {
         ));
     }
 
+    #[cfg(any())]
     #[test]
     fn test_review_fix_runner_adapter_claude_rejects_traversal_briefing() {
         let directory = tempfile::tempdir().expect("temporary repository");
@@ -362,6 +429,7 @@ mod tests {
         ));
     }
 
+    #[cfg(any())]
     #[test]
     fn test_trusted_review_fix_briefing_loader_returns_read_failed_for_missing_file() {
         let directory = tempfile::tempdir().expect("temporary repository");
@@ -376,6 +444,7 @@ mod tests {
         ));
     }
 
+    #[cfg(any())]
     #[test]
     fn test_trusted_review_fix_briefing_loader_valid_relative_file_returns_validated_content() {
         let directory = tempfile::tempdir().expect("temporary repository");
@@ -390,6 +459,7 @@ mod tests {
         assert!(content.as_str().len() <= 64 * 1024);
     }
 
+    #[cfg(any())]
     #[test]
     fn test_trusted_review_fix_briefing_loader_content_over_domain_bound_returns_invalid_content() {
         let directory = tempfile::tempdir().expect("temporary repository");
@@ -407,6 +477,7 @@ mod tests {
         ));
     }
 
+    #[cfg(any())]
     #[test]
     fn test_trusted_review_fix_briefing_loader_rejects_non_regular_target_as_untrusted() {
         let directory = tempfile::tempdir().expect("temporary repository");
@@ -422,6 +493,7 @@ mod tests {
         ));
     }
 
+    #[cfg(any())]
     #[cfg(unix)]
     #[test]
     fn test_review_fix_runner_adapter_claude_rejects_symlinked_briefing() {
@@ -450,6 +522,7 @@ mod tests {
         ));
     }
 
+    #[cfg(any())]
     #[cfg(unix)]
     #[test]
     fn test_trusted_review_fix_briefing_loader_rejects_symlinked_intermediate_component() {
@@ -504,7 +577,6 @@ mod tests {
 
         let service: Arc<dyn RunReviewFixService> = Arc::new(RunReviewFixInteractor::new(
             Arc::new(GitReviewFixTrackResolver),
-            Arc::new(TrustedReviewFixBriefingLoader),
             Arc::new(CompletedRunner {
                 expected_repository_root: directory
                     .path()

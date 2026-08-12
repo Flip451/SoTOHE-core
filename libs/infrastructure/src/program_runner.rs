@@ -157,6 +157,9 @@ impl ProgramRunnerPort for ProcessProgramRunner {
         {
             return Ok(ProgramRunOutcome::OutputLimitExceeded { stream, output });
         }
+        // A successful leader can leave descendants in its process group even
+        // after every output pipe closes. They must not outlive this runner.
+        terminate(&mut child)?;
         Ok(ProgramRunOutcome::Exited {
             exit_code: ProgramExitCode::new(exit_status.code().unwrap_or(-1)),
             output,
@@ -526,5 +529,33 @@ mod tests {
             started.elapsed() < Duration::from_secs(5),
             "descendant pipe cleanup must remain bounded"
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_program_runner_terminates_descendant_that_closed_output_pipes_after_leader_exits() {
+        let temporary = tempfile::tempdir().unwrap();
+        let sentinel = temporary.path().join("descendant-survived");
+        let sentinel_argument = sentinel.to_str().unwrap();
+
+        let outcome = ProcessProgramRunner::new()
+            .run(invocation(
+                &[
+                    "sh",
+                    "-c",
+                    "(sleep 1; touch \"$1\") >/dev/null 2>&1 & exit 0",
+                    "program-runner",
+                    sentinel_argument,
+                ],
+                5,
+            ))
+            .unwrap();
+
+        assert!(matches!(
+            outcome,
+            ProgramRunOutcome::Exited { exit_code, .. } if exit_code.as_i32() == 0
+        ));
+        std::thread::sleep(Duration::from_secs(2));
+        assert!(!sentinel.exists(), "the descendant must be terminated before the runner returns");
     }
 }

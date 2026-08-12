@@ -243,10 +243,6 @@
       {"layer": "usecase", "entry_key": "SubagentDispatchInstruction"},
       {"layer": "usecase", "entry_key": "SubagentName"},
       {"layer": "usecase", "entry_key": "SubagentNameValidationError"},
-      {"layer": "usecase", "entry_key": "SubagentBriefingContent"},
-      {"layer": "usecase", "entry_key": "SubagentBriefingContentValidationError"},
-      {"layer": "usecase", "entry_key": "ReviewFixBriefingLoaderPort"},
-      {"layer": "usecase", "entry_key": "ReviewFixBriefingLoadError"},
       {"layer": "usecase", "entry_key": "RunReviewFixOutput"},
       {"layer": "usecase", "entry_key": "ReviewFixRunner"},
       {"layer": "usecase", "entry_key": "RunReviewFixInteractor"},
@@ -259,7 +255,6 @@
       {"layer": "infrastructure", "entry_key": "ReviewFixRunnerAdapter"},
       {"layer": "infrastructure", "entry_key": "GitReviewFixTrackResolver"},
       {"layer": "infrastructure", "entry_key": "CodexReviewFixRunner"},
-      {"layer": "infrastructure", "entry_key": "TrustedReviewFixBriefingLoader"},
       {"layer": "cli_driver", "entry_key": "ReviewInput"},
       {"layer": "cli_driver", "entry_key": "ReviewResultsInput"},
       {"layer": "cli_driver", "entry_key": "ReviewDriver"},
@@ -275,6 +270,16 @@
       {"layer": "cli_composition", "entry_key": "cli_composition::review_v2::scope::validate_review_group_name_str"},
       {"layer": "cli_composition", "entry_key": "cli_composition::review_v2::scope::validate_track_id_str"},
       {"layer": "cli_composition", "entry_key": "cli_composition::review_v2::shared::build_review_v2_str"}
+    ],
+    "T044": [
+      {"layer": "usecase", "entry_key": "ReviewFixRunnerError"},
+      {"layer": "usecase", "entry_key": "RunReviewFixCommand"},
+      {"layer": "usecase", "entry_key": "RunReviewFixError"},
+      {"layer": "usecase", "entry_key": "RunReviewFixInteractor"},
+      {"layer": "usecase", "entry_key": "SubagentDispatchInstruction"},
+      {"layer": "usecase", "entry_key": "RunReviewFixService"},
+      {"layer": "cli_driver", "entry_key": "ReviewFixDriver"},
+      {"layer": "cli_composition", "entry_key": "ReviewCompositionRoot"}
     ],
     "T039": [
       {"layer": "usecase", "entry_key": "RefVerifyChainFilter"},

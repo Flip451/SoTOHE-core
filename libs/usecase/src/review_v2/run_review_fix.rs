@@ -30,7 +30,7 @@ use crate::review_v2::{ReviewRoundType, ReviewScopeName, ReviewScopeNameValidati
 #[derive(Clone)]
 pub struct RunReviewFixCommand {
     scope: String,
-    briefing_content: SubagentBriefingContent,
+    briefing_file: PathBuf,
     track_id: String,
     repository_root: PathBuf,
     round_type: ReviewRoundType,
@@ -42,14 +42,14 @@ impl RunReviewFixCommand {
     #[must_use]
     pub fn new_resolved(
         scope: ReviewScopeName,
-        briefing_content: SubagentBriefingContent,
+        briefing_file: PathBuf,
         resolution: ReviewFixResolution,
         round_type: ReviewRoundType,
         model: Option<ModelName>,
     ) -> Self {
         Self {
             scope: scope.as_str().to_owned(),
-            briefing_content,
+            briefing_file,
             track_id: resolution.track_id.as_str().to_owned(),
             repository_root: resolution.repository_root,
             round_type,
@@ -63,8 +63,8 @@ impl RunReviewFixCommand {
     }
 
     #[must_use]
-    pub fn briefing_content(&self) -> &SubagentBriefingContent {
-        &self.briefing_content
+    pub fn briefing_file(&self) -> &Path {
+        &self.briefing_file
     }
 
     #[must_use]
@@ -103,29 +103,6 @@ impl ReviewTrackId {
     pub fn as_str(&self) -> &str {
         &self.0
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SubagentBriefingContent(String);
-
-impl SubagentBriefingContent {
-    pub fn try_new(value: String) -> Result<Self, SubagentBriefingContentValidationError> {
-        if value.len() > 64 * 1024 {
-            return Err(SubagentBriefingContentValidationError::ExceedsMaximumBytes);
-        }
-        Ok(Self(value))
-    }
-
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-#[derive(Debug, Error)]
-pub enum SubagentBriefingContentValidationError {
-    #[error("review-fix briefing content exceeds the 65536-byte limit")]
-    ExceedsMaximumBytes,
 }
 
 /// Resolver-proven association between the active track and its repository.
@@ -307,7 +284,7 @@ pub struct SubagentDispatchInstruction {
     pub model: ModelName,
     pub effort: ReasoningEffort,
     pub scope: ReviewScopeName,
-    pub briefing_content: SubagentBriefingContent,
+    pub briefing_file: PathBuf,
     pub track_id: ReviewTrackId,
     /// Resolver-proven repository root for the in-host fixer dispatch.
     pub repository_root: PathBuf,
@@ -331,8 +308,6 @@ pub enum RunReviewFixError {
     FixRunnerFailed(ReviewFixRunnerError),
     #[error("track resolution failed: {0}")]
     TrackResolution(#[from] ReviewFixTrackResolveError),
-    #[error("briefing load failed: {0}")]
-    BriefingLoad(#[from] ReviewFixBriefingLoadError),
     #[error("explicit track '{}' does not match current branch track '{}'", explicit.as_str(), resolved.as_str())]
     TrackMismatch { explicit: ReviewTrackId, resolved: ReviewTrackId },
 }
@@ -383,24 +358,6 @@ pub enum ReviewFixTrackResolveError {
     NonTrackBranch(DiagnosticText),
 }
 
-#[derive(Debug, Error)]
-pub enum ReviewFixBriefingLoadError {
-    #[error("review-fix briefing file is not trusted: {0}")]
-    UntrustedFile(DiagnosticText),
-    #[error("could not read review-fix briefing: {0}")]
-    ReadFailed(DiagnosticText),
-    #[error("review-fix briefing content is invalid: {0}")]
-    InvalidContent(SubagentBriefingContentValidationError),
-}
-
-pub trait ReviewFixBriefingLoaderPort: Send + Sync {
-    fn load_briefing_content(
-        &self,
-        repository_root: &Path,
-        briefing_file: &Path,
-    ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError>;
-}
-
 // ── RunReviewFixService ───────────────────────────────────────────────────────
 
 /// Application service trait (primary port) for the run-review-fix use case.
@@ -428,7 +385,6 @@ pub trait RunReviewFixService: Send + Sync {
 /// the domain+infra wiring — mirroring the `RunReviewInteractor` pattern.
 pub struct RunReviewFixInteractor {
     track_resolver: Arc<dyn ReviewFixTrackResolverPort>,
-    briefing_loader: Arc<dyn ReviewFixBriefingLoaderPort>,
     runner: Arc<dyn ReviewFixRunner>,
 }
 
@@ -437,10 +393,9 @@ impl RunReviewFixInteractor {
     #[must_use]
     pub fn new(
         track_resolver: Arc<dyn ReviewFixTrackResolverPort>,
-        briefing_loader: Arc<dyn ReviewFixBriefingLoaderPort>,
         runner: Arc<dyn ReviewFixRunner>,
     ) -> Self {
-        Self { track_resolver, briefing_loader, runner }
+        Self { track_resolver, runner }
     }
 }
 
@@ -458,13 +413,9 @@ impl RunReviewFixService for RunReviewFixInteractor {
                 });
             }
         }
-        let briefing_content = self
-            .briefing_loader
-            .load_briefing_content(resolved.repository_root(), &request.briefing_file)
-            .map_err(RunReviewFixError::BriefingLoad)?;
         let command = RunReviewFixCommand::new_resolved(
             request.scope,
-            briefing_content,
+            request.briefing_file,
             resolved,
             request.round_type,
             request.model,
@@ -524,7 +475,7 @@ mod tests {
     fn make_valid_command() -> RunReviewFixCommand {
         RunReviewFixCommand::new_resolved(
             ReviewScopeName::try_new("domain".to_owned()).expect("valid test scope"),
-            SubagentBriefingContent::try_new("briefing".to_owned()).expect("valid briefing"),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             ReviewFixResolution::new(
                 ReviewTrackId::try_new("my-track-2026-05-31".to_owned())
                     .expect("valid test track ID"),
@@ -536,23 +487,10 @@ mod tests {
     }
 
     #[test]
-    fn test_subagent_briefing_content_accepts_limit_and_rejects_over_bound() {
-        let maximum = "x".repeat(64 * 1024);
-
-        let content = SubagentBriefingContent::try_new(maximum.clone())
-            .expect("the 65536-byte limit must be accepted");
-        assert_eq!(content.as_str(), maximum);
-        assert!(matches!(
-            SubagentBriefingContent::try_new("x".repeat(64 * 1024 + 1)),
-            Err(SubagentBriefingContentValidationError::ExceedsMaximumBytes)
-        ));
-    }
-
-    #[test]
     fn test_run_review_fix_command_new_resolved_preserves_validated_values() {
         let command = RunReviewFixCommand::new_resolved(
             ReviewScopeName::try_new("cli_driver".to_owned()).expect("valid test scope"),
-            SubagentBriefingContent::try_new("briefing".to_owned()).expect("valid briefing"),
+            PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             ReviewFixResolution::new(
                 ReviewTrackId::try_new("review-fix-command-2026".to_owned())
                     .expect("valid test track ID"),
@@ -563,7 +501,7 @@ mod tests {
         );
 
         assert_eq!(command.scope(), "cli_driver");
-        assert_eq!(command.briefing_content().as_str(), "briefing");
+        assert_eq!(command.briefing_file(), Path::new("tmp/reviewer-runtime/briefing.md"));
         assert_eq!(command.track_id(), "review-fix-command-2026");
         assert_eq!(command.repository_root(), PathBuf::from("/test-resolved-root"));
         assert!(matches!(command.round_type(), ReviewRoundType::Final));
@@ -757,6 +695,15 @@ mod tests {
     }
 
     #[test]
+    fn test_review_track_id_rejects_empty_value_with_focused_validation_error() {
+        let error = ReviewTrackId::try_new(String::new())
+            .expect_err("an empty track ID must be rejected at the usecase boundary");
+
+        assert!(matches!(&error, ReviewTrackIdValidationError::Invalid(_)));
+        assert!(error.to_string().contains("invalid review track ID"));
+    }
+
+    #[test]
     fn test_review_track_id_try_new_invalid_input_returns_diagnostic_error() {
         let error = ReviewTrackId::try_new("Invalid Track ID".to_owned())
             .expect_err("an invalid raw track ID must be rejected at the usecase boundary");
@@ -835,19 +782,6 @@ mod tests {
     }
 
     #[test]
-    fn test_review_fix_briefing_load_error_preserves_each_failure_category() {
-        let untrusted = ReviewFixBriefingLoadError::UntrustedFile(DiagnosticText::new("symlink"));
-        let read_failed = ReviewFixBriefingLoadError::ReadFailed(DiagnosticText::new("missing"));
-        let invalid = ReviewFixBriefingLoadError::InvalidContent(
-            SubagentBriefingContentValidationError::ExceedsMaximumBytes,
-        );
-
-        assert!(untrusted.to_string().contains("not trusted: symlink"));
-        assert!(read_failed.to_string().contains("could not read review-fix briefing: missing"));
-        assert!(invalid.to_string().contains("content is invalid"));
-    }
-
-    #[test]
     fn test_run_review_fix_error_subagent_dispatch_required_retains_typed_instruction() {
         let instruction = SubagentDispatchInstruction {
             agent: SubagentName::try_new("review-fix-lead".to_owned())
@@ -856,8 +790,7 @@ mod tests {
             effort: ReasoningEffort::Low,
             scope: ReviewScopeName::try_new("cli_driver".to_owned())
                 .expect("valid test review scope"),
-            briefing_content: SubagentBriefingContent::try_new("briefing".to_owned())
-                .expect("valid briefing"),
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: ReviewTrackId::try_new("dispatch-render-2026".to_owned())
                 .expect("valid test track ID"),
             repository_root: PathBuf::from("/resolved/repository"),
@@ -873,6 +806,54 @@ mod tests {
                 ReviewFixRunnerError::SubagentDispatchRequired(value)
             ) if *value == instruction
         ));
+    }
+
+    #[test]
+    fn test_subagent_dispatch_instruction_boundary_rejects_invalid_scope_track_id_and_round_type() {
+        let cases = [
+            (
+                "invalid scope",
+                String::new(),
+                Some("dispatch-track-2026".to_owned()),
+                "fast".to_owned(),
+                "invalid review-fix scope",
+            ),
+            (
+                "invalid track ID",
+                "cli_driver".to_owned(),
+                Some(String::new()),
+                "fast".to_owned(),
+                "invalid review-fix track ID",
+            ),
+            (
+                "invalid round type",
+                "cli_driver".to_owned(),
+                Some("dispatch-track-2026".to_owned()),
+                "later".to_owned(),
+                "invalid review-fix round type",
+            ),
+        ];
+
+        for (case, scope, track_id, round_type, expected_error) in cases {
+            let error = match RunReviewFixRequest::try_new(
+                scope,
+                PathBuf::from("tmp/reviewer-runtime/briefing.md"),
+                track_id,
+                PathBuf::from("track/items"),
+                round_type,
+                None,
+            ) {
+                Ok(_) => panic!(
+                    "invalid raw values must be rejected before a dispatch instruction exists"
+                ),
+                Err(error) => error,
+            };
+
+            assert!(
+                error.to_string().contains(expected_error),
+                "{case} must identify the offending boundary field"
+            );
+        }
     }
 
     #[test]
@@ -1027,8 +1008,7 @@ mod tests {
             effort: ReasoningEffort::Low,
             scope: ReviewScopeName::try_new("cli_driver".to_owned())
                 .expect("valid test review scope"),
-            briefing_content: SubagentBriefingContent::try_new("briefing".to_owned())
-                .expect("valid briefing"),
+            briefing_file: PathBuf::from("tmp/reviewer-runtime/briefing.md"),
             track_id: ReviewTrackId::try_new("dispatch-runner-2026".to_owned())
                 .expect("valid test track ID"),
             repository_root: PathBuf::from("/test-repository"),
@@ -1146,19 +1126,6 @@ mod tests {
         }
     }
 
-    struct FixedBriefingLoader;
-
-    impl ReviewFixBriefingLoaderPort for FixedBriefingLoader {
-        fn load_briefing_content(
-            &self,
-            _repository_root: &Path,
-            _briefing_file: &Path,
-        ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
-            SubagentBriefingContent::try_new("briefing".to_owned())
-                .map_err(ReviewFixBriefingLoadError::InvalidContent)
-        }
-    }
-
     struct RecordingTrackResolver {
         result: Mutex<Option<Result<ReviewFixResolution, ReviewFixTrackResolveError>>>,
         requested_items_dirs: Arc<Mutex<Vec<PathBuf>>>,
@@ -1220,7 +1187,6 @@ mod tests {
     ) -> RunReviewFixInteractor {
         RunReviewFixInteractor::new(
             Arc::new(FixedTrackResolver),
-            Arc::new(FixedBriefingLoader),
             Arc::new(MockReviewFixRunner::returning(result)),
         )
     }
@@ -1258,7 +1224,6 @@ mod tests {
         let commands = Arc::new(Mutex::new(Vec::new()));
         let interactor = RunReviewFixInteractor::new(
             Arc::new(resolver),
-            Arc::new(FixedBriefingLoader),
             Arc::new(RecordingRunner { calls: calls.clone(), commands: commands.clone() }),
         );
 
@@ -1291,7 +1256,6 @@ mod tests {
         let calls = Arc::new(AtomicUsize::new(0));
         let service: Arc<dyn RunReviewFixService> = Arc::new(RunReviewFixInteractor::new(
             Arc::new(resolver),
-            Arc::new(FixedBriefingLoader),
             Arc::new(RecordingRunner {
                 calls: calls.clone(),
                 commands: Arc::new(Mutex::new(Vec::new())),
@@ -1316,7 +1280,6 @@ mod tests {
         let calls = Arc::new(AtomicUsize::new(0));
         let interactor = RunReviewFixInteractor::new(
             Arc::new(resolver),
-            Arc::new(FixedBriefingLoader),
             Arc::new(RecordingRunner {
                 calls: calls.clone(),
                 commands: Arc::new(Mutex::new(Vec::new())),
@@ -1347,7 +1310,6 @@ mod tests {
         let calls = Arc::new(AtomicUsize::new(0));
         let interactor = RunReviewFixInteractor::new(
             Arc::new(resolver),
-            Arc::new(FixedBriefingLoader),
             Arc::new(RecordingRunner {
                 calls: calls.clone(),
                 commands: Arc::new(Mutex::new(Vec::new())),
@@ -1369,45 +1331,6 @@ mod tests {
             0,
             "resolution failure must not invoke the runner"
         );
-    }
-
-    #[test]
-    fn test_run_review_fix_interactor_propagates_briefing_load_error_without_running() {
-        struct UntrustedBriefingLoader;
-
-        impl ReviewFixBriefingLoaderPort for UntrustedBriefingLoader {
-            fn load_briefing_content(
-                &self,
-                _repository_root: &Path,
-                _briefing_file: &Path,
-            ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
-                Err(ReviewFixBriefingLoadError::UntrustedFile(DiagnosticText::new(
-                    "symlinked intermediate component",
-                )))
-            }
-        }
-
-        let calls = Arc::new(AtomicUsize::new(0));
-        let interactor = RunReviewFixInteractor::new(
-            Arc::new(FixedTrackResolver),
-            Arc::new(UntrustedBriefingLoader),
-            Arc::new(RecordingRunner {
-                calls: calls.clone(),
-                commands: Arc::new(Mutex::new(Vec::new())),
-            }),
-        );
-
-        let error = match interactor.run(make_valid_request()) {
-            Err(error) => error,
-            Ok(_) => panic!("an untrusted briefing must fail before the runner is invoked"),
-        };
-
-        assert!(matches!(
-            error,
-            RunReviewFixError::BriefingLoad(ReviewFixBriefingLoadError::UntrustedFile(detail))
-                if detail.as_str() == "symlinked intermediate component"
-        ));
-        assert_eq!(calls.load(Ordering::SeqCst), 0, "briefing failure must not invoke runner");
     }
 
     #[test]

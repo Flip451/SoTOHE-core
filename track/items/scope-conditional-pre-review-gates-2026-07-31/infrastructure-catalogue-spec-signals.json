@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cc7863af61f1c91af46055a33e6b38803b6f8e5122a30e725f2cd70f691d2ba2",
+  "catalogue_declaration_hash": "b7009eb9aa9026d774fc44618d5040763df80b2ef1458313f0441d5887475826",
   "signals": [
     {
       "type_name": "CodexReviewFixRunner",
@@ -70,7 +70,7 @@
     {
       "type_name": "GitReviewFixTrackResolver",
       "signal": "blue",
-      "entry_hash": "d552ef540d1b5ddbe2f02bad581225dddf8d7d221cefcd3615d3a2f256db73b9"
+      "entry_hash": "1b989b2df2d9e5cb15189dd30d02921c996df5e9056b5cf858d5c8c302cd2eac"
     },
     {
       "type_name": "LayerIdDto",
@@ -125,7 +125,7 @@
     {
       "type_name": "ReviewFixRunnerAdapter",
       "signal": "blue",
-      "entry_hash": "eecce4952cea0fe9f44dedc957f5ec5c964ef812b4fea526ed96adc9e84d34c0"
+      "entry_hash": "e139161471f9eb265e5853ea08324e75058611f12f896a9a9b05067918fe2b61"
     },
     {
       "type_name": "ReviewScopeNameDto",
@@ -151,11 +151,6 @@
       "type_name": "TrackIdDto",
       "signal": "blue",
       "entry_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b"
-    },
-    {
-      "type_name": "TrustedReviewFixBriefingLoader",
-      "signal": "blue",
-      "entry_hash": "268274b5fa4d557e3eb959212eeba4a424d7390e215caa9eb026bcba444ef672"
     },
     {
       "type_name": "infrastructure::operator_command_config::decode_phase_command_config",

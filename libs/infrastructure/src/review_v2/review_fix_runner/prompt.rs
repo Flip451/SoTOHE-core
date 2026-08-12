@@ -1,6 +1,8 @@
 use usecase::review_v2::run_review_fix::{ReviewFixRunnerError, RunReviewFixCommand};
 
 use super::launch_context::prompt_path_string;
+#[cfg(test)]
+use crate::review_v2::review_fix_briefing::MAX_BRIEFING_BYTES;
 
 pub(super) fn shell_quote_arg(raw: &str) -> String {
     if raw
@@ -38,14 +40,15 @@ pub(super) fn build_prompt(
     scope: &str,
     command: &RunReviewFixCommand,
 ) -> Result<String, ReviewFixRunnerError> {
-    build_prompt_with_context(scope, command)
+    let briefing_content = crate::review_v2::review_fix_briefing::read_trusted_briefing(command)?;
+    build_prompt_with_context(scope, command, &briefing_content)
 }
 
 pub(super) fn build_prompt_with_context(
     scope: &str,
     command: &RunReviewFixCommand,
+    briefing_content: &str,
 ) -> Result<String, ReviewFixRunnerError> {
-    let briefing_content = command.briefing_content().as_str();
     let track_id = prompt_path_string(std::path::Path::new(command.track_id()), "track_id")?;
     let scope = prompt_path_string(std::path::Path::new(scope), "scope")?;
     let round_type = prompt_path_string(
@@ -93,20 +96,30 @@ pub(super) fn build_prompt_with_context(
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::fs;
+    use std::path::PathBuf;
+
     use super::*;
     use usecase::review_v2::ReviewScopeName;
     use usecase::review_v2::run_review_fix::{
-        ReviewFixResolution, ReviewTrackId, RunReviewFixCommand, SubagentBriefingContent,
+        ReviewFixResolution, ReviewTrackId, RunReviewFixCommand,
     };
 
     fn make_command() -> RunReviewFixCommand {
+        make_command_with(
+            std::env::current_dir().expect("repository root"),
+            PathBuf::from("Cargo.toml"),
+        )
+    }
+
+    fn make_command_with(repository_root: PathBuf, briefing_file: PathBuf) -> RunReviewFixCommand {
         RunReviewFixCommand::new_resolved(
             ReviewScopeName::try_new("infrastructure".to_owned()).expect("valid scope"),
-            SubagentBriefingContent::try_new("briefing".to_owned()).expect("valid briefing"),
+            briefing_file,
             ReviewFixResolution::new(
                 ReviewTrackId::try_new("review-fix-codex-rustify-2026-05-31".to_owned())
                     .expect("valid track ID"),
-                std::env::current_dir().expect("repository root"),
+                repository_root,
             ),
             usecase::review_v2::ReviewRoundType::Fast,
             Some(usecase::capability_exec::ModelName::try_new("gpt-5.5").expect("valid model")),
@@ -179,5 +192,82 @@ mod tests {
             build_prompt("infra\n- Scope: cli", &make_command()),
             Err(ReviewFixRunnerError::Unexpected(_))
         ));
+    }
+
+    #[test]
+    fn test_build_prompt_reads_valid_relative_briefing_below_resolver_root() {
+        let root = tempfile::tempdir().expect("temporary repository root");
+        fs::write(root.path().join("briefing.md"), "trusted briefing content")
+            .expect("briefing fixture");
+
+        let prompt = build_prompt(
+            "infrastructure",
+            &make_command_with(root.path().to_path_buf(), PathBuf::from("briefing.md")),
+        )
+        .expect("valid relative briefing must be read");
+
+        assert!(prompt.contains("trusted briefing content"));
+    }
+
+    #[test]
+    fn test_build_prompt_rejects_absolute_briefing_path() {
+        let root = tempfile::tempdir().expect("temporary repository root");
+        let outside = tempfile::NamedTempFile::new().expect("outside briefing fixture");
+
+        let error = build_prompt(
+            "infrastructure",
+            &make_command_with(root.path().to_path_buf(), outside.path().to_path_buf()),
+        )
+        .expect_err("absolute briefing paths must be rejected");
+
+        assert!(error.to_string().contains("relative path beneath the repository root"));
+    }
+
+    #[test]
+    fn test_build_prompt_rejects_parent_traversal_briefing_path() {
+        let root = tempfile::tempdir().expect("temporary repository root");
+
+        let error = build_prompt(
+            "infrastructure",
+            &make_command_with(root.path().to_path_buf(), PathBuf::from("../outside.md")),
+        )
+        .expect_err("parent traversal briefing paths must be rejected");
+
+        assert!(error.to_string().contains("relative path beneath the repository root"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_build_prompt_rejects_symlinked_briefing_path() {
+        let root = tempfile::tempdir().expect("temporary repository root");
+        let outside = tempfile::NamedTempFile::new().expect("outside briefing fixture");
+        std::os::unix::fs::symlink(outside.path(), root.path().join("briefing.md"))
+            .expect("briefing symlink");
+
+        let error = build_prompt(
+            "infrastructure",
+            &make_command_with(root.path().to_path_buf(), PathBuf::from("briefing.md")),
+        )
+        .expect_err("symlinked briefing paths must be rejected");
+
+        assert!(error.to_string().contains("not trusted"));
+    }
+
+    #[test]
+    fn test_build_prompt_rejects_briefing_over_byte_bound() {
+        let root = tempfile::tempdir().expect("temporary repository root");
+        let briefing = root.path().join("briefing.md");
+        fs::File::create(&briefing)
+            .expect("briefing fixture")
+            .set_len(MAX_BRIEFING_BYTES + 1)
+            .expect("oversize briefing fixture");
+
+        let error = build_prompt(
+            "infrastructure",
+            &make_command_with(root.path().to_path_buf(), PathBuf::from("briefing.md")),
+        )
+        .expect_err("over-bound briefings must be rejected");
+
+        assert!(error.to_string().contains("larger than the configured bound"));
     }
 }

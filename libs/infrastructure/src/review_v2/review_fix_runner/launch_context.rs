@@ -8,24 +8,19 @@
 
 use std::ffi::{OsStr, OsString};
 use std::io::Read;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
 
-use usecase::review_v2::run_review_fix::{
-    ReviewFixBriefingLoadError, ReviewFixRunnerError, SubagentBriefingContent,
-};
+use usecase::review_v2::run_review_fix::ReviewFixRunnerError;
 
 use super::session_log::{
     credential_redaction_overlap_bytes, credential_values, redact_credential_values,
 };
 use super::spawn::{RuntimeFile, create_runtime_file, read_runtime_file_bounded};
 
-// This transport limit intentionally exceeds the domain content limit. It lets
-// the loader report a validated content failure distinctly from an I/O failure.
-const MAX_BRIEFING_FILE_BYTES: u64 = 128 * 1024;
 const MAX_RETAINED_CHILD_OUTPUT_BYTES: usize = 64 * 1024;
 /// A child that exceeds this amount is terminated rather than drained forever.
 pub(super) const MAX_CHILD_TOTAL_OUTPUT_BYTES: usize = 1024 * 1024;
@@ -43,56 +38,6 @@ pub(crate) struct TrustedLaunchContext {
 }
 
 impl TrustedLaunchContext {
-    pub(crate) fn load_briefing_content(
-        repository_root: &Path,
-        briefing_file: &Path,
-    ) -> Result<SubagentBriefingContent, ReviewFixBriefingLoadError> {
-        if briefing_file.is_absolute()
-            || briefing_file.components().any(|component| matches!(component, Component::ParentDir))
-        {
-            return Err(untrusted_briefing_file(
-                "briefing_file must be a relative path beneath the resolver-proven repository root",
-            ));
-        }
-        let repository_root = repository_root.canonicalize().map_err(|error| {
-            untrusted_briefing_file(format!(
-                "failed to canonicalize resolver-proven repository root {}: {error}",
-                repository_root.display()
-            ))
-        })?;
-        let path = repository_root.join(briefing_file);
-        crate::track::symlink_guard::reject_symlinks_below(&path, &repository_root).map_err(
-            |error| untrusted_briefing_file(format!("briefing_file is not trusted: {error}")),
-        )?;
-        if !matches!(
-            crate::trusted_file::locate_record(&path, &repository_root),
-            Ok(crate::trusted_file::RecordLocation::Inside)
-        ) {
-            return Err(untrusted_briefing_file(
-                "briefing_file is outside the resolver-proven repository root",
-            ));
-        }
-        if std::fs::symlink_metadata(&path)
-            .map(|metadata| !metadata.file_type().is_file())
-            .unwrap_or(false)
-        {
-            return Err(untrusted_briefing_file(
-                "briefing_file must be a regular file beneath the resolver-proven repository root",
-            ));
-        }
-        let briefing_content = crate::trusted_file::read_bounded_regular_file(
-            &path,
-            &repository_root,
-            MAX_BRIEFING_FILE_BYTES,
-        )
-        .map_err(|error| {
-            briefing_read_failed(format!("failed to read trusted briefing file: {error}"))
-        })?
-        .ok_or_else(|| briefing_read_failed("briefing_file does not exist"))?;
-        SubagentBriefingContent::try_new(briefing_content)
-            .map_err(ReviewFixBriefingLoadError::InvalidContent)
-    }
-
     pub(crate) fn for_repository(repository_root: &Path) -> Result<Self, ReviewFixRunnerError> {
         let repository_root = repository_root.canonicalize().map_err(|error| {
             unexpected(format!(
@@ -472,18 +417,6 @@ pub(super) fn prompt_path_string(path: &Path, label: &str) -> Result<String, Rev
 
 fn unexpected(detail: impl Into<String>) -> ReviewFixRunnerError {
     ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(detail.into()))
-}
-
-fn untrusted_briefing_file(detail: impl Into<String>) -> ReviewFixBriefingLoadError {
-    ReviewFixBriefingLoadError::UntrustedFile(usecase::git_workflow::DiagnosticText::new(
-        detail.into(),
-    ))
-}
-
-fn briefing_read_failed(detail: impl Into<String>) -> ReviewFixBriefingLoadError {
-    ReviewFixBriefingLoadError::ReadFailed(usecase::git_workflow::DiagnosticText::new(
-        detail.into(),
-    ))
 }
 
 #[cfg(test)]

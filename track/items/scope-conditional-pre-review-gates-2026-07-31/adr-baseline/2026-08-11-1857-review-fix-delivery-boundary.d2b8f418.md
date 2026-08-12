@@ -21,13 +21,6 @@ regular file、64 KiB 上限、および content を運ぶ dispatch は実装レ
 content-passing の義務化は正当化されない transport mechanism の連鎖を生むため、D1〜D3 を
 deprecated とする。
 
-## Reassess When
-
-- briefing が信頼されない主体によって生成される、または権限の異なる process / host 間を越えて運ばれ、
-  delivery boundary が実際の trust boundary になったとき。
-- provider / subagent が filesystem を介さず byte-exact な content を受け取れるようになり、入力衛生を
-  architecture boundary として定める必要が生じたとき。
-
 ## Original Record (historical — rejected and not in force)
 
 以下の原文全体は棄却された提案の記録としてそのまま保存するものであり、いずれの記述も現在は効力を持たない。

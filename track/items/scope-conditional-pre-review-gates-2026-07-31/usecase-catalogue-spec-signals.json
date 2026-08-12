@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "697ea228feec246da00b8d9cee66e2d00a6c8aa4907cd85063fa65f2c110d090",
+  "catalogue_declaration_hash": "cb90c13c9f255dd8ac36cc5b8f783eb54536aebe9dcc6f79f252e3236cf7c34b",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",
@@ -273,11 +273,6 @@
       "entry_hash": "4882c5d00ac1392714f157667f08113510b0af7ff44bf4227b35b3b3d48a97d4"
     },
     {
-      "type_name": "ReviewFixBriefingLoadError",
-      "signal": "blue",
-      "entry_hash": "22daca581cdc9efdf98a0d96413193d0343731f6542628c1f02b1995eec5b3dc"
-    },
-    {
       "type_name": "ReviewFixResolution",
       "signal": "blue",
       "entry_hash": "c7674e9a5984b50d0f01a795fe90677814267bfb3402935b44e3fd02c5adc32f"
@@ -290,7 +285,7 @@
     {
       "type_name": "ReviewFixTrackResolveError",
       "signal": "blue",
-      "entry_hash": "2e3cbe28c1f79a2f7e6aff1ef6e4c82f8286a1c9be93376eeeaccb1cd42a60a4"
+      "entry_hash": "fcc287d117258546dfebe81cc0228b398214348ddf959298618a4bdd5d5fddbd"
     },
     {
       "type_name": "ReviewNotRequiredReason",
@@ -415,7 +410,7 @@
     {
       "type_name": "RunReviewFixCommand",
       "signal": "blue",
-      "entry_hash": "9e9ad15345ab8b12beaa4d36866e4ef21f5824fbf6efa860970a7daa530aa7ac"
+      "entry_hash": "960a1776dabbcdcacb4712443c3e6d337e37be8cbbce9be39b88a9ddfa9427c8"
     },
     {
       "type_name": "RunReviewFixCommandValidationError",
@@ -425,12 +420,12 @@
     {
       "type_name": "RunReviewFixError",
       "signal": "blue",
-      "entry_hash": "d707714b54ce05dcc9306eb43949d6a6d49032b733e7d645caf4e91b5bc67c7d"
+      "entry_hash": "13138307fcc8ebcbf94b0c8fe65c52526fa467588149c8148ba75d6af55daa9f"
     },
     {
       "type_name": "RunReviewFixInteractor",
       "signal": "blue",
-      "entry_hash": "6a1ad0357581b15c9939aa5de1e642603e96b5e89f2dada615e15269f5af5673"
+      "entry_hash": "39062c3411fbf2cebacbce6ee1be2dd2c113ff476270cc17517c52c5bac1a975"
     },
     {
       "type_name": "RunReviewFixOutput",
@@ -440,32 +435,22 @@
     {
       "type_name": "RunReviewFixRequest",
       "signal": "blue",
-      "entry_hash": "f27778630bd20e74f64ff92415f750a0c8f7edb5a27eb423ffa52932b1ac9180"
-    },
-    {
-      "type_name": "SubagentBriefingContent",
-      "signal": "blue",
-      "entry_hash": "0c16610ee2af6679409c94325e56f89117fcf71e956c4581e711b71f05c2116b"
-    },
-    {
-      "type_name": "SubagentBriefingContentValidationError",
-      "signal": "blue",
-      "entry_hash": "d8e9baf30395cac43d5598139cf60baa4385f15eda163a7aa9382cf1da579992"
+      "entry_hash": "0f22f6b13aa5f1e868d229cc48b97b805db634d85aa4ed27323f73bd2a37a25e"
     },
     {
       "type_name": "SubagentDispatchInstruction",
       "signal": "blue",
-      "entry_hash": "fb70fbd7b1010bee13714bd5acd3f4e8752928c83682d54dc105fbd28518e48b"
+      "entry_hash": "fc34c50a4718b677b6e618515314961344657ca46daf4154c94a890364a144b1"
     },
     {
       "type_name": "SubagentName",
       "signal": "blue",
-      "entry_hash": "159a3b7c1ffdb3662fb7356c1b930540c4706edd8ce5eb94e0d175c8ebf19238"
+      "entry_hash": "4dda558e3821904e5fff1e194c608f28bf003fb6dfdb8ce7540a3096d69c9603"
     },
     {
       "type_name": "SubagentNameValidationError",
       "signal": "blue",
-      "entry_hash": "be981a7fedf001c06bfdb4c624552398b0974fc4624f2350d6d8d0b8007b5359"
+      "entry_hash": "81d384b95122c5867f1e34aa63609855b43b5ea9a69bcf5dd7b3bbfd2cdf99bb"
     },
     {
       "type_name": "SuccessfulProgramExecutionRecord",
@@ -538,11 +523,6 @@
       "entry_hash": "9bc48797051224999871b072189ed56e79a116e9e367f4a29b5f933250803101"
     },
     {
-      "type_name": "ReviewFixBriefingLoaderPort",
-      "signal": "blue",
-      "entry_hash": "a1194dbf3dd93297a3b90ad61cc36559fe4b63fe378a174f9b74d7650b41cc44"
-    },
-    {
       "type_name": "ReviewFixRunner",
       "signal": "blue",
       "entry_hash": "1030beede158c5762b5129158153aa0c3ef19b78727ee75d0dd9222f0345b302"
@@ -550,7 +530,7 @@
     {
       "type_name": "ReviewFixTrackResolverPort",
       "signal": "blue",
-      "entry_hash": "e23d0ec81a634f8bfdf5f121d80bea18c8c4c647ae30075b172d9e92fd8b9053"
+      "entry_hash": "4ea6c3a230751de8c40d0d8fd43894b2010f63b13950cd929031c9931838a47d"
     },
     {
       "type_name": "ReviewResultsRoundPort",

@@ -10,6 +10,7 @@ pub mod hasher;
 pub mod persistence;
 pub mod results;
 pub mod review_fix_adapter;
+pub(crate) mod review_fix_briefing;
 pub mod review_fix_runner;
 pub mod scope_config_loader;
 mod session;
@@ -24,8 +25,6 @@ pub(crate) use hasher::RootedSystemReviewHasher;
 pub use hasher::SystemReviewHasher;
 pub use persistence::{FsCommitHashStore, FsReviewStore};
 pub use results::{ResultsRoundAdapter, ResultsScopeAdapter, ResultsStateAdapter};
-pub use review_fix_adapter::{
-    GitReviewFixTrackResolver, ReviewFixRunnerAdapter, TrustedReviewFixBriefingLoader,
-};
+pub use review_fix_adapter::{GitReviewFixTrackResolver, ReviewFixRunnerAdapter};
 pub use review_fix_runner::CodexReviewFixRunner;
 pub use scope_config_loader::load_v2_scope_config;

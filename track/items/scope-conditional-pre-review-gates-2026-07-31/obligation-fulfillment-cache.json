@@ -199,13 +199,13 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "1c2a0e09ae8e74c1ae9e151aa4cd30427dcf0d2d4384943e99e78635ff639b04",
-        "declaration_hash": "1f74abea2f6c4a44670ede31c783bea0fe781875880a1ccf74ed5fe7282dc4ec",
+        "bound_tests_set_hash": "ad5a3265e81ede03dcb058c11bf38c041dc562c8eb904f805956f360ecc2e776",
+        "declaration_hash": "60979f512300ccaabafcb1c879953d746c0a9880b7f62b4b0e91a4fadae1e42f",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(command.scope(), \"cli_driver\");\n        assert_eq!(command.briefing_content().as_str(), \"briefing\");\n        assert_eq!(command.track_id(), \"review-fix-command-2026\");\n        assert_eq!(command.repository_root(), PathBuf::from(\"/test-resolved-root\"));\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));\n        assert_eq!(command.model().map(ModelName::as_str), Some(\"gpt-5.5\"));"
+        "citation": "assert_eq!(command.scope(), \"cli_driver\");\n        assert_eq!(command.briefing_file(), Path::new(\"tmp/reviewer-runtime/briefing.md\"));\n        assert_eq!(command.track_id(), \"review-fix-command-2026\");\n        assert_eq!(command.repository_root(), PathBuf::from(\"/test-resolved-root\"));\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));\n        assert_eq!(command.model().map(ModelName::as_str), Some(\"gpt-5.5\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -230,13 +230,13 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "a28344202d2e639ebe84f06a04361ffe1dcb67ceb3c112e33fba016c06e46c29",
-        "declaration_hash": "1f74abea2f6c4a44670ede31c783bea0fe781875880a1ccf74ed5fe7282dc4ec",
+        "bound_tests_set_hash": "623fff73989a17d651edfb8217ee754e5ec6156d95a7ac56a519b19cd262e43e",
+        "declaration_hash": "60979f512300ccaabafcb1c879953d746c0a9880b7f62b4b0e91a4fadae1e42f",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(command.scope(), \"cli_driver \");\n        assert_eq!(command.track_id(), \"driver-interactor-2026\");\n        assert_eq!(command.repository_root(), PathBuf::from(\"/test-repository\"));\n        assert_eq!(command.briefing_content().as_str(), \"trusted loader content\");\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));\n        assert_eq!(command.model().map(ModelName::as_str), Some(\"gpt-5.5\"));"
+        "citation": "assert_eq!(command.scope(), \"cli_driver\");\n        assert_eq!(command.briefing_file(), Path::new(\"tmp/reviewer-runtime/briefing.md\"));\n        assert_eq!(command.track_id(), \"review-fix-command-2026\");\n        assert_eq!(command.repository_root(), PathBuf::from(\"/test-resolved-root\"));\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));\n        assert_eq!(command.model().map(ModelName::as_str), Some(\"gpt-5.5\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -248,7 +248,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -266,13 +266,13 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "aceb1fef80372737387704a07757937225d1bf814c0591a5b2ce073bd0f20c5a",
+        "bound_tests_set_hash": "4bc46b348044345a7cb3fb7d31fe7a1d790b28a987880911fe7df733773646da",
         "declaration_hash": "af3912ea7d91b317df190cea278b062dbcecd885b49faccc050cba2c365a84d8",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));\nassert_eq!(outcome.stderr, None);\nassert!(*service.received.lock().expect(\"test mutex must not be poisoned\"));\nassert_ne!(outcome.exit_code, 0, \"{case} must return a non-zero outcome\");\nassert!(outcome.stderr.as_deref().is_some_and(|message| { message.contains(expected_field) }));"
+        "citation": "assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));\nassert_eq!(outcome.stderr, None); ... assert_ne!(outcome.exit_code, 0, \"{case} must return a non-zero outcome\"); ... assert!(outcome.stderr.as_deref().is_some_and(|message| { message.contains(expected_field) }));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -295,6 +295,11 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
           "test_name": "test_review_fix_driver_renders_typed_track_mismatch_as_nonzero_outcome"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_rejects_empty_explicit_track_id_with_focused_validation_error"
         }
       ]
     },
@@ -312,13 +317,13 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "adebb0a742f1bb4e80fbe2d83a2017b276284dda88800e0435ee26313a0c0963",
+        "bound_tests_set_hash": "555e0f7810f0f5c94b68b0be0192904fb10690a1eaee2bf4e02ab4d7d8e8211a",
         "declaration_hash": "af3912ea7d91b317df190cea278b062dbcecd885b49faccc050cba2c365a84d8",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));\n        assert_eq!(outcome.stderr, None); ... assert_ne!(outcome.exit_code, 0, \"{case} must return a non-zero outcome\");\n            assert!(\n                outcome\n                    .stderr\n                    .as_deref()\n                    .is_some_and(|message| { message.contains(expected_field) }),\n                \"{case} must identify its invalid field\"\n            ); ... assert!(\n            *accepted_service.received.lock().expect(\"test mutex must not be poisoned\"),\n            \"case-insensitive other must reach the usecase boundary\"\n        ); ... assert_eq!(command.scope(), \" cli_driver \");\n        assert_eq!(command.track_id(), \"driver-interactor-2026\");\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));"
+        "citation": "assert_ne!(outcome.exit_code, 0, \"{case} must return a non-zero outcome\"); ... message.contains(expected_field) ... assert!(*accepted_service.received.lock().expect(\"test mutex must not be poisoned\"), \"case-insensitive other must reach the usecase boundary\"); ... assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -340,7 +345,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -14311,13 +14316,13 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "a28344202d2e639ebe84f06a04361ffe1dcb67ceb3c112e33fba016c06e46c29",
-        "declaration_hash": "1f74abea2f6c4a44670ede31c783bea0fe781875880a1ccf74ed5fe7282dc4ec",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "bound_tests_set_hash": "623fff73989a17d651edfb8217ee754e5ec6156d95a7ac56a519b19cd262e43e",
+        "declaration_hash": "60979f512300ccaabafcb1c879953d746c0a9880b7f62b4b0e91a4fadae1e42f",
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(command.scope(), \"cli_driver \");\n        assert_eq!(command.track_id(), \"driver-interactor-2026\");\n        assert_eq!(command.repository_root(), PathBuf::from(\"/test-repository\"));\n        assert_eq!(command.briefing_content().as_str(), \"trusted loader content\");\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));\n        assert_eq!(command.model().map(ModelName::as_str), Some(\"gpt-5.5\"));"
+        "citation": "assert_eq!(command.scope(), \" cli_driver \");\n        assert_eq!(command.track_id(), \"driver-interactor-2026\");\n        assert_eq!(command.repository_root(), PathBuf::from(\"/test-repository\"));\n        assert_eq!(command.briefing_file(), Path::new(\"tmp/reviewer-runtime/briefing.md\"));\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));\n        assert_eq!(command.model().map(ModelName::as_str), Some(\"gpt-5.5\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14329,7 +14334,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -14349,11 +14354,11 @@
       "key": {
         "bound_tests_set_hash": "ef29e06eb6cfd44e155677a860475e2fb0cdc31e5c55829eaab5629fcecb6236",
         "declaration_hash": "01b169d0c65914b5c7ced56763494e5563d7a2b0061cd8ba429af287527512fe",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(error, RunReviewFixCommandValidationError::InvalidScope(_))); ... assert!(matches!(error, RunReviewFixCommandValidationError::InvalidTrackId(_))); ... assert!(matches!(error, RunReviewFixCommandValidationError::InvalidRoundType(_))); ... assert!(matches!(result, Err(RunReviewFixCommandValidationError::InvalidModel(_))));"
+        "citation": "match expected_field {\n                \"invalid review-fix scope\" => {\n                    assert!(matches!(error, RunReviewFixCommandValidationError::InvalidScope(_)));\n                }\n                \"invalid review-fix track ID\" => {\n                    assert!(matches!(error, RunReviewFixCommandValidationError::InvalidTrackId(_)));\n                }\n                \"invalid review-fix round type\" => {\n                    assert!(matches!(\n                        error,\n                        RunReviewFixCommandValidationError::InvalidRoundType(_)\n                    ));\n                }\n                _ => panic!(\"test case must declare a known validation field\"),\n            }\n\nassert!(matches!(result, Err(RunReviewFixCommandValidationError::InvalidModel(_))));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14549,11 +14554,11 @@
       "key": {
         "bound_tests_set_hash": "f5f9d1d72218f63d4885481a7a2bca278411e90b63eb24348fb8f9491b06a33b",
         "declaration_hash": "af3912ea7d91b317df190cea278b062dbcecd885b49faccc050cba2c365a84d8",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(*service.received.lock().expect(\"test mutex must not be poisoned\"));\nassert_eq!(outcome.exit_code, 0);\nassert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));\nassert_eq!(outcome.stderr.as_deref(), Some(\"runner completed\"));\n\nassert!(\n    !*service.received.lock().expect(\"test mutex must not be poisoned\"),\n    \"invalid raw input must be rejected before the injected service runs\"\n);"
+        "citation": "assert!(*service.received.lock().expect(\"test mutex must not be poisoned\"));\n        assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));\n        assert_eq!(outcome.stderr.as_deref(), Some(\"runner completed\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14583,13 +14588,13 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "eb7dc2978248d25b52b3534d810d496e973815e2645908a4d7dd357c7c576826",
+        "bound_tests_set_hash": "3e41634c5dc22f6e091709f268bbc8804dc5a887ba47f13784551db25087d3db",
         "declaration_hash": "af3912ea7d91b317df190cea278b062dbcecd885b49faccc050cba2c365a84d8",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"assert_eq!(accepted.exit_code, 0);\" ... \"assert!(\\n            *accepted_service.received.lock().expect(\\\"test mutex must not be poisoned\\\"),\\n            \\\"case-insensitive other must reach the usecase boundary\\\"\\n        );\" ... \"assert_ne!(outcome.exit_code, 0, \\\"{case} must return a non-zero outcome\\\");\" ... \"message.contains(expected_field)\" ... \"assert_eq!(outcome.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);\" ... \"assert_eq!(outcome.stdout.as_deref(),\\n            Some(\\n                \\\"SUBAGENT_DISPATCH_REQUIRED\\\\n{\\\\\\\"agent\\\\\\\":\\\\\\\"review-fix-lead\\\\\\\",\\\\\\\"model\\\\\\\":\\\\\\\"gpt-5.5\\\\\\\",\\\\\\\"effort\\\\\\\":\\\\\\\"high\\\\\\\",\\\\\\\"scope\\\\\\\":\\\\\\\"cli_driver\\\\\\\",\\\\\\\"briefing_content\\\\\\\":\\\\\\\"validated briefing\\\\\\\\ncontent\\\\\\\",\\\\\\\"track_id\\\\\\\":\\\\\\\"dispatch-driver-2026\\\\\\\",\\\\\\\"repository_root\\\\\\\":\\\\\\\"/resolver/proven/root\\\\\\\",\\\\\\\"round_type\\\\\\\":\\\\\\\"final\\\\\\\"}\\\"\\n            )\\n        );\""
+        "citation": "assert_eq!(accepted.exit_code, 0); ... assert!(*accepted_service.received.lock().expect(\"test mutex must not be poisoned\"), \"case-insensitive other must reach the usecase boundary\"); ... assert_ne!(outcome.exit_code, 0, \"{case} must return a non-zero outcome\"); ... message.contains(expected_field) ... assert!(outcome.stdout.is_none()); ... message.contains(\"explicit track 'requested-track-2026' does not match current branch track 'current-track-2026'\")"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14607,6 +14612,11 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
           "test_name": "test_review_fix_driver_renders_validated_dispatch_instruction_protocol"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_rejects_empty_explicit_track_id_with_focused_validation_error"
         }
       ]
     },
@@ -14624,13 +14634,13 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "884c6e249504f521af275796e6a95aa86dc76ff41e5a695253463e726c05b6ac",
+        "bound_tests_set_hash": "5848b9264c0d2dadc4ec7ea9f9800c8d79218828bc54fc5c38ea49066ec29104",
         "declaration_hash": "af3912ea7d91b317df190cea278b062dbcecd885b49faccc050cba2c365a84d8",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(accepted.exit_code, 0); ... assert!(*accepted_service.received.lock().expect(\"test mutex must not be poisoned\"), \"case-insensitive other must reach the usecase boundary\"); ... assert_ne!(outcome.exit_code, 0, \"{case} must return a non-zero outcome\"); ... message.contains(expected_field) ... assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));"
+        "citation": "assert_ne!(outcome.exit_code, 0, \"{case} must return a non-zero outcome\");\n            assert!(\n                outcome\n                    .stderr\n                    .as_deref()\n                    .is_some_and(|message| { message.contains(expected_field) }),\n                \"{case} must identify its invalid field\"\n            );\n\nassert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));\n        assert_eq!(outcome.stderr, None);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14642,7 +14652,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -14662,7 +14672,7 @@
       "key": {
         "bound_tests_set_hash": "ca541da14b33d210c60838d25bc71cf8d544a4bd44b2a814d227fdfa269840f0",
         "declaration_hash": "0b33671e9049b94929485021f975ae99d922cda65b6d94197d155507e8055938",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -14755,11 +14765,11 @@
       "key": {
         "bound_tests_set_hash": "d8d2ba02298bf232c9719058050212cc1d1b34fc02e069bace740f188a057cf6",
         "declaration_hash": "c8218dc8d3be16840b6f226fde06987400d89d07caf4416e16384bb6ef494132",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"constructing the root and its production driver must not execute a use case\""
+        "citation": "assert_eq!(\n            invocations.load(Ordering::SeqCst),\n            0,\n            \"constructing the root and its production driver must not execute a use case\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14784,13 +14794,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "075de9714cdb8fa38a3a29627e74a76219806dd639105458b54c52e44cf8f1fb",
-        "declaration_hash": "4a3dbe492c425a2d351592b67afd71fb29afeeaede9128dc746b452d51001159",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "bound_tests_set_hash": "17c263906433433423055a375e65a4ebcbebb92cd734c236c241519414739d7e",
+        "declaration_hash": "69d5576e14840c9b408b0bd1fc260f6a90f5477d0131349e939dd3fb8f83db16",
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let output = interactor\n            .run(request_with(None, \"track/items/active\"))\n            .expect(\"a resolved branch must reach the runner\");\n\n        assert_eq!(output.status, \"completed\");\n        assert_eq!(calls.load(Ordering::SeqCst), 1);"
+        "citation": "let interactor = RunReviewFixInteractor::new(\n            Arc::new(resolver),\n            Arc::new(RecordingRunner { calls: calls.clone(), commands: commands.clone() }),\n        );\n\n        let output = interactor\n            .run(request_with(None, \"track/items/active\"))\n            .expect(\"a resolved branch must reach the runner\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14822,7 +14832,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         },
         {
           "layer": "cli_composition",
@@ -14850,13 +14860,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "075de9714cdb8fa38a3a29627e74a76219806dd639105458b54c52e44cf8f1fb",
-        "declaration_hash": "4a3dbe492c425a2d351592b67afd71fb29afeeaede9128dc746b452d51001159",
+        "bound_tests_set_hash": "17c263906433433423055a375e65a4ebcbebb92cd734c236c241519414739d7e",
+        "declaration_hash": "69d5576e14840c9b408b0bd1fc260f6a90f5477d0131349e939dd3fb8f83db16",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"constructing the root and its production driver must not execute a use case\""
+        "citation": "let error = match interactor\n            .run(request_with(Some(\"different-track-2026\"), \"track/items/active\")) {\n            Err(error) => error,\n            Ok(_) => panic!(\"an explicit ID different from the branch must fail closed\"),\n        };\n\n        assert!(matches!(\n            error,\n            RunReviewFixError::TrackMismatch { explicit, resolved }\n                if explicit.as_str() == \"different-track-2026\"\n                    && resolved.as_str() == \"resolved-track-2026\"\n        ));\n        assert_eq!(calls.load(Ordering::SeqCst), 0, \"mismatch must not invoke the runner\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14888,7 +14898,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         },
         {
           "layer": "cli_composition",
@@ -14916,13 +14926,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "075de9714cdb8fa38a3a29627e74a76219806dd639105458b54c52e44cf8f1fb",
-        "declaration_hash": "4a3dbe492c425a2d351592b67afd71fb29afeeaede9128dc746b452d51001159",
+        "bound_tests_set_hash": "17c263906433433423055a375e65a4ebcbebb92cd734c236c241519414739d7e",
+        "declaration_hash": "69d5576e14840c9b408b0bd1fc260f6a90f5477d0131349e939dd3fb8f83db16",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let interactor = RunReviewFixInteractor::new(\n            Arc::new(resolver),\n            Arc::new(FixedBriefingLoader),\n            Arc::new(RecordingRunner { calls: calls.clone(), commands: commands.clone() }),\n        );"
+        "citation": "let interactor = RunReviewFixInteractor::new(\n            Arc::new(resolver),\n            Arc::new(RecordingRunner { calls: calls.clone(), commands: commands.clone() }),\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -14954,7 +14964,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         },
         {
           "layer": "cli_composition",
@@ -14973,7 +14983,7 @@
         "entry_key": "ReviewFixTrackResolverPort",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
+          "element_id": "CN-09"
         }
       },
       "obligation_id": {
@@ -14982,135 +14992,135 @@
         "item_identifier": "trait_method:resolve_current_track"
       },
       "key": {
-        "bound_tests_set_hash": "177b050a4c6ac81e808ca36d06094299549ed53f2b38e4be214217fd6c84a98e",
-        "declaration_hash": "e5a6e3b5db6cf639d8a4e21b8ad8c5579a942accbde79ace649822b644539be2",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "bound_tests_set_hash": "860d23aa39085a7b0e11daec3fb01a5e26681dab38d0013158a4ffd90d295fc9",
+        "declaration_hash": "61c5c749b5606308600d2bd1b1f279e3f62b85d923a8611372c3e312b9ba8bb0",
+        "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let track = port\n            .resolve_current_track(Path::new(\"track/items/active\"))\n            .expect(\"the port double must expose the resolved track\");\n\n        assert_eq!(track.track_id().as_str(), \"resolved-track-2026\");\n        assert_eq!(track.repository_root(), PathBuf::from(\"/test-repository\"));\n        assert_eq!(\n            resolver.requested_items_dirs.lock().expect(\"test lock\").as_slice(),\n            [PathBuf::from(\"track/items/active\")]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_review_fix_track_resolver_port_double_receives_items_dir_and_returns_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_resolves_active_track_branch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_run_review_fix_interactor_returns_non_track_branch_error_without_running"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_validates_raw_input_invokes_service_and_renders_outcome"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_rejects_full_raw_validation_matrix_without_invoking_service"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::shim::tests",
+          "test_name": "test_review_composition_root_review_fix_driver_factory_is_wire_only"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_fix_driver_codex_completed_status_returns_command_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewFixTrackResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-19"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewFixTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_current_track"
+      },
+      "key": {
+        "bound_tests_set_hash": "860d23aa39085a7b0e11daec3fb01a5e26681dab38d0013158a4ffd90d295fc9",
+        "declaration_hash": "61c5c749b5606308600d2bd1b1f279e3f62b85d923a8611372c3e312b9ba8bb0",
+        "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let track = port\n            .resolve_current_track(Path::new(\"track/items/active\"))\n            .expect(\"the port double must expose the resolved track\");\n\n        assert_eq!(track.track_id().as_str(), \"resolved-track-2026\");\n        assert_eq!(track.repository_root(), PathBuf::from(\"/test-repository\"));\n        assert_eq!(\n            resolver.requested_items_dirs.lock().expect(\"test lock\").as_slice(),\n            [PathBuf::from(\"track/items/active\")]\n        );\n\nlet resolved = GitReviewFixTrackResolver\n            .resolve_current_track(&dir.path().join(\"track/items\"))\n            .expect(\"a track branch must resolve from the items directory\");\n\nassert_eq!(resolved.track_id().as_str(), \"review-fix-resolution-2026\");\n\nlet error = match interactor.run(request_with(None, \"track/items/active\")) {\n            Err(error) => error,\n            Ok(_) => panic!(\"a non-track branch must fail closed\"),\n        };\n\nassert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_review_fix_track_resolver_port_double_receives_items_dir_and_returns_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_resolves_active_track_branch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_run_review_fix_interactor_returns_non_track_branch_error_without_running"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_validates_raw_input_invokes_service_and_renders_outcome"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_rejects_full_raw_validation_matrix_without_invoking_service"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::shim::tests",
+          "test_name": "test_review_composition_root_review_fix_driver_factory_is_wire_only"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_fix_driver_codex_completed_status_returns_command_outcome"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ReviewFixTrackResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ReviewFixTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_current_track"
+      },
+      "key": {
+        "bound_tests_set_hash": "860d23aa39085a7b0e11daec3fb01a5e26681dab38d0013158a4ffd90d295fc9",
+        "declaration_hash": "61c5c749b5606308600d2bd1b1f279e3f62b85d923a8611372c3e312b9ba8bb0",
+        "anchor_text_hash": "8ff761daa1c64e174cd3b3dc79bdfc8f69c516bdf1714145790f55e3a9992a17"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "let resolved = GitReviewFixTrackResolver\n            .resolve_current_track(&dir.path().join(\"track/items\"))\n            .expect(\"a track branch must resolve from the items directory\");\n\n        assert_eq!(resolved.track_id().as_str(), \"review-fix-resolution-2026\");\n        assert_eq!(\n            resolved.repository_root(),\n            dir.path().canonicalize().expect(\"fixture repository root must canonicalize\")\n        );"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_review_fix_track_resolver_port_double_receives_items_dir_and_returns_track"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_git_review_fix_track_resolver_resolves_active_track_branch"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_run_review_fix_interactor_returns_non_track_branch_error_without_running"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_validates_raw_input_invokes_service_and_renders_outcome"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_rejects_full_raw_validation_matrix_without_invoking_service"
-        },
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::shim::tests",
-          "test_name": "test_review_composition_root_review_fix_driver_factory_is_wire_only"
-        },
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::tests",
-          "test_name": "review_fix_driver_codex_completed_status_returns_command_outcome"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "ReviewFixTrackResolverPort",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-09"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ReviewFixTrackResolverPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:resolve_current_track"
-      },
-      "key": {
-        "bound_tests_set_hash": "177b050a4c6ac81e808ca36d06094299549ed53f2b38e4be214217fd6c84a98e",
-        "declaration_hash": "e5a6e3b5db6cf639d8a4e21b8ad8c5579a942accbde79ace649822b644539be2",
-        "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let track = port\n            .resolve_current_track(Path::new(\"track/items/active\"))\n            .expect(\"the port double must expose the resolved track\");\n\n        assert_eq!(track.track_id().as_str(), \"resolved-track-2026\");\n        assert_eq!(track.repository_root(), PathBuf::from(\"/test-repository\"));\n        assert_eq!(\n            resolver.requested_items_dirs.lock().expect(\"test lock\").as_slice(),\n            [PathBuf::from(\"track/items/active\")]\n        );\n\n        let resolved = GitReviewFixTrackResolver\n            .resolve_current_track(&dir.path().join(\"track/items\"))\n            .expect(\"a track branch must resolve from the items directory\");\n\n        assert_eq!(resolved.track_id().as_str(), \"review-fix-resolution-2026\");\n        assert_eq!(\n            resolved.repository_root(),\n            dir.path().canonicalize().expect(\"fixture repository root must canonicalize\")\n        );\n\n        assert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_review_fix_track_resolver_port_double_receives_items_dir_and_returns_track"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_git_review_fix_track_resolver_resolves_active_track_branch"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_run_review_fix_interactor_returns_non_track_branch_error_without_running"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_validates_raw_input_invokes_service_and_renders_outcome"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_rejects_full_raw_validation_matrix_without_invoking_service"
-        },
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::shim::tests",
-          "test_name": "test_review_composition_root_review_fix_driver_factory_is_wire_only"
-        },
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::tests",
-          "test_name": "review_fix_driver_codex_completed_status_returns_command_outcome"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "ReviewFixTrackResolverPort",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-19"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ReviewFixTrackResolverPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:resolve_current_track"
-      },
-      "key": {
-        "bound_tests_set_hash": "177b050a4c6ac81e808ca36d06094299549ed53f2b38e4be214217fd6c84a98e",
-        "declaration_hash": "e5a6e3b5db6cf639d8a4e21b8ad8c5579a942accbde79ace649822b644539be2",
-        "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let port: &dyn ReviewFixTrackResolverPort = &resolver;\n\n        let track = port\n            .resolve_current_track(Path::new(\"track/items/active\"))\n            .expect(\"the port double must expose the resolved track\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -15463,13 +15473,13 @@
         "item_identifier": "trait_method:run"
       },
       "key": {
-        "bound_tests_set_hash": "21364e5a8e218cb31a90db12b65c5f35a8528a73b5aafdb9c73d95e6bc09c723",
+        "bound_tests_set_hash": "778a4a08fc21c5505bf6bed0a61ae2fa4ccc6167eaa03b39419e403a64c50b07",
         "declaration_hash": "111c83b134a8093641a6c083ed304b9f3a79570b46cb7c9f9bb1def4c3239faa",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(output.status, \"completed\");\n        assert_eq!(calls.load(Ordering::SeqCst), 1);"
+        "citation": "assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout.as_deref(), Some(\"REVIEW_FIX_STATUS: completed\"));\n        assert_eq!(outcome.stderr, None);\n        assert_eq!(\n            *resolver.received_items_dirs.lock().expect(\"test mutex must not be poisoned\"),\n            vec![PathBuf::from(\"track/items/driver-interactor\")]\n        );\n        let command = runner\n            .received_commands\n            .lock()\n            .expect(\"test mutex must not be poisoned\")\n            .pop()\n            .expect(\"resolved command must reach the runner\");\n        assert_eq!(command.scope(), \" cli_driver \");\n        assert_eq!(command.track_id(), \"driver-interactor-2026\");\n        assert_eq!(command.repository_root(), PathBuf::from(\"/test-repository\"));\n        assert_eq!(command.briefing_file(), Path::new(\"tmp/reviewer-runtime/briefing.md\"));\n        assert!(matches!(command.round_type(), ReviewRoundType::Final));\n        assert_eq!(command.model().map(ModelName::as_str), Some(\"gpt-5.5\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -15491,7 +15501,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -15509,13 +15519,13 @@
         "item_identifier": "trait_method:run"
       },
       "key": {
-        "bound_tests_set_hash": "21364e5a8e218cb31a90db12b65c5f35a8528a73b5aafdb9c73d95e6bc09c723",
+        "bound_tests_set_hash": "778a4a08fc21c5505bf6bed0a61ae2fa4ccc6167eaa03b39419e403a64c50b07",
         "declaration_hash": "111c83b134a8093641a6c083ed304b9f3a79570b46cb7c9f9bb1def4c3239faa",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"expect(\\\"the primary service port must invoke the resolved runner\\\");\"; \"assert_eq!(calls.load(Ordering::SeqCst), 1);\"; \"RunReviewFixError::TrackMismatch { explicit, resolved }\"; \"mismatch must not invoke the runner\"; \"RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\""
+        "citation": "`let output = service\n            .run(request_with(None, \"track/items/service\"))\n            .expect(\"the primary service port must invoke the resolved runner\");` … `assert_eq!(calls.load(Ordering::SeqCst), 1);` and `let error = match interactor\n            .run(request_with(Some(\"different-track-2026\"), \"track/items/active\"))` … `assert_eq!(calls.load(Ordering::SeqCst), 0, \"mismatch must not invoke the runner\");` and `let error = match interactor.run(request_with(None, \"track/items/active\"))` … `assert_eq!(\n            calls.load(Ordering::SeqCst),\n            0,\n            \"resolution failure must not invoke the runner\"\n        );`"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -15537,7 +15547,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -15555,13 +15565,13 @@
         "item_identifier": "trait_method:run"
       },
       "key": {
-        "bound_tests_set_hash": "21364e5a8e218cb31a90db12b65c5f35a8528a73b5aafdb9c73d95e6bc09c723",
+        "bound_tests_set_hash": "778a4a08fc21c5505bf6bed0a61ae2fa4ccc6167eaa03b39419e403a64c50b07",
         "declaration_hash": "111c83b134a8093641a6c083ed304b9f3a79570b46cb7c9f9bb1def4c3239faa",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let output = service\n            .run(request_with(None, \"track/items/service\"))\n            .expect(\"the primary service port must invoke the resolved runner\");\n\n        assert_eq!(output.status, \"completed\");\n        assert_eq!(calls.load(Ordering::SeqCst), 1);"
+        "citation": "\"the primary service port must invoke the resolved runner\"; \"assert_eq!(output.status, \\\"completed\\\");\"; \"mismatch must not invoke the runner\"; \"resolution failure must not invoke the runner\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -15583,7 +15593,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -16629,13 +16639,13 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "231ec84534678eb26db0db6026d4e7f0d47e33955cd7397b8fdd60893c0bab58",
+        "bound_tests_set_hash": "dcb79dc02000ea1bcc8649d64db1bdcf5118aaf8ca3886f537eff0a53f1054e3",
         "declaration_hash": "b16347fdf0cf803577fd702637b5a1d92c7c2aa0bc029005289c53aacde31cec",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(smoke.stderr.as_deref(), Some(\"[ERROR] smoke test failed: sandbox\"));\n        assert_ne!(spawn.exit_code, 0);\n        assert!(spawn.stderr.as_deref().is_some_and(|message| message.contains(\"spawn failed\")));\n        assert_ne!(sentinel.exit_code, 0);"
+        "citation": "let smoke = render(ReviewFixRunnerError::SmokeTestFailed(DiagnosticText::new(\"sandbox\"))); ... let unexpected = render(ReviewFixRunnerError::Unexpected(DiagnosticText::new(\"unexpected\")));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -16665,13 +16675,13 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "b9b23f37e4ceb4b9e8b2ea7f3478b1c7e92c2aa203ce2e8b62787d4435430699",
+        "bound_tests_set_hash": "2faeb77bdce6aceb162702cdeded66cc1497cfb2c5df688131bb4f6a566f9fd1",
         "declaration_hash": "b16347fdf0cf803577fd702637b5a1d92c7c2aa0bc029005289c53aacde31cec",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let smoke = render(ReviewFixRunnerError::SmokeTestFailed(DiagnosticText::new(\"sandbox\"))); ... let spawn = render(ReviewFixRunnerError::SpawnFailed(DiagnosticText::new(\"spawn\"))); ... let sentinel =\n            render(ReviewFixRunnerError::SentinelNotFound(DiagnosticText::new(\"sentinel\"))); ... let dispatch = render(ReviewFixRunnerError::SubagentDispatchRequired(Box::new( ... ))); ... let unexpected =\n            render(ReviewFixRunnerError::Unexpected(DiagnosticText::new(\"unexpected\")));"
+        "citation": "let smoke = render(ReviewFixRunnerError::SmokeTestFailed(DiagnosticText::new(\"sandbox\"))); ... let spawn = render(ReviewFixRunnerError::SpawnFailed(DiagnosticText::new(\"spawn\"))); ... let sentinel = render(ReviewFixRunnerError::SentinelNotFound(DiagnosticText::new(\"sentinel\"))); ... let dispatch = render(ReviewFixRunnerError::SubagentDispatchRequired(Box::new( ... ))); ... let unexpected = render(ReviewFixRunnerError::Unexpected(DiagnosticText::new(\"unexpected\")));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -16701,13 +16711,13 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "bdc08507c500921ea36193e82b7c3c0a1600d68f15cff4b06ab050e345bafcda",
+        "bound_tests_set_hash": "a84ca4f49bfd54f8ccbf1286b98131ec2d84f57f2eff28981a11824427765965",
         "declaration_hash": "b16347fdf0cf803577fd702637b5a1d92c7c2aa0bc029005289c53aacde31cec",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            smoke_test_failure.stderr.as_deref(),\n            Some(\"[ERROR] smoke test failed: sandbox denied\")\n        );"
+        "citation": "assert_eq!(smoke_test_failure.stderr.as_deref(),\n            Some(\"[ERROR] smoke test failed: sandbox denied\")\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -16723,22 +16733,22 @@
         "entry_key": "ReviewFixTrackResolveError",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
+          "element_id": "IN-18"
         }
       },
       "obligation_id": {
         "entry_key": "ReviewFixTrackResolveError",
         "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-16"
+        "item_identifier": "voluntary:IN-18"
       },
       "key": {
-        "bound_tests_set_hash": "a6299421fc6e86088450c9404ed41d67dca3d4cfeedcb440ee5a432734036bcd",
-        "declaration_hash": "2765ba90dd31be4d57f11cfaf77e165f3f4e22d1e8795023abd20741d19beb6e",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "bound_tests_set_hash": "2fe0bfe4c5c6f0307bfdad035bdaf314f6a63b2e482b567a32efef2a91bccf5e",
+        "declaration_hash": "aab444fb7a2bb03b2033cd1fce1c44382bc116d0202bd1db58431197ea29150c",
+        "anchor_text_hash": "8ff761daa1c64e174cd3b3dc79bdfc8f69c516bdf1714145790f55e3a9992a17"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "            Err(error) => error,\n            Ok(_) => panic!(\"a non-track branch must fail closed\"),\n        };\n\n        assert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));"
+        "citation": "assert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -16763,8 +16773,8 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "a6299421fc6e86088450c9404ed41d67dca3d4cfeedcb440ee5a432734036bcd",
-        "declaration_hash": "2765ba90dd31be4d57f11cfaf77e165f3f4e22d1e8795023abd20741d19beb6e",
+        "bound_tests_set_hash": "2fe0bfe4c5c6f0307bfdad035bdaf314f6a63b2e482b567a32efef2a91bccf5e",
+        "declaration_hash": "aab444fb7a2bb03b2033cd1fce1c44382bc116d0202bd1db58431197ea29150c",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
@@ -16794,8 +16804,8 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "a6299421fc6e86088450c9404ed41d67dca3d4cfeedcb440ee5a432734036bcd",
-        "declaration_hash": "2765ba90dd31be4d57f11cfaf77e165f3f4e22d1e8795023abd20741d19beb6e",
+        "bound_tests_set_hash": "2fe0bfe4c5c6f0307bfdad035bdaf314f6a63b2e482b567a32efef2a91bccf5e",
+        "declaration_hash": "aab444fb7a2bb03b2033cd1fce1c44382bc116d0202bd1db58431197ea29150c",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
@@ -16825,13 +16835,13 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "b64c635ce10247c4755742cd7900d0ee7412cd48be54216f504285d24d099b4e",
+        "bound_tests_set_hash": "a8a7b4c74bae6fbe53ac92ffe00b0e20ba565cf83feacaa67ba5f32ec363af53",
         "declaration_hash": "8c578f598abe95eebf08e925a6df760773a556611af9ae4c394fd0b27521e92c",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(invalid_scope.exit_code, 0);\n        assert!(\n            invalid_scope\n                .stderr\n                .as_deref()\n                .is_some_and(|message| message.contains(\"invalid review-fix scope\"))\n        );"
+        "citation": "assert!(\n            *accepted_service.received.lock().expect(\"test mutex must not be poisoned\"),\n            \"catch-all other must not be a scope validation error\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -16918,13 +16928,13 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "b64c635ce10247c4755742cd7900d0ee7412cd48be54216f504285d24d099b4e",
+        "bound_tests_set_hash": "a8a7b4c74bae6fbe53ac92ffe00b0e20ba565cf83feacaa67ba5f32ec363af53",
         "declaration_hash": "4f43fc5ca47ec76fcb12d6bd9df2e5d44d7078fd127a82d5055ead89bef5276b",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(invalid_track.exit_code, 0);\n        assert!(\n            invalid_track\n                .stderr\n                .as_deref()\n                .is_some_and(|message| message.contains(\"invalid review-fix track ID\"))\n        );"
+        "citation": "assert!(\n            !*service.received.lock().expect(\"test mutex must not be poisoned\"),\n            \"invalid raw values must not invoke the injected service\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -16949,13 +16959,13 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "b64c635ce10247c4755742cd7900d0ee7412cd48be54216f504285d24d099b4e",
+        "bound_tests_set_hash": "0d3d423a98896013fa33eec71ae7a770e5812898e586d6788c47b59aa9f64ad5",
         "declaration_hash": "4f43fc5ca47ec76fcb12d6bd9df2e5d44d7078fd127a82d5055ead89bef5276b",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(invalid_track.exit_code, 0); assert!(invalid_track.stderr.as_deref().is_some_and(|message| message.contains(\"invalid review-fix track ID\")));"
+        "citation": "let error = ReviewTrackId::try_new(String::new())\n            .expect_err(\"an empty track ID must be rejected at the usecase boundary\");\n\n        assert!(matches!(&error, ReviewTrackIdValidationError::Invalid(_)));\n        assert!(error.to_string().contains(\"invalid review track ID\"));\n\n        assert_ne!(invalid_track.exit_code, 0);\n        assert!(\n            invalid_track\n                .stderr\n                .as_deref()\n                .is_some_and(|message| message.contains(\"invalid review-fix track ID\"))\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -16963,6 +16973,11 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
           "test_name": "test_review_fix_driver_renders_raw_validation_and_interactor_error_boundaries"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_review_track_id_rejects_empty_value_with_focused_validation_error"
         }
       ]
     },
@@ -17011,13 +17026,13 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "b64c635ce10247c4755742cd7900d0ee7412cd48be54216f504285d24d099b4e",
+        "bound_tests_set_hash": "a8a7b4c74bae6fbe53ac92ffe00b0e20ba565cf83feacaa67ba5f32ec363af53",
         "declaration_hash": "0059d222b996894afe19c7a4e8586f14d8bd25a4730b0e73adeeee0bc170cdb6",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(invalid_scope.exit_code, 0);\n        assert!(\n            invalid_scope\n                .stderr\n                .as_deref()\n                .is_some_and(|message| message.contains(\"invalid review-fix scope\"))\n        );\n        assert_ne!(invalid_track.exit_code, 0);\n        assert!(\n            invalid_track\n                .stderr\n                .as_deref()\n                .is_some_and(|message| message.contains(\"invalid review-fix track ID\"))\n        );"
+        "citation": "assert_ne!(invalid_scope.exit_code, 0);\nassert!(\n    invalid_scope\n        .stderr\n        .as_deref()\n        .is_some_and(|message| message.contains(\"invalid review-fix scope\"))\n);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17104,13 +17119,13 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "7a96a09c320cbe7978b5af60bba9836d872f628c55591992e7668f355a98f8e3",
-        "declaration_hash": "c341e5b3d230894f4dff96e5b5868870f026646a41f41ea83d60965fd7dbbfc2",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "bound_tests_set_hash": "ef3108a7b7f4e5cc2198d15e688bda3e91000458be9e8322de349711327af88f",
+        "declaration_hash": "f6beb5b619848db86a6d105071fc4a161a9a4bf2b102eb038e6971dad82aca35",
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            error,\n            RunReviewFixError::TrackMismatch { explicit, resolved }\n                if explicit.as_str() == \"different-track-2026\"\n                    && resolved.as_str() == \"resolved-track-2026\"\n        ));\n\nassert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));\n\nassert!(matches!(\n            error,\n            RunReviewFixError::BriefingLoad(ReviewFixBriefingLoadError::UntrustedFile(detail))\n                if detail.as_str() == \"symlinked intermediate component\"\n        ));\n\nassert!(matches!(\n            smoke_failure,\n            Err(RunReviewFixError::FixRunnerFailed(ReviewFixRunnerError::SmokeTestFailed(message)))\n                if message.as_str() == \"smoke detail\"\n        ));"
+        "citation": "assert!(matches!(error, RunReviewFixError::TrackMismatch { explicit, resolved } if explicit.as_str() == \"different-track-2026\" && resolved.as_str() == \"resolved-track-2026\"));\n\nassert!(matches!(error, RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail)) if detail.as_str() == \"main\"));\n\nassert!(matches!(smoke_failure, Err(RunReviewFixError::FixRunnerFailed(ReviewFixRunnerError::SmokeTestFailed(message))) if message.as_str() == \"smoke detail\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17128,11 +17143,6 @@
           "layer": "usecase",
           "module_path": "usecase::review_v2::run_review_fix::tests",
           "test_name": "test_run_review_fix_interactor_preserves_all_runner_error_variants"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_run_review_fix_interactor_propagates_briefing_load_error_without_running"
         },
         {
           "layer": "cli_driver",
@@ -17155,13 +17165,13 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "faa6cb885d9c89fef4caa6b57f0eb6fd4357da11a7d6b741a4fc2bd75db89e10",
-        "declaration_hash": "c341e5b3d230894f4dff96e5b5868870f026646a41f41ea83d60965fd7dbbfc2",
+        "bound_tests_set_hash": "2381a33ce0fc9276ce99c992fc937de6cfe7249f03157afd3c6f789924c64749",
+        "declaration_hash": "f6beb5b619848db86a6d105071fc4a161a9a4bf2b102eb038e6971dad82aca35",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            error,\n            RunReviewFixError::TrackMismatch { explicit, resolved }\n                if explicit.as_str() == \"different-track-2026\"\n                    && resolved.as_str() == \"resolved-track-2026\"\n        ));\n        assert_eq!(calls.load(Ordering::SeqCst), 0, \"mismatch must not invoke the runner\");\n\n        assert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));\n        assert_eq!(\n            calls.load(Ordering::SeqCst),\n            0,\n            \"resolution failure must not invoke the runner\"\n        );"
+        "citation": "assert!(matches!(\n            error,\n            RunReviewFixError::TrackMismatch { explicit, resolved }\n                if explicit.as_str() == \"different-track-2026\"\n                    && resolved.as_str() == \"resolved-track-2026\"\n        ));\n        assert_eq!(calls.load(Ordering::SeqCst), 0, \"mismatch must not invoke the runner\");\n\nassert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));\n        assert_eq!(\n            calls.load(Ordering::SeqCst),\n            0,\n            \"resolution failure must not invoke the runner\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17191,13 +17201,13 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "faa6cb885d9c89fef4caa6b57f0eb6fd4357da11a7d6b741a4fc2bd75db89e10",
-        "declaration_hash": "c341e5b3d230894f4dff96e5b5868870f026646a41f41ea83d60965fd7dbbfc2",
+        "bound_tests_set_hash": "2381a33ce0fc9276ce99c992fc937de6cfe7249f03157afd3c6f789924c64749",
+        "declaration_hash": "f6beb5b619848db86a6d105071fc4a161a9a4bf2b102eb038e6971dad82aca35",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            error,\n            RunReviewFixError::TrackMismatch { explicit, resolved }\n                if explicit.as_str() == \"different-track-2026\"\n                    && resolved.as_str() == \"resolved-track-2026\"\n        ));\n        assert_eq!(calls.load(Ordering::SeqCst), 0, \"mismatch must not invoke the runner\");\n\n        assert!(matches!(\n            error,\n            RunReviewFixError::TrackResolution(ReviewFixTrackResolveError::NonTrackBranch(detail))\n                if detail.as_str() == \"main\"\n        ));\n        assert_eq!(\n            calls.load(Ordering::SeqCst),\n            0,\n            \"resolution failure must not invoke the runner\"\n        );"
+        "citation": "assert!(matches!(\n            error,\n            RunReviewFixError::TrackMismatch { explicit, resolved }\n                if explicit.as_str() == \"different-track-2026\"\n                    && resolved.as_str() == \"resolved-track-2026\"\n        ));\n        assert_eq!(calls.load(Ordering::SeqCst), 0, \"mismatch must not invoke the runner\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17210,42 +17220,6 @@
           "layer": "usecase",
           "module_path": "usecase::review_v2::run_review_fix::tests",
           "test_name": "test_run_review_fix_interactor_returns_non_track_branch_error_without_running"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "RunReviewFixRequest",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "RunReviewFixRequest",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-16"
-      },
-      "key": {
-        "bound_tests_set_hash": "ebebe2f6ecf68220ac5a0d1fdbd1154d98cd7b8512ee3099ed202f71c0f3e096",
-        "declaration_hash": "3060e2e6fa22e7ec14a6792085a9fa434e144e4f6bb28d7eddcec60579bf776e",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let request = RunReviewFixRequest::try_new(\n            \"  cli_driver  \".to_owned(),\n            PathBuf::from(\"tmp/reviewer-runtime/briefing.md\"),\n            Some(\"review-fix-command-2026\".to_owned()),\n            PathBuf::from(\"track/items\"),\n            \"final\".to_owned(),\n            Some(\"gpt-5.5\".to_owned()),\n        )\n        .expect(\"valid raw review-fix values must construct a request\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_run_review_fix_request_try_new_rejects_full_validation_matrix"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_run_review_fix_request_try_new_preserves_raw_values_and_accepts_other_catch_all"
         }
       ]
     },
@@ -17264,44 +17238,8 @@
       },
       "key": {
         "bound_tests_set_hash": "ebebe2f6ecf68220ac5a0d1fdbd1154d98cd7b8512ee3099ed202f71c0f3e096",
-        "declaration_hash": "3060e2e6fa22e7ec14a6792085a9fa434e144e4f6bb28d7eddcec60579bf776e",
+        "declaration_hash": "72bbf73978aa589555453fde9f197b6ea32fb6bae417147fb6dbb44554f168f3",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(error.to_string().contains(expected_field),\n                \"{case} must identify its invalid field: {error}\"\n            );\n            match expected_field {\n                \"invalid review-fix scope\" => {\n                    assert!(matches!(error, RunReviewFixCommandValidationError::InvalidScope(_)));\n                }\n                \"invalid review-fix track ID\" => {\n                    assert!(matches!(error, RunReviewFixCommandValidationError::InvalidTrackId(_)));\n                }\n                \"invalid review-fix round type\" => {\n                    assert!(matches!(\n                        error,\n                        RunReviewFixCommandValidationError::InvalidRoundType(_)\n                    ));\n                }"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_run_review_fix_request_try_new_rejects_full_validation_matrix"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_run_review_fix_request_try_new_preserves_raw_values_and_accepts_other_catch_all"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "RunReviewFixRequest",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-19"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "RunReviewFixRequest",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-19"
-      },
-      "key": {
-        "bound_tests_set_hash": "ebebe2f6ecf68220ac5a0d1fdbd1154d98cd7b8512ee3099ed202f71c0f3e096",
-        "declaration_hash": "3060e2e6fa22e7ec14a6792085a9fa434e144e4f6bb28d7eddcec60579bf776e",
-        "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -17323,6 +17261,42 @@
     },
     {
       "edge_id": {
+        "entry_key": "RunReviewFixRequest",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "AC-19"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RunReviewFixRequest",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-19"
+      },
+      "key": {
+        "bound_tests_set_hash": "ebebe2f6ecf68220ac5a0d1fdbd1154d98cd7b8512ee3099ed202f71c0f3e096",
+        "declaration_hash": "72bbf73978aa589555453fde9f197b6ea32fb6bae417147fb6dbb44554f168f3",
+        "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(error.to_string().contains(expected_field), \"{case} must identify its invalid field: {error}\");\n            match expected_field {\n                \"invalid review-fix scope\" => {\n                    assert!(matches!(error, RunReviewFixCommandValidationError::InvalidScope(_)));\n                }\n                \"invalid review-fix track ID\" => {\n                    assert!(matches!(error, RunReviewFixCommandValidationError::InvalidTrackId(_)));\n                }\n                \"invalid review-fix round type\" => {\n                    assert!(matches!(\n                        error,\n                        RunReviewFixCommandValidationError::InvalidRoundType(_)\n                    ));\n                }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_run_review_fix_request_try_new_rejects_full_validation_matrix"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_run_review_fix_request_try_new_preserves_raw_values_and_accepts_other_catch_all"
+        }
+      ]
+    },
+    {
+      "edge_id": {
         "entry_key": "ReviewFixResolution",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
@@ -17335,9 +17309,9 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "504f5cbda754f55c31b41629cbb83740ed871aba2da91e55eb8b1fba284c24d0",
+        "bound_tests_set_hash": "a77e5b9a8562dc4bc5512cddfd5cce81ccc3f20dc777839670c7558315d18209",
         "declaration_hash": "26e176f2d531333fbad3ebb34c17bda4804b9b54a9ce1726d41e039221705d70",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
@@ -17368,7 +17342,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -17386,7 +17360,7 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "504f5cbda754f55c31b41629cbb83740ed871aba2da91e55eb8b1fba284c24d0",
+        "bound_tests_set_hash": "a77e5b9a8562dc4bc5512cddfd5cce81ccc3f20dc777839670c7558315d18209",
         "declaration_hash": "26e176f2d531333fbad3ebb34c17bda4804b9b54a9ce1726d41e039221705d70",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
@@ -17419,7 +17393,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -17437,13 +17411,13 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "504f5cbda754f55c31b41629cbb83740ed871aba2da91e55eb8b1fba284c24d0",
+        "bound_tests_set_hash": "a77e5b9a8562dc4bc5512cddfd5cce81ccc3f20dc777839670c7558315d18209",
         "declaration_hash": "26e176f2d531333fbad3ebb34c17bda4804b9b54a9ce1726d41e039221705d70",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "ReviewFixResolution::new(\n                ReviewTrackId::try_new(\"review-fix-root-mismatch-2026\".to_owned())\n                    .expect(\"valid track ID\"),\n                nested_root,\n            )"
+        "citation": "ReviewFixResolution::new(\n                ReviewTrackId::try_new(\n                    \"review-fix-trusted-root-2026\".to_owned(),\n                )\n                .expect(\"valid track ID\"),\n                repository_root.clone(),\n            )"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17470,7 +17444,7 @@
         {
           "layer": "cli_driver",
           "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
+          "test_name": "test_review_fix_driver_real_interactor_delivers_briefing_path_and_renders_outcome"
         }
       ]
     },
@@ -17816,13 +17790,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixRunner"
       },
       "key": {
-        "bound_tests_set_hash": "1e66937b45218132c8b5213ba24de3988e4c432484934c34baad55bfed4a1c73",
+        "bound_tests_set_hash": "b91865734c533bb37534c729732ed0a5d6cdf68c5f9c3fd3e1c576d2494e102e",
         "declaration_hash": "babb23ee1f82538f2d95178c7eef07c350426a5b1f61ff632fd87a49ae458e67",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            result,\n            Err(ReviewFixRunnerError::SubagentDispatchRequired(instruction))\n                if instruction.model.as_str() == \"claude-override\"\n                    && instruction.round_type == ReviewRoundType::Fast\n                    && instruction.repository_root == directory.path()\n        ));"
+        "citation": "let runner: &dyn ReviewFixRunner = &ReviewFixRunnerAdapter;\n        let result = runner.run_fix(claude_command(directory.path(), PathBuf::from(\"briefing.md\")));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17840,6 +17814,56 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
           "test_name": "test_review_fix_driver_real_runner_adapter_delivers_raw_input_to_claude_dispatch"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_forwards_raw_input_to_usecase_and_renders_typed_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_reads_valid_relative_briefing_below_resolver_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_absolute_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_parent_traversal_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_symlinked_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_briefing_over_byte_bound"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_absolute_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_traversal_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_symlinked_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_over_bound_briefing_path"
         }
       ]
     },
@@ -17857,7 +17881,7 @@
         "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixRunner"
       },
       "key": {
-        "bound_tests_set_hash": "1e66937b45218132c8b5213ba24de3988e4c432484934c34baad55bfed4a1c73",
+        "bound_tests_set_hash": "b91865734c533bb37534c729732ed0a5d6cdf68c5f9c3fd3e1c576d2494e102e",
         "declaration_hash": "babb23ee1f82538f2d95178c7eef07c350426a5b1f61ff632fd87a49ae458e67",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
@@ -17881,6 +17905,56 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
           "test_name": "test_review_fix_driver_real_runner_adapter_delivers_raw_input_to_claude_dispatch"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_forwards_raw_input_to_usecase_and_renders_typed_results"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_reads_valid_relative_briefing_below_resolver_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_absolute_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_parent_traversal_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_symlinked_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_briefing_over_byte_bound"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_absolute_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_traversal_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_symlinked_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_over_bound_briefing_path"
         }
       ]
     },
@@ -17898,13 +17972,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixRunner"
       },
       "key": {
-        "bound_tests_set_hash": "1e66937b45218132c8b5213ba24de3988e4c432484934c34baad55bfed4a1c73",
+        "bound_tests_set_hash": "b91865734c533bb37534c729732ed0a5d6cdf68c5f9c3fd3e1c576d2494e102e",
         "declaration_hash": "babb23ee1f82538f2d95178c7eef07c350426a5b1f61ff632fd87a49ae458e67",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            result,\n            Err(ReviewFixRunnerError::SubagentDispatchRequired(instruction))\n                if instruction.model.as_str() == \"claude-override\"\n                    && instruction.round_type == ReviewRoundType::Fast\n                    && instruction.repository_root == directory.path()\n        ));"
+        "citation": "assert!(matches!(\n            result,\n            Err(ReviewFixRunnerError::Unexpected(detail))\n                if detail.as_str().contains(\"does not match the runner repository\")\n        ));\n\nassert!(matches!(\n            result,\n            Err(ReviewFixRunnerError::SubagentDispatchRequired(instruction))\n                if instruction.model.as_str() == \"claude-override\"\n                    && instruction.round_type == ReviewRoundType::Fast\n                    && instruction.repository_root == directory.path()\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17922,47 +17996,56 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
           "test_name": "test_review_fix_driver_real_runner_adapter_delivers_raw_input_to_claude_dispatch"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "GitReviewFixTrackResolver",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "GitReviewFixTrackResolver",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
-      },
-      "key": {
-        "bound_tests_set_hash": "8827cbda05ca66e94f3a503d9b98aaf0b8f0606911cc86ea82ffd058aab75314",
-        "declaration_hash": "417dc28a5f240d1085375d48e73cd34395fb251996444a3a015762a2302708b7",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "let error = GitReviewFixTrackResolver\n            .resolve_current_track(&items_dir)\n            .expect_err(\"a non-track branch must be rejected\");\n\n        assert!(matches!(\n            error,\n            usecase::review_v2::run_review_fix::ReviewFixTrackResolveError::NonTrackBranch(_)\n        ));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_fix_driver_forwards_raw_input_to_usecase_and_renders_typed_results"
+        },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_git_review_fix_track_resolver_participates_in_interactor_delivery_flow"
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_reads_valid_relative_briefing_below_resolver_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_absolute_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_parent_traversal_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_symlinked_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_runner::prompt::tests",
+          "test_name": "test_build_prompt_rejects_briefing_over_byte_bound"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_git_review_fix_track_resolver_rejects_non_track_branch"
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_absolute_briefing_path"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_git_review_fix_track_resolver_rejects_ambient_git_dir_after_isolation_failure"
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_traversal_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_symlinked_briefing_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_review_fix_runner_adapter_claude_rejects_over_bound_briefing_path"
         }
       ]
     },
@@ -17980,13 +18063,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
       },
       "key": {
-        "bound_tests_set_hash": "8827cbda05ca66e94f3a503d9b98aaf0b8f0606911cc86ea82ffd058aab75314",
-        "declaration_hash": "417dc28a5f240d1085375d48e73cd34395fb251996444a3a015762a2302708b7",
+        "bound_tests_set_hash": "5c166565e689495691185b94ebfc9d8e2ec1007cf08aeabb2630787bfee0d4f1",
+        "declaration_hash": "d7bae25beeba82473359fe90c0d55f1580204a8d43e90be080f9309fd5db3d2f",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let output = service\n            .run(\n                RunReviewFixRequest::try_new(\n                    \"cli\".to_owned(),\n                    Path::new(\"briefing.md\").to_path_buf(),\n                    None,\n                    directory.path().join(\"track/items\"),\n                    \"fast\".to_owned(),\n                    None,\n                )\n                .expect(\"valid delivery request\"),\n            )\n            .expect(\"resolved branch must invoke the runner\");\n\n        assert_eq!(output.status, \"completed\");\n\nlet error = GitReviewFixTrackResolver\n            .resolve_current_track(&items_dir)\n            .expect_err(\"a non-track branch must be rejected\");\n\n        assert!(matches!(\n            error,\n            usecase::review_v2::run_review_fix::ReviewFixTrackResolveError::NonTrackBranch(_)\n        ));"
+        "citation": "let resolved = GitReviewFixTrackResolver\n            .resolve_current_track(&dir.path().join(\"track/items\"))\n            .expect(\"a track branch must resolve from the items directory\");\n\n        assert_eq!(resolved.track_id().as_str(), \"review-fix-resolution-2026\");\n        assert_eq!(\n            resolved.repository_root(),\n            dir.path().canonicalize().expect(\"fixture repository root must canonicalize\")\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -17994,6 +18077,11 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
           "test_name": "test_git_review_fix_track_resolver_participates_in_interactor_delivery_flow"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_resolves_active_track_branch"
         },
         {
           "layer": "infrastructure",
@@ -18021,13 +18109,13 @@
         "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
       },
       "key": {
-        "bound_tests_set_hash": "8827cbda05ca66e94f3a503d9b98aaf0b8f0606911cc86ea82ffd058aab75314",
-        "declaration_hash": "417dc28a5f240d1085375d48e73cd34395fb251996444a3a015762a2302708b7",
+        "bound_tests_set_hash": "5c166565e689495691185b94ebfc9d8e2ec1007cf08aeabb2630787bfee0d4f1",
+        "declaration_hash": "d7bae25beeba82473359fe90c0d55f1580204a8d43e90be080f9309fd5db3d2f",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(command.track_id(), \"review-fix-delivery-2026\");"
+        "citation": "let resolved = GitReviewFixTrackResolver\n            .resolve_current_track(&dir.path().join(\"track/items\"))\n            .expect(\"a track branch must resolve from the items directory\");\n\n        assert_eq!(resolved.track_id().as_str(), \"review-fix-resolution-2026\");\n        assert_eq!(\n            resolved.repository_root(),\n            dir.path().canonicalize().expect(\"fixture repository root must canonicalize\")\n        );\n\n        let error = GitReviewFixTrackResolver\n            .resolve_current_track(&items_dir)\n            .expect_err(\"a non-track branch must be rejected\");\n\n        assert!(matches!(\n            error,\n            usecase::review_v2::run_review_fix::ReviewFixTrackResolveError::NonTrackBranch(_)\n        ));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -18035,6 +18123,57 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
           "test_name": "test_git_review_fix_track_resolver_participates_in_interactor_delivery_flow"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_resolves_active_track_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_rejects_non_track_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_rejects_ambient_git_dir_after_isolation_failure"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "GitReviewFixTrackResolver",
+        "anchor_id": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
+          "element_id": "IN-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "GitReviewFixTrackResolver",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "5c166565e689495691185b94ebfc9d8e2ec1007cf08aeabb2630787bfee0d4f1",
+        "declaration_hash": "d7bae25beeba82473359fe90c0d55f1580204a8d43e90be080f9309fd5db3d2f",
+        "anchor_text_hash": "8ff761daa1c64e174cd3b3dc79bdfc8f69c516bdf1714145790f55e3a9992a17"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let resolved = GitReviewFixTrackResolver\n            .resolve_current_track(&dir.path().join(\"track/items\"))\n            .expect(\"a track branch must resolve from the items directory\");\n\n        assert_eq!(resolved.track_id().as_str(), \"review-fix-resolution-2026\");\n...\nlet error = GitReviewFixTrackResolver\n            .resolve_current_track(&items_dir)\n            .expect_err(\"a non-track branch must be rejected\");\n\n        assert!(matches!(\n            error,\n            usecase::review_v2::run_review_fix::ReviewFixTrackResolveError::NonTrackBranch(_)\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_participates_in_interactor_delivery_flow"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
+          "test_name": "test_git_review_fix_track_resolver_resolves_active_track_branch"
         },
         {
           "layer": "infrastructure",
@@ -18134,13 +18273,13 @@
         "item_identifier": "voluntary:IN-16"
       },
       "key": {
-        "bound_tests_set_hash": "25a03c43f130685c01676007d7fdda6ec77e84e9f9f009f81fde36ebe3c81afb",
-        "declaration_hash": "f3b35c6fb63cfd2bffccd5217927aa76e208dbd86d248100be77faa8e7e20ce2",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
+        "bound_tests_set_hash": "4ecd90d0127e4405bf63be7944042c54d042c8d39331331df64eab1a2c913e2f",
+        "declaration_hash": "23792fecf6603afc0d2e0aa70116dbf4082cee73b743093cacbb6aff112bfedb",
+        "anchor_text_hash": "f0d77360e47957f4e95d2215d53b2adf3176b61734dc2b7602cfbd3b3c5e40d9"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            lines.next(),\n            Some(\n                \"{\\\"agent\\\":\\\"review-fix-lead\\\",\\\"model\\\":\\\"claude\\\\\\\"model\\\",\\\"effort\\\":\\\"low\\\",\\\"scope\\\":\\\"cli_driver\\\",\\\"briefing_content\\\":\\\"briefing\\\\\\\\content\\\",\\\"track_id\\\":\\\"dispatch-render-2026\\\",\\\"repository_root\\\":\\\"/resolver-proven/root\\\\\\\\path\\\",\\\"round_type\\\":\\\"fast\\\"}\"\n            )\n        );"
+        "citation": "assert_eq!(outcome.exit_code, SUBAGENT_DISPATCH_EXIT_CODE);\n        let stdout = outcome.stdout.unwrap();\n        let mut lines = stdout.lines();\n        assert_eq!(lines.next(), Some(SUBAGENT_DISPATCH_SENTINEL));\n        assert_eq!(\n            lines.next(),\n            Some(\n                \"{\\\"agent\\\":\\\"review-fix-lead\\\",\\\"model\\\":\\\"claude\\\\\\\"model\\\",\\\"effort\\\":\\\"low\\\",\\\"scope\\\":\\\"cli_driver\\\",\\\"briefing_file\\\":\\\"tmp/reviewer-runtime/briefing\\\\\\\\path.md\\\",\\\"track_id\\\":\\\"dispatch-render-2026\\\",\\\"repository_root\\\":\\\"/resolver-proven/root\\\\\\\\path\\\",\\\"round_type\\\":\\\"fast\\\"}\"\n            )\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -18170,13 +18309,13 @@
         "item_identifier": "voluntary:CN-09"
       },
       "key": {
-        "bound_tests_set_hash": "e8ac2d60a9cedda8e34118a110f5a92a9b5002d357c989841ae533d0b71c5e72",
-        "declaration_hash": "f3b35c6fb63cfd2bffccd5217927aa76e208dbd86d248100be77faa8e7e20ce2",
+        "bound_tests_set_hash": "4015454a7122b4f984294fb63a711b98b9ba9b218317788a7ba51f6f16a869b2",
+        "declaration_hash": "23792fecf6603afc0d2e0aa70116dbf4082cee73b743093cacbb6aff112bfedb",
         "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(stdout.contains(\"\\\"agent\\\":\\\"review-fix-lead\\\"\")); assert!(stdout.contains(\"\\\"model\\\":\\\"gpt-5.5\\\"\")); assert!(stdout.contains(\"\\\"effort\\\":\\\"low\\\"\")); assert!(stdout.contains(\"\\\"scope\\\":\\\"cli_composition\\\"\")); assert!(stdout.contains(\"\\\"briefing_content\\\":\\\"# Briefing\\\\n\\\"\")); assert!(stdout.contains(\"\\\"track_id\\\":\\\"review-fix-codex-rustify-2026-05-31\\\"\")); assert!(stdout.contains(&format!(\"\\\"repository_root\\\":\\\"{}\\\"\", dir.path().display()))); assert!(stdout.contains(\"\\\"round_type\\\":\\\"fast\\\"\"));"
+        "citation": "let outcome = crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(\n            run_review_fix_input(\n                PathBuf::from(\"briefing.md\"),\n                usecase::review_v2::ReviewRoundType::Fast,\n            ),\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -18189,6 +18328,11 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
           "test_name": "review_fix_driver_claude_provider_renders_subagent_dispatch_instruction"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::run_review_fix::tests",
+          "test_name": "test_subagent_dispatch_instruction_boundary_rejects_invalid_scope_track_id_and_round_type"
         }
       ]
     },
@@ -18206,13 +18350,13 @@
         "item_identifier": "voluntary:AC-19"
       },
       "key": {
-        "bound_tests_set_hash": "ee2a21e3306d4c333bed8c22e9c19b41abdf509b576aa19df2448f53bc3a8d24",
-        "declaration_hash": "f3b35c6fb63cfd2bffccd5217927aa76e208dbd86d248100be77faa8e7e20ce2",
+        "bound_tests_set_hash": "b0e646c718ad87917910c813dfa070b6cd98e67fabcdaf6fa73bbf276c6df2d6",
+        "declaration_hash": "23792fecf6603afc0d2e0aa70116dbf4082cee73b743093cacbb6aff112bfedb",
         "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(stdout.contains(\"\\\"agent\\\":\\\"review-fix-lead\\\"\")); assert!(stdout.contains(\"\\\"model\\\":\\\"gpt-5.5\\\"\")); assert!(stdout.contains(\"\\\"effort\\\":\\\"low\\\"\")); assert!(stdout.contains(\"\\\"scope\\\":\\\"cli_composition\\\"\")); assert!(stdout.contains(\"\\\"briefing_content\\\":\\\"# Briefing\\\\n\\\"\")); assert!(stdout.contains(\"\\\"track_id\\\":\\\"review-fix-codex-rustify-2026-05-31\\\"\")); assert!(stdout.contains(&format!(\"\\\"repository_root\\\":\\\"{}\\\"\", dir.path().display()))); assert!(stdout.contains(\"\\\"round_type\\\":\\\"fast\\\"\"));"
+        "citation": "let outcome = crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(\n            run_review_fix_input(\n                PathBuf::from(\"briefing.md\"),\n                usecase::review_v2::ReviewRoundType::Fast,\n            ),\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -18220,42 +18364,6 @@
           "layer": "cli_composition",
           "module_path": "cli_composition::review_v2::tests",
           "test_name": "review_fix_driver_claude_provider_renders_subagent_dispatch_instruction"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentName",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentName",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-16"
-      },
-      "key": {
-        "bound_tests_set_hash": "c125eda740a0c5361b6f4fbc1b154e60feefe571b59d304610860263169f68a8",
-        "declaration_hash": "7a2d18a7461b0ac6f9f5274d2d873260614f71b288f832e8d5cb5984ed62ae99",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(name.as_str(), \"review-fix-lead\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_subagent_name_accepts_valid_value_and_exposes_accessor"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_subagent_name_rejects_empty_or_whitespace_without_exposing_domain_error"
         }
       ]
     },
@@ -18273,13 +18381,13 @@
         "item_identifier": "voluntary:AC-12"
       },
       "key": {
-        "bound_tests_set_hash": "53baa4632ddfcd71c8a3d6e2ea767e893150bc52ffeb295418d2d5b1b423060c",
-        "declaration_hash": "7a2d18a7461b0ac6f9f5274d2d873260614f71b288f832e8d5cb5984ed62ae99",
+        "bound_tests_set_hash": "bf1eb32a8e009a7226b63a7ba230e99d79fc30a665e478325770bfc28977bc1b",
+        "declaration_hash": "6bffd11cda1244f6d964e1331f3791550ae280d0e7d764daed011501611c696f",
         "anchor_text_hash": "6f504ab46c4ee9db049ec0a7da9fac7497f9dd752b32c265a9b769659b11e026"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(stdout.contains(\"\\\"agent\\\":\\\"review-fix-lead\\\"));"
+        "citation": "assert_eq!(name.as_str(), \"review-fix-lead\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -18310,42 +18418,6 @@
         "entry_key": "SubagentNameValidationError",
         "anchor_id": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentNameValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-16"
-      },
-      "key": {
-        "bound_tests_set_hash": "0e479041cccfd923dc35631987c2b89df8b3a3295f3a48a3606a6d558e047820",
-        "declaration_hash": "e574d0ea12a803ded6571bd621e7cee8bfc695d2114e0ebd9539886b9c896f1e",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(\n                matches!(SubagentName::try_new(raw), Err(SubagentNameValidationError::Invalid(_))),\n                \"invalid subagent names must use the usecase-owned error\"\n            );"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_subagent_name_rejects_empty_or_whitespace_without_exposing_domain_error"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_rejects_full_raw_validation_matrix_without_invoking_service"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentNameValidationError",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
           "element_id": "AC-12"
         }
       },
@@ -18356,7 +18428,7 @@
       },
       "key": {
         "bound_tests_set_hash": "e4f9cb70ff5989b6bb052ea5e9c8502b76132c3c69cffc0db97913fb011ecfb1",
-        "declaration_hash": "e574d0ea12a803ded6571bd621e7cee8bfc695d2114e0ebd9539886b9c896f1e",
+        "declaration_hash": "745223a37a12bbc6b693847162898f37ab0225832a8dc84933aa1eed8fbefbbb",
         "anchor_text_hash": "6f504ab46c4ee9db049ec0a7da9fac7497f9dd752b32c265a9b769659b11e026"
       },
       "verdict": {
@@ -18512,400 +18584,6 @@
           "layer": "usecase",
           "module_path": "usecase::review_v2::review_aux::tests",
           "test_name": "test_review_results_interactor_rejects_missing_configured_scope_state"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "ReviewFixBriefingLoaderPort",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ReviewFixBriefingLoaderPort",
-        "obligation_kind": "contract",
-        "item_identifier": "trait_method:load_briefing_content"
-      },
-      "key": {
-        "bound_tests_set_hash": "1fdf6890b0d48d20a70a31936e9db0909bad7cb383906a9b3a30a5e431746733",
-        "declaration_hash": "da792da944ffbb67260f05bb5db01dfffbee0dff59d23b6d8b4238d837f93abc",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(matches!(result, Err(usecase::review_v2::run_review_fix::ReviewFixBriefingLoadError::UntrustedFile(_)))); ... assert!(matches!(result, Err(usecase::review_v2::run_review_fix::ReviewFixBriefingLoadError::UntrustedFile(detail)) if detail.as_str().contains(\"symlink\"))); ... assert_eq!(content.as_str(), expected); ... assert!(matches!(result, Err(usecase::review_v2::run_review_fix::ReviewFixBriefingLoadError::InvalidContent( usecase::review_v2::run_review_fix::SubagentBriefingContentValidationError::ExceedsMaximumBytes )))); ... assert_eq!(command.briefing_content().as_str(), \"trusted loader content\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_review_fix_briefing_load_error_preserves_each_failure_category"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_review_fix_runner_adapter_claude_rejects_traversal_briefing"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_review_fix_runner_adapter_claude_rejects_symlinked_briefing"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_rejects_symlinked_intermediate_component"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_rejects_non_regular_target_as_untrusted"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_returns_read_failed_for_missing_file"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_valid_relative_file_returns_validated_content"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_content_over_domain_bound_returns_invalid_content"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "TrustedReviewFixBriefingLoader",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TrustedReviewFixBriefingLoader",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::review_v2::run_review_fix::ReviewFixBriefingLoaderPort"
-      },
-      "key": {
-        "bound_tests_set_hash": "fcc03d8c5805555d3c0a08bc4bbd517208fffc7c433cf617eb2081975750fd76",
-        "declaration_hash": "e9483b3225c5c87153bbee6ba4334c8a8a789a1bd35d0d6087dedb122ea8247c",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(command.briefing_content().as_str(), briefing_content);"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_review_fix_runner_adapter_claude_rejects_traversal_briefing"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_review_fix_runner_adapter_claude_rejects_symlinked_briefing"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_rejects_symlinked_intermediate_component"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_rejects_non_regular_target_as_untrusted"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_returns_read_failed_for_missing_file"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_valid_relative_file_returns_validated_content"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_content_over_domain_bound_returns_invalid_content"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
-        },
-        {
-          "layer": "cli_composition",
-          "module_path": "cli_composition::review_v2::tests",
-          "test_name": "test_review_fix_driver_configured_loader_delivers_briefing_content_to_runner"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentBriefingContent",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentBriefingContent",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-16"
-      },
-      "key": {
-        "bound_tests_set_hash": "5f9b955a1b64a793906ff20497692fc136f41801f7881197fd180f37fc83ed2b",
-        "declaration_hash": "f1de163ffc4a76458ceaa9db35760d483f5240196b71636cf5a2e9ae654fd2fb",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(command.briefing_content().as_str(), \"trusted loader content\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_subagent_briefing_content_accepts_limit_and_rejects_over_bound"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_valid_relative_file_returns_validated_content"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentBriefingContent",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-09"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentBriefingContent",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-09"
-      },
-      "key": {
-        "bound_tests_set_hash": "19cc40db4562b78979a35d8cd9b790a44d682ae91a868d59d7637701812d471e",
-        "declaration_hash": "f1de163ffc4a76458ceaa9db35760d483f5240196b71636cf5a2e9ae654fd2fb",
-        "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(command.briefing_content().as_str(), \"trusted loader content\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentBriefingContent",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-19"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentBriefingContent",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-19"
-      },
-      "key": {
-        "bound_tests_set_hash": "19cc40db4562b78979a35d8cd9b790a44d682ae91a868d59d7637701812d471e",
-        "declaration_hash": "f1de163ffc4a76458ceaa9db35760d483f5240196b71636cf5a2e9ae654fd2fb",
-        "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert_eq!(command.briefing_content().as_str(), \"trusted loader content\");"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_real_interactor_loads_content_before_command_and_renders_outcome"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentBriefingContentValidationError",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentBriefingContentValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-16"
-      },
-      "key": {
-        "bound_tests_set_hash": "901a869b060604d0e3a336574362747f69cb0fb9445b7e869bb73c41cf687d49",
-        "declaration_hash": "bc3a964844ba0045670821faf5670d7a9022933d49d22de032977cd89bbad2b7",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            SubagentBriefingContent::try_new(\"x\".repeat(64 * 1024 + 1)),\n            Err(SubagentBriefingContentValidationError::ExceedsMaximumBytes)\n        ));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_subagent_briefing_content_accepts_limit_and_rejects_over_bound"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_review_fix_briefing_load_error_preserves_each_failure_category"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentBriefingContentValidationError",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-09"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentBriefingContentValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-09"
-      },
-      "key": {
-        "bound_tests_set_hash": "4225ad9efce4e4c3dd07daf105a26a0bfae6372a3a2cfdce8ce3e7c7b24d3f51",
-        "declaration_hash": "bc3a964844ba0045670821faf5670d7a9022933d49d22de032977cd89bbad2b7",
-        "anchor_text_hash": "3800152d2b2d1a4e33456e665f7578d3377515b19dc491d468a1f32e07beb29c"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "\"review-fix briefing content exceeds the 65536-byte limit\""
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_briefing_load_failures_render_nonzero_typed_diagnostics"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "SubagentBriefingContentValidationError",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-19"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "SubagentBriefingContentValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-19"
-      },
-      "key": {
-        "bound_tests_set_hash": "901a869b060604d0e3a336574362747f69cb0fb9445b7e869bb73c41cf687d49",
-        "declaration_hash": "bc3a964844ba0045670821faf5670d7a9022933d49d22de032977cd89bbad2b7",
-        "anchor_text_hash": "b699782b54594f26859334ae0f6440cfab4e0b7acc37ab7eafb669557867343b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "Err(SubagentBriefingContentValidationError::ExceedsMaximumBytes)"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_subagent_briefing_content_accepts_limit_and_rejects_over_bound"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_review_fix_briefing_load_error_preserves_each_failure_category"
-        }
-      ]
-    },
-    {
-      "edge_id": {
-        "entry_key": "ReviewFixBriefingLoadError",
-        "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-16"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ReviewFixBriefingLoadError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-16"
-      },
-      "key": {
-        "bound_tests_set_hash": "e9d82d1b10a0df6274795bfcff610263f0a24c1f1bd29801f6170f43a2e33b79",
-        "declaration_hash": "fc0d3a98dc020430507d96190994ebe7dfebdf86351f5bfe7791e377bcc1b830",
-        "anchor_text_hash": "ac77ec06e03060398a0d2fcac4aeeeeab65b1842e4b662333799a66f5d014c9b"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "assert!(untrusted.to_string().contains(\"not trusted: symlink\"));\n        assert!(read_failed.to_string().contains(\"could not read review-fix briefing: missing\"));\n        assert!(invalid.to_string().contains(\"content is invalid\"));"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
-      "bound_tests": [
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::review::tests",
-          "test_name": "test_review_fix_driver_briefing_load_failures_render_nonzero_typed_diagnostics"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::review_v2::run_review_fix::tests",
-          "test_name": "test_review_fix_briefing_load_error_preserves_each_failure_category"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_review_fix_runner_adapter_claude_rejects_traversal_briefing"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::review_v2::review_fix_adapter::tests",
-          "test_name": "test_trusted_review_fix_briefing_loader_returns_read_failed_for_missing_file"
         }
       ]
     },

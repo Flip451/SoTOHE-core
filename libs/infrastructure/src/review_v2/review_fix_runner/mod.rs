@@ -123,6 +123,18 @@ impl ReviewFixRunner for CodexReviewFixRunner {
         &self,
         command: RunReviewFixCommand,
     ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
+        let briefing_content =
+            crate::review_v2::review_fix_briefing::read_trusted_briefing(&command)?;
+        self.run_fix_with_briefing(command, briefing_content)
+    }
+}
+
+impl CodexReviewFixRunner {
+    pub(super) fn run_fix_with_briefing(
+        &self,
+        command: RunReviewFixCommand,
+        briefing_content: String,
+    ) -> Result<RunReviewFixOutput, ReviewFixRunnerError> {
         let codex_home = resolve_codex_home()?;
         #[cfg(test)]
         let runtime = if self.bin_override.is_none() {
@@ -161,7 +173,7 @@ impl ReviewFixRunner for CodexReviewFixRunner {
         let _home_cleanup = SafeHomeCleanup(safe_home.clone());
         let safe_env = build_safe_env(&safe_home, &codex_home, path_prefix)?;
         self.smoke_test_codex_version(&bin, &safe_env, &launch_context)?;
-        let prompt = build_prompt_with_context(command.scope(), &command)?;
+        let prompt = build_prompt_with_context(command.scope(), &command, &briefing_content)?;
         let output_last_message =
             launch_context.create_runtime_file("review-fix-codex-last-message", "txt")?;
         let output_last_message_path = output_last_message.path().to_path_buf();
@@ -249,12 +261,11 @@ mod tests {
         make_command_with_briefing_file(PathBuf::from("tmp/reviewer-runtime/briefing.md"))
     }
 
-    fn make_command_with_briefing_file(_briefing_file: PathBuf) -> RunReviewFixCommand {
+    fn make_command_with_briefing_file(briefing_file: PathBuf) -> RunReviewFixCommand {
         RunReviewFixCommand::new_resolved(
             usecase::review_v2::ReviewScopeName::try_new("infrastructure".to_owned())
                 .expect("valid scope"),
-            usecase::review_v2::SubagentBriefingContent::try_new("# Briefing\n".to_owned())
-                .expect("valid briefing"),
+            briefing_file,
             usecase::review_v2::run_review_fix::ReviewFixResolution::new(
                 usecase::review_v2::run_review_fix::ReviewTrackId::try_new(
                     "review-fix-codex-rustify-2026-05-31".to_owned(),
@@ -647,8 +658,7 @@ exit 0
         let command = RunReviewFixCommand::new_resolved(
             usecase::review_v2::ReviewScopeName::try_new("infrastructure".to_owned())
                 .expect("valid scope"),
-            usecase::review_v2::SubagentBriefingContent::try_new("# Briefing\n".to_owned())
-                .expect("valid briefing"),
+            PathBuf::from("briefing.md"),
             usecase::review_v2::run_review_fix::ReviewFixResolution::new(
                 usecase::review_v2::run_review_fix::ReviewTrackId::try_new(
                     "review-fix-trusted-root-2026".to_owned(),
