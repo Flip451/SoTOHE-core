@@ -9,7 +9,7 @@ GO-03 → T018、T019、T020、T021、T022、T023。
 GO-04 → T018、T020、T021、T022、T023。
 GO-05 → T017、T018、T019、T020、T021、T022。
 
-## Tasks (31/32 resolved)
+## Tasks (32/32 resolved)
 
 ### S0 — 確定済みの履歴 task
 
@@ -71,4 +71,4 @@ GO-05 → T017、T018、T019、T020、T021、T022。
 
 > T044 は path-carrying review-fix delivery と process-group containment を復元する。IN-16、CN-02。
 
-- [~] **T044**: review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。`libs/usecase/src/operator_command.rs` と phase/pre-review config loaders の executable-basename recursion rejection および対応テストを更新する。IN-16、IN-20、CN-02、CN-01、AC-01、AC-05。
+- [x] **T044**: review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。`libs/usecase/src/operator_command.rs` と phase/pre-review config loaders の executable-basename recursion rejection および対応テストを更新する。IN-16、IN-20、CN-02、CN-01、AC-01、AC-05。

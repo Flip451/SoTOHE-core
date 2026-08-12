@@ -250,7 +250,7 @@
     {
       "id": "T044",
       "description": "review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。`libs/usecase/src/operator_command.rs` と phase/pre-review config loaders の executable-basename recursion rejection および対応テストを更新する。IN-16、IN-20、CN-02、CN-01、AC-01、AC-05。",
-      "status": "in_progress",
+      "status": "done",
       "depends_on": [
         "T043"
       ]
