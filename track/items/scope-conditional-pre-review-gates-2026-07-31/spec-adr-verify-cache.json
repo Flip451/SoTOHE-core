@@ -968,7 +968,7 @@
       }
     },
     {
-      "claim_hash": "07a396adf15accfc8f609dae5115bf3b6b38a3129c93664c94f2742080865d26",
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
@@ -979,7 +979,7 @@
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-01",
-          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
         }
       },
       "evidence_origin": {
@@ -991,18 +991,18 @@
       }
     },
     {
-      "claim_hash": "07a396adf15accfc8f609dae5115bf3b6b38a3129c93664c94f2742080865d26",
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
-        "citation": "gate-kind から内部 operation への不可視な mapping は置かない。`sotp review local` が scope を解決して該当 command を順次 dispatch し"
+        "citation": "gate-kind から内部 operation への不可視な mapping は置かない。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-01",
-          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
         }
       },
       "evidence_origin": {
@@ -1014,18 +1014,18 @@
       }
     },
     {
-      "claim_hash": "07a396adf15accfc8f609dae5115bf3b6b38a3129c93664c94f2742080865d26",
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
-        "citation": "shell interpolation、pipe、暗黙の `sh -c` は提供しない。"
+        "citation": "「検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。shell interpolation、pipe、暗黙の `sh -c` は提供しない。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-01",
-          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
         }
       },
       "evidence_origin": {
@@ -1037,18 +1037,18 @@
       }
     },
     {
-      "claim_hash": "07a396adf15accfc8f609dae5115bf3b6b38a3129c93664c94f2742080865d26",
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
       "evidence_hash": "3d8eba927a69b0b0a34038c094d593cd8194eff6ee01edb0fb46ea89ad29abbe",
       "verdict": {
         "kind": "pass",
-        "citation": "config に保存・解決された literal argv 自体は変更せず、invocation surface が dispatch boundary で caller-supplied optional `--host` だけを実行時 argv に追加できる。それ以外の argv を書き換えたり意味解釈したりしないという D1 の規則と、config が provider-neutral な literal argv を宣言する決定は維持する。"
+        "citation": "config に保存・解決された literal argv 自体は変更せず、invocation surface が dispatch boundary で caller-supplied optional `--host` だけを実行時 argv に追加できる。それ以外の argv を書き換えたり意味解釈したりしない"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OS-01",
-          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
         }
       },
       "evidence_origin": {
@@ -1152,7 +1152,7 @@
       }
     },
     {
-      "claim_hash": "fbef8ead42b1d6c5d92f7647463813d87f65da7bfc61396cd224712b31c31bd0",
+      "claim_hash": "cc4c36c0b12e3f599b6d91ae80da50311b0c5a96e833d1f935e384c85e1c9cdf",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
@@ -1163,7 +1163,7 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-01",
-          "text_label": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite exact-literal-prefix recursion denylist を適用し、先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。"
+          "text_label": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite recursion denylist を適用する。argv executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）の場合、続く subcommand が `phase enter`、`review local`、または `review fix-local` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。"
         }
       },
       "evidence_origin": {
@@ -1520,18 +1520,18 @@
       }
     },
     {
-      "claim_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
+      "claim_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
-        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき pre-entry command の ordered list を持つ。phase engine は pre-entry を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。"
+        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき pre-entry command の ordered list を持つ。phase engine は pre-entry を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       },
       "evidence_origin": {
@@ -1543,7 +1543,7 @@
       }
     },
     {
-      "claim_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
+      "claim_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
@@ -1554,7 +1554,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       },
       "evidence_origin": {
@@ -1727,18 +1727,18 @@
       }
     },
     {
-      "claim_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review local` が scope を解決した上で D1 のマトリクスに従い必要な gate を内部発火する。Makefile wrapper は薄い委譲のみとし、scope-blind な dependency 前置を廃する"
+        "citation": "“`sotp review local` が scope を解決した上で D1 のマトリクスに従い必要な gate を内部発火する。”"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       },
       "evidence_origin": {
@@ -1750,7 +1750,7 @@
       }
     },
     {
-      "claim_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
@@ -1761,7 +1761,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       },
       "evidence_origin": {
@@ -1773,18 +1773,18 @@
       }
     },
     {
-      "claim_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "evidence_hash": "f88a086a82a5216f6242511265ab98065de514066318e357ac4855d6d8968dd4",
       "verdict": {
         "kind": "pass",
-        "citation": "検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。"
+        "citation": "phase command config と pre-review gate config は、少なくとも schema version、各 argv の非空、phase または scope declaration の一意性、repository root 固定 cwd、bounded output、明示 timeout または約 60 分の既定 timeout、および phase engine の再帰呼び出しを検証する。検証不能・重複・再帰・上限超過は実行前または検出時に non-zero で停止する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       },
       "evidence_origin": {

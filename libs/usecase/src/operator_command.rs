@@ -46,19 +46,14 @@ impl CommandArgv {
     pub fn arguments(&self) -> &[CommandArgument] {
         &self.0
     }
-    /// Returns this already-validated argv with additional trailing arguments.
-    ///
-    /// Appending cannot change the executable or its first two subcommand
-    /// tokens, so it preserves the non-empty and recursive-invocation
-    /// invariants established by [`Self::try_new`].
-    #[must_use]
+    /// Returns this argv with trailing arguments after revalidating its invariants.
     pub fn with_appended_arguments(
         &self,
         additional: impl IntoIterator<Item = CommandArgument>,
-    ) -> Self {
+    ) -> Result<Self, CommandArgvValidationError> {
         let mut arguments = self.0.clone();
         arguments.extend(additional);
-        Self(arguments)
+        Self::try_new(arguments)
     }
     fn recursive_prefix(&self) -> Option<Vec<CommandArgument>> {
         const DENYLIST: [[&str; 3]; 3] = [
@@ -79,31 +74,16 @@ impl CommandArgv {
 ///
 /// Configuration is untrusted input, so lexical aliases such as `./bin/sotp`
 /// and `bin/./sotp` must receive the same recursive-invocation protection as
-/// the canonical command. A bare `sotp` is also rejected because it can
-/// resolve to this process through `PATH`.
+/// the canonical command. The basename is compared case-insensitively and
+/// accepts an optional `.exe` suffix so configuration remains safe on
+/// case-insensitive Windows filesystems. A bare `sotp` is also rejected
+/// because it can resolve to this process through `PATH`.
 fn is_sotp_executable(value: &CommandArgument) -> bool {
-    let mut components = Vec::new();
-    for component in std::path::Path::new(value.as_str()).components() {
-        match component {
-            std::path::Component::CurDir => {}
-            std::path::Component::ParentDir => {
-                if matches!(components.last(), Some(std::path::Component::Normal(_))) {
-                    components.pop();
-                } else {
-                    components.push(component);
-                }
-            }
-            _ => components.push(component),
-        }
-    }
-    let names: Vec<&str> = components
-        .iter()
-        .filter_map(|component| match component {
-            std::path::Component::Normal(name) => name.to_str(),
-            _ => None,
-        })
-        .collect();
-    names.as_slice() == ["sotp"] || names.ends_with(&["bin", "sotp"])
+    let basename = value.as_str().rsplit(['/', '\\']).next().unwrap_or_default();
+    let normalized_basename = basename.to_ascii_lowercase();
+    let stem = normalized_basename.strip_suffix(".exe").unwrap_or(&normalized_basename);
+
+    stem == "sotp"
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -358,14 +338,23 @@ mod tests {
     }
 
     #[test]
-    fn test_command_argument_preserves_empty_literal_and_argv_order() {
-        let empty = CommandArgument::try_new(String::new());
-        assert_eq!(empty.as_str(), "");
-        assert_eq!(empty.as_ref(), "");
-        let command_argv = CommandArgv::try_new(argv(&["bin/sotp", "signal", "check"])).unwrap();
-        let values: Vec<&str> =
-            command_argv.arguments().iter().map(CommandArgument::as_str).collect();
-        assert_eq!(values, ["bin/sotp", "signal", "check"]);
+    fn test_command_argv_rejects_empty_and_recursive_sequences() {
+        assert!(matches!(CommandArgv::try_new(Vec::new()), Err(CommandArgvValidationError::Empty)));
+
+        for subcommand in [["phase", "enter"], ["review", "local"], ["review", "fix-local"]] {
+            assert!(matches!(
+                CommandArgv::try_new(argv(&["bin/sotp", subcommand[0], subcommand[1]])),
+                Err(CommandArgvValidationError::RecursiveInvocation { .. })
+            ));
+        }
+    }
+
+    #[test]
+    fn test_command_argument_preserves_opaque_literal_value() {
+        let argument = CommandArgument::try_new("--scope=implementation/日本語".to_owned());
+
+        assert_eq!(argument.as_str(), "--scope=implementation/日本語");
+        assert_eq!(argument.as_ref(), "--scope=implementation/日本語");
     }
 
     #[test]
@@ -392,14 +381,64 @@ mod tests {
     }
 
     #[test]
-    fn test_configured_command_rejects_lexical_sotp_aliases() {
-        for executable in ["./bin/sotp", "bin/./sotp", "bin/../bin/sotp", "sotp"] {
-            assert!(matches!(
-                ConfiguredCommand::try_new(argv(&[executable, "review", "local"]), None),
-                Err(ConfiguredCommandValidationError::Argv(
-                    CommandArgvValidationError::RecursiveInvocation { .. }
-                ))
-            ));
+    fn test_configured_command_rejects_recursive_sotp_commands_by_normalized_basename() {
+        for executable in [
+            "./bin/sotp",
+            "bin/./sotp",
+            "bin/../bin/sotp",
+            "sotp",
+            "target/debug/sotp",
+            "target/release/sotp",
+            "/opt/sotohe/target/debug/sotp",
+            "target/debug/sotp.exe",
+            "SOTP",
+            "Sotp.exe",
+            "target\\debug\\SOTP.EXE",
+        ] {
+            for subcommand in [["phase", "enter"], ["review", "local"], ["review", "fix-local"]] {
+                let error = ConfiguredCommand::try_new(
+                    argv(&[executable, subcommand[0], subcommand[1]]),
+                    None,
+                )
+                .unwrap_err();
+
+                assert!(matches!(
+                    error,
+                    ConfiguredCommandValidationError::Argv(
+                        CommandArgvValidationError::RecursiveInvocation { .. }
+                    )
+                ));
+                assert!(matches!(
+                    CommandConfigValidationError::from(error),
+                    CommandConfigValidationError::RecursiveInvocation { .. }
+                ));
+            }
+        }
+    }
+
+    #[test]
+    fn test_configured_command_allows_non_sotp_binaries_for_recursive_subcommands() {
+        for executable in ["target/debug/not-sotp", "target/debug/sotp-helper", "sotp-backup"] {
+            for subcommand in [["phase", "enter"], ["review", "local"], ["review", "fix-local"]] {
+                assert!(
+                    ConfiguredCommand::try_new(
+                        argv(&[executable, subcommand[0], subcommand[1]]),
+                        None
+                    )
+                    .is_ok(),
+                    "non-sotp executable {executable} must not be rejected"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn test_configured_command_allows_unicode_non_sotp_basenames_with_exe_suffix() {
+        for executable in ["日本", "target/debug/日本.exe"] {
+            assert!(
+                ConfiguredCommand::try_new(argv(&[executable, "review", "local"]), None).is_ok(),
+                "non-sotp executable {executable} must not be rejected"
+            );
         }
     }
 
@@ -407,9 +446,20 @@ mod tests {
     fn test_command_argv_appends_arguments_without_changing_prefix() {
         let command_argv = CommandArgv::try_new(argv(&["bin/sotp", "signal", "calc"])).unwrap();
         let augmented =
-            command_argv.with_appended_arguments(argv(&["--items-dir", "custom/items"]));
+            command_argv.with_appended_arguments(argv(&["--items-dir", "custom/items"])).unwrap();
         let values: Vec<&str> = augmented.arguments().iter().map(CommandArgument::as_str).collect();
         assert_eq!(values, ["bin/sotp", "signal", "calc", "--items-dir", "custom/items"]);
+    }
+
+    #[test]
+    fn test_command_argv_rejects_appended_recursive_prefix() {
+        for executable in ["bin/sotp", "target/debug/sotp"] {
+            let command_argv = CommandArgv::try_new(argv(&[executable])).unwrap();
+            assert!(matches!(
+                command_argv.with_appended_arguments(argv(&["review", "local"])),
+                Err(CommandArgvValidationError::RecursiveInvocation { .. })
+            ));
+        }
     }
 
     #[test]

@@ -316,7 +316,7 @@
     "out_of_scope": [
       {
         "id": "OS-01",
-        "text": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation としての finite exact-literal-prefix recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。",
+        "text": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
@@ -375,7 +375,7 @@
   "constraints": [
     {
       "id": "CN-01",
-      "text": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite exact-literal-prefix recursion denylist を適用し、先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。",
+      "text": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite recursion denylist を適用する。argv executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）の場合、続く subcommand が `phase enter`、`review local`、または `review fix-local` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
@@ -495,7 +495,7 @@
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。",
+      "text": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md",
@@ -555,7 +555,7 @@
     },
     {
       "id": "AC-05",
-      "text": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。",
+      "text": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md",

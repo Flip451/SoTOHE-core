@@ -586,27 +586,28 @@ mod tests {
             Err(CommandConfigValidationError::DuplicateDeclaration(_))
         ));
 
-        for declaration in [
-            phase_declaration(
-                "implementation",
-                command(&["bin/sotp", "phase", "enter"], None),
-                Vec::new(),
-            ),
-            phase_declaration(
-                "implementation",
-                command(&["bin/sotp", "signal"], None),
-                vec![command(&["bin/sotp", "review", "local"], None)],
-            ),
-            phase_declaration(
-                "implementation",
-                command(&["bin/sotp", "signal"], None),
-                vec![command(&["bin/sotp", "review", "fix-local"], None)],
-            ),
-        ] {
-            assert!(matches!(
-                decode_phase_command_config(phase_config(vec![declaration])),
-                Err(CommandConfigValidationError::RecursiveInvocation { .. })
-            ));
+        for executable in
+            ["./bin/sotp", "target/debug/sotp", "/opt/sotohe/target/debug/sotp", "SOTP.EXE"]
+        {
+            for subcommand in [["phase", "enter"], ["review", "local"], ["review", "fix-local"]] {
+                for declaration in [
+                    phase_declaration(
+                        "implementation",
+                        command(&[executable, subcommand[0], subcommand[1]], None),
+                        Vec::new(),
+                    ),
+                    phase_declaration(
+                        "implementation",
+                        command(&["bin/sotp", "signal"], None),
+                        vec![command(&[executable, subcommand[0], subcommand[1]], None)],
+                    ),
+                ] {
+                    assert!(matches!(
+                        decode_phase_command_config(phase_config(vec![declaration])),
+                        Err(CommandConfigValidationError::RecursiveInvocation { .. })
+                    ));
+                }
+            }
         }
     }
 
@@ -772,6 +773,49 @@ mod tests {
     }
 
     #[test]
+    fn test_pre_review_command_config_dto_validates_schema_version_duplicate_scope_and_non_empty_argv()
+     {
+        let invalid_schema = PreReviewCommandConfigDto {
+            schema_version: CommandConfigSchemaVersionDto { version: 2 },
+            scopes: Vec::new(),
+        };
+        assert!(matches!(
+            decode_pre_review_command_config(invalid_schema),
+            Err(CommandConfigValidationError::InvalidSchemaVersion { .. })
+        ));
+
+        let duplicate_scope = PreReviewCommandConfigDto {
+            schema_version: CommandConfigSchemaVersionDto { version: 1 },
+            scopes: vec![
+                PreReviewScopeCommandDeclarationDto {
+                    scope: ReviewScopeNameDto { value: "implementation".to_owned() },
+                    commands: Vec::new(),
+                },
+                PreReviewScopeCommandDeclarationDto {
+                    scope: ReviewScopeNameDto { value: "implementation".to_owned() },
+                    commands: Vec::new(),
+                },
+            ],
+        };
+        assert!(matches!(
+            decode_pre_review_command_config(duplicate_scope),
+            Err(CommandConfigValidationError::DuplicateScope(_))
+        ));
+
+        let empty_argv = PreReviewCommandConfigDto {
+            schema_version: CommandConfigSchemaVersionDto { version: 1 },
+            scopes: vec![PreReviewScopeCommandDeclarationDto {
+                scope: ReviewScopeNameDto { value: "implementation".to_owned() },
+                commands: vec![command(&[], None)],
+            }],
+        };
+        assert!(matches!(
+            decode_pre_review_command_config(empty_argv),
+            Err(CommandConfigValidationError::EmptyArgv)
+        ));
+    }
+
+    #[test]
     fn test_decode_rejects_duplicate_scope_empty_argv_timeout_and_recursion() {
         let duplicate = PreReviewCommandConfigDto {
             schema_version: CommandConfigSchemaVersionDto { version: 1 },
@@ -810,6 +854,120 @@ mod tests {
     }
 
     #[test]
+    fn test_pre_review_scope_command_declaration_dto_rejects_invalid_command_argv_and_timeout() {
+        for executable in
+            ["./bin/sotp", "target/debug/sotp", "/opt/sotohe/target/debug/sotp", "SOTP.EXE"]
+        {
+            let recursive = PreReviewCommandConfigDto {
+                schema_version: CommandConfigSchemaVersionDto { version: 1 },
+                scopes: vec![PreReviewScopeCommandDeclarationDto {
+                    scope: ReviewScopeNameDto { value: "implementation".to_owned() },
+                    commands: vec![command(&[executable, "review", "local"], None)],
+                }],
+            };
+            assert!(matches!(
+                decode_pre_review_command_config(recursive),
+                Err(CommandConfigValidationError::RecursiveInvocation { .. })
+            ));
+        }
+
+        for timeout in [0, 3_601] {
+            let invalid_timeout = PreReviewCommandConfigDto {
+                schema_version: CommandConfigSchemaVersionDto { version: 1 },
+                scopes: vec![PreReviewScopeCommandDeclarationDto {
+                    scope: ReviewScopeNameDto { value: "implementation".to_owned() },
+                    commands: vec![command(&["bin/sotp", "signal"], Some(timeout))],
+                }],
+            };
+            assert!(matches!(
+                decode_pre_review_command_config(invalid_timeout),
+                Err(CommandConfigValidationError::TimeoutOutOfRange { .. })
+            ));
+        }
+    }
+
+    #[test]
+    fn test_pre_review_command_config_accepts_maximum_timeout() {
+        let config = decode_pre_review_command_config(PreReviewCommandConfigDto {
+            schema_version: CommandConfigSchemaVersionDto { version: 1 },
+            scopes: vec![PreReviewScopeCommandDeclarationDto {
+                scope: ReviewScopeNameDto { value: "implementation".to_owned() },
+                commands: vec![command(&["bin/sotp", "signal"], Some(3_600))],
+            }],
+        })
+        .unwrap();
+
+        let scope =
+            decode_scope(ReviewScopeNameDto { value: "implementation".to_owned() }).unwrap();
+        assert_eq!(config.commands_for(&scope).unwrap()[0].timeout().as_secs(), 3_600);
+    }
+
+    #[test]
+    fn test_pre_review_scope_command_declaration_rejects_all_recursive_subcommands() {
+        for argv in [
+            ["bin/sotp", "phase", "enter"],
+            ["bin/sotp", "review", "local"],
+            ["bin/sotp", "review", "fix-local"],
+        ] {
+            let config = PreReviewCommandConfigDto {
+                schema_version: CommandConfigSchemaVersionDto { version: 1 },
+                scopes: vec![PreReviewScopeCommandDeclarationDto {
+                    scope: ReviewScopeNameDto { value: "implementation".to_owned() },
+                    commands: vec![command(&argv, None)],
+                }],
+            };
+            assert!(matches!(
+                decode_pre_review_command_config(config),
+                Err(CommandConfigValidationError::RecursiveInvocation { .. })
+            ));
+        }
+    }
+
+    #[test]
+    fn test_pre_review_scope_command_declaration_dto_rejects_empty_and_non_literal_argv() {
+        let empty_argv: PreReviewCommandConfigDto = serde_json::from_str(
+            r#"{"schema_version":1,"scopes":[{"scope":"implementation","commands":[{"argv":[],"timeout_seconds":null}]}]}"#,
+        )
+        .unwrap();
+        assert!(matches!(
+            decode_pre_review_command_config(empty_argv),
+            Err(CommandConfigValidationError::EmptyArgv)
+        ));
+        assert!(serde_json::from_str::<PreReviewCommandConfigDto>(
+            r#"{"schema_version":1,"scopes":[{"scope":"implementation","commands":[{"argv":"bin/sotp review local","timeout_seconds":null}]}]}"#,
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn test_command_argv_dto_decode_rejects_empty_arguments() {
+        let dto: ConfiguredCommandDto =
+            serde_json::from_str(r#"{"argv":[],"timeout_seconds":null}"#).unwrap();
+
+        assert!(matches!(decode_command(dto), Err(CommandConfigValidationError::EmptyArgv)));
+    }
+
+    #[test]
+    fn test_review_scope_name_dto_controls_pre_review_declaration_identity() {
+        let same_scope: PreReviewCommandConfigDto = serde_json::from_str(
+            r#"{"schema_version":1,"scopes":[{"scope":"implementation","commands":[]},{"scope":"implementation","commands":[]}]}"#,
+        )
+        .unwrap();
+        assert_eq!(same_scope.scopes[0].scope, same_scope.scopes[1].scope);
+        assert!(matches!(
+            decode_pre_review_command_config(same_scope),
+            Err(CommandConfigValidationError::DuplicateScope(_))
+        ));
+
+        let distinct_scopes: PreReviewCommandConfigDto = serde_json::from_str(
+            r#"{"schema_version":1,"scopes":[{"scope":"implementation","commands":[]},{"scope":"infrastructure","commands":[]}]}"#,
+        )
+        .unwrap();
+        assert_ne!(distinct_scopes.scopes[0].scope, distinct_scopes.scopes[1].scope);
+        assert!(decode_pre_review_command_config(distinct_scopes).is_ok());
+    }
+
+    #[test]
     fn test_decode_pre_review_config_rejects_invalid_review_scope() {
         for scope in ["", "Other", "範囲"] {
             let dto = PreReviewCommandConfigDto {
@@ -829,27 +987,28 @@ mod tests {
 
     #[test]
     fn test_pre_review_loader_rejects_all_denylisted_prefixes_with_trailing_arguments() {
-        for argv in [
-            r#"["bin/sotp", "phase", "enter", "implementation"]"#,
-            r#"["bin/sotp", "review", "local", "--scope", "infrastructure"]"#,
-            r#"["bin/sotp", "review", "fix-local", "--scope", "infrastructure"]"#,
-        ] {
-            let result = load_pre_review_config(&format!(
-                r#"{{
-                    "schema_version": 1,
-                    "scopes": [{{
-                        "scope": "infrastructure",
-                        "commands": [{{"argv": {argv}, "timeout_seconds": null}}]
-                    }}]
-                }}"#,
-            ));
+        for executable in
+            ["./bin/sotp", "target/debug/sotp", "/opt/sotohe/target/debug/sotp", "SOTP.EXE"]
+        {
+            for subcommand in [["phase", "enter"], ["review", "local"], ["review", "fix-local"]] {
+                let result = load_pre_review_config(&format!(
+                    r#"{{
+                        "schema_version": 1,
+                        "scopes": [{{
+                            "scope": "infrastructure",
+                            "commands": [{{"argv": ["{executable}", "{}", "{}", "--scope", "infrastructure"], "timeout_seconds": null}}]
+                        }}]
+                    }}"#,
+                    subcommand[0], subcommand[1],
+                ));
 
-            assert!(matches!(
-                result,
-                Err(CommandConfigLoadError::Invalid(
-                    CommandConfigValidationError::RecursiveInvocation { .. }
-                ))
-            ));
+                assert!(matches!(
+                    result,
+                    Err(CommandConfigLoadError::Invalid(
+                        CommandConfigValidationError::RecursiveInvocation { .. }
+                    ))
+                ));
+            }
         }
     }
 
@@ -1048,26 +1207,59 @@ mod tests {
 
     #[test]
     fn test_phase_loader_rejects_denylisted_prefix_with_trailing_arguments() {
-        let result = load_phase_config(
-            r#"{
-                "schema_version": 1,
-                "phases": [{
-                    "id":"implementation",
-                    "writer":{
-                        "argv":["bin/sotp","review","local","--scope","cli"],
-                        "timeout_seconds":null
-                    },
-                    "pre_entry_commands":[]
-                }]
-            }"#,
-        );
+        for executable in
+            ["./bin/sotp", "target/debug/sotp", "/opt/sotohe/target/debug/sotp", "SOTP.EXE"]
+        {
+            for subcommand in [["phase", "enter"], ["review", "local"], ["review", "fix-local"]] {
+                let result = load_phase_config(&format!(
+                    r#"{{
+                        "schema_version": 1,
+                        "phases": [{{
+                            "id":"implementation",
+                            "writer":{{
+                                "argv":["{executable}","{}","{}","--scope","cli"],
+                                "timeout_seconds":null
+                            }},
+                            "pre_entry_commands":[]
+                        }}]
+                    }}"#,
+                    subcommand[0], subcommand[1],
+                ));
 
-        assert!(matches!(
-            result,
-            Err(CommandConfigLoadError::Invalid(
-                CommandConfigValidationError::RecursiveInvocation { .. }
-            ))
-        ));
+                assert!(matches!(
+                    result,
+                    Err(CommandConfigLoadError::Invalid(
+                        CommandConfigValidationError::RecursiveInvocation { .. }
+                    ))
+                ));
+            }
+        }
+    }
+
+    #[test]
+    fn test_phase_loader_rejects_recursive_phase_enter_and_review_fix_local_pre_entry_argv() {
+        for argv in [
+            r#"["bin/sotp","phase","enter","--scope","cli"]"#,
+            r#"["bin/sotp","review","fix-local","--scope","cli"]"#,
+        ] {
+            let result = load_phase_config(&format!(
+                r#"{{
+                    "schema_version": 1,
+                    "phases": [{{
+                        "id":"implementation",
+                        "writer":{{"argv":["bin/sotp","signal"],"timeout_seconds":null}},
+                        "pre_entry_commands":[{{"argv":{argv},"timeout_seconds":null}}]
+                    }}]
+                }}"#,
+            ));
+
+            assert!(matches!(
+                result,
+                Err(CommandConfigLoadError::Invalid(
+                    CommandConfigValidationError::RecursiveInvocation { .. }
+                ))
+            ));
+        }
     }
 
     #[test]
@@ -1267,6 +1459,52 @@ mod tests {
         let values: Vec<&str> =
             dto.arguments.iter().map(|argument| argument.value.as_str()).collect();
         assert_eq!(values, ["bin/sotp", "task-contract", "check"]);
+    }
+
+    #[test]
+    fn test_configured_command_dto_deserializes_command_shape_and_rejects_unknown_fields() {
+        let dto: ConfiguredCommandDto =
+            serde_json::from_str(r#"{"argv":["bin/sotp","signal","check"],"timeout_seconds":12}"#)
+                .unwrap();
+
+        let argv: Vec<&str> =
+            dto.argv.arguments.iter().map(|argument| argument.value.as_str()).collect();
+        assert_eq!(argv, ["bin/sotp", "signal", "check"]);
+        assert_eq!(dto.timeout_seconds.map(|timeout| timeout.seconds), Some(12));
+        assert!(
+            serde_json::from_str::<ConfiguredCommandDto>(
+                r#"{"argv":["bin/sotp","signal"],"timeout_seconds":null,"extra":true}"#,
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_pre_review_scope_command_declaration_dto_deserializes_gates_shape_and_rejects_unknown_fields()
+     {
+        let dto: PreReviewCommandConfigDto = serde_json::from_str(
+            r#"{
+                "schema_version": 1,
+                "scopes": [{
+                    "scope": "implementation",
+                    "commands": [{"argv": ["bin/sotp", "signal", "check"], "timeout_seconds": null}]
+                }]
+            }"#,
+        )
+        .unwrap();
+
+        assert_eq!(dto.scopes.len(), 1);
+        assert_eq!(dto.scopes[0].scope.value, "implementation");
+        assert_eq!(dto.scopes[0].commands[0].argv.arguments[0].value, "bin/sotp");
+        assert!(
+            serde_json::from_str::<PreReviewCommandConfigDto>(
+                r#"{
+                "schema_version": 1,
+                "scopes": [{"scope": "implementation", "commands": [], "extra": true}]
+            }"#,
+            )
+            .is_err()
+        );
     }
 
     #[test]

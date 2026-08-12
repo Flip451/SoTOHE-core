@@ -556,10 +556,10 @@
     },
     {
       "claim_hash": "079521ac57ccf0ce57502eaa781898372387fa8f3645071f87b49241f935caf0",
-      "evidence_hash": "213840898b304208d16ca9f4c31b455230724c7df0d5ddb01097e2edccd94861",
+      "evidence_hash": "43902c170bc1460260f1a4eecd050bd5a558832b6a75ec1a6c39b240a798bfed",
       "verdict": {
         "kind": "pass",
-        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `["
+        "citation": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -574,7 +574,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに writer/pre-entry argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、または `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+          "text_label": "phase command config は各 phase の unique id、canonical writer 一件、ordered pre-entry argv 群、timeout を machine-readable に表す。validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
         }
       }
     },
@@ -796,10 +796,10 @@
     },
     {
       "claim_hash": "55c675db14bbbba4d64a8210986311c7a5b9b677d0e1772030b00b7a727a49ec",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -814,7 +814,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -1372,199 +1372,7 @@
     },
     {
       "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "ClaudeLocalArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
-      "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
-      "verdict": {
-        "kind": "pass",
-        "citation": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "ClaudeLocalArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-07",
-          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
-      "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "CodexLocalArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-05",
-          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
-      "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
-      "verdict": {
-        "kind": "pass",
-        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "CodexLocalArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-03",
-          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `["
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "CodexLocalArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
-      "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
-      "verdict": {
-        "kind": "pass",
-        "citation": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "CodexLocalArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-07",
-          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd",
-      "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "ValidatedAutoRecordArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-05",
-          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
-        }
-      }
-    },
-    {
-      "claim_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd",
-      "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
-      "verdict": {
-        "kind": "pass",
-        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "types",
-          "entry_key": "ValidatedAutoRecordArgs"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-03",
-          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
-        }
-      }
-    },
-    {
-      "claim_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
         "citation": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
@@ -1574,6 +1382,198 @@
         "data": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
           "section_key": "types",
+          "entry_key": "ClaudeLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
+      "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "ClaudeLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
+      "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CodexLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
+      "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CodexLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CodexLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
+      "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "CodexLocalArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd",
+      "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "ValidatedAutoRecordArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd",
+      "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
+          "entry_key": "ValidatedAutoRecordArgs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "types",
           "entry_key": "ValidatedAutoRecordArgs"
         }
       },
@@ -1582,7 +1582,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -1636,10 +1636,10 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+        "citation": "validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1654,7 +1654,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -1732,10 +1732,10 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `["
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1750,7 +1750,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -1828,10 +1828,10 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
+        "citation": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1846,7 +1846,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -1924,7 +1924,7 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
         "citation": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
@@ -1942,7 +1942,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -2020,10 +2020,10 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2038,7 +2038,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -2116,7 +2116,103 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::codex_local::review_input_from_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::codex_local::review_input_from_args"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp review local` が scope を解決してその配列を順次 dispatch する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::codex_local::run_execute_codex_local"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
+        }
+      }
+    },
+    {
+      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::review::codex_local::run_execute_codex_local"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
         "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。"
@@ -2126,102 +2222,6 @@
         "data": {
           "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
           "section_key": "functions",
-          "entry_key": "cli::commands::review::codex_local::review_input_from_args"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
-      "verdict": {
-        "kind": "pass",
-        "citation": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "functions",
-          "entry_key": "cli::commands::review::codex_local::review_input_from_args"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-07",
-          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp review local` が scope を解決してその配列を順次 dispatch する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "functions",
-          "entry_key": "cli::commands::review::codex_local::run_execute_codex_local"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-05",
-          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
-        }
-      }
-    },
-    {
-      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
-      "verdict": {
-        "kind": "pass",
-        "citation": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "functions",
-          "entry_key": "cli::commands::review::codex_local::run_execute_codex_local"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-03",
-          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
-        }
-      }
-    },
-    {
-      "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli-types.json",
-          "section_key": "functions",
           "entry_key": "cli::commands::review::codex_local::run_execute_codex_local"
         }
       },
@@ -2230,7 +2230,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -2308,10 +2308,10 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "「`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。」"
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2326,7 +2326,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -2404,10 +2404,10 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し"
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2422,7 +2422,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },
@@ -2500,10 +2500,10 @@
     },
     {
       "claim_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
-      "evidence_hash": "2be761837adb9975072173a0841bff11b2278f47b3d588641d778b0f97663766",
+      "evidence_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
       "verdict": {
         "kind": "pass",
-        "citation": "「`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。」"
+        "citation": "`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -2518,7 +2518,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または configured argv の先頭三要素が exactly `[\"bin/sotp\", \"phase\", \"enter\"]`、`[\"bin/sotp\", \"review\", \"local\"]`、もしくは `[\"bin/sotp\", \"review\", \"fix-local\"]` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
         }
       }
     },

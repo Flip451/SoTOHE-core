@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-12T07:19:49Z",
+  "generated_at": "2026-08-12T10:24:40Z",
   "declaration_hash": "b7009eb9aa9026d774fc44618d5040763df80b2ef1458313f0441d5887475826",
-  "implementation_input_hash": "ddce7d33399681b5b48c2a86e60329b6f5faec5f50b05a66d92a3b641a4b5946",
+  "implementation_input_hash": "5b18d2b5be60d51740ea9de6512f8a37b9d7f8f16a88f38d00f23fcb33a82c71",
   "signals": [
     {
       "type_name": "CommandArgumentDto",

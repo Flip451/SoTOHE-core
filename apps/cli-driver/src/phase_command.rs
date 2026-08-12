@@ -431,12 +431,16 @@ mod tests {
 
     fn failed_record(outcome: ProgramRunOutcome) -> FailedProgramExecutionRecord {
         let command = command_with_timeout(&["bin/sotp", "capability", "exec"], 1);
+        let invoked_argv = match command.argv().with_appended_arguments([
+            CommandArgument::try_new("--host".to_owned()),
+            CommandArgument::try_new("codex".to_owned()),
+        ]) {
+            Ok(argv) => argv,
+            Err(error) => panic!("capability exec host arguments must remain valid: {error:?}"),
+        };
         let record = ProgramExecutionRecord {
             sequence_index: CommandSequenceIndex::new(1),
-            invoked_argv: command.argv().with_appended_arguments([
-                CommandArgument::try_new("--host".to_owned()),
-                CommandArgument::try_new("codex".to_owned()),
-            ]),
+            invoked_argv,
             command,
             outcome,
         };
@@ -593,12 +597,16 @@ mod tests {
     #[test]
     fn test_phase_enter_completed_host_bearing_writer_renders_actual_argv() {
         let command = command_with_timeout(&["bin/sotp", "capability", "exec"], 1);
+        let invoked_argv = match command.argv().with_appended_arguments([
+            CommandArgument::try_new("--host".to_owned()),
+            CommandArgument::try_new("codex".to_owned()),
+        ]) {
+            Ok(argv) => argv,
+            Err(error) => panic!("capability exec host arguments must remain valid: {error:?}"),
+        };
         let writer_record = match (ProgramExecutionRecord {
             sequence_index: CommandSequenceIndex::new(3),
-            invoked_argv: command.argv().with_appended_arguments([
-                CommandArgument::try_new("--host".to_owned()),
-                CommandArgument::try_new("codex".to_owned()),
-            ]),
+            invoked_argv,
             command,
             outcome: ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(0),

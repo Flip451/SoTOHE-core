@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-08-12T06:40:42Z",
-  "declaration_hash": "cb90c13c9f255dd8ac36cc5b8f783eb54536aebe9dcc6f79f252e3236cf7c34b",
-  "implementation_input_hash": "a91e4d7b2a1d3dda39ac4c24e798ee0d9cc71536d87c05fdde41b844cea15382",
+  "generated_at": "2026-08-12T11:16:08Z",
+  "declaration_hash": "8168909fa5d0ccddc25fbed27c3dcf619377c3109504458e38bf7fdbe9f86a38",
+  "implementation_input_hash": "03b2922e4a264c28667ab697b0895bf6043499557e6aa2a1951cc2aa050c2ef2",
   "signals": [
     {
       "type_name": "CapabilityExecRequest",

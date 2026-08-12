@@ -392,7 +392,9 @@ mod tests {
     use domain::TrackId;
     use domain::review_v2::{MainScopeName, ScopeName};
 
-    use crate::operator_command::{CommandArgument, CommandConfigSchemaVersion, ConfiguredCommand};
+    use crate::operator_command::{
+        CommandArgument, CommandConfigLoadError, CommandConfigSchemaVersion, ConfiguredCommand,
+    };
     use crate::program_runner::{
         CapturedProgramOutput, ClassifiedProgramExecutionRecord, FailedProgramExecutionRecord,
         ProgramExecutionRecord, ProgramExitCode, ProgramInvocation, ProgramOutputStream,
@@ -407,10 +409,10 @@ mod tests {
     use super::{
         CurrentReviewTrackResolveError, CurrentReviewTrackResolverPort, PreReviewCommandConfig,
         PreReviewCommandConfigLoaderPort, PreReviewCommandConfigValidationError,
-        PreReviewCommandDispatchCommand, PreReviewCommandDispatchInteractor,
-        PreReviewCommandDispatchOutcome, PreReviewCommandDispatchService,
-        PreReviewCommandGatedReviewInteractor, PreReviewScopeCommandDeclaration,
-        ReviewScopeSelector, ReviewTrackSelector,
+        PreReviewCommandDispatchCommand, PreReviewCommandDispatchError,
+        PreReviewCommandDispatchInteractor, PreReviewCommandDispatchOutcome,
+        PreReviewCommandDispatchService, PreReviewCommandGatedReviewInteractor,
+        PreReviewScopeCommandDeclaration, ReviewScopeSelector, ReviewTrackSelector,
     };
 
     fn scope(value: &str) -> ScopeName {
@@ -463,6 +465,31 @@ mod tests {
             PreReviewCommandConfig::try_new(CommandConfigSchemaVersion::new(2), Vec::new()),
             Err(PreReviewCommandConfigValidationError::InvalidSchemaVersion { .. })
         ));
+    }
+
+    #[test]
+    fn test_pre_review_command_dispatch_error_exposes_all_declared_failure_variants() {
+        let config = PreReviewCommandDispatchError::from(CommandConfigLoadError::DecodeFailed {
+            message: domain::FreeText::new("invalid configuration"),
+        });
+        let unknown_scope = PreReviewCommandDispatchError::UnknownScope(scope("implementation"));
+        let track_resolution =
+            PreReviewCommandDispatchError::from(CurrentReviewTrackResolveError::ResolveFailed {
+                message: domain::FreeText::new("branch unavailable"),
+            });
+        let track_mismatch = PreReviewCommandDispatchError::TrackMismatch {
+            explicit: TrackId::try_new("requested-track".to_owned()).unwrap(),
+            resolved: TrackId::try_new("resolved-track".to_owned()).unwrap(),
+        };
+        let runner = PreReviewCommandDispatchError::from(ProgramRunnerError::SpawnFailed {
+            message: domain::FreeText::new("runner unavailable"),
+        });
+
+        assert!(matches!(config, PreReviewCommandDispatchError::Config(_)));
+        assert!(matches!(unknown_scope, PreReviewCommandDispatchError::UnknownScope(_)));
+        assert!(matches!(track_resolution, PreReviewCommandDispatchError::TrackResolution(_)));
+        assert!(matches!(track_mismatch, PreReviewCommandDispatchError::TrackMismatch { .. }));
+        assert!(matches!(runner, PreReviewCommandDispatchError::Runner(_)));
     }
 
     #[test]

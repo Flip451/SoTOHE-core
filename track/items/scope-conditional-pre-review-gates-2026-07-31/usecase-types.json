@@ -81,7 +81,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Self"
+          "returns": "Result<Self, CommandArgvValidationError>"
         }
       ],
       "type_name": "CommandArgv"

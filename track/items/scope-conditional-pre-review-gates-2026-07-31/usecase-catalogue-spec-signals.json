@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "cb90c13c9f255dd8ac36cc5b8f783eb54536aebe9dcc6f79f252e3236cf7c34b",
+  "catalogue_declaration_hash": "8168909fa5d0ccddc25fbed27c3dcf619377c3109504458e38bf7fdbe9f86a38",
   "signals": [
     {
       "type_name": "CapabilityExecInteractor",

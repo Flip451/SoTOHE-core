@@ -7,9 +7,9 @@ use thiserror::Error;
 
 use crate::capability_exec::ProviderName;
 use crate::operator_command::{
-    CommandArgument, CommandConfigLoadError, CommandConfigSchemaVersion,
+    CommandArgument, CommandArgv, CommandConfigLoadError, CommandConfigSchemaVersion,
     CommandConfigValidationError, CommandDeclarationId, CommandSequenceIndex, ConfiguredCommand,
-    OutputCaptureLimitBytes,
+    ConfiguredCommandValidationError, OutputCaptureLimitBytes,
 };
 use crate::program_runner::{
     ClassifiedProgramExecutionRecord, FailedProgramExecutionRecord, ProgramExecutionRecord,
@@ -291,7 +291,7 @@ impl PhaseCommandService for PhaseCommandInteractor {
         let record = self.run(
             CommandSequenceIndex::new(completed.len()),
             writer.clone(),
-            writer_argv(&writer, command.host.as_ref()),
+            writer_argv(&writer, command.host.as_ref())?,
             &command.repository_root,
         )?;
         match record.classify() {
@@ -311,13 +311,20 @@ impl PhaseCommandService for PhaseCommandInteractor {
 fn writer_argv(
     command: &ConfiguredCommand,
     host: Option<&ProviderName>,
-) -> crate::operator_command::CommandArgv {
+) -> Result<CommandArgv, CommandConfigLoadError> {
     match host.filter(|_| is_capability_exec(command)) {
-        Some(host) => command.argv().with_appended_arguments([
-            CommandArgument::try_new("--host".to_owned()),
-            CommandArgument::try_new(host.as_str().to_owned()),
-        ]),
-        None => command.argv().clone(),
+        Some(host) => command
+            .argv()
+            .with_appended_arguments([
+                CommandArgument::try_new("--host".to_owned()),
+                CommandArgument::try_new(host.as_str().to_owned()),
+            ])
+            .map_err(|error| {
+                CommandConfigLoadError::Invalid(
+                    ConfiguredCommandValidationError::Argv(error).into(),
+                )
+            }),
+        None => Ok(command.argv().clone()),
     }
 }
 
@@ -584,30 +591,34 @@ mod tests {
 
     #[test]
     fn test_phase_command_config_rejects_recursive_review_fix_local_prefix() {
-        let recursive_writer = raw_config(
-            1,
-            vec![raw_declaration(
-                "phase-one",
-                raw_command(&["bin/sotp", "review", "fix-local"], None),
-                Vec::new(),
-            )],
-        );
-        let recursive_pre_entry = raw_config(
-            1,
-            vec![raw_declaration(
-                "phase-one",
-                raw_command(&["writer"], None),
-                vec![raw_command(&["bin/sotp", "review", "fix-local"], None)],
-            )],
-        );
+        for executable in ["./bin/sotp", "target/debug/sotp", "/opt/sotohe/target/debug/sotp"] {
+            for subcommand in [["phase", "enter"], ["review", "local"], ["review", "fix-local"]] {
+                let recursive_writer = raw_config(
+                    1,
+                    vec![raw_declaration(
+                        "phase-one",
+                        raw_command(&[executable, subcommand[0], subcommand[1]], None),
+                        Vec::new(),
+                    )],
+                );
+                let recursive_pre_entry = raw_config(
+                    1,
+                    vec![raw_declaration(
+                        "phase-one",
+                        raw_command(&["writer"], None),
+                        vec![raw_command(&[executable, subcommand[0], subcommand[1]], None)],
+                    )],
+                );
 
-        for configuration in [&recursive_writer, &recursive_pre_entry] {
-            assert!(matches!(
-                decode_config(configuration),
-                Err(crate::operator_command::CommandConfigLoadError::Invalid(
-                    CommandConfigValidationError::RecursiveInvocation { .. }
-                ))
-            ));
+                for configuration in [&recursive_writer, &recursive_pre_entry] {
+                    assert!(matches!(
+                        decode_config(configuration),
+                        Err(crate::operator_command::CommandConfigLoadError::Invalid(
+                            CommandConfigValidationError::RecursiveInvocation { .. }
+                        ))
+                    ));
+                }
+            }
         }
     }
 
@@ -831,6 +842,49 @@ mod tests {
     }
 
     #[test]
+    fn test_phase_command_config_loader_rejects_recursive_sotp_basename_variants() {
+        let mut configurations = Vec::new();
+        let mut roots = Vec::new();
+
+        for (executable_index, executable) in
+            ["./bin/sotp", "target/debug/sotp", "/opt/sotohe/target/debug/sotp", "SOTP.EXE"]
+                .iter()
+                .enumerate()
+        {
+            for (subcommand_index, subcommand) in
+                [["phase", "enter"], ["review", "local"], ["review", "fix-local"]]
+                    .iter()
+                    .enumerate()
+            {
+                let root =
+                    PathBuf::from(format!("/recursive-{executable_index}-{subcommand_index}"));
+                configurations.push((
+                    root.clone(),
+                    raw_config(
+                        1,
+                        vec![raw_declaration(
+                            "phase-one",
+                            raw_command(&[executable, subcommand[0], subcommand[1]], None),
+                            Vec::new(),
+                        )],
+                    ),
+                ));
+                roots.push(root);
+            }
+        }
+
+        let loader = RootedValidatingLoader::new(configurations);
+        for root in roots {
+            assert!(matches!(
+                loader.load(&root),
+                Err(crate::operator_command::CommandConfigLoadError::Invalid(
+                    CommandConfigValidationError::RecursiveInvocation { .. }
+                ))
+            ));
+        }
+    }
+
+    #[test]
     fn test_phase_command_config_loader_preserves_order_and_default_timeout_for_selected_root() {
         let loader = RootedValidatingLoader::new([
             (
@@ -959,6 +1013,19 @@ mod tests {
             Ok(ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(exit_code),
                 output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+            })
+        }
+    }
+
+    struct FailingRunner;
+
+    impl ProgramRunnerPort for FailingRunner {
+        fn run(
+            &self,
+            _invocation: ProgramInvocation,
+        ) -> Result<ProgramRunOutcome, ProgramRunnerError> {
+            Err(ProgramRunnerError::SpawnFailed {
+                message: domain::FreeText::new("runner unavailable".to_owned()),
             })
         }
     }
@@ -1232,6 +1299,57 @@ mod tests {
     }
 
     #[test]
+    fn test_phase_command_service_validate_rejects_recursive_sotp_basename_variants_before_launch()
+    {
+        let mut configurations = Vec::new();
+        let mut roots = Vec::new();
+
+        for (executable_index, executable) in
+            ["./bin/sotp", "target/debug/sotp", "/opt/sotohe/target/debug/sotp", "SOTP.EXE"]
+                .iter()
+                .enumerate()
+        {
+            for (subcommand_index, subcommand) in
+                [["phase", "enter"], ["review", "local"], ["review", "fix-local"]]
+                    .iter()
+                    .enumerate()
+            {
+                let root = PathBuf::from(format!(
+                    "/service-recursive-{executable_index}-{subcommand_index}"
+                ));
+                configurations.push((
+                    root.clone(),
+                    raw_config(
+                        1,
+                        vec![raw_declaration(
+                            "phase-one",
+                            raw_command(&[executable, subcommand[0], subcommand[1]], None),
+                            Vec::new(),
+                        )],
+                    ),
+                ));
+                roots.push(root);
+            }
+        }
+
+        let runner = Arc::new(RecordingRunner { invocations: Mutex::new(Vec::new()) });
+        let service = PhaseCommandInteractor::new(
+            Arc::new(RootedValidatingLoader::new(configurations)),
+            runner.clone(),
+        );
+
+        for root in roots {
+            assert!(matches!(
+                service.validate(PhaseValidateCommand { repository_root: root }),
+                Err(CommandConfigLoadError::Invalid(
+                    CommandConfigValidationError::RecursiveInvocation { .. }
+                ))
+            ));
+        }
+        assert!(runner.invocations().is_empty());
+    }
+
+    #[test]
     fn test_phase_command_service_explain_returns_selected_declaration() {
         let (service, _) = enter_service(
             command_argv(&["bin/sotp", "capability", "exec", "implementer", "briefing.md"]),
@@ -1311,6 +1429,41 @@ mod tests {
             )))
         ));
         assert!(runner.invocations().is_empty());
+    }
+
+    #[test]
+    fn test_phase_command_enter_returns_unknown_phase_error_without_running_commands() {
+        let (service, runner) = enter_service(command("writer"), Vec::new());
+        let unknown_phase = CommandDeclarationId::try_new("unknown-phase".to_owned()).unwrap();
+
+        assert!(matches!(
+            service.enter(PhaseEnterCommand {
+                repository_root: PathBuf::from("/repository"),
+                phase_id: unknown_phase.clone(),
+                host: None,
+            }),
+            Err(super::PhaseCommandEnterError::UnknownPhase(phase_id)) if phase_id == unknown_phase
+        ));
+        assert!(runner.invocations().is_empty());
+    }
+
+    #[test]
+    fn test_phase_command_enter_propagates_runner_failure() {
+        let declaration = PhaseCommandDeclaration::new(
+            CommandDeclarationId::try_new("phase-one".to_owned()).unwrap(),
+            command("writer"),
+            Vec::new(),
+        );
+        let config =
+            PhaseCommandConfig::try_new(CommandConfigSchemaVersion::new(1), vec![declaration])
+                .unwrap();
+        let service =
+            PhaseCommandInteractor::new(Arc::new(StaticLoader(config)), Arc::new(FailingRunner));
+
+        assert!(matches!(
+            service.enter(enter_command(None)),
+            Err(super::PhaseCommandEnterError::Runner(ProgramRunnerError::SpawnFailed { .. }))
+        ));
     }
 
     #[test]

@@ -249,9 +249,8 @@
     },
     {
       "id": "T044",
-      "description": "review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。IN-16、CN-02。",
+      "description": "review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。`libs/usecase/src/operator_command.rs` と phase/pre-review config loaders の executable-basename recursion rejection および対応テストを更新する。IN-16、CN-02、CN-01、AC-01、AC-05。",
       "status": "in_progress",
-      "commit_hash": null,
       "depends_on": [
         "T043"
       ]
@@ -353,8 +352,8 @@
           "T037"
         ]
       },
-    {
-      "id": "S4",
+      {
+        "id": "S4",
         "title": "phase-entry convergence matrix",
         "description": [
           "T038–T041 は exit-code check commands、per-phase matrix configuration、canonical workflow entrypoint を追加・更新する。IN-12、IN-13、CN-06、AC-14、AC-15、AC-16。"
@@ -366,18 +365,18 @@
           "T039",
           "T040",
           "T041"
-      ]
-    },
-    {
-      "id": "S5",
-      "title": "post-rejection review-fix restoration",
-      "description": [
-        "T044 は path-carrying review-fix delivery と process-group containment を復元する。IN-16、CN-02。"
-      ],
-      "task_ids": [
-        "T044"
-      ]
-    }
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "post-rejection review-fix restoration",
+        "description": [
+          "T044 は path-carrying review-fix delivery と process-group containment を復元する。IN-16、CN-02。"
+        ],
+        "task_ids": [
+          "T044"
+        ]
+      }
     ]
   }
 }
