@@ -78,7 +78,7 @@ impl CommandArgv {
 /// accepts an optional `.exe` suffix so configuration remains safe on
 /// case-insensitive Windows filesystems. A bare `sotp` is also rejected
 /// because it can resolve to this process through `PATH`.
-fn is_sotp_executable(value: &CommandArgument) -> bool {
+pub(crate) fn is_sotp_executable(value: &CommandArgument) -> bool {
     let basename = value.as_str().rsplit(['/', '\\']).next().unwrap_or_default();
     let normalized_basename = basename.to_ascii_lowercase();
     let stem = normalized_basename.strip_suffix(".exe").unwrap_or(&normalized_basename);

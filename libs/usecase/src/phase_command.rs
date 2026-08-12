@@ -9,7 +9,7 @@ use crate::capability_exec::ProviderName;
 use crate::operator_command::{
     CommandArgument, CommandArgv, CommandConfigLoadError, CommandConfigSchemaVersion,
     CommandConfigValidationError, CommandDeclarationId, CommandSequenceIndex, ConfiguredCommand,
-    ConfiguredCommandValidationError, OutputCaptureLimitBytes,
+    ConfiguredCommandValidationError, OutputCaptureLimitBytes, is_sotp_executable,
 };
 use crate::program_runner::{
     ClassifiedProgramExecutionRecord, FailedProgramExecutionRecord, ProgramExecutionRecord,
@@ -329,11 +329,11 @@ fn writer_argv(
 }
 
 fn is_capability_exec(command: &ConfiguredCommand) -> bool {
-    command.argv().arguments().iter().take(3).map(CommandArgument::as_str).eq([
-        "bin/sotp",
-        "capability",
-        "exec",
-    ])
+    let Some((executable, arguments)) = command.argv().arguments().split_first() else {
+        return false;
+    };
+    is_sotp_executable(executable)
+        && arguments.iter().take(2).map(CommandArgument::as_str).eq(["capability", "exec"])
 }
 
 #[cfg(test)]
@@ -1594,47 +1594,49 @@ mod tests {
 
     #[test]
     fn test_phase_command_enter_appends_supplied_host_only_to_capability_exec_writer() {
-        let writer =
-            command_argv(&["bin/sotp", "capability", "exec", "implementer", "briefing.md"]);
-        let (service, runner) = enter_service(writer.clone(), vec![command_argv(&["pre-entry"])]);
+        for executable in ["sotp", "./bin/sotp", "target/debug/sotp"] {
+            let writer = command_argv(&[executable, "capability", "exec", "implementer"]);
+            let (service, runner) = enter_service(writer.clone(), Vec::new());
 
+            let outcome = service
+                .enter(enter_command(Some(ProviderName::try_new("codex").unwrap())))
+                .unwrap();
+
+            let invocations = runner.invocations();
+            let [writer_invocation] = invocations.as_slice() else {
+                panic!("expected one writer invocation");
+            };
+            assert_eq!(
+                argv_values(writer_invocation),
+                vec![executable, "capability", "exec", "implementer", "--host", "codex"]
+            );
+            match outcome {
+                PhaseCommandEnterOutcome::Completed { writer_record, .. } => {
+                    assert_eq!(writer_record.as_ref().command, writer);
+                }
+                PhaseCommandEnterOutcome::Blocked { .. } => {
+                    panic!("expected completed enter outcome")
+                }
+            }
+        }
+
+        let writer = command_argv(&["writer", "capability", "exec", "implementer"]);
+        let (service, runner) = enter_service(writer.clone(), Vec::new());
         let outcome =
             service.enter(enter_command(Some(ProviderName::try_new("codex").unwrap()))).unwrap();
 
         let invocations = runner.invocations();
-        let [pre_entry, writer_invocation] = invocations.as_slice() else {
-            panic!("expected pre-entry and writer invocations");
+        let [writer_invocation] = invocations.as_slice() else {
+            panic!("expected one writer invocation");
         };
-        assert_eq!(argv_values(pre_entry), vec!["pre-entry"]);
         assert_eq!(
             argv_values(writer_invocation),
-            vec!["bin/sotp", "capability", "exec", "implementer", "briefing.md", "--host", "codex",]
-        );
-        assert_eq!(
-            writer.argv().arguments().iter().map(CommandArgument::as_str).collect::<Vec<_>>(),
-            vec!["bin/sotp", "capability", "exec", "implementer", "briefing.md"]
+            vec!["writer", "capability", "exec", "implementer"]
         );
         match outcome {
             PhaseCommandEnterOutcome::Completed { writer_record, .. } => {
                 assert_eq!(writer_record.as_ref().command, writer);
-                assert_eq!(
-                    writer_record
-                        .as_ref()
-                        .invoked_argv
-                        .arguments()
-                        .iter()
-                        .map(CommandArgument::as_str)
-                        .collect::<Vec<_>>(),
-                    vec![
-                        "bin/sotp",
-                        "capability",
-                        "exec",
-                        "implementer",
-                        "briefing.md",
-                        "--host",
-                        "codex",
-                    ]
-                );
+                assert_eq!(writer_record.as_ref().invoked_argv, *writer.argv());
             }
             PhaseCommandEnterOutcome::Blocked { .. } => panic!("expected completed enter outcome"),
         }
