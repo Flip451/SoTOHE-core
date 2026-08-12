@@ -307,6 +307,9 @@ mod tests {
         let rustdoc_json = minimal_rustdoc_json();
         std::fs::write(&rustdoc_path, &rustdoc_json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), rustdoc_json).unwrap();
+        crate::verify::test_support::git_init(root);
+        crate::verify::test_support::run_git(root, &["add", "."]);
+        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
 
         (workspace, rustdoc_path)
     }

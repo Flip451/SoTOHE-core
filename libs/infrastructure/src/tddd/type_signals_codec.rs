@@ -1,11 +1,10 @@
 //! Serde codec for per-layer TDDD evaluation-result files.
 
 use domain::tddd::type_signals_doc::{
-    BaselineHash, CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest,
-    Sha256DigestError, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsSchemaVersion,
-    TypeSignalsSchemaVersionError,
+    BaselineHash, CatalogueDeclarationHash, Sha256Digest, Sha256DigestError, TypeSignalsCacheKey,
+    TypeSignalsDocument, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
 };
-use domain::{ContentHash, FreeText, Timestamp, TypeSignal};
+use domain::{CommitHash, ContentHash, FreeText, Timestamp, TypeSignal};
 use serde::{Deserialize, Serialize};
 use sha2::Digest;
 
@@ -38,7 +37,7 @@ struct TypeSignalsDocDto {
     schema_version: u32,
     generated_at: String,
     declaration_hash: String,
-    implementation_input_hash: String,
+    head_commit: String,
     baseline_hash: String,
     signals: Vec<TypeSignalDto>,
 }
@@ -79,10 +78,7 @@ pub fn decode(json: &str) -> Result<TypeSignalsDocument, TypeSignalsCodecError> 
     }
     let cache_key = TypeSignalsCacheKey::new(
         CatalogueDeclarationHash::new(parse_digest("declaration_hash", dto.declaration_hash)?),
-        ImplementationInputHash::new(parse_digest(
-            "implementation_input_hash",
-            dto.implementation_input_hash,
-        )?),
+        parse_head_commit(dto.head_commit)?,
         BaselineHash::new(parse_digest("baseline_hash", dto.baseline_hash)?),
     );
     Ok(TypeSignalsDocument::with_schema_version(
@@ -106,12 +102,7 @@ pub fn encode(doc: &TypeSignalsDocument) -> Result<String, TypeSignalsCodecError
         schema_version: doc.schema_version().value(),
         generated_at: doc.generated_at().as_str().to_owned(),
         declaration_hash: doc.cache_key().declaration_hash().as_digest().as_str().to_owned(),
-        implementation_input_hash: doc
-            .cache_key()
-            .implementation_input_hash()
-            .as_digest()
-            .as_str()
-            .to_owned(),
+        head_commit: doc.cache_key().head_commit().as_ref().to_owned(),
         baseline_hash: doc.cache_key().baseline_hash().as_digest().as_str().to_owned(),
         signals: doc.signals().iter().map(signal_to_dto).collect(),
     };
@@ -130,7 +121,7 @@ pub fn declaration_hash(declaration_bytes: &[u8]) -> CatalogueDeclarationHash {
 
 /// Computes the SHA-256 digest of baseline file bytes.
 #[must_use = "the baseline hash is required to validate type-signal freshness"]
-pub fn baseline_hash(baseline_bytes: &[u8]) -> BaselineHash {
+pub(crate) fn baseline_hash(baseline_bytes: &[u8]) -> BaselineHash {
     let bytes: [u8; 32] = sha2::Sha256::digest(baseline_bytes).into();
     BaselineHash::new(Sha256Digest::from_content_hash(ContentHash::from_bytes(bytes)))
 }
@@ -143,6 +134,15 @@ fn parse_digest(field: &str, value: String) -> Result<Sha256Digest, TypeSignalsC
     Sha256Digest::try_new(value).map_err(|source| TypeSignalsCodecError::InvalidDigest {
         field: FreeText::new(field),
         source,
+    })
+}
+
+fn parse_head_commit(value: String) -> Result<CommitHash, TypeSignalsCodecError> {
+    CommitHash::try_new(value.clone()).map_err(|error| {
+        TypeSignalsCodecError::InvalidTimestamp(FreeText::new(format!(
+            "invalid head_commit '{}': {error}",
+            value
+        )))
     })
 }
 
@@ -178,7 +178,10 @@ fn signal_to_dto(signal: &TypeSignal) -> TypeSignalDto {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use domain::ConfidenceSignal;
-    use domain::tddd::type_signals_doc::{TypeSignalsReuseDecision, decide_type_signals_reuse};
+    use domain::tddd::type_signals_doc::{
+        TypeSignalsAuthorityStatus, TypeSignalsReuseDecision, TypeSignalsReuseInput,
+        TypeSignalsWorktreeStatus, decide_type_signals_reuse,
+    };
 
     use super::*;
 
@@ -190,7 +193,7 @@ mod tests {
             Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
             TypeSignalsCacheKey::new(
                 CatalogueDeclarationHash::new(digest.clone()),
-                ImplementationInputHash::new(digest.clone()),
+                CommitHash::try_new("a".repeat(40)).unwrap(),
                 BaselineHash::new(digest),
             ),
             vec![TypeSignal::new(
@@ -255,7 +258,7 @@ mod tests {
             schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
-            implementation_input_hash: DIGEST.to_owned(),
+            head_commit: "a".repeat(40),
             baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         })
@@ -268,17 +271,17 @@ mod tests {
     }
 
     #[test]
-    fn test_decode_requires_implementation_input_hash() {
+    fn test_decode_requires_head_commit() {
         let mut payload = serde_json::to_value(&TypeSignalsDocDto {
             schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
-            implementation_input_hash: DIGEST.to_owned(),
+            head_commit: "a".repeat(40),
             baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         })
         .unwrap();
-        payload.as_object_mut().unwrap().remove("implementation_input_hash");
+        payload.as_object_mut().unwrap().remove("head_commit");
         assert!(matches!(decode(&payload.to_string()), Err(TypeSignalsCodecError::Json(_))));
     }
 
@@ -288,7 +291,7 @@ mod tests {
             schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
-            implementation_input_hash: DIGEST.to_owned(),
+            head_commit: "a".repeat(40),
             baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         })
@@ -303,7 +306,7 @@ mod tests {
             schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
-            implementation_input_hash: DIGEST.to_owned(),
+            head_commit: "a".repeat(40),
             baseline_hash: DIGEST.to_owned(),
             signals: vec![signal_to_dto(&TypeSignal::new(
                 "Example",
@@ -330,7 +333,7 @@ mod tests {
             schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
-            implementation_input_hash: DIGEST.to_owned(),
+            head_commit: "a".repeat(40),
             baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         })
@@ -345,7 +348,7 @@ mod tests {
             schema_version: domain::TYPE_SIGNALS_SCHEMA_VERSION,
             generated_at: "2026-04-18T12:00:00Z".to_owned(),
             declaration_hash: DIGEST.to_owned(),
-            implementation_input_hash: DIGEST.to_owned(),
+            head_commit: "a".repeat(40),
             baseline_hash: DIGEST.to_owned(),
             signals: vec![],
         };
@@ -371,10 +374,10 @@ mod tests {
             Err(TypeSignalsCodecError::InvalidTimestamp(_))
         ));
 
-        let invalid_digest = TypeSignalsDocDto { implementation_input_hash: "g".repeat(64), ..dto };
+        let invalid_head = TypeSignalsDocDto { head_commit: "g".repeat(40), ..dto };
         assert!(matches!(
-            decode(&serde_json::to_string(&invalid_digest).unwrap()),
-            Err(TypeSignalsCodecError::InvalidDigest { source: Sha256DigestError::InvalidHex, .. })
+            decode(&serde_json::to_string(&invalid_head).unwrap()),
+            Err(TypeSignalsCodecError::InvalidTimestamp(_))
         ));
     }
 
@@ -391,19 +394,26 @@ mod tests {
     fn test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_recomparison() {
         let digest = Sha256Digest::try_new(DIGEST.to_owned()).unwrap();
         let declaration = CatalogueDeclarationHash::new(digest.clone());
-        let implementation = ImplementationInputHash::new(digest.clone());
+        let head_commit = CommitHash::try_new("a".repeat(40)).unwrap();
         let recorded_baseline = baseline_hash(b"baseline A");
         let current_baseline = baseline_hash(b"baseline B");
         let recorded = TypeSignalsCacheKey::new(
             declaration.clone(),
-            implementation.clone(),
+            head_commit.clone(),
             recorded_baseline.clone(),
         );
-        let current = TypeSignalsCacheKey::new(declaration, implementation, current_baseline);
+        let current = TypeSignalsCacheKey::new(declaration, head_commit, current_baseline);
 
         assert_eq!(recorded.baseline_hash(), &baseline_hash(b"baseline A"));
+        let input = TypeSignalsReuseInput::verify(
+            recorded,
+            current,
+            TypeSignalsWorktreeStatus::Clean,
+            TypeSignalsAuthorityStatus::Readable,
+        )
+        .unwrap();
         assert_eq!(
-            decide_type_signals_reuse(&recorded, &current),
+            decide_type_signals_reuse(&input),
             TypeSignalsReuseDecision::ReevaluateWithoutExtraction,
             "a changed rustdoc baseline digest must invalidate reuse"
         );

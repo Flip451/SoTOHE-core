@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "75b08407555f9e7f807095bc8c9716fb620cc567e5bb55a82353366b1f410261",
+  "catalogue_declaration_hash": "5a28cbe60f0187bc092d30d25e993c38c8fa759ab1b03189af5d5788af4cefe3",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "ab658097655eeb67d01198dafc1e61a50d1ea68728ebdb6f30343165d44d3afe",
+      "entry_hash": "f65a0647d9819daac79ccc914e5685e700510f6054d5e009639080ba650fc74f",
       "signal": "blue",
       "type_name": "BaseMergeAttemptOutcome"
     },
@@ -28,17 +28,17 @@
       "type_name": "BaseMergeError"
     },
     {
-      "entry_hash": "043431269da2540a07fb37ae68549309b1fcf6ddd33e0b08e9925ce67f1e4138",
+      "entry_hash": "67d873554fe43955eaf8dd465bab315363a992f0c4ff7897df28ccb50869b6a8",
       "signal": "blue",
       "type_name": "BaseMergeGitError"
     },
     {
-      "entry_hash": "f86af0e2899273ca4ae2585deb08e1e5c94935f6ddaa8025d87c9186be6acd0b",
+      "entry_hash": "e20e3890d59425021aa011021b0200d84c99fdba8c8c4f9e4afc0075050337b5",
       "signal": "blue",
       "type_name": "BaseMergeInteractor"
     },
     {
-      "entry_hash": "36b3dacd79c82d6cef4a501a3d2cbaaf84a7b9a8207ca367a2299e04ed1f6f4d",
+      "entry_hash": "ca72b8a7a57bad5b9bce06b5ea61d91e8efdd306b5c43eb9e1b5ff63be9557e5",
       "signal": "blue",
       "type_name": "BaseMergeOutcome"
     },
@@ -48,12 +48,12 @@
       "type_name": "BaselineReplacementError"
     },
     {
-      "entry_hash": "0bd2be93fff5916a1f4df6639d1115ed139c50c8420474e362f4a9e6c9c7fb01",
+      "entry_hash": "9be37a4a209521fe68b14d8111203ef23ab655d2ae4836ac361a18ec341ba96c",
       "signal": "blue",
       "type_name": "GitStashInteractor"
     },
     {
-      "entry_hash": "1e1310187323e27ce06e020a01fefeabde489fa00ab9510d9625aa64efea47b6",
+      "entry_hash": "ada779c2aa530c8fb260be6931b383d32e0bc852a0d639ee52d1b82e5c932939",
       "signal": "blue",
       "type_name": "GitStashPopError"
     },
@@ -98,12 +98,12 @@
       "type_name": "ViewsRegenerationError"
     },
     {
-      "entry_hash": "ef8e3a67fae814abb1a9e1bdfde23591b7f960a7a0fb35c5192523b79b552c6a",
+      "entry_hash": "0033b5be301ddea5ae1e412cca0836965211fd7b7ec875c6742779ee27b4b323",
       "signal": "blue",
       "type_name": "BaseMergeCleanupPort"
     },
     {
-      "entry_hash": "fe79ec97f3e02913e3af8efa9da83405d61302112a551952ffd39f0a3370877e",
+      "entry_hash": "602543c81a45460c8366ad395e22fb5444f92dfc63eebcbde1d9b8c1c010e71e",
       "signal": "blue",
       "type_name": "BaseMergeContextPort"
     },
@@ -113,22 +113,22 @@
       "type_name": "BaseMergeGitPort"
     },
     {
-      "entry_hash": "803684946032e46b52185f945fc57bbb8ccd8630930c78080bb126e48dd196c4",
+      "entry_hash": "0e3c83a4933dca3aeb99d19c33ca5edbfcc42cda7aa6d829e4728261031c2f5e",
       "signal": "blue",
       "type_name": "BaseMergeService"
     },
     {
-      "entry_hash": "7b69474d1b205f82851e2148d51aec59325e5bea214cc3ca9c411547e4a3ef05",
+      "entry_hash": "a8f67115a6a850f39f121c7708530704d1943a879e9376e7209c1f21325ea3b0",
       "signal": "blue",
       "type_name": "GitStashPort"
     },
     {
-      "entry_hash": "e8ad0f4d45d1a160c32b3e032e2a6ede7502d81b455777c062c6e92ca06f5742",
+      "entry_hash": "759c64728a0795ddd87fc711041db336d9ab6be1b121e2603798511ca0378c53",
       "signal": "blue",
       "type_name": "GitStashService"
     },
     {
-      "entry_hash": "e91b265f9b43c1c9ce764ef43236a17df6092461cf8c64b3a5075dc66b80c072",
+      "entry_hash": "5e986ac4003925cc6e02fe26c0936aaeeed2c5c6d211e76579a1f1de0f1d45ce",
       "signal": "blue",
       "type_name": "TrackBlobReader"
     },

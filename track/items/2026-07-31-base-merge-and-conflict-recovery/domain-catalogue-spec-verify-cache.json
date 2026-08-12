@@ -82,17 +82,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
       "evidence_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"and actual baseline hashes where the baseline authority is present\"",
+        "citation": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
         "kind": "pass"
       }
     },
@@ -106,17 +106,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
+      "evidence_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
       "evidence_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"and actual baseline hashes\"",
+        "citation": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated.",
         "kind": "pass"
       }
     },
@@ -130,17 +130,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
+      "evidence_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
       "evidence_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"actual baseline in the local pre-commit workspace\"",
+        "citation": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated.",
         "kind": "pass"
       }
     },
@@ -154,17 +154,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
+      "evidence_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "record synchronization of that exact merged base commit",
+        "citation": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit.",
         "kind": "pass"
       }
     },
@@ -178,17 +178,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ceba9efdd0d217760ba3ffbea60d6f8e34b4182d342efb7838a4d27fee14fa09",
+      "evidence_hash": "7bf749a6d9682efb36aef1627911df2cec8e6cc4390ff1fbdc856f17797fb15c",
       "evidence_origin": {
         "data": {
           "element_id": "IN-06",
           "section": "in_scope",
-          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed."
+          "text_label": "Persist synchronization of the exact base commit incorporated by a successful guarded merge only after its baseline and view stages succeed."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "the exact base commit incorporated by a successful guarded merge",
+        "citation": "Persist synchronization of the exact base commit incorporated by a successful guarded merge only after its baseline and view stages succeed.",
         "kind": "pass"
       }
     },
@@ -202,17 +202,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "e83f6a2ed9edffe9aa6824d83e7db6682b02f2d49a18bb16493e9c5133fde6e2",
+      "evidence_hash": "3ff212f6a7a3ff02906a56e726b92b5a1318d1c5af8fd66a33421c938b3875fc",
       "evidence_origin": {
         "data": {
           "element_id": "CN-05",
           "section": "constraint",
-          "text_label": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed."
+          "text_label": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"pinned to the already-authorized base commit\"",
+        "citation": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported.",
         "kind": "pass"
       }
     },
@@ -226,17 +226,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "f2da6d4914d5cf5601dbe12239438ded42fb6368f6d2364f111f5f3b9aa1c8ee",
+      "evidence_hash": "fec9f51822fa405898d85893766aebb116d434e197689026e6028703cdb42813",
       "evidence_origin": {
         "data": {
           "element_id": "CN-06",
           "section": "constraint",
-          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
+          "text_label": "The sync-base record must use the exact base commit incorporated by the guarded merge and be written only after that clean merge's baseline and view stages succeed."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution",
+        "citation": "The sync-base record must use the exact base commit incorporated by the guarded merge",
         "kind": "pass"
       }
     },
@@ -250,17 +250,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
+      "evidence_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit\"",
+        "citation": "the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit",
         "kind": "pass"
       }
     },
@@ -274,17 +274,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "25f655f974305b546c6635b354735cdf64f7896f137dbfe26030bac0aedf968f",
+      "evidence_hash": "63419c88b93818a74e560a9208095d5aeeccac151b54d33be7244b75ec73426c",
       "evidence_origin": {
         "data": {
           "element_id": "AC-10",
           "section": "acceptance_criteria",
-          "text_label": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds."
+          "text_label": "If baseline regeneration fails, the operation reports failure rather than cleanup completion."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds.",
+        "citation": "If baseline regeneration fails, the operation reports failure rather than cleanup completion.",
         "kind": "pass"
       }
     },
@@ -298,17 +298,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "378894138d56361386909e22fee0d4efd63c31c9b4613c4fad06ce1641acba72",
+      "evidence_hash": "5c11a380b5604cad3eef4ab1b89817c128104488df8ac05d563b618d3655d8cc",
       "evidence_origin": {
         "data": {
           "element_id": "AC-11",
           "section": "acceptance_criteria",
-          "text_label": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+          "text_label": "Following successful baseline and view stages of a clean guarded merge, the sync-base record contains the exact base commit that merge incorporated."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit\"",
+        "citation": "Following successful baseline and view stages of a clean guarded merge, the sync-base record contains the exact base commit that merge incorporated.",
         "kind": "pass"
       }
     },
@@ -409,242 +409,602 @@
       }
     },
     {
-      "claim_hash": "13b7b5ef8ee7294b22f6e8883b8951c5a564c6575616f339f3491079dddbbddc",
+      "claim_hash": "635851a52967309d3ec50896053a2795352d682c2d76d7cbb81997628338e24a",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsCacheKey",
+          "entry_key": "TypeSignalsAuthorityStatus",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
           "section_key": "types"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
       "evidence_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes",
+        "citation": "reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "13b7b5ef8ee7294b22f6e8883b8951c5a564c6575616f339f3491079dddbbddc",
+      "claim_hash": "635851a52967309d3ec50896053a2795352d682c2d76d7cbb81997628338e24a",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsCacheKey",
+          "entry_key": "TypeSignalsAuthorityStatus",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
           "section_key": "types"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "13b7b5ef8ee7294b22f6e8883b8951c5a564c6575616f339f3491079dddbbddc",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsCacheKey",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "13b7b5ef8ee7294b22f6e8883b8951c5a564c6575616f339f3491079dddbbddc",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsCacheKey",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-08",
-          "section": "acceptance_criteria",
-          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "\"a recorded hash differing from the current hash of an authority successfully read for that evaluation\"",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsDocument",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
-      "evidence_origin": {
-        "data": {
-          "element_id": "IN-05",
-          "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present.",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsDocument",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsDocument",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
+      "evidence_hash": "165a62a9d4f12d4375599b5e26fc2e91db37b919d9931ae2465ce7c39d79bd94",
       "evidence_origin": {
         "data": {
           "element_id": "CN-04",
           "section": "constraint",
-          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
+          "text_label": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success.",
+        "citation": "\"an unreadable authority must cause type-signals reevaluation rather than cache reuse\"",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "claim_hash": "635851a52967309d3ec50896053a2795352d682c2d76d7cbb81997628338e24a",
       "claim_origin": {
         "data": {
-          "entry_key": "TypeSignalsDocument",
+          "entry_key": "TypeSignalsAuthorityStatus",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
           "section_key": "types"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsDocument",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-08",
-          "section": "acceptance_criteria",
-          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "\"a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes.\"",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TypeSignalsDocument",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
+      "evidence_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
       "evidence_origin": {
         "data": {
           "element_id": "AC-09",
           "section": "acceptance_criteria",
-          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact\"",
+        "citation": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "382638e54881a8e3b1d9dd47c956d954605ca86c73f810ef1eaa7e0626975b51",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCacheKey",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "382638e54881a8e3b1d9dd47c956d954605ca86c73f810ef1eaa7e0626975b51",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCacheKey",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "382638e54881a8e3b1d9dd47c956d954605ca86c73f810ef1eaa7e0626975b51",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCacheKey",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "165a62a9d4f12d4375599b5e26fc2e91db37b919d9931ae2465ce7c39d79bd94",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "382638e54881a8e3b1d9dd47c956d954605ca86c73f810ef1eaa7e0626975b51",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCacheKey",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "382638e54881a8e3b1d9dd47c956d954605ca86c73f810ef1eaa7e0626975b51",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCacheKey",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6253798202c84543803707a594bb88bbdd9ea8141c724924e565f518abd65fcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result.\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "382638e54881a8e3b1d9dd47c956d954605ca86c73f810ef1eaa7e0626975b51",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsCacheKey",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsDocument",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsDocument",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsDocument",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "165a62a9d4f12d4375599b5e26fc2e91db37b919d9931ae2465ce7c39d79bd94",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsDocument",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsDocument",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6253798202c84543803707a594bb88bbdd9ea8141c724924e565f518abd65fcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result.\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsDocument",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0a7e2283ce3959f02ce7cb3c2bd66b656bddfd10fd87484a4a76dd9ed6156aa3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsReuseInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0a7e2283ce3959f02ce7cb3c2bd66b656bddfd10fd87484a4a76dd9ed6156aa3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsReuseInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0a7e2283ce3959f02ce7cb3c2bd66b656bddfd10fd87484a4a76dd9ed6156aa3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsReuseInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "165a62a9d4f12d4375599b5e26fc2e91db37b919d9931ae2465ce7c39d79bd94",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0a7e2283ce3959f02ce7cb3c2bd66b656bddfd10fd87484a4a76dd9ed6156aa3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsReuseInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0a7e2283ce3959f02ce7cb3c2bd66b656bddfd10fd87484a4a76dd9ed6156aa3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsReuseInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6253798202c84543803707a594bb88bbdd9ea8141c724924e565f518abd65fcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result.\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0a7e2283ce3959f02ce7cb3c2bd66b656bddfd10fd87484a4a76dd9ed6156aa3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsReuseInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4b34c700d685a077c327bc8ede0a8d292d9c7e59cfdc98f6782e310cc4c68d64",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsWorktreeStatus",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4b34c700d685a077c327bc8ede0a8d292d9c7e59cfdc98f6782e310cc4c68d64",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsWorktreeStatus",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4b34c700d685a077c327bc8ede0a8d292d9c7e59cfdc98f6782e310cc4c68d64",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsWorktreeStatus",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4b34c700d685a077c327bc8ede0a8d292d9c7e59cfdc98f6782e310cc4c68d64",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TypeSignalsWorktreeStatus",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "a dirty working tree ... requires reevaluation rather than cache reuse",
         "kind": "pass"
       }
     },
@@ -673,7 +1033,7 @@
       }
     },
     {
-      "claim_hash": "8513c3b301ed41b219c18693f08372a250be9b60b595a3d5a3ccaeb98d97dc13",
+      "claim_hash": "1a6487ca2b1a71bfe87142d60988a10f3a3773b81f985c301c3a188e479d7a59",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
@@ -682,22 +1042,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
       "evidence_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "evaluate and self-heal type-signals cache entries against catalogue declaration",
+        "citation": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "8513c3b301ed41b219c18693f08372a250be9b60b595a3d5a3ccaeb98d97dc13",
+      "claim_hash": "1a6487ca2b1a71bfe87142d60988a10f3a3773b81f985c301c3a188e479d7a59",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
@@ -706,22 +1066,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
+      "evidence_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
       "evidence_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A type-signals cache may be reused only when every applicable comparison equals the recorded value",
+        "citation": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "8513c3b301ed41b219c18693f08372a250be9b60b595a3d5a3ccaeb98d97dc13",
+      "claim_hash": "1a6487ca2b1a71bfe87142d60988a10f3a3773b81f985c301c3a188e479d7a59",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
@@ -730,17 +1090,209 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
+      "evidence_hash": "165a62a9d4f12d4375599b5e26fc2e91db37b919d9931ae2465ce7c39d79bd94",
       "evidence_origin": {
         "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "a type-signals cache is reused only when every applicable comparison matches the cache record",
+        "citation": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a6487ca2b1a71bfe87142d60988a10f3a3773b81f985c301c3a188e479d7a59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a6487ca2b1a71bfe87142d60988a10f3a3773b81f985c301c3a188e479d7a59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6253798202c84543803707a594bb88bbdd9ea8141c724924e565f518abd65fcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a6487ca2b1a71bfe87142d60988a10f3a3773b81f985c301c3a188e479d7a59",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6bc71ee3accaa99846fa85c9f0cd952b2a8349b44ae47afe3d620fe127c81bca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationInputHash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6bc71ee3accaa99846fa85c9f0cd952b2a8349b44ae47afe3d620fe127c81bca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationInputHash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6bc71ee3accaa99846fa85c9f0cd952b2a8349b44ae47afe3d620fe127c81bca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationInputHash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "165a62a9d4f12d4375599b5e26fc2e91db37b919d9931ae2465ce7c39d79bd94",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6bc71ee3accaa99846fa85c9f0cd952b2a8349b44ae47afe3d620fe127c81bca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationInputHash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6bc71ee3accaa99846fa85c9f0cd952b2a8349b44ae47afe3d620fe127c81bca",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ImplementationInputHash",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse.",
         "kind": "pass"
       }
     }

@@ -33,7 +33,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -42,7 +42,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "baseline の再取得元には、guarded merge の方向検査で既に解決された権威ある base commit に固定した、一時的かつ隔離された git worktree を用いる。後から branch 名を再解決して取得元を決め直さない。",
+        "citation": "baseline はガード付き merge コマンドが実際に取り込んだ base commit から再生成する。",
         "kind": "pass"
       }
     },
@@ -56,7 +56,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -65,7 +65,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`base_commit` は guarded merge が実際に取り込んだ exact commit identity であり、同期状態の権威値とする。",
+        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
         "kind": "pass"
       }
     },
@@ -79,7 +79,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -88,7 +88,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "Baseline の publish が成功した後、影響を受ける rendered view を新たに publish された baseline に対して再生成する。sync-base stamp は Views、Baseline、ViewsAfterBaseline のすべてが成功した後にだけ書き込む。",
+        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。",
         "kind": "pass"
       }
     },
@@ -185,12 +185,12 @@
       }
     },
     {
-      "claim_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
+      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
         },
         "kind": "spec_element"
       },
@@ -208,16 +208,16 @@
       }
     },
     {
-      "claim_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
+      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -226,21 +226,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「baseline の再取得元には、guarded merge の方向検査で既に解決された権威ある base commit に固定した、一時的かつ隔離された git worktree を用いる。」 「置換対象となる完全な baseline を、現行 baseline の sibling 一時領域へ先に生成し、必要な全要素を検証する。生成と検証が成功した後にだけ、完成した replacement を原子的に publish する。」",
+        "citation": "baseline はガード付き merge コマンドが実際に取り込んだ base commit から再生成する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
+      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -249,21 +249,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "\"後続の成功した base merge は、その merge が取り込んだ新しい exact base commit を持つ stamp へ原子的に置き換える。\"",
+        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
+      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -272,21 +272,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "clean merge の後始末は Views → Baseline → ViewsAfterBaseline → SyncBaseStamp の順を維持する。Baseline の publish が成功した後、影響を受ける rendered view を新たに publish された baseline に対して再生成する。sync-base stamp は Views、Baseline、ViewsAfterBaseline のすべてが成功した後にだけ書き込む。",
+        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ceba9efdd0d217760ba3ffbea60d6f8e34b4182d342efb7838a4d27fee14fa09",
+      "claim_hash": "7bf749a6d9682efb36aef1627911df2cec8e6cc4390ff1fbdc856f17797fb15c",
       "claim_origin": {
         "data": {
           "element_id": "IN-06",
           "section": "in_scope",
-          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed."
+          "text_label": "Persist synchronization of the exact base commit incorporated by a successful guarded merge only after its baseline and view stages succeed."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -295,21 +295,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "sync-base stamp は、active track の gitignored な運用状態として `track/items/<track-id>/.sync-base.json` に置く。schema は少なくとも次の field を持つ。",
+        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ceba9efdd0d217760ba3ffbea60d6f8e34b4182d342efb7838a4d27fee14fa09",
+      "claim_hash": "7bf749a6d9682efb36aef1627911df2cec8e6cc4390ff1fbdc856f17797fb15c",
       "claim_origin": {
         "data": {
           "element_id": "IN-06",
           "section": "in_scope",
-          "text_label": "Persist the active track's synchronization state as an atomically replaced, schema-versioned record containing its track identity, base branch, and the exact base commit incorporated by a successful guarded merge only after initial views, baseline, and post-baseline view rendering succeed."
+          "text_label": "Persist synchronization of the exact base commit incorporated by a successful guarded merge only after its baseline and view stages succeed."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -318,7 +318,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "sync-base stamp は Views、Baseline、ViewsAfterBaseline のすべてが成功した後にだけ書き込む。",
+        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
         "kind": "pass"
       }
     },
@@ -378,7 +378,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "a979fe29c6be78cf10562be42b80209059a33f1afa82acfe2d2d2f5783a71f9f",
+      "evidence_hash": "cd9aacf0b537b4ac3c0639da8d90b8c9519cf734585d7d0d7c53c0e2967b5d4e",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -387,17 +387,17 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "guarded pop は、対応する push が作成した stash commit OID とだけ対にする。可変な `stash@{n}` index を identity に用いない。push は created OID または nothing-to-stash を machine-owned、gitignored、repository-scoped な single-slot record に原子的に永続化し、record がある間の再 push は fail-closed とする。",
+        "citation": "ガード付き stash push は作成した stash の commit OID、または stash を作成しなかったことを記録する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
+      "claim_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
       "claim_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
         },
         "kind": "spec_element"
       },
@@ -410,21 +410,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "現在アクティブなトラックを対象として、type-signals cache に `baseline_hash` を記録する。信号機評価は実際の baseline を読み、その hash を計算してから cache の再利用可否を判定する。",
+        "citation": "現在アクティブなトラックを対象として、type-signals cache に `baseline_hash` を記録する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "bcee6a77404cb12364005fc93a0bbc453fbab3aa47d78c0fc82135cdfc481229",
+      "claim_hash": "bbc266e64a98339dad5afa5487ed8536f7796855fd8140816ec931834f3fb287",
       "claim_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "For the currently active track only, evaluate and self-heal type-signals cache entries against catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes where the baseline authority is present. A structurally absent baseline narrows only baseline verification, while only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "For the currently active track only, reuse a type-signals evaluation cache only for a clean working tree whose HEAD matches the cache's recorded commit; otherwise reevaluate it."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "41ed5a24385bef8c771ee70f1dcc8156aa25042ef2989b7f43bdcc0522f9906e",
+      "evidence_hash": "f258a4d9bb40c50799731959dd0be2e31c4e5b0b1d303bd533e75ca82104541d",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -433,7 +433,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "権威照合は、その権威が存在する文脈にのみ適用する。存在する権威の読み取り不能または不一致は常に fail-closed とし、照合の縮退は権威の構造的不在に限る。取得失敗は構造的不在に含めない。\n\n`implementation_input_hash` は committed 成分と local-only の nightly toolchain identity の複合とする。\nnightly の構造的不在は toolchain enumeration が成功し、かつ一致する nightly が導入されていない場合に限り、この場合だけ implementation-input 照合を縮退させる。",
+        "citation": "type-signals の評価 cache は、作業ツリーに差分がなく、かつ HEAD commit が記録時と一致する場合に限り再利用する。",
         "kind": "pass"
       }
     },
@@ -507,29 +507,6 @@
       }
     },
     {
-      "claim_hash": "371198f173f95e1427c0a8cf17642eb2fabbf9c19ad819cf25844bdb16341ae7",
-      "claim_origin": {
-        "data": {
-          "element_id": "OS-04",
-          "section": "out_of_scope",
-          "text_label": "External-interference defenses beyond the guarded stash threat model are out of scope."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "a979fe29c6be78cf10562be42b80209059a33f1afa82acfe2d2d2f5783a71f9f",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D1",
-          "file_path": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "これを超える防御は採用しない。",
-        "kind": "pass"
-      }
-    },
-    {
       "claim_hash": "7ec10995aa47e8531cbd5645e1c378863fa0617b440210cba4f0929d62416aaa",
       "claim_origin": {
         "data": {
@@ -553,12 +530,12 @@
       }
     },
     {
-      "claim_hash": "1c4d4eda6a4a2dafa6178979f4e7ea21c499d9e8bb85d6284e8503b3c3db7e71",
+      "claim_hash": "c5325f5246825998e31960130e1fa9a212630f14117fe343d0e090d6523d4a60",
       "claim_origin": {
         "data": {
           "element_id": "CN-02",
           "section": "constraint",
-          "text_label": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup."
+          "text_label": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages; conflicted merge outcomes do not write a sync-base record."
         },
         "kind": "spec_element"
       },
@@ -576,16 +553,16 @@
       }
     },
     {
-      "claim_hash": "1c4d4eda6a4a2dafa6178979f4e7ea21c499d9e8bb85d6284e8503b3c3db7e71",
+      "claim_hash": "c5325f5246825998e31960130e1fa9a212630f14117fe343d0e090d6523d4a60",
       "claim_origin": {
         "data": {
           "element_id": "CN-02",
           "section": "constraint",
-          "text_label": "Conflict recovery must follow the canonical workflow through conflict editing, zero-findings review, and guarded commit under orchestrator ownership; conflict outcomes do not run clean-merge cleanup."
+          "text_label": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages; conflicted merge outcomes do not write a sync-base record."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -594,17 +571,17 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "conflict outcome では、この clean-merge cleanup を実行しない。",
+        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\nSyncBaseStamp は競合なしの merge に限る。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
+      "claim_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
       "claim_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
         },
         "kind": "spec_element"
       },
@@ -617,21 +594,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "catalogue declaration hash、implementation input hash、baseline hash の 3 値がすべて一致する場合に限り既存評価を再利用する。",
+        "citation": "catalogue declaration hash、implementation input hash、baseline hash の 3 値がすべて一致する場合に限り既存評価を再利用する。いずれかが不一致なら cache stale として信号機を再評価し、成功後に評価結果と現在の 3 hash で cache を原子的に置き換える。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ee0f980ce1d9d04fc84effa6c2e7a0cfe317904b0a05985883062f8f733d6dc3",
+      "claim_hash": "d787bacd138a9d99b9f23279ae0fa6f18ffdb181b46c12a178f2254a6cbc2293",
       "claim_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "A type-signals cache may be reused only when every applicable comparison equals the recorded value: the local pre-commit workspace verifies catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline hashes, and remains the sole enforcement point for baseline freshness. A structurally absent baseline narrows only baseline verification; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison."
+          "text_label": "A type-signals evaluation cache may be reused only when the working tree is clean and HEAD matches the commit recorded with that cache; otherwise it must be reevaluated."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "41ed5a24385bef8c771ee70f1dcc8156aa25042ef2989b7f43bdcc0522f9906e",
+      "evidence_hash": "f258a4d9bb40c50799731959dd0be2e31c4e5b0b1d303bd533e75ca82104541d",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -640,21 +617,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`implementation_input_hash` は committed 成分と local-only の nightly toolchain identity の複合とする。\nnightly の構造的不在は toolchain enumeration が成功し、かつ一致する nightly が導入されていない場合に\n限り、この場合だけ implementation-input 照合を縮退させる。",
+        "citation": "type-signals の評価 cache は、作業ツリーに差分がなく、かつ HEAD commit が記録時と一致する場合に限り再利用する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "567f5055c449190fcfecb7ec66a4225926236134cbe56f8c334364bc399ef7ca",
+      "claim_hash": "165a62a9d4f12d4375599b5e26fc2e91db37b919d9931ae2465ce7c39d79bd94",
       "claim_origin": {
         "data": {
           "element_id": "CN-04",
           "section": "constraint",
-          "text_label": "During type-signals evaluation, a cache miss caused by a recorded hash differing from the hash of an authority successfully read for that evaluation, or by any cache decode failure, must reevaluate and atomically overwrite only after success. During validation-gate freshness checking, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, and any mismatch when the composite implementation-input hash is computable must fail closed without reevaluation; evaluation failures and cache-write failures must also fail closed. Only successful toolchain enumeration that finds no matching nightly may skip the implementation-input comparison, and only a structurally absent baseline authority may narrow baseline verification rather than fail."
+          "text_label": "A dirty working tree, a HEAD commit that differs from the recorded cache commit, or an unreadable authority must cause type-signals reevaluation rather than cache reuse."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "41ed5a24385bef8c771ee70f1dcc8156aa25042ef2989b7f43bdcc0522f9906e",
+      "evidence_hash": "f258a4d9bb40c50799731959dd0be2e31c4e5b0b1d303bd533e75ca82104541d",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -663,21 +640,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "権威照合は、その権威が存在する文脈にのみ適用する。存在する権威の読み取り不能または不一致は常に\nfail-closed とし、照合の縮退は権威の構造的不在に限る。取得失敗は構造的不在に含めない。\n\n`implementation_input_hash` は committed 成分と local-only の nightly toolchain identity の複合とする。\nnightly の構造的不在は toolchain enumeration が成功し、かつ一致する nightly が導入されていない場合に\n限り、この場合だけ implementation-input 照合を縮退させる。",
+        "citation": "作業ツリーに差分がある場合、HEAD commit が一致しない場合、または権威を読み取れない場合は常に再計算する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e83f6a2ed9edffe9aa6824d83e7db6682b02f2d49a18bb16493e9c5133fde6e2",
+      "claim_hash": "3ff212f6a7a3ff02906a56e726b92b5a1318d1c5af8fd66a33421c938b3875fc",
       "claim_origin": {
         "data": {
           "element_id": "CN-05",
           "section": "constraint",
-          "text_label": "Baseline recapture must generate and validate a complete replacement in an isolated worktree pinned to the already-authorized base commit, atomically publish it only after success, and preserve or restore the prior baseline on any failure; every failure, including failed restoration, fails closed."
+          "text_label": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -686,21 +663,44 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "置換対象となる完全な baseline を、現行 baseline の sibling 一時領域へ先に生成し、必要な全要素を検証する。生成と検証が成功した後にだけ、完成した replacement を原子的に publish する。replacement が準備できる前に現行 baseline を削除してはならない。生成、検証、置換のいずれかが失敗した場合は現行 baseline を維持し、置換処理の途中で旧状態の復元が必要になった場合はそれを復元する。復元自体の失敗も成功として扱わず fail-closed とする。",
+        "citation": "baseline はガード付き merge コマンドが実際に取り込んだ base commit から再生成する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f2da6d4914d5cf5601dbe12239438ded42fb6368f6d2364f111f5f3b9aa1c8ee",
+      "claim_hash": "3ff212f6a7a3ff02906a56e726b92b5a1318d1c5af8fd66a33421c938b3875fc",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fec9f51822fa405898d85893766aebb116d434e197689026e6028703cdb42813",
       "claim_origin": {
         "data": {
           "element_id": "CN-06",
           "section": "constraint",
-          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
+          "text_label": "The sync-base record must use the exact base commit incorporated by the guarded merge and be written only after that clean merge's baseline and view stages succeed."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -709,21 +709,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`base_commit` は guarded merge が実際に取り込んだ exact commit identity であり、同期状態の権威値とする。stamp の書き込み時点で branch 名を再解決した値に置き換えてはならない。同じ値での再実行は idempotent とし、後続の成功した base merge は、その merge が取り込んだ新しい exact base commit を持つ stamp へ原子的に置き換える。stamp の生成、検証、書き込み、置換の失敗は fail-closed とする。",
+        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f2da6d4914d5cf5601dbe12239438ded42fb6368f6d2364f111f5f3b9aa1c8ee",
+      "claim_hash": "fec9f51822fa405898d85893766aebb116d434e197689026e6028703cdb42813",
       "claim_origin": {
         "data": {
           "element_id": "CN-06",
           "section": "constraint",
-          "text_label": "The sync-base record must use the exact commit incorporated by the guarded merge rather than a later branch-name resolution, be atomically written only after initial views, baseline recapture, and post-baseline view rendering succeed, support idempotent retry for the same value, and fail closed on record generation, validation, write, replacement, or post-baseline rendering failure."
+          "text_label": "The sync-base record must use the exact base commit incorporated by the guarded merge and be written only after that clean merge's baseline and view stages succeed."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -732,21 +732,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「sync-base stamp は Views、Baseline、ViewsAfterBaseline のすべてが成功した後にだけ書き込む。」また、「ViewsAfterBaseline の失敗は既存 stage と同じく fail-closed」とする。",
+        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "99de888360329d69ebf1aa74eb3726a226841a6090143a344d4e001482459659",
+      "claim_hash": "218fe049b3f5391fbe9ebd9605f7a1934ff6fa06d51f2cc6c98351f615eb94f6",
       "claim_origin": {
         "data": {
           "element_id": "CN-07",
           "section": "constraint",
-          "text_label": "Clean-merge cleanup may complete only in the order Views, Baseline, ViewsAfterBaseline, then SyncBaseStamp; post-baseline rendering failure fails closed while preserving the prior rendered-view state, conflict outcomes do not run that cleanup, and baseline replacement does not delete the type-signals cache."
+          "text_label": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -755,30 +755,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "clean merge の後始末は Views → Baseline → ViewsAfterBaseline → SyncBaseStamp の順を維持する。」「ViewsAfterBaseline の失敗は既存 stage と同じく fail-closed とし、rendered view の prior state を維持する。conflict outcome では、この clean-merge cleanup を実行しない。」「baseline の置換は type-signals cache の削除を含まない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "3793f9236ea479dd220604a0cd0de01b65dd304b4b9cc1fff0e138551bb72a0a",
-      "claim_origin": {
-        "data": {
-          "element_id": "CN-08",
-          "section": "constraint",
-          "text_label": "The guarded stash threat model serializes the guarded path with the adapter lock, rejects unguarded stash mutations through the repository reference-transaction hook layer, assigns token-holding operator manual intervention to operator responsibility, and uses OID re-verification at application time as the final protection against misapplication."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "a979fe29c6be78cf10562be42b80209059a33f1afa82acfe2d2d2f5783a71f9f",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D1",
-          "file_path": "knowledge/adr/2026-08-11-0910-guarded-stash-pop-pairing.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "threat model は、guarded path を adapter lock で直列化し、unguarded mutation を hook layer で拒否し、token 保持者の manual intervention を operator responsibility とする範囲で閉じる。OID 再検証を最後の防御とし、これを超える防御は採用しない。",
+        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。\n\n競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nSyncBaseStamp は競合なしの merge に限る。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
         "kind": "pass"
       }
     },
@@ -829,12 +806,12 @@
       }
     },
     {
-      "claim_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
+      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
       "claim_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
         },
         "kind": "spec_element"
       },
@@ -852,16 +829,16 @@
       }
     },
     {
-      "claim_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
+      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
       "claim_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -870,21 +847,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "置換対象となる完全な baseline を、現行 baseline の sibling 一時領域へ先に生成し、必要な全要素を検証する。生成と検証が成功した後にだけ、完成した replacement を原子的に publish する。",
+        "citation": "baseline は merge が取り込んだ exact base commit から再生成する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
+      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
       "claim_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -893,21 +870,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`base_commit` は guarded merge が実際に取り込んだ exact commit identity であり、同期状態の権威値とする。」「後続の成功した base merge は、その merge が取り込んだ新しい exact base commit を持つ stamp へ原子的に置き換える。",
+        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
+      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
       "claim_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -916,17 +893,17 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "### D3: clean merge の後始末は Views → Baseline → ViewsAfterBaseline → SyncBaseStamp の順でのみ完了する\n\nclean merge の後始末は Views → Baseline → ViewsAfterBaseline → SyncBaseStamp の順を維持する。\nBaseline の publish が成功した後、影響を受ける rendered view を新たに publish された baseline に対して\n再生成する。sync-base stamp は Views、Baseline、ViewsAfterBaseline のすべてが成功した後にだけ書き込む。",
+        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3a5065ab5c4b29cf9d6b4431b9582f1c7327f37294f0ab952bfe38de5ef07daf",
+      "claim_hash": "3c33695aa5ec09085a3265ae03d1114da000072e324b6a71f2dd73a96fa3d0fe",
       "claim_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point. The recovery workflow that the orchestrator drives then performs writer-routed conflict editing, applicable chain-limited zero-findings review, sanctioned type-baseline capture from a disposable clone of the exact merged base commit, and guarded commit. Its post-review capture restores the comparison authority for base-owned, source-identical catalogue deltas without duplicating their originating ownership; it does not update `.sync-base.json`, publish a retained tree, or regenerate derived views."
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
         },
         "kind": "spec_element"
       },
@@ -944,16 +921,16 @@
       }
     },
     {
-      "claim_hash": "3a5065ab5c4b29cf9d6b4431b9582f1c7327f37294f0ab952bfe38de5ef07daf",
+      "claim_hash": "3c33695aa5ec09085a3265ae03d1114da000072e324b6a71f2dd73a96fa3d0fe",
       "claim_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point. The recovery workflow that the orchestrator drives then performs writer-routed conflict editing, applicable chain-limited zero-findings review, sanctioned type-baseline capture from a disposable clone of the exact merged base commit, and guarded commit. Its post-review capture restores the comparison authority for base-owned, source-identical catalogue deltas without duplicating their originating ownership; it does not update `.sync-base.json`, publish a retained tree, or regenerate derived views."
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -962,30 +939,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "conflict outcome では、この clean-merge cleanup を実行しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "3a5065ab5c4b29cf9d6b4431b9582f1c7327f37294f0ab952bfe38de5ef07daf",
-      "claim_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point. The recovery workflow that the orchestrator drives then performs writer-routed conflict editing, applicable chain-limited zero-findings review, sanctioned type-baseline capture from a disposable clone of the exact merged base commit, and guarded commit. Its post-review capture restores the comparison authority for base-owned, source-identical catalogue deltas without duplicating their originating ownership; it does not update `.sync-base.json`, publish a retained tree, or regenerate derived views."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "be127fa966f86c502c2836f00189646818ed032056bc9275d50611eeb7c7f54f",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D1",
-          "file_path": "knowledge/adr/2026-08-09-1210-base-owned-catalogue-deltas-conflict-recovery.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "conflict 後の回復では、影響する信号連鎖に限定した review が指摘なしで完了した後、実際に merge した base commit の使い捨ての複製に対する正規の baseline 取得コマンドにより、型 baseline を現在の base に合わせ直してよい。\n\nこれは clean-merge cleanup ではなく、`.sync-base.json` の更新、保持用作業領域の公開、表示用ファイルの再生成を含まない。\n\n取り込んだ entry の所有は取り込み元の merge 済み track に残し、回復を実行する track は帰属の網羅性を満たすための merge 統合作業への帰属だけを記録して、同じ catalogue entry を複製しない。",
+        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nSyncBaseStamp は競合なしの merge に限る。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
         "kind": "pass"
       }
     },
@@ -1036,39 +990,16 @@
       }
     },
     {
-      "claim_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
+      "claim_hash": "727f267c2e6f588391e70cba005134597873d05c5945bc7f7f1c202fe2c2d8ab",
       "claim_origin": {
         "data": {
           "element_id": "AC-07",
           "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
+          "text_label": "For the active track, a type-signals evaluation cache is reused only when the working tree is clean and HEAD equals the commit recorded with that cache; otherwise it is reevaluated."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "c61cfe7661653b4f84a88130ddd1c3e4ab993b78cf461f9b879f0a96ca748863",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D4",
-          "file_path": "knowledge/adr/2026-07-29-0839-base-merge-and-conflict-recovery.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "catalogue declaration hash、implementation input hash、baseline hash の 3 値がすべて一致する場合に限り既存評価を再利用する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "cf274903077160fcd0f487a5aabf68c23e40d24e6e0ed7a4233bb385580974fd",
-      "claim_origin": {
-        "data": {
-          "element_id": "AC-07",
-          "section": "acceptance_criteria",
-          "text_label": "For the active track, a type-signals cache is reused only when every applicable comparison matches the cache record: catalogue declaration, the composite implementation input of committed source tree, Cargo manifests, Cargo.lock, committed `tddd-features.json` feature selection, and local-only nightly-toolchain identity, and actual baseline in the local pre-commit workspace; a structurally absent baseline narrows only the baseline comparison, and a successfully enumerated environment with no matching nightly skips only the implementation-input comparison."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "41ed5a24385bef8c771ee70f1dcc8156aa25042ef2989b7f43bdcc0522f9906e",
+      "evidence_hash": "f258a4d9bb40c50799731959dd0be2e31c4e5b0b1d303bd533e75ca82104541d",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1077,17 +1008,17 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "権威照合は、その権威が存在する文脈にのみ適用する。存在する権威の読み取り不能または不一致は常に fail-closed とし、照合の縮退は権威の構造的不在に限る。取得失敗は構造的不在に含めない。",
+        "citation": "type-signals の評価 cache は、作業ツリーに差分がなく、かつ HEAD commit が記録時と一致する場合に限り再利用する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "99935bb6bb87a1b8c13cdd0651d725909bab6097812a366175d7a160c1f88195",
+      "claim_hash": "6253798202c84543803707a594bb88bbdd9ea8141c724924e565f518abd65fcc",
       "claim_origin": {
         "data": {
           "element_id": "AC-08",
           "section": "acceptance_criteria",
-          "text_label": "During type-signals evaluation, a recorded hash differing from the current hash of an authority successfully read for that evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result and all current hashes."
+          "text_label": "During type-signals evaluation, a missing cache, schema mismatch, missing required cache field, invalid cache value, or malformed cache JSON is treated as a cache miss; successful reevaluation atomically replaces the cache with the new result."
         },
         "kind": "spec_element"
       },
@@ -1100,21 +1031,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「いずれかが不一致なら cache stale として信号機を再評価し、成功後に評価結果と現在の 3 hash で cache を原子的に置き換える。\n\ntype-signals cache が存在しない場合、または schema version 不一致、必須 field 欠損、不正値、JSON 破損を含む decode 不良がある場合は、cache miss として信号機を再評価する。」",
+        "citation": "type-signals cache が存在しない場合、または schema version 不一致、必須 field 欠損、不正値、JSON 破損を含む decode 不良がある場合は、cache miss として信号機を再評価する。再評価に成功した場合だけ、現行 schema の cache を原子的に書き戻す。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "74efffaf3c6787f1361fae37a09697bcaa0d5bd0657ef7fe7c8c6a421a80fc03",
+      "claim_hash": "81527a63edf0e30286566a30d084ec5b68f307bc7e9753796b683b9b094d6989",
       "claim_origin": {
         "data": {
           "element_id": "AC-09",
           "section": "acceptance_criteria",
-          "text_label": "During local `signal check-impl-catalog` freshness checking and merge-gate branch implementation-input verification, a present baseline or other authoritative input that is unreadable or whose current hash differs from the persisted signal artifact, rustup or toolchain-probe execution failure, unreadable identity of an installed nightly, any computable composite implementation-input mismatch, evaluation failures, and cache-write failures fail closed without evaluator repair; only successful toolchain enumeration that finds no matching nightly skips the implementation-input comparison, while a structurally absent baseline narrows only baseline verification. Inactive and archived tracks are untouched, and manual type-signals deletion is not part of ordinary baseline recapture."
+          "text_label": "During type-signals evaluation, an unreadable authority, a dirty working tree, or a HEAD commit that differs from the recorded cache commit requires reevaluation rather than cache reuse."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "41ed5a24385bef8c771ee70f1dcc8156aa25042ef2989b7f43bdcc0522f9906e",
+      "evidence_hash": "f258a4d9bb40c50799731959dd0be2e31c4e5b0b1d303bd533e75ca82104541d",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1123,44 +1054,44 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "権威照合は、その権威が存在する文脈にのみ適用する。存在する権威の読み取り不能または不一致は常に fail-closed とし、照合の縮退は権威の構造的不在に限る。取得失敗は構造的不在に含めない。",
+        "citation": "作業ツリーに差分がある場合、HEAD commit が一致しない場合、または権威を読み取れない場合は常に再計算する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "25f655f974305b546c6635b354735cdf64f7896f137dbfe26030bac0aedf968f",
+      "claim_hash": "63419c88b93818a74e560a9208095d5aeeccac151b54d33be7244b75ec73426c",
       "claim_origin": {
         "data": {
           "element_id": "AC-10",
           "section": "acceptance_criteria",
-          "text_label": "If isolated baseline generation, validation, atomic replacement, or necessary restoration fails, the operation reports failure rather than cleanup completion and the previously valid baseline remains available whenever restoration succeeds."
+          "text_label": "If baseline regeneration fails, the operation reports failure rather than cleanup completion."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
-          "decision_id": "D1",
+          "decision_id": "D3",
           "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "生成、検証、置換のいずれかが失敗した場合は現行 baseline を維持し、置換処理の途中で旧状態の復元が必要になった場合はそれを復元する。復元自体の失敗も成功として扱わず fail-closed とする。",
+        "citation": "いずれかの段階が失敗した場合は失敗を報告する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "378894138d56361386909e22fee0d4efd63c31c9b4613c4fad06ce1641acba72",
+      "claim_hash": "5c11a380b5604cad3eef4ab1b89817c128104488df8ac05d563b618d3655d8cc",
       "claim_origin": {
         "data": {
           "element_id": "AC-11",
           "section": "acceptance_criteria",
-          "text_label": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+          "text_label": "Following successful baseline and view stages of a clean guarded merge, the sync-base record contains the exact base commit that merge incorporated."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -1169,21 +1100,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "`schema_version`, `track_id`, `base_branch`, `base_commit`; `base_commit` is guarded merge exact commit identity; same-value reruns are idempotent; later successful base merge atomically replaces the stamp with the new exact base commit.",
+        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "378894138d56361386909e22fee0d4efd63c31c9b4613c4fad06ce1641acba72",
+      "claim_hash": "5c11a380b5604cad3eef4ab1b89817c128104488df8ac05d563b618d3655d8cc",
       "claim_origin": {
         "data": {
           "element_id": "AC-11",
           "section": "acceptance_criteria",
-          "text_label": "Following successful initial views, baseline, and post-baseline view-rendering steps, the active track has a schema-versioned sync-base record with its track id, base branch, and the exact merged base commit; tracked views do not retain signals evaluated against a superseded baseline. Rerunning with that same commit is idempotent, while a later successful merge atomically replaces the record with its newly incorporated commit."
+          "text_label": "Following successful baseline and view stages of a clean guarded merge, the sync-base record contains the exact base commit that merge incorporated."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -1192,21 +1123,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "sync-base stamp は Views、Baseline、ViewsAfterBaseline のすべてが成功した後にだけ書き込む。これにより、superseded baseline に対して評価された signal を tracked view に残したまま完了を報告しない。",
+        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3cbbb014a4f62d867a0a746c1980e7b0582bb989d47ff548f21d8b10481109c6",
+      "claim_hash": "6fc35b2994fa9c46b8fd998ea21543540371efab54383c52e180b40658614d37",
       "claim_origin": {
         "data": {
           "element_id": "AC-12",
           "section": "acceptance_criteria",
-          "text_label": "A conflict outcome enters the canonical recovery workflow without running clean-merge cleanup, and a failure in views, baseline recapture, or sync-base recording prevents a completed-cleanup success result."
+          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "f1f1a8a53bce527bc8f562bb5c5134cd4b4cd1fbf899c2c3d12894a3a1ac3f56",
+      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -1215,21 +1146,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "いずれかの段階が失敗した場合、merge 操作は後始末を含む完了を報告してはならない。conflict outcome では、この clean-merge cleanup を実行しない。",
+        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nSyncBaseStamp は競合なしの merge に限る。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "edd72bcb5540ac997cd50047358c6f2bf40895d9d5d7e97566806aa5c39894ed",
+      "claim_hash": "aa68fd2f5c5c96775736d7540c0fd8702241c99737e819f6cb87c3496e89e145",
       "claim_origin": {
         "data": {
           "element_id": "AC-13",
           "section": "acceptance_criteria",
-          "text_label": "A guarded stash push atomically persists either the created stash commit identity or an explicit nothing-to-stash outcome in a machine-owned, gitignored, repository-scoped single-slot record; a second guarded push while that record exists fails closed. A guarded stash-pop reads that record: an absent record fails closed with guidance that reports no pending guarded stash record, directs the operator to inspect `git stash list` for the expected entry or OID, and requires either a guarded push before retrying or guided recovery of the orphaned stash; nothing-to-stash is a no-op that clears the record, and identified-stash restoration removes only that stash and clears the record after success. A crash after stash creation but before record persistence deliberately enters the same absent-record lane; that window is not hidden or transactionally eliminated. An absent or mismatched identified stash, or another pop failure, fails closed while retaining the record; no failure silently clears it, and unrelated pre-existing stash entries are untouched."
+          "text_label": "A guarded stash push records the created stash commit OID or that no stash was created. A guarded stash-pop applies only the recorded OID and clears the record after success; for a no-stash record it applies nothing and clears the record. An absent record or missing OID reports failure and stops, and unrelated stash entries are untouched."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "a979fe29c6be78cf10562be42b80209059a33f1afa82acfe2d2d2f5783a71f9f",
+      "evidence_hash": "cd9aacf0b537b4ac3c0639da8d90b8c9519cf734585d7d0d7c53c0e2967b5d4e",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -1238,7 +1169,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "guarded pop は、対応する push が作成した stash commit OID とだけ対にする。可変な `stash@{n}` index を identity に用いない。push は created OID または nothing-to-stash を machine-owned、gitignored、repository-scoped な single-slot record に原子的に永続化し、record がある間の再 push は fail-closed とする。\n\npop は record を唯一の権威とする。created OID は各操作直前に再検証して OID 指定で適用・除去し、成功後に record を clear する。record 不在は fail-closed、OID の不在・不一致やその他の失敗は record を保持して fail-closed、nothing-to-stash は no-op 後に clear とし、無関係な stash には触れない。\n\nstash 作成成功から record 永続化までの crash window は、absent-record の fail-closed recovery lane に写像する。",
+        "citation": "ガード付き stash push は作成した stash の commit OID、または stash を作成しなかったことを記録する。\n\nガード付き stash pop は記録された OID を指定して stash を適用し、成功後に記録を消す。\n\nstash を作成しなかった記録なら、pop は何も適用せず記録を消す。\n\n記録がない場合または OID が見つからない場合は失敗を報告して停止し、無関係な stash entry には触れない。",
         "kind": "pass"
       }
     }

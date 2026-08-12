@@ -4,7 +4,6 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use domain::review_v2::types::FilePath;
-use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::TdddLayerBindingsPort;
 use domain::{
     AdrDecisionCommon, AdrDecisionEntry, ConfidenceSignal, DecisionGrounds, NonEmptyString,
@@ -16,13 +15,11 @@ use usecase::signal_report::{
     SignalReportLocation, SignalReportOccurrence, SignalReportReason, SignalReportReference,
     SignalReportSourcePort,
 };
-use usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 
 use crate::capability_exec::bounded_read_utf8_file;
 use crate::git_cli::{SystemGitRepo, isolated_bounded_git_output};
 use crate::tddd::{
     catalogue_document_codec::CatalogueDocumentCodec, catalogue_spec_signals_codec,
-    feature_declaration_adapter::FsTdddFeatureDeclarationAdapter,
     tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter, type_signals_codec,
 };
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -245,26 +242,8 @@ impl SystemSignalReportSourceAdapter {
         let bindings = FsTdddLayerBindingsAdapter::new()
             .load(root, None)
             .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
-        let track_dir = root.join("track/items").join(track_id.as_ref());
-        let feature_declaration = FsTdddFeatureDeclarationAdapter::new()
-            .load_for_actual(&track_dir, root, &bindings)
-            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
         let mut occurrences = Vec::new();
         for binding in bindings {
-            let layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|_| {
-                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-            })?;
-            let features = feature_declaration.features_for(&layer_id).map_err(|_| {
-                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-            })?;
-            let target_crate = match binding.targets.as_slice() {
-                [target] => target.as_str(),
-                _ => {
-                    return Err(SignalReportError::SourceUnavailable(
-                        SignalReportChain::ImplCatalog,
-                    ));
-                }
-            };
             let signals_path =
                 track_file(root, track_id, &binding.signal_file(), SignalReportChain::ImplCatalog)?;
             let document = type_signals_codec::decode(&read_text(
@@ -289,21 +268,8 @@ impl SystemSignalReportSourceAdapter {
             {
                 return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
             }
-            let implementation_input_hash =
-                crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-                    root,
-                    target_crate,
-                    features,
-                )
-                .map_err(|_| {
-                    SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-                })?;
-            if *document.cache_key().implementation_input_hash() != implementation_input_hash {
-                return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
-            }
             // A baseline recapture can change reverse filtering without touching
-            // the catalogue or the implementation, so the cached signals are only
-            // current when all three cache-key hashes match the current inputs.
+            // the catalogue, so the cached signals must still match the local baseline.
             let baseline_text = crate::track_artifact::read_track_artifact(
                 &root.join("track/items"),
                 track_id,
@@ -737,21 +703,14 @@ mod tests {
     /// `baseline_hash` must be the hash of exactly these bytes.
     const FIXTURE_BASELINE_BYTES: &[u8] = b"fixture-baseline";
 
-    fn fresh_impl_catalog_signals(root: &Path, catalogue_text: &str) -> String {
-        let implementation_input_hash =
-            crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-                root,
-                "infrastructure",
-                &[],
-            )
-            .expect("fixture implementation inputs must hash");
+    fn fresh_impl_catalog_signals(_root: &Path, catalogue_text: &str) -> String {
         serde_json::to_string_pretty(&serde_json::json!({
             "schema_version": 4,
             "generated_at": "2026-07-31T00:00:00Z",
             "declaration_hash": type_signals_codec::declaration_hash(catalogue_text.as_bytes())
                 .as_digest()
                 .as_str(),
-            "implementation_input_hash": implementation_input_hash.as_digest().as_str(),
+            "head_commit": "a".repeat(40),
             "baseline_hash": type_signals_codec::baseline_hash(FIXTURE_BASELINE_BYTES)
                 .as_digest()
                 .as_str(),
@@ -1485,37 +1444,6 @@ mod tests {
                 level: SignalReportLevel::Yellow,
                 ..
             }]
-        ));
-    }
-
-    #[test]
-    fn test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs() {
-        let root = tempfile::tempdir().unwrap();
-        let track = TrackId::try_new("report-test").unwrap();
-        let track_dir = root.path().join("track/items/report-test");
-        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
-        let signals_path = track_dir.join("infrastructure-type-signals.json");
-        fs::write(&signals_path, fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
-
-        let source_path = root.path().join("libs/infrastructure/src/lib.rs");
-        fs::write(&source_path, "pub struct ChangedFixture;\n").unwrap();
-        let stale_source = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
-            .expect_err("changed implementation source must stale the persisted artifact");
-        assert!(matches!(
-            stale_source,
-            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-        ));
-
-        fs::write(&source_path, "pub struct Fixture;\n").unwrap();
-        let selected_feature = "{\n  \"schema_version\": 1,\n  \"layers\": {\n    \"infrastructure\": [\"freshness\"]\n  }\n}\n";
-        fs::write(track_dir.join("tddd-features.json"), selected_feature).unwrap();
-        fs::write(track_dir.join("tddd-features-baseline.json"), selected_feature).unwrap();
-        let stale_features =
-            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
-                .expect_err("changed feature selection must stale the persisted artifact");
-        assert!(matches!(
-            stale_features,
-            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
         ));
     }
 

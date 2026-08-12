@@ -6,7 +6,6 @@
 //! degrades from the recorded commit to the configured base branch (CN-05).
 
 use std::collections::{BTreeMap, HashSet};
-use std::io::{BufReader, Read};
 use std::path::Path;
 use std::process::Stdio;
 
@@ -30,43 +29,16 @@ use crate::track_artifact::{TrackArtifactReadError, read_track_artifact};
 const METADATA_FILE: &str = "metadata.json";
 const MAX_TRACK_METADATA_BYTES: u64 = 4 * 1024 * 1024;
 const MAX_GIT_OUTPUT_BYTES: u64 = 16 * 1024 * 1024;
-const MAX_UNTRACKED_FILE_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_BINARY_TREE_PATHSPEC_BYTES: usize = 64 * 1024;
-/// Generated build, cache, and credential outputs excluded before collection.
-const IGNORED_NON_REVIEW_PATHS: [&str; 32] = [
-    ":(top,exclude)target/**",
-    ":(top,exclude)target-*/**",
-    ":(top,exclude)**/*.rs.bk",
-    ":(top,exclude).claude/logs/**",
-    ":(top,exclude).claude/worktrees/**",
-    ":(top,exclude).fastembed_cache/**",
-    ":(top,exclude)**/.fastembed_cache/**",
-    ":(top,exclude).semantic_index/**",
-    ":(top,exclude)**/.semantic_index/**",
-    ":(top,exclude).semantic_index.*",
-    ":(top,exclude)sotp-dry-index-*/**",
-    ":(top,exclude).env",
-    ":(top,exclude).env.*",
-    ":(top,exclude)**/*.pem",
-    ":(top,exclude)**/*.key",
-    ":(top,exclude)private/**",
-    ":(top,exclude)config/secrets/**",
-    ":(top,exclude)tmp/**",
-    ":(top,exclude).cache/**",
-    ":(top,exclude).harness/tools/**",
-    ":(top,exclude)bin/sotp",
-    ":(top,exclude).cargo-install/**",
-    ":(top,exclude)repomix-output.txt",
-    ":(top,exclude)repomix-output.xml",
-    ":(top,exclude)repomix-output.*/**",
-    ":(top,exclude).idea/**",
-    ":(top,exclude).vscode/**",
-    ":(top,exclude).locks/**",
-    ":(top,exclude)track/items/**/.commit_hash",
-    ":(top,exclude)track/items/**/.commit_hash.tmp",
-    ":(top,exclude)track/items/*/*-graph*/**",
-    ":(top,exclude)track/items/*/logs/**",
-];
+
+mod untracked;
+
+use untracked::{
+    IGNORED_NON_REVIEW_PATHS, drop_ignored_non_review_paths, file_path_bytes, retained_paths,
+    untracked_additions, untracked_paths,
+};
+#[cfg(test)]
+use untracked::{MAX_UNTRACKED_FILE_BYTES, count_file_lines};
 
 fn measure_failed(message: impl Into<String>) -> ScopeDiffMeasureError {
     ScopeDiffMeasureError::MeasureFailed { message: FreeText::new(message.into()) }
@@ -134,9 +106,9 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
             ],
         )?;
         // Enumerate ordinary and ignored files separately. The ignored pass is
-        // needed for in-scope source files. Only the ignored pass excludes
-        // trusted non-review outputs: a visible file may be explicitly
-        // re-included by an ignore negation and must reach classification.
+        // needed for in-scope source files. Git can still emit an embedded
+        // repository as a directory entry despite an exclude pathspec, so the
+        // Rust-side prefix filter below enforces the exclusions on both passes.
         let visible_untracked = git_bytes(
             &items_dir,
             &["ls-files", "-z", "--others", "--exclude-standard", "--full-name", "--", ":/"],
@@ -164,6 +136,7 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
         )?;
         let mut untracked = untracked_paths(&visible_untracked)?;
         untracked.extend(untracked_paths(&ignored_untracked)?);
+        let untracked = drop_ignored_non_review_paths(untracked)?;
         let untracked = retained_paths(&scope_config, untracked);
         changed.extend(untracked_additions(&root, &untracked)?);
 
@@ -510,23 +483,6 @@ fn parse_numstat_count(field: &[u8], record: &[u8]) -> Result<u32, ScopeDiffMeas
     })
 }
 
-/// Counts an untracked file's whole length as additions.
-fn untracked_paths(output: &[u8]) -> Result<Vec<FilePath>, ScopeDiffMeasureError> {
-    output
-        .split(|byte| *byte == b'\0')
-        .filter(|raw_path| !raw_path.is_empty())
-        .map(file_path_bytes)
-        .collect()
-}
-
-/// Keeps paths that [`ReviewScopeConfig::classify`] will include in a scope.
-/// This applies operational and other-track exclusions before any file I/O.
-fn retained_paths(scope_config: &ReviewScopeConfig, paths: Vec<FilePath>) -> Vec<FilePath> {
-    let included: HashSet<FilePath> =
-        scope_config.classify(&paths).into_values().flatten().collect();
-    paths.into_iter().filter(|path| included.contains(path)).collect()
-}
-
 /// Applies the same operational and other-track exclusions to tracked rows
 /// before a binary fallback can inspect their working-tree paths.
 fn retained_numstat_entries(
@@ -546,119 +502,6 @@ fn retained_numstat_entries(
             NumstatEntry::Counted(path, _) | NumstatEntry::Binary(path) => retained.contains(path),
         })
         .collect()
-}
-
-fn untracked_additions(
-    root: &Path,
-    paths: &[FilePath],
-) -> Result<Vec<(FilePath, u32)>, ScopeDiffMeasureError> {
-    let mut changed = Vec::new();
-    let mut remaining_bytes = MAX_UNTRACKED_FILE_BYTES;
-    for path in paths {
-        let absolute_path = root.join(path.as_str());
-        match reject_symlinks_below(&absolute_path, root) {
-            Ok(true) => {}
-            Ok(false) => continue,
-            Err(error) => {
-                return Err(measure_failed(format!(
-                    "refusing untracked path {}: {}",
-                    path.as_str(),
-                    io_classification(&error)
-                )));
-            }
-        }
-        let lines = count_file_lines(&absolute_path, path.as_str(), &mut remaining_bytes)?;
-        changed.push((path.clone(), lines));
-    }
-    Ok(changed)
-}
-
-/// Counts newline-delimited lines without requiring UTF-8 or whole-file buffering.
-///
-/// `relative` is the candidate's repository-relative path and is what every
-/// failure names: `path` is absolute and stays out of the reported message.
-fn count_file_lines(
-    path: &Path,
-    relative: &str,
-    remaining_bytes: &mut u64,
-) -> Result<u32, ScopeDiffMeasureError> {
-    let path_metadata = std::fs::symlink_metadata(path).map_err(|error| {
-        measure_failed(format!(
-            "read metadata for untracked file {relative}: {}",
-            io_classification(&error)
-        ))
-    })?;
-    if !path_metadata.file_type().is_file() {
-        return Err(measure_failed(format!("untracked file {relative} is not a regular file")));
-    }
-
-    let file = std::fs::File::open(path).map_err(|error| {
-        measure_failed(format!("read untracked file {relative}: {}", io_classification(&error)))
-    })?;
-    let metadata = file.metadata().map_err(|error| {
-        measure_failed(format!(
-            "read metadata for untracked file {relative}: {}",
-            io_classification(&error)
-        ))
-    })?;
-    if !metadata.is_file() || metadata.len() > *remaining_bytes {
-        return Err(measure_failed(format!(
-            "untracked file {relative} exceeds the remaining {remaining_bytes}-byte read budget"
-        )));
-    }
-
-    let budget = *remaining_bytes;
-    let mut reader = BufReader::new(file.take(budget.saturating_add(1)));
-    let mut buffer = [0_u8; 8 * 1024];
-    let mut bytes_seen = 0_u64;
-    let mut lines = 0_u32;
-    let mut saw_bytes = false;
-    let mut last_byte = 0_u8;
-
-    loop {
-        let bytes_read = reader.read(&mut buffer).map_err(|error| {
-            measure_failed(format!("read untracked file {relative}: {}", io_classification(&error)))
-        })?;
-        if bytes_read == 0 {
-            break;
-        }
-        bytes_seen = bytes_seen.saturating_add(bytes_read as u64);
-        if bytes_seen > budget {
-            return Err(measure_failed(format!(
-                "untracked file {relative} exceeds the remaining {budget}-byte read budget"
-            )));
-        }
-        let Some(chunk) = buffer.get(..bytes_read) else {
-            return Err(measure_failed(format!("short read from untracked file {relative}")));
-        };
-        saw_bytes = true;
-        if let Some(byte) = chunk.last() {
-            last_byte = *byte;
-        }
-        for byte in chunk {
-            if *byte == b'\n' {
-                lines = lines.saturating_add(1);
-            }
-        }
-    }
-
-    if saw_bytes && last_byte != b'\n' {
-        lines = lines.saturating_add(1);
-    }
-    *remaining_bytes = remaining_bytes.saturating_sub(bytes_seen);
-    Ok(lines)
-}
-
-fn file_path(raw: &str) -> Result<FilePath, ScopeDiffMeasureError> {
-    let normalized = raw.strip_prefix("./").unwrap_or(raw);
-    FilePath::new(normalized)
-        .map_err(|error| measure_failed(format!("invalid path '{normalized}': {error}")))
-}
-
-fn file_path_bytes(raw: &[u8]) -> Result<FilePath, ScopeDiffMeasureError> {
-    let raw = std::str::from_utf8(raw)
-        .map_err(|_| measure_failed("Git returned a non-UTF-8 repository path"))?;
-    file_path(raw)
 }
 
 /// Merges tracked and untracked contributions for a path before classification.
@@ -755,6 +598,17 @@ mod tests {
         std::fs::write(path, contents).unwrap();
     }
 
+    fn embedded_git_repo(root: &std::path::Path, rel: &str) {
+        let embedded = root.join(rel);
+        std::fs::create_dir_all(&embedded).unwrap();
+        git(&embedded, &["init", "-b", "main"]);
+        git(&embedded, &["config", "user.email", "embedded@example.com"]);
+        git(&embedded, &["config", "user.name", "embedded"]);
+        write(&embedded, "lib.rs", "line\n");
+        git(&embedded, &["add", "lib.rs"]);
+        git(&embedded, &["commit", "-m", "embedded repository"]);
+    }
+
     /// A repository whose `main` holds the base commit and whose track branch
     /// carries one committed change to `libs/domain/src/committed.rs` (+3
     /// lines). Nothing is staged, unstaged or untracked yet.
@@ -803,7 +657,12 @@ mod tests {
     /// runs each test in its own process.
     static CWD_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
-    fn measure_in(root: &std::path::Path) -> Vec<domain::batch_plan::MeasuredScopeDiff> {
+    fn measure_result_in(
+        root: &std::path::Path,
+    ) -> Result<
+        Vec<domain::batch_plan::MeasuredScopeDiff>,
+        usecase::batch_plan::ScopeDiffMeasureError,
+    > {
         use usecase::batch_plan::ScopeDiffMeasurePort;
 
         let _guard = CWD_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -816,7 +675,11 @@ mod tests {
         );
 
         std::env::set_current_dir(original).unwrap();
-        measured.unwrap()
+        measured
+    }
+
+    fn measure_in(root: &std::path::Path) -> Vec<domain::batch_plan::MeasuredScopeDiff> {
+        measure_result_in(root).unwrap()
     }
 
     fn domain_lines(measured: &[domain::batch_plan::MeasuredScopeDiff]) -> u32 {
@@ -1000,6 +863,35 @@ mod tests {
             domain_lines(&measure_in(&root)),
             3,
             "ignored build output must not consume the untracked-file read budget"
+        );
+    }
+
+    #[test]
+    fn test_an_embedded_git_repository_under_ignored_cache_prefix_is_skipped() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        embedded_git_repo(root, ".cache/cargo/advisory-dbs/advisory-db-3157b0e258782691");
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "an embedded repository under an excluded cache prefix must not be measured"
+        );
+    }
+
+    #[test]
+    fn test_an_embedded_git_repository_under_reviewable_prefix_fails_closed() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        embedded_git_repo(root, "libs/domain/src/embedded-repository");
+
+        let error = measure_result_in(root)
+            .expect_err("an embedded repository in reviewable space must fail measurement");
+        assert!(
+            error.to_string().contains(
+                "untracked file libs/domain/src/embedded-repository/ is not a regular file"
+            ),
+            "the existing non-regular-file failure must be preserved: {error}"
         );
     }
 

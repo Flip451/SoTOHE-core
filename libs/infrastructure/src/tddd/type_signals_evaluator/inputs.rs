@@ -1,13 +1,16 @@
 //! Freshness-input helpers for the type-signal evaluator.
 
-use std::io;
+use std::io::{self, Read as _};
 use std::path::Path;
+use std::process::{Child, ExitStatus, Stdio};
+use std::sync::mpsc::{self, Receiver, RecvTimeoutError};
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant};
 
-use domain::tddd::CargoFeatureName;
-use domain::tddd::type_signals_doc::{ImplementationInputHash, Sha256Digest, TypeSignalsCacheKey};
-use sha2::Digest as _;
+use domain::CommitHash;
+use domain::tddd::type_signals_doc::TypeSignalsCacheKey;
 
-use super::{EvaluateSignalsError, build_inputs};
+use super::EvaluateSignalsError;
 use crate::tddd::type_signals_codec;
 
 pub(super) fn read_bytes_file_limited(
@@ -40,68 +43,161 @@ pub(super) fn read_utf8_file_limited(
     String::from_utf8(bytes).map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
 }
 
-/// Computes the current implementation-side input hash for one layer.
-pub(crate) fn hash_workspace_inputs(
-    workspace_root: &Path,
-    target_crate: &str,
-    features: &[CargoFeatureName],
-) -> Result<ImplementationInputHash, EvaluateSignalsError> {
-    let toolchain_identifier = build_inputs::nightly_toolchain_identifier(workspace_root)?;
-    hash_workspace_inputs_with_toolchain_identifier(
+const MAX_GIT_OUTPUT_BYTES: usize = 8 * 1024;
+const GIT_PROBE_TIMEOUT: Duration = Duration::from_secs(10);
+const GIT_PROBE_POLL_INTERVAL: Duration = Duration::from_millis(10);
+
+pub(super) fn read_head_commit(workspace_root: &Path) -> Result<CommitHash, EvaluateSignalsError> {
+    let output = crate::git_cli::isolation::isolated_bounded_git_output(
         workspace_root,
-        target_crate,
-        features,
-        &toolchain_identifier,
+        &["rev-parse", "--verify", "HEAD^{commit}"],
+        MAX_GIT_OUTPUT_BYTES,
     )
-}
-
-pub(crate) fn hash_workspace_inputs_with_toolchain_identifier(
-    workspace_root: &Path,
-    target_crate: &str,
-    features: &[CargoFeatureName],
-    toolchain_identifier: &[u8],
-) -> Result<ImplementationInputHash, EvaluateSignalsError> {
-    let implementation_hash = build_inputs::hash_implementation_inputs_with_toolchain_identifier(
-        workspace_root,
-        target_crate,
-        toolchain_identifier,
-    )?;
-    implementation_hash_with_feature_selection(implementation_hash, features)
-}
-
-pub(crate) fn implementation_hash_with_feature_selection(
-    implementation_hash: Sha256Digest,
-    features: &[CargoFeatureName],
-) -> Result<ImplementationInputHash, EvaluateSignalsError> {
-    let mut hasher = sha2::Sha256::new();
-    hasher.update(b"type-signals-feature-selection-v1\0");
-    hasher.update(implementation_hash.as_str().as_bytes());
-    for feature in features {
-        hasher.update(feature.as_str().as_bytes());
-        hasher.update([0]);
-    }
-    let digest = Sha256Digest::try_new(format!("{:x}", hasher.finalize())).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "failed to construct implementation-input digest: {error}"
-        ))
+    .map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!("cannot read HEAD: {error}"))
     })?;
-    Ok(ImplementationInputHash::new(digest))
+    if !output.status.success() {
+        return Err(EvaluateSignalsError::authoritative_input(
+            "cannot resolve repository HEAD".to_owned(),
+        ));
+    }
+    CommitHash::try_new(
+        std::str::from_utf8(&output.stdout)
+            .map_err(|error| {
+                EvaluateSignalsError::authoritative_input(format!("HEAD is not UTF-8: {error}"))
+            })?
+            .trim()
+            .to_owned(),
+    )
+    .map_err(|error| EvaluateSignalsError::authoritative_input(format!("HEAD is invalid: {error}")))
+}
+
+pub(super) fn worktree_is_clean(workspace_root: &Path) -> Result<bool, EvaluateSignalsError> {
+    drain_worktree_status(workspace_root).map_err(|error| {
+        EvaluateSignalsError::authoritative_input(format!(
+            "cannot inspect worktree status: {error}"
+        ))
+    })
+}
+
+struct StatusReader {
+    receiver: Receiver<io::Result<bool>>,
+    handle: JoinHandle<()>,
+}
+
+fn drain_worktree_status(workspace_root: &Path) -> io::Result<bool> {
+    let args = ["status", "--porcelain=v1", "--untracked-files=all", "--"];
+    let mut command = crate::git_cli::isolation::isolated_git_command(workspace_root, &args);
+    command.stderr(Stdio::null());
+    let mut child = crate::git_cli::spawn_bounded_git_child(&mut command)?;
+    let stdout = match child.stdout.take() {
+        Some(stdout) => stdout,
+        None => {
+            return cleanup_status_probe(
+                io::Error::other("git status stdout was not captured"),
+                &mut child,
+                None,
+            );
+        }
+    };
+    let (sender, receiver) = mpsc::sync_channel(1);
+    let handle = match thread::Builder::new().name("streaming-git-status-reader".to_owned()).spawn(
+        move || {
+            let mut dirty = false;
+            let mut buffer = [0_u8; 8 * 1024];
+            let mut stdout = stdout;
+            let result = loop {
+                match stdout.read(&mut buffer) {
+                    Ok(0) => break Ok(dirty),
+                    Ok(_) => dirty = true,
+                    Err(error) => break Err(error),
+                }
+            };
+            let _ = sender.send(result);
+        },
+    ) {
+        Ok(handle) => handle,
+        Err(error) => return cleanup_status_probe(error, &mut child, None),
+    };
+    let reader = StatusReader { receiver, handle };
+    let started = Instant::now();
+    let status = match wait_for_status_child(&mut child, started) {
+        Ok(status) => status,
+        Err(error) => return cleanup_status_probe(error, &mut child, Some(reader)),
+    };
+    let dirty = match receive_status_reader(&reader, started) {
+        Ok(dirty) => dirty,
+        Err(error) => return cleanup_status_probe(error, &mut child, Some(reader)),
+    };
+    reader.handle.join().map_err(|_| io::Error::other("git status reader panicked"))?;
+    if !status.success() {
+        return Err(io::Error::other("git status failed"));
+    }
+    Ok(!dirty)
+}
+
+fn wait_for_status_child(child: &mut Child, started: Instant) -> io::Result<ExitStatus> {
+    loop {
+        match child.try_wait()? {
+            Some(status) => return Ok(status),
+            None if started.elapsed() >= GIT_PROBE_TIMEOUT => {
+                return Err(io::Error::new(io::ErrorKind::TimedOut, "git status timed out"));
+            }
+            None => thread::sleep(GIT_PROBE_POLL_INTERVAL),
+        }
+    }
+}
+
+fn receive_status_reader(reader: &StatusReader, started: Instant) -> io::Result<bool> {
+    let remaining = GIT_PROBE_TIMEOUT
+        .checked_sub(started.elapsed())
+        .ok_or_else(|| io::Error::new(io::ErrorKind::TimedOut, "git status timed out"))?;
+    match reader.receiver.recv_timeout(remaining) {
+        Ok(result) => result,
+        Err(RecvTimeoutError::Timeout) => {
+            Err(io::Error::new(io::ErrorKind::TimedOut, "git status timed out"))
+        }
+        Err(RecvTimeoutError::Disconnected) => {
+            Err(io::Error::other("git status reader disconnected"))
+        }
+    }
+}
+
+fn cleanup_status_probe<T>(
+    error: io::Error,
+    child: &mut Child,
+    reader: Option<StatusReader>,
+) -> io::Result<T> {
+    let cleanup = crate::git_cli::terminate_bounded_git_child(child);
+    let join = reader.map_or(Ok(()), |reader| {
+        reader.handle.join().map_err(|_| io::Error::other("git status reader panicked"))
+    });
+    match (cleanup, join) {
+        (Ok(()), Ok(())) => Err(error),
+        (Err(cleanup), Ok(())) => Err(io::Error::new(
+            error.kind(),
+            format!("{error}; status probe cleanup failed: {cleanup}"),
+        )),
+        (Ok(()), Err(_)) => {
+            Err(io::Error::new(error.kind(), format!("{error}; status probe reader join failed")))
+        }
+        (Err(cleanup), Err(_)) => Err(io::Error::new(
+            error.kind(),
+            format!("{error}; status probe cleanup failed: {cleanup}; reader join failed"),
+        )),
+    }
 }
 
 /// Rejects persistence when inputs change while rustdoc or evaluation is running.
 pub(super) fn verify_evaluation_inputs_unchanged(
     workspace_root: &Path,
-    target_crate: &str,
-    features: &[CargoFeatureName],
     catalogue_path: &Path,
     baseline_path: &Path,
     initial_key: &TypeSignalsCacheKey,
 ) -> Result<(), EvaluateSignalsError> {
-    if hash_workspace_inputs(workspace_root, target_crate, features)?
-        != *initial_key.implementation_input_hash()
-    {
+    if read_head_commit(workspace_root)? != *initial_key.head_commit() {
         return Err(EvaluateSignalsError::authoritative_input(
-            "implementation inputs changed during type-signal evaluation".to_owned(),
+            "repository HEAD changed during type-signal evaluation".to_owned(),
         ));
     }
     let catalogue =
@@ -134,9 +230,9 @@ pub(super) fn verify_evaluation_inputs_unchanged(
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use super::{implementation_hash_with_feature_selection, read_utf8_file_limited};
-    use domain::tddd::CargoFeatureName;
-    use domain::tddd::type_signals_doc::Sha256Digest;
+    use super::{read_utf8_file_limited, worktree_is_clean};
+    use crate::verify::test_support::run_git;
+    use std::fs;
 
     #[test]
     fn test_read_utf8_file_limited_rejects_missing_file() {
@@ -144,18 +240,20 @@ mod tests {
     }
 
     #[test]
-    fn test_implementation_hash_changes_when_feature_selection_changes() {
-        let base = Sha256Digest::try_new("0".repeat(64)).unwrap();
-        let no_features = implementation_hash_with_feature_selection(base.clone(), &[]).unwrap();
-        let semantic_dup = implementation_hash_with_feature_selection(
-            base,
-            &[CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()],
-        )
-        .unwrap();
+    fn test_worktree_is_clean_drains_large_status_output_without_retaining_it() {
+        let repository = tempfile::tempdir().unwrap();
+        run_git(repository.path(), &["init", "-q", "-b", "main"]);
+        run_git(repository.path(), &["config", "user.email", "test@example.com"]);
+        run_git(repository.path(), &["config", "user.name", "test"]);
+        fs::write(repository.path().join("tracked.txt"), "base\n").unwrap();
+        run_git(repository.path(), &["add", "tracked.txt"]);
+        run_git(repository.path(), &["commit", "-q", "-m", "initial"]);
+        let suffix = "x".repeat(48);
+        for index in 0..320 {
+            fs::write(repository.path().join(format!("untracked-{index:04}-{suffix}")), "saved\n")
+                .unwrap();
+        }
 
-        assert_ne!(
-            no_features, semantic_dup,
-            "a changed rustdoc feature selection must force a fresh type-signal extraction"
-        );
+        assert!(!worktree_is_clean(repository.path()).unwrap());
     }
 }

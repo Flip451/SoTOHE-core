@@ -97,7 +97,7 @@
       }
     },
     {
-      "claim_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCommand",
@@ -121,7 +121,7 @@
       }
     },
     {
-      "claim_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCommand",
@@ -130,22 +130,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "159a4df613499121f63be5754204b03ab26bfe583ebcd98993927ff9ddc9a72b",
+      "evidence_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge, regenerate derived views, replace the baseline from a commit-pinned isolated worktree without exposing a partial replacement, regenerate affected views against that published baseline, and then record synchronization of that exact merged base commit.",
+        "citation": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCommand",
@@ -154,22 +154,70 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ed3a944687a361098c2ee196108b66f8ca2414acbd97373b59232d0c644c863c",
+      "evidence_hash": "7ec10995aa47e8531cbd5645e1c378863fa0617b440210cba4f0929d62416aaa",
       "evidence_origin": {
         "data": {
-          "element_id": "IN-03",
-          "section": "in_scope",
-          "text_label": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow, with both `/track:recover` and `$track-recover` adapters shipping as provider-framing-only entry points."
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow, with both `/track:recover` and `$track-recover` adapters shipping as provider-framing-only entry points.",
+        "citation": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommand",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3ff212f6a7a3ff02906a56e726b92b5a1318d1c5af8fd66a33421c938b3875fc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommand",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "218fe049b3f5391fbe9ebd9605f7a1934ff6fa06d51f2cc6c98351f615eb94f6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCommand",
@@ -193,7 +241,7 @@
       }
     },
     {
-      "claim_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCommand",
@@ -217,7 +265,7 @@
       }
     },
     {
-      "claim_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCommand",
@@ -226,22 +274,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "7780c2425c2ade7c91e02680c3ae14dac6cf45b66aff10a9a129b68ac0c70ae8",
+      "evidence_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge, derived views are regenerated; a complete, validated baseline replacement produced in an isolated worktree pinned to the exact merged base commit is atomically published; affected views are regenerated against that published baseline; and only then is the sync-base record atomically written before the operation reports success.",
+        "citation": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCommand",
@@ -250,17 +298,65 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "3a5065ab5c4b29cf9d6b4431b9582f1c7327f37294f0ab952bfe38de5ef07daf",
+      "evidence_hash": "3c33695aa5ec09085a3265ae03d1114da000072e324b6a71f2dd73a96fa3d0fe",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point. The recovery workflow that the orchestrator drives then performs writer-routed conflict editing, applicable chain-limited zero-findings review, sanctioned type-baseline capture from a disposable clone of the exact merged base commit, and guarded commit. Its post-review capture restores the comparison authority for base-owned, source-identical catalogue deltas without duplicating their originating ownership; it does not update `.sync-base.json`, publish a retained tree, or regenerate derived views."
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "When a guarded base merge conflicts, it yields the conflicted outcome, performs no clean-merge cleanup, and surfaces the canonical recovery workflow entry point.",
+        "citation": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommand",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "63419c88b93818a74e560a9208095d5aeeccac151b54d33be7244b75ec73426c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "If baseline regeneration fails, the operation reports failure rather than cleanup completion."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If baseline regeneration fails, the operation reports failure rather than cleanup completion.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommand",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6fc35b2994fa9c46b8fd998ea21543540371efab54383c52e180b40658614d37",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported.",
         "kind": "pass"
       }
     },
@@ -313,10 +409,10 @@
       }
     },
     {
-      "claim_hash": "b942ed8843bb365491be2c443dcfb149f64434df3381acd0ce9b1d7143eafa6b",
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
       "claim_origin": {
         "data": {
-          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge",
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
           "section_key": "functions"
         },
@@ -337,10 +433,106 @@
       }
     },
     {
-      "claim_hash": "b942ed8843bb365491be2c443dcfb149f64434df3381acd0ce9b1d7143eafa6b",
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
       "claim_origin": {
         "data": {
-          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge",
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ec10995aa47e8531cbd5645e1c378863fa0617b440210cba4f0929d62416aaa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3ff212f6a7a3ff02906a56e726b92b5a1318d1c5af8fd66a33421c938b3875fc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "218fe049b3f5391fbe9ebd9605f7a1934ff6fa06d51f2cc6c98351f615eb94f6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
           "section_key": "functions"
         },
@@ -357,6 +549,102 @@
       },
       "verdict": {
         "citation": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d1a8d3e43a11bbad62882da88d0ebfbaced67f21758977ebd741d2beb5bf6129",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3c33695aa5ec09085a3265ae03d1114da000072e324b6a71f2dd73a96fa3d0fe",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6fc35b2994fa9c46b8fd998ea21543540371efab54383c52e180b40658614d37",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported.",
         "kind": "pass"
       }
     }

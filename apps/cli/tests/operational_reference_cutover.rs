@@ -230,8 +230,9 @@ fn test_track_recover_surfaces_delegate_to_one_canonical_workflow() {
         "recover adapters must route review and commit through their provider-specific surfaces"
     );
     assert!(
-        TRACK_RECOVER_WORKFLOW.contains("never runs clean-merge cleanup"),
-        "recover workflow must preserve the conflict branch's cleanup exclusion"
+        TRACK_RECOVER_WORKFLOW.contains("are exclusive to the successful guarded merge command")
+            && TRACK_RECOVER_WORKFLOW.contains("this workflow never runs them"),
+        "recover workflow must keep the view and sync-base cleanup stages exclusive to the clean merge"
     );
 }
 

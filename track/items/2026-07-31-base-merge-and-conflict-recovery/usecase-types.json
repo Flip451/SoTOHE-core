@@ -36,7 +36,7 @@
           "params": [
             {
               "name": "port",
-              "ty": "std::sync::Arc<dyn GitStashPort>"
+              "ty": "Arc<dyn GitStashPort>"
             }
           ],
           "returns": "Self"
@@ -99,10 +99,6 @@
     {
       "for_type": "BaseMergeInteractor",
       "trait_ref": "BaseMergeService"
-    },
-    {
-      "for_type": "GitStashInteractor",
-      "trait_ref": "GitStashService"
     },
     {
       "action": "modify",
@@ -287,16 +283,20 @@
     {
       "for_type": "GitStashPopError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GitStashInteractor",
+      "trait_ref": "GitStashService"
     }
   ],
   "traits": {
     "BaseMergeCleanupPort": {
       "action": "add",
-      "docs": "Post-merge cleanup driven port. Synchronous by design.",
+      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12). Synchronous by design: sequential cleanup stages over local filesystem and process boundaries.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Derived-view regeneration operation. Synchronous by design.",
+          "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
           "has_default_impl": false,
           "is_async": false,
           "name": "regenerate_views",
@@ -310,7 +310,7 @@
           "returns": "Result<(), ViewsRegenerationError>"
         },
         {
-          "docs": "TDDD baseline-replacement operation. Synchronous by design.",
+          "docs": "[CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
           "has_default_impl": false,
           "is_async": false,
           "name": "replace_baselines",
@@ -324,7 +324,7 @@
           "returns": "Result<(), BaselineReplacementError>"
         },
         {
-          "docs": "Sync-base record-write operation. Synchronous by design.",
+          "docs": "[IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
           "has_default_impl": false,
           "is_async": false,
           "name": "write_sync_base_record",
@@ -348,22 +348,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-02",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-05",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
@@ -373,6 +357,14 @@
         },
         {
           "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -395,11 +387,11 @@
     },
     "BaseMergeContextPort": {
       "action": "add",
-      "docs": "Base-merge context-loading driven port. Synchronous by design.",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01).",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "Context load operation. Synchronous by design.",
+          "docs": "Loads the merge direction. Synchronous by design: local repository-context lookup.",
           "has_default_impl": false,
           "is_async": false,
           "name": "load_direction",
@@ -428,10 +420,6 @@
         },
         {
           "anchor": "AC-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-02",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],
@@ -527,7 +515,7 @@
     },
     "BaseMergeService": {
       "action": "add",
-      "docs": "Application-service boundary for BaseMergeCommand and final BaseMergeOutcome values.",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "methods": [
         {
@@ -558,7 +546,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-03",
+          "anchor": "IN-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -566,7 +554,15 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-02",
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -583,22 +579,6 @@
         },
         {
           "anchor": "AC-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -621,11 +601,10 @@
     },
     "GitStashPort": {
       "action": "add",
-      "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13). Driven port for guarded stash push and paired pop infrastructure capabilities. Synchronous by design: guarded CLI git subprocess on the local repository.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "push",
@@ -634,7 +613,6 @@
           "returns": "Result<GitStashPushOutcome, GitStashPushError>"
         },
         {
-          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "pop",
@@ -668,11 +646,10 @@
     },
     "GitStashService": {
       "action": "add",
-      "docs": "IN-04 / AC-06 / AC-13.",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13). Synchronous application boundary for guarded stash push and pop.",
       "informal_grounds": [],
       "methods": [
         {
-          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "push",
@@ -681,7 +658,6 @@
           "returns": "Result<GitStashPushOutcome, GitStashPushError>"
         },
         {
-          "docs": "IN-04 / AC-06 / AC-13. Synchronous by design.",
           "has_default_impl": false,
           "is_async": false,
           "name": "pop",
@@ -715,7 +691,7 @@
     },
     "TrackBlobReader": {
       "action": "modify",
-      "docs": "TrackBlobReader: adds read_type_implementation_input_hash and borrows branch in read_adr_verify_report. Synchronous port by design. IN-05 / CN-03 / CN-04 / AC-07 / AC-09.",
+      "docs": "[GO-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#GO-02): committed-branch artifact reader for the strict merge gate. Synchronous by design: local git-blob reads through a process boundary.",
       "informal_grounds": [],
       "methods": [
         {
@@ -755,28 +731,6 @@
           ],
           "receiver": "&self",
           "returns": "BlobFetchResult<(Vec<u8>, String)>"
-        },
-        {
-          "docs": "Track-added branch-side implementation-input hash reader for one TDDD layer. IN-05 / CN-03 / CN-04 / AC-07 / AC-09.",
-          "has_default_impl": true,
-          "is_async": false,
-          "name": "read_type_implementation_input_hash",
-          "params": [
-            {
-              "name": "_branch",
-              "ty": "&str"
-            },
-            {
-              "name": "_track_id",
-              "ty": "&str"
-            },
-            {
-              "name": "_layer_id",
-              "ty": "&str"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "BlobFetchResult<String>"
         },
         {
           "has_default_impl": false,
@@ -904,23 +858,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-09",
+          "anchor": "GO-02",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -999,7 +937,7 @@
   "types": {
     "BaseMergeAttemptOutcome": {
       "action": "add",
-      "docs": "Usecase boundary DTO returned by the base-merge git port.",
+      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1019,7 +957,13 @@
           {
             "name": "Conflicted",
             "payload": {
-              "kind": "unit"
+              "fields": [
+                {
+                  "name": "base_commit",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
             }
           }
         ]
@@ -1035,11 +979,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
+          "anchor": "CN-05",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1052,10 +992,6 @@
         },
         {
           "anchor": "AC-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1359,7 +1295,7 @@
     },
     "BaseMergeGitError": {
       "action": "add",
-      "docs": "IN-01 / CN-01 / AC-01 / AC-02 / AC-04.",
+      "docs": "IN-01 / CN-01 / AC-01 / AC-02.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1405,16 +1341,12 @@
         {
           "anchor": "AC-02",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
     },
     "BaseMergeInteractor": {
       "action": "add",
-      "docs": "Dependency-injected interactor implementing BaseMergeService.",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1439,7 +1371,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-03",
+          "anchor": "IN-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1447,7 +1379,15 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-02",
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1467,22 +1407,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-07",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-10",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
@@ -1498,7 +1422,7 @@
     },
     "BaseMergeOutcome": {
       "action": "add",
-      "docs": "Usecase boundary DTO returned by the base-merge application service.",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1532,19 +1456,11 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "IN-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1557,6 +1473,22 @@
         },
         {
           "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1668,7 +1600,7 @@
     },
     "GitStashInteractor": {
       "action": "add",
-      "docs": "IN-04 / AC-06 / AC-13.",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13). R1 role constraints require this application boundary between the primary adapter and GitStashPort; the pass-through delegation is intentional.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1700,7 +1632,7 @@
     },
     "GitStashPopError": {
       "action": "add",
-      "docs": "IN-04 / AC-06 / AC-13.",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1733,22 +1665,6 @@
                 "domain::CommitHash"
               ],
               "kind": "tuple"
-            }
-          },
-          {
-            "name": "StashIdentityMismatch",
-            "payload": {
-              "fields": [
-                {
-                  "name": "expected",
-                  "ty": "domain::CommitHash"
-                },
-                {
-                  "name": "actual",
-                  "ty": "domain::CommitHash"
-                }
-              ],
-              "kind": "struct"
             }
           }
         ]

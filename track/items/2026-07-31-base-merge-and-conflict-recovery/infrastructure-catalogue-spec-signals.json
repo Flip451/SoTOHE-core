@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "a0bb5678983c2166aecf0dd3b56746ad401e9e0111dde14b5f29b9017d0c1a3a",
+  "catalogue_declaration_hash": "5da9bfe87716f24e31d896962228a2f1f2001deec8b676b8216e7843fa23c0a2",
   "schema_version": 1,
   "signals": [
     {
@@ -8,12 +8,12 @@
       "type_name": "EvaluateSignalsError"
     },
     {
-      "entry_hash": "e96afe31da24165b2729d5259f8d5ad49bba3ab12b795ad6b98ffbb1776804a3",
+      "entry_hash": "2167f19ed631bbbffb2eba3c0e53182fb8cde66ba52bef2b8a33b0bf8220411b",
       "signal": "blue",
       "type_name": "FsBaseMergeCleanupAdapter"
     },
     {
-      "entry_hash": "74388bee5f36d04c6599db58332fbc16d7b652953969c019d74d1f1c639ac82c",
+      "entry_hash": "1acfa22df1f90327c3cbec9a05605e1f0415f3b7ec490d9836123a999c776184",
       "signal": "blue",
       "type_name": "FsBaseMergeContextAdapter"
     },
@@ -23,7 +23,7 @@
       "type_name": "FsBaseMergeGitAdapter"
     },
     {
-      "entry_hash": "175178d6bb811c93bb4fb809d1a924052c12e0e17227bb8a58b18c982817f590",
+      "entry_hash": "04ec074aa5571907998bff8d60a3a614229e430dc9b320ba38f03061ec6eec61",
       "signal": "blue",
       "type_name": "FsGitStashAdapter"
     },
@@ -38,7 +38,7 @@
       "type_name": "SyncBaseRecordSchemaVersion"
     },
     {
-      "entry_hash": "07b8788cb48162bc61f6fd581b77888df4a753efe11c9f9735aafc83666228ad",
+      "entry_hash": "9356b774bfe7bf5775d86ced5f7ed2f4a942a78300ec65098396aff8a567e8cd",
       "signal": "blue",
       "type_name": "TypeSignalsCodecError"
     },
@@ -48,27 +48,22 @@
       "type_name": "TypeSignalsExecutorAdapter"
     },
     {
-      "entry_hash": "b98eed6fba2e0efcce99c4d5c6ec71d2cfba31549a71ece8212d369fbd707088",
-      "signal": "blue",
-      "type_name": "infrastructure::tddd::type_signals_codec::baseline_hash"
-    },
-    {
-      "entry_hash": "82dd3fc43d3702abfe53568d8901aa20e5dd205eb4fa0d2295d678566ea359f9",
+      "entry_hash": "1308d1e8b13266d16637c22d6da05b19a68ccae02398608978235b52e24ce3f0",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_codec::decode"
     },
     {
-      "entry_hash": "33d8d2f6a5b643acc5cdebf91b24513d99116d407af5fea72e891bf55aa077bd",
+      "entry_hash": "f8f0d7a925867446dbd12c45957d33429eb6a7af29bcd116f4542ba62d594453",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_codec::encode"
     },
     {
-      "entry_hash": "4f27d6b97bc22e8eae0aa09f4a6e4f20f4cbb3226badfd965a3c32671511a552",
+      "entry_hash": "2688348460da63a890b222cf5940f2ffaf88b48961029c4f9aa8f04dd976b925",
       "signal": "blue",
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
     },
     {
-      "entry_hash": "9f9d999fa30afa902db21e39b46d268381abbdf6ea2234e0f0b423559b73d4ab",
+      "entry_hash": "9f0e276b6d8a85b1856fc093839c2cffc2e36d93c494d43651bb01ccfdb12242",
       "signal": "blue",
       "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file"
     }

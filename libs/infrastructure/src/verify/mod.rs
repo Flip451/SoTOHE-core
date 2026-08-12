@@ -12,7 +12,6 @@ pub use domain::verify::{Severity, VerifyFinding, VerifyOutcome};
 
 pub mod adr_signals;
 pub mod architecture_rules;
-pub(crate) mod branch_implementation_inputs;
 pub mod canonical_modules;
 pub mod catalogue_spec_refs;
 pub mod catalogue_spec_signals;
@@ -23,7 +22,6 @@ pub mod domain_strings;
 pub mod frontmatter;
 pub(crate) mod git_inventory;
 pub mod hooks_path;
-pub(crate) mod implementation_input_hash;
 pub mod latest_track;
 pub mod layers;
 pub mod machine_paths;

@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "91e038d98ef99427a1ee9db03d6a56f8fa850d3f06e6feba8c1a7d9972c1646a",
+  "catalogue_declaration_hash": "645d2873ac98961d334f7de969c4f4013c4ec3ad5d402506d8889aede7ca526e",
   "schema_version": 1,
   "signals": [
     {
@@ -13,7 +13,7 @@
       "type_name": "GitStashAction"
     },
     {
-      "entry_hash": "96a5a5803acdb412819895c4d161a8368e38a13c355b19bc2bfe17434e3eb0c0",
+      "entry_hash": "d5f48ae2f3c080734ccad3e479bfaa2aa2bb02cbff2286374c7e1238b6c6417c",
       "signal": "blue",
       "type_name": "TrackCommand"
     },
@@ -23,9 +23,9 @@
       "type_name": "cli::commands::git::execute"
     },
     {
-      "entry_hash": "b942ed8843bb365491be2c443dcfb149f64434df3381acd0ce9b1d7143eafa6b",
+      "entry_hash": "21ed72eeb0e3b6c9b54d548e392125f3b84dc0f1eb36569a60df35eb546c0b5d",
       "signal": "blue",
-      "type_name": "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge"
+      "type_name": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies"
     }
   ]
 }

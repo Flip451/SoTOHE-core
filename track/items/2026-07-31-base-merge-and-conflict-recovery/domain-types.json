@@ -23,17 +23,13 @@
     },
     "domain::tddd::type_signals_doc::decide_type_signals_reuse": {
       "action": "modify",
-      "docs": "Pure comparison of two typed cache keys into a reuse-decision value.",
+      "docs": "[IN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-05), [CN-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-03), [CN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-04), [AC-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-07), [AC-08](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-08), [AC-09](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-09). Domain cache-reuse decision owner.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
         {
-          "name": "recorded_key",
-          "ty": "&TypeSignalsCacheKey"
-        },
-        {
-          "name": "current_key",
-          "ty": "&TypeSignalsCacheKey"
+          "name": "input",
+          "ty": "&TypeSignalsReuseInput"
         }
       ],
       "returns": "TypeSignalsReuseDecision",
@@ -48,7 +44,19 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
           "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -146,8 +154,8 @@
               "ty": "CatalogueDeclarationHash"
             },
             {
-              "name": "implementation_input_hash",
-              "ty": "ImplementationInputHash"
+              "name": "head_commit",
+              "ty": "CommitHash"
             },
             {
               "name": "baseline_hash",
@@ -167,10 +175,10 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "implementation_input_hash",
+          "name": "head_commit",
           "params": [],
           "receiver": "&self",
-          "returns": "&ImplementationInputHash"
+          "returns": "&CommitHash"
         },
         {
           "has_default_impl": false,
@@ -182,6 +190,35 @@
         }
       ],
       "type_name": "TypeSignalsCacheKey"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify",
+          "params": [
+            {
+              "name": "recorded_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "current_key",
+              "ty": "TypeSignalsCacheKey"
+            },
+            {
+              "name": "worktree_status",
+              "ty": "TypeSignalsWorktreeStatus"
+            },
+            {
+              "name": "authority_status",
+              "ty": "TypeSignalsAuthorityStatus"
+            }
+          ],
+          "returns": "Option<Self>"
+        }
+      ],
+      "type_name": "TypeSignalsReuseInput"
     }
   ],
   "layer": "domain",
@@ -363,6 +400,62 @@
     {
       "for_type": "BaseMergeDirectionError",
       "trait_ref": "core::convert::From<RefValidationError>"
+    },
+    {
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TypeSignalsReuseInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TypeSignalsWorktreeStatus",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TypeSignalsWorktreeStatus",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TypeSignalsWorktreeStatus",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TypeSignalsWorktreeStatus",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TypeSignalsWorktreeStatus",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TypeSignalsAuthorityStatus",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TypeSignalsAuthorityStatus",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TypeSignalsAuthorityStatus",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TypeSignalsAuthorityStatus",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TypeSignalsAuthorityStatus",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {},
@@ -544,6 +637,33 @@
         }
       ]
     },
+    "ImplementationInputHash": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "tddd::type_signals_doc",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
     "TrackMetadata": {
       "action": "reference",
       "docs": "Baseline aggregate carried for the BaseMergeDirection constructor edge.",
@@ -715,9 +835,50 @@
         }
       ]
     },
+    "TypeSignalsAuthorityStatus": {
+      "action": "add",
+      "docs": "[IN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-05), [CN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-04), [AC-09](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-09). Authority-readability observation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Readable",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unreadable",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
     "TypeSignalsCacheKey": {
       "action": "add",
-      "docs": "Atomic freshness identity composed of catalogue declaration, implementation input, and actual baseline hashes.",
+      "docs": "[IN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-05), [CN-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-03), [CN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-04), [AC-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-07), [AC-08](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-08), [AC-09](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-09).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -742,11 +903,19 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
           "anchor": "AC-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
           "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -864,6 +1033,95 @@
         },
         {
           "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsReuseInput": {
+      "action": "add",
+      "docs": "[IN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-05), [CN-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-03), [CN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-04), [AC-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-07), [AC-08](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-08), [AC-09](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-09). Opaque verified reuse evidence; construction gate owned by its validating constructor.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsWorktreeStatus": {
+      "action": "add",
+      "docs": "[IN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-05), [CN-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-03), [AC-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-07), [AC-09](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-09). Worktree-cleanliness observation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Clean",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Dirty",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::type_signals_doc",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {

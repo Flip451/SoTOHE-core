@@ -306,6 +306,107 @@
           "hash": "rvw1:sha256:b39708ee495641da64223f3a5a16b4c4eabdb311b845231f1fb73dcaf71d3458",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T13:11:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94c137e2e72f8d966b1c33013acdf5f5cc560ef487ced6fdee591f63aa980806",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T13:16:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94c137e2e72f8d966b1c33013acdf5f5cc560ef487ced6fdee591f63aa980806",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:05:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:25b10d53cf21737c4285d607d9185fe1096558e9c928ef3250a99c9a77d5ddd4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:08:38Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-09-1210-base-owned-catalogue-deltas-conflict-recovery.md",
+              "line": 23,
+              "message": "`merge した base commit` を baseline にする以上、conflict 解消が誤って base 側を採用した場合は baseline と一致し、差分には現れません。そのため「解消の誤りは差し替え後も差分として現れる」という包括的保証は D1 自身の比較権威の定義と両立しません。base と異なる誤解消だけが差分になると限定し、base 側の誤採用は後続 review で検出する責務だと明確化してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:25b10d53cf21737c4285d607d9185fe1096558e9c928ef3250a99c9a77d5ddd4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T14:14:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05f66f6dce4bed804721ca35492bb8e3aa42530a1d809a849691404b33e31c17",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:16:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:05f66f6dce4bed804721ca35492bb8e3aa42530a1d809a849691404b33e31c17",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T13:43:14Z",
+          "findings": [
+            {
+              "category": "broken narrative reference",
+              "file": "knowledge/adr/README.md",
+              "line": 178,
+              "message": "README の索引名が古い決定を記述したままです。現在の ADR は clean merge だけでなく競合結果の Baseline 段階も決め、原子的 lifecycle を要求せず明示的に却下していますが、索引は依然として「clean な base merge」「原子的 lifecycle」と案内しています。現在の ADR タイトル／決定に合わせて索引名を更新してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "broken narrative reference",
+              "file": "knowledge/adr/README.md",
+              "line": 179,
+              "message": "README の索引名が旧 decision のままです。現在の ADR は「権威が存在する文脈への照合限定」ではなく「clean な同一 HEAD commit の場合だけ cache を再利用する」と決めているため、リンク先の判断を別内容として案内しています。現在の ADR タイトル／決定に合わせて索引名を更新してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f26185a84a33cbdeae39fac4e5dfc2a89fc39203f22a76e8c384515ff9cdf6c0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T13:46:27Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-05-1035-type-signals-authority-availability-boundary.md",
+              "line": 22,
+              "message": "Context と Consequences は cache の再利用可否を「作業ツリーが clean」「記録時と同じ HEAD」の二条件だけで判定するとしていますが、D1 はさらに「権威を読み取れない場合」も再計算条件に加えています。このため、clean な同一 HEAD で権威を読めない場合に再利用するのか再計算するのか、ADR 内で決定が一致していません。二条件だけにするか、権威の可読性も再利用条件だと揃えてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e376879c4adfb6f0e87077c4da70709a4a1f666505e83959509ef585ab097ecc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T13:52:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a3635ef89759ae99ab4733d1db16e669a2649c8ecddd20cbec74315910cd05ec",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T22:08:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e4eeb86d5c36afb0c4dde6507661bc0ea96dcb03dc18c7a7b2c9b5761a7e17a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -446,6 +547,42 @@
           "hash": "rvw1:sha256:30b017e382f3240aa51892d09276773d1fd007d2463e3ee9f0f58fcbfb475826",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T00:58:50Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 206,
+              "message": "The `RecoverBaselines` arm performs a separate active-track resolution call and then revalidates the result before invoking the recovery driver. This is multi-step application orchestration in the CLI bin, contrary to the thin-bin policy; move optional track-ID resolution behind the recovery driver so this arm only constructs one typed input, calls the driver, and emits its outcome.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 204,
+              "message": "The new public `recover-baselines` command has parsing tests only; no CLI-scope test exercises this dispatch arm on either success or failure. Add an injectable recovery-dispatch seam, analogous to `MergeBase`, and assert both driver input propagation and exit/error mapping.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d6cbb932752dd7e2bb6756dc7a0481b3775bfac6c711e3127b53610b0b9f05f3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T02:17:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:89e3afea9cf262cf4013e7cb7ebf2e99c3afb8d46f776ed8094917c7d8058deb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T15:22:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd0783316ad2e8a84776e389d4af83b72c0de56729237cd2de32928d646c70a0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -532,6 +669,20 @@
           "at": "2026-08-09T12:56:02Z",
           "findings": [],
           "hash": "rvw1:sha256:d91a3f3c3a13d0fbad5a1dfc87b2f9e5a8a98cc05e65b796cc6bfde989c4059c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T03:59:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:34980f0b2466e828d0c428691473e19b97b25d172f783d23952e55bb211c8c20",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T15:33:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:23e6d878b768f61d6fb22200a637fdae91961f3b6a59297c55d6a0b4487d686b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -771,6 +922,35 @@
           "hash": "rvw1:sha256:a62c7aeb2dcaacc1d4018663d338bdecc1e7c5ab7ef200322e3e6255901cfcb6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T02:22:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9d349c24b68a8849d9a245a359b3070bb8f73c46bb53b93d673e70204807177",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T15:25:18Z",
+          "findings": [
+            {
+              "category": "boundary exposure violation",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 9,
+              "message": "Remove this stale public re-export. `usecase::TrackId` is the unchanged re-export of the domain `TrackId` defined in `libs/domain/src/ids.rs`, so publishing it from `cli_driver::track` exposes a domain value object through the primary-adapter API. No remaining code consumes this alias after the recover-baselines surface was deleted; callers needing the typed identity should use the usecase boundary directly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1c347bb7f8a33358ef89b43133623e635032ac4b56a8b3d862340f84f5cd8a71",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T15:29:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b22a8b2ccea18943825d515d25d901930f97e160fff876a45412050df2142ed0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -845,6 +1025,35 @@
           "at": "2026-08-11T03:32:50Z",
           "findings": [],
           "hash": "rvw1:sha256:e57bfa136ad59dc7a75b4fc8d68595a9745d195c824df2228e836ac54cabbbec",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T15:39:23Z",
+          "findings": [
+            {
+              "category": "typestate / invariant gap",
+              "file": "libs/domain/src/tddd/type_signals_doc.rs",
+              "line": 269,
+              "message": "`decide_type_signals_reuse` can return `SkipEvaluation` from two equal keys without receiving or encoding the other mandatory reuse conditions: a clean worktree and readable authority. This permits the invalid state “dirty worktree + matching HEAD/key” to produce a reuse decision despite the module contract requiring reevaluation. Encode cleanliness and authority availability in a validated input type or enum passed to this decision.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:71c5ccdb9cc55340e16b7115856d42e8e429b00e641c1bab92e5d6e77e447065",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T18:10:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd9dc929fc7f612eaa982b6a9d9ddc471e15dc756270ef29ac3b4155b7cb6e93",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T20:27:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2dc357f9438fe426650dbc9a21037ca09b07022596359cdbd0458c910219051f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1707,6 +1916,108 @@
           "at": "2026-08-10T12:55:05Z",
           "findings": [],
           "hash": "rvw1:sha256:c0c6f158f842513bb952a40241844ceaf188602666cf7755e37444d304bb0f1c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:05:22Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "message": "Step 1.5 requires replacing the existing type baselines but does not specify the replacement invocation. The sanctioned `bin/sotp track baseline-capture` command is first-write-wins unless given the source-workspace recovery path; following the documented default leaves the pre-merge baseline unchanged, so the subsequent gates still compare against the wrong authority. Specify how to establish the exact merged-base commit and invoke capture from its disposable clone using the replacement-capable route, with failure stopping recovery.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01cd0dead53b47ed998fc2ef4e18277b2f7c70567e7380c317660c582aa01850",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T14:09:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c00474955c1d19df789565fc82520390ef2dcf06eb71bf8f800d34bed82b884f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:13:34Z",
+          "findings": [
+            {
+              "category": "command_wiring_breakage",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 27,
+              "message": "The documented `--source-workspace` invocation is not actually replacement-capable. The production baseline adapter returns success without writing whenever the target baseline already exists, and supplying `--source-workspace` does not change that behavior. A recovery track therefore retains its pre-merge baseline while Step 1.5 exits zero and appears to satisfy the gate. Route recovery through a real atomic baseline-replacement operation, or add replacement semantics exercised through the production adapter.",
+              "severity": "P1"
+            },
+            {
+              "category": "hook_coverage_gap",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 22,
+              "message": "Step 1.5 requires creating a commit-pinned disposable clone/worktree, but exposes no guarded command that can create or clean it up. Both recovery adapters prohibit direct VCS/filesystem recovery operations, while `baseline-capture` only consumes an already-created path. Providers therefore cannot execute this step without crossing the documented responsibility and hook boundary. A guarded recovery command should own the exact-commit worktree lifecycle and baseline replacement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c00474955c1d19df789565fc82520390ef2dcf06eb71bf8f800d34bed82b884f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T00:55:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:90983af60e5a433944db58571b2096a13aa0f60d92279fb6c4113a371079e14e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T00:58:21Z",
+          "findings": [
+            {
+              "category": "command_wiring_breakage",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 26,
+              "message": "The newly mandatory `bin/sotp track recover-baselines` command is not allowed by the Codex command policy: `.codex/rules/default.rules` permits `track branch`, `switch-base`, and `merge-base`, but has no `recover-baselines` prefix. In an approval-disabled Codex session, `$track-recover` therefore cannot execute Step 1.5 and has no permitted direct-git/filesystem fallback. Add an allow rule for `[\"bin/sotp\", \"track\", \"recover-baselines\"]` alongside `merge-base`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:90983af60e5a433944db58571b2096a13aa0f60d92279fb6c4113a371079e14e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T03:55:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6f07b14f8d53ab25333e851af3b6e240880ae0d9a3a7ef977262ba47bb71d43",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T22:36:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:759441ebc818b21f4f4b4992ca429fda1a97167c9c427e780f60be5934cc9407",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T22:36:46Z",
+          "findings": [
+            {
+              "category": "command_wiring_breakage",
+              "file": ".codex/rules/default.rules",
+              "line": 16,
+              "message": "The `recover-baselines` CLI surface has been deleted and recovery now occurs inside `track merge-base`, but this change still adds an allow rule for the obsolete command. The shipped Codex policy therefore advertises permission for a command that no longer exists and is no longer referenced by the workflow. Remove this stale rule so the default permission surface matches the live guarded commands.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:759441ebc818b21f4f4b4992ca429fda1a97167c9c427e780f60be5934cc9407",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T22:52:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c5f892b32c372510aad73e5511b19b4d68ee67808a70564b7d173cacbdfda6e9",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3118,6 +3429,86 @@
           "at": "2026-08-11T11:10:33Z",
           "findings": [],
           "hash": "rvw1:sha256:f5ded8ab88a099f4e40e0e1f1b0aa463db3a606f005e74e3b3e3823f6906cbc0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:05:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3b27067fa02e74d365b320f976aa5ca88c65ac32103363bd97ce3f660f8462",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:07:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ab3b27067fa02e74d365b320f976aa5ca88c65ac32103363bd97ce3f660f8462",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T00:57:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7b72f61b2f276bd38c1d6937204d40967d0089f885798f8867da51559e13fd5c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T22:15:35Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 391,
+              "message": "T025 is not executable as written: “Conform source…” names behavioral areas (`cleanup staging`, `implementation-input hashing`, `stash auxiliary state`, and the `recover-baselines` surface) but no concrete files or symbols for those edits. The executor must infer the boundary from other artifacts. Name the affected targets—such as the relevant base-merge, type-signal, stash, and CLI symbols/files—alongside each operation and mirror that boundary in S16.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:106f05e623b400ed36f30118c5ee85b161343e2cb68ae2d4584cdf9bdb78ee43",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T22:22:21Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 90,
+              "message": "T025 explicitly claims updates to `BaseMergeInteractor`, `FsBaseMergeContextAdapter`, `FsBaseMergeGitAdapter`, `FsBaseMergeCleanupAdapter`, `FsGitStashAdapter`, and `GitDriver`, but its task-contract row omits all six catalogue entries; they remain attributed only to older tasks (with the first/third adapters partly attributed to T024). Attribute these T025-touched entries to T025 and remove any T024 attribution whose recover-baselines contribution no longer survives the strip.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:34274b8a5de6bc4216fc697e7312193e4b14eb5cb8c5e722de75dd28e6f0f68a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T22:25:50Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 165,
+              "message": "T025 and S16 now name executable targets, but their shared description also restates upstream behavior in prose—e.g. “retain exact-base conflict replacement and the three cleanup stages,” “use clean-tree plus recorded-HEAD cache identity,” and “retaining the guarded pairing identity.” Per `.harness/policies/no-upstream-restatement.md`, retain the target/operation list and anchor citations, but remove these behavior-contract restatements.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bb781e59a50e57ce134ebc1db57bc028f6f766103b4d4be687807f8f045de233",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T22:34:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82885a067737710044b177f1f556011861ca5cc3a5d2dbd92ecc5136b5ba0913",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T22:34:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82885a067737710044b177f1f556011861ca5cc3a5d2dbd92ecc5136b5ba0913",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -7098,6 +7489,209 @@
           "hash": "rvw1:sha256:f435a476a7d177a2a986e5e9487ce0ca4b0658a660b202f8b2a636ccb48e476c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T02:36:24Z",
+          "findings": [
+            {
+              "category": "data_loss",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 630,
+              "message": "Recovery unconditionally deletes `replacement`, including when atomic exchange succeeded but post-exchange verification, fsync, or phase-marker cleanup failed. `publish_baseline_replacements` deliberately leaves the prior tree there for recovery in these cases; deleting it can lose the previously valid baseline and concurrent writes. Only discard it after an unambiguously successful recovery publication.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 135,
+              "message": "`load_recovery_request` treats any conflict with a readable `MERGE_HEAD` on the active track as an authorized guarded base-merge conflict. A direct merge of an unrelated branch can therefore supply its commit as `base_commit` and cause baseline replacement from unrelated content. Validate provenance against durable state recorded by the guarded merge path and fail closed otherwise.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 437,
+              "message": "The recovery additions grow production code in this module to 887 lines. `bin/sotp verify module-size` now fails the 700-line maximum, blocking verification. Extract the recovery context/replacement machinery into a sibling module.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 528,
+              "message": "The new filtering helpers grow production code in this module to 738 lines. `bin/sotp verify module-size` fails the 700-line maximum. Move the exclusion-matcher logic into a focused sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:93b5a4a09c50e7aab8bd598ecf0e66ef6c1a42c2c8bf63bd236b344715ad79da",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T02:57:33Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 531,
+              "message": "On a retry after a post-exchange publication failure, `reconcile_interrupted_replacement` promotes the retained prior tree into the canonical recovery slot. A subsequent successful Recovery run skips `promote_baseline_recovery_slot`, while its success cleanup removes only the replacement directory, so `.sotp-baseline-recovery/<track>` remains. This violates the recovery lane's no-retained-tree contract and leaves stale state for later operations. Use recovery-specific reconciliation or remove the canonical slot only after the retry completes successfully.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 455,
+              "message": "The production portion of this module is 993 lines, exceeding the repository's 700-line maximum. `bin/sotp verify module-size` reports this file as an error, so the change violates the infrastructure module-size architecture rule.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 528,
+              "message": "The production portion of this module is 738 lines, exceeding the repository's 700-line maximum. `bin/sotp verify module-size` reports this file as an error, so the change violates the infrastructure module-size architecture rule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0b37fa481539635c984e07b8f7a56b3c69b13b5414f41cc8cbfbe8b1a57dce31",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T03:10:03Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 455,
+              "message": "The production portion of this module is 998 lines, exceeding the repository's 700-line maximum. `bin/sotp verify module-size` fails on this file, so the current change violates the module-size architecture rule.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 528,
+              "message": "The production portion of this module is 738 lines, exceeding the repository's 700-line maximum. `bin/sotp verify module-size` fails on this file, so the current change violates the module-size architecture rule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b77bf99d17517a09b1cfe520b8066392602dcb894e7bb189ab7eaead08a001ed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T03:39:04Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 521,
+              "message": "`git_state_file_path` accepts the path emitted by `git rev-parse --git-path` and only performs a symlink check; it never proves that the path is contained under a resolved Git administrative root. A redirected or malformed Git directory can therefore make provenance reads and `atomic_write_file` replace `MERGE_MSG` outside any established trusted root. Resolve the Git admin directory explicitly and enforce canonical containment beneath it before reading or writing the state file.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0b1e8046cf0d91a08b17cf2da744e305497fa5b4527dbc60f19956c771c72925",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T03:52:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f5440be5d5d807281a06a461a4959c27db9afeecdf6bd376141cd0a5c4f6041e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T14:58:06Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 179,
+              "message": "`branch_ref_snapshot` again collects the complete `for-each-ref` output through the 16 KiB-bounded `run_git`. Repositories with roughly 300 local branches exceed that bound, causing guarded stash push/pop to fail before operating. Preserve the fixed-size streamed digest used by the prior implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/tddd/type_signals_evaluator/inputs.rs",
+              "line": 70,
+              "message": "The cleanliness probe collects full `git status --porcelain` output with an 8 KiB limit. A sufficiently large dirty worktree therefore returns `AuthoritativeInput` instead of taking the required recomputation path. Stream only the clean/dirty decision or otherwise drain output without retaining it all.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/base_merge/publication.rs",
+              "line": 25,
+              "message": "This added method raises `publication.rs` to 704 production lines, exceeding the repository's 700-line maximum. `bin/sotp verify module-size` now fails on this file, so the module must be split or reduced before the verification gate can pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:66315f43b8b7993067b7bfacda10267b83392b69ac6392d7e86e0606a9a54096",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T15:19:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4861259f46dca1b634c8576c22024fec6e191d3300886ca5fb0af148321fbd2a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T21:43:16Z",
+          "findings": [
+            {
+              "category": "resource_lifecycle",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 259,
+              "message": "A successful conflicted merge now ends after Baseline → Views, without the SyncBaseStamp call that normally consumes the retained `PendingWriterLock`. This code clears `pending_writer_lock` only when rendering fails, so a successful conflict leaves the writer transaction held until the adapter is dropped; reusing the service then rejects subsequent cleanup requests as still pending. Add an explicit successful conflict-finalization/release path while preserving lock retention for the clean three-stage flow.",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded_io",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 270,
+              "message": "The newly inlined baseline freshness check reads the entire rustdoc baseline with `std::fs::read`. Unlike the bounded signal and catalogue reads in this adapter, a large or sparse baseline can trigger unbounded allocation or OOM before a typed read failure is returned. Apply a fixed byte limit with an extra-byte overflow check before hashing.",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded_io",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 363,
+              "message": "`evaluate_layer_catalogue` now reads the complete local rustdoc baseline without a size bound. Repository input can therefore make this verifier allocate arbitrarily large memory instead of failing closed; use the bounded baseline reader/64 MiB limit before computing the hash.",
+              "severity": "P1"
+            },
+            {
+              "category": "unbounded_io",
+              "file": "libs/infrastructure/src/verify/spec_states.rs",
+              "line": 448,
+              "message": "The explicit `check_impl_catalog_from_signals_file` path repeats the unbounded `std::fs::read` of the baseline, allowing the live signal-check command to exhaust memory on an oversized baseline. Read with the same bounded baseline limit and reject overflow before hashing.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e48755ef135057fc2c754fec635823076ea5490b06eb1d15b050fbf18a46f82c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T21:57:27Z",
+          "findings": [
+            {
+              "category": "resource_lifecycle",
+              "file": "libs/infrastructure/src/base_merge.rs",
+              "line": 258,
+              "message": "If `guarded_conflict_matches_request` fails, this `?` returns from `regenerate_views` before the common error cleanup at lines 276–278 runs. Because `replace_baselines` retained the writer transaction, an unreadable or malformed `MERGE_HEAD` leaves `pending_writer_lock` occupied and can block later cleanup requests. Convert the probe failure into the local `result` or explicitly release the pending transaction before returning.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bdf1d56152b1e8df8251849d84906b81b01f6f935fdfddd15005753dea60435d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T22:04:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c2a70065bf19959240500d26aa8b05bbe7809c01cf8724410adc01476d0e2f98",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -8132,6 +8726,64 @@
           "hash": "rvw1:sha256:35bc5c7058a07255a3915e8331a2eae78d38dc1b575b9665a696f21c287da5fd",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:10:26Z",
+          "findings": [
+            {
+              "category": "test-obligation binding coherence",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 47,
+              "message": "The new binding adds `test_run_source_workspace_replaces_baseline_without_sync_or_view_side_effects` to `BaseMergeCleanupPort::replace_baselines`, but that test exercises `BaselineCaptureInteractor` and a `RustdocBaselineCapturePort` stub; it never invokes `BaseMergeCleanupPort::replace_baselines`. This is false fulfillment evidence and should be removed from this record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:90b3ee1e6d5682d9ccbd99e18a0973f41e1caccbb3c99714e65d9a8d362f42da",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-11T14:14:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c07611e262d8e18455d35d85c4d551ca7755da766f853c70ccb81a14d991ed23",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:25:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c07611e262d8e18455d35d85c4d551ca7755da766f853c70ccb81a14d991ed23",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T01:04:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:70e54a026bcad1318c8e7c4cf91945ab8089ffb82ae2b7c41425973e4dce0693",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T22:42:03Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 7067,
+              "message": "The restored GitStashPort bindings have not been validated against the current declarations. `bin/sotp test-obligation check --track-id 2026-07-31-base-merge-and-conflict-recovery` fails because the push, pop, and FsGitStashAdapter conformance obligations have stale declaration hashes. Regenerate the obligations, re-evaluate these bindings, and rerun the check; until then the deterministic test-obligation gate is not green.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e633311c6ddd30421420b60bd432b4148d21887d4934a79ce5354ccb0a44c105",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T22:56:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e633311c6ddd30421420b60bd432b4148d21887d4934a79ce5354ccb0a44c105",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -8371,6 +9023,57 @@
           "at": "2026-08-11T06:30:12Z",
           "findings": [],
           "hash": "rvw1:sha256:da69ffa2ec0bf64ee0e4dc58cd1d2420535b2316fbfaae45de05de09368e4c00",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:21:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0a59d5ce8f8d1b12ebffac18a7cf3cf9a8609ce57e96d9fe81c7b6eadb7e20f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T13:55:47Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 97,
+              "message": "AC-08 retains the superseded hash-based cache contract: it requires authority-hash comparisons and persistence of “all current hashes,” while IN-05 and AC-07/AC-09 define the current in-scope cache key as clean working tree plus matching HEAD, with reevaluation otherwise. This acceptance criterion therefore requires behavior outside the revised scope and could cause downstream planning to restore the deliberately removed hash machinery.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39843538463378ffce4f3952ca035ed8f75d42650fe469204654823c854acfe4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T13:59:34Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
+              "line": 281,
+              "message": "GO-02's merge-conflict-recovery intent has no acceptance criterion that deterministically proves the unchanged D2 lifecycle of conflict editing, zero-findings review, and guarded commit. AC-04 verifies only the conflict-time baseline stage and recovery entry point, while AC-05 verifies adapter/SSoT ownership, so completion could satisfy every AC without demonstrating reliable gated recovery.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:81c10aeb323cc044fa8ccf17be2c3ce3bfa03f40f06ba0b413d756471eeb772c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T14:02:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8dd96f55c5c019c64049120d8f1a87fbc2ee0cf5b6ffb034ebcc38465067b599",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T22:10:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acba30424da3e11d7878ea6df9dea99bb03c0c33cf8b0a7110133140e8b2b7c3",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -9336,6 +10039,187 @@
           "hash": "rvw1:sha256:e3915563dde4b612bb1fe4acd5d5ab1979ff55d1b79e1d17d34741e3611291c5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T04:08:32Z",
+          "findings": [
+            {
+              "category": "DRY",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+              "line": 191,
+              "message": "`cli_driver::RecoverBaselinesInput` and `usecase::RecoverBaselinesCommand` duplicate the same fields, derives, and invariants, and `TrackDriver::handle_recover_baselines` only converts them field-for-field. Reuse/alias the use-case command or give the adapter DTO a genuinely boundary-specific shape.",
+              "severity": "P1"
+            },
+            {
+              "category": "SOLID / API precision",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 380,
+              "message": "`usecase::BaseMergeCleanupPort` mixes the clean-merge-only methods with `replace_recovery_baselines`, although `BaseMergeInteractor` uses only the former group and `RecoverBaselinesInteractor` uses only the latter. This violates interface segregation. Moreover, the recovery method returns `RecoverBaselinesError`, exposing context-only variants it cannot produce. Split out a recovery replacement port and use a stage-specific error, or explicitly constrain the producible subset.",
+              "severity": "P1"
+            },
+            {
+              "category": "SOLID / API precision",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 487,
+              "message": "`usecase::BaseMergeContextPort` combines `load_direction` and recovery-context loading even though the two interactors consume disjoint halves. `load_recovery_request` also exposes cleanup-only `RecoverBaselinesError` variants that this operation cannot produce. Introduce a recovery-context port with a precise error contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "SoT integrity / upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 348,
+              "message": "The docs for `usecase::BaseMergeCleanupPort` and `usecase::BaseMergeContextPort`, including their recovery methods, reproduce the exact-commit worktree lifecycle, excluded cleanup stages, conflict-state requirement, and identity-rejection behavior from CN-02/AC-04. Per `.harness/policies/no-upstream-restatement.md`, retain only the changed symbol/operation, anchor citations, and necessary sync rationale.",
+              "severity": "P1"
+            },
+            {
+              "category": "SoT integrity / upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 412,
+              "message": "The docs for `infrastructure::FsBaseMergeCleanupAdapter` and `infrastructure::FsBaseMergeContextAdapter` restate CN-02/AC-04 behavior in prose—disposable-worktree/HEAD/removal rules and fail-closed conflict/base-authority checks. Replace those restatements with concise adapter-purpose text plus anchor citations, as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:975ccdb52c50c1709b2781e896f9da982a90183f0b1161665ffcb5b4a8b5f12c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T14:10:42Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 293,
+              "message": "`usecase::BaseMergeCleanupPort` declares three filesystem/process-backed operations as synchronous, but its entry docs now contain only upstream anchors and no longer acknowledge the synchronous design choice. Restore a local synchronization rationale such as “Synchronous by design” without restating upstream behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 388,
+              "message": "`usecase::BaseMergeContextPort::load_direction` performs external context loading with `is_async: false`, but neither the entry nor method docs acknowledge why this port is synchronous. Add a concise local synchronization rationale.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 700,
+              "message": "`usecase::TrackBlobReader` is a fully synchronous external blob-reading port, but its revised entry docs omit the previously recorded synchronous-port rationale. Add a concise acknowledgement of the synchronization choice.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 700,
+              "message": "`usecase::TrackBlobReader` restates GO-02’s behavioral rationale in prose (“so type-signal freshness is checked without weakening repository safety gates”) after citing the anchor. This violates `.harness/policies/no-upstream-restatement.md`; retain the anchor and at most a short type-purpose noun phrase.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e3ba03ce8d84e9166560bc0ef0d2befd3e3d15f2553d0a06920dfcc7bf00ac9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T14:22:44Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 60,
+              "message": "`infrastructure::tddd::type_signals_codec::encode` returns the shared `TypeSignalsCodecError`, but encoding can produce only `Json` and `UnsupportedSchemaVersion`; `InvalidSchemaVersion`, `InvalidTimestamp`, `InvalidDigest`, and `InvalidSignal` are decode-only variants. This forces callers to handle four structurally impossible cases, and the entry docs neither identify the producible subset nor justify the broad error type. Use an encode-specific error or document the exact subset and rationale.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3d68cac6f2fcf50d6b1c8c9ae3359ca72142ee8ee2ea574bac3dab8f7b52f6fd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T14:38:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:29eace1f8200dde1af7b409c4f4eed02e6dca58871b8301b823cf64ba3601ba7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T18:20:24Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+              "line": 942,
+              "message": "`TypeSignalsReuseInput::Verified` contains only two cache keys and exposes no validated constructor or capability tying it to a clean worktree and readable authority. Any caller can construct `Verified` under dirty or unreadable conditions; matching keys can then select cache reuse. The illegal state this round intends to eliminate remains representable, so the verified state must be opaque and constructible only by the validation owner.",
+              "severity": "P1"
+            },
+            {
+              "category": "duplicated method signature across sibling types",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 649,
+              "message": "`GitStashPort` and `GitStashService` are sibling usecase traits with identical `push` and `pop` signatures, leaving the interactor as a lockstep pass-through boundary. Consolidate the contract or establish an operation-specific application-service responsibility before retaining both declarations.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+              "line": 26,
+              "message": "The `decide_type_signals_reuse` docs reproduce the fail-closed rule and the condition under which evaluation may be skipped. Under `.harness/policies/no-upstream-restatement.md`, this behavior must be referenced through the existing spec anchors rather than restated in prose.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/domain-types.json",
+              "line": 936,
+              "message": "`TypeSignalsReuseInput.docs` restates the clean-worktree/readable-authority conditions and mandatory reevaluation behavior from CN-03/CN-04 and AC-07–AC-09. Replace this sentence-level contract with a short identifying phrase and anchor citations as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 54,
+              "message": "The evaluator docs restate the cache-presence, authority-readability, and worktree-cleanliness validation sequence. Preserve the local ownership label if needed, but reference the upstream anchors instead of reproducing their behavior, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c6cbe55304141bb571d1679b6b83c01044974dd3be60ff739747cb215209160f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T20:34:57Z",
+          "findings": [
+            {
+              "category": "role/kind mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 202,
+              "message": "`FsGitStashAdapter` is catalogued as a `SecondaryAdapter`, but its implementation edge targets `GitStashService`, whose role is `ApplicationService`. A secondary adapter must implement a driven `SecondaryPort` or `Repository`; an application service is a primary port implemented on the use-case side. Either classify the consolidated trait as a `SecondaryPort`, or restore a use-case application-service implementation backed by a secondary port.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c59d69dccae1baea123b5fa69b24746568afa8884946cc54baad3015a421a9f1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T21:22:07Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 604,
+              "message": "`GitStashPort` is a driven Git/persistence boundary, but both methods are synchronous and the entry no longer acknowledges or justifies that blocking choice. Document why synchronous execution is intentional for this I/O port, or make the boundary asynchronous; otherwise adapters may require an API-color change during implementation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:65b47f688de32f3ee57a3fbeca945ac381d1de88b4ad6578c009c3b02bb1f8f3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T21:31:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b9651a3d10be02ae82ec0f1a737121322f70afa513b6e4987ee526ce0cbff69b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -9621,6 +10505,70 @@
           "at": "2026-08-11T06:23:44Z",
           "findings": [],
           "hash": "rvw1:sha256:5035d827c672f7603ca07bb82c1c3bc18ca3a79a81561981918010af4fba1201",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-11T14:22:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c7c801b46ab984e2447477207a94b9eea99d73f000bc09a18dfc8e56cbbfd92d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T00:55:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f88b4221a3c2787a7a82e1b7b1b80d56fa828543d10e639a134a25897f2ec14",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T00:57:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f88b4221a3c2787a7a82e1b7b1b80d56fa828543d10e639a134a25897f2ec14",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T01:02:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f88b4221a3c2787a7a82e1b7b1b80d56fa828543d10e639a134a25897f2ec14",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T02:18:54Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/usecase/src/base_merge.rs",
+              "line": 62,
+              "message": "The new argument-free recovery path is untested: both `RecoverBaselinesInteractor` tests construct `track_id: Some(...)`, although `None` is now the path that delegates active-track resolution through the context port. Add a happy-path test using `track_id: None` and assert that the context-derived request reaches only `replace_recovery_baselines`; otherwise this central follow-up behavior can regress unnoticed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c064901864cd8e9cec310e02504442f979bd22fc8ed9adf13a27d40bf6ac676",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T02:28:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c880c662bb8fbd20ebe95293efd7a9aa7101acbb0c615571e825c178d52a4b9c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T14:48:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af75d99472949a4b90cc70dd99df774b376476e6f4ac83e7b0c46497a7a6709a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T21:36:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0bf8593d38dfae860257b8960fc50a015481bbabf228eae9daee4bb881d2cfcd",
           "type": "final",
           "verdict": "zero_findings"
         }

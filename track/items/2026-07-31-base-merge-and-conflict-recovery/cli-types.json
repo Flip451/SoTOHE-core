@@ -25,9 +25,9 @@
         }
       ]
     },
-    "cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge": {
+    "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies": {
       "action": "add",
-      "docs": "Stateless CLI dispatch seam that routes MergeBase through the injected primary-adapter handler while preserving the normal track-command dispatch contract.",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -48,7 +48,39 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
           "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -239,7 +271,7 @@
     },
     "TrackCommand": {
       "action": "modify",
-      "docs": "CLI track-command enum modified to add the unit MergeBase variant.",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -642,7 +674,15 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-03",
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -659,6 +699,14 @@
         },
         {
           "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]

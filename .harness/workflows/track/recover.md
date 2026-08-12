@@ -4,7 +4,7 @@
 
 ## Mission
 
-Recover an active track after `bin/sotp track merge-base` reports a conflict. The orchestrator coordinates resolution through each artifact's designated owner, then drives the normal review and guarded-commit lanes. A conflict never runs clean-merge cleanup; that cleanup is exclusive to the successful guarded merge command.
+Recover an active track after `bin/sotp track merge-base` reports a conflict. The orchestrator coordinates resolution through each artifact's designated owner, then drives the normal review and guarded-commit lanes. A conflicted merge already replaced the type baselines from the exact merged base commit and regenerated the derived views (cleanup-state ADR D3); the sync-base stamp stages are exclusive to the successful guarded merge command, and this workflow never runs them.
 
 ## Inputs
 
@@ -47,41 +47,15 @@ orchestrator first selects only existing hunks and records affected paths. If th
 still do not pass, invoke each affected designated writer in `conflict-preparation` mode; that
 mode may resolve existing hunks and regenerate derived artifacts only, never meaning or
 placeholders. Do not claim SoT convergence during preparation. After upstream reconvergence,
-invoke the same writer in normal mode. If the remaining failure is base-induced drift without a
-conflict hunk, use the affected chain's normal writer/implementer reconciliation and the guarded,
-chain-limited review route below before demanding the global pre-gates. If neither route can make
-all pre-gates pass, retain the conflict and fail closed.
+invoke the same writer in normal mode. Base-induced signal drift is not a gate-bypass case: the
+conflicted guarded merge itself already replaced the type baselines from the exact merged base
+commit (cleanup-state ADR D3), so the normal pre-gates and the canonical review workflow apply
+throughout the recovery. If the pre-gates still cannot pass, retain the conflict and fail closed.
 
 Whenever direct hunk selection or a `conflict-preparation` dispatch touches an ADR, immediately
 dispatch `adr-diagnoser` for the lifecycle-specific two-box verdict required by
 `.harness/policies/pre-track-adr-authoring.md`; follow that verdict before any downstream
 re-entry, review, or commit.
-
-For that D2-only, base-induced-drift route, run the existing guarded CLI surfaces directly for the
-affected chain and scope (without claiming global pre-gate convergence):
-
-Before invoking the raw review command, the orchestrator must write or refresh
-`tmp/reviewer-runtime/briefing-<affected-scope>.md` from the current post-merge SoT by following
-Step 3 of `.harness/workflows/track/review.md`: recompute the design intent, scope checklist,
-architecture constraints and verification checklist from the current ADR/spec/plan/source, and
-replace any prior briefing rather than reusing it. The canonical scope-specific severity policy is
-still injected by `bin/sotp review local`.
-
-```
-bin/sotp ref-verify run --track-id <id>
-bin/sotp ref-verify results --track-id <id> --chain <affected-chain>
-bin/sotp adr-baseline check-review --track-id <id>
-bin/sotp review local --track-id <id> --round-type <fast|final> --group <affected-scope> \
-  --briefing-file tmp/reviewer-runtime/briefing-<affected-scope>.md
-```
-
-Inspect the chain-scoped result after every run. If the full run aborts while unrelated or stale
-downstream artifacts prevent enumeration, do not treat that abort as an affected-chain failure;
-regenerate the affected chain, rerun the full command, and inspect the chain result as soon as it is
-enumerable. Run the applicable chain signal check before the review when its upstream artefact was
-regenerated. This pre-gate-free review route is permitted only for base-induced drift with no
-conflict hunk; once the affected chain is reconciled, rerun the normal global pre-gates and
-canonical review workflow.
 
 **Step 3: Verify and review**
 
@@ -127,7 +101,7 @@ branch.
 | Step | Gate | Verdict |
 | --- | --- | --- |
 | 1 | Active track branch and conflicted guarded-merge context | pass / stop |
-| 2 | `task-contract-check`, signal, `track-active-gate`, and scoped-review pre-gates pass (or the D2-only chain-limited route above is recorded while reconverging) | pass / stop |
+| 2 | `task-contract-check`, signal, `track-active-gate`, and scoped-review pre-gates pass | pass / stop |
 | 3 | Required implementation verification | pass / fail |
 | 3 | Canonical review reaches `zero_findings` | pass / fail |
 | 4 | Guarded staged diff matches the recovery scope | pass / fix-staging |
@@ -146,4 +120,4 @@ branch.
 
 - A conflict resolution that has passed the normal verification and review gates.
 - A guarded commit and its normal repository note.
-- No clean-merge views, baseline, or sync-base cleanup from this workflow.
+- No sync-base cleanup from this workflow; the type baselines and derived views were already refreshed by the conflicted merge itself.

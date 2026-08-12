@@ -149,11 +149,31 @@
           "T023"
         ],
         "title": "Baseline-fresh clean-merge views"
+      },
+      {
+        "description": [
+          "Add the guarded `bin/sotp track recover-baselines` command through the catalogued usecase, infrastructure, CLI-driver, CLI, and composition surfaces; add focused regression coverage. IN-03; CN-02; AC-04."
+        ],
+        "id": "S15",
+        "task_ids": [
+          "T024"
+        ],
+        "title": "Guarded recovery baseline replacement"
+      },
+      {
+        "description": [
+          "Modify the T025-attributed targets in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/{base_merge.rs,git_stash.rs,merge_gate.rs}`, `libs/infrastructure/src/{base_merge.rs,tddd/type_signals_evaluator.rs,tddd/type_signals_evaluator/{inputs.rs,freshness.rs},git_cli/{stash_adapter.rs,stash_record.rs}}`, and `apps/cli-driver/src/git.rs`; delete the T025-attributed obsolete symbols in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/infrastructure/src/verify/spec_states.rs`, `libs/usecase/src/base_merge.rs`, `apps/cli-driver/src/track.rs`, `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `apps/cli-composition/src/track/composition_root.rs`; add focused regression coverage. IN-01; IN-02; IN-03; IN-04; IN-05; IN-06; CN-01; CN-02; CN-03; CN-04; CN-05; CN-06; CN-07; AC-01; AC-02; AC-03; AC-04; AC-06; AC-07; AC-08; AC-09; AC-10; AC-11; AC-12; AC-13."
+        ],
+        "id": "S16",
+        "task_ids": [
+          "T025"
+        ],
+        "title": "Strip-catalogue conformance"
       }
     ],
     "summary": [
-      "GO-01 → T001–T004, T010, T011, T013, T014, T020, and T023.",
-      "GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, and T022."
+      "GO-01 → T001–T004, T010, T011, T013, T014, T020, T023, and T025.",
+      "GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, T022, T024, and T025."
     ]
   },
   "schema_version": 2,
@@ -357,6 +377,20 @@
       "description": "Update `libs/usecase/src/base_merge.rs` to re-render derived views during clean-merge cleanup; add focused regression coverage. IN-02; IN-06; CN-05; CN-06; CN-07; AC-03; AC-10; AC-11.",
       "id": "T023",
       "status": "done"
+    },
+    {
+      "description": "Add the guarded `bin/sotp track recover-baselines` command through the catalogued usecase, infrastructure, CLI-driver, CLI, and composition surfaces; add focused regression coverage. IN-03; CN-02; AC-04.",
+      "id": "T024",
+      "status": "done"
+    },
+    {
+      "commit_hash": null,
+      "depends_on": [
+        "T024"
+      ],
+      "description": "Modify the T025-attributed targets in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/{base_merge.rs,git_stash.rs,merge_gate.rs}`, `libs/infrastructure/src/{base_merge.rs,tddd/type_signals_evaluator.rs,tddd/type_signals_evaluator/{inputs.rs,freshness.rs},git_cli/{stash_adapter.rs,stash_record.rs}}`, and `apps/cli-driver/src/git.rs`; delete the T025-attributed obsolete symbols in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/infrastructure/src/verify/spec_states.rs`, `libs/usecase/src/base_merge.rs`, `apps/cli-driver/src/track.rs`, `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `apps/cli-composition/src/track/composition_root.rs`; add focused regression coverage. IN-01; IN-02; IN-03; IN-04; IN-05; IN-06; CN-01; CN-02; CN-03; CN-04; CN-05; CN-06; CN-07; AC-01; AC-02; AC-03; AC-04; AC-06; AC-07; AC-08; AC-09; AC-10; AC-11; AC-12; AC-13.",
+      "id": "T025",
+      "status": "todo"
     }
   ]
 }

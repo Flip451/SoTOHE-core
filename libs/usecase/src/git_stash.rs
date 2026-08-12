@@ -59,14 +59,6 @@ pub enum GitStashPopError {
     /// The recorded stash commit is no longer present in the stash list.
     #[error("recorded stash identity is missing: {0}")]
     StashIdentityMissing(CommitHash),
-    /// The recorded identity does not match the stash entry being inspected.
-    #[error("recorded stash identity mismatch: expected {expected}, found {actual}")]
-    StashIdentityMismatch {
-        /// Identity persisted by the guarded push.
-        expected: CommitHash,
-        /// Different identity found at the inspected stash entry.
-        actual: CommitHash,
-    },
 }
 
 /// Secondary port implemented by the infrastructure Git adapter.

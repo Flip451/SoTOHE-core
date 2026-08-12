@@ -786,6 +786,21 @@ fn setup_type_signal_workspace()
 }"#;
     std::fs::write(track_dir.join("tddd-features.json"), feature_declaration).unwrap();
     std::fs::write(track_dir.join("tddd-features-baseline.json"), feature_declaration).unwrap();
+    std::fs::write(
+        root.join(".gitignore"),
+        "track/items/freshness-composition/*-type-signals.json\n",
+    )
+    .unwrap();
+    std::process::Command::new("git").args(["add", "."]).current_dir(root).status().ok();
+    std::process::Command::new("git")
+        .env("GIT_AUTHOR_NAME", "test")
+        .env("GIT_AUTHOR_EMAIL", "test@test.com")
+        .env("GIT_COMMITTER_NAME", "test")
+        .env("GIT_COMMITTER_EMAIL", "test@test.com")
+        .args(["commit", "--quiet", "-m", "fixture inputs"])
+        .current_dir(root)
+        .status()
+        .ok();
 
     let rustdoc_json_paths = std::collections::BTreeMap::from([
         ("domain".to_owned(), domain_rustdoc_json_path),
@@ -845,7 +860,7 @@ fn test_signal_driver_calc_impl_catalog_persists_each_signal_document() {
             .join(format!("{layer}-type-signals.json"));
         let persisted: serde_json::Value =
             serde_json::from_str(&std::fs::read_to_string(signal_path).unwrap()).unwrap();
-        assert!(persisted.get("implementation_input_hash").is_some());
+        assert!(persisted.get("head_commit").is_some());
     }
 }
 
@@ -884,7 +899,7 @@ fn test_signal_composition_freshness_skip_and_conservative_reextract_use_real_ad
     let initial_signals: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(&signal_path).unwrap()).unwrap();
     let initial_declaration_hash = initial_signals.get("declaration_hash").cloned().unwrap();
-    assert!(initial_signals.get("implementation_input_hash").unwrap().is_string());
+    assert!(initial_signals.get("head_commit").unwrap().is_string());
 
     let skip_observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
     let skip = calc_impl_catalog_with_observer(root, track_id.clone(), skip_observer.clone());
@@ -904,8 +919,8 @@ fn test_signal_composition_freshness_skip_and_conservative_reextract_use_real_ad
     );
     assert_eq!(
         catalogue_only_observer.launches(),
-        0,
-        "catalogue-only changes must reevaluate without rustdoc extraction"
+        2,
+        "a dirty worktree must recalculate every layer with fresh rustdoc extraction"
     );
     let reevaluated_signals: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(&signal_path).unwrap()).unwrap();
@@ -914,10 +929,10 @@ fn test_signal_composition_freshness_skip_and_conservative_reextract_use_real_ad
         initial_declaration_hash,
         "the changed declaration must be recorded, proving signal evaluation reran"
     );
-    assert!(reevaluated_signals.get("implementation_input_hash").unwrap().is_string());
+    assert!(reevaluated_signals.get("head_commit").unwrap().is_string());
 
     let mut incomplete_signals = reevaluated_signals;
-    incomplete_signals.as_object_mut().unwrap().remove("implementation_input_hash");
+    incomplete_signals.as_object_mut().unwrap().remove("head_commit");
     std::fs::write(&signal_path, serde_json::to_vec(&incomplete_signals).unwrap()).unwrap();
     let incomplete_observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
     let incomplete =
@@ -925,8 +940,8 @@ fn test_signal_composition_freshness_skip_and_conservative_reextract_use_real_ad
     assert_eq!(incomplete.exit_code, 0, "incomplete artifacts must be regenerated: {incomplete:?}");
     assert_eq!(
         incomplete_observer.launches(),
-        1,
-        "a recorded artifact without every required hash must not be reused"
+        2,
+        "a recorded artifact without every required identity must not be reused"
     );
 
     std::fs::write(root.join("libs/domain/src/lib.rs"), "pub struct ChangedFixture;\n").unwrap();
@@ -945,52 +960,7 @@ fn test_signal_composition_freshness_skip_and_conservative_reextract_use_real_ad
     );
     assert_eq!(
         changed_source_observer.launches_for("usecase"),
-        0,
-        "the unchanged usecase layer must skip rustdoc extraction"
-    );
-
-    let lockfile_path = root.join("Cargo.lock");
-    let changed_lockfile_content = [
-        std::fs::read_to_string(&lockfile_path).unwrap(),
-        "# changed lockfile fixture for freshness verification\n".to_owned(),
-    ]
-    .concat();
-    std::fs::write(&lockfile_path, &changed_lockfile_content).unwrap();
-    let changed_lockfile_observer =
-        RustdocLaunchObserver::using_json_paths(rustdoc_json_paths.clone());
-    let changed_lockfile =
-        calc_impl_catalog_with_observer(root, track_id.clone(), changed_lockfile_observer.clone());
-    assert_eq!(
-        changed_lockfile.exit_code, 0,
-        "changed lockfile contents must recalculate cleanly: {changed_lockfile:?}"
-    );
-    assert_eq!(
-        changed_lockfile_observer.launches_for("domain"),
         1,
-        "a lockfile change must re-extract the domain layer"
-    );
-    assert_eq!(
-        changed_lockfile_observer.launches_for("usecase"),
-        1,
-        "a lockfile change must re-extract every affected layer"
-    );
-
-    std::fs::remove_file(&lockfile_path).unwrap();
-    let missing_lockfile_observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths);
-    let missing_lockfile =
-        calc_impl_catalog_with_observer(root, track_id, missing_lockfile_observer.clone());
-    assert_ne!(
-        missing_lockfile.exit_code, 0,
-        "a missing authoritative lockfile must fail closed: {missing_lockfile:?}"
-    );
-    let diagnostic = missing_lockfile.stdout.as_deref().unwrap_or_default();
-    assert!(
-        diagnostic.contains("authoritative input failed") && diagnostic.contains("Cargo.lock"),
-        "the failure must identify the authoritative missing lockfile: {missing_lockfile:?}"
-    );
-    assert_eq!(
-        missing_lockfile_observer.launches(),
-        0,
-        "a missing authoritative lockfile must fail before rustdoc launch"
+        "a dirty worktree must recalculate the unchanged layer too"
     );
 }

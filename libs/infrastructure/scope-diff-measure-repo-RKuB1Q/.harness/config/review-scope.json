@@ -1,0 +1,3 @@
+{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"]}},
+                "review_operational": ["track/items/<track-id>/review.json"],
+                "other_track": [], "default_diff_ceiling_lines": 500}

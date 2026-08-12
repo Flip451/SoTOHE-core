@@ -253,7 +253,7 @@ mod tests {
             ts(),
             domain::TypeSignalsCacheKey::new(
                 domain::CatalogueDeclarationHash::new(digest.clone()),
-                domain::ImplementationInputHash::new(digest.clone()),
+                domain::CommitHash::try_new("a".repeat(40)).unwrap(),
                 domain::BaselineHash::new(digest),
             ),
             signals,

@@ -23,15 +23,12 @@
 use std::path::Path;
 use std::process::{Output, Stdio};
 
-use sha2::Digest;
-
 use super::isolation::isolated_git_command;
 use super::{collect_bounded_git_output, guarded_git_command, spawn_bounded_git_child};
 
 /// Retain at most this many bytes from either stream of a Git probe. The
-/// branch implementation-input reader applies the same 16 MiB per-blob limit
-/// after retrieval; keeping the subprocess bound here makes that limit real
-/// even when Git is asked to emit a larger blob or a very large tree listing.
+/// Keeping the subprocess bound here makes the blob limit real even when Git
+/// is asked to emit a larger blob or a very large tree listing.
 const MAX_GIT_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 
 /// Low-level result of running `git show origin/<ref>:<path>`.
@@ -101,7 +98,7 @@ fn spawn_git(repo_root: &Path, args: &[&str]) -> std::io::Result<Output> {
 ///
 /// This keeps the locale and output bound of [`spawn_git`] while also using the
 /// repository/history isolation contract required when the answer is hashed
-/// into implementation-input freshness.
+/// into branch-read safety.
 fn spawn_isolated_git(repo_root: &Path, args: &[&str]) -> std::io::Result<Output> {
     let mut command = isolated_git_command(repo_root, args);
     command.env("LANG", "C").env("LC_ALL", "C").env("LANGUAGE", "C");
@@ -128,7 +125,7 @@ pub(crate) fn git_ls_tree_entry_kind(
 }
 
 /// Isolated counterpart of [`git_ls_tree_entry_kind`] for branch reads that
-/// contribute to an implementation-input digest.
+/// contribute to a branch-read decision.
 pub(crate) fn git_ls_tree_entry_kind_isolated(
     repo_root: &Path,
     branch: &str,
@@ -190,20 +187,6 @@ pub(crate) fn git_show_blob(repo_root: &Path, branch: &str, path: &str) -> BlobR
     classify_git_show_output(path, output)
 }
 
-fn git_show_blob_isolated(repo_root: &Path, branch: &str, path: &str) -> BlobResult {
-    let git_ref = format!("origin/{branch}:{path}");
-    let output = match spawn_isolated_git(repo_root, &["show", &git_ref]) {
-        Ok(output) => output,
-        Err(error) => {
-            return BlobResult::CommandFailed(format!(
-                "failed to run isolated git show for {path}: {error}"
-            ));
-        }
-    };
-
-    classify_git_show_output(path, output)
-}
-
 fn classify_git_show_output(path: &str, output: Output) -> BlobResult {
     if output.status.success() {
         return BlobResult::Found(output.stdout);
@@ -219,38 +202,6 @@ fn classify_git_show_output(path: &str, output: Output) -> BlobResult {
             stderr.trim()
         ))
     }
-}
-
-/// Reads a bounded branch blob and computes its content digest in fixed-size
-/// chunks. The caller receives the byte count so the implementation-input
-/// walker can enforce its cumulative read budget without retaining a crate
-/// tree in memory.
-pub(crate) fn git_show_blob_sha256(
-    repo_root: &Path,
-    branch: &str,
-    path: &str,
-    maximum_bytes: usize,
-) -> Result<([u8; 32], u64), String> {
-    let bytes = match git_show_blob_isolated(repo_root, branch, path) {
-        BlobResult::Found(bytes) => bytes,
-        BlobResult::NotFound => {
-            return Err(format!("implementation input '{path}' not found on origin/{branch}"));
-        }
-        BlobResult::CommandFailed(error) => return Err(error),
-    };
-    if bytes.len() > maximum_bytes {
-        return Err(format!(
-            "implementation input '{path}' exceeds the {maximum_bytes}-byte per-file limit"
-        ));
-    }
-    let mut hasher = sha2::Sha256::new();
-    for chunk in bytes.chunks(8 * 1024) {
-        hasher.update(chunk);
-    }
-    let digest = hasher.finalize();
-    let mut output = [0_u8; 32];
-    output.copy_from_slice(&digest);
-    Ok((output, bytes.len() as u64))
 }
 
 /// Lists regular-file blob entries directly under `origin/<branch>:<dir_path>/`.
@@ -476,29 +427,6 @@ mod tests {
         let dir = setup_repo_with_file("large.bin", &contents);
         let result = git_show_blob(dir.path(), "main", "large.bin");
         assert!(matches!(result, BlobResult::CommandFailed(_)), "got {result:?}");
-    }
-
-    #[test]
-    fn test_git_show_blob_sha256_ignores_ambient_repository_selection() {
-        let target = setup_repo_with_file("target.txt", b"target repository");
-        let elsewhere = setup_repo_with_file("elsewhere.txt", b"ambient repository");
-        let expected = match git_show_blob(target.path(), "main", "target.txt") {
-            BlobResult::Found(bytes) => {
-                let digest = sha2::Sha256::digest(bytes);
-                let mut output = [0_u8; 32];
-                output.copy_from_slice(&digest);
-                output
-            }
-            other => panic!("expected target blob, got {other:?}"),
-        };
-
-        let actual =
-            temp_env::with_var("GIT_DIR", Some(elsewhere.path().join(".git").as_os_str()), || {
-                git_show_blob_sha256(target.path(), "main", "target.txt", MAX_GIT_OUTPUT_BYTES)
-            })
-            .unwrap()
-            .0;
-        assert_eq!(actual, expected);
     }
 
     #[test]

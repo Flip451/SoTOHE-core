@@ -52,17 +52,17 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
 /// logic is written once and the two public entry points share it.
 #[allow(clippy::too_many_lines)]
 fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
-    dispatch_track_cmd_with_base_merge(cmd, |input| {
+    dispatch_track_cmd_with_dependencies(cmd, |input| {
         TrackCompositionRoot::new().track_driver().handle_base_merge(input)
     })
 }
 
-/// Dispatches a command while obtaining the base-merge outcome at the composition boundary.
+/// Dispatches track commands with injected command-boundary outcomes.
 ///
 /// Keeping this seam local lets command tests exercise the `MergeBase` enum dispatch without
 /// reimplementing any guarded merge policy outside the driver and usecase layers.
 #[allow(clippy::too_many_lines)]
-fn dispatch_track_cmd_with_base_merge(
+fn dispatch_track_cmd_with_dependencies(
     cmd: TrackCommand,
     base_merge: impl FnOnce(cli_driver::track::BaseMergeInput) -> cli_driver::CommandOutcome,
 ) -> Result<ExitCode, crate::CliError> {
@@ -211,7 +211,7 @@ mod tests {
 
     #[test]
     fn test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome() {
-        let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |input| {
+        let result = dispatch_track_cmd_with_dependencies(TrackCommand::MergeBase, |input| {
             assert_eq!(input.workspace_root, PathBuf::from("."));
             cli_driver::CommandOutcome::success(Some("base merge completed".to_owned()))
         });
@@ -221,7 +221,7 @@ mod tests {
 
     #[test]
     fn test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure() {
-        let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |_| {
+        let result = dispatch_track_cmd_with_dependencies(TrackCommand::MergeBase, |_| {
             cli_driver::CommandOutcome::failure(Some(
                 "base merge conflicted; continue with /track:recover".to_owned(),
             ))
@@ -236,7 +236,7 @@ mod tests {
     fn test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success()
      {
         let workspace = tempfile::tempdir().unwrap();
-        let result = dispatch_track_cmd_with_base_merge(TrackCommand::MergeBase, |_| {
+        let result = dispatch_track_cmd_with_dependencies(TrackCommand::MergeBase, |_| {
             TrackCompositionRoot::new().track_driver().handle_base_merge(
                 cli_driver::track::BaseMergeInput {
                     workspace_root: workspace.path().to_path_buf(),

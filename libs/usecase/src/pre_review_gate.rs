@@ -719,7 +719,7 @@ mod tests {
             ts("2026-06-27T00:00:00Z"),
             domain::TypeSignalsCacheKey::new(
                 domain::CatalogueDeclarationHash::new(digest.clone()),
-                domain::ImplementationInputHash::new(digest.clone()),
+                domain::CommitHash::try_new("a".repeat(40)).unwrap(),
                 domain::BaselineHash::new(digest),
             ),
             signals,

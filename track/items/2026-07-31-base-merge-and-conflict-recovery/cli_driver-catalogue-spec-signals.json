@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "40152f45c2c888785a0628d1205fc353a44e67a6e317c336062ae1fa572bc136",
+  "catalogue_declaration_hash": "a0176aee2726f3520c8a3e7b22d9c7bdcf335d0ffc1dd287c5e50afa054dfe37",
   "schema_version": 1,
   "signals": [
     {
@@ -8,7 +8,7 @@
       "type_name": "BaseMergeInput"
     },
     {
-      "entry_hash": "f836173f7a16637101aa891199637ac946ac63c1f1e28d8bc10c20c2c647b11e",
+      "entry_hash": "0c5d840ad4bec01ed25d1f190b2a618ac6dfa720f720596c74c4b2b30781be34",
       "signal": "blue",
       "type_name": "GitDriver"
     },
@@ -18,7 +18,7 @@
       "type_name": "GitStashInput"
     },
     {
-      "entry_hash": "68228b87d7f6ca2aa2ed4e94c92e5c8897f3f1d3b8db7d81c9e23580114f39e8",
+      "entry_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
       "signal": "blue",
       "type_name": "TrackDriver"
     }

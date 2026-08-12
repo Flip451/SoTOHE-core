@@ -743,7 +743,7 @@ mod tests {
         let cleanup_calls = cleanup_calls.lock().unwrap();
         assert_eq!(
             cleanup_calls.iter().map(|(stage, _)| *stage).collect::<Vec<_>>(),
-            vec!["views", "baseline", "views", "sync-base"]
+            vec!["baseline", "views", "sync-base"]
         );
         for (_, request) in cleanup_calls.iter() {
             assert_eq!(request.workspace_root, workspace);

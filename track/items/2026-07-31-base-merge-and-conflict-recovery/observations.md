@@ -236,3 +236,15 @@ T017 の precision クロージャ実装は infrastructure final で 9 時間 77
 tmp/handoff/2026-08-11-stash-concurrency-prescription.md に従い、T021 の並行性 findings を閉集合として処理する: (1) index 参照(`stash@{N}`)を全廃し OID アドレッシング(apply 直前に OID 実在を再検証、drop はその場で OID→参照を再解決)へ、(2) push→record 永続化のクラッシュ窓は AC-13 の absent-record 回復レーンへ写像されることを spec/docs に明文化、(3) 脅威モデルを宣言して閉じる(guarded 経路は adapter ロックで直列化 / unguarded は reference-transaction hook が遮断 / token 保持者の手動介入は operator 責任、OID 再検証が最後の網)、(4) 型モデル・再記述は機械的修正。新規防御機構の追加はゼロ。宣言の外から防御要求が来た場合は実装せず裁定へ上げる。
 
 merge-3 統合レビューで、取り込んだ PR #234（generic-type-aliases レーン）自身の normalize_alias_target_paths 設計（最終セグメント正規化による過剰一致の懸念）が P1 として指摘された。tracing レーンの telemetry 配置指摘と同 class の originating-lane 再審理であり、統合ラウンドでは Known Accepted Deviation とし、follow-up 裁定事項に追加する。
+
+## 2026-08-11: User 裁定 — baseline 差し替えの前倒しと特例 review 経路の撤去
+
+delta ADR 2026-08-09-1210 の裁定レビューで User は次を確定した: (1) baseline の取得元は merge した base commit（= develop のコミット）であり develop は正であるから、差し替えに事前の review 通過を要求する理由はない。差し替えは回復の冒頭（merge した base commit が確定した時点）で行う。(2) これにより base 由来 drift のための「ゲート前置なしの chain 限定 review 経路」は不要となる。この経路は本 track の進行過程で歪んで混入したものであり撤去する。conflict marker がゲートを解析不能にする場合の conflict-preparation 例外（既存の User 裁定）は別機構として維持する。
+
+## 2026-08-12: User 裁定による一回限りの ledger 手動介入
+
+delta `2026-08-09-1210` は 0715 D3 改訂に吸収され User 裁定で削除されたが、ledger に deletion kind が存在せず `check-commit` が SourceMissing で恒久 fail-closed になるため、User の明示裁定（chat 2026-08-12「致し方なく今回に限って ledger を改竄する」）に基づき、orchestrator が当該 delta の record 8 件を ledger.jsonl から手動除去し、baseline 複製 8 file を削除した（複製削除は権限層の都合で User が実行）。deletion kind の正規追加は将来 track の作業として持ち越し。機械所有物への手編集はこの記録をもって一回限りの例外とする。
+
+## 2026-08-13: 次の一手 — .sync-base.json の撤去（User 裁定）
+
+`.sync-base.json` は読取消費者がなく、取り込み済み base commit は git 履歴から導出でき、後始末完了の検出は baseline_hash 不一致 / view-freshness の fail-closed gate が担うため冗長と判定。本 commit 確定後に、0715 D2 削除・D3 の 2 段化（Baseline → Views）・spec 該当要素削除・SyncBaseRecord 機構一式の削除を行う。

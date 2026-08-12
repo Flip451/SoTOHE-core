@@ -1,12 +1,10 @@
 use std::collections::BTreeSet;
 use std::fs;
-use std::io::Read as _;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use domain::CommitHash;
-use sha2::{Digest as _, Sha256};
 use usecase::base_merge::BaseMergeCleanupRequest;
 
 use super::cleanup_tree::{copy_tree_with_baselines, remove_tree_bounded};
@@ -19,10 +17,7 @@ use super::view_transaction::{
     restore_view_exchange, rollback_if_published, snapshot_rendered_views,
     validate_optional_file_unchanged, validate_rendered_view_snapshot,
 };
-use super::{
-    MAX_BASE_MERGE_GIT_OUTPUT_BYTES, MAX_CLEANUP_FILE_BYTES, MAX_CLEANUP_TREE_BYTES,
-    MAX_CLEANUP_TREE_ENTRIES,
-};
+use super::{MAX_BASE_MERGE_GIT_OUTPUT_BYTES, MAX_CLEANUP_FILE_BYTES, MAX_CLEANUP_TREE_ENTRIES};
 use crate::git_cli::{
     collect_bounded_git_output, guarded_git_command, spawn_bounded_git_child,
     without_history_rewrites, without_repository_selection,
@@ -44,150 +39,6 @@ pub(super) const VIEW_TRANSACTION_PHASE_ROLLBACK: &str = "rollback";
 pub(super) const VIEW_TRANSACTION_PHASE_ROLLBACK_EXCHANGED: &str = "rollback-exchanged";
 pub(super) const VIEW_TRANSACTION_PHASE_COMPLETE: &str = "complete";
 pub(super) const VIEW_TRANSACTION_PHASE_ROLLED_BACK: &str = "rolled-back";
-
-pub(super) type GeneratedBaselineDigest = (u64, Vec<u8>);
-pub(super) type GeneratedBaselineSnapshot = Vec<(String, Option<GeneratedBaselineDigest>)>;
-
-pub(super) fn snapshot_generated_baselines(
-    track_dir: &Path,
-    generated_baseline_files: &BTreeSet<String>,
-) -> Result<GeneratedBaselineSnapshot, String> {
-    snapshot_generated_baselines_with_limits(
-        track_dir,
-        generated_baseline_files,
-        MAX_CLEANUP_TREE_ENTRIES,
-        MAX_CLEANUP_TREE_BYTES,
-    )
-}
-
-fn snapshot_generated_baselines_with_limits(
-    track_dir: &Path,
-    generated_baseline_files: &BTreeSet<String>,
-    max_entries: usize,
-    max_total_bytes: u64,
-) -> Result<GeneratedBaselineSnapshot, String> {
-    if generated_baseline_files.len() > max_entries {
-        return Err(format!(
-            "generated baseline snapshot exceeds {max_entries} filesystem entries"
-        ));
-    }
-
-    let mut total_bytes = 0_u64;
-    let mut snapshot = Vec::with_capacity(generated_baseline_files.len());
-    for file_name in generated_baseline_files {
-        let path = track_dir.join(file_name);
-        let entry = match fs::symlink_metadata(&path) {
-            Ok(metadata) if metadata.file_type().is_file() => {
-                if metadata.len() > MAX_CLEANUP_FILE_BYTES {
-                    return Err(format!("file exceeds read-size limit: {}", path.display()));
-                }
-                let remaining = max_total_bytes.checked_sub(total_bytes).ok_or_else(|| {
-                    format!("generated baseline snapshot exceeds {max_total_bytes} bytes")
-                })?;
-                if metadata.len() > remaining {
-                    return Err(format!(
-                        "generated baseline snapshot exceeds {max_total_bytes} bytes at {}",
-                        path.display()
-                    ));
-                }
-                let (length, digest) = digest_regular_file_bounded(
-                    &path,
-                    track_dir,
-                    remaining.min(MAX_CLEANUP_FILE_BYTES),
-                )?;
-                total_bytes = total_bytes.checked_add(length).ok_or_else(|| {
-                    format!("generated baseline snapshot exceeds {max_total_bytes} bytes")
-                })?;
-                if total_bytes > max_total_bytes {
-                    return Err(format!(
-                        "generated baseline snapshot exceeds {max_total_bytes} bytes at {}",
-                        path.display()
-                    ));
-                }
-                Some((length, digest))
-            }
-            Ok(_) => {
-                return Err(format!(
-                    "generated baseline is not a regular file: {}",
-                    path.display()
-                ));
-            }
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
-            Err(error) => {
-                return Err(format!(
-                    "cannot inspect generated baseline {}: {error}",
-                    path.display()
-                ));
-            }
-        };
-        snapshot.push((file_name.clone(), entry));
-    }
-    Ok(snapshot)
-}
-
-pub(super) fn generated_baselines_changed(
-    track_dir: &Path,
-    prior: &GeneratedBaselineSnapshot,
-) -> Result<bool, String> {
-    let generated_baseline_files = prior.iter().map(|(file_name, _)| file_name.clone()).collect();
-    let current = snapshot_generated_baselines(track_dir, &generated_baseline_files)?;
-    Ok(current.as_slice() != prior.as_slice())
-}
-
-fn digest_regular_file_bounded(
-    path: &Path,
-    trusted_root: &Path,
-    limit: u64,
-) -> Result<GeneratedBaselineDigest, String> {
-    reject_symlinks_below(path, trusted_root)
-        .map_err(|error| format!("cannot inspect {}: {error}", path.display()))?;
-    let metadata = fs::symlink_metadata(path)
-        .map_err(|error| format!("cannot inspect {}: {error}", path.display()))?;
-    if metadata.file_type().is_symlink() {
-        return Err(format!("refusing symlinked file: {}", path.display()));
-    }
-    if !metadata.is_file() {
-        return Err(format!("refusing non-regular file: {}", path.display()));
-    }
-    if metadata.len() > limit {
-        return Err(format!("file exceeds read-size limit: {}", path.display()));
-    }
-    let mut file =
-        fs::File::open(path).map_err(|error| format!("cannot open {}: {error}", path.display()))?;
-    let opened_metadata = file
-        .metadata()
-        .map_err(|error| format!("cannot inspect opened file {}: {error}", path.display()))?;
-    if !opened_metadata.is_file() || opened_metadata.len() != metadata.len() {
-        return Err(format!("file changed while it was inspected: {}", path.display()));
-    }
-    let mut hasher = Sha256::new();
-    let mut length = 0_u64;
-    let mut buffer = [0_u8; 8192];
-    loop {
-        let read = file
-            .read(&mut buffer)
-            .map_err(|error| format!("cannot read {}: {error}", path.display()))?;
-        if read == 0 {
-            break;
-        }
-        let read = u64::try_from(read).map_err(|error| error.to_string())?;
-        length = length
-            .checked_add(read)
-            .ok_or_else(|| format!("file exceeds read-size limit: {}", path.display()))?;
-        if length > limit {
-            return Err(format!("file exceeds read-size limit: {}", path.display()));
-        }
-        let read_length = usize::try_from(read).map_err(|error| error.to_string())?;
-        let chunk = buffer
-            .get(..read_length)
-            .ok_or_else(|| format!("cannot process bytes read from {}", path.display()))?;
-        hasher.update(chunk);
-    }
-    if length != opened_metadata.len() {
-        return Err(format!("file changed while it was read: {}", path.display()));
-    }
-    Ok((length, hasher.finalize().to_vec()))
-}
 
 /// Render views away from the live track, then publish the complete rendered
 /// track with the same atomic exchange used by baseline replacement.
@@ -687,29 +538,6 @@ pub(super) fn remove_commit_pinned_worktree(
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_snapshot_generated_baselines_rejects_excess_entries_before_reading() {
-        let fixture = tempfile::tempdir().unwrap();
-        let names =
-            BTreeSet::from(["one.json".to_owned(), "two.json".to_owned(), "three.json".to_owned()]);
-
-        let result = snapshot_generated_baselines_with_limits(fixture.path(), &names, 2, 10);
-
-        assert!(result.unwrap_err().contains("exceeds 2 filesystem entries"));
-    }
-
-    #[test]
-    fn test_snapshot_generated_baselines_rejects_aggregate_bytes() {
-        let fixture = tempfile::tempdir().unwrap();
-        fs::write(fixture.path().join("one.json"), b"123456").unwrap();
-        fs::write(fixture.path().join("two.json"), b"abcdef").unwrap();
-        let names = BTreeSet::from(["one.json".to_owned(), "two.json".to_owned()]);
-
-        let result = snapshot_generated_baselines_with_limits(fixture.path(), &names, 2, 10);
-
-        assert!(result.unwrap_err().contains("exceeds 10 bytes"));
-    }
 
     #[test]
     fn test_registry_drift_is_preserved_before_publication() {

@@ -1,12 +1,12 @@
 //! Freshness-aware evaluation-result document for per-layer TDDD type signals.
 //!
-//! A document records the declaration and implementation inputs that govern
-//! reuse. Any missing implementation identity selects re-extraction.
+//! A document records the declaration, HEAD, and baseline inputs that govern
+//! reuse. Cache reuse is valid only for a clean worktree at the recorded HEAD.
 
 use std::fmt;
 
 use crate::tddd::catalogue::TypeSignal;
-use crate::{ContentHash, Timestamp};
+use crate::{CommitHash, ContentHash, Timestamp};
 
 /// Schema version for `<layer>-type-signals.json` documents.
 pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 4;
@@ -85,17 +85,13 @@ macro_rules! digest_identity {
 }
 
 digest_identity!(CatalogueDeclarationHash, "Identity of the normalized catalogue declaration.");
-digest_identity!(
-    ImplementationInputHash,
-    "Identity of one layer's source contents, lockfile dependency resolution, and toolchain identity."
-);
 digest_identity!(BaselineHash, "Identity of the actual rustdoc baseline bytes.");
 
 /// Complete identity of the inputs that govern a type-signals cache entry.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeSignalsCacheKey {
     declaration_hash: CatalogueDeclarationHash,
-    implementation_input_hash: ImplementationInputHash,
+    head_commit: CommitHash,
     baseline_hash: BaselineHash,
 }
 
@@ -104,10 +100,10 @@ impl TypeSignalsCacheKey {
     #[must_use]
     pub fn new(
         declaration_hash: CatalogueDeclarationHash,
-        implementation_input_hash: ImplementationInputHash,
+        head_commit: CommitHash,
         baseline_hash: BaselineHash,
     ) -> Self {
-        Self { declaration_hash, implementation_input_hash, baseline_hash }
+        Self { declaration_hash, head_commit, baseline_hash }
     }
 
     /// Returns the catalogue declaration identity.
@@ -116,10 +112,10 @@ impl TypeSignalsCacheKey {
         &self.declaration_hash
     }
 
-    /// Returns the implementation-input identity.
+    /// Returns the recorded repository HEAD identity.
     #[must_use]
-    pub fn implementation_input_hash(&self) -> &ImplementationInputHash {
-        &self.implementation_input_hash
+    pub fn head_commit(&self) -> &CommitHash {
+        &self.head_commit
     }
 
     /// Returns the baseline identity.
@@ -258,21 +254,63 @@ impl TypeSignalsLoadResult {
 pub enum TypeSignalsReuseDecision {
     /// Both identities match, so no evaluation is needed.
     SkipEvaluation,
-    /// The declaration changed while the implementation identity still matches.
+    /// The declaration changed while the HEAD identity still matches.
     ReevaluateWithoutExtraction,
-    /// The implementation identity changed or cannot be determined.
+    /// The HEAD identity changed or cannot be determined.
     ReextractAndEvaluate,
+}
+
+/// Observation of the worktree used to validate a reuse candidate.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TypeSignalsWorktreeStatus {
+    /// No worktree changes were observed.
+    Clean,
+    /// Worktree changes were observed.
+    Dirty,
+}
+
+/// Observation of the cache authority used to validate a reuse candidate.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TypeSignalsAuthorityStatus {
+    /// The cache authority was readable and valid.
+    Readable,
+    /// The cache authority was unavailable or invalid.
+    Unreadable,
+}
+
+/// Opaque evidence supplied by the infrastructure evaluator before reuse is decided.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TypeSignalsReuseInput {
+    /// The cache document's recorded input identity.
+    recorded_key: TypeSignalsCacheKey,
+    /// The currently observed input identity.
+    current_key: TypeSignalsCacheKey,
+}
+
+impl TypeSignalsReuseInput {
+    /// Constructs reuse evidence only after the validation observations pass.
+    #[must_use]
+    pub fn verify(
+        recorded_key: TypeSignalsCacheKey,
+        current_key: TypeSignalsCacheKey,
+        worktree_status: TypeSignalsWorktreeStatus,
+        authority_status: TypeSignalsAuthorityStatus,
+    ) -> Option<Self> {
+        if worktree_status != TypeSignalsWorktreeStatus::Clean
+            || authority_status != TypeSignalsAuthorityStatus::Readable
+        {
+            return None;
+        }
+        Some(Self { recorded_key, current_key })
+    }
 }
 
 /// Selects the fail-closed reuse path for one layer.
 #[must_use]
-pub fn decide_type_signals_reuse(
-    recorded_key: &TypeSignalsCacheKey,
-    current_key: &TypeSignalsCacheKey,
-) -> TypeSignalsReuseDecision {
-    if current_key.implementation_input_hash() != recorded_key.implementation_input_hash() {
+pub fn decide_type_signals_reuse(input: &TypeSignalsReuseInput) -> TypeSignalsReuseDecision {
+    if input.current_key.head_commit() != input.recorded_key.head_commit() {
         TypeSignalsReuseDecision::ReextractAndEvaluate
-    } else if current_key == recorded_key {
+    } else if input.current_key == input.recorded_key {
         TypeSignalsReuseDecision::SkipEvaluation
     } else {
         TypeSignalsReuseDecision::ReevaluateWithoutExtraction
@@ -294,23 +332,37 @@ mod tests {
     fn declaration(value: &str) -> CatalogueDeclarationHash {
         CatalogueDeclarationHash::new(digest(value))
     }
-    fn implementation(value: &str) -> ImplementationInputHash {
-        ImplementationInputHash::new(digest(value))
+    fn head(value: char) -> CommitHash {
+        CommitHash::try_new(value.to_string().repeat(40)).unwrap()
     }
     fn baseline(value: &str) -> BaselineHash {
         BaselineHash::new(digest(value))
     }
     fn cache_key(
         declaration_value: &str,
-        implementation_value: &str,
+        head_value: char,
         baseline_value: &str,
     ) -> TypeSignalsCacheKey {
         TypeSignalsCacheKey::new(
             declaration(declaration_value),
-            implementation(implementation_value),
+            head(head_value),
             baseline(baseline_value),
         )
     }
+
+    fn verified_input(
+        recorded_key: TypeSignalsCacheKey,
+        current_key: TypeSignalsCacheKey,
+    ) -> TypeSignalsReuseInput {
+        TypeSignalsReuseInput::verify(
+            recorded_key,
+            current_key,
+            TypeSignalsWorktreeStatus::Clean,
+            TypeSignalsAuthorityStatus::Readable,
+        )
+        .unwrap()
+    }
+
     fn timestamp() -> Timestamp {
         Timestamp::new("2026-07-14T00:00:00Z").unwrap()
     }
@@ -319,7 +371,7 @@ mod tests {
     fn test_document_retains_only_required_freshness_inputs() {
         let document = TypeSignalsDocument::new(
             timestamp(),
-            cache_key(A, B, A),
+            cache_key(A, 'b', A),
             vec![TypeSignal::new(
                 "Example",
                 "value_object",
@@ -333,7 +385,7 @@ mod tests {
 
         assert_eq!(document.schema_version().value(), TYPE_SIGNALS_SCHEMA_VERSION);
         assert_eq!(document.cache_key().declaration_hash().as_digest().as_str(), A);
-        assert_eq!(document.cache_key().implementation_input_hash().as_digest().as_str(), B);
+        assert_eq!(document.cache_key().head_commit().as_ref(), &B[..40]);
         assert_eq!(document.cache_key().baseline_hash().as_digest().as_str(), A);
     }
 
@@ -349,26 +401,77 @@ mod tests {
     }
 
     #[test]
-    fn test_decide_type_signals_reuse_all_three_matching_hashes_skips_evaluation() {
+    fn test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation() {
         assert_eq!(
-            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, A),),
+            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),
             TypeSignalsReuseDecision::SkipEvaluation
         );
     }
 
     #[test]
-    fn test_decide_type_signals_reuse_each_isolated_hash_mismatch_reevaluates() {
+    fn test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates() {
         assert_eq!(
-            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(B, A, A),),
+            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(B, 'a', A),)),
             TypeSignalsReuseDecision::ReevaluateWithoutExtraction
         );
         assert_eq!(
-            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, B, A),),
+            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'b', A),)),
             TypeSignalsReuseDecision::ReextractAndEvaluate
         );
         assert_eq!(
-            decide_type_signals_reuse(&cache_key(A, A, A), &cache_key(A, A, B)),
+            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', B),)),
             TypeSignalsReuseDecision::ReevaluateWithoutExtraction
+        );
+    }
+
+    #[test]
+    fn test_type_signals_reuse_input_verify_rejects_unverified_evidence() {
+        assert_eq!(
+            TypeSignalsReuseInput::verify(
+                cache_key(A, 'a', A),
+                cache_key(A, 'a', A),
+                TypeSignalsWorktreeStatus::Dirty,
+                TypeSignalsAuthorityStatus::Readable,
+            ),
+            None
+        );
+        assert_eq!(
+            TypeSignalsReuseInput::verify(
+                cache_key(A, 'a', A),
+                cache_key(A, 'a', A),
+                TypeSignalsWorktreeStatus::Clean,
+                TypeSignalsAuthorityStatus::Unreadable,
+            ),
+            None
+        );
+    }
+
+    #[test]
+    fn test_decide_type_signals_reuse_unverified_observations_reevaluate() {
+        let decide_after_verification = |worktree_status, authority_status| {
+            TypeSignalsReuseInput::verify(
+                cache_key(A, 'a', A),
+                cache_key(A, 'a', A),
+                worktree_status,
+                authority_status,
+            )
+            .as_ref()
+            .map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, decide_type_signals_reuse)
+        };
+
+        assert_eq!(
+            decide_after_verification(
+                TypeSignalsWorktreeStatus::Dirty,
+                TypeSignalsAuthorityStatus::Readable
+            ),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
+        assert_eq!(
+            decide_after_verification(
+                TypeSignalsWorktreeStatus::Clean,
+                TypeSignalsAuthorityStatus::Unreadable
+            ),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
         );
     }
 }

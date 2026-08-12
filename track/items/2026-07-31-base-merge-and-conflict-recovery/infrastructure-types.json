@@ -1,34 +1,6 @@
 {
   "crate_name": "infrastructure",
   "functions": {
-    "infrastructure::tddd::type_signals_codec::baseline_hash": {
-      "action": "add",
-      "docs": "Computes a typed SHA-256 identity from baseline bytes.",
-      "informal_grounds": [],
-      "is_async": false,
-      "params": [
-        {
-          "name": "baseline_bytes",
-          "ty": "&[u8]"
-        }
-      ],
-      "returns": "domain::tddd::type_signals_doc::BaselineHash",
-      "role": "FreeFunction",
-      "spec_refs": [
-        {
-          "anchor": "IN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-07",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        }
-      ]
-    },
     "infrastructure::tddd::type_signals_codec::decode": {
       "action": "reference",
       "docs": "Baseline function signature for decoding a type-signals cache document.",
@@ -48,10 +20,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-08",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
@@ -59,7 +27,7 @@
     },
     "infrastructure::tddd::type_signals_codec::encode": {
       "action": "reference",
-      "docs": "Baseline function signature for encoding a typed cache document as opaque JSON text.",
+      "docs": "Produces only Json or UnsupportedSchemaVersion; String is opaque JSON text, and the shared TypeSignalsCodecError keeps encode and decode under one codec error vocabulary.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -76,22 +44,14 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-04",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-08",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-09",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
     },
     "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
-      "action": "reference",
-      "docs": "Baseline-public entrypoint for per-layer type-signal evaluation.",
+      "action": "modify",
+      "docs": "[IN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-05), [CN-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-03), [CN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-04), [AC-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-07), [AC-08](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-08), [AC-09](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-09). Infrastructure evidence-validation owner.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -124,7 +84,19 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
           "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -134,30 +106,8 @@
       ]
     },
     "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file": {
-      "action": "modify",
-      "docs": "Explicit-path implementation-catalogue signal checker with track-modified baseline inputs.",
+      "action": "delete",
       "informal_grounds": [],
-      "is_async": false,
-      "params": [
-        {
-          "name": "signals_path",
-          "ty": "&std::path::Path"
-        },
-        {
-          "name": "baseline_path",
-          "ty": "&std::path::Path"
-        },
-        {
-          "name": "catalog_hash_hex",
-          "ty": "&str"
-        },
-        {
-          "name": "strict",
-          "ty": "bool"
-        }
-      ],
-      "returns": "domain::verify::VerifyOutcome",
-      "role": "FreeFunction",
       "spec_refs": [
         {
           "anchor": "IN-05",
@@ -165,6 +115,10 @@
         },
         {
           "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -409,7 +363,7 @@
     },
     "FsBaseMergeCleanupAdapter": {
       "action": "add",
-      "docs": "Secondary adapter implementing BaseMergeCleanupPort with blocking CLI-process and filesystem operations; its private injected RustdocBaselineCapturePort dependency is intentionally hidden from the public shape.",
+      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -430,7 +384,11 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-02",
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -442,27 +400,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-07",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-10",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -473,7 +411,7 @@
     },
     "FsBaseMergeContextAdapter": {
       "action": "add",
-      "docs": "Unit secondary adapter implementing BaseMergeContextPort.",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -497,10 +435,6 @@
         },
         {
           "anchor": "AC-01",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-02",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -561,7 +495,7 @@
     },
     "FsGitStashAdapter": {
       "action": "add",
-      "docs": "IN-04 / AC-06.",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13). Secondary adapter implementing the guarded stash port.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -581,6 +515,10 @@
         },
         {
           "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -747,10 +685,6 @@
       "spec_refs": [
         {
           "anchor": "IN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-04",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {

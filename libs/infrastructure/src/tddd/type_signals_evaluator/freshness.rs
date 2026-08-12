@@ -9,7 +9,8 @@ use domain::schema::SchemaExportError;
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::type_signals_doc::{
-    TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsReuseDecision, decide_type_signals_reuse,
+    TypeSignalsAuthorityStatus, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsReuseInput,
+    TypeSignalsWorktreeStatus,
 };
 
 use crate::schema_export::RustdocSchemaExporter;
@@ -22,13 +23,27 @@ pub(super) trait RustdocJsonPathProvider {
     ) -> Result<PathBuf, SchemaExportError>;
 }
 
-pub(super) fn reuse_decision_for_recorded_document(
+pub(super) fn reuse_input_for_recorded_document(
     recorded: Option<&TypeSignalsDocument>,
     current_key: &TypeSignalsCacheKey,
-) -> TypeSignalsReuseDecision {
-    recorded.map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, |document| {
-        decide_type_signals_reuse(document.cache_key(), current_key)
-    })
+    worktree_clean: bool,
+) -> Option<TypeSignalsReuseInput> {
+    let authority_status = if recorded.is_some() {
+        TypeSignalsAuthorityStatus::Readable
+    } else {
+        TypeSignalsAuthorityStatus::Unreadable
+    };
+    let recorded_key = recorded.map(|document| document.cache_key().clone())?;
+    TypeSignalsReuseInput::verify(
+        recorded_key,
+        current_key.clone(),
+        if worktree_clean {
+            TypeSignalsWorktreeStatus::Clean
+        } else {
+            TypeSignalsWorktreeStatus::Dirty
+        },
+        authority_status,
+    )
 }
 
 impl RustdocJsonPathProvider for RustdocSchemaExporter {

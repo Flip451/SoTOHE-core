@@ -1136,20 +1136,8 @@ mod tests {
             .as_str()
             .to_owned();
         object.insert("baseline_hash".to_owned(), serde_json::json!(baseline_hash));
-        let implementation_input_hash =
-            crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-                &root,
-                "domain",
-                &[],
-            )
-            .unwrap()
-            .as_digest()
-            .as_str()
-            .to_owned();
-        object.insert(
-            "implementation_input_hash".to_owned(),
-            serde_json::json!(implementation_input_hash),
-        );
+        object.insert("head_commit".to_owned(), serde_json::json!("a".repeat(40)));
+        object.remove("implementation_input_hash");
         std::fs::write(&signals_path, serde_json::to_string_pretty(&persisted).unwrap()).unwrap();
         let persisted_before_check = std::fs::read_to_string(&signals_path).unwrap();
 
@@ -1202,6 +1190,8 @@ mod tests {
             serde_json::json!(domain::TYPE_SIGNALS_SCHEMA_VERSION),
         );
         object.insert("baseline_hash".to_owned(), serde_json::json!(stale_baseline_hash));
+        object.insert("head_commit".to_owned(), serde_json::json!("a".repeat(40)));
+        object.remove("implementation_input_hash");
         std::fs::write(&signals_path, serde_json::to_string_pretty(&persisted).unwrap()).unwrap();
 
         let check = SystemSignalCommandAdapter::new()

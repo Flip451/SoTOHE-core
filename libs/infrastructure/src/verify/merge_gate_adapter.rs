@@ -37,8 +37,6 @@ use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::git_cli::isolation::isolated_bounded_git_output;
 use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind_isolated};
 
-use super::branch_implementation_inputs::hash_branch_implementation_inputs;
-
 const MAX_ARCHITECTURE_RULES_BYTES: usize = 4 * 1024 * 1024;
 const MAX_SPEC_BYTES: usize = 16 * 1024 * 1024;
 const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
@@ -267,19 +265,6 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         }
         let hash_hex = crate::tddd::type_signals_codec::declaration_hash(&bytes);
         BlobFetchResult::Found((bytes, hash_hex.as_digest().as_str().to_owned()))
-    }
-
-    fn read_type_implementation_input_hash(
-        &self,
-        branch: &str,
-        track_id: &str,
-        layer_id: &str,
-    ) -> BlobFetchResult<String> {
-        match hash_branch_implementation_inputs(&self.repo_root, branch, track_id, layer_id) {
-            Ok(Some(hash)) => BlobFetchResult::Found(hash.as_digest().as_str().to_owned()),
-            Ok(None) => BlobFetchResult::NotFound,
-            Err(message) => BlobFetchResult::FetchError(message),
-        }
     }
 
     fn read_enabled_layers(&self, branch: &str) -> BlobFetchResult<Vec<String>> {
@@ -750,112 +735,6 @@ mod tests {
         dir
     }
 
-    fn setup_repo_with_implementation_inputs() -> tempfile::TempDir {
-        const ARCHITECTURE_RULES: &str = r#"{
-  "version": 2,
-  "layers": [
-    {
-      "crate": "domain",
-      "path": "libs/domain",
-      "may_depend_on": [],
-      "deny_reason": "",
-      "tddd": {
-        "enabled": true,
-        "schema_export": { "method": "rustdoc", "targets": ["domain"] }
-      }
-    }
-  ]
-}"#;
-        const FEATURE_DECLARATION: &str = r#"{"schema_version":1,"layers":{"domain":[]}}"#;
-        let dir = tempfile::tempdir().unwrap();
-        let repo = dir.path();
-        git(repo, &["init", "--quiet", "--initial-branch=main"]);
-        std::fs::write(repo.join("architecture-rules.json"), ARCHITECTURE_RULES).unwrap();
-        std::fs::write(
-            repo.join("Cargo.toml"),
-            "[workspace]\nmembers = [\"libs/domain\"]\nresolver = \"2\"\n",
-        )
-        .unwrap();
-        std::fs::write(repo.join("Cargo.lock"), "version = 4\n").unwrap();
-        std::fs::write(repo.join(".test-nightly-toolchain-identity"), "nightly-fixture\n").unwrap();
-        std::fs::create_dir_all(repo.join("libs/domain/src")).unwrap();
-        std::fs::write(
-            repo.join("libs/domain/Cargo.toml"),
-            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
-        )
-        .unwrap();
-        std::fs::write(repo.join("libs/domain/src/lib.rs"), "pub struct BranchDomain;\n").unwrap();
-        let track_dir = repo.join("track/items/foo");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("tddd-features.json"), FEATURE_DECLARATION).unwrap();
-        std::fs::write(track_dir.join("tddd-features-baseline.json"), FEATURE_DECLARATION).unwrap();
-        git(repo, &["add", "."]);
-        git(repo, &["commit", "--quiet", "-m", "initial"]);
-        git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
-        git(repo, &["fetch", "--quiet", "origin"]);
-        dir
-    }
-
-    fn setup_repo_with_usecase_path_dependency_inputs() -> tempfile::TempDir {
-        const ARCHITECTURE_RULES: &str = r#"{
-  "version": 2,
-  "layers": [
-    {
-      "crate": "domain",
-      "path": "libs/domain",
-      "may_depend_on": [],
-      "deny_reason": ""
-    },
-    {
-      "crate": "usecase",
-      "path": "libs/usecase",
-      "may_depend_on": ["domain"],
-      "deny_reason": "",
-      "tddd": {
-        "enabled": true,
-        "schema_export": { "method": "rustdoc", "targets": ["usecase"] }
-      }
-    }
-  ]
-}"#;
-        const FEATURE_DECLARATION: &str = r#"{"schema_version":1,"layers":{"usecase":[]}}"#;
-        let dir = tempfile::tempdir().unwrap();
-        let repo = dir.path();
-        git(repo, &["init", "--quiet", "--initial-branch=main"]);
-        std::fs::write(repo.join("architecture-rules.json"), ARCHITECTURE_RULES).unwrap();
-        std::fs::write(
-            repo.join("Cargo.toml"),
-            "[workspace]\nmembers = [\"libs/domain\", \"libs/usecase\"]\nresolver = \"2\"\n",
-        )
-        .unwrap();
-        std::fs::write(repo.join("Cargo.lock"), "version = 4\n").unwrap();
-        std::fs::write(repo.join(".test-nightly-toolchain-identity"), "nightly-fixture\n").unwrap();
-        std::fs::create_dir_all(repo.join("libs/domain/src")).unwrap();
-        std::fs::create_dir_all(repo.join("libs/usecase/src")).unwrap();
-        std::fs::write(
-            repo.join("libs/domain/Cargo.toml"),
-            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2021\"\n",
-        )
-        .unwrap();
-        std::fs::write(
-            repo.join("libs/usecase/Cargo.toml"),
-            "[package]\nname = \"usecase\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\ndomain = { path = \"../domain\" }\n",
-        )
-        .unwrap();
-        std::fs::write(repo.join("libs/domain/src/lib.rs"), "pub struct BranchDomain;\n").unwrap();
-        std::fs::write(repo.join("libs/usecase/src/lib.rs"), "pub struct BranchUsecase;\n")
-            .unwrap();
-        let track_dir = repo.join("track/items/foo");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        std::fs::write(track_dir.join("tddd-features.json"), FEATURE_DECLARATION).unwrap();
-        std::fs::write(track_dir.join("tddd-features-baseline.json"), FEATURE_DECLARATION).unwrap();
-        git(repo, &["add", "."]);
-        git(repo, &["commit", "--quiet", "-m", "initial"]);
-        git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
-        git(repo, &["fetch", "--quiet", "origin"]);
-        dir
-    }
-
     // --- Spec document fixtures ---
 
     const SPEC_JSON_MINIMAL: &str = r#"{
@@ -1042,180 +921,6 @@ mod tests {
     }
 
     #[test]
-    fn test_read_type_implementation_input_hash_matches_branch_blob_semantics() {
-        let dir = setup_repo_with_implementation_inputs();
-        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        let expected = crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-            dir.path(),
-            "domain",
-            &[],
-        )
-        .unwrap();
-
-        match reader.read_type_implementation_input_hash("main", "foo", "domain") {
-            BlobFetchResult::Found(hash_hex) => {
-                assert_eq!(hash_hex, expected.as_digest().as_str());
-            }
-            other => panic!("expected Found, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn test_read_type_implementation_input_hash_uses_committed_branch_blobs_over_worktree_changes()
-    {
-        let dir = setup_repo_with_implementation_inputs();
-        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        let committed_hash = crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-            dir.path(),
-            "domain",
-            &[],
-        )
-        .unwrap();
-
-        std::fs::write(
-            dir.path().join("libs/domain/src/lib.rs"),
-            "pub struct WorktreeOnlyChange;\n",
-        )
-        .unwrap();
-        let worktree_hash = crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-            dir.path(),
-            "domain",
-            &[],
-        )
-        .unwrap();
-        assert_ne!(
-            committed_hash, worktree_hash,
-            "the worktree mutation must change the local implementation-input hash"
-        );
-
-        match reader.read_type_implementation_input_hash("main", "foo", "domain") {
-            BlobFetchResult::Found(hash_hex) => {
-                assert_eq!(hash_hex, committed_hash.as_digest().as_str());
-                assert_ne!(hash_hex, worktree_hash.as_digest().as_str());
-            }
-            other => panic!("expected Found, got {other:?}"),
-        }
-    }
-
-    #[test]
-    fn test_read_type_implementation_input_hash_includes_committed_path_dependency_sources() {
-        let dir = setup_repo_with_usecase_path_dependency_inputs();
-        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        let expected = crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-            dir.path(),
-            "usecase",
-            &[],
-        )
-        .unwrap();
-
-        let branch_hash = match reader.read_type_implementation_input_hash("main", "foo", "usecase")
-        {
-            BlobFetchResult::Found(hash_hex) => hash_hex,
-            other => panic!("expected Found, got {other:?}"),
-        };
-        assert_eq!(
-            branch_hash,
-            expected.as_digest().as_str(),
-            "local and branch hashes must agree for identical dependency closures"
-        );
-
-        std::fs::write(
-            dir.path().join("libs/domain/src/lib.rs"),
-            "pub struct WorktreeOnlyDomainChange;\n",
-        )
-        .unwrap();
-        let changed_local = crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-            dir.path(),
-            "usecase",
-            &[],
-        )
-        .unwrap();
-        assert_ne!(
-            expected, changed_local,
-            "a dependency source change must invalidate the local usecase hash"
-        );
-
-        let unchanged_branch =
-            match reader.read_type_implementation_input_hash("main", "foo", "usecase") {
-                BlobFetchResult::Found(hash_hex) => hash_hex,
-                other => panic!("expected Found, got {other:?}"),
-            };
-        assert_eq!(
-            unchanged_branch,
-            expected.as_digest().as_str(),
-            "branch hashing must remain based on committed dependency blobs"
-        );
-    }
-
-    #[test]
-    fn test_read_type_implementation_input_hash_fails_closed_when_inputs_are_unavailable() {
-        let dir = setup_repo_with_track("foo", &[]);
-        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        assert!(matches!(
-            reader.read_type_implementation_input_hash("main", "foo", "domain"),
-            BlobFetchResult::FetchError(_)
-        ));
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_read_type_implementation_input_hash_maps_structurally_absent_nightly_to_not_found() {
-        use std::os::unix::fs::PermissionsExt;
-
-        let dir = setup_repo_with_implementation_inputs();
-        std::fs::remove_file(dir.path().join(".test-nightly-toolchain-identity")).unwrap();
-        let fake_bin = tempfile::tempdir().unwrap();
-        let fake_rustup = fake_bin.path().join("rustup");
-        std::fs::write(
-            &fake_rustup,
-            "#!/bin/sh\nif [ \"$1\" = \"toolchain\" ] && [ \"$2\" = \"list\" ]; then\nprintf 'stable-x86_64-unknown-linux-gnu (default)\\n'\nexit 0\nfi\nexit 1\n",
-        )
-        .unwrap();
-        std::fs::set_permissions(&fake_rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
-        let mut path = fake_bin.path().as_os_str().to_os_string();
-        path.push(":");
-        path.push(std::env::var_os("PATH").unwrap_or_default());
-
-        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        let result = crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
-            temp_env::with_var("PATH", Some(path), || {
-                reader.read_type_implementation_input_hash("main", "foo", "domain")
-            })
-        });
-
-        assert_eq!(result, BlobFetchResult::NotFound);
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_read_type_implementation_input_hash_maps_nightly_probe_failure_to_fetch_error() {
-        use std::os::unix::fs::PermissionsExt;
-
-        let dir = setup_repo_with_implementation_inputs();
-        std::fs::remove_file(dir.path().join(".test-nightly-toolchain-identity")).unwrap();
-        let fake_bin = tempfile::tempdir().unwrap();
-        let fake_rustup = fake_bin.path().join("rustup");
-        std::fs::write(
-            &fake_rustup,
-            "#!/bin/sh\nif [ \"$1\" = \"toolchain\" ] && [ \"$2\" = \"list\" ]; then\nprintf 'nightly-x86_64-unknown-linux-gnu\\n'\nexit 0\nfi\nexit 1\n",
-        )
-        .unwrap();
-        std::fs::set_permissions(&fake_rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
-        let mut path = fake_bin.path().as_os_str().to_os_string();
-        path.push(":");
-        path.push(std::env::var_os("PATH").unwrap_or_default());
-
-        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        let result = crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
-            temp_env::with_var("PATH", Some(path), || {
-                reader.read_type_implementation_input_hash("main", "foo", "domain")
-            })
-        });
-
-        assert!(matches!(result, BlobFetchResult::FetchError(_)));
-    }
-
-    #[test]
     fn test_read_authoritative_inputs_bad_branch_fail_closed() {
         let dir = setup_repo_with_track("foo", &[]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
@@ -1224,10 +929,6 @@ mod tests {
         assert!(matches!(reader.read_spec_document(branch, "foo"), BlobFetchResult::FetchError(_)));
         assert!(matches!(
             reader.read_type_catalogue(branch, "foo", "domain"),
-            BlobFetchResult::FetchError(_)
-        ));
-        assert!(matches!(
-            reader.read_type_implementation_input_hash(branch, "foo", "domain"),
             BlobFetchResult::FetchError(_)
         ));
         assert!(matches!(reader.read_impl_plan(branch, "foo"), BlobFetchResult::FetchError(_)));
@@ -1856,7 +1557,7 @@ decisions:
   "schema_version": 4,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "implementation_input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "head_commit": "0000000000000000000000000000000000000000",
   "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
@@ -1881,8 +1582,8 @@ decisions:
                     "0000000000000000000000000000000000000000000000000000000000000000"
                 );
                 assert_eq!(
-                    doc.cache_key().implementation_input_hash().as_digest().as_str(),
-                    "0000000000000000000000000000000000000000000000000000000000000000"
+                    doc.cache_key().head_commit().as_ref(),
+                    "0000000000000000000000000000000000000000"
                 );
                 assert_eq!(
                     doc.cache_key().baseline_hash().as_digest().as_str(),

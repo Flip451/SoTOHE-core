@@ -494,6 +494,25 @@ fn test_run_maps_authoritative_and_cache_write_executor_failures() {
 }
 
 #[test]
+fn test_run_maps_evaluation_variant_from_executor_to_layered_failure() {
+    let interactor = build_interactor(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(StagedFailingExecutor(TypeSignalsExecutionError::Evaluation(
+            crate::git_workflow::DiagnosticText::new("signal evaluator rejected the graph"),
+        ))),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+
+    let error = interactor.run(valid_request(tmp.path())).unwrap_err();
+
+    assert!(matches!(
+        error,
+        TypeSignalsError::EvaluationFailed { ref layer_id, ref reason }
+            if layer_id.as_ref() == "domain" && reason.as_str() == "signal evaluator rejected the graph"
+    ));
+}
+
+#[test]
 fn test_run_with_invalid_layer_binding_preserves_diagnostic_text() {
     let interactor = build_interactor(
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("invalid layer")] }),

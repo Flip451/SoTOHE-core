@@ -13,5 +13,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | cli::commands::git::execute | free_function | reference | fn(cmd: GitCommand) -> std::process::ExitCode | 🔵 | 🔵 |
-| cli::commands::track::dispatch::dispatch_track_cmd_with_base_merge | free_function | add | fn(cmd: TrackCommand, base_merge: impl FnOnce(cli_driver::track::BaseMergeInput) -> cli_driver::CommandOutcome) -> Result<std::process::ExitCode, crate::CliError> | 🔵 | 🔵 |
+| cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies | free_function | add | fn(cmd: TrackCommand, base_merge: impl FnOnce(cli_driver::track::BaseMergeInput) -> cli_driver::CommandOutcome) -> Result<std::process::ExitCode, crate::CliError> | 🔵 | 🔵 |
 

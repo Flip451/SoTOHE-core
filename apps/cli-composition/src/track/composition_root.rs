@@ -36,23 +36,35 @@ impl TrackCompositionRoot {
     /// calls `FixpointResolveDriverService::fixpoint_resolve` itself (ADR
     /// 2026-06-21-1328 D2: composition root is wire-only).
     pub fn track_driver(&self) -> cli_driver::track::TrackDriver {
-        use std::sync::Arc;
-
-        use super::service_impl::TrackServiceImpl;
-
-        let service = Arc::new(TrackServiceImpl);
-        let fixpoint_resolve_service =
-            Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
-                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointWorkspaceContextAdapter),
-                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsDryCheckConfigLoaderAdapter),
-                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointDryGateFactoryAdapter),
-                Arc::new(infrastructure::track::fixpoint_resolve_driver::FsFixpointGateStateFactoryAdapter),
-            ));
-        let base_merge_service = Arc::new(usecase::base_merge::BaseMergeInteractor::new(
-            Arc::new(infrastructure::base_merge::FsBaseMergeContextAdapter::new()),
-            Arc::new(infrastructure::base_merge::FsBaseMergeGitAdapter::new()),
-            Arc::new(infrastructure::base_merge::FsBaseMergeCleanupAdapter::new()),
-        ));
-        cli_driver::track::TrackDriver::new(service, fixpoint_resolve_service, base_merge_service)
+        build_track_driver()
     }
+}
+
+pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
+    use std::sync::Arc;
+
+    use super::service_impl::TrackServiceImpl;
+
+    let service = Arc::new(TrackServiceImpl);
+    let fixpoint_resolve_service =
+        Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
+            Arc::new(
+                infrastructure::track::fixpoint_resolve_driver::FsFixpointWorkspaceContextAdapter,
+            ),
+            Arc::new(infrastructure::track::fixpoint_resolve_driver::FsDryCheckConfigLoaderAdapter),
+            Arc::new(
+                infrastructure::track::fixpoint_resolve_driver::FsFixpointDryGateFactoryAdapter,
+            ),
+            Arc::new(
+                infrastructure::track::fixpoint_resolve_driver::FsFixpointGateStateFactoryAdapter,
+            ),
+        ));
+    let base_merge_cleanup: Arc<dyn usecase::base_merge::BaseMergeCleanupPort> =
+        Arc::new(infrastructure::base_merge::FsBaseMergeCleanupAdapter::new());
+    let base_merge_service = Arc::new(usecase::base_merge::BaseMergeInteractor::new(
+        Arc::new(infrastructure::base_merge::FsBaseMergeContextAdapter::new()),
+        Arc::new(infrastructure::base_merge::FsBaseMergeGitAdapter::new()),
+        base_merge_cleanup,
+    ));
+    cli_driver::track::TrackDriver::new(service, fixpoint_resolve_service, base_merge_service)
 }

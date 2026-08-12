@@ -176,9 +176,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`batch-plan.json` の scope 名を review scope 設定に照合し、未知名を fail-closed で拒否する](2026-07-30-0951-batch-plan-scope-name-config-validation.md) | Accepted | 2026-07-30 |
 | [`batch-plan.json` の宣言対象を未 settle タスクに限定する](2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md) | Accepted | 2026-07-30 |
 | [per-task commit hash の記録時に repository 実在と HEAD 到達可能性を要求する](2026-07-30-2101-per-task-commit-hash-record-time-validation.md) | Accepted | 2026-07-30 |
-| [clean な base merge 後の baseline 再取得と同期状態の原子的 lifecycle を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
-| [type-signals の権威照合は権威が存在する文脈に限定する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
-| [conflict recovery 中の base-owned catalogue delta は exact merged base baseline で照合する](2026-08-09-1210-base-owned-catalogue-deltas-conflict-recovery.md) | Proposed | 2026-08-09 |
+| [base merge 後の baseline 再取得と同期記録を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
+| [type-signals cache は clean な同一 HEAD commit でのみ再利用する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
 | [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
 
 ### ADR 運用

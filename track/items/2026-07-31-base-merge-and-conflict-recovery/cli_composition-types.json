@@ -4,5 +4,6 @@
   "layer": "cli_composition",
   "schema_version": 5,
   "traits": {},
-  "types": {}
+  "types": {
+  }
 }

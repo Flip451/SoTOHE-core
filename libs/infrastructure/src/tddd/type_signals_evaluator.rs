@@ -1,24 +1,13 @@
 //! Per-layer type-signal evaluation with conservative rustdoc reuse.
 
-use std::cell::RefCell;
 use std::collections::BTreeMap;
-use std::io::Write;
-use std::path::Component;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
-use std::sync::atomic::{AtomicU64, Ordering};
 
-#[cfg(unix)]
-use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
-
-#[path = "type_signals_evaluator/build_inputs.rs"]
-pub(crate) mod build_inputs;
 #[path = "type_signals_evaluator/freshness.rs"]
 mod freshness;
 #[path = "type_signals_evaluator/inputs.rs"]
 pub(crate) mod inputs;
-#[path = "type_signals_evaluator/layer_graph.rs"]
-pub(crate) mod layer_graph;
 #[path = "type_signals_evaluator/signal_builder.rs"]
 mod signal_builder;
 #[path = "type_signals_evaluator/signal_tags.rs"]
@@ -28,10 +17,13 @@ use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::type_signals_doc::{
     BaselineHash, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsReuseDecision,
+    decide_type_signals_reuse,
 };
 use domain::{FreeText, Timestamp, TrackId};
-use freshness::{RustdocJsonPathProvider, reuse_decision_for_recorded_document};
-use inputs::{hash_workspace_inputs, read_utf8_file_limited, verify_evaluation_inputs_unchanged};
+use freshness::{RustdocJsonPathProvider, reuse_input_for_recorded_document};
+use inputs::{
+    read_head_commit, read_utf8_file_limited, verify_evaluation_inputs_unchanged, worktree_is_clean,
+};
 use signal_builder::build_type_signals_from_report;
 use signal_tags::{contract_role_kind_tag, data_role_kind_tag, function_role_kind_tag};
 
@@ -39,8 +31,11 @@ use signal_tags::{contract_role_kind_tag, data_role_kind_tag, function_role_kind
 pub use freshness::RustdocLaunchObserver;
 
 #[cfg(test)]
+static PROCESS_ENVIRONMENT_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+#[cfg(test)]
 pub(crate) fn with_process_environment_lock<T>(action: impl FnOnce() -> T) -> T {
-    let _environment_guard = match build_inputs::PROCESS_ENVIRONMENT_LOCK.lock() {
+    let _environment_guard = match PROCESS_ENVIRONMENT_LOCK.lock() {
         Ok(guard) => guard,
         Err(poisoned) => poisoned.into_inner(),
     };
@@ -61,10 +56,6 @@ use crate::verify::tddd_layers::TdddLayerBinding;
 const MAX_TYPE_SIGNALS_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RUSTDOC_JSON_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
-const MAX_RUSTDOC_WORKSPACE_DEPTH: usize = 64;
-const MAX_RUSTDOC_WORKSPACE_CLEANUP_ENTRIES: usize = 100_000;
-const MAX_RUSTDOC_WORKSPACE_ATTEMPTS: u64 = 128;
-static RUSTDOC_WORKSPACE_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Error returned when a layer's type signals cannot be evaluated safely.
 #[derive(Debug)]
@@ -113,291 +104,12 @@ pub(crate) fn reject_symlinked_type_signals_anchor(path: &Path, label: &str) -> 
     })
 }
 
-/// Bounded private workspace containing the Git-visible inputs for one target.
-struct GitVisibleWorkspace {
-    path: Option<PathBuf>,
-}
-impl GitVisibleWorkspace {
-    fn path(&self) -> Result<&Path, EvaluateSignalsError> {
-        self.path.as_deref().ok_or_else(|| {
-            EvaluateSignalsError::authoritative_input(
-                "temporary rustdoc workspace has already been cleaned up",
-            )
-        })
-    }
-
-    fn cleanup(mut self) -> Result<(), EvaluateSignalsError> {
-        let Some(path) = self.path.as_deref() else {
-            return Ok(());
-        };
-        let result = build_inputs::remove_workspace_tree(path);
-        if result.is_ok() {
-            self.path = None;
-        }
-        result
-    }
-}
-
-impl Drop for GitVisibleWorkspace {
-    fn drop(&mut self) {
-        if let Some(path) = self.path.as_deref() {
-            let _ = build_inputs::remove_workspace_tree(path);
-        }
-    }
-}
-fn materialize_git_visible_workspace(
-    workspace_root: &Path,
-    target: &str,
-) -> Result<GitVisibleWorkspace, EvaluateSignalsError> {
-    reject_symlinked_type_signals_anchor(workspace_root, "workspace_root")
-        .map_err(EvaluateSignalsError::authoritative_input)?;
-    let (paths, members) = build_inputs::rustdoc_input_paths(workspace_root, target)?;
-    let path = create_workspace_root()?;
-    let workspace = GitVisibleWorkspace { path: Some(path) };
-    let result = materialize_workspace_files(workspace_root, &workspace, &paths, &members);
-    match result {
-        Ok(()) => Ok(workspace),
-        Err(error) => match workspace.cleanup() {
-            Ok(()) => Err(error),
-            Err(cleanup_error) => Err(EvaluateSignalsError::authoritative_input(format!(
-                "{error}; temporary rustdoc workspace cleanup failed: {cleanup_error}"
-            ))),
-        },
-    }
-}
-
-fn materialize_workspace_files(
-    workspace_root: &Path,
-    workspace: &GitVisibleWorkspace,
-    paths: &[String],
-    members: &[String],
-) -> Result<(), EvaluateSignalsError> {
-    let destination_root = workspace.path()?;
-    let mut remaining_budget = build_inputs::MAX_TOTAL_SOURCE_BYTES;
-    let manifest_path = workspace_root.join("Cargo.toml");
-    let manifest = build_inputs::read_regular_source_file(
-        &manifest_path,
-        build_inputs::MAX_SOURCE_FILE_BYTES,
-        &mut remaining_budget,
-    )?;
-    let manifest = build_inputs::filtered_workspace_manifest(&manifest, members)?;
-    write_snapshot_file(destination_root, "Cargo.toml", &manifest)?;
-
-    let lockfile_path = workspace_root.join("Cargo.lock");
-    let lockfile = build_inputs::read_regular_source_file(
-        &lockfile_path,
-        build_inputs::MAX_SOURCE_FILE_BYTES,
-        &mut remaining_budget,
-    )?;
-    write_snapshot_file(destination_root, "Cargo.lock", &lockfile)?;
-
-    for relative in paths {
-        if matches!(relative.as_str(), "Cargo.toml" | "Cargo.lock") {
-            continue;
-        }
-        let source = workspace_root.join(relative);
-        let metadata = match std::fs::symlink_metadata(&source) {
-            Ok(metadata) => metadata,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
-            Err(error) => {
-                return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "cannot inspect Git-visible rustdoc input '{}': {error}",
-                    source.display()
-                )));
-            }
-        };
-        if !metadata.is_file() || metadata.file_type().is_symlink() {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "Git-visible rustdoc input '{}' is not a regular file",
-                source.display()
-            )));
-        }
-        let bytes = build_inputs::read_regular_source_file(
-            &source,
-            build_inputs::MAX_SOURCE_FILE_BYTES,
-            &mut remaining_budget,
-        )?;
-        write_snapshot_file(destination_root, relative, &bytes)?;
-    }
-    Ok(())
-}
-
-fn create_workspace_root() -> Result<PathBuf, EvaluateSignalsError> {
-    let base = std::fs::canonicalize(std::env::temp_dir()).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot resolve temporary directory: {error}"
-        ))
-    })?;
-    let metadata = std::fs::symlink_metadata(&base).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot inspect temporary directory: {error}"
-        ))
-    })?;
-    if !metadata.is_dir() {
-        return Err(EvaluateSignalsError::authoritative_input(
-            "temporary directory is not a directory",
-        ));
-    }
-    for _ in 0..MAX_RUSTDOC_WORKSPACE_ATTEMPTS {
-        let sequence = RUSTDOC_WORKSPACE_SEQUENCE.fetch_add(1, Ordering::Relaxed);
-        let candidate =
-            base.join(format!("sotp-rustdoc-visible-{}-{sequence}", std::process::id()));
-        match build_inputs::create_private_dir(&candidate) {
-            Ok(()) => return Ok(candidate),
-            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
-            Err(error) => {
-                return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "cannot create temporary rustdoc workspace '{}': {error}",
-                    candidate.display()
-                )));
-            }
-        }
-    }
-    Err(EvaluateSignalsError::authoritative_input(
-        "could not allocate a unique temporary rustdoc workspace",
-    ))
-}
-
-fn write_snapshot_file(
-    destination_root: &Path,
-    relative: &str,
-    bytes: &[u8],
-) -> Result<(), EvaluateSignalsError> {
-    let relative_path = Path::new(relative);
-    create_workspace_parent(destination_root, relative_path)?;
-    let destination = destination_root.join(relative_path);
-    crate::track::symlink_guard::reject_symlinks_below(&destination, destination_root).map_err(
-        |error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "temporary rustdoc path rejected: {error}"
-            ))
-        },
-    )?;
-    let mut options = std::fs::OpenOptions::new();
-    options.write(true).create_new(true);
-    #[cfg(unix)]
-    options.mode(0o600);
-    let mut output = options.open(&destination).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot create temporary rustdoc file '{}': {error}",
-            destination.display()
-        ))
-    })?;
-    output.write_all(bytes).map_err(|error| {
-        EvaluateSignalsError::authoritative_input(format!(
-            "cannot write temporary rustdoc file '{}': {error}",
-            destination.display()
-        ))
-    })?;
-    #[cfg(unix)]
-    std::fs::set_permissions(&destination, std::fs::Permissions::from_mode(0o600)).map_err(
-        |error| {
-            EvaluateSignalsError::authoritative_input(format!(
-                "cannot secure temporary rustdoc file: {error}"
-            ))
-        },
-    )?;
-    Ok(())
-}
-
-fn create_workspace_parent(
-    destination_root: &Path,
-    relative: &Path,
-) -> Result<(), EvaluateSignalsError> {
-    let mut current = destination_root.to_path_buf();
-    let mut depth = 0_usize;
-    for component in relative.parent().unwrap_or_else(|| Path::new("")).components() {
-        let Component::Normal(name) = component else {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "temporary rustdoc path has an unsafe component: {}",
-                relative.display()
-            )));
-        };
-        depth = depth.saturating_add(1);
-        if depth > MAX_RUSTDOC_WORKSPACE_DEPTH {
-            return Err(EvaluateSignalsError::authoritative_input(format!(
-                "temporary rustdoc path exceeds maximum depth: {}",
-                relative.display()
-            )));
-        }
-        current.push(name);
-        match std::fs::symlink_metadata(&current) {
-            Ok(metadata) if metadata.file_type().is_symlink() || !metadata.is_dir() => {
-                return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "temporary rustdoc parent is not a directory: {}",
-                    current.display()
-                )));
-            }
-            Ok(_) => {}
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                build_inputs::create_private_dir(&current).map_err(|error| {
-                    EvaluateSignalsError::authoritative_input(format!(
-                        "cannot create temporary rustdoc directory '{}': {error}",
-                        current.display()
-                    ))
-                })?;
-            }
-            Err(error) => {
-                return Err(EvaluateSignalsError::authoritative_input(format!(
-                    "cannot inspect temporary rustdoc directory '{}': {error}",
-                    current.display()
-                )));
-            }
-        }
-    }
-    Ok(())
-}
-
-/// Supplies rustdoc from a lazily-created Git-visible implementation-input tree.
-struct GitVisibleRustdocProvider {
-    workspace_root: PathBuf,
-    snapshot: RefCell<Option<GitVisibleWorkspace>>,
-}
-impl GitVisibleRustdocProvider {
-    fn new(workspace_root: &Path) -> Self {
-        Self { workspace_root: workspace_root.to_path_buf(), snapshot: RefCell::new(None) }
-    }
-
-    fn cleanup(self) -> Result<(), EvaluateSignalsError> {
-        self.snapshot.into_inner().map_or(Ok(()), |snapshot| snapshot.cleanup())
-    }
-}
-
-impl RustdocJsonPathProvider for GitVisibleRustdocProvider {
-    fn export_rustdoc_json_path(
-        &self,
-        crate_name: &CrateName,
-        features: &[CargoFeatureName],
-    ) -> Result<PathBuf, domain::schema::SchemaExportError> {
-        let mut snapshot = self.snapshot.borrow_mut();
-        if snapshot.is_none() {
-            let workspace =
-                materialize_git_visible_workspace(&self.workspace_root, crate_name.as_str())
-                    .map_err(|error| {
-                        domain::schema::SchemaExportError::RustdocFailed(error.to_string())
-                    })?;
-            *snapshot = Some(workspace);
-        }
-        let workspace_root = snapshot
-            .as_ref()
-            .ok_or_else(|| {
-                domain::schema::SchemaExportError::RustdocFailed(
-                    "Git-visible rustdoc workspace was not created".to_owned(),
-                )
-            })?
-            .path()
-            .map_err(|error| domain::schema::SchemaExportError::RustdocFailed(error.to_string()))?;
-        RustdocSchemaExporter::new(workspace_root.to_path_buf())
-            .export_rustdoc_json_path_with_features(crate_name, features)
-    }
-}
-
 /// Evaluates and writes type signals for one TDDD-enabled layer.
 ///
 /// # Errors
 ///
-/// Returns an error when required files cannot be read, rustdoc cannot be
-/// obtained, or the implementation input identity is unavailable.
+/// Returns an error when required files cannot be read or rustdoc cannot be
+/// obtained safely.
 pub fn execute_type_signals_for_layer(
     items_dir: &Path,
     track_id: &TrackId,
@@ -405,24 +117,8 @@ pub fn execute_type_signals_for_layer(
     binding: &TdddLayerBinding,
     features: &[CargoFeatureName],
 ) -> Result<ExitCode, EvaluateSignalsError> {
-    let exporter = GitVisibleRustdocProvider::new(workspace_root);
-    let result = execute_with_dependencies(
-        items_dir,
-        track_id,
-        workspace_root,
-        binding,
-        features,
-        &exporter,
-    );
-    let cleanup = exporter.cleanup();
-    match (result, cleanup) {
-        (Ok(exit_code), Ok(())) => Ok(exit_code),
-        (Err(error), Ok(())) => Err(error),
-        (Ok(_), Err(error)) => Err(error),
-        (Err(error), Err(cleanup_error)) => Err(EvaluateSignalsError::authoritative_input(
-            format!("{error}; temporary rustdoc workspace cleanup failed: {cleanup_error}"),
-        )),
-    }
+    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
+    execute_with_dependencies(items_dir, track_id, workspace_root, binding, features, &exporter)
 }
 
 #[cfg(feature = "test-helpers")]
@@ -494,21 +190,27 @@ fn execute_with_dependencies(
     };
     let declaration_hash = type_signals_codec::declaration_hash(&catalogue_bytes);
     let (baseline_json, baseline_hash) = read_actual_baseline(&baseline_path)?;
-    let implementation_hash = hash_workspace_inputs(&canonical_workspace, target_crate, features)?;
+    let head_commit = read_head_commit(&canonical_workspace)?;
     let current_key = TypeSignalsCacheKey::new(
         declaration_hash.clone(),
-        implementation_hash.clone(),
+        head_commit.clone(),
         baseline_hash.clone(),
     );
     let recorded = read_utf8_file_limited(&signal_path, MAX_TYPE_SIGNALS_BYTES)
         .ok()
         .and_then(|text| type_signals_codec::decode(&text).ok());
-    match reuse_decision_for_recorded_document(recorded.as_ref(), &current_key) {
+    let reuse_input = reuse_input_for_recorded_document(
+        recorded.as_ref(),
+        &current_key,
+        worktree_is_clean(&canonical_workspace)?,
+    );
+    let reuse_decision = reuse_input
+        .as_ref()
+        .map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, decide_type_signals_reuse);
+    match reuse_decision {
         TypeSignalsReuseDecision::SkipEvaluation => {
             verify_evaluation_inputs_unchanged(
                 &canonical_workspace,
-                target_crate,
-                features,
                 &catalogue_path,
                 &baseline_path,
                 &current_key,
@@ -538,13 +240,6 @@ fn execute_with_dependencies(
             json_path.display()
         ))
     })?;
-    let current_implementation_hash =
-        hash_workspace_inputs(&canonical_workspace, target_crate, features)?;
-    if current_implementation_hash != implementation_hash {
-        return Err(EvaluateSignalsError::authoritative_input(format!(
-            "implementation inputs for '{target_crate}' changed during rustdoc extraction; re-run the evaluation"
-        )));
-    }
     evaluate_and_write(
         &catalogue_bytes,
         &catalogue_path,
@@ -553,10 +248,9 @@ fn execute_with_dependencies(
         &canonical_items,
         target_crate,
         binding,
-        features,
         content,
         declaration_hash,
-        implementation_hash,
+        head_commit,
         &baseline_path,
         &baseline_json,
         baseline_hash,
@@ -572,10 +266,9 @@ fn evaluate_and_write(
     trusted_items_root: &Path,
     target_crate: &str,
     binding: &TdddLayerBinding,
-    features: &[CargoFeatureName],
     rustdoc_json: String,
     declaration_hash: domain::CatalogueDeclarationHash,
-    implementation_hash: domain::ImplementationInputHash,
+    head_commit: domain::CommitHash,
     baseline_path: &Path,
     baseline_json: &str,
     baseline_hash: BaselineHash,
@@ -631,13 +324,11 @@ fn evaluate_and_write(
     reject_type_signals_path(catalogue_path, trusted_items_root, "catalogue")?;
     verify_evaluation_inputs_unchanged(
         workspace_root,
-        target_crate,
-        features,
         catalogue_path,
         baseline_path,
         &TypeSignalsCacheKey::new(
             declaration_hash.clone(),
-            implementation_hash.clone(),
+            head_commit.clone(),
             baseline_hash.clone(),
         ),
     )?;
@@ -647,7 +338,7 @@ fn evaluate_and_write(
         })?;
     let document = TypeSignalsDocument::new(
         generated_at,
-        TypeSignalsCacheKey::new(declaration_hash, implementation_hash, baseline_hash),
+        TypeSignalsCacheKey::new(declaration_hash, head_commit, baseline_hash),
         build_type_signals_from_report(report.iter(), &kinds),
     );
     let encoded = type_signals_codec::encode(&document).map_err(|error| {
@@ -700,60 +391,11 @@ fn read_actual_baseline(path: &Path) -> Result<(String, BaselineHash), EvaluateS
 
 #[cfg(test)]
 #[cfg(feature = "test-helpers")]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use crate::verify::tddd_layers::parse_tddd_layers;
-
-    #[cfg(unix)]
-    fn with_fake_rustup<T>(action: impl FnOnce() -> T) -> T {
-        use std::os::unix::fs::PermissionsExt;
-
-        with_process_environment_lock(|| {
-            let fake_bin = tempfile::tempdir().unwrap();
-            let rustup = fake_bin.path().join("rustup");
-            std::fs::write(&rustup, "#!/bin/sh\nprintf 'nightly-test\\n'\n").unwrap();
-            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
-            let mut path_entries = vec![fake_bin.path().to_owned()];
-            if let Some(path) = std::env::var_os("PATH") {
-                path_entries.extend(std::env::split_paths(&path));
-            }
-            let path = std::env::join_paths(path_entries).unwrap();
-            temp_env::with_var("PATH", Some(path.as_os_str()), action)
-        })
-    }
-
-    #[cfg(unix)]
-    fn with_fake_rustup_mutating_file_on_second_hash<T>(
-        mutation_path: &Path,
-        mutation: &str,
-        action: impl FnOnce() -> T,
-    ) -> T {
-        use std::os::unix::fs::PermissionsExt;
-
-        with_process_environment_lock(|| {
-            let fake_bin = tempfile::tempdir().unwrap();
-            let counter_path = fake_bin.path().join("rustup-count");
-            let rustup = fake_bin.path().join("rustup");
-            std::fs::write(
-                &rustup,
-                format!(
-                    "#!/bin/sh\ncount=0\nif [ -r '{counter}' ]; then IFS= read -r count < '{counter}'; fi\ncount=$((count + 1))\nprintf '%s' \"$count\" > '{counter}'\nif [ \"$count\" -eq 3 ]; then printf '%s' '{mutation}' >> '{path}'; fi\nprintf 'nightly-test\\n'\n",
-                    counter = counter_path.display(),
-                    mutation = mutation,
-                    path = mutation_path.display(),
-                ),
-            )
-            .unwrap();
-            std::fs::set_permissions(&rustup, std::fs::Permissions::from_mode(0o755)).unwrap();
-            let mut path_entries = vec![fake_bin.path().to_owned()];
-            if let Some(path) = std::env::var_os("PATH") {
-                path_entries.extend(std::env::split_paths(&path));
-            }
-            let path = std::env::join_paths(path_entries).unwrap();
-            temp_env::with_var("PATH", Some(path.as_os_str()), action)
-        })
-    }
+    use usecase::merge_gate::{BlobFetchResult, TrackBlobReader};
 
     fn rustdoc_json() -> String {
         format!(
@@ -783,7 +425,7 @@ mod tests {
         .unwrap();
         std::fs::write(
             root.join("libs/infrastructure/Cargo.toml"),
-            "[package]\nname = \"infrastructure\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[features]\nsemantic-dup = []\n",
+            "[package]\nname = \"infrastructure\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
         )
         .unwrap();
         std::fs::write(root.join("libs/infrastructure/src/lib.rs"), "pub struct Fixture;\n")
@@ -797,6 +439,11 @@ mod tests {
         let json = rustdoc_json();
         std::fs::write(&rustdoc_path, &json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), json).unwrap();
+        std::fs::write(
+            root.join(".gitignore"),
+            "track/items/feature-input-track/infrastructure-type-signals.json\n",
+        )
+        .unwrap();
         let rules = r#"{
             "version": 2,
             "layers": [{
@@ -811,6 +458,8 @@ mod tests {
             }]
         }"#;
         std::fs::write(root.join("architecture-rules.json"), rules).unwrap();
+        crate::verify::test_support::run_git(root, &["add", "."]);
+        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
         let binding = parse_tddd_layers(rules).unwrap().pop().unwrap();
 
         (workspace, items_dir, track_id, binding, rustdoc_path)
@@ -820,350 +469,341 @@ mod tests {
         items_dir.join(track_id.as_ref()).join("infrastructure-type-signals.json")
     }
 
-    fn current_document(
-        workspace_root: &Path,
+    fn cache_document(
         items_dir: &Path,
         track_id: &TrackId,
+        head_commit: domain::CommitHash,
     ) -> TypeSignalsDocument {
         let track_dir = items_dir.join(track_id.as_ref());
         let catalogue = std::fs::read(track_dir.join("infrastructure-types.json")).unwrap();
         let (_, baseline_hash) =
             read_actual_baseline(&track_dir.join("infrastructure-types-baseline.json")).unwrap();
-        let implementation_hash = with_fake_rustup(|| {
-            hash_workspace_inputs(workspace_root, "infrastructure", &[]).unwrap()
-        });
-
         TypeSignalsDocument::new(
             Timestamp::new("2026-07-31T00:00:00Z").unwrap(),
             TypeSignalsCacheKey::new(
                 type_signals_codec::declaration_hash(&catalogue),
-                implementation_hash,
+                head_commit,
                 baseline_hash,
             ),
             vec![],
         )
     }
 
-    fn write_current_cache(workspace_root: &Path, items_dir: &Path, track_id: &TrackId) -> String {
-        let encoded =
-            type_signals_codec::encode(&current_document(workspace_root, items_dir, track_id))
-                .unwrap();
+    fn current_cache_document(
+        workspace_root: &Path,
+        items_dir: &Path,
+        track_id: &TrackId,
+    ) -> TypeSignalsDocument {
+        cache_document(items_dir, track_id, read_head_commit(workspace_root).unwrap())
+    }
+
+    fn write_cache(
+        items_dir: &Path,
+        track_id: &TrackId,
+        head_commit: domain::CommitHash,
+    ) -> String {
+        let document = cache_document(items_dir, track_id, head_commit);
+        let encoded = type_signals_codec::encode(&document).unwrap();
         std::fs::write(signal_path(items_dir, track_id), &encoded).unwrap();
         encoded
     }
 
-    fn execute_with_observer(
-        items_dir: &Path,
-        track_id: &TrackId,
-        workspace_root: &Path,
-        binding: &TdddLayerBinding,
-        observer: &RustdocLaunchObserver,
-    ) -> Result<ExitCode, EvaluateSignalsError> {
-        with_fake_rustup(|| {
-            execute_type_signals_for_layer_with_launch_observer(
-                items_dir,
-                track_id,
-                workspace_root,
-                binding,
-                &[],
-                observer,
-            )
-        })
-    }
-
     #[test]
-    fn test_execute_type_signals_feature_selection_change_reextracts_and_reaches_rustdoc() {
+    fn test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache() {
         let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let declared_feature = CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap();
+        let original =
+            write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
         let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        with_fake_rustup(|| {
+        assert_eq!(
             execute_type_signals_for_layer_with_launch_observer(
                 &items_dir,
                 &track_id,
                 workspace.path(),
                 &binding,
-                std::slice::from_ref(&declared_feature),
+                &[],
                 &observer,
             )
-        })
+            .unwrap(),
+            ExitCode::SUCCESS
+        );
+        assert_eq!(observer.launches(), 0);
+        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
+    }
+
+    #[test]
+    fn test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let head_commit = read_head_commit(workspace.path()).unwrap();
+        write_cache(&items_dir, &track_id, head_commit);
+        std::fs::write(
+            workspace.path().join("libs/infrastructure/src/lib.rs"),
+            "pub struct ChangedFixture;\n",
+        )
         .unwrap();
-        let signal_path =
-            items_dir.join(track_id.as_ref()).join("infrastructure-type-signals.json");
-        let first =
-            type_signals_codec::decode(&std::fs::read_to_string(&signal_path).unwrap()).unwrap();
-
-        execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
-            .unwrap();
-        let second =
-            type_signals_codec::decode(&std::fs::read_to_string(signal_path).unwrap()).unwrap();
-
-        assert_eq!(
-            observer.feature_selections_for("infrastructure"),
-            vec![vec!["semantic-dup".to_owned()], Vec::new()],
-            "each measured rustdoc extraction must observe its declared feature selection"
-        );
-        assert_eq!(observer.launches_for("infrastructure"), 2);
-        assert_ne!(
-            first.cache_key().implementation_input_hash(),
-            second.cache_key().implementation_input_hash(),
-            "changing the declaration-derived feature selection must not reuse a stale artifact"
-        );
-    }
-
-    #[test]
-    fn test_execute_type_signals_all_three_hash_cache_hit_skips_evaluation() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let original = write_current_cache(workspace.path(), &items_dir, &track_id);
         let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
 
-        assert_eq!(
-            execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
-                .unwrap(),
-            ExitCode::SUCCESS
-        );
-        assert_eq!(observer.launches(), 0, "a full three-hash cache hit must not extract rustdoc");
-        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
-    }
+        execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        )
+        .unwrap();
 
-    #[cfg(unix)]
-    #[test]
-    fn test_execute_type_signals_cache_hit_input_mutation_fails_closed() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let original = write_current_cache(workspace.path(), &items_dir, &track_id);
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-
-        let source_path = workspace.path().join("libs/infrastructure/src/lib.rs");
-        let error = with_fake_rustup_mutating_file_on_second_hash(
-            &source_path,
-            "\\npub struct ChangedDuringCacheCheck;\\n",
-            || {
-                execute_type_signals_for_layer_with_launch_observer(
-                    &items_dir,
-                    &track_id,
-                    workspace.path(),
-                    &binding,
-                    &[],
-                    &observer,
-                )
-                .unwrap_err()
-            },
-        );
-
-        assert!(
-            error
-                .to_string()
-                .contains("implementation inputs changed during type-signal evaluation"),
-            "got: {error}"
-        );
-        assert_eq!(observer.launches(), 0, "a changed cache-hit input must not be reused");
-        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn test_execute_type_signals_cache_hit_catalogue_mutation_fails_closed() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let original = write_current_cache(workspace.path(), &items_dir, &track_id);
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-        let catalogue_path = items_dir.join(track_id.as_ref()).join("infrastructure-types.json");
-
-        let error = with_fake_rustup_mutating_file_on_second_hash(&catalogue_path, "\\n", || {
-            execute_type_signals_for_layer_with_launch_observer(
-                &items_dir,
-                &track_id,
-                workspace.path(),
-                &binding,
-                &[],
-                &observer,
-            )
-            .unwrap_err()
-        });
-
-        assert!(
-            error.to_string().contains("catalogue changed during type-signal evaluation"),
-            "got: {error}"
-        );
-        assert_eq!(observer.launches(), 0, "a changed cache-hit catalogue must not be reused");
-        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
-    }
-
-    #[test]
-    fn test_execute_type_signals_each_hash_mismatch_is_a_cache_miss() {
-        for mismatch in ["declaration", "implementation", "baseline"] {
-            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-            let original = write_current_cache(workspace.path(), &items_dir, &track_id);
-            let track_dir = items_dir.join(track_id.as_ref());
-            if mismatch == "declaration" {
-                let catalogue_path = track_dir.join("infrastructure-types.json");
-                let catalogue = std::fs::read_to_string(&catalogue_path).unwrap();
-                std::fs::write(catalogue_path, format!("{catalogue}\n")).unwrap();
-            } else if mismatch == "implementation" {
-                std::fs::write(
-                    workspace.path().join("libs/infrastructure/src/lib.rs"),
-                    "pub struct ChangedFixture;\n",
-                )
-                .unwrap();
-            } else {
-                assert_eq!(mismatch, "baseline");
-                std::fs::write(
-                    track_dir.join("infrastructure-types-baseline.json"),
-                    format!("{}\n", rustdoc_json()),
-                )
-                .unwrap();
-            }
-            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-
-            assert_eq!(
-                execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
-                    .unwrap(),
-                ExitCode::SUCCESS,
-                "{mismatch} mismatch must evaluate rather than reuse the old cache"
-            );
-            assert_eq!(
-                observer.launches(),
-                1,
-                "{mismatch} mismatch must obtain a fresh rustdoc artifact"
-            );
-            let replacement = std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap();
-            let replacement = type_signals_codec::decode(&replacement).unwrap();
-            assert_ne!(
-                type_signals_codec::encode(&replacement).unwrap(),
-                original,
-                "{mismatch} mismatch must replace the stale cache"
-            );
-            assert_eq!(
-                replacement.cache_key(),
-                current_document(workspace.path(), &items_dir, &track_id).cache_key(),
-                "{mismatch} replacement must use all current authoritative hashes"
-            );
-        }
-    }
-
-    #[test]
-    fn test_execute_type_signals_missing_malformed_or_schema_incompatible_cache_replaces_it() {
-        for invalid_cache in ["missing", "malformed", "schema-incompatible"] {
-            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-            let path = signal_path(&items_dir, &track_id);
-            if invalid_cache == "malformed" {
-                std::fs::write(&path, "{ malformed cache }").unwrap();
-            } else if invalid_cache == "schema-incompatible" {
-                let current = type_signals_codec::encode(&current_document(
-                    workspace.path(),
-                    &items_dir,
-                    &track_id,
-                ))
-                .unwrap();
-                let marker = format!("\"schema_version\": {}", domain::TYPE_SIGNALS_SCHEMA_VERSION);
-                std::fs::write(&path, current.replacen(&marker, "\"schema_version\": 3", 1))
-                    .unwrap();
-            } else {
-                assert_eq!(invalid_cache, "missing");
-            }
-            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-
-            assert_eq!(
-                execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
-                    .unwrap(),
-                ExitCode::SUCCESS,
-                "{invalid_cache} cache must be reevaluated"
-            );
-            assert_eq!(observer.launches(), 1, "{invalid_cache} cache must reextract rustdoc");
-            assert_eq!(
-                type_signals_codec::decode(&std::fs::read_to_string(&path).unwrap())
-                    .unwrap()
-                    .cache_key(),
-                current_document(workspace.path(), &items_dir, &track_id).cache_key()
-            );
-        }
-    }
-
-    #[test]
-    fn test_execute_type_signals_invalid_signal_value_cache_replaces_it() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let path = signal_path(&items_dir, &track_id);
-        let current =
-            type_signals_codec::encode(&current_document(workspace.path(), &items_dir, &track_id))
-                .unwrap();
-        let mut invalid: serde_json::Value = serde_json::from_str(&current).unwrap();
-        invalid.as_object_mut().unwrap().insert(
-            "signals".to_owned(),
-            serde_json::json!([{
-                "type_name": "Example",
-                "kind_tag": "struct",
-                "signal": "bogus",
-                "found_type": true
-            }]),
-        );
-        let invalid_json = serde_json::to_string_pretty(&invalid).unwrap();
-        assert!(matches!(
-            type_signals_codec::decode(&invalid_json),
-            Err(type_signals_codec::TypeSignalsCodecError::InvalidSignal(_))
-        ));
-        std::fs::write(&path, invalid_json).unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-
-        assert_eq!(
-            execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
-                .unwrap(),
-            ExitCode::SUCCESS
-        );
-        assert_eq!(observer.launches(), 1, "an invalid signal cache must be reevaluated");
-        let persisted =
-            type_signals_codec::decode(&std::fs::read_to_string(&path).unwrap()).unwrap();
-        let expected = current_document(workspace.path(), &items_dir, &track_id);
-        assert_eq!(persisted.cache_key(), expected.cache_key());
-        assert_eq!(persisted.signals(), expected.signals());
-    }
-
-    #[test]
-    fn test_execute_type_signals_evaluation_failure_fails_closed_without_replacing_cache() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let original = write_current_cache(workspace.path(), &items_dir, &track_id);
-        let catalogue_path = items_dir.join(track_id.as_ref()).join("infrastructure-types.json");
-        let catalogue = std::fs::read_to_string(&catalogue_path).unwrap();
-        std::fs::write(&catalogue_path, format!("{catalogue}\n")).unwrap();
-        std::fs::write(&rustdoc_path, "{ malformed rustdoc }").unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-
-        let error =
-            execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
-                .unwrap_err();
-        assert!(error.to_string().contains("cannot decode rustdoc JSON"));
         assert_eq!(observer.launches(), 1);
-        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
-    }
-
-    #[test]
-    fn test_execute_type_signals_successful_replacement_uses_atomic_write_path() {
-        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-
-        execute_with_observer(&items_dir, &track_id, workspace.path(), &binding, &observer)
-            .unwrap();
-
-        let path = signal_path(&items_dir, &track_id);
-        assert!(path.exists());
-        let persisted =
-            type_signals_codec::decode(&std::fs::read_to_string(path).unwrap()).unwrap();
-        let expected = current_document(workspace.path(), &items_dir, &track_id);
+        let persisted = type_signals_codec::decode(
+            &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+        )
+        .unwrap();
         assert_eq!(
             persisted.cache_key(),
-            expected.cache_key(),
-            "the replacement must persist all three current authoritative hashes"
+            current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
         );
+    }
+
+    #[test]
+    fn test_execute_type_signals_clean_worktree_with_different_head_recalculates() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        write_cache(&items_dir, &track_id, domain::CommitHash::try_new("b".repeat(40)).unwrap());
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+        execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        )
+        .unwrap();
+
+        assert_eq!(observer.launches(), 1);
+        let persisted = type_signals_codec::decode(
+            &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+        )
+        .unwrap();
         assert_eq!(
-            persisted.signals(),
-            expected.signals(),
-            "the replacement must persist the evaluator's expected signal set"
+            persisted.cache_key(),
+            current_cache_document(workspace.path(), &items_dir, &track_id).cache_key()
         );
-        assert!(
-            std::fs::read_dir(items_dir.join(track_id.as_ref())).unwrap().all(|entry| !entry
-                .unwrap()
-                .file_name()
-                .to_string_lossy()
-                .starts_with(".tmp-")),
-            "the atomic writer must leave no temporary replacement file"
+    }
+
+    #[test]
+    fn test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically() {
+        let invalid_cache_variants = [
+            ("missing", None),
+            ("malformed", Some("not-json".to_owned())),
+            (
+                "schema-mismatch",
+                Some(
+                    serde_json::json!({
+                        "schema_version": 999,
+                        "generated_at": "2026-07-31T00:00:00Z",
+                        "declaration_hash": "a".repeat(64),
+                        "head_commit": "b".repeat(40),
+                        "baseline_hash": "a".repeat(64),
+                        "signals": []
+                    })
+                    .to_string(),
+                ),
+            ),
+            (
+                "missing-required-field",
+                Some(
+                    serde_json::json!({
+                        "schema_version": 4,
+                        "generated_at": "2026-07-31T00:00:00Z",
+                        "declaration_hash": "a".repeat(64),
+                        "baseline_hash": "a".repeat(64),
+                        "signals": []
+                    })
+                    .to_string(),
+                ),
+            ),
+            (
+                "invalid-value",
+                Some(
+                    serde_json::json!({
+                        "schema_version": 4,
+                        "generated_at": "2026-07-31T00:00:00Z",
+                        "declaration_hash": "a".repeat(64),
+                        "head_commit": "not-a-commit",
+                        "baseline_hash": "a".repeat(64),
+                        "signals": []
+                    })
+                    .to_string(),
+                ),
+            ),
+        ];
+
+        for (label, invalid_cache) in invalid_cache_variants {
+            let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+            if let Some(invalid_cache) = invalid_cache {
+                std::fs::write(signal_path(&items_dir, &track_id), invalid_cache).unwrap();
+            }
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+            execute_type_signals_for_layer_with_launch_observer(
+                &items_dir,
+                &track_id,
+                workspace.path(),
+                &binding,
+                &[],
+                &observer,
+            )
+            .unwrap_or_else(|error| panic!("{label} cache must be treated as a miss: {error}"));
+
+            assert_eq!(observer.launches(), 1, "{label} cache must trigger evaluation");
+            let persisted = type_signals_codec::decode(
+                &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+            )
+            .unwrap();
+            assert_eq!(
+                persisted.cache_key(),
+                current_cache_document(workspace.path(), &items_dir, &track_id).cache_key(),
+                "{label} cache must be atomically replaced with current identities"
+            );
+        }
+    }
+
+    #[test]
+    fn test_execute_type_signals_cache_replacement_is_read_by_track_blob_reader() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+        execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        )
+        .unwrap();
+
+        assert_eq!(observer.launches(), 1, "a missing cache must trigger evaluation");
+        let persisted = type_signals_codec::decode(
+            &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),
+        )
+        .unwrap();
+
+        let root = workspace.path();
+        crate::verify::test_support::run_git(root, &["branch", "-M", "main"]);
+        crate::verify::test_support::run_git(
+            root,
+            &["remote", "add", "origin", root.to_str().unwrap()],
         );
+        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+        crate::verify::test_support::run_git(
+            root,
+            &["add", "-f", "track/items/feature-input-track/infrastructure-type-signals.json"],
+        );
+        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "replace cache"]);
+        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+
+        let reader =
+            crate::verify::merge_gate_adapter::GitShowTrackBlobReader::new(root.to_path_buf());
+        match reader.read_type_signals("main", track_id.as_ref(), "infrastructure") {
+            BlobFetchResult::Found(document) => {
+                assert_eq!(document.cache_key(), persisted.cache_key());
+                assert_eq!(document.signals(), persisted.signals());
+            }
+            other => {
+                panic!("the replaced cache must be readable through TrackBlobReader: {other:?}")
+            }
+        }
+    }
+
+    #[test]
+    fn test_unreadable_type_signals_reader_forces_cache_miss_and_reevaluation() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let root = workspace.path();
+        let signal_file = signal_path(&items_dir, &track_id);
+        let relative_signal_file =
+            "track/items/feature-input-track/infrastructure-type-signals.json";
+
+        // Start with a cache that would otherwise be eligible for reuse, then
+        // publish an unreadable replacement to the branch the blob reader sees.
+        write_cache(&items_dir, &track_id, read_head_commit(root).unwrap());
+        crate::verify::test_support::run_git(root, &["branch", "-M", "main"]);
+        crate::verify::test_support::run_git(
+            root,
+            &["remote", "add", "origin", root.to_str().unwrap()],
+        );
+        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+        std::fs::write(&signal_file, b"not valid json").unwrap();
+        crate::verify::test_support::run_git(root, &["add", "-f", relative_signal_file]);
+        crate::verify::test_support::run_git(
+            root,
+            &["commit", "--quiet", "-m", "unreadable cache"],
+        );
+        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+
+        let reader =
+            crate::verify::merge_gate_adapter::GitShowTrackBlobReader::new(root.to_path_buf());
+        match reader.read_type_signals("main", track_id.as_ref(), "infrastructure") {
+            BlobFetchResult::FetchError(message) => {
+                assert!(message.contains("decode error"), "reader diagnostic: {message}");
+            }
+            other => {
+                panic!("an existing malformed cache must be reported as unreadable: {other:?}")
+            }
+        }
+
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+        execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            root,
+            &binding,
+            &[],
+            &observer,
+        )
+        .unwrap();
+
+        assert_eq!(observer.launches(), 1, "unreadable cache must force reevaluation");
+        let replacement =
+            type_signals_codec::decode(&std::fs::read_to_string(&signal_file).unwrap()).unwrap();
+        assert_eq!(
+            replacement.cache_key(),
+            current_cache_document(root, &items_dir, &track_id).cache_key()
+        );
+
+        crate::verify::test_support::run_git(root, &["add", "-f", relative_signal_file]);
+        crate::verify::test_support::run_git(
+            root,
+            &["commit", "--quiet", "-m", "replace unreadable cache"],
+        );
+        crate::verify::test_support::run_git(root, &["fetch", "--quiet", "origin"]);
+        assert!(matches!(
+            reader.read_type_signals("main", track_id.as_ref(), "infrastructure"),
+            BlobFetchResult::Found(_)
+        ));
+    }
+
+    #[test]
+    fn test_execute_type_signals_unreadable_authority_does_not_reuse_cache() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let original =
+            write_cache(&items_dir, &track_id, read_head_commit(workspace.path()).unwrap());
+        std::fs::remove_file(items_dir.join(track_id.as_ref()).join("infrastructure-types.json"))
+            .unwrap();
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+        let result = execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        );
+
+        assert!(matches!(result, Err(EvaluateSignalsError::AuthoritativeInput(_))));
+        assert_eq!(observer.launches(), 0, "unreadable authority must not reuse the cache");
+        assert_eq!(std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(), original);
     }
 }

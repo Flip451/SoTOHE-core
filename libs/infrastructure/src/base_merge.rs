@@ -26,15 +26,19 @@ use crate::git_cli::{
     spawn_bounded_git_child, without_history_rewrites, without_repository_selection,
 };
 use crate::tddd::rustdoc_baseline_capture_adapter::RustdocBaselineCaptureAdapter;
-use crate::track::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
+use crate::track::atomic_write::atomic_write_file;
+use crate::track::symlink_guard::reject_symlinks_up_to_root;
 
 const MAX_BASE_MERGE_GIT_OUTPUT_BYTES: usize = 8 * 1024;
+const MAX_GUARDED_MERGE_PROVENANCE_BYTES: u64 = 8 * 1024;
 const MAX_CLEANUP_TREE_DEPTH: usize = 64;
 const MAX_CLEANUP_TREE_ENTRIES: usize = 10_000;
 const MAX_CLEANUP_FILE_BYTES: u64 = 64 * 1024 * 1024;
 const MAX_CLEANUP_TREE_BYTES: u64 = 256 * 1024 * 1024;
 const MAX_SYNC_BASE_RECORD_BYTES: u64 = 64 * 1024;
 pub(super) const BASELINE_REPLACEMENT_PHASE_MARKER: &str = ".sotp-baseline-replacement-phase";
+const GUARDED_MERGE_PROVENANCE_MARKER: &str = "# sotp-guarded-base-merge-v1";
+const MERGE_MESSAGE_FILE: &str = "MERGE_MSG";
 pub(super) const TRACK_WRITER_LOCK_FILE: &str = "metadata.json.lock";
 
 mod baseline_support;
@@ -42,31 +46,35 @@ mod cleanup_tree;
 mod errors;
 mod merge_state_probe;
 mod publication;
+mod recovery;
 mod sync_base;
 mod sync_base_record;
 mod view_transaction;
 mod worktree_probe;
 
+use baseline_support::regenerate_views_transactionally;
+#[cfg(test)]
 use baseline_support::{
-    add_commit_pinned_worktree, create_unique_directory, generated_baselines_changed,
-    regenerate_views_transactionally, remove_commit_pinned_worktree, snapshot_generated_baselines,
+    add_commit_pinned_worktree, create_unique_directory, remove_commit_pinned_worktree,
 };
+#[cfg(test)]
 use cleanup_tree::{
-    capture_baselines_in_worktree, collect_validated_baselines, copy_cleanup_inputs_with_baselines,
-    copy_tree_with_baselines, remove_tree_bounded,
+    collect_validated_baselines, copy_cleanup_inputs_with_baselines, copy_tree_with_baselines,
+    remove_tree_bounded,
 };
 use errors::{context_unavailable, git_execution_error};
 use merge_state_probe::{
     base_commit_is_merged_into_head, has_unmerged_paths, merge_head_is_present,
-    merge_head_matches_commit,
+    merge_head_matches_commit, read_merge_head,
 };
 #[cfg(test)]
 use publication::acquire_track_writer_lock;
-use publication::{
-    PendingWriterLock, generated_baseline_file_names, path_exists, promote_baseline_recovery_slot,
-    publish_baseline_replacements, reconcile_interrupted_replacement, with_writer_lock,
-    write_replacement_phase_marker,
-};
+use publication::{PendingWriterLock, with_writer_lock};
+#[cfg(test)]
+use publication::{publish_baseline_replacements, write_replacement_phase_marker};
+use recovery::replace_baselines_from_exact_commit;
+#[cfg(test)]
+use recovery::{ExactCommitReplacementError, combine_exact_commit_cleanup_result};
 use sync_base::{read_regular_file_bounded, write_sync_base_record_atomically};
 pub use sync_base_record::{SyncBaseRecord, SyncBaseRecordSchemaVersion};
 #[cfg(test)]
@@ -164,7 +172,14 @@ impl BaseMergeGitPort for FsBaseMergeGitAdapter {
         let base_commit = resolve_base_commit(&repository_root, authoritative_direction.source())?;
         let output = match run_guarded_merge(&repository_root, &base_commit) {
             Ok(output) => output,
-            Err(_) => return adjudicate_merge_after_runner_error(&repository_root, base_commit),
+            Err(_) => {
+                let outcome =
+                    adjudicate_merge_after_runner_error(&repository_root, base_commit.clone());
+                if matches!(&outcome, Ok(BaseMergeAttemptOutcome::Conflicted { .. })) {
+                    record_guarded_merge_provenance(&repository_root, &current, &base_commit)?;
+                }
+                return outcome;
+            }
         };
         if output.status.success() {
             if merge_head_is_present(&repository_root)? || has_unmerged_paths(&repository_root)? {
@@ -177,7 +192,8 @@ impl BaseMergeGitPort for FsBaseMergeGitAdapter {
 
         if output.status.code() == Some(1) && has_unmerged_paths(&repository_root)? {
             if merge_head_matches_commit(&repository_root, &base_commit)? {
-                return Ok(BaseMergeAttemptOutcome::Conflicted);
+                record_guarded_merge_provenance(&repository_root, &current, &base_commit)?;
+                return Ok(BaseMergeAttemptOutcome::Conflicted { base_commit });
             }
             return Err(git_execution_error("guarded git merge left unrelated unmerged paths"));
         }
@@ -190,7 +206,6 @@ impl BaseMergeGitPort for FsBaseMergeGitAdapter {
 pub struct FsBaseMergeCleanupAdapter {
     baseline_capture: Arc<dyn RustdocBaselineCapturePort>,
     pending_writer_lock: Mutex<Option<PendingWriterLock>>,
-    post_baseline_rerender: Mutex<Option<(BaseMergeCleanupRequest, bool)>>,
 }
 
 #[allow(clippy::new_without_default)]
@@ -201,18 +216,20 @@ impl FsBaseMergeCleanupAdapter {
         Self {
             baseline_capture: Arc::new(RustdocBaselineCaptureAdapter::new()),
             pending_writer_lock: Mutex::new(None),
-            post_baseline_rerender: Mutex::new(None),
         }
     }
 
     #[cfg(test)]
     fn with_baseline_capture(capture: Arc<dyn RustdocBaselineCapturePort>) -> Self {
-        Self {
-            baseline_capture: capture,
-            pending_writer_lock: Mutex::new(None),
-            post_baseline_rerender: Mutex::new(None),
-        }
+        Self { baseline_capture: capture, pending_writer_lock: Mutex::new(None) }
     }
+}
+
+fn guarded_conflict_matches_request(request: &BaseMergeCleanupRequest) -> Result<bool, String> {
+    let repository_root =
+        resolve_workspace_repository_root(&request.workspace_root).map_err(str::to_owned)?;
+    merge_head_matches_commit(&repository_root, &request.base_commit)
+        .map_err(|error| format!("cannot inspect guarded merge state: {error}"))
 }
 
 impl BaseMergeCleanupPort for FsBaseMergeCleanupAdapter {
@@ -220,22 +237,6 @@ impl BaseMergeCleanupPort for FsBaseMergeCleanupAdapter {
         &self,
         request: &BaseMergeCleanupRequest,
     ) -> Result<(), ViewsRegenerationError> {
-        let mut post_baseline = self.post_baseline_rerender.lock().map_err(|_| {
-            ViewsRegenerationError::Regeneration(DiagnosticText::new(
-                "post-baseline rerender state is poisoned",
-            ))
-        })?;
-        if let Some((pending, changed)) = post_baseline.as_ref() {
-            if pending != request {
-                return Err(ViewsRegenerationError::Regeneration(DiagnosticText::new(
-                    "request does not match the pending active track transaction",
-                )));
-            }
-            if !changed {
-                post_baseline.take();
-                return Ok(());
-            }
-        }
         let writer_error = || {
             ViewsRegenerationError::Regeneration(DiagnosticText::new(
                 "active track writer transaction state is poisoned",
@@ -246,14 +247,28 @@ impl BaseMergeCleanupPort for FsBaseMergeCleanupAdapter {
                 .map_err(|error| ViewsRegenerationError::Regeneration(DiagnosticText::new(error)))
         };
         let result = {
-            let pending_writer = self.pending_writer_lock.lock().map_err(|_| writer_error())?;
+            let mut pending_writer = self.pending_writer_lock.lock().map_err(|_| writer_error())?;
             if pending_writer.is_some() {
-                if post_baseline.as_ref().is_none_or(|(pending, _)| pending != request) {
+                if pending_writer.as_ref().is_some_and(|pending| pending.request != *request) {
                     Err(ViewsRegenerationError::Regeneration(DiagnosticText::new(
                         "request does not match the pending active track transaction",
                     )))
                 } else {
-                    render()
+                    match guarded_conflict_matches_request(request) {
+                        Ok(is_conflicted) => {
+                            let result = render();
+                            if result.is_ok() && is_conflicted {
+                                // A conflicted merge intentionally stops after Baseline → Views and
+                                // has no SyncBaseStamp stage to consume the retained transaction
+                                // lock.
+                                pending_writer.take();
+                            }
+                            result
+                        }
+                        Err(error) => {
+                            Err(ViewsRegenerationError::Regeneration(DiagnosticText::new(error)))
+                        }
+                    }
                 }
             } else {
                 drop(pending_writer);
@@ -262,7 +277,6 @@ impl BaseMergeCleanupPort for FsBaseMergeCleanupAdapter {
                 })
             }
         };
-        post_baseline.take();
         if result.is_err() {
             let mut pending_writer = self.pending_writer_lock.lock().map_err(|_| writer_error())?;
             pending_writer.take();
@@ -274,50 +288,19 @@ impl BaseMergeCleanupPort for FsBaseMergeCleanupAdapter {
         &self,
         request: &BaseMergeCleanupRequest,
     ) -> Result<(), BaselineReplacementError> {
-        let mut post_baseline = self.post_baseline_rerender.lock().map_err(|_| {
-            BaselineReplacementError::Publish(DiagnosticText::new(
-                "post-baseline rerender state is poisoned",
-            ))
-        })?;
-        let generated_baseline_files = generated_baseline_file_names(&request.workspace_root)
-            .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-        let baseline_changed = with_writer_lock(
+        with_writer_lock(
             &self.pending_writer_lock,
             request,
             true,
-            || {
-                let prior = snapshot_generated_baselines(
-                    &request.workspace_root.join("track/items").join(request.track_id.as_ref()),
-                    &generated_baseline_files,
-                )
-                .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-                replace_baselines_from_exact_commit(request, Arc::clone(&self.baseline_capture))?;
-                generated_baselines_changed(
-                    &request.workspace_root.join("track/items").join(request.track_id.as_ref()),
-                    &prior,
-                )
-                .map_err(|error| BaselineReplacementError::Publish(DiagnosticText::new(error)))
-            },
+            || replace_baselines_from_exact_commit(request, Arc::clone(&self.baseline_capture)),
             |error| BaselineReplacementError::Publish(DiagnosticText::new(error)),
-        )?;
-        *post_baseline = Some((request.clone(), baseline_changed));
-        Ok(())
+        )
     }
 
     fn write_sync_base_record(
         &self,
         request: &BaseMergeCleanupRequest,
     ) -> Result<(), SyncBaseRecordError> {
-        let post_baseline = self.post_baseline_rerender.lock().map_err(|_| {
-            SyncBaseRecordError::Write(DiagnosticText::new(
-                "post-baseline rerender state is poisoned",
-            ))
-        })?;
-        if post_baseline.is_some() {
-            return Err(SyncBaseRecordError::Write(DiagnosticText::new(
-                "rendered views have not completed successfully",
-            )));
-        }
         with_writer_lock(
             &self.pending_writer_lock,
             request,
@@ -325,228 +308,6 @@ impl BaseMergeCleanupPort for FsBaseMergeCleanupAdapter {
             || write_sync_base_record_atomically(request),
             |error| SyncBaseRecordError::Write(DiagnosticText::new(error)),
         )
-    }
-}
-
-fn replace_baselines_from_exact_commit(
-    request: &BaseMergeCleanupRequest,
-    baseline_capture: Arc<dyn RustdocBaselineCapturePort>,
-) -> Result<(), BaselineReplacementError> {
-    let repository_root = resolve_workspace_repository_root(&request.workspace_root)
-        .map_err(|detail| BaselineReplacementError::Isolation(DiagnosticText::new(detail)))?;
-    let track_dir = request.workspace_root.join("track/items").join(request.track_id.as_ref());
-    let items_dir = request.workspace_root.join("track/items");
-    reject_symlinks_up_to_root(&items_dir).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(error.to_string()))
-    })?;
-    reject_symlinks_below(&track_dir, &items_dir).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(error.to_string()))
-    })?;
-    if !track_dir.is_dir() {
-        return Err(BaselineReplacementError::Isolation(DiagnosticText::new(
-            "active track directory is unavailable",
-        )));
-    }
-    let generated_baseline_files = generated_baseline_file_names(&request.workspace_root)
-        .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-
-    let track_parent = track_dir.parent().ok_or_else(|| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(
-            "active track directory has no parent directory",
-        ))
-    })?;
-    let track_root = track_parent.parent().ok_or_else(|| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(
-            "track items directory has no recovery root",
-        ))
-    })?;
-    reject_symlinks_up_to_root(track_root).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cannot inspect track recovery root: {error}"
-        )))
-    })?;
-    let recovery_root = track_root.join(".sotp-baseline-recovery");
-    fs::create_dir_all(&recovery_root).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cannot create baseline recovery root: {error}"
-        )))
-    })?;
-    fs::File::open(track_root).and_then(|directory| directory.sync_all()).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cannot persist baseline recovery root entry: {error}"
-        )))
-    })?;
-    reject_symlinks_below(&recovery_root, track_root).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cannot inspect baseline recovery root: {error}"
-        )))
-    })?;
-    let recovery_slot = recovery_root.join(request.track_id.as_ref());
-    let replacement =
-        recovery_root.join(format!(".sotp-baseline-replacement-{}", request.track_id));
-    let active_phase_marker = track_dir.join(BASELINE_REPLACEMENT_PHASE_MARKER);
-    reject_symlinks_below(&active_phase_marker, &items_dir).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cannot inspect active baseline replacement phase marker: {error}"
-        )))
-    })?;
-    reject_symlinks_below(&replacement, &recovery_root).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cannot inspect baseline replacement staging slot: {error}"
-        )))
-    })?;
-    let had_replacement = path_exists(&replacement)
-        .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-    if had_replacement {
-        reconcile_interrupted_replacement(
-            &replacement,
-            &recovery_slot,
-            &recovery_root,
-            &track_dir,
-            &generated_baseline_files,
-        )
-        .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-    }
-    if path_exists(&active_phase_marker)
-        .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?
-    {
-        let recovered_canonical_slot = path_exists(&recovery_slot)
-            .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-        if !had_replacement && !recovered_canonical_slot {
-            return Err(BaselineReplacementError::Isolation(DiagnosticText::new(
-                "active track contains an unreconciled baseline replacement phase marker",
-            )));
-        }
-        fs::remove_file(&active_phase_marker).map_err(|error| {
-            BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-                "cannot clear recovered baseline replacement phase marker: {error}"
-            )))
-        })?;
-        fs::File::open(&track_dir).and_then(|directory| directory.sync_all()).map_err(|error| {
-            BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-                "cannot persist recovered baseline replacement phase marker removal: {error}"
-            )))
-        })?;
-    }
-    fs::create_dir(&replacement).map_err(|error| {
-        BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cannot create baseline replacement staging slot: {error}"
-        )))
-    })?;
-
-    let worktree = match create_unique_directory(&repository_root, ".sotp-base-merge-worktree-") {
-        Ok(worktree) => worktree,
-        Err(error) => {
-            let detail =
-                match cleanup_directory(&replacement, "baseline replacement staging directory") {
-                    Ok(()) => error.to_string(),
-                    Err(cleanup) => format!("{error}; {cleanup}"),
-                };
-            return Err(BaselineReplacementError::Isolation(DiagnosticText::new(detail)));
-        }
-    };
-    let mut published = false;
-    let mut exchanged = false;
-    let result: Result<(), BaselineReplacementError> = (|| {
-        add_commit_pinned_worktree(&repository_root, &worktree, &request.base_commit)
-            .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-        copy_cleanup_inputs_with_baselines(
-            &request.workspace_root,
-            &worktree,
-            request.track_id.as_ref(),
-            &generated_baseline_files,
-        )
-        .map_err(|error| BaselineReplacementError::Isolation(DiagnosticText::new(error)))?;
-        capture_baselines_in_worktree(
-            &worktree,
-            request.track_id.as_ref(),
-            Arc::clone(&baseline_capture),
-        )?;
-        collect_validated_baselines(&worktree, request.track_id.as_ref())
-            .map_err(|error| BaselineReplacementError::Validation(DiagnosticText::new(error)))?;
-        write_replacement_phase_marker(&replacement)?;
-        copy_tree_with_baselines(
-            &worktree.join("track/items").join(request.track_id.as_ref()),
-            &replacement,
-            true,
-            &recovery_root,
-            &generated_baseline_files,
-        )
-        .map_err(|error| BaselineReplacementError::Validation(DiagnosticText::new(error)))?;
-        publish_baseline_replacements(
-            &track_dir,
-            &replacement,
-            &generated_baseline_files,
-            &mut exchanged,
-        )?;
-        published = true;
-        promote_baseline_recovery_slot(&replacement, &recovery_slot, &recovery_root)
-    })();
-
-    let removal = remove_commit_pinned_worktree(&repository_root, &worktree)
-        .map_err(|error| format!("cannot unregister detached cleanup worktree: {error}"));
-    let directory_cleanup = cleanup_directory(&worktree, "detached cleanup worktree");
-    // After exchange, retain both trees: rollback could discard concurrent writes.
-    let replacement_cleanup = if result.is_err()
-        && !published
-        && !exchanged
-        && !matches!(&result, Err(BaselineReplacementError::Restoration { .. }))
-    {
-        cleanup_directory(&replacement, "baseline replacement staging directory")
-    } else {
-        Ok(())
-    };
-    combine_baseline_cleanup_result(result, [removal, directory_cleanup, replacement_cleanup])
-}
-
-fn cleanup_directory(path: &Path, label: &str) -> Result<(), String> {
-    let trusted_root = path
-        .parent()
-        .ok_or_else(|| format!("cannot remove {label} {}: no trusted parent", path.display()))?;
-    remove_tree_bounded(path, trusted_root)
-        .map_err(|error| format!("cannot remove {label} {}: {error}", path.display()))
-}
-
-fn combine_baseline_cleanup_result(
-    result: Result<(), BaselineReplacementError>,
-    cleanup_results: [Result<(), String>; 3],
-) -> Result<(), BaselineReplacementError> {
-    let cleanup_details: Vec<String> =
-        cleanup_results.into_iter().filter_map(Result::err).collect();
-    match (result, cleanup_details.is_empty()) {
-        (Ok(()), true) => Ok(()),
-        (Ok(()), false) => Err(BaselineReplacementError::Isolation(DiagnosticText::new(format!(
-            "cleanup after baseline replacement failed: {}",
-            cleanup_details.join("; ")
-        )))),
-        (Err(error), true) => Err(error),
-        (Err(error), false) => Err(append_cleanup_failure(error, cleanup_details.join("; "))),
-    }
-}
-
-fn append_cleanup_failure(
-    error: BaselineReplacementError,
-    cleanup: String,
-) -> BaselineReplacementError {
-    let append = |detail: DiagnosticText| {
-        DiagnosticText::new(format!("{detail}; cleanup also failed: {cleanup}"))
-    };
-    match error {
-        BaselineReplacementError::Isolation(detail) => {
-            BaselineReplacementError::Isolation(append(detail))
-        }
-        BaselineReplacementError::Generation(detail) => {
-            BaselineReplacementError::Generation(append(detail))
-        }
-        BaselineReplacementError::Validation(detail) => {
-            BaselineReplacementError::Validation(append(detail))
-        }
-        BaselineReplacementError::Publish(detail) => {
-            BaselineReplacementError::Publish(append(detail))
-        }
-        BaselineReplacementError::Restoration { publish, restoration } => {
-            BaselineReplacementError::Restoration { publish, restoration: append(restoration) }
-        }
     }
 }
 
@@ -577,6 +338,108 @@ fn read_current_track_branch(repository_root: &Path) -> Result<TrackBranch, &'st
     let branch = std::str::from_utf8(&output.stdout).map_err(|_| "current branch is invalid")?;
     TrackBranch::try_new(branch.trim().to_owned())
         .map_err(|_| "current branch is not an active track")
+}
+
+fn record_guarded_merge_provenance(
+    repository_root: &Path,
+    current: &TrackBranch,
+    base_commit: &CommitHash,
+) -> Result<(), BaseMergeGitError> {
+    if read_merge_head(repository_root)?.as_ref() != Some(base_commit) {
+        return Err(git_execution_error("guarded merge did not retain the expected MERGE_HEAD"));
+    }
+    let merge_message =
+        git_state_file_path(repository_root, MERGE_MESSAGE_FILE).map_err(git_execution_error)?;
+    let bytes = read_regular_file_bounded(
+        &merge_message,
+        repository_root,
+        MAX_GUARDED_MERGE_PROVENANCE_BYTES,
+    )
+    .map_err(git_execution_error)?;
+    let mut contents = bytes;
+    if !contents.ends_with(b"\n") {
+        contents.push(b'\n');
+    }
+    let marker = format!(
+        "{GUARDED_MERGE_PROVENANCE_MARKER} track={} base={}\n",
+        current.as_ref(),
+        base_commit.as_ref()
+    );
+    if contents.len().saturating_add(marker.len()) > MAX_GUARDED_MERGE_PROVENANCE_BYTES as usize {
+        return Err(git_execution_error("guarded merge message exceeds the provenance limit"));
+    }
+    contents.extend_from_slice(marker.as_bytes());
+    atomic_write_file(&merge_message, &contents).map_err(|error| {
+        git_execution_error(format!("cannot persist guarded merge provenance: {error}"))
+    })
+}
+
+fn git_state_file_path(repository_root: &Path, name: &str) -> Result<PathBuf, String> {
+    let git_admin_dir_output = isolated_bounded_git_output(
+        repository_root,
+        &["rev-parse", "--absolute-git-dir"],
+        MAX_BASE_MERGE_GIT_OUTPUT_BYTES,
+    )
+    .map_err(|_| "git administrative directory could not be resolved".to_owned())?;
+    if !git_admin_dir_output.status.success() {
+        return Err("git administrative directory could not be resolved".to_owned());
+    }
+    let raw_git_admin_dir = std::str::from_utf8(&git_admin_dir_output.stdout)
+        .map_err(|_| "git administrative directory is invalid".to_owned())?
+        .trim();
+    if raw_git_admin_dir.is_empty() {
+        return Err("git administrative directory is empty".to_owned());
+    }
+    let git_admin_dir = Path::new(raw_git_admin_dir);
+    let git_admin_dir = if git_admin_dir.is_absolute() {
+        git_admin_dir.to_owned()
+    } else {
+        repository_root.join(git_admin_dir)
+    };
+    reject_symlinks_up_to_root(&git_admin_dir)
+        .map_err(|_| "git administrative directory is unavailable".to_owned())?;
+    let git_admin_dir = git_admin_dir
+        .canonicalize()
+        .map_err(|_| "git administrative directory is unavailable".to_owned())?;
+    if !git_admin_dir.is_dir() {
+        return Err("git administrative directory is unavailable".to_owned());
+    }
+
+    let output = isolated_bounded_git_output(
+        repository_root,
+        &["rev-parse", "--git-path", name],
+        MAX_BASE_MERGE_GIT_OUTPUT_BYTES,
+    )
+    .map_err(|_| "git state path could not be resolved".to_owned())?;
+    if !output.status.success() {
+        return Err("git state path could not be resolved".to_owned());
+    }
+    let raw_path = std::str::from_utf8(&output.stdout)
+        .map_err(|_| "git state path is invalid".to_owned())?
+        .trim();
+    if raw_path.is_empty() {
+        return Err("git state path is empty".to_owned());
+    }
+    let path = Path::new(raw_path);
+    let path = if path.is_absolute() { path.to_owned() } else { repository_root.join(path) };
+    confine_git_state_path(&path, &git_admin_dir)
+}
+
+fn confine_git_state_path(path: &Path, git_admin_dir: &Path) -> Result<PathBuf, String> {
+    reject_symlinks_up_to_root(path).map_err(|_| "git state path is unavailable".to_owned())?;
+    let parent = path.parent().ok_or_else(|| "git state path is unavailable".to_owned())?;
+    let canonical_parent =
+        parent.canonicalize().map_err(|_| "git state path is unavailable".to_owned())?;
+    let canonical_path = match path.canonicalize() {
+        Ok(path) => path,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => canonical_parent
+            .join(path.file_name().ok_or_else(|| "git state path is unavailable".to_owned())?),
+        Err(_) => return Err("git state path is unavailable".to_owned()),
+    };
+    if !canonical_path.starts_with(git_admin_dir) {
+        return Err("git state path is outside the git administrative directory".to_owned());
+    }
+    Ok(canonical_path)
 }
 
 fn track_id_from_branch(branch: &TrackBranch) -> Result<TrackId, &'static str> {
@@ -641,7 +504,7 @@ fn adjudicate_merge_after_runner_error(
 ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> {
     if has_unmerged_paths(repository_root)? {
         if merge_head_matches_commit(repository_root, &base_commit)? {
-            return Ok(BaseMergeAttemptOutcome::Conflicted);
+            return Ok(BaseMergeAttemptOutcome::Conflicted { base_commit });
         }
         return Err(git_execution_error(
             "guarded git merge runner failed with unresolved merge state",
@@ -738,6 +601,31 @@ mod tests {
 
     fn git(root: &Path, args: &[&str]) {
         crate::verify::test_support::git_with_identity(root, args);
+    }
+
+    #[test]
+    fn test_confine_git_state_path_missing_file_inside_git_admin_accepted() {
+        let fixture = tempfile::tempdir().unwrap();
+        let git_admin_dir = fixture.path().join(".git");
+        std::fs::create_dir_all(&git_admin_dir).unwrap();
+        let git_admin_dir = git_admin_dir.canonicalize().unwrap();
+        let state_path = git_admin_dir.join("MERGE_MSG");
+
+        assert_eq!(super::confine_git_state_path(&state_path, &git_admin_dir).unwrap(), state_path);
+    }
+
+    #[test]
+    fn test_confine_git_state_path_outside_git_admin_rejected() {
+        let fixture = tempfile::tempdir().unwrap();
+        let git_admin_dir = fixture.path().join(".git");
+        let outside = fixture.path().join("outside");
+        std::fs::create_dir_all(&git_admin_dir).unwrap();
+        std::fs::create_dir_all(&outside).unwrap();
+        let git_admin_dir = git_admin_dir.canonicalize().unwrap();
+        let state_path = outside.join("MERGE_MSG");
+
+        let error = super::confine_git_state_path(&state_path, &git_admin_dir).unwrap_err();
+        assert_eq!(error, "git state path is outside the git administrative directory");
     }
 
     fn write_metadata(root: &Path, id: &str, base_branch: &str) {
@@ -911,7 +799,7 @@ mod tests {
             "declaration_hash": crate::tddd::type_signals_codec::declaration_hash(&catalogue)
                 .as_digest()
                 .as_str(),
-            "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "baseline_hash": crate::tddd::type_signals_codec::baseline_hash(baseline)
                 .as_digest()
                 .as_str(),
@@ -976,7 +864,9 @@ mod tests {
         }
     }
 
-    struct ConflictedCleanupGit;
+    struct ConflictedCleanupGit {
+        base_commit: CommitHash,
+    }
 
     impl BaseMergeGitPort for ConflictedCleanupGit {
         fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
@@ -988,7 +878,7 @@ mod tests {
             _workspace_root: &Path,
             _direction: &BaseMergeDirection,
         ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> {
-            Ok(BaseMergeAttemptOutcome::Conflicted)
+            Ok(BaseMergeAttemptOutcome::Conflicted { base_commit: self.base_commit.clone() })
         }
     }
 
@@ -1061,43 +951,6 @@ mod tests {
         }
     }
 
-    struct PostBaselineViewFailureCleanup {
-        adapter: FsBaseMergeCleanupAdapter,
-        track_dir: PathBuf,
-        regenerate_calls: Arc<Mutex<usize>>,
-    }
-
-    impl BaseMergeCleanupPort for PostBaselineViewFailureCleanup {
-        fn regenerate_views(
-            &self,
-            request: &BaseMergeCleanupRequest,
-        ) -> Result<(), ViewsRegenerationError> {
-            let call = {
-                let mut calls = self.regenerate_calls.lock().unwrap();
-                *calls += 1;
-                *calls
-            };
-            if call == 2 {
-                std::fs::write(self.track_dir.join("domain-types.json"), "{}").unwrap();
-            }
-            self.adapter.regenerate_views(request)
-        }
-
-        fn replace_baselines(
-            &self,
-            request: &BaseMergeCleanupRequest,
-        ) -> Result<(), BaselineReplacementError> {
-            self.adapter.replace_baselines(request)
-        }
-
-        fn write_sync_base_record(
-            &self,
-            request: &BaseMergeCleanupRequest,
-        ) -> Result<(), SyncBaseRecordError> {
-            self.adapter.write_sync_base_record(request)
-        }
-    }
-
     struct ConcurrentWriteBaselineCapture {
         live_track: std::path::PathBuf,
     }
@@ -1165,6 +1018,21 @@ mod tests {
             adapter.load_direction(&fixture.path().join("track")),
             Err(BaseMergeContextError::Unavailable(_))
         ));
+    }
+
+    #[test]
+    fn test_fs_base_merge_git_rejects_non_track_current_branch() {
+        let fixture = setup_repository("adapter-test", "develop");
+        let root = fixture.path();
+        let direction = FsBaseMergeContextAdapter::new().load_direction(root).unwrap();
+
+        git(root, &["switch", "--quiet", "develop"]);
+
+        let result = FsBaseMergeGitAdapter::new().merge_base(root, &direction);
+
+        assert!(matches!(result, Err(BaseMergeGitError::Execution(detail))
+            if detail.as_str().contains("current branch is not an active track")));
+        assert!(!root.join("track.txt").exists(), "the guarded merge must not start");
     }
 
     #[test]
@@ -1393,7 +1261,11 @@ git update-ref refs/heads/develop "$advanced" "$parent"
 
         let outcome = FsBaseMergeGitAdapter::new().merge_base(root, &direction).unwrap();
 
-        assert_eq!(outcome, BaseMergeAttemptOutcome::Conflicted);
+        let expected_base_commit = resolve_base_commit(root, direction.source()).unwrap();
+        assert_eq!(
+            outcome,
+            BaseMergeAttemptOutcome::Conflicted { base_commit: expected_base_commit }
+        );
         let status = std::process::Command::new("git")
             .args(["status", "--porcelain"])
             .current_dir(root)
@@ -1543,7 +1415,7 @@ git update-ref refs/heads/develop "$advanced" "$parent"
 
         assert_eq!(
             adjudicate_merge_after_runner_error(root, base_commit.clone()).unwrap(),
-            BaseMergeAttemptOutcome::Conflicted,
+            BaseMergeAttemptOutcome::Conflicted { base_commit: base_commit.clone() },
             "a matching MERGE_HEAD plus unmerged paths identifies the runner-created conflict"
         );
 
@@ -1972,122 +1844,6 @@ git update-ref refs/heads/develop "$advanced" "$parent"
     }
 
     #[test]
-    fn test_base_merge_interactor_post_baseline_view_failure_preserves_rendered_view() {
-        let fixture = setup_cleanup_repository();
-        let root = fixture.path();
-        let track_dir = root.join("track/items/cleanup-test");
-        write_cleanup_render_inputs(root, b"prior-baseline");
-        crate::track::render::sync_rendered_views(root, Some("cleanup-test")).unwrap();
-        let rendered_view = track_dir.join("domain-types.md");
-        let prior_rendered_view = std::fs::read(&rendered_view).unwrap();
-        assert!(!prior_rendered_view.is_empty(), "the fixture must seed a rendered type view");
-        let base_commit = CommitHash::try_new(current_commit(root, "develop^{commit}")).unwrap();
-        let regenerate_calls = Arc::new(Mutex::new(0));
-        let cleanup = PostBaselineViewFailureCleanup {
-            adapter: FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
-                FixtureBaselineCapture,
-            )),
-            track_dir: track_dir.clone(),
-            regenerate_calls: Arc::clone(&regenerate_calls),
-        };
-
-        let interactor = usecase::base_merge::BaseMergeInteractor::new(
-            Arc::new(FixedCleanupContext),
-            Arc::new(ExactCommitCleanupGit { base_commit }),
-            Arc::new(cleanup),
-        );
-
-        let result = usecase::base_merge::BaseMergeService::execute(
-            &interactor,
-            usecase::base_merge::BaseMergeCommand { workspace_root: root.to_path_buf() },
-        );
-
-        assert!(matches!(
-            result,
-            Err(usecase::base_merge::BaseMergeError::PostMergeCleanup(
-                usecase::base_merge::PostMergeCleanupError::Views(
-                    ViewsRegenerationError::Regeneration(_)
-                )
-            ))
-        ));
-        assert_eq!(*regenerate_calls.lock().unwrap(), 2);
-        assert_eq!(std::fs::read(&rendered_view).unwrap(), prior_rendered_view);
-        assert!(
-            !track_dir.join(".sync-base.json").exists(),
-            "SyncBaseStamp must not run after post-baseline view failure"
-        );
-    }
-
-    #[test]
-    fn test_post_baseline_rerender_restores_all_views_after_later_layer_failure() {
-        let fixture = setup_cleanup_repository();
-        let root = fixture.path();
-        let track_dir = root.join("track/items/cleanup-test");
-        let second_types = CLEANUP_DOMAIN_TYPES_JSON
-            .replace("\"crate_name\": \"domain\"", "\"crate_name\": \"second\"")
-            .replace("\"layer\": \"domain\"", "\"layer\": \"second\"");
-        std::fs::write(track_dir.join("second-types.json"), &second_types).unwrap();
-        std::fs::write(track_dir.join("second-types-baseline.json"), "prior-second-baseline")
-            .unwrap();
-        std::fs::write(
-            root.join("architecture-rules.json"),
-            r#"{
-  "version": 2,
-  "module_limits": {"max_lines": 700, "warn_lines": 400, "exclude": []},
-  "canonical_modules": [],
-  "extra_dirs": [],
-  "layers": [
-    {
-      "crate": "domain",
-      "path": "libs/domain",
-      "may_depend_on": [],
-      "deny_reason": "",
-      "verify": {"domain_purity": true, "domain_strings": true},
-      "tddd": {
-        "enabled": true,
-        "catalogue_file": "domain-types.json",
-        "schema_export": {"method": "rustdoc", "targets": ["domain"]}
-      }
-    },
-    {
-      "crate": "second",
-      "path": "libs/second",
-      "may_depend_on": [],
-      "deny_reason": "",
-      "verify": {"domain_purity": true, "domain_strings": true},
-      "tddd": {
-        "enabled": true,
-        "catalogue_file": "second-types.json",
-        "schema_export": {"method": "rustdoc", "targets": ["second"]}
-      }
-    }
-  ]
-}"#,
-        )
-        .unwrap();
-        write_cleanup_render_inputs(root, b"prior-baseline");
-        crate::track::render::sync_rendered_views(root, Some("cleanup-test")).unwrap();
-        let prior_domain_view = std::fs::read(track_dir.join("domain-types.md")).unwrap();
-        let prior_second_view = std::fs::read(track_dir.join("second-types.md")).unwrap();
-
-        let changed_domain = CLEANUP_DOMAIN_TYPES_JSON.replace("\"TrackId\"", "\"ChangedId\"");
-        std::fs::write(track_dir.join("domain-types.json"), changed_domain).unwrap();
-        std::fs::write(track_dir.join("second-types.json"), "{}").unwrap();
-        let request = BaseMergeCleanupRequest {
-            workspace_root: root.to_path_buf(),
-            track_id: TrackId::try_new("cleanup-test").unwrap(),
-            base_branch: BaseBranchName::try_new("develop".to_owned()).unwrap(),
-            base_commit: CommitHash::try_new("0123456789abcdef").unwrap(),
-        };
-
-        let result = FsBaseMergeCleanupAdapter::new().regenerate_views(&request);
-
-        assert!(matches!(result, Err(ViewsRegenerationError::Regeneration(_))));
-        assert_eq!(std::fs::read(track_dir.join("domain-types.md")).unwrap(), prior_domain_view);
-        assert_eq!(std::fs::read(track_dir.join("second-types.md")).unwrap(), prior_second_view);
-    }
-
-    #[test]
     fn test_base_merge_interactor_unchanged_baseline_keeps_rendered_type_view_stable() {
         let fixture = setup_cleanup_repository();
         let root = fixture.path();
@@ -2231,24 +1987,26 @@ git update-ref refs/heads/develop "$advanced" "$parent"
     }
 
     #[test]
-    fn test_base_merge_interactor_clean_merge_view_failure_preserves_baseline_and_sync_stamp() {
-        let fixture = tempfile::tempdir().unwrap();
-        let track_dir = fixture.path().join("track/items/cleanup-test");
-        std::fs::create_dir_all(&track_dir).unwrap();
-        let prior_baseline = track_dir.join("domain-types-baseline.json");
-        std::fs::write(&prior_baseline, "prior-valid-baseline").unwrap();
+    fn test_base_merge_interactor_clean_merge_view_failure_follows_baseline_stage() {
+        let fixture = setup_cleanup_repository();
+        let root = fixture.path();
+        let track_dir = root.join("track/items/cleanup-test");
+        write_cleanup_render_inputs(root, b"prior-valid-baseline");
         std::fs::write(track_dir.join("track-input.json"), "prior-complete-track-input").unwrap();
         std::fs::write(track_dir.join("metadata.json"), "{malformed").unwrap();
+        let base_commit = CommitHash::try_new(current_commit(root, "develop^{commit}")).unwrap();
 
         let interactor = usecase::base_merge::BaseMergeInteractor::new(
             Arc::new(FixedCleanupContext),
-            Arc::new(CleanCleanupGit),
-            Arc::new(FsBaseMergeCleanupAdapter::new()),
+            Arc::new(ExactCommitCleanupGit { base_commit }),
+            Arc::new(FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
+                FixtureBaselineCapture,
+            ))),
         );
 
         let result = usecase::base_merge::BaseMergeService::execute(
             &interactor,
-            usecase::base_merge::BaseMergeCommand { workspace_root: fixture.path().to_path_buf() },
+            usecase::base_merge::BaseMergeCommand { workspace_root: root.to_path_buf() },
         );
 
         assert!(matches!(
@@ -2259,7 +2017,11 @@ git update-ref refs/heads/develop "$advanced" "$parent"
                 )
             ))
         ));
-        assert_eq!(std::fs::read_to_string(&prior_baseline).unwrap(), "prior-valid-baseline");
+        let published_baseline =
+            std::fs::read_to_string(track_dir.join("domain-types-baseline.json")).unwrap();
+        assert_ne!(published_baseline, "prior-valid-baseline");
+        crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec::from_json(&published_baseline)
+            .unwrap();
         assert_eq!(
             std::fs::read_to_string(track_dir.join("track-input.json")).unwrap(),
             "prior-complete-track-input"
@@ -2298,7 +2060,6 @@ git update-ref refs/heads/develop "$advanced" "$parent"
                 )
             ))
         ));
-        assert!(track_dir.join("plan.md").is_file(), "Views must complete before Baseline");
         assert_eq!(std::fs::read_to_string(&prior_baseline).unwrap(), "prior-valid-baseline");
         assert_eq!(
             std::fs::read_to_string(track_dir.join("track-input.json")).unwrap(),
@@ -2467,20 +2228,26 @@ git update-ref refs/heads/develop "$advanced" "$parent"
     }
 
     #[test]
-    fn test_fs_base_merge_cleanup_adapter_conflict_keeps_track_available_without_cleanup() {
-        let fixture = tempfile::tempdir().unwrap();
-        let track_dir = fixture.path().join("track/items/cleanup-test");
-        std::fs::create_dir_all(&track_dir).unwrap();
+    fn test_fs_base_merge_cleanup_adapter_conflict_replaces_baseline_then_regenerates_views() {
+        let fixture = setup_cleanup_repository();
+        let root = fixture.path();
+        let track_dir = root.join("track/items/cleanup-test");
+        write_cleanup_render_inputs(root, b"prior-baseline");
         std::fs::write(track_dir.join("recovery-input.txt"), "preserved").unwrap();
+        let base_commit = CommitHash::try_new(current_commit(root, "develop^{commit}")).unwrap();
+        std::fs::write(root.join(".git/MERGE_HEAD"), format!("{base_commit}\n")).unwrap();
+        let cleanup = Arc::new(FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(
+            FixtureBaselineCapture,
+        )));
         let interactor = usecase::base_merge::BaseMergeInteractor::new(
             Arc::new(FixedCleanupContext),
-            Arc::new(ConflictedCleanupGit),
-            Arc::new(FsBaseMergeCleanupAdapter::new()),
+            Arc::new(ConflictedCleanupGit { base_commit: base_commit.clone() }),
+            Arc::clone(&cleanup) as Arc<dyn BaseMergeCleanupPort>,
         );
 
         let outcome = usecase::base_merge::BaseMergeService::execute(
             &interactor,
-            usecase::base_merge::BaseMergeCommand { workspace_root: fixture.path().to_path_buf() },
+            usecase::base_merge::BaseMergeCommand { workspace_root: root.to_path_buf() },
         )
         .unwrap();
 
@@ -2491,8 +2258,56 @@ git update-ref refs/heads/develop "$advanced" "$parent"
             "preserved"
         );
         assert!(!track_dir.join(".sync-base.json").exists());
-        assert!(!track_dir.join("plan.md").exists());
-        assert!(!track_dir.join("domain-types-baseline.json").exists());
+        assert!(track_dir.join("plan.md").is_file());
+        let published_baseline =
+            std::fs::read_to_string(track_dir.join("domain-types-baseline.json")).unwrap();
+        assert_ne!(published_baseline, "prior-baseline");
+        crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec::from_json(&published_baseline)
+            .unwrap();
+
+        std::fs::remove_file(root.join(".git/MERGE_HEAD")).unwrap();
+        let release = cleanup.replace_baselines(&usecase::base_merge::BaseMergeCleanupRequest {
+            workspace_root: root.to_path_buf(),
+            track_id: TrackId::try_new("cleanup-test").unwrap(),
+            base_branch: BaseBranchName::try_new("develop".to_owned()).unwrap(),
+            base_commit,
+        });
+        assert!(
+            release.is_ok(),
+            "successful conflicted cleanup must release its writer transaction: {release:?}"
+        );
+    }
+
+    #[test]
+    fn test_fs_base_merge_cleanup_releases_writer_lock_when_conflict_probe_fails() {
+        let fixture = setup_cleanup_repository();
+        let root = fixture.path();
+        let track_dir = root.join("track/items/cleanup-test");
+        write_cleanup_render_inputs(root, b"prior-baseline");
+        let request = usecase::base_merge::BaseMergeCleanupRequest {
+            workspace_root: root.to_path_buf(),
+            track_id: TrackId::try_new("cleanup-test").unwrap(),
+            base_branch: BaseBranchName::try_new("develop".to_owned()).unwrap(),
+            base_commit: CommitHash::try_new(current_commit(root, "develop^{commit}")).unwrap(),
+        };
+        let adapter =
+            FsBaseMergeCleanupAdapter::with_baseline_capture(Arc::new(FixtureBaselineCapture));
+        adapter.replace_baselines(&request).unwrap();
+        std::fs::write(root.join(".git/MERGE_HEAD"), "not-a-commit\n").unwrap();
+
+        let render = adapter.regenerate_views(&request);
+
+        assert!(
+            render.is_err(),
+            "malformed MERGE_HEAD must fail closed while probing the conflict state"
+        );
+        std::fs::remove_file(root.join(".git/MERGE_HEAD")).unwrap();
+        let reacquire = adapter.replace_baselines(&request);
+        assert!(
+            reacquire.is_ok(),
+            "failed conflict probing must release the retained writer transaction: {reacquire:?}"
+        );
+        assert!(track_dir.join("domain-types-baseline.json").is_file());
     }
 
     #[test]
@@ -2675,17 +2490,19 @@ git update-ref refs/heads/develop "$advanced" "$parent"
 
     #[test]
     fn test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed() {
-        let result = combine_baseline_cleanup_result(
-            Err(BaselineReplacementError::Restoration {
+        let result = combine_exact_commit_cleanup_result(
+            Err(ExactCommitReplacementError::Baseline(BaselineReplacementError::Restoration {
                 publish: DiagnosticText::new("atomic publication failed"),
                 restoration: DiagnosticText::new("prior baseline restoration failed"),
-            }),
+            })),
             [Ok(()), Ok(()), Ok(())],
         );
 
         assert!(matches!(
             result,
-            Err(BaselineReplacementError::Restoration { publish, restoration })
+            Err(ExactCommitReplacementError::Baseline(
+                BaselineReplacementError::Restoration { publish, restoration }
+            ))
                 if publish.as_str() == "atomic publication failed"
                     && restoration.as_str() == "prior baseline restoration failed"
         ));

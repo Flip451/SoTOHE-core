@@ -20,8 +20,11 @@ pub enum BaseMergeAttemptOutcome {
         /// The exact base commit incorporated by the successful merge.
         base_commit: CommitHash,
     },
-    /// Git reported conflicts; recovery remains orchestrator-owned.
-    Conflicted,
+    /// Git reported conflicts at this exact base commit.
+    Conflicted {
+        /// The exact base commit recorded by `MERGE_HEAD`.
+        base_commit: CommitHash,
+    },
 }
 
 /// Final result of a guarded base merge.
@@ -284,7 +287,21 @@ impl BaseMergeService for BaseMergeInteractor {
             self.context.load_direction(&command.workspace_root).map_err(map_context_error)?;
 
         match self.git.merge_base(&command.workspace_root, &direction).map_err(map_git_error)? {
-            BaseMergeAttemptOutcome::Conflicted => Ok(BaseMergeOutcome::Conflicted),
+            BaseMergeAttemptOutcome::Conflicted { base_commit } => {
+                let request = BaseMergeCleanupRequest {
+                    workspace_root: command.workspace_root.clone(),
+                    track_id: direction.track_id().clone(),
+                    base_branch: direction.source().clone(),
+                    base_commit,
+                };
+                self.cleanup.replace_baselines(&request).map_err(|error| {
+                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(error))
+                })?;
+                self.cleanup.regenerate_views(&request).map_err(|error| {
+                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error))
+                })?;
+                Ok(BaseMergeOutcome::Conflicted)
+            }
             BaseMergeAttemptOutcome::Clean { base_commit } => {
                 let request = BaseMergeCleanupRequest {
                     workspace_root: command.workspace_root,
@@ -292,15 +309,9 @@ impl BaseMergeService for BaseMergeInteractor {
                     base_branch: direction.source().clone(),
                     base_commit,
                 };
-                self.cleanup.regenerate_views(&request).map_err(|error| {
-                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error))
-                })?;
                 self.cleanup.replace_baselines(&request).map_err(|error| {
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(error))
                 })?;
-                // Baseline publication can change the authority without changing the
-                // catalogue. Re-sync the tracked type views against that new authority
-                // before recording the merge as synchronized.
                 self.cleanup.regenerate_views(&request).map_err(|error| {
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error))
                 })?;
@@ -334,15 +345,16 @@ fn map_git_error(error: BaseMergeGitError) -> BaseMergeError {
 mod tests {
     use std::sync::Mutex;
 
-    use domain::{BranchStrategySnapshot, MergeMethod, NonEmptyString, TrackMetadata};
+    use domain::{
+        BaseBranchName, BranchStrategySnapshot, MergeMethod, NonEmptyString, TrackMetadata,
+    };
 
     use super::*;
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     enum CleanupStage {
-        Views,
         Baseline,
-        ViewsAfterBaseline,
+        Views,
         SyncBaseStamp,
     }
 
@@ -476,7 +488,9 @@ mod tests {
                 GitResponse::Clean => Ok(BaseMergeAttemptOutcome::Clean {
                     base_commit: CommitHash::try_new("0123456789abcdef").unwrap(),
                 }),
-                GitResponse::Conflict => Ok(BaseMergeAttemptOutcome::Conflicted),
+                GitResponse::Conflict => Ok(BaseMergeAttemptOutcome::Conflicted {
+                    base_commit: CommitHash::try_new("0123456789abcdef").unwrap(),
+                }),
                 GitResponse::Failure => {
                     Err(BaseMergeGitError::Execution(DiagnosticText::new("git failed")))
                 }
@@ -505,6 +519,30 @@ mod tests {
                 target: direction.active_track().as_ref().to_owned(),
             });
             Ok(BaseMergeAttemptOutcome::Clean { base_commit: self.base_commit.clone() })
+        }
+    }
+
+    struct ExactConflictGit {
+        base_commit: CommitHash,
+        calls: Arc<Mutex<Vec<MergeCall>>>,
+    }
+
+    impl BaseMergeGitPort for ExactConflictGit {
+        fn ensure_worktree_clean(&self, _workspace_root: &Path) -> Result<(), BaseMergeGitError> {
+            Ok(())
+        }
+
+        fn merge_base(
+            &self,
+            workspace_root: &Path,
+            direction: &BaseMergeDirection,
+        ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> {
+            self.calls.lock().unwrap().push(MergeCall {
+                workspace_root: workspace_root.to_path_buf(),
+                source: direction.source().as_str().to_owned(),
+                target: direction.active_track().as_ref().to_owned(),
+            });
+            Ok(BaseMergeAttemptOutcome::Conflicted { base_commit: self.base_commit.clone() })
         }
     }
 
@@ -561,13 +599,6 @@ mod tests {
             request: &BaseMergeCleanupRequest,
         ) -> Result<(), DiagnosticText> {
             let mut calls = self.calls.lock().unwrap();
-            let stage = if stage == CleanupStage::Views
-                && calls.iter().any(|call| call.stage == CleanupStage::Baseline)
-            {
-                CleanupStage::ViewsAfterBaseline
-            } else {
-                stage
-            };
             calls.push(CleanupCall { stage, request: request.clone() });
             if self.failure == Some(stage) {
                 return Err(DiagnosticText::new("cleanup failed"));
@@ -635,13 +666,6 @@ mod tests {
     impl StatefulCleanup {
         fn record_call(&self, stage: CleanupStage, request: &BaseMergeCleanupRequest) {
             let mut state = self.state.lock().unwrap();
-            let stage = if stage == CleanupStage::Views
-                && state.calls.iter().any(|call| call.stage == CleanupStage::Baseline)
-            {
-                CleanupStage::ViewsAfterBaseline
-            } else {
-                stage
-            };
             state.calls.push(CleanupCall { stage, request: request.clone() });
         }
     }
@@ -797,9 +821,8 @@ mod tests {
         assert_eq!(
             *cleanup_calls.lock().unwrap(),
             vec![
-                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
                 CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },
-                CleanupCall { stage: CleanupStage::ViewsAfterBaseline, request: cleanup_request() },
+                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
                 CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },
             ]
         );
@@ -824,15 +847,10 @@ mod tests {
         assert_eq!(outcome, BaseMergeOutcome::Completed);
         assert_eq!(git_calls.lock().unwrap().len(), 1);
         let cleanup_calls = cleanup_calls.lock().unwrap();
-        assert_eq!(cleanup_calls.len(), 4);
+        assert_eq!(cleanup_calls.len(), 3);
         assert_eq!(
             cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![
-                CleanupStage::Views,
-                CleanupStage::Baseline,
-                CleanupStage::ViewsAfterBaseline,
-                CleanupStage::SyncBaseStamp,
-            ]
+            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
         );
         for call in cleanup_calls.iter() {
             assert_eq!(call.request.workspace_root, PathBuf::from("/workspace"));
@@ -843,7 +861,30 @@ mod tests {
     }
 
     #[test]
-    fn test_base_merge_execute_conflict_skips_clean_merge_cleanup() {
+    fn test_base_merge_execute_clean_regenerates_views_once_after_baseline() {
+        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::new(direction())),
+            Arc::new(RecordingGit {
+                response: GitResponse::Clean,
+                calls: Arc::new(Mutex::new(Vec::new())),
+            }),
+            Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+        );
+
+        assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
+
+        let stages =
+            cleanup_calls.lock().unwrap().iter().map(|call| call.stage).collect::<Vec<_>>();
+        assert_eq!(
+            stages,
+            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp]
+        );
+        assert_eq!(stages.iter().filter(|stage| **stage == CleanupStage::Views).count(), 1);
+    }
+
+    #[test]
+    fn test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views() {
         let git_calls = Arc::new(Mutex::new(Vec::new()));
         let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
         let interactor = BaseMergeInteractor::new(
@@ -859,7 +900,102 @@ mod tests {
 
         assert_eq!(outcome, BaseMergeOutcome::Conflicted);
         assert_eq!(git_calls.lock().unwrap().len(), 1);
-        assert!(cleanup_calls.lock().unwrap().is_empty());
+        assert_eq!(
+            cleanup_calls.lock().unwrap().as_slice(),
+            &[
+                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },
+                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views() {
+        let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
+        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::new(direction())),
+            Arc::new(ExactConflictGit {
+                base_commit: exact_base_commit.clone(),
+                calls: Arc::new(Mutex::new(Vec::new())),
+            }),
+            Arc::new(RecordingCleanup { calls: Arc::clone(&cleanup_calls), failure: None }),
+        );
+
+        assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Conflicted);
+
+        let cleanup_calls = cleanup_calls.lock().unwrap();
+        assert_eq!(cleanup_calls.len(), 2);
+        let baseline_call = cleanup_calls.first().unwrap();
+        let views_call = cleanup_calls.get(1).unwrap();
+        assert_eq!(baseline_call.stage, CleanupStage::Baseline);
+        assert_eq!(views_call.stage, CleanupStage::Views);
+        assert!(cleanup_calls.iter().all(|call| call.request.base_commit == exact_base_commit));
+        assert!(
+            cleanup_calls.iter().all(|call| call.request.base_branch.as_str() == "snapshot-base")
+        );
+    }
+
+    #[test]
+    fn test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion() {
+        let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
+        let state = stateful_cleanup_state();
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::new(direction())),
+            Arc::new(ExactConflictGit {
+                base_commit: exact_base_commit.clone(),
+                calls: Arc::new(Mutex::new(Vec::new())),
+            }),
+            stateful_cleanup(Arc::clone(&state), Some(BaselineFailure::Generation)),
+        );
+
+        let error = interactor.execute(command()).unwrap_err();
+
+        assert!(matches!(
+            error,
+            BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(
+                BaselineReplacementError::Generation(detail)
+            )) if detail.as_str() == "baseline generation failed"
+        ));
+        let state = state.lock().unwrap();
+        let only_call = state.calls.first().unwrap();
+        assert_eq!(state.calls.len(), 1);
+        assert_eq!(only_call.stage, CleanupStage::Baseline);
+        assert_eq!(only_call.request.base_commit, exact_base_commit);
+        assert!(state.sync_base_record.is_none());
+    }
+
+    #[test]
+    fn test_base_merge_execute_conflict_views_failure_is_reported_without_sync() {
+        let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
+        let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
+        let interactor = BaseMergeInteractor::new(
+            Arc::new(SuccessfulContext::new(direction())),
+            Arc::new(ExactConflictGit {
+                base_commit: exact_base_commit.clone(),
+                calls: Arc::new(Mutex::new(Vec::new())),
+            }),
+            Arc::new(RecordingCleanup {
+                calls: Arc::clone(&cleanup_calls),
+                failure: Some(CleanupStage::Views),
+            }),
+        );
+
+        let error = interactor.execute(command()).unwrap_err();
+
+        assert!(matches!(
+            error,
+            BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(
+                ViewsRegenerationError::Regeneration(detail)
+            )) if detail.as_str() == "cleanup failed"
+        ));
+        let cleanup_calls = cleanup_calls.lock().unwrap();
+        assert_eq!(
+            cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
+            vec![CleanupStage::Baseline, CleanupStage::Views]
+        );
+        assert!(cleanup_calls.iter().all(|call| call.request.base_commit == exact_base_commit));
+        assert!(!cleanup_calls.iter().any(|call| call.stage == CleanupStage::SyncBaseStamp));
     }
 
     #[test]
@@ -1025,20 +1161,11 @@ mod tests {
     #[test]
     fn test_base_merge_execute_cleanup_failure_preserves_each_failed_stage() {
         for (failure, expected_stages) in [
-            (CleanupStage::Views, vec![CleanupStage::Views]),
-            (CleanupStage::Baseline, vec![CleanupStage::Views, CleanupStage::Baseline]),
-            (
-                CleanupStage::ViewsAfterBaseline,
-                vec![CleanupStage::Views, CleanupStage::Baseline, CleanupStage::ViewsAfterBaseline],
-            ),
+            (CleanupStage::Baseline, vec![CleanupStage::Baseline]),
+            (CleanupStage::Views, vec![CleanupStage::Baseline, CleanupStage::Views]),
             (
                 CleanupStage::SyncBaseStamp,
-                vec![
-                    CleanupStage::Views,
-                    CleanupStage::Baseline,
-                    CleanupStage::ViewsAfterBaseline,
-                    CleanupStage::SyncBaseStamp,
-                ],
+                vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp],
             ),
         ] {
             let git_calls = Arc::new(Mutex::new(Vec::new()));
@@ -1060,12 +1187,6 @@ mod tests {
             assert!(match (failure, error) {
                 (
                     CleanupStage::Views,
-                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error)),
-                ) => {
-                    matches!(error, ViewsRegenerationError::Regeneration(detail) if detail.as_str() == "cleanup failed")
-                }
-                (
-                    CleanupStage::ViewsAfterBaseline,
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error)),
                 ) => {
                     matches!(error, ViewsRegenerationError::Regeneration(detail) if detail.as_str() == "cleanup failed")
@@ -1149,7 +1270,7 @@ mod tests {
         assert_eq!(state.active_baseline, "prior-valid-baseline");
         assert_eq!(
             state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Views, CleanupStage::Baseline]
+            vec![CleanupStage::Baseline]
         );
     }
 
@@ -1196,7 +1317,7 @@ mod tests {
             assert_eq!(state.active_baseline, "prior-valid-baseline");
             assert_eq!(
                 state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-                vec![CleanupStage::Views, CleanupStage::Baseline]
+                vec![CleanupStage::Baseline]
             );
         }
     }
@@ -1226,7 +1347,7 @@ mod tests {
         assert_eq!(state.active_baseline, "prior-valid-baseline");
         assert_eq!(
             state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Views, CleanupStage::Baseline]
+            vec![CleanupStage::Baseline]
         );
     }
 
@@ -1317,12 +1438,7 @@ mod tests {
         assert!(state.sync_base_record.is_none());
         assert_eq!(
             state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![
-                CleanupStage::Views,
-                CleanupStage::Baseline,
-                CleanupStage::ViewsAfterBaseline,
-                CleanupStage::SyncBaseStamp,
-            ]
+            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
         );
     }
 
@@ -1375,12 +1491,7 @@ mod tests {
             assert!(state.sync_base_record.is_none());
             assert_eq!(
                 state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-                vec![
-                    CleanupStage::Views,
-                    CleanupStage::Baseline,
-                    CleanupStage::ViewsAfterBaseline,
-                    CleanupStage::SyncBaseStamp,
-                ]
+                vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
             );
         }
     }
@@ -1408,20 +1519,18 @@ mod tests {
         assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit));
         assert_eq!(
             state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![
-                CleanupStage::Views,
-                CleanupStage::Baseline,
-                CleanupStage::ViewsAfterBaseline,
-                CleanupStage::SyncBaseStamp,
-            ]
+            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
         );
         assert!(state.calls.iter().all(|call| call.request.base_commit == exact_base_commit));
     }
 
     #[test]
-    fn test_base_merge_attempt_outcome_conflicted_skips_cleanup() {
-        let attempt = BaseMergeAttemptOutcome::Conflicted;
-        assert!(matches!(attempt, BaseMergeAttemptOutcome::Conflicted));
+    fn test_base_merge_attempt_outcome_conflicted_runs_baseline_then_views() {
+        let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
+        let attempt =
+            BaseMergeAttemptOutcome::Conflicted { base_commit: exact_base_commit.clone() };
+        assert!(matches!(attempt, BaseMergeAttemptOutcome::Conflicted { base_commit }
+            if base_commit == exact_base_commit));
 
         let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
         let interactor = BaseMergeInteractor::new(
@@ -1434,7 +1543,13 @@ mod tests {
         );
 
         assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Conflicted);
-        assert!(cleanup_calls.lock().unwrap().is_empty());
+        assert_eq!(
+            cleanup_calls.lock().unwrap().as_slice(),
+            &[
+                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },
+                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
+            ]
+        );
     }
 
     #[test]
@@ -1462,10 +1577,7 @@ mod tests {
         assert_eq!(state.sync_base_record.as_ref(), Some(&prior_record));
         assert_eq!(
             state.calls.as_slice(),
-            [
-                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
-                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },
-            ]
+            [CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }]
         );
     }
 
@@ -1518,17 +1630,12 @@ mod tests {
         assert!(matches!(outcome, BaseMergeOutcome::Completed));
         assert_eq!(
             state.lock().unwrap().calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![
-                CleanupStage::Views,
-                CleanupStage::Baseline,
-                CleanupStage::ViewsAfterBaseline,
-                CleanupStage::SyncBaseStamp,
-            ]
+            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
         );
     }
 
     #[test]
-    fn test_base_merge_outcome_conflicted_has_no_cleanup_calls() {
+    fn test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync() {
         let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
         let interactor = BaseMergeInteractor::new(
             Arc::new(SuccessfulContext::new(direction())),
@@ -1542,7 +1649,13 @@ mod tests {
         let outcome = interactor.execute(command()).unwrap();
 
         assert!(matches!(outcome, BaseMergeOutcome::Conflicted));
-        assert!(cleanup_calls.lock().unwrap().is_empty());
+        assert_eq!(
+            cleanup_calls.lock().unwrap().as_slice(),
+            &[
+                CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },
+                CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
+            ]
+        );
     }
 
     #[test]
@@ -1628,12 +1741,7 @@ mod tests {
         assert_eq!(success_state.sync_base_record.as_ref(), Some(&exact_base_commit));
         assert_eq!(
             success_state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![
-                CleanupStage::Views,
-                CleanupStage::Baseline,
-                CleanupStage::ViewsAfterBaseline,
-                CleanupStage::SyncBaseStamp,
-            ]
+            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
         );
     }
 }

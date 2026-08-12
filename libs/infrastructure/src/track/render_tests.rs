@@ -1679,7 +1679,7 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
         "schema_version": 4,
         "generated_at": "2026-04-19T00:00:00Z",
         "declaration_hash": hash,
-        "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "baseline_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "signals": [
             {
@@ -1743,7 +1743,7 @@ fn sync_rendered_views_requires_present_baseline_to_match_signal_document() {
             "schema_version": 4,
             "generated_at": "2026-04-19T00:00:00Z",
             "declaration_hash": declaration_hash.clone(),
-            "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "baseline_hash": baseline_hash,
             "signals": [
                 {

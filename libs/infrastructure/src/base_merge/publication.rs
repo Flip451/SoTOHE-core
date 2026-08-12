@@ -17,7 +17,7 @@ use super::{BASELINE_REPLACEMENT_PHASE_MARKER, TRACK_WRITER_LOCK_FILE};
 
 const TDDD_FEATURES_BASELINE_FILE: &str = "tddd-features-baseline.json";
 pub(super) struct PendingWriterLock {
-    request: BaseMergeCleanupRequest,
+    pub(super) request: BaseMergeCleanupRequest,
     file: fs::File,
 }
 
