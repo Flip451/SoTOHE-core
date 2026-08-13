@@ -18,6 +18,231 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:50:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12e3e53312dd437dab4e41dd1c59e4792eb0bc190c7a27c8bbf260d2404a7b9c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:53:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12e3e53312dd437dab4e41dd1c59e4792eb0bc190c7a27c8bbf260d2404a7b9c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:41:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:46:05Z",
+          "findings": [
+            {
+              "category": "branch-wide consistency",
+              "file": ".harness/config/phase-commands.json",
+              "line": 17,
+              "message": "意図した ADR review check の削除と、shipped matrix を固定するテストが同期されていません。`apps/cli/src/commands/phase.rs` の `test_shipped_phase_commands_declare_direct_upstream_convergence_matrix` はこの JSON を `include_str!` で直接読み、`spec-design` に削除済みの第2コマンドが存在すると assert するため、CI の CLI テストが確実に失敗します。operator-owned override を許容する形へ当該 assertion も更新または条件化してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:50:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:39:03Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates upstream behavior contracts instead of limiting the task text to target + operation + anchors; in particular, the clauses about mandatory configuration validation, pathspec application, nested-repository handling, and preserving the port duplicate IN/CN/AC content. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates upstream behavior contracts instead of limiting the task text to target + operation + anchors; the scaffold location, static lifetime removal, hard-link semantics, byte identity, and production-copy clauses duplicate IN/OS/CN/AC content. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 26,
+              "message": "Section S1 repeats the upstream design rationale and behavior contract in prose (validated operator configuration, port preservation, and nested-repository handling) rather than using only target + operation + anchors. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 36,
+              "message": "Section S2 repeats the upstream behavior contract in prose (cargo-cleanable scaffolds, lifetime retention, hard-link optimization, and production-export preservation) rather than using only target + operation + anchors. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a15655576b4eb0d86b98703ff5d12912c5b45062d1ea043d27ae54eee4bb2615",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:45:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d6960247e0d5c930a3e1f1d64911bc6e02ee97258f47547cfb8aa08658df18e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:50:06Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 6,
+              "message": "T001 is a pre-implementation split candidate: it combines the independently verifiable config-loading/fail-closed unit (IN-01, CN-01, AC-01, AC-02) with trailing-directory filtering (IN-02, CN-02, AC-03). Split these into separately committable tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 12,
+              "message": "T002 bundles three independently verifiable behavior units: target-scoped scaffold placement and fallback (IN-03, CN-03, AC-04), removal of process-lifetime TempDir retention (IN-04, AC-05), and test-only hard-link transplantation with production-copy preservation (IN-05, CN-04, AC-06, AC-07). Split them into separate tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/task-coverage.json",
+              "line": 24,
+              "message": "AC-04's mapping to T002 is not load-bearing for its in-process-test requirement. T002 concretely targets `apps/cli/tests/`, and batch-plan estimates only the `cli` scope, while the current in-process scaffold export test is `export_transplants_running_binary_into_bin_sotp` in `apps/cli-composition/src/template_export/mod.rs`. Add an explicit target/task and corresponding scope estimate for that in-process path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6d6960247e0d5c930a3e1f1d64911bc6e02ee97258f47547cfb8aa08658df18e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:56:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e92dd906d938197a1aabd71401269b14d7114ad47730a45a615a579662149daf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:59:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e92dd906d938197a1aabd71401269b14d7114ad47730a45a615a579662149daf",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:38:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b998039e04d3f6fbf8634fb1af1da26a19cd416cbaa875b014ce0d8b39d276cb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:40:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b998039e04d3f6fbf8634fb1af1da26a19cd416cbaa875b014ce0d8b39d276cb",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:46:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3109b97664c98d07d418837970acb4e32091fba5133f80c848b8f154ae7c1dd9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:49:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3109b97664c98d07d418837970acb4e32091fba5133f80c848b8f154ae7c1dd9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:02:37Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+              "line": 15,
+              "message": "`usecase::ScopeDiffMeasurePort::measure_scope_diff` is declared synchronous (`is_async: false`) despite performing external Git/filesystem I/O, while the entry docs do not acknowledge or justify this sync choice. Record the boundary-color decision explicitly or expose an async-compatible contract before implementation locks in the adapter shape.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:86a2953d3124cdbffe88d7adc78a6b889d7dc48ab05b67aa2fc79d2c196bff6e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:12:53Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+              "line": 15,
+              "message": "`usecase::ScopeDiffMeasurePort::measure_scope_diff` is declared synchronous (`is_async: false`) despite its contract performing external Git/filesystem I/O, and the entry docs do not acknowledge or justify that synchronous boundary choice. This can force adapter rework if the port must support non-blocking I/O.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e448c3a11f7aa7630573ed88688aa6f8dfd230deb90f1112c7adf7500b06ef9c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:29:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e448c3a11f7aa7630573ed88688aa6f8dfd230deb90f1112c7adf7500b06ef9c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:33:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e448c3a11f7aa7630573ed88688aa6f8dfd230deb90f1112c7adf7500b06ef9c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

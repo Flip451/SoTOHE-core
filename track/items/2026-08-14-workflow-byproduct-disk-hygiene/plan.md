@@ -1,4 +1,38 @@
 <!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
 # Workflow byproduct disk hygiene: scope diff untracked-directory measurement failure and template export test /tmp scaffold leak
 
-> **Note**: `impl-plan.json` not yet generated. Run `/track:impl-plan` to generate the implementation plan.
+## Summary
+
+GO-01 → T001, T002, T003, T004, T005.
+
+## Tasks (0/5 resolved)
+
+### S1 — Scope-diff configuration
+
+> Update the scope-diff config targets and adapter regressions. D1; IN-01; CN-01; AC-01; AC-02.
+
+- [ ] **T001**: Update `libs/infrastructure/src/scope_diff_measure.rs`, the scope-diff config under `.harness/config/`, and focused adapter regression tests. D1; IN-01; CN-01; AC-01; AC-02.
+
+### S2 — Untracked directory filtering
+
+> Update the scope-diff adapter filtering target and regressions. D2; IN-02; CN-02; AC-03.
+
+- [ ] **T002**: Update `libs/infrastructure/src/scope_diff_measure.rs` and focused adapter regression tests for untracked entry filtering. D2; IN-02; CN-02; AC-03.
+
+### S3 — Scaffold placement
+
+> Update integration and in-process scaffold test targets. D3; IN-03; CN-03; AC-04.
+
+- [ ] **T003**: Update scaffold setup in `apps/cli/tests/` and the in-process export regression in `apps/cli-composition/src/template_export/mod.rs`. D3; IN-03; CN-03; AC-04.
+
+### S4 — Host-first scaffold lifecycle
+
+> Update the host-first scaffold test target and regression coverage. D4; IN-04; AC-05.
+
+- [ ] **T004**: Update `apps/cli/tests/consumer_scaffold_host_first.rs` and its focused regression coverage. D4; IN-04; AC-05.
+
+### S5 — Template-export transplant
+
+> Update template-export transplant regression targets. D5; IN-05; OS-01; CN-04; AC-06; AC-07.
+
+- [ ] **T005**: Update template-export transplant regressions in `apps/cli/tests/` and `apps/cli-composition/src/template_export/mod.rs`. D5; IN-05; OS-01; CN-04; AC-06; AC-07.

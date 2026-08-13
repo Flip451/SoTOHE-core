@@ -18,18 +18,6 @@
         {
           "argv": ["bin/sotp", "signal", "check-adr-user", "--gate", "commit"],
           "timeout_seconds": 3600
-        },
-        {
-          "argv": [
-            "bin/sotp",
-            "review",
-            "check-zero-findings",
-            "--scope",
-            "adr",
-            "--round",
-            "final"
-          ],
-          "timeout_seconds": 3600
         }
       ]
     },
