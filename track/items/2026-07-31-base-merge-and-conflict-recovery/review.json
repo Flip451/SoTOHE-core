@@ -3511,6 +3511,13 @@
           "hash": "rvw1:sha256:82885a067737710044b177f1f556011861ca5cc3a5d2dbd92ecc5136b5ba0913",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T23:41:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2769f050d49603a97041ed9984e90fb70cd89f4164e9e4185a8532a4feec6e36",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -8782,6 +8789,28 @@
           "at": "2026-08-12T22:56:35Z",
           "findings": [],
           "hash": "rvw1:sha256:e633311c6ddd30421420b60bd432b4148d21887d4934a79ce5354ccb0a44c105",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-12T23:47:24Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 191,
+              "message": "Duplicate TypeSignalsCacheKey × AC-08 binding: the checker uses first-match semantics, so this later record's unverified-observation and unreadable-authority tests are excluded from the authoritative bound-test set. Merge this record with the existing binding at line 21 using the union of both test sets.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4232a782331bd50f83417a26e7e580fc88eef2f7cf7f0a5444ba42a0e0786d54",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-12T23:58:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e50be0ce7929ce2c4a4375536524d9dc9e3a908aed2581de7775c3283d6d6f98",
           "type": "final",
           "verdict": "zero_findings"
         }

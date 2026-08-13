@@ -1517,215 +1517,7 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
-          "test_name": "test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_recomparison"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
-          "test_name": "test_baseline_hash_changes_when_baseline_bytes_change"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::verify::spec_states::tests",
-          "test_name": "test_check_impl_catalog_stale_baseline_hash_returns_error"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "IN-05",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "TypeSignalsCacheKey"
-      },
-      "key": {
-        "anchor_text_hash": "b6c73a772fa3fd9972c487a209629483975cadf6994710ab799b92f810c4a3e4",
-        "bound_tests_set_hash": "a46cf6ec4022509e86a1b711c469a2a0dda35c985e745dc0a71c800aa9fcf9be",
-        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
-      },
-      "obligation_id": {
-        "entry_key": "TypeSignalsCacheKey",
-        "item_identifier": "voluntary:IN-05",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_eq!(decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)), TypeSignalsReuseDecision::SkipEvaluation); ... assert_eq!(decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(B, 'a', A),)), TypeSignalsReuseDecision::ReevaluateWithoutExtraction); ... TypeSignalsWorktreeStatus::Dirty ... None",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
-          "test_name": "test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_recomparison"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
-          "test_name": "test_baseline_hash_changes_when_baseline_bytes_change"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::verify::spec_states::tests",
-          "test_name": "test_check_impl_catalog_stale_baseline_hash_returns_error"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CN-03",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "TypeSignalsCacheKey"
-      },
-      "key": {
-        "anchor_text_hash": "e0828e44e3c7db06ac7ad555195a9c13e6eccb776a95677ebc371aaf3756d578",
-        "bound_tests_set_hash": "a46cf6ec4022509e86a1b711c469a2a0dda35c985e745dc0a71c800aa9fcf9be",
-        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
-      },
-      "obligation_id": {
-        "entry_key": "TypeSignalsCacheKey",
-        "item_identifier": "voluntary:CN-03",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_eq!(observer.launches(), 0);",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
-          "test_name": "test_baseline_hash_cache_key_tracks_baseline_bytes_and_mismatch_requires_recomparison"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_codec::tests",
-          "test_name": "test_baseline_hash_changes_when_baseline_bytes_change"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_and_matching_head_reuses_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_clean_worktree_with_different_head_recalculates"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
-          "test_name": "test_execute_type_signals_dirty_worktree_recalculates_even_with_matching_cache"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::verify::spec_states::tests",
-          "test_name": "test_check_impl_catalog_stale_baseline_hash_returns_error"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-07",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "TypeSignalsCacheKey"
-      },
-      "key": {
-        "anchor_text_hash": "52517ee8022f765a8b35caecfc11133f1a54deca9549f3853e544f257ffb631a",
-        "bound_tests_set_hash": "a46cf6ec4022509e86a1b711c469a2a0dda35c985e745dc0a71c800aa9fcf9be",
-        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
-      },
-      "obligation_id": {
-        "entry_key": "TypeSignalsCacheKey",
-        "item_identifier": "voluntary:AC-07",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
-        },
-        {
-          "layer": "domain",
-          "module_path": "domain::tddd::type_signals_doc::tests",
-          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
         },
         {
           "layer": "domain",
@@ -1751,6 +1543,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::merge_gate::tests",
+          "test_name": "test_u45_stage2_matching_declaration_and_baseline_consumes_cached_signals"
         }
       ],
       "edge_id": {
@@ -1762,7 +1564,7 @@
       },
       "key": {
         "anchor_text_hash": "818bf2cf4f7e6b53d49efda15ec8c409369f1b0bc03715556ad63affc5f4bd59",
-        "bound_tests_set_hash": "dd28de834183bdc2955afbeaa4965d4d7412c866d61a4f0028b078c4dc4ccb29",
+        "bound_tests_set_hash": "c5ad9384f5c3f1d4d4f226134ad2e1f2ff1b10ff1949b2a5c54aeefabfcd5a3a",
         "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
       },
       "obligation_id": {
@@ -1771,7 +1573,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(observer.launches(), 1, \"{label} cache must trigger evaluation\"); ... assert_eq!(persisted.cache_key(), current_cache_document(workspace.path(), &items_dir, &track_id).cache_key(), \"{label} cache must be atomically replaced with current identities\");",
+        "citation": "assert_eq!(observer.launches(), 1, \"{label} cache must trigger evaluation\");\n            let persisted = type_signals_codec::decode(\n                &std::fs::read_to_string(signal_path(&items_dir, &track_id)).unwrap(),\n            )\n            .unwrap();\n            assert_eq!(\n                persisted.cache_key(),\n                current_cache_document(workspace.path(), &items_dir, &track_id).cache_key(),\n                \"{label} cache must be atomically replaced with current identities\"\n            );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -25239,6 +25041,1775 @@
       },
       "verdict": {
         "citation": "assert_eq!(\n            *stash_service.inputs.lock().unwrap(),\n            vec![GitStashInput::Push, GitStashInput::Pop]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_dirty_worktree_rejection_precedes_merge_attempt"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackCommand"
+      },
+      "key": {
+        "anchor_text_hash": "e800efa5f80d047ee343cae35b7c3c6d88723d99729d93867bc674db8ca6d4e7",
+        "bound_tests_set_hash": "51ef511873e6c9e6835dad442a2c5ea4ee8027b17ccb70b47fe888cce0500a51",
+        "declaration_hash": "340784c871f5229ed3af7ab3631376bffb1f3c185ce8f1af0bcddc829128c78e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = interactor.execute(command()).unwrap_err();\n\n        assert!(matches!(\n            error,\n            BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(\n                BaselineReplacementError::Generation(detail)\n            )) if detail.as_str() == \"baseline generation failed\"\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_dirty_worktree_rejection_precedes_merge_attempt"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "e800efa5f80d047ee343cae35b7c3c6d88723d99729d93867bc674db8ca6d4e7",
+        "bound_tests_set_hash": "51ef511873e6c9e6835dad442a2c5ea4ee8027b17ccb70b47fe888cce0500a51",
+        "declaration_hash": "a0e4981049c855e86c98df3ac82dacf29f417393f7e1a3dc14a56ff3390553e6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "        let error = interactor.execute(command()).unwrap_err();\n\n        assert!(matches!(\n            error,\n            BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(\n                BaselineReplacementError::Generation(detail)\n            )) if detail.as_str() == \"baseline generation failed\"\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_dirty_worktree_rejection_precedes_merge_attempt"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7a13fe65a21a0759c695a44a6a616b143ff7e42d7bb9093bba33f0ec9b91ba4f",
+        "bound_tests_set_hash": "51ef511873e6c9e6835dad442a2c5ea4ee8027b17ccb70b47fe888cce0500a51",
+        "declaration_hash": "340784c871f5229ed3af7ab3631376bffb1f3c185ce8f1af0bcddc829128c78e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "item_identifier": "voluntary:AC-12",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(baseline_call.request.base_commit, exact_base_commit); ... assert_eq!(views_call.stage, CleanupStage::Views); ... assert!(state.sync_base_record.is_none()); ... let error = interactor.execute(command()).unwrap_err();",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_dirty_worktree_rejection_precedes_merge_attempt"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "7a13fe65a21a0759c695a44a6a616b143ff7e42d7bb9093bba33f0ec9b91ba4f",
+        "bound_tests_set_hash": "51ef511873e6c9e6835dad442a2c5ea4ee8027b17ccb70b47fe888cce0500a51",
+        "declaration_hash": "a0e4981049c855e86c98df3ac82dacf29f417393f7e1a3dc14a56ff3390553e6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:AC-12",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = result.unwrap_err().to_string();\n        assert!(error.contains(\"base merge failed\"));\n        assert!(!error.contains(\"base merge completed\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_context_rejects_non_track_and_nested_workspace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_non_track_current_branch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_dirty_worktree_rejection_precedes_merge_attempt"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackCommand"
+      },
+      "key": {
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34",
+        "bound_tests_set_hash": "48bee282caec8b603ce2cfad514788c0571096aef5ced65bd22517a482d8ac78",
+        "declaration_hash": "340784c871f5229ed3af7ab3631376bffb1f3c185ce8f1af0bcddc829128c78e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(detail.as_str().contains(\"current branch is not an active track\")); ... assert!(matches!(error, BaseMergeError::Context(detail)\n            if detail.as_str() == \"reverse-direction merge context is rejected\")); ... outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_rejects_snapshot_source_before_ports"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_guard_failures_without_success"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_context_rejects_non_track_and_nested_workspace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_git_rejects_non_track_current_branch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_active_track_mismatch_returns_typed_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_dirty_worktree_rejection_precedes_merge_attempt"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_reverse_direction_context_rejection_skips_git_and_cleanup"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "bbbb8b0ae8e121225a1f2c7388f5aa303e348da890d769ed1323f1fac625ca34",
+        "bound_tests_set_hash": "48bee282caec8b603ce2cfad514788c0571096aef5ced65bd22517a482d8ac78",
+        "declaration_hash": "a0e4981049c855e86c98df3ac82dacf29f417393f7e1a3dc14a56ff3390553e6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(outcome.stderr.as_deref().unwrap().contains(\"differs from snapshot base 'develop'\")) ... if detail.as_str().contains(\"current branch is not an active track\") ... if detail.as_str() == \"reverse-direction merge context is rejected\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackCommand"
+      },
+      "key": {
+        "anchor_text_hash": "a4ab390783e3e23e68b3b4f5049e5159af7ac6f59379590572cc0e19eae367ac",
+        "bound_tests_set_hash": "77335eba0dfd7856402aeb3574dfcdd12c4bf823789be983b651514efdb3d10a",
+        "declaration_hash": "340784c871f5229ed3af7ab3631376bffb1f3c185ce8f1af0bcddc829128c78e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "item_identifier": "voluntary:CN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(cleanup_calls.iter().all(|call| call.request.base_commit == exact_base_commit)); ... let error = interactor.execute(command()).unwrap_err();",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "a4ab390783e3e23e68b3b4f5049e5159af7ac6f59379590572cc0e19eae367ac",
+        "bound_tests_set_hash": "77335eba0dfd7856402aeb3574dfcdd12c4bf823789be983b651514efdb3d10a",
+        "declaration_hash": "a0e4981049c855e86c98df3ac82dacf29f417393f7e1a3dc14a56ff3390553e6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:CN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(cleanup_calls.iter().all(|call| call.request.base_commit == exact_base_commit));\n\nlet error = interactor.execute(command()).unwrap_err();\n\nassert!(matches!(\n    error,\n    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(\n        BaselineReplacementError::Generation(detail)\n    )) if detail.as_str() == \"baseline generation failed\"\n));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-07",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackCommand"
+      },
+      "key": {
+        "anchor_text_hash": "2d6fd2cb71a220d60209f01b674a1ff52c0b6a1f74be036e46dae43c7f72b31e",
+        "bound_tests_set_hash": "77335eba0dfd7856402aeb3574dfcdd12c4bf823789be983b651514efdb3d10a",
+        "declaration_hash": "340784c871f5229ed3af7ab3631376bffb1f3c185ce8f1af0bcddc829128c78e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommand",
+        "item_identifier": "voluntary:CN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            state.lock().unwrap().calls.iter().map(|call| call.stage).collect::<Vec<_>>(),\n            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-07",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TrackDriver"
+      },
+      "key": {
+        "anchor_text_hash": "2d6fd2cb71a220d60209f01b674a1ff52c0b6a1f74be036e46dae43c7f72b31e",
+        "bound_tests_set_hash": "77335eba0dfd7856402aeb3574dfcdd12c4bf823789be983b651514efdb3d10a",
+        "declaration_hash": "a0e4981049c855e86c98df3ac82dacf29f417393f7e1a3dc14a56ff3390553e6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackDriver",
+        "item_identifier": "voluntary:CN-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(cleanup_calls.lock().unwrap().as_slice(), &[ CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }, CleanupCall { stage: CleanupStage::Views, request: cleanup_request() }, ]); ... assert!(!cleanup_calls.iter().any(|call| call.stage == CleanupStage::SyncBaseStamp)); ... assert!(matches!(error, BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views( ViewsRegenerationError::Regeneration(detail) )) if detail.as_str() == \"cleanup failed\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "BaseMergeAttemptOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "a4ab390783e3e23e68b3b4f5049e5159af7ac6f59379590572cc0e19eae367ac",
+        "bound_tests_set_hash": "77335eba0dfd7856402aeb3574dfcdd12c4bf823789be983b651514efdb3d10a",
+        "declaration_hash": "f102cd6f56ee8d7d819e43221a8c58d4f06113ce2ccd74967547106364476e25"
+      },
+      "obligation_id": {
+        "entry_key": "BaseMergeAttemptOutcome",
+        "item_identifier": "voluntary:CN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(cleanup_calls.iter().all(|call| call.request.base_commit == exact_base_commit));\n\nlet error = interactor.execute(command()).unwrap_err();\n\nassert!(matches!(\n    error,\n    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(\n        BaselineReplacementError::Generation(detail)\n    )) if detail.as_str() == \"baseline generation failed\"\n));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-09",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsAuthorityStatus"
+      },
+      "key": {
+        "anchor_text_hash": "46ac95eda52adc5e1bde595efcbb2f6e0280715e89c5a7ce1e43d5a244d2663a",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "bf60630483747618ad96accfb4540b1f569740b9cb52e4d4824bd72107f46099"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsAuthorityStatus",
+        "item_identifier": "voluntary:AC-09",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsAuthorityStatus"
+      },
+      "key": {
+        "anchor_text_hash": "68c5d0fe7b581610f8f0db9192756bb4dc7a499207bc3efdc648f69003bcb096",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "bf60630483747618ad96accfb4540b1f569740b9cb52e4d4824bd72107f46099"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsAuthorityStatus",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsAuthorityStatus"
+      },
+      "key": {
+        "anchor_text_hash": "b6c73a772fa3fd9972c487a209629483975cadf6994710ab799b92f810c4a3e4",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "bf60630483747618ad96accfb4540b1f569740b9cb52e4d4824bd72107f46099"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsAuthorityStatus",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-09",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "46ac95eda52adc5e1bde595efcbb2f6e0280715e89c5a7ce1e43d5a244d2663a",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "item_identifier": "voluntary:AC-09",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"TypeSignalsWorktreeStatus::Dirty,\\n                TypeSignalsAuthorityStatus::Readable\\n            ),\\n            TypeSignalsReuseDecision::ReextractAndEvaluate\"; \"TypeSignalsWorktreeStatus::Clean,\\n                TypeSignalsAuthorityStatus::Unreadable\\n            ),\\n            TypeSignalsReuseDecision::ReextractAndEvaluate\"; \"observer.launches(), 0, \\\"unreadable authority must not reuse the cache\\\"\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "68c5d0fe7b581610f8f0db9192756bb4dc7a499207bc3efdc648f69003bcb096",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n\n        assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', B),)),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "52517ee8022f765a8b35caecfc11133f1a54deca9549f3853e544f257ffb631a",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "f9465dbe62275f41e03c74e0238175529e379aba9783e3905a1d60ab42e3d9dc"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseInput",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n    decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n    TypeSignalsReuseDecision::SkipEvaluation\n); ... assert_eq!(\n    decide_after_verification(\n        TypeSignalsWorktreeStatus::Dirty,\n        TypeSignalsAuthorityStatus::Readable\n    ),\n    TypeSignalsReuseDecision::ReextractAndEvaluate\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "818bf2cf4f7e6b53d49efda15ec8c409369f1b0bc03715556ad63affc5f4bd59",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "f9465dbe62275f41e03c74e0238175529e379aba9783e3905a1d60ab42e3d9dc"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseInput",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeSignalsReuseInput::verify(\n                cache_key(A, 'a', A),\n                cache_key(A, 'a', A),\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable,\n            ),\n            None",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-09",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "46ac95eda52adc5e1bde595efcbb2f6e0280715e89c5a7ce1e43d5a244d2663a",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "f9465dbe62275f41e03c74e0238175529e379aba9783e3905a1d60ab42e3d9dc"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseInput",
+        "item_identifier": "voluntary:AC-09",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n\nassert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(B, 'a', A),)),\n            TypeSignalsReuseDecision::ReevaluateWithoutExtraction\n        );\n\nassert_eq!(observer.launches(), 0, \"unreadable authority must not reuse the cache\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "e0828e44e3c7db06ac7ad555195a9c13e6eccb776a95677ebc371aaf3756d578",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "f9465dbe62275f41e03c74e0238175529e379aba9783e3905a1d60ab42e3d9dc"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseInput",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-04",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "68c5d0fe7b581610f8f0db9192756bb4dc7a499207bc3efdc648f69003bcb096",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "f9465dbe62275f41e03c74e0238175529e379aba9783e3905a1d60ab42e3d9dc"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseInput",
+        "item_identifier": "voluntary:CN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );\n        assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Clean,\n                TypeSignalsAuthorityStatus::Unreadable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsReuseInput"
+      },
+      "key": {
+        "anchor_text_hash": "b6c73a772fa3fd9972c487a209629483975cadf6994710ab799b92f810c4a3e4",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "f9465dbe62275f41e03c74e0238175529e379aba9783e3905a1d60ab42e3d9dc"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsReuseInput",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsWorktreeStatus"
+      },
+      "key": {
+        "anchor_text_hash": "52517ee8022f765a8b35caecfc11133f1a54deca9549f3853e544f257ffb631a",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "a1594d5107edbcba717724f2feb0396d9f9a9323f25779208efa478b58d3464c"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsWorktreeStatus",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_after_verification(\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-09",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsWorktreeStatus"
+      },
+      "key": {
+        "anchor_text_hash": "46ac95eda52adc5e1bde595efcbb2f6e0280715e89c5a7ce1e43d5a244d2663a",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "a1594d5107edbcba717724f2feb0396d9f9a9323f25779208efa478b58d3464c"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsWorktreeStatus",
+        "item_identifier": "voluntary:AC-09",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"TypeSignalsWorktreeStatus::Dirty,\\n                TypeSignalsAuthorityStatus::Readable\\n            ),\\n            TypeSignalsReuseDecision::ReextractAndEvaluate\"; \"TypeSignalsWorktreeStatus::Clean,\\n                TypeSignalsAuthorityStatus::Unreadable\\n            ),\\n            TypeSignalsReuseDecision::ReextractAndEvaluate\"; \"assert_eq!(observer.launches(), 0, \\\"unreadable authority must not reuse the cache\\\");\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsWorktreeStatus"
+      },
+      "key": {
+        "anchor_text_hash": "e0828e44e3c7db06ac7ad555195a9c13e6eccb776a95677ebc371aaf3756d578",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "a1594d5107edbcba717724f2feb0396d9f9a9323f25779208efa478b58d3464c"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsWorktreeStatus",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );\n...\n                TypeSignalsWorktreeStatus::Dirty,\n                TypeSignalsAuthorityStatus::Readable\n            ),\n            TypeSignalsReuseDecision::ReextractAndEvaluate",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_type_signals_reuse_input_verify_rejects_unverified_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsWorktreeStatus"
+      },
+      "key": {
+        "anchor_text_hash": "b6c73a772fa3fd9972c487a209629483975cadf6994710ab799b92f810c4a3e4",
+        "bound_tests_set_hash": "9bb903e7edbb2f01e692aeb8d1e00d49257d144300aecc7edef58d306827d6f0",
+        "declaration_hash": "a1594d5107edbcba717724f2feb0396d9f9a9323f25779208efa478b58d3464c"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsWorktreeStatus",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-07",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "52517ee8022f765a8b35caecfc11133f1a54deca9549f3853e544f257ffb631a",
+        "bound_tests_set_hash": "725c7d8f10ca9df42c209d83c92c161c069eab17408a34c83130ddff7d5b2ed1",
+        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "item_identifier": "voluntary:AC-07",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "e0828e44e3c7db06ac7ad555195a9c13e6eccb776a95677ebc371aaf3756d578",
+        "bound_tests_set_hash": "725c7d8f10ca9df42c209d83c92c161c069eab17408a34c83130ddff7d5b2ed1",
+        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),))",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_matching_declaration_head_and_baseline_skips_evaluation"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_each_isolated_cache_identity_mismatch_reevaluates"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::type_signals_doc::tests",
+          "test_name": "test_decide_type_signals_reuse_unverified_observations_reevaluate"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_missing_or_invalid_cache_is_replaced_atomically"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        "entry_key": "TypeSignalsCacheKey"
+      },
+      "key": {
+        "anchor_text_hash": "b6c73a772fa3fd9972c487a209629483975cadf6994710ab799b92f810c4a3e4",
+        "bound_tests_set_hash": "725c7d8f10ca9df42c209d83c92c161c069eab17408a34c83130ddff7d5b2ed1",
+        "declaration_hash": "ebc28269a265cbae2f9180ba5640d7c6ced40b9adf8eec7b548a60007c27c59b"
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsCacheKey",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            decide_type_signals_reuse(&verified_input(cache_key(A, 'a', A), cache_key(A, 'a', A),)),\n            TypeSignalsReuseDecision::SkipEvaluation\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
