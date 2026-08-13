@@ -351,9 +351,7 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
                 .map_err(PreReviewGateError::from)?
             else {
                 all_violations.push(
-                    domain::task_contract::CoverageViolation::MissingSignalDocument {
-                        layer: layer.clone(),
-                    },
+                    domain::task_contract::CoverageViolation::MissingSignalDocument(layer.clone()),
                 );
                 continue;
             };
@@ -524,11 +522,11 @@ impl PreReviewGateInteractor {
             if is_red {
                 // Red is always a blocker regardless of task status.
                 let entry_ref = entry_key_to_contracted_ref(contract_doc, layer, key)?;
-                violations.push(PreReviewGateViolation::NonBlueSignal { entry: entry_ref, signal });
+                violations.push(PreReviewGateViolation::NonBlueSignal(entry_ref, signal));
             } else if requires_blue && signal != ConfidenceSignal::Blue {
                 // Done/in_progress task with non-blue, non-red signal → block.
                 let entry_ref = entry_key_to_contracted_ref(contract_doc, layer, key)?;
-                violations.push(PreReviewGateViolation::NonBlueSignal { entry: entry_ref, signal });
+                violations.push(PreReviewGateViolation::NonBlueSignal(entry_ref, signal));
             }
             // No done/in_progress owner + Yellow → skip (no violation)
         }
@@ -721,6 +719,34 @@ mod tests {
             domain::ImplementationInputHash::new(digest),
             signals,
         )
+    }
+
+    fn assert_liveness_violations(
+        outcome: PreReviewGateOutcome,
+        expected: Vec<PreReviewGateViolation>,
+    ) {
+        match outcome {
+            PreReviewGateOutcome::Blocked(violations) => {
+                assert_eq!(violations.as_slice(), expected.as_slice());
+            }
+            PreReviewGateOutcome::Passed => panic!("expected liveness gate to be blocked"),
+        }
+    }
+
+    fn assert_coverage_violations(
+        outcome: CoverageVerifyOutcome,
+        expected: Vec<CoverageViolation>,
+    ) {
+        match outcome {
+            CoverageVerifyOutcome::Blocked(violations) => {
+                assert_eq!(violations.as_slice(), expected.as_slice());
+            }
+            CoverageVerifyOutcome::Passed => panic!("expected coverage gate to be blocked"),
+        }
+    }
+
+    fn missing_signal_documents(layers: &[&str]) -> Vec<CoverageViolation> {
+        layers.iter().map(|name| CoverageViolation::MissingSignalDocument(layer(name))).collect()
     }
 
     // ── Mock implementations ──────────────────────────────────────────────────
@@ -962,19 +988,13 @@ mod tests {
             Ok(make_signals(vec![yellow_signal("Foo")])),
         );
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
-        match outcome {
-            PreReviewGateOutcome::Blocked { violations, .. } => {
-                assert_eq!(violations.len(), 1);
-                match &violations[0] {
-                    PreReviewGateViolation::NonBlueSignal { entry, signal } => {
-                        assert_eq!(entry.entry_key().as_str(), "Foo");
-                        assert_eq!(*signal, ConfidenceSignal::Yellow);
-                    }
-                    other => panic!("expected NonBlueSignal, got {other:?}"),
-                }
-            }
-            other => panic!("expected Blocked, got {other:?}"),
-        }
+        assert_liveness_violations(
+            outcome,
+            vec![PreReviewGateViolation::NonBlueSignal(
+                ContractedEntryRef::new(layer("domain"), entry_key("Foo")),
+                ConfidenceSignal::Yellow,
+            )],
+        );
     }
 
     // ── AC-07 (e): all blue + complete attribution → Passed (binary) ──────────
@@ -1293,25 +1313,18 @@ mod tests {
             signal_docs,
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                let orphan_keys: Vec<&str> = violations
-                    .iter()
-                    .filter_map(|v| {
-                        if let CoverageViolation::OrphanEntry { entry } = v {
-                            Some(entry.entry_key().as_str())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    orphan_keys.contains(&"Foo"),
-                    "expected OrphanEntry for Foo, got: {orphan_keys:?}"
-                );
-            }
-            other => panic!("expected Blocked with OrphanEntry, got {other:?}"),
-        }
+        let mut expected = vec![CoverageViolation::OrphanEntry(ContractedEntryRef::new(
+            layer("domain"),
+            entry_key("Foo"),
+        ))];
+        expected.extend(missing_signal_documents(&[
+            "usecase",
+            "infrastructure",
+            "cli_driver",
+            "cli",
+            "cli_composition",
+        ]));
+        assert_coverage_violations(outcome, expected);
     }
 
     // ── Coverage (c): attributed key absent from signal doc → InvalidEntryRef ──
@@ -1335,25 +1348,18 @@ mod tests {
             signal_docs,
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                let invalid_keys: Vec<&str> = violations
-                    .iter()
-                    .filter_map(|v| {
-                        if let CoverageViolation::InvalidEntryRef { entry, .. } = v {
-                            Some(entry.entry_key().as_str())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    invalid_keys.contains(&"Missing"),
-                    "expected InvalidEntryRef for Missing, got: {invalid_keys:?}"
-                );
-            }
-            other => panic!("expected Blocked with InvalidEntryRef, got {other:?}"),
-        }
+        let mut expected = vec![CoverageViolation::InvalidEntryRef(
+            ContractedEntryRef::new(layer("domain"), entry_key("Missing")),
+            domain::FreeText::new("entry_key 'Missing' not found in domain-type-signals.json"),
+        )];
+        expected.extend(missing_signal_documents(&[
+            "usecase",
+            "infrastructure",
+            "cli_driver",
+            "cli",
+            "cli_composition",
+        ]));
+        assert_coverage_violations(outcome, expected);
     }
 
     #[test]
@@ -1373,34 +1379,17 @@ mod tests {
         );
 
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                // All 6 canonical TDDD layers are absent → 6 MissingSignalDocument violations.
-                let missing_layers: Vec<&str> = violations
-                    .iter()
-                    .filter_map(|v| {
-                        if let CoverageViolation::MissingSignalDocument { layer } = v {
-                            Some(layer.as_ref())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    missing_layers.contains(&"domain"),
-                    "expected MissingSignalDocument for domain, got violations: {violations:?}"
-                );
-                // Ensure no InvalidEntryRef is produced when the signal doc is absent.
-                let has_invalid_ref = violations
-                    .iter()
-                    .any(|v| matches!(v, CoverageViolation::InvalidEntryRef { .. }));
-                assert!(
-                    !has_invalid_ref,
-                    "InvalidEntryRef should not be emitted when signal document is absent"
-                );
-            }
-            other => panic!("expected Blocked with MissingSignalDocument, got {other:?}"),
-        }
+        assert_coverage_violations(
+            outcome,
+            missing_signal_documents(&[
+                "domain",
+                "usecase",
+                "infrastructure",
+                "cli_driver",
+                "cli",
+                "cli_composition",
+            ]),
+        );
     }
 
     // ── Coverage: no attribution AND no signal doc → MissingSignalDocument ────────
@@ -1431,25 +1420,16 @@ mod tests {
         );
 
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                let missing_layers: Vec<&str> = violations
-                    .iter()
-                    .filter_map(|v| {
-                        if let CoverageViolation::MissingSignalDocument { layer } = v {
-                            Some(layer.as_ref())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    missing_layers.contains(&"domain"),
-                    "expected MissingSignalDocument for domain (no attribution, no signal doc), got: {missing_layers:?}"
-                );
-            }
-            other => panic!("expected Blocked with MissingSignalDocument, got {other:?}"),
-        }
+        assert_coverage_violations(
+            outcome,
+            missing_signal_documents(&[
+                "domain",
+                "infrastructure",
+                "cli_driver",
+                "cli",
+                "cli_composition",
+            ]),
+        );
     }
 
     // ── Coverage (f): non-canonical layer attribution → InvalidEntryRef ──────────
@@ -1484,32 +1464,13 @@ mod tests {
             signal_docs,
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                let invalid_refs: Vec<_> = violations
-                    .iter()
-                    .filter_map(|v| {
-                        if let CoverageViolation::InvalidEntryRef { entry, reason } = v {
-                            Some((entry, reason))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    !invalid_refs.is_empty(),
-                    "expected at least one InvalidEntryRef for non-canonical layer 'doman', got: {violations:?}"
-                );
-                let (entry, reason) = invalid_refs[0];
-                assert_eq!(entry.layer().as_ref(), "doman", "expected layer 'doman' in violation");
-                assert_eq!(entry.entry_key().as_str(), "Foo");
-                assert!(
-                    reason.contains("not a canonical TDDD layer"),
-                    "expected reason to mention canonical TDDD layer, got: {reason}"
-                );
-            }
-            other => panic!("expected Blocked with InvalidEntryRef, got {other:?}"),
-        }
+        assert_coverage_violations(
+            outcome,
+            vec![CoverageViolation::InvalidEntryRef(
+                ContractedEntryRef::new(layer("doman"), entry_key("Foo")),
+                domain::FreeText::new("layer 'doman' is not a canonical TDDD layer"),
+            )],
+        );
     }
 
     // ── Coverage (e): all entries attributed and consistent → Passed ───────────
@@ -1594,27 +1555,13 @@ mod tests {
             signal_docs,
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                let orphan_keys: Vec<&str> = violations
-                    .iter()
-                    .filter_map(|v| {
-                        if let CoverageViolation::OrphanEntry { entry } = v {
-                            Some(entry.entry_key().as_str())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                assert!(
-                    orphan_keys.contains(&"ImplOnlyType"),
-                    "expected OrphanEntry for ImplOnlyType (kind: unknown), got: {orphan_keys:?}"
-                );
-            }
-            other => {
-                panic!("expected Blocked with OrphanEntry for unknown-kind row, got {other:?}")
-            }
-        }
+        assert_coverage_violations(
+            outcome,
+            vec![CoverageViolation::OrphanEntry(ContractedEntryRef::new(
+                layer("domain"),
+                entry_key("ImplOnlyType"),
+            ))],
+        );
     }
 
     // ── D9 task-key referential integrity tests ───────────────────────────────
@@ -1654,24 +1601,13 @@ mod tests {
         )])));
         let svc = coverage_interactor_with_plan(contract, d9_signal_docs(vec!["Foo"]), plan_reader);
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                let invalid_task_refs: Vec<_> = violations
-                    .iter()
-                    .filter_map(|v| match v {
-                        CoverageViolation::InvalidTaskRef { task_id: tid, entry_keys } => {
-                            Some((tid.clone(), entry_keys.clone()))
-                        }
-                        _ => None,
-                    })
-                    .collect();
-                assert_eq!(invalid_task_refs.len(), 1, "expected exactly 1 InvalidTaskRef");
-                assert_eq!(invalid_task_refs[0].0.as_ref(), "T999");
-                assert_eq!(invalid_task_refs[0].1.len(), 1);
-                assert_eq!(invalid_task_refs[0].1[0].entry_key().as_str(), "Foo");
-            }
-            other => panic!("expected Blocked with InvalidTaskRef, got {other:?}"),
-        }
+        assert_coverage_violations(
+            outcome,
+            vec![CoverageViolation::InvalidTaskRef(
+                task_id("T999"),
+                vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+            )],
+        );
     }
 
     // ── Coverage (i): every task key present in impl-plan → no InvalidTaskRef ─
@@ -1719,23 +1655,19 @@ mod tests {
             plan_reader,
         );
         let outcome = svc.verify_coverage(coverage_cmd("my-track")).unwrap();
-        match outcome {
-            CoverageVerifyOutcome::Blocked { violations, .. } => {
-                let stale_ids: std::collections::BTreeSet<String> = violations
-                    .iter()
-                    .filter_map(|v| match v {
-                        CoverageViolation::InvalidTaskRef { task_id: tid, .. } => {
-                            Some(tid.as_ref().to_owned())
-                        }
-                        _ => None,
-                    })
-                    .collect();
-                assert_eq!(stale_ids.len(), 2);
-                assert!(stale_ids.contains("T100"));
-                assert!(stale_ids.contains("T200"));
-            }
-            other => panic!("expected Blocked with InvalidTaskRefs, got {other:?}"),
-        }
+        assert_coverage_violations(
+            outcome,
+            vec![
+                CoverageViolation::InvalidTaskRef(
+                    task_id("T100"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                ),
+                CoverageViolation::InvalidTaskRef(
+                    task_id("T200"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Bar"))],
+                ),
+            ],
+        );
     }
 
     // ── D7 task-status filtering tests ───────────────────────────────────────────
@@ -1791,19 +1723,13 @@ mod tests {
         );
 
         let outcome = svc.check(cmd("my-track", "domain")).unwrap();
-        match outcome {
-            PreReviewGateOutcome::Blocked { violations, .. } => {
-                assert_eq!(violations.len(), 1);
-                match &violations[0] {
-                    PreReviewGateViolation::NonBlueSignal { entry, signal } => {
-                        assert_eq!(entry.entry_key().as_str(), "Foo");
-                        assert_eq!(*signal, ConfidenceSignal::Red);
-                    }
-                    other => panic!("expected NonBlueSignal(Red), got {other:?}"),
-                }
-            }
-            other => panic!("expected Blocked, got {other:?}"),
-        }
+        assert_liveness_violations(
+            outcome,
+            vec![PreReviewGateViolation::NonBlueSignal(
+                ContractedEntryRef::new(layer("domain"), entry_key("Foo")),
+                ConfidenceSignal::Red,
+            )],
+        );
     }
 
     // ── D7 case (e): in_progress + done tasks with Blue signals → Passed ─────────

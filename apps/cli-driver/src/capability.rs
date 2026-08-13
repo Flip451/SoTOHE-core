@@ -27,7 +27,7 @@ impl core::str::FromStr for CapabilityNameArg {
 
 /// CLI-boundary mirror of a validated host provider name.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ProviderNameArg(ProviderName);
+pub struct ProviderNameArg(pub(crate) ProviderName);
 
 impl core::str::FromStr for ProviderNameArg {
     type Err = String;
@@ -96,8 +96,8 @@ impl FromStr for TimeoutSecondsArg {
 pub struct CapabilityExecDriverInput {
     /// Name of the capability to resolve from the runtime profile.
     pub capability: CapabilityNameArg,
-    /// Actual provider hosting the orchestrator that invoked this command.
-    pub host: ProviderNameArg,
+    /// Caller-declared provider hosting the orchestrator, when supplied.
+    pub host: Option<ProviderNameArg>,
     /// Validated path to the capability briefing file.
     pub briefing_file: CapabilityFilePathArg,
     /// Provider-process timeout; `None` waits without a time limit.
@@ -149,7 +149,7 @@ fn into_request(
 
     Ok(CapabilityExecRequest {
         capability: input.capability.0,
-        host: input.host.0,
+        host: input.host.map(|host| host.0),
         briefing_file: input.briefing_file.0,
         timeout: input.timeout_seconds.map(|timeout| timeout.0),
         resume,
@@ -231,12 +231,16 @@ mod tests {
     fn input() -> CapabilityExecDriverInput {
         CapabilityExecDriverInput {
             capability: CapabilityNameArg::from_str("implementer").expect("valid test capability"),
-            host: ProviderNameArg::from_str("claude").expect("valid test provider"),
+            host: Some(ProviderNameArg::from_str("claude").expect("valid test provider")),
             briefing_file: CapabilityFilePathArg::from_str("tmp/briefing.md")
                 .expect("valid test briefing path"),
             timeout_seconds: None,
             resume: CapabilityResumeArg::Fresh,
         }
+    }
+
+    fn test_driver(service: Arc<dyn CapabilityExecService>) -> CapabilityDriver {
+        CapabilityDriver::new(service)
     }
 
     #[test]
@@ -249,7 +253,7 @@ mod tests {
     #[test]
     fn test_capability_driver_forwards_timeout_to_request() {
         let requests = Arc::new(Mutex::new(Vec::new()));
-        let driver = CapabilityDriver::new(Arc::new(RecordingService {
+        let driver = test_driver(Arc::new(RecordingService {
             outcome: CapabilityDispatchOutcome::Executed {
                 provider: ProviderName::try_new("codex").expect("valid test provider"),
                 exit_code: 0,
@@ -269,7 +273,7 @@ mod tests {
 
     #[test]
     fn test_capability_driver_executed_outcome_is_machine_discriminated() {
-        let driver = CapabilityDriver::new(Arc::new(StaticService {
+        let driver = test_driver(Arc::new(StaticService {
             outcome: CapabilityDispatchOutcome::Executed {
                 provider: ProviderName::try_new("codex").expect("valid test provider"),
                 exit_code: 0,
@@ -289,7 +293,7 @@ mod tests {
 
     #[test]
     fn test_capability_driver_in_host_outcome_includes_required_payload() {
-        let driver = CapabilityDriver::new(Arc::new(StaticService {
+        let driver = test_driver(Arc::new(StaticService {
             outcome: CapabilityDispatchOutcome::DelegateInHost {
                 capability: CapabilityName::try_new("implementer").expect("valid test capability"),
                 briefing_file: usecase::capability_exec::CapabilityFilePath::try_new(
@@ -314,7 +318,7 @@ mod tests {
     #[test]
     fn test_capability_driver_forwards_shared_exec_inputs_to_generic_service() {
         let requests = Arc::new(Mutex::new(Vec::new()));
-        let driver = CapabilityDriver::new(Arc::new(RecordingService {
+        let driver = test_driver(Arc::new(RecordingService {
             outcome: CapabilityDispatchOutcome::Executed {
                 provider: ProviderName::try_new("codex").expect("valid test provider"),
                 exit_code: 0,
@@ -329,14 +333,56 @@ mod tests {
         assert_eq!(recorded.len(), 1);
         let request = recorded.first().expect("one request is recorded");
         assert_eq!(request.capability.as_str(), "implementer");
-        assert_eq!(request.host.as_str(), "claude");
+        assert_eq!(request.host.as_ref().map(ProviderName::as_str), Some("claude"));
         assert_eq!(request.briefing_file.as_path(), PathBuf::from("tmp/briefing.md"));
+    }
+
+    #[test]
+    fn test_capability_driver_preserves_omitted_host_in_request() {
+        let requests = Arc::new(Mutex::new(Vec::new()));
+        let driver = test_driver(Arc::new(RecordingService {
+            outcome: CapabilityDispatchOutcome::Executed {
+                provider: ProviderName::try_new("claude").expect("valid test provider"),
+                exit_code: 0,
+            },
+            requests: requests.clone(),
+        }));
+        let mut input = input();
+        input.host = None;
+
+        let outcome = driver.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let recorded = requests.lock().expect("test request recorder lock");
+        let request = recorded.first().expect("one request is recorded");
+        assert_eq!(request.host, None);
+    }
+
+    #[test]
+    fn test_capability_driver_preserves_explicit_host_without_profile_normalization() {
+        let requests = Arc::new(Mutex::new(Vec::new()));
+        let driver = test_driver(Arc::new(RecordingService {
+            outcome: CapabilityDispatchOutcome::Executed {
+                provider: ProviderName::try_new("claude").expect("valid test provider"),
+                exit_code: 0,
+            },
+            requests: requests.clone(),
+        }));
+        let mut input = input();
+        input.host = Some(ProviderNameArg::from_str("codex").expect("valid test provider"));
+
+        let outcome = driver.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        let recorded = requests.lock().expect("test request recorder lock");
+        let request = recorded.first().expect("one request is recorded");
+        assert_eq!(request.host.as_ref().map(ProviderName::as_str), Some("codex"));
     }
 
     #[test]
     fn test_capability_driver_maps_normalized_targeted_resume_to_typed_request() {
         let requests = Arc::new(Mutex::new(Vec::new()));
-        let driver = CapabilityDriver::new(Arc::new(RecordingService {
+        let driver = test_driver(Arc::new(RecordingService {
             outcome: CapabilityDispatchOutcome::Executed {
                 provider: ProviderName::try_new("codex").expect("valid test provider"),
                 exit_code: 0,
@@ -379,7 +425,7 @@ mod tests {
     #[test]
     fn test_capability_driver_rejects_empty_targeted_resume_with_typed_error() {
         let requests = Arc::new(Mutex::new(Vec::new()));
-        let driver = CapabilityDriver::new(Arc::new(RecordingService {
+        let driver = test_driver(Arc::new(RecordingService {
             outcome: CapabilityDispatchOutcome::Executed {
                 provider: ProviderName::try_new("codex").expect("valid test provider"),
                 exit_code: 0,

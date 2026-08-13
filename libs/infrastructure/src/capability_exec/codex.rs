@@ -397,7 +397,7 @@ mod tests {
         Ok(CapabilityDispatchRequest {
             request: CapabilityExecRequest {
                 capability: CapabilityName::try_new(capability)?,
-                host: ProviderName::try_new(host)?,
+                host: Some(ProviderName::try_new(host)?),
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
                 timeout: None,
                 resume: usecase::capability_exec::CapabilityResumeRequest::Fresh,

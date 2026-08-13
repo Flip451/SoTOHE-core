@@ -109,7 +109,7 @@ impl ClaudeCapabilityAdapter {
         passthrough: &mut impl Write,
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let allowed_tools = self.agent_tools(request)?;
-        if request.request.host == self.provider {
+        if request.request.host.as_ref() == Some(&self.provider) {
             return Ok(CapabilityDispatchOutcome::DelegateInHost {
                 capability: request.request.capability.clone(),
                 briefing_file: request.request.briefing_file.clone(),
@@ -327,7 +327,7 @@ mod tests {
         Ok(CapabilityDispatchRequest {
             request: CapabilityExecRequest {
                 capability: CapabilityName::try_new(capability)?,
-                host: ProviderName::try_new(host)?,
+                host: Some(ProviderName::try_new(host)?),
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
                 timeout: None,
                 resume: usecase::capability_exec::CapabilityResumeRequest::Fresh,
@@ -347,6 +347,12 @@ mod tests {
         host: &str,
     ) -> Result<CapabilityDispatchRequest, Box<dyn std::error::Error>> {
         request_with_capability_from_host("implementer", host)
+    }
+
+    fn request_without_host() -> Result<CapabilityDispatchRequest, Box<dyn std::error::Error>> {
+        let mut request = request_from_host("claude")?;
+        request.request.host = None;
+        Ok(request)
     }
 
     fn write_agent(root: &Path, definition: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -458,7 +464,7 @@ mod tests {
     }
 
     #[test]
-    fn test_claude_capability_adapter_cross_provider_uses_native_agent_prompt()
+    fn test_claude_capability_adapter_mismatched_supplied_host_uses_subprocess()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
         write_agent(
@@ -505,6 +511,34 @@ mod tests {
             ]
         );
         assert_eq!(invocation.2, None, "an omitted timeout runs the provider without a limit");
+        Ok(())
+    }
+
+    #[test]
+    fn test_claude_capability_adapter_omitted_host_uses_subprocess()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner { exit_code: 9, ..Default::default() });
+        let adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        let outcome = adapter.dispatch(&request_without_host()?)?;
+
+        assert!(matches!(
+            outcome,
+            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }
+                if provider.as_str() == "claude"
+        ));
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        assert_eq!(invocations.len(), 1);
+        assert_eq!(invocations.first().expect("one process invocation is recorded").0, "claude");
         Ok(())
     }
 

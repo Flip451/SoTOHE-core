@@ -20,6 +20,7 @@ pub mod git;
 pub mod guard;
 pub mod hook;
 pub mod maintenance;
+pub mod phase;
 pub mod pr;
 pub mod ref_verify;
 pub mod review;

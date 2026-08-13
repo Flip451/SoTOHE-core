@@ -32,8 +32,8 @@ use crate::dry_write_driver::CapabilityName;
 pub struct CapabilityExecRequest {
     /// Capability selected from the runtime profile.
     pub capability: CapabilityName,
-    /// Provider of the host that invoked this command.
-    pub host: ProviderName,
+    /// Caller-declared host provider, when the caller supplied one.
+    pub host: Option<ProviderName>,
     /// Validated path to the capability briefing.
     pub briefing_file: CapabilityFilePath,
     /// Provider-process timeout; `None` waits without a time limit.
@@ -506,7 +506,7 @@ mod tests {
     fn request() -> Result<CapabilityExecRequest, Box<dyn std::error::Error>> {
         Ok(CapabilityExecRequest {
             capability: CapabilityName::try_new("implementer")?,
-            host: ProviderName::try_new("codex")?,
+            host: Some(ProviderName::try_new("codex")?),
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
             timeout: None,
             resume: CapabilityResumeRequest::Fresh,
@@ -779,14 +779,14 @@ mod tests {
     -> Result<(), Box<dyn std::error::Error>> {
         let request = CapabilityExecRequest {
             capability: CapabilityName::try_new("implementer")?,
-            host: ProviderName::try_new("codex")?,
+            host: Some(ProviderName::try_new("codex")?),
             briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
             timeout: Some(TimeoutSeconds::try_new(1800)?),
             resume: CapabilityResumeRequest::Fresh,
         };
 
         assert_eq!(request.capability.as_str(), "implementer");
-        assert_eq!(request.host.as_str(), "codex");
+        assert_eq!(request.host.as_ref().map(ProviderName::as_str), Some("codex"));
         assert_eq!(request.briefing_file.as_path(), PathBuf::from("tmp/briefing.md"));
         assert_eq!(request.timeout.map(|timeout| timeout.as_secs()), Some(1800));
         Ok(())
@@ -900,7 +900,7 @@ mod tests {
         let recorded = dispatches.lock().expect("test dispatch recorder lock");
         assert_eq!(recorded.len(), 1);
         assert_eq!(recorded[0].request.capability.as_str(), "implementer");
-        assert_eq!(recorded[0].request.host.as_str(), "codex");
+        assert_eq!(recorded[0].request.host.as_ref().map(ProviderName::as_str), Some("codex"));
         assert_eq!(recorded[0].profile.provider.as_str(), "codex");
         assert_eq!(recorded[0].profile.model.as_str(), "gpt-5");
         assert_eq!(recorded[0].briefing.as_str(), "perform the task");
@@ -915,7 +915,54 @@ mod tests {
     }
 
     #[test]
-    fn test_capability_exec_claude_provider_dispatches_validated_request()
+    fn test_capability_exec_omitted_host_dispatches_to_requested_capability_provider()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let dispatches = Arc::new(Mutex::new(Vec::new()));
+        let provider = ProviderName::try_new("claude")?;
+        let interactor = CapabilityExecInteractor::new(
+            Arc::new(StaticProfilePort {
+                profile: CapabilityProfile {
+                    provider: provider.clone(),
+                    model: ModelName::try_new("claude-opus")?,
+                    effort: ReasoningEffort::High,
+                    execution_mode: ExecutionMode::OrchestratorOutput,
+                },
+                calls: Arc::new(AtomicUsize::new(0)),
+            }),
+            Arc::new(StaticSourcePort {
+                briefing: Ok(BriefingText::try_new("perform the task".to_owned())?),
+                discipline: Ok(DisciplineText::try_new("no direct git writes".to_owned())?),
+                briefing_path: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
+                calls: Arc::new(AtomicUsize::new(0)),
+            }),
+            resolver(&recorder(), &[])?,
+            vec![Arc::new(RecordingProviderPort {
+                provider: provider.clone(),
+                outcome: CapabilityDispatchOutcome::Executed { provider, exit_code: 0 },
+                dispatches: dispatches.clone(),
+            })],
+            PathBuf::from(PROJECT_ROOT),
+        );
+
+        let mut request = request()?;
+        request.host = None;
+        let outcome = interactor.execute(request)?;
+
+        assert!(matches!(
+            outcome,
+            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 0 }
+                if provider.as_str() == "claude"
+        ));
+        let recorded = dispatches.lock().expect("test dispatch recorder lock");
+        assert_eq!(recorded.len(), 1);
+        assert_eq!(recorded[0].request.host, None);
+        assert_eq!(recorded[0].profile.provider.as_str(), "claude");
+        assert_eq!(recorded[0].profile.model.as_str(), "claude-opus");
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_exec_preserves_explicit_mismatched_host_for_selected_provider()
     -> Result<(), Box<dyn std::error::Error>> {
         let dispatches = Arc::new(Mutex::new(Vec::new()));
         let provider = ProviderName::try_new("claude")?;
@@ -946,15 +993,11 @@ mod tests {
 
         let outcome = interactor.execute(request()?)?;
 
-        assert!(matches!(
-            outcome,
-            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 0 }
-                if provider.as_str() == "claude"
-        ));
+        assert!(matches!(outcome, CapabilityDispatchOutcome::Executed { exit_code: 0, .. }));
         let recorded = dispatches.lock().expect("test dispatch recorder lock");
         assert_eq!(recorded.len(), 1);
+        assert_eq!(recorded[0].request.host.as_ref().map(ProviderName::as_str), Some("codex"));
         assert_eq!(recorded[0].profile.provider.as_str(), "claude");
-        assert_eq!(recorded[0].profile.model.as_str(), "claude-opus");
         Ok(())
     }
 

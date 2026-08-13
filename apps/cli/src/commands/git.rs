@@ -72,20 +72,11 @@ pub fn execute(cmd: GitCommand) -> ExitCode {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use crate::commands::track::test_support::process_env_lock;
+    use infrastructure::git_cli::resolve_repo_path;
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::process::{Command, ExitCode};
-    use std::sync::{Mutex, OnceLock};
-
-    use infrastructure::git_cli::resolve_repo_path;
-
-    // Private helpers re-exported from cli-composition for test access.
-    // These are kept here so existing integration-level tests continue to work.
-
-    fn cwd_lock() -> &'static Mutex<()> {
-        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
-        LOCK.get_or_init(|| Mutex::new(()))
-    }
 
     struct CurrentDirGuard {
         original: PathBuf,
@@ -145,7 +136,7 @@ mod tests {
 
     #[test]
     fn repo_root_resolves_git_toplevel_from_nested_directory() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
         run_git(dir.path(), &["init"]);
         let nested = dir.path().join("nested/deeper");
@@ -160,7 +151,7 @@ mod tests {
 
     #[test]
     fn add_all_excludes_transient_files_from_nested_directory() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
@@ -186,7 +177,7 @@ mod tests {
 
     #[test]
     fn add_all_succeeds_when_gitignored_transient_dir_exists() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
@@ -215,7 +206,7 @@ mod tests {
 
     #[test]
     fn add_all_succeeds_when_gitignored_transient_file_exists() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
@@ -240,7 +231,7 @@ mod tests {
 
     #[test]
     fn add_from_file_stages_paths_from_nested_directory() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
@@ -271,7 +262,7 @@ mod tests {
 
     #[test]
     fn commit_from_file_uses_explicit_track_dir_from_nested_directory() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
@@ -315,7 +306,7 @@ mod tests {
 
     #[test]
     fn commit_from_file_requires_track_branch_when_no_explicit_selector() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
@@ -345,7 +336,7 @@ mod tests {
 
     #[test]
     fn note_from_file_reads_track_commit_scratch_from_nested_directory() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);
@@ -374,7 +365,7 @@ mod tests {
 
     #[test]
     fn unstage_removes_paths_from_index_without_discarding_worktree() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("a.txt"), "base\n").unwrap();
         fs::write(dir.path().join("b.txt"), "base\n").unwrap();
@@ -422,7 +413,7 @@ mod tests {
 
         // Just verify the file can be read and deduplicated by running add-from-file
         // with a temp git repo
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let repo_dir = init_repo();
         fs::create_dir_all(repo_dir.path().join("src")).unwrap();
         fs::write(repo_dir.path().join("src/lib.rs"), "fn main() {}\n").unwrap();
@@ -447,7 +438,7 @@ mod tests {
 
     #[test]
     fn load_stage_paths_rejects_transient_automation_directory() {
-        let _lock = cwd_lock().lock().unwrap();
+        let _lock = process_env_lock().lock().unwrap();
         let dir = init_repo();
         fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
         run_git(dir.path(), &["add", "tracked.txt"]);

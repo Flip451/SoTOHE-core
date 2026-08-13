@@ -48,13 +48,9 @@ fn run_classify(args: &ClassifyArgs) -> Result<String, crate::CliError> {
     let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
         .map_err(|e| crate::CliError::Message(e.to_string()))?;
 
-    let outcome = cli_composition::ReviewCompositionRoot::new().review_driver().handle(
-        ReviewInput::Classify {
-            paths: args.paths.clone(),
-            track_id: Some(track_id),
-            items_dir: args.items_dir.clone(),
-        },
-    );
+    let outcome = cli_composition::ReviewCompositionRoot::new()
+        .review_driver()
+        .handle(ReviewInput::Classify(args.paths.clone(), Some(track_id), args.items_dir.clone()));
     if outcome.exit_code != 0 {
         return Err(crate::CliError::Message(
             outcome.stderr.unwrap_or_else(|| "review classify failed".to_owned()),

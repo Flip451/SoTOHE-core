@@ -1,0 +1,74 @@
+<!-- Generated from metadata.json + impl-plan.json — DO NOT EDIT DIRECTLY -->
+# Scope Conditional Pre Review Gates
+
+## Summary
+
+GO-01 → T018、T019、T023。
+GO-02 → T018、T019、T020、T021、T022。
+GO-03 → T018、T019、T020、T021、T022、T023。
+GO-04 → T018、T020、T021、T022、T023。
+GO-05 → T017、T018、T019、T020、T021、T022。
+
+## Tasks (32/32 resolved)
+
+### S0 — 確定済みの履歴 task
+
+> T001–T004 は recorded commit を持つ historical task として保持する。
+
+- [x] **T001**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateKind`、`PreReviewGateMatrix`、matrix / lookup / load error、`PreReviewGateConfigLoaderPort` を追加し、`libs/usecase/src/lib.rs` から公開する。matrix validation と lookup の unit tests を追加する。IN-01、CN-01、AC-01。 (`94600fc2fb39340e10fbffad046570612bd458cb`)
+- [x] **T002**: `libs/infrastructure/src/pre_review_gate_config.rs` に `FsPreReviewGateConfigLoader` を実装し、infrastructure module に登録する。loader port の conformance / decode tests を追加する。IN-01、CN-01、AC-01。 (`35a4fd6ff771e6aaf5f179d7d24a1866e192a511`)
+- [x] **T003**: `.harness/config/pre-review-gates.json` に scope × gate declaration を追加し、`libs/infrastructure/src/pre_review_gate_config.rs` に declaration fixture validation を追加する。IN-01、OS-03、CN-01、AC-01。 (`bc598f770db5f6d9bf2630c8312a5727ee1612bc`)
+- [x] **T004**: `libs/usecase/src/pre_review_gate_dispatch.rs` に `PreReviewGateDispatchService`、`PreReviewGateDispatchCommand`、`PreReviewGateDispatchError`、`PreReviewGateDispatchInteractor`、`PreReviewGateDispatchOutcome` を実装する。scope lookup、`NotApplicable`、`TaskContractLiveness` の全 path と result / error tests を追加する。IN-02、IN-03、IN-04、OS-01、OS-02、CN-02、CN-03、AC-02、AC-03、AC-04。 (`f866a34ffc7a9d994b4be36e9280ae2d006909c8`)
+
+### S1 — scope-owned atomic cutover
+
+> T017–T023 が domain、usecase、infrastructure、cli_driver、cli_composition、cli、harness-policy の exclusive targets を一括で更新する。
+
+- [x] **T017**: `libs/domain/src/task_contract.rs` と domain module registration の catalogue-entry-only task-contract types を復元し、carrier variants と tests を削除・更新する。IN-07、IN-08、OS-03、CN-05、AC-08、AC-09、AC-10。 (`cf20210b86e0d19fd452f014ba931bbeebf31483`)
+- [x] **T018**: `libs/usecase/**` の carrier / evidence / hidden-gate identities、`pre_review_gate_dispatch.rs`、`pre_review_gate/evidence.rs`、`review_v2/pre_review_gated.rs` を削除し、task-contract migration、baseline program-runner primitives、pre-review scope selection primitives、module registrations と tests を実装する。refined execution-record adaptation は T025、operator command adaptation は T026、phase command adaptation は T027、pre-review command dispatch adaptation は T028 に属する。IN-01、IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-02、OS-03、OS-04、CN-01、CN-02、CN-03、CN-05、AC-01、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。 (`cf20210b86e0d19fd452f014ba931bbeebf31483`)
+- [x] **T019**: `libs/infrastructure/**` の `source_only_baseline_restoration_inspector.rs` と `pre_review_gate_config.rs` を削除し、task-contract codec、program runner、pre-review command configuration の loader / DTO / decode / validation、registrations と tests を実装する。phase-command configuration DTO / loader / decode adaptation は T029 に属する。IN-01、IN-02、IN-03、IN-05、IN-07、IN-08、OS-02、OS-03、OS-04、CN-01、CN-02、CN-03、CN-05、AC-01、AC-02、AC-03、AC-04、AC-05、AC-08、AC-09、AC-10。 (`cf20210b86e0d19fd452f014ba931bbeebf31483`)
+- [x] **T020**: `apps/cli-driver/**` の obsolete task-contract / review carrier surfaces を削除し、initial `CommandOutcome` migration、review dispatch migration、module registrations と tests を実装する。phase-command driver / input / render-boundary adaptation は T030 に属する。IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-02、OS-03、OS-04、CN-01、CN-03、CN-05、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。 (`cf20210b86e0d19fd452f014ba931bbeebf31483`)
+- [x] **T021**: `apps/cli-composition/**` の `task_contract.rs` と `review_v2/pre_review_gate.rs` carrier / gate adapters を削除し、phase / review service wiring、`review_v2/{mod.rs,shim.rs,pre_review_command.rs}`、module registrations と tests を実装する。IN-02、IN-03、IN-05、IN-06、IN-07、IN-08、OS-01、OS-03、OS-04、CN-03、CN-05、AC-02、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。 (`cf20210b86e0d19fd452f014ba931bbeebf31483`)
+- [x] **T022**: `apps/cli/**` の task-contract CLI carrier surfaces を削除し、`commands/phase.rs`、`commands/review/{mod.rs,local.rs}` の phase parsing / emission と review dispatch、registrations、CLI integration tests を実装する。IN-02、IN-03、IN-04、IN-05、IN-06、IN-07、IN-08、OS-01、OS-03、OS-04、CN-01、CN-03、CN-04、CN-05、AC-02、AC-03、AC-04、AC-05、AC-06、AC-07、AC-08、AC-09、AC-10。 (`cf20210b86e0d19fd452f014ba931bbeebf31483`)
+- [x] **T023**: `.harness/config/phase-commands.json` を追加し、`.harness/config/pre-review-gates.json` を literal argv declarations に置換し、`Makefile.toml` を thin delegation に保ち、`.harness/capabilities/impl-planner.md` と `.harness/custom/review-prompts/impl-plan.md` を更新する。IN-01、IN-05、IN-06、IN-08、IN-19、OS-04、CN-01、CN-04、CN-05、AC-01、AC-05、AC-06、AC-07、AC-10、AC-21、AC-22。 (`cf20210b86e0d19fd452f014ba931bbeebf31483`)
+
+### S2 — approved catalogue repair extension
+
+> `libs/{domain,usecase,infrastructure}/src/{task_contract,program_runner,operator_command,phase_command,pre_review_command}.rs` と `apps/{cli-driver,cli-composition}/src/{task_contract,phase_command}.rs` を catalogue shape に適応する。IN-01、IN-02、IN-03、IN-04、IN-05、IN-08、IN-11、AC-01、AC-02、AC-03、AC-04、AC-05、AC-07、AC-10、AC-13。
+
+- [x] **T024**: `libs/domain/src/task_contract.rs` と `apps/cli-driver/src/task_contract.rs` の blocked outcome を validated `NonEmptyVec` payload に適応し、`CommandOutcome` render boundary の空 payload 拒否を unit tests で確認する。IN-08、AC-10。 (`60e6c796627cc98404bccaa2421920b227df04eb`)
+- [x] **T025**: `libs/usecase/src/program_runner.rs` の execution record を success / failure の refined wrapper と分類 outcome に適応し、成功、非 zero、output-limit、timeout の record tests を更新する。IN-02、IN-03、IN-04、CN-02、CN-03、AC-02、AC-03、AC-04、AC-05。 (`0ef1e23f055292df748e70fed583e8d121cc303a`)
+- [x] **T026**: `libs/usecase/src/operator_command.rs` の validated argv value objects と operation-specific configuration validation error vocabulary を catalogue shape に適応し、各 validation failure の tests を更新する。IN-01、IN-03、IN-20、CN-01、AC-01、AC-04、AC-05。 (`35b7c8833adc405a82b54b977169e1dc4f2d8d6b`)
+- [x] **T027**: `libs/usecase/src/operator_command.rs` の `ConfiguredCommand` construction と configuration/load error vocabulary、および `libs/usecase/src/phase_command.rs` の phase command config / declaration / loader-port、configuration validation error、validate command を catalogue shape に適応し、configuration validation tests を更新する。IN-01、IN-11、IN-19、IN-20、CN-01、AC-01、AC-13、AC-21、AC-22。 (`275cc9ee271ceeab0a9fa85967f1dd8d92e92602`)
+- [x] **T034**: `libs/usecase/src/phase_command.rs` の phase explanation と explain query を catalogue shape に適応し、explain result tests を更新する。IN-04、AC-03。 (`2e6744ddd38b8618bf7da173bb567c5a631df7c4`)
+- [x] **T035**: `libs/usecase/src/phase_command.rs` の phase enter orchestration、host-bearing `PhaseEnterCommand`、enter outcome、shared service / interactor、`ProgramExecutionRecord` と関連 tests を catalogue shape に適応する。IN-02、IN-11、CN-03、AC-02、AC-13。 (`6d04e3ced70556127af5ae7e577b88e374fc4e93`)
+- [x] **T028**: `libs/usecase/src/pre_review_command.rs` を refined execution record、pre-review-specific configuration error、dispatch outcome / explanation consumer shape に適応し、success と first-failure dispatch tests を更新する。IN-05、CN-01、CN-03、AC-05、AC-07。 (`4a05480da7f57adcde5364474da509b474d92932`)
+- [x] **T029**: `libs/infrastructure/src/operator_command_config.rs` の phase command configuration loader、command DTO 群、phase DTO / declaration DTO、`decode_phase_command_config` を更新し、phase DTO decode / invalid-config tests を更新する。IN-01、IN-03、IN-19、IN-20、AC-01、AC-21、AC-22。 (`22b098d16aa6ca63fd48ff24475501f06d57d791`)
+- [x] **T030**: `apps/cli-driver/src/phase_command.rs` の `CommandOutcome`、`PhaseCommandDriver`、`PhaseCommandInput`、`PhaseIdArg` と関連 tests を catalogue shape に適応する。IN-04、IN-11、CN-03、AC-02、AC-03、AC-13。 (`9e07ef30fc507e2b696cfafd235da663116c1b68`)
+- [x] **T036**: `apps/cli-composition/src/phase_command.rs` に `PhaseCompositionRoot` を追加し、phase configuration loader、phase service、phase driver の wiring と module registration、および composition-boundary tests を実装する。IN-04、AC-02、AC-03。 (`d4d9983f8bf98b4c09bc2a3b37221e6aab1d82eb`)
+- [x] **T031**: `apps/cli/src/main.rs` の top-level `CliCommand`、`Phase` variant、dispatch arm と、`apps/cli/src/commands/phase.rs` の `PhaseCommand`、`PhaseEnterArgs`、`PhaseIdArgs`、validate args、`execute`、`execute_with_driver`、`input_from_command`、関連 tests を catalogue shape に適応する。IN-04、IN-11、AC-03、AC-13。 (`80c93d4dc62eea66df4ee6e556e8da4a001e28d6`)
+- [x] **T032**: `libs/usecase/src/capability_exec.rs` の `CapabilityExecRequest`、`CapabilityExecInteractor`、`CapabilityExecService`、`apps/cli-driver/src/capability.rs` の `CapabilityExecDriverInput` と `CapabilityDriver`、`apps/cli-composition/src/capability.rs` の `CapabilityCompositionRoot`、`apps/cli/src/commands/capability.rs` の `CapabilityExecArgs` と `into_driver_input` を catalogue shape に適応する。`.harness/config/phase-commands.json` の phase writer argv と dispatch tests を更新する。IN-01、IN-04、IN-09、IN-10、IN-11、CN-01、AC-01、AC-03、AC-11、AC-12、AC-13。 (`539602a5ba3f6ec65fb5bac5f6375d0713213b74`)
+- [x] **T033**: `libs/infrastructure/src/operator_command_config.rs` の pre-review-gate configuration decode を更新し、pre-review DTO / review-scope decode / invalid-config tests を更新する。IN-05、AC-05。 (`6e009564fda3e9c247e6e76c81d8932b5494739c`)
+
+### S3 — PR review redundant-surface removal
+
+> `apps/cli/src/commands/review/mod.rs` から `codex-local` / `claude-local` subcommand とそれらだけが使用する CLI wiring / dispatch / dead code を削除する。IN-05。
+
+- [x] **T037**: `apps/cli/src/commands/review/{claude_local.rs,codex_local.rs,mod.rs,tests.rs}` から provider-specific modules、Args、handlers、provider-local execute / render / validation functions、interim wiring を削除し、関連 tests を更新する。review CLI の subcommand enum の最終形と attribution は T042 に委ねる。IN-05。 (`a9f31561b5604a0af4065a14fb07b2b8ef1c15b1`)
+
+### S4 — phase-entry convergence matrix
+
+> T038–T041 は exit-code check commands、per-phase matrix configuration、canonical workflow entrypoint を追加・更新する。IN-12、IN-13、CN-06、AC-14、AC-15、AC-16。
+
+- [x] **T038**: `libs/usecase/src/review_v2/{check_zero_findings.rs,mod.rs}` に `ReviewCheckZeroFindings{Query,Outcome,Service,Interactor}` を追加し、`libs/infrastructure/src/review_v2/` の usecase state port を実装する `ReviewCheckZeroFindingsStateAdapter` を追加する。`apps/cli-driver/src/review.rs` と `apps/cli-composition/src/review_v2/{check_zero_findings.rs,mod.rs}` の driver / adapter wiring を更新する。`apps/cli/src/commands/review/{mod.rs,tests.rs}` の `CheckZeroFindingsArgs` / `ReviewCheckRoundArg` と handler tests を追加する。error surface の最終形、enum variant registration と review CLI の subcommand enum の最終形は T042 に委ねる。CN-06、AC-16。 (`ce1eba1dabdc6f458f4dc3dfcabf10fed8bf194d`)
+- [x] **T042**: `cli:ReviewCommand` の final shape を排他的に統合し、legacy variant removal、`CheckZeroFindings` の追加、`CheckApproved` payload の `ReviewCheckApprovedArgs` rename を実装する。`apps/cli-driver/src/review.rs` の `ReviewCheckZeroFindingsInput` から usecase query への fallible conversion と CLI caller integration、dispatch / tests を更新する。既存 `review check-approved` 経路の互換性検証 tests を更新する。CN-06、AC-16、AC-17。 (`731a2f250aaa49af9defd0956290f1925d14651d`)
+- [x] **T043**: usecase の review-results projection / read-port / stored-state boundary と review-fix resolution boundary を実装・更新する。`apps/cli-driver/src/review.rs` の results-input conversion と review / review-fix driver handoff、CLI callers / outcome emission tests を更新する。AC-20 の round/verdict 出力内容を検証するテストを実装する。composition の重複 input boundaries を削除し、pure-DI `ReviewCompositionRoot` の wire-only review / review-fix driver factories を更新する。`libs/infrastructure` の results scope/state/round port adapters、review-fix runner adapter、Git write-side track resolver を実装・更新する。IN-15、IN-16、IN-17、AC-18、CN-09、AC-19、AC-20。 (`1e5ecec7f826f815141c25106ad8ddbf9bf18c74`)
+- [x] **T039**: `ref-verify check-approved` の Chain 1 / Chain 2 selector を usecase、CLI driver、`apps/cli/src/commands/ref_verify.rs` に実装し、CLI exit-code tests を追加する。`libs/infrastructure/src/ref_verify/driver_adapter.rs` の chain-scoped check-approved fail-closed path を更新し、`apps/cli-composition/src/{ref_verify.rs,lib.rs}` の pure-DI handoff を更新して wrapper / DTO re-export を削除する。CN-06、AC-16。 (`d6737bc396ffcd8dfd5e3af9e2cfd10c2605c30d`)
+- [x] **T040**: `.harness/config/phase-commands.json` を phase ごとの convergence matrix に更新し、`apps/cli/src/commands/phase.rs` に phase-entry fixture / integration tests を追加する。IN-12、CN-06、AC-14、AC-16。 (`3fa648d673b5d4d72853905f4c009f33819fbb7d`)
+- [x] **T041**: `.harness/workflows/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.claude/commands/track/{plan,spec-design,type-design,impl-plan,adr2pr}.md`、`.agents/skills/track-{plan,spec-design,type-design,impl-plan,adr2pr}/SKILL.md` の phase-writer launch sites を `bin/sotp phase enter <phase-id>` に更新し、direct writer dispatch を除去する。workflow-level static regression check を追加する。IN-13、AC-15。 (`5c4a6ced03809ed91f1b2fce1c8b0192e901b91b`)
+
+### S5 — post-rejection review-fix restoration
+
+> T044 は path-carrying review-fix delivery と process-group containment を復元する。IN-16、CN-02。
+
+- [x] **T044**: review-fix delivery path（`libs/usecase` の `run_review_fix` family、`libs/infrastructure` の launch boundary、`apps/cli-driver` / `apps/cli` surfaces）と `libs/infrastructure/src/program_runner.rs` の PR round-2 process-group containment を復元・更新する。`libs/usecase/src/operator_command.rs` と phase/pre-review config loaders の executable-basename recursion rejection および対応テストを更新する。IN-16、IN-20、CN-02、CN-01、AC-01、AC-05。

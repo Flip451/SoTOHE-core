@@ -14,3 +14,4 @@ usecase = { path = "../../libs/usecase" }
 
 [dev-dependencies]
 domain = { path = "../../libs/domain" }
+toml = { workspace = true }

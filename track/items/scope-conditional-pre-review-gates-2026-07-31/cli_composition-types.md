@@ -1,0 +1,11 @@
+<!-- Generated from cli_composition-types.json — DO NOT EDIT DIRECTLY -->
+
+## Composition Roots
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| CapabilityCompositionRoot | composition_root | reference | — | 🔵 | 🔵 |
+| PhaseCompositionRoot | composition_root | add | — | 🔵 | 🔵 |
+| RefVerifyCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
+| ReviewCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
+

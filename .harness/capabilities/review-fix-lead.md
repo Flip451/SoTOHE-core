@@ -82,15 +82,15 @@ hope that the reviewer withdraws the finding is prohibited.
 ### Reviewer invocation
 
 Always invoke the reviewer via `cargo make track-local-review`, not by calling
-`bin/sotp review local` directly. The cargo-make task runs
-`signal calc-impl-catalog && task-contract check` before each reviewer invocation, refreshing
-impl-catalog signals and running the task-contract pre-review gate (fail-closed). On gate pass it
-delegates to `bin/sotp review local`, which auto-resolves the reviewer provider and model from
-`agent-profiles.json`.
+`bin/sotp review local` directly. The wrapper delegates to `bin/sotp review local`, which
+resolves the review scope and dispatches the operator-owned pre-review command sequence
+declared for that scope in `.harness/config/pre-review-gates.json` (fail-closed; scopes with
+an empty command vector run no gate). The CLI also auto-resolves the reviewer provider and
+model from `agent-profiles.json`.
 
-`bin/sotp track views sync` is still needed when fresh rendered views (`plan.md`,
-`contract-map.md`, `<layer>-types.md`) are required between rounds; the cargo-make dependency
-only covers signals and the task-contract gate, not view rendering.
+Run `cargo make track-views-sync` when fresh rendered views (`plan.md`, `contract-map.md`,
+`<layer>-types.md`) are required between rounds. This explicit fixer refresh route regenerates
+views only; the scope-conditional dispatch remains the sole owner of pre-review gate commands.
 
 Invocation form:
 
@@ -101,10 +101,12 @@ cargo make track-local-review -- --round-type {round_type} --group {scope} --bri
 Do NOT pass `--track-id`; the wrapper auto-resolves the active track from the current git branch.
 
 The reviewer subprocess legitimately runs for many minutes (`bin/sotp review local` allows it
-1800 seconds). When your provider's shell tool enforces a per-call timeout, set that timeout
-parameter to at least 1,920,000 ms for this invocation, including time for the cargo-make gates
-that run before the reviewer subprocess. Do not conclude reviewer failure from a shell-tool
-timeout shorter than that; a timed-out invocation kills the in-flight round and records nothing.
+3600 seconds by default). When your provider's shell tool enforces a per-call timeout, set that
+timeout parameter to at least 18,120,000 ms for this invocation: the configured
+implementation-scope gate sequence may consume four 3600-second command budgets before the
+3600-second reviewer budget, with a 120-second allowance for wrapper overhead. Do not conclude
+reviewer failure from a shell-tool timeout shorter than that; a timed-out invocation kills the
+in-flight round and records nothing.
 
 ### Verdict parsing and confirmation
 

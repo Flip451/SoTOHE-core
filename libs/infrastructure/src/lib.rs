@@ -31,9 +31,11 @@ pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
 mod lexical_path;
+pub mod operator_command_config;
 pub mod planned_task_reader;
 pub mod pr;
 pub mod pr_review;
+pub mod program_runner;
 pub mod provider_session;
 pub mod ref_verify;
 pub mod review_scope_config_reader;
@@ -61,6 +63,7 @@ pub mod template_export;
 pub mod test_obligation;
 pub mod track;
 pub(crate) mod track_artifact;
+mod trusted_file;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
 pub use git_cli::workflow_adapter::FsGitWorkflowAdapter;
@@ -114,13 +117,16 @@ pub use verify_adapter::FsVerifyAdapter;
 pub(crate) fn discover_isolated_repo_for_items_dir(
     items_dir: &std::path::Path,
 ) -> Result<(crate::git_cli::SystemGitRepo, std::path::PathBuf), std::io::Error> {
-    // Each failure is returned with its cause intact and no path written into it.
-    // Callers report these to an operator, and a rendered path would both leak the
-    // checkout location and bury the distinction between the three causes: the
-    // guard's refusal keeps its own payload, the filesystem's error keeps its kind,
-    // and an absent repository is its own type.
-    crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir)?;
-    let anchor = items_dir.canonicalize()?;
+    crate::track::symlink_guard::reject_symlinks_up_to_root(items_dir).map_err(|error| {
+        crate::sanitized_failure::sanitized_io_error(crate::sanitized_failure::io_classification(
+            &error,
+        ))
+    })?;
+    let anchor = items_dir.canonicalize().map_err(|error| {
+        crate::sanitized_failure::sanitized_io_error(crate::sanitized_failure::io_classification(
+            &error,
+        ))
+    })?;
     let repo = crate::git_cli::SystemGitRepo::discover_from_isolated(&anchor).map_err(|error| {
         crate::sanitized_failure::sanitized_io_error(match error {
             // `rev-parse --show-toplevel` exiting nonzero is how git reports that
@@ -140,91 +146,51 @@ pub(crate) fn resolve_items_dir_under_current_repo(
 ) -> Result<std::path::PathBuf, std::io::Error> {
     use std::path::Component;
 
-    use crate::git_cli::SystemGitRepo;
-
     if items_dir.as_os_str().is_empty() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            "items_dir must not be empty",
+        return Err(crate::sanitized_failure::sanitized_io_error(
+            "items directory must not be empty",
         ));
     }
     if items_dir
         .components()
         .any(|component| matches!(component, Component::ParentDir | Component::Prefix(_)))
     {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("items_dir cannot escape the current repository root: {}", items_dir.display()),
+        return Err(crate::sanitized_failure::sanitized_io_error(
+            "items directory cannot escape the current repository root",
         ));
     }
 
-    let repo = SystemGitRepo::discover().map_err(|e| {
-        std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("cannot discover current git repository: {e}"),
-        )
-    })?;
-    let repo_root = repo.root().canonicalize().map_err(|e| {
-        std::io::Error::new(
-            e.kind(),
-            format!(
-                "failed to canonicalize current repository root {}: {e}",
-                repo.root().display()
-            ),
-        )
+    // The repository must be discovered from the caller's items directory,
+    // rather than from the process environment. In particular, `GIT_DIR` can
+    // otherwise make this reader inspect a repository unrelated to its input.
+    let (repo, canonical_items_dir) = discover_isolated_repo_for_items_dir(items_dir)?;
+    let repo_root = repo.root().canonicalize().map_err(|error| {
+        crate::sanitized_failure::sanitized_io_error(crate::sanitized_failure::io_classification(
+            &error,
+        ))
     })?;
     match repo_root.symlink_metadata() {
         Ok(meta) if meta.file_type().is_symlink() => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                format!("refusing to use symlinked repository root: {}", repo_root.display()),
+            return Err(crate::sanitized_failure::sanitized_io_error(
+                "refusing to use a symlinked repository root",
             ));
         }
         Ok(_) => {}
         Err(e) => {
-            return Err(std::io::Error::new(
-                e.kind(),
-                format!("failed to stat repository root {}: {e}", repo_root.display()),
+            return Err(crate::sanitized_failure::sanitized_io_error(
+                crate::sanitized_failure::io_classification(&e),
             ));
         }
     }
 
-    let absolute_items_dir =
-        if items_dir.is_absolute() { items_dir.to_path_buf() } else { repo_root.join(items_dir) };
-    if !absolute_items_dir.starts_with(&repo_root) {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!(
-                "items_dir must resolve inside the current repository root {}; got {}",
-                repo_root.display(),
-                items_dir.display()
-            ),
-        ));
-    }
-
-    crate::track::symlink_guard::reject_symlinks_below(&absolute_items_dir, &repo_root)
-        .map(|_| ())?;
-
-    let canonical_items_dir = absolute_items_dir.canonicalize().map_err(|e| {
-        std::io::Error::new(
-            e.kind(),
-            format!("failed to canonicalize items_dir {}: {e}", items_dir.display()),
-        )
-    })?;
     if !canonical_items_dir.starts_with(&repo_root) {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!(
-                "items_dir resolves outside the current repository root {}; got {}",
-                repo_root.display(),
-                canonical_items_dir.display()
-            ),
+        return Err(crate::sanitized_failure::sanitized_io_error(
+            "items directory resolves outside the current repository root",
         ));
     }
     if !canonical_items_dir.is_dir() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("items_dir is not a directory: {}", items_dir.display()),
+        return Err(crate::sanitized_failure::sanitized_io_error(
+            "items directory is not a directory",
         ));
     }
 
@@ -308,11 +274,13 @@ impl TrackWriter for InMemoryTrackStore {
 #[cfg(test)]
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::path::Path;
+
     use domain::{
         StatusOverride, TrackId, TrackMetadata, TrackReader, TrackWriter, derive_track_status,
     };
 
-    use super::InMemoryTrackStore;
+    use super::{InMemoryTrackStore, resolve_items_dir_under_current_repo};
 
     fn test_snapshot() -> domain::branch_strategy::BranchStrategySnapshot {
         domain::branch_strategy::BranchStrategySnapshot::new(
@@ -364,5 +332,16 @@ mod tests {
         let reloaded = store.find(track.id()).unwrap().unwrap();
         assert!(reloaded.status_override().is_some());
         assert_eq!(derive_track_status(None, reloaded.status_override()).to_string(), "blocked");
+    }
+
+    #[test]
+    fn test_resolve_items_dir_under_current_repo_absolute_outside_path_sanitizes_diagnostic() {
+        let outside_directory = tempfile::tempdir().unwrap();
+        let supplied_path = outside_directory.path().display().to_string();
+
+        let error = resolve_items_dir_under_current_repo(Path::new(&supplied_path)).unwrap_err();
+
+        assert_eq!(error.to_string(), "no enclosing git repository");
+        assert!(!error.to_string().contains(&supplied_path));
     }
 }

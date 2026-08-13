@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::io::{Seek, SeekFrom, Write};
+
+use super::spawn::RuntimeFile;
+use usecase::review_v2::run_review_fix::ReviewFixRunnerError;
 
 /// Names of environment variables that carry authentication credentials and are
 /// intentionally passed through to the nested Codex run via `build_safe_env`.
@@ -7,13 +10,31 @@ use std::path::{Path, PathBuf};
 pub(super) const CREDENTIAL_VARS: &[&str] =
     &["OPENAI_API_KEY", "CODEX_API_KEY", "OPENAI_ORG_ID", "OPENAI_BASE_URL"];
 
+/// The number of trailing bytes a streaming redactor must retain before
+/// emitting a chunk. A credential can begin this many bytes before a pipe
+/// boundary and finish in the next read.
+pub(super) fn credential_redaction_overlap_bytes() -> usize {
+    credential_values()
+        .iter()
+        .map(|(_, value)| value)
+        .map(|value| value.len())
+        .max()
+        .unwrap_or_default()
+}
+
+pub(super) fn credential_values() -> Vec<(&'static str, String)> {
+    CREDENTIAL_VARS
+        .iter()
+        .filter_map(|&var| std::env::var(var).ok().map(|value| (var, value)))
+        .filter(|(_, value)| !value.is_empty())
+        .collect()
+}
+
 /// Replaces every non-empty credential value found in `text` with a
 /// `[REDACTED:<VAR_NAME>]` placeholder.  Empty values are never replaced —
 /// replacing an empty string would corrupt the entire log.
 pub(super) fn redact_credentials(text: &str) -> String {
-    let values =
-        CREDENTIAL_VARS.iter().filter_map(|&var| std::env::var(var).ok().map(|val| (var, val)));
-    redact_credential_values(text, values)
+    redact_credential_values(text, credential_values())
 }
 
 pub(super) fn redact_credential_values<'a>(
@@ -34,13 +55,13 @@ pub(super) fn redact_credential_values<'a>(
 }
 
 pub(super) fn write_session_log(
-    log_path: &Path,
+    log_file: &mut RuntimeFile,
     bin: &std::ffi::OsStr,
     exit_status: &str,
     stdout: &str,
     stderr: &str,
     runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
-) {
+) -> Result<(), ReviewFixRunnerError> {
     let bin_display = bin.to_string_lossy();
     let redacted_stdout = redact_credentials(stdout);
     let redacted_stderr = redact_credentials(stderr);
@@ -50,12 +71,17 @@ pub(super) fn write_session_log(
          === STDOUT ===\n{redacted_stdout}\n\
          === STDERR ===\n{redacted_stderr}"
     );
-    if let Err(e) = std::fs::write(log_path, &log_content) {
-        eprintln!(
-            "[review-fix-runner] warning: failed to write session log {}: {e}",
-            log_path.display()
-        );
-    }
+    let result = log_file
+        .verify_path_identity()
+        .and_then(|()| log_file.file.set_len(0))
+        .and_then(|()| log_file.file.seek(SeekFrom::Start(0)))
+        .and_then(|_| log_file.file.write_all(log_content.as_bytes()));
+    result.map_err(|error| {
+        ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(format!(
+            "failed to write session log {}: {error}",
+            log_file.path().display()
+        )))
+    })
 }
 
 /// Deletes the session log file on drop unless told to keep it.
@@ -66,15 +92,15 @@ pub(super) fn write_session_log(
 ///
 /// [`keep_for_diagnosis`]: SessionLogCleanup::keep_for_diagnosis
 pub(super) struct SessionLogCleanup {
-    path: PathBuf,
+    file: RuntimeFile,
     /// When `true` (the default), drop removes the file.
     /// Set to `false` via `keep_for_diagnosis` to retain the file.
     remove_on_drop: bool,
 }
 
 impl SessionLogCleanup {
-    pub(super) fn new(path: PathBuf) -> Self {
-        Self { path, remove_on_drop: true }
+    pub(super) fn new(file: RuntimeFile) -> Self {
+        Self { file, remove_on_drop: true }
     }
 
     /// Prevents the log from being deleted on drop so it can be used for diagnosis.
@@ -86,7 +112,7 @@ impl SessionLogCleanup {
 impl Drop for SessionLogCleanup {
     fn drop(&mut self) {
         if self.remove_on_drop {
-            let _ = std::fs::remove_file(&self.path);
+            self.file.remove();
         }
     }
 }
@@ -94,6 +120,7 @@ impl Drop for SessionLogCleanup {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use super::super::spawn::create_runtime_file;
     use super::*;
 
     // ── redact_credentials ────────────────────────────────────────────────────
@@ -195,5 +222,51 @@ mod tests {
         assert!(CREDENTIAL_VARS.contains(&"CODEX_API_KEY"));
         assert!(CREDENTIAL_VARS.contains(&"OPENAI_ORG_ID"));
         assert!(CREDENTIAL_VARS.contains(&"OPENAI_BASE_URL"));
+    }
+
+    #[test]
+    fn test_write_session_log_rejects_removed_runtime_path() {
+        let repository = tempfile::tempdir().expect("repository fixture");
+        let mut log_file = create_runtime_file(repository.path(), "session-log", "txt")
+            .expect("create runtime file");
+        log_file.remove();
+
+        let error = write_session_log(
+            &mut log_file,
+            std::ffi::OsStr::new("codex"),
+            "exit status: 1",
+            "stdout",
+            "stderr",
+            None,
+        )
+        .expect_err("missing runtime path must be reported");
+
+        assert!(error.to_string().contains("failed to write session log"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_write_session_log_rejects_replaced_runtime_path() {
+        let repository = tempfile::tempdir().expect("repository fixture");
+        let mut log_file = create_runtime_file(repository.path(), "session-log", "txt")
+            .expect("create runtime file");
+        log_file.remove();
+        std::fs::write(log_file.path(), "replacement log entry").expect("replace runtime path");
+
+        let error = write_session_log(
+            &mut log_file,
+            std::ffi::OsStr::new("codex"),
+            "exit status: 1",
+            "stdout",
+            "stderr",
+            None,
+        )
+        .expect_err("replacement runtime path must be reported");
+
+        assert!(error.to_string().contains("failed to write session log"));
+        assert_eq!(
+            std::fs::read_to_string(log_file.path()).expect("read replacement path"),
+            "replacement log entry"
+        );
     }
 }

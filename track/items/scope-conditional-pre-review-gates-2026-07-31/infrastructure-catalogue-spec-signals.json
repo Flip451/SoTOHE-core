@@ -1,0 +1,166 @@
+{
+  "catalogue_declaration_hash": "b7009eb9aa9026d774fc44618d5040763df80b2ef1458313f0441d5887475826",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "25511014ebfe82a85b5aaa2819a4d85a3dbeeba57b36d080122ed948dafce0d1",
+      "signal": "blue",
+      "type_name": "CodexReviewFixRunner"
+    },
+    {
+      "entry_hash": "53965b2bded41d104d5038c790fbfeb145bf55b3db89e6597eaaf7bc4779960f",
+      "signal": "blue",
+      "type_name": "CommandArgumentDto"
+    },
+    {
+      "entry_hash": "d585f4c32fe00b487b73ce77d3e6bc8cd2e4d1552bcdf2b6bb37bdbe3edb0965",
+      "signal": "blue",
+      "type_name": "CommandArgvDto"
+    },
+    {
+      "entry_hash": "eee730bed1793ebec8362244f22ade7c49d604b8ac2e49d5029d537c6bd7ea16",
+      "signal": "blue",
+      "type_name": "CommandConfigSchemaVersionDto"
+    },
+    {
+      "entry_hash": "708f984cde4c23b04d76983ee9b544fe1d6f3905840143bdeaaf916b5ef73fc7",
+      "signal": "blue",
+      "type_name": "CommandDeclarationIdDto"
+    },
+    {
+      "entry_hash": "635182ea28b2cce5cd6efa77685723209d3d1b46ab5098f02d0d80322134b3ee",
+      "signal": "blue",
+      "type_name": "CommandTimeoutSecondsDto"
+    },
+    {
+      "entry_hash": "df6c8ee361e5761910a9ca55da7f69bbe52f1c8dc14e6754a66c40e50c5d0856",
+      "signal": "blue",
+      "type_name": "ConfiguredCommandDto"
+    },
+    {
+      "entry_hash": "d05a0cd39814f68580ea84dd25927dbff460575c74f441ccfca20cf51e8056ea",
+      "signal": "blue",
+      "type_name": "ContractedEntryRefDto"
+    },
+    {
+      "entry_hash": "1c22726a358b865b8482f8225b9ad7089cefb56c906b3877b1f6076c69b3d7c4",
+      "signal": "blue",
+      "type_name": "EntryKeyDto"
+    },
+    {
+      "entry_hash": "27036fd07e5aa58f43de624a0aa31ddeb539d4c3d829e4471618625d8dd325a4",
+      "signal": "blue",
+      "type_name": "FsPhaseCommandConfigLoader"
+    },
+    {
+      "entry_hash": "a3f99c5ba56df9424e7bd2b59d20ee1f77b9676199670b999146179c9e86e7fe",
+      "signal": "blue",
+      "type_name": "FsPreReviewCommandConfigLoader"
+    },
+    {
+      "entry_hash": "3e01b6b7c54bad971124fe632eda960a5befe86bb2c2927a20e937df3a4d62b2",
+      "signal": "blue",
+      "type_name": "FsRefVerifyAggregateAdapter"
+    },
+    {
+      "entry_hash": "4dfaa606c2957affa2a296791f53ab5d783b7cd943506fd446a29f0e39c6d853",
+      "signal": "blue",
+      "type_name": "GitCurrentReviewTrackResolver"
+    },
+    {
+      "entry_hash": "1b989b2df2d9e5cb15189dd30d02921c996df5e9056b5cf858d5c8c302cd2eac",
+      "signal": "blue",
+      "type_name": "GitReviewFixTrackResolver"
+    },
+    {
+      "entry_hash": "af7cabb51672b37c338952e365f41a6a9bb0ef77fa7e541ec18090ab3b5c967e",
+      "signal": "blue",
+      "type_name": "LayerIdDto"
+    },
+    {
+      "entry_hash": "ebc7239851062b20f2c7d35000169f1c75c146eb250ad3fd422dd315d61e8df2",
+      "signal": "blue",
+      "type_name": "PhaseCommandConfigDto"
+    },
+    {
+      "entry_hash": "94aea2a91b9d0aaaa8068caf3368d96ff8f05b9c023b28056c5f10eb65aa4bc4",
+      "signal": "blue",
+      "type_name": "PhaseCommandDeclarationDto"
+    },
+    {
+      "entry_hash": "8ad40084f6680529774b0e05255803c03b5b237cbc7901faa9dde07403e14d0f",
+      "signal": "blue",
+      "type_name": "PreReviewCommandConfigDto"
+    },
+    {
+      "entry_hash": "4d846fa35d8767c20303bc42e895f78e373f4c7825f179168630addbe9b13896",
+      "signal": "blue",
+      "type_name": "PreReviewScopeCommandDeclarationDto"
+    },
+    {
+      "entry_hash": "5c49961aa67d03c8ec521e30c0867442ea951b7aa31ee3bb87a7c88b5bce8a88",
+      "signal": "blue",
+      "type_name": "ProcessProgramRunner"
+    },
+    {
+      "entry_hash": "17b34b5b03019298b732ee4de39e2094a00ffa1d372134500f07f9c977330f61",
+      "signal": "blue",
+      "type_name": "ResultsRoundAdapter"
+    },
+    {
+      "entry_hash": "60f34827b075147670cd94fb0704ce6be5a3b89f0f046979351edfeef27cb4e5",
+      "signal": "blue",
+      "type_name": "ResultsScopeAdapter"
+    },
+    {
+      "entry_hash": "c0b2464d285d1d7704079f53e9ecac150d8b72e776f16a3c4621fff907b58830",
+      "signal": "blue",
+      "type_name": "ResultsStateAdapter"
+    },
+    {
+      "entry_hash": "73b64dafc079d17c0178083660c7cf23dc19a1d4dd88af376c62c7179f685c44",
+      "signal": "blue",
+      "type_name": "ReviewCheckZeroFindingsStateAdapter"
+    },
+    {
+      "entry_hash": "e139161471f9eb265e5853ea08324e75058611f12f896a9a9b05067918fe2b61",
+      "signal": "blue",
+      "type_name": "ReviewFixRunnerAdapter"
+    },
+    {
+      "entry_hash": "fbbc172386af955ca47bc50955acc4cdd8afdf982d711a6bdc1daed968e292b3",
+      "signal": "blue",
+      "type_name": "ReviewScopeNameDto"
+    },
+    {
+      "entry_hash": "0c1dc61b295314653a4b12c225ee5483086a79f65fdab8a4224b5b1a64a1fb60",
+      "signal": "blue",
+      "type_name": "TaskContractDocumentDto"
+    },
+    {
+      "entry_hash": "b13e5fe27ee5891b53e324b05be31b1a23a058b9940f4995dbf06502d1918c45",
+      "signal": "blue",
+      "type_name": "TaskContractSchemaVersionDto"
+    },
+    {
+      "entry_hash": "703d96db8273f7a37f9d2a55e1cee447ce1d1a167b48f6ab62054889fb2d6c38",
+      "signal": "blue",
+      "type_name": "TaskIdDto"
+    },
+    {
+      "entry_hash": "ec0ffc493027e11291b9592cb7b7b88b0e09b2131e077e50143f408e64e9093b",
+      "signal": "blue",
+      "type_name": "TrackIdDto"
+    },
+    {
+      "entry_hash": "5d8c1dfb9723cc5aee0eda850761aa7328bb426bbd6034f71c136dc2c2f16a3f",
+      "signal": "blue",
+      "type_name": "infrastructure::operator_command_config::decode_phase_command_config"
+    },
+    {
+      "entry_hash": "31f36d48983111454b0b78d6498e05598d7c38d96de67ce2c7c31a1a3dc4dab9",
+      "signal": "blue",
+      "type_name": "infrastructure::operator_command_config::decode_pre_review_command_config"
+    }
+  ]
+}

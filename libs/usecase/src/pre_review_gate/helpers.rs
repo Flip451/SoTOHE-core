@@ -103,22 +103,20 @@ pub(super) fn collect_per_layer_violations(
     let mut out = Vec::new();
     for (key, entry) in scope_entries {
         if !attributed_keys.contains(key.as_str()) {
-            out.push(domain::task_contract::CoverageViolation::OrphanEntry {
-                entry: entry.clone(),
-            });
+            out.push(domain::task_contract::CoverageViolation::OrphanEntry(entry.clone()));
         }
     }
     for entry in &attributed {
         let key = entry.entry_key().as_str();
         if !scope_entries.contains_key(key) {
-            out.push(domain::task_contract::CoverageViolation::InvalidEntryRef {
-                entry: (*entry).clone(),
-                reason: format!(
+            out.push(domain::task_contract::CoverageViolation::InvalidEntryRef(
+                (*entry).clone(),
+                FreeText::new(format!(
                     "entry_key '{}' not found in {}-type-signals.json",
                     key,
                     layer.as_ref()
-                ),
-            });
+                )),
+            ));
         }
     }
     out
@@ -133,13 +131,13 @@ pub(super) fn collect_non_canonical_layer_violations(
     for refs in contract_doc.entries().values() {
         for entry in refs {
             if !canonical.contains(entry.layer().as_ref()) {
-                out.push(domain::task_contract::CoverageViolation::InvalidEntryRef {
-                    entry: entry.clone(),
-                    reason: format!(
+                out.push(domain::task_contract::CoverageViolation::InvalidEntryRef(
+                    entry.clone(),
+                    FreeText::new(format!(
                         "layer '{}' is not a canonical TDDD layer",
                         entry.layer().as_ref()
-                    ),
-                });
+                    )),
+                ));
             }
         }
     }
@@ -157,9 +155,8 @@ pub(super) fn collect_task_key_ri_violations(
         .entries()
         .iter()
         .filter(|(task_id, _)| !plan_task_ids.contains_key(task_id))
-        .map(|(task_id, refs)| domain::task_contract::CoverageViolation::InvalidTaskRef {
-            task_id: task_id.clone(),
-            entry_keys: refs.clone(),
+        .map(|(task_id, refs)| {
+            domain::task_contract::CoverageViolation::InvalidTaskRef(task_id.clone(), refs.clone())
         })
         .collect()
 }

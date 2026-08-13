@@ -161,6 +161,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [feature バッチ消化への既定反転 — per-layer 並列レビューを始動させる](2026-06-22-1327-feature-batch-default-inversion.md) | Accepted | 2026-06-22 |
 | [impl 段階の構造的不整合検出時のフェーズ遷移診断スキル](2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md) | Proposed | 2026-06-26 |
 | [タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用](2026-06-27-0852-pre-review-task-contract-conformance-gate.md) | Accepted | 2026-06-27 |
+| [phase command と pre-review gate を operator-owned argv 配列で宣言する](2026-08-02-0806-operator-owned-phase-command-config.md) | Proposed | 2026-08-02 |
+| [phase enter を canonical writer entry とし収束 check command を公開する](2026-08-04-0001-phase-enter-adoption-and-check-commands.md) | Proposed | 2026-08-04 |
 | [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
 | [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
 | [SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite](2026-07-22-0400-sot-reentry-sequencing.md) | Proposed | 2026-07-22 |
@@ -247,6 +249,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
 | [Codex 正規入口の整備](2026-07-22-1149-codex-merge-done-adr-entrypoints.md) | Proposed | 2026-07-22 |
 | [reasoning effort に max 段を追加し、限定レーンを Luna Max へ移行する](2026-08-02-0151-codex-reasoning-effort-max.md) | Proposed | 2026-08-02 |
+| [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
 
 ### テスト・CI ツーリング
 
@@ -282,3 +285,5 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止](2026-07-02-1600-review-load-batch-findings-no-restatement.md) | — | 2026-07-02 |
 | [レビュー指示書のカテゴリ閉列挙を半開形式へ改める](2026-07-23-0109-review-briefing-open-category-format.md) | Proposed | 2026-07-23 |
 | [機械導出される義務成果物を review 運用成果物として扱う](2026-07-25-0715-derived-obligation-artifact-review-scope.md) | Proposed | 2026-07-25 |
+| [`sotp review results` の scope selector と列挙範囲を一致させる](2026-08-10-0814-review-results-scope-selection.md) | Proposed | 2026-08-10 |
+| [review-fix コマンド群の delivery boundary と briefing の信頼境界](2026-08-11-1857-review-fix-delivery-boundary.md) | Deprecated | 2026-08-11 |

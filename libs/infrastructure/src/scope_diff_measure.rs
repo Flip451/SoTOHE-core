@@ -33,7 +33,7 @@ const MAX_GIT_OUTPUT_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_UNTRACKED_FILE_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_BINARY_TREE_PATHSPEC_BYTES: usize = 64 * 1024;
 /// Generated build, cache, and credential outputs excluded before collection.
-const IGNORED_NON_REVIEW_PATHS: [&str; 32] = [
+const IGNORED_NON_REVIEW_PATHS: [&str; 33] = [
     ":(top,exclude)target/**",
     ":(top,exclude)target-*/**",
     ":(top,exclude)**/*.rs.bk",
@@ -44,6 +44,9 @@ const IGNORED_NON_REVIEW_PATHS: [&str; 32] = [
     ":(top,exclude).semantic_index/**",
     ":(top,exclude)**/.semantic_index/**",
     ":(top,exclude).semantic_index.*",
+    // Git reports an ignored nested repository as the directory itself; exclude
+    // that exact path as well as its descendants before regular-file inspection.
+    ":(top,exclude).cache",
     ":(top,exclude)sotp-dry-index-*/**",
     ":(top,exclude).env",
     ":(top,exclude).env.*",
@@ -72,10 +75,7 @@ fn measure_failed(message: impl Into<String>) -> ScopeDiffMeasureError {
     ScopeDiffMeasureError::MeasureFailed { message: FreeText::new(message.into()) }
 }
 
-/// Measures a track's actual per-scope diff through git.
-///
-/// Constructed with no arguments so composition roots stay zero-argument
-/// wiring accessors; the items directory arrives with each call.
+/// Measures a track's per-scope diff; each call supplies the items directory.
 #[derive(Debug, Default)]
 pub struct GitScopeDiffMeasurer;
 

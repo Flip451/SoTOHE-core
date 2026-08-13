@@ -136,8 +136,8 @@ impl TaskContractDriver {
 
         match self.check_service.check(cmd) {
             Ok(PreReviewGateOutcome::Passed) => CommandOutcome::success(None),
-            Ok(PreReviewGateOutcome::Blocked { violations, .. }) => {
-                let message = render_check_violations(&violations);
+            Ok(PreReviewGateOutcome::Blocked(violations)) => {
+                let message = render_check_violations(violations.as_slice());
                 CommandOutcome::failure(Some(message))
             }
             Err(e) => CommandOutcome::failure(Some(render_gate_error(e))),
@@ -158,8 +158,8 @@ impl TaskContractDriver {
 
         match self.coverage_service.verify_coverage(cmd) {
             Ok(CoverageVerifyOutcome::Passed) => CommandOutcome::success(None),
-            Ok(CoverageVerifyOutcome::Blocked { violations, .. }) => {
-                let message = render_coverage_violations(&violations);
+            Ok(CoverageVerifyOutcome::Blocked(violations)) => {
+                let message = render_coverage_violations(violations.as_slice());
                 CommandOutcome::failure(Some(message))
             }
             Err(e) => CommandOutcome::failure(Some(render_gate_error(e))),
@@ -177,15 +177,13 @@ fn render_gate_error(e: PreReviewGateError) -> String {
             "task-contract.json not found for track — run the impl-planner to generate it"
                 .to_owned()
         }
-        PreReviewGateError::TaskContractReadFailed { message } => {
-            format!("failed to read task-contract.json: {message}")
+        PreReviewGateError::TaskContractReadFailed { .. } => {
+            "failed to read task-contract.json".to_owned()
         }
-        PreReviewGateError::SignalReadFailed { layer, message } => {
-            format!("failed to read type-signals for layer '{layer}': {message}")
+        PreReviewGateError::SignalReadFailed { layer, .. } => {
+            format!("failed to read type-signals for layer '{layer}'")
         }
-        PreReviewGateError::ImplPlanReadFailed { message } => {
-            format!("failed to read impl-plan.json: {message}")
-        }
+        PreReviewGateError::ImplPlanReadFailed { .. } => "failed to read impl-plan.json".to_owned(),
     }
 }
 
@@ -199,7 +197,7 @@ fn render_check_violations(violations: &[PreReviewGateViolation]) -> String {
             PreReviewGateViolation::MissingTaskContract => {
                 "  - MissingTaskContract: task-contract.json is absent for this track".to_owned()
             }
-            PreReviewGateViolation::NonBlueSignal { entry, signal } => {
+            PreReviewGateViolation::NonBlueSignal(entry, signal) => {
                 format!(
                     "  - NonBlueSignal: {} / {} has signal {:?} (expected Blue)",
                     entry.layer().as_ref(),
@@ -250,28 +248,28 @@ fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
             CoverageViolation::MissingTaskContract => {
                 "  - MissingTaskContract: task-contract.json is absent for this track".to_owned()
             }
-            CoverageViolation::OrphanEntry { entry } => {
+            CoverageViolation::OrphanEntry(entry) => {
                 format!(
                     "  - OrphanEntry: {} / {} has no task attribution in task-contract.json",
                     entry.layer().as_ref(),
                     entry.entry_key().as_str()
                 )
             }
-            CoverageViolation::InvalidEntryRef { entry, reason } => {
+            CoverageViolation::InvalidEntryRef(entry, reason) => {
                 format!(
                     "  - InvalidEntryRef: {} / {} — {reason}",
                     entry.layer().as_ref(),
                     entry.entry_key().as_str()
                 )
             }
-            CoverageViolation::MissingSignalDocument { layer } => {
+            CoverageViolation::MissingSignalDocument(layer) => {
                 format!(
                     "  - MissingSignalDocument: {}-type-signals.json is absent; \
                      run `bin/sotp signal calc-impl-catalog` to generate it",
                     layer.as_ref()
                 )
             }
-            CoverageViolation::InvalidTaskRef { task_id, entry_keys } => {
+            CoverageViolation::InvalidTaskRef(task_id, entry_keys) => {
                 let keys = entry_keys
                     .iter()
                     .map(|e| format!("{}/{}", e.layer().as_ref(), e.entry_key().as_str()))
@@ -298,9 +296,84 @@ fn render_coverage_violations(violations: &[CoverageViolation]) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
-    use usecase::pre_review_gate::PreReviewGateViolation;
+    use std::sync::{Arc, Mutex};
 
-    use super::{render_check_violations, render_coverage_violations};
+    use domain::task_contract::ContractedEntryRef;
+    use domain::tddd::LayerId;
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
+    use domain::{ConfidenceSignal, FreeText};
+    use usecase::ValidationError;
+    use usecase::pre_review_gate::{
+        CoverageVerifyCommand, CoverageVerifyOutcome, CoverageVerifyService, CoverageViolation,
+        PreReviewGateCommand, PreReviewGateError, PreReviewGateOutcome, PreReviewGateService,
+        PreReviewGateViolation,
+    };
+
+    use super::{
+        TaskContractDriver, TaskContractInput, render_check_violations, render_coverage_violations,
+    };
+
+    struct FixedCheckService {
+        outcome: PreReviewGateOutcome,
+        calls: Mutex<Vec<PreReviewGateCommand>>,
+    }
+
+    impl PreReviewGateService for FixedCheckService {
+        fn check(
+            &self,
+            cmd: PreReviewGateCommand,
+        ) -> Result<PreReviewGateOutcome, PreReviewGateError> {
+            self.calls.lock().expect("test mutex").push(cmd);
+            Ok(self.outcome.clone())
+        }
+    }
+
+    struct FixedCoverageService {
+        outcome: CoverageVerifyOutcome,
+        calls: Mutex<Vec<CoverageVerifyCommand>>,
+    }
+
+    impl CoverageVerifyService for FixedCoverageService {
+        fn verify_coverage(
+            &self,
+            cmd: CoverageVerifyCommand,
+        ) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
+            self.calls.lock().expect("test mutex").push(cmd);
+            Ok(self.outcome.clone())
+        }
+    }
+
+    struct FailingCheckService {
+        calls: Mutex<Vec<PreReviewGateCommand>>,
+    }
+
+    impl PreReviewGateService for FailingCheckService {
+        fn check(
+            &self,
+            cmd: PreReviewGateCommand,
+        ) -> Result<PreReviewGateOutcome, PreReviewGateError> {
+            self.calls.lock().expect("test mutex").push(cmd);
+            Err(PreReviewGateError::TaskContractReadFailed {
+                message: FreeText::new("/private/tracks/task-contract.json: permission denied"),
+            })
+        }
+    }
+
+    struct FailingCoverageService {
+        calls: Mutex<Vec<CoverageVerifyCommand>>,
+    }
+
+    impl CoverageVerifyService for FailingCoverageService {
+        fn verify_coverage(
+            &self,
+            cmd: CoverageVerifyCommand,
+        ) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
+            self.calls.lock().expect("test mutex").push(cmd);
+            Err(PreReviewGateError::ImplPlanReadFailed {
+                message: FreeText::new("/private/tracks/impl-plan.json: permission denied"),
+            })
+        }
+    }
 
     /// D3 / AC-03: the liveness-gate Blocked rendering surfaces the
     /// `/track:diagnose` soft prompt so the calling orchestrator sees it on
@@ -308,7 +381,7 @@ mod tests {
     /// taxonomy, the Claude slash-command spec, and the provider-agnostic
     /// operational SSoT path for the calling LLM to pick up.
     #[test]
-    fn render_check_violations_includes_track_diagnose_soft_prompt() {
+    fn test_render_check_violations_includes_track_diagnose_soft_prompt() {
         let message = render_check_violations(&[PreReviewGateViolation::MissingTaskContract]);
         assert!(
             message.contains("/track:diagnose"),
@@ -329,7 +402,7 @@ mod tests {
     /// Coverage path renders attribution violations without the diagnose
     /// suggestion (T005 description, AC-03 anchor on D3 only).
     #[test]
-    fn render_coverage_violations_does_not_include_track_diagnose_soft_prompt() {
+    fn test_render_coverage_violations_does_not_include_track_diagnose_soft_prompt() {
         let message = render_coverage_violations(&[
             usecase::pre_review_gate::CoverageViolation::MissingTaskContract,
         ]);
@@ -338,5 +411,188 @@ mod tests {
             "Coverage render must NOT include the /track:diagnose soft prompt — that path is \
              a separate concern (AC-03 anchors on D3 / Check only), got: {message}"
         );
+    }
+
+    #[test]
+    fn test_render_tuple_violations_preserves_entry_and_free_text_diagnostics() {
+        let entry = ContractedEntryRef::new(
+            LayerId::try_new("cli_driver".to_owned()).expect("test layer"),
+            CatalogueEntryKey::try_new("PhaseCommandDriver".to_owned()).expect("test entry"),
+        );
+        let check = render_check_violations(&[PreReviewGateViolation::NonBlueSignal(
+            entry.clone(),
+            ConfidenceSignal::Yellow,
+        )]);
+        let coverage = render_coverage_violations(&[
+            usecase::pre_review_gate::CoverageViolation::InvalidEntryRef(
+                entry,
+                domain::FreeText::new("missing catalogue entry"),
+            ),
+        ]);
+
+        assert!(check.contains("cli_driver / PhaseCommandDriver"));
+        assert!(coverage.contains("missing catalogue entry"));
+    }
+
+    #[test]
+    fn test_task_contract_driver_check_blocked_renders_every_violation() {
+        let entry = ContractedEntryRef::new(
+            LayerId::try_new("cli_driver".to_owned()).expect("test layer"),
+            CatalogueEntryKey::try_new("CommandOutcome".to_owned()).expect("test entry"),
+        );
+        let check_service = Arc::new(FixedCheckService {
+            outcome: PreReviewGateOutcome::blocked(vec![
+                PreReviewGateViolation::MissingTaskContract,
+                PreReviewGateViolation::NonBlueSignal(entry, ConfidenceSignal::Yellow),
+            ])
+            .expect("non-empty blocked violations"),
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = TaskContractDriver::new(
+            check_service.clone(),
+            Arc::new(FixedCoverageService {
+                outcome: CoverageVerifyOutcome::Passed,
+                calls: Mutex::new(Vec::new()),
+            }),
+        );
+
+        let outcome = driver
+            .handle(TaskContractInput::Check { layer: None, track_id: "test-track".to_owned() });
+
+        assert_eq!(outcome.exit_code, 1);
+        let message = outcome.stderr.expect("blocked outcome renders stderr");
+        assert!(message.contains("MissingTaskContract"));
+        assert!(message.contains("cli_driver / CommandOutcome"));
+        assert_eq!(check_service.calls.lock().expect("test mutex").len(), 1);
+    }
+
+    #[test]
+    fn test_task_contract_driver_coverage_blocked_renders_every_violation() {
+        let coverage_service = Arc::new(FixedCoverageService {
+            outcome: CoverageVerifyOutcome::blocked(vec![
+                CoverageViolation::MissingTaskContract,
+                CoverageViolation::MissingSignalDocument(
+                    LayerId::try_new("cli_driver".to_owned()).expect("test layer"),
+                ),
+            ])
+            .expect("non-empty blocked violations"),
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = TaskContractDriver::new(
+            Arc::new(FixedCheckService {
+                outcome: PreReviewGateOutcome::Passed,
+                calls: Mutex::new(Vec::new()),
+            }),
+            coverage_service.clone(),
+        );
+
+        let outcome =
+            driver.handle(TaskContractInput::Coverage { track_id: "test-track".to_owned() });
+
+        assert_eq!(outcome.exit_code, 1);
+        let message = outcome.stderr.expect("blocked outcome renders stderr");
+        assert!(message.contains("MissingTaskContract"));
+        assert!(message.contains("MissingSignalDocument: cli_driver-type-signals.json"));
+        assert_eq!(coverage_service.calls.lock().expect("test mutex").len(), 1);
+    }
+
+    #[test]
+    fn test_task_contract_driver_check_passed_translates_command_and_invokes_only_check_service() {
+        let check_service = Arc::new(FixedCheckService {
+            outcome: PreReviewGateOutcome::Passed,
+            calls: Mutex::new(Vec::new()),
+        });
+        let coverage_service = Arc::new(FixedCoverageService {
+            outcome: CoverageVerifyOutcome::Passed,
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = TaskContractDriver::new(check_service.clone(), coverage_service.clone());
+
+        let outcome = driver.handle(TaskContractInput::Check {
+            layer: Some("cli_driver".to_owned()),
+            track_id: "test-track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_none());
+        let calls = check_service.calls.lock().expect("test mutex");
+        assert_eq!(calls.len(), 1);
+        let call = calls.first().expect("one check call");
+        assert_eq!(call.track_id.as_ref(), "test-track");
+        assert_eq!(call.layer.as_ref().map(AsRef::as_ref), Some("cli_driver"));
+        assert!(coverage_service.calls.lock().expect("test mutex").is_empty());
+    }
+
+    #[test]
+    fn test_task_contract_driver_coverage_passed_translates_command_and_invokes_only_coverage_service()
+     {
+        let check_service = Arc::new(FixedCheckService {
+            outcome: PreReviewGateOutcome::Passed,
+            calls: Mutex::new(Vec::new()),
+        });
+        let coverage_service = Arc::new(FixedCoverageService {
+            outcome: CoverageVerifyOutcome::Passed,
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = TaskContractDriver::new(check_service.clone(), coverage_service.clone());
+
+        let outcome =
+            driver.handle(TaskContractInput::Coverage { track_id: "test-track".to_owned() });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_none());
+        assert!(check_service.calls.lock().expect("test mutex").is_empty());
+        let calls = coverage_service.calls.lock().expect("test mutex");
+        assert_eq!(calls.len(), 1);
+        assert_eq!(calls.first().expect("one coverage call").track_id.as_ref(), "test-track");
+    }
+
+    #[test]
+    fn test_task_contract_driver_check_service_error_is_sanitized() {
+        let check_service = Arc::new(FailingCheckService { calls: Mutex::new(Vec::new()) });
+        let driver = TaskContractDriver::new(
+            check_service.clone(),
+            Arc::new(FixedCoverageService {
+                outcome: CoverageVerifyOutcome::Passed,
+                calls: Mutex::new(Vec::new()),
+            }),
+        );
+
+        let outcome = driver
+            .handle(TaskContractInput::Check { layer: None, track_id: "test-track".to_owned() });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stderr.as_deref(), Some("failed to read task-contract.json"));
+        assert!(!outcome.stderr.expect("error stderr").contains("/private"));
+        assert_eq!(check_service.calls.lock().expect("test mutex").len(), 1);
+    }
+
+    #[test]
+    fn test_task_contract_driver_coverage_service_error_is_sanitized() {
+        let coverage_service = Arc::new(FailingCoverageService { calls: Mutex::new(Vec::new()) });
+        let driver = TaskContractDriver::new(
+            Arc::new(FixedCheckService {
+                outcome: PreReviewGateOutcome::Passed,
+                calls: Mutex::new(Vec::new()),
+            }),
+            coverage_service.clone(),
+        );
+
+        let outcome =
+            driver.handle(TaskContractInput::Coverage { track_id: "test-track".to_owned() });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stderr.as_deref(), Some("failed to read impl-plan.json"));
+        assert!(!outcome.stderr.expect("error stderr").contains("/private"));
+        assert_eq!(coverage_service.calls.lock().expect("test mutex").len(), 1);
+    }
+
+    #[test]
+    fn test_task_contract_driver_empty_blocked_payload_is_rejected_before_render() {
+        let check_result = PreReviewGateOutcome::blocked(Vec::new());
+        let coverage_result = CoverageVerifyOutcome::blocked(Vec::new());
+
+        assert!(matches!(check_result, Err(ValidationError::EmptyString)));
+        assert!(matches!(coverage_result, Err(ValidationError::EmptyString)));
     }
 }

@@ -107,14 +107,23 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 
 ### Phase 1 loop: spec-design workflow
 
+The phase workflows prepare their configured briefings and enter Phase 1–3 exclusively through
+`bin/sotp phase enter spec-design`, `bin/sotp phase enter type-design`, and
+`bin/sotp phase enter impl-plan`, respectively. Do not dispatch a phase writer outside its
+corresponding phase entry.
+
 1. Invoke the `spec-design` workflow (`.harness/workflows/track/spec-design.md`).
 2. Read the signal result (blue / yellow / red counts + 🔴 element ids with cited ADR paths).
 3. Apply the loop rule:
    - **🔵**: run `bin/sotp ref-verify run` (semantic review of Chain ①). On `[BLOCKED]`, treat
-     as 🔴 (route to `adr-editor` or re-invoke `spec-design` depending on which side is wrong).
+     as 🔴 (route to `adr-editor` or re-invoke the `spec-design` workflow depending on which
+     side is wrong).
      On `[ESCALATE]`, report to user and stop. On `[OK]`, mark Phase 1 `completed` and proceed
      to Phase 2.
-   - **🟡**: log warning and proceed to Phase 2. Yellow must be resolved before merge.
+   - **🟡**: re-invoke the `spec-design` workflow to resolve the yellow, then run the Phase 1
+     🔵 path.
+     Do not enter Phase 2 until that path completes. Count against `max_retry`; on overflow,
+     stop and present the latest signal to the user.
    - **🔴**: escalate through the delta-candidate lane (the input box is frozen — no
      in-place semantic edit, regardless of the target ADR's pre/post-merge state):
      a. Identify the target ADR path and decision from the 🔴 element.
@@ -129,8 +138,8 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
         delta box and stays 🟡 until the merge-stage user adjudication. On bounce, have
         adr-editor remove the candidate and route the presented resolution back to the
         originating element (typically a spec-side fix).
-     d. After admission (which changes the adr scope), re-converge the ADR side before the re-dispatch: run `bin/sotp signal check-adr-user --gate commit`, then run the `review` workflow's single-scope re-entry round for the adr scope only (`.harness/workflows/track/review.md` §Single-scope re-entry round) to `zero_findings`; do not invoke `review-fix-lead` directly or launch the all-required-scopes review wave here. Run the ADR signal check again so it reflects any review-driven repair; repeat until both checks satisfy the re-entry prerequisite in `.harness/policies/sot-reentry-sequencing.md`. Downstream scopes stay halted until their own upstream re-converges. Then re-invoke `spec-design` so the failing element(s) cite the admitted draft and Chain ① regenerates — what rides to the merge gate is the draft's chain ⓪ 🟡, never a standing Chain ① 🔴. After a bounce, re-invoke `spec-design` with the resolution instead (a bounce leaves the ADR unchanged, so no adr re-convergence is needed). Count either retry against `max_retry`; on overflow, stop.
-     e. Non-semantic fixes to an input-box ADR (typo / reference path) follow the apply-then-classify lane instead: adr-editor applies, adr-diagnoser classifies, and only a non-semantic verdict is retained and restamped kind: non-semantic-fix. After a retained restamp, re-converge the ADR side through the same signal check and adr-scoped `review` workflow lifecycle before re-invoking `spec-design`, per `.harness/policies/sot-reentry-sequencing.md`.
+     d. After admission (which changes the adr scope), re-converge the ADR side before the re-dispatch: run `bin/sotp signal check-adr-user --gate commit`, then run the `review` workflow's single-scope re-entry round for the adr scope only (`.harness/workflows/track/review.md` §Single-scope re-entry round) to `zero_findings`; do not invoke `review-fix-lead` directly or launch the all-required-scopes review wave here. Run the ADR signal check again so it reflects any review-driven repair; repeat until both checks satisfy the re-entry prerequisite in `.harness/policies/sot-reentry-sequencing.md`. Downstream scopes stay halted until their own upstream re-converges. Then re-invoke the `spec-design` workflow so the failing element(s) cite the admitted draft and Chain ① regenerates — what rides to the merge gate is the draft's chain ⓪ 🟡, never a standing Chain ① 🔴. After a bounce, re-invoke the `spec-design` workflow with the resolution instead (a bounce leaves the ADR unchanged, so no adr re-convergence is needed). Count either retry against `max_retry`; on overflow, stop.
+     e. Non-semantic fixes to an input-box ADR (typo / reference path) follow the apply-then-classify lane instead: adr-editor applies, adr-diagnoser classifies, and only a non-semantic verdict is retained and restamped kind: non-semantic-fix. After a retained restamp, re-converge the ADR side through the same signal check and adr-scoped `review` workflow lifecycle before re-invoking the `spec-design` workflow, per `.harness/policies/sot-reentry-sequencing.md`.
 
 ### Phase 2 loop: type-design workflow
 
@@ -138,14 +147,18 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 2. Read the per-layer signal result.
 3. Apply the loop rule:
    - **🔵 all layers**: run `bin/sotp ref-verify run` (semantic review covering Chain ① and
-     Chain ②). On `[BLOCKED]`, route by owning side: catalogue-side → invoke `type-designer`,
+     Chain ②). On `[BLOCKED]`, route by owning side: catalogue-side → re-invoke the
+     `type-design` workflow,
      re-run semantic review; spec-side → treat as Phase 2 🔴 (see below). On `[ESCALATE]`,
      report to user and stop. On `[OK]`, mark Phase 2 `completed` and proceed to Phase 3.
-   - **🟡**: log warning and proceed. Yellow must be resolved before merge.
+   - **🟡**: re-invoke the `type-design` workflow to resolve the yellow, then run the Phase 2
+     🔵 path.
+     Do not enter Phase 3 until that path completes. Count against `max_retry`; on overflow,
+     stop and present the latest signal to the user.
    - **🔴**:
-     a. Re-invoke `spec-design` workflow (Phase 2 🔴 typically indicates spec needs refinement).
+     a. Re-invoke the `spec-design` workflow (Phase 2 🔴 typically indicates spec needs refinement).
      b. Re-evaluate Phase 1 gate. If Phase 1 also 🔴, escalate via Phase 1 ADR loop.
-     c. Re-converge the spec before the re-dispatch. The re-entry prerequisite requires the `spec_adr` reference signal to satisfy `.harness/config/signal-gates.json`'s applicable specification — under a strict designation a 🟡 also blocks, so the plan workflow's general 🟡-advance rule does not apply to this re-entry: resolve the yellow (typically by re-invoking `spec-design`) before proceeding. Once the signal satisfies the gate specification, run the `review` workflow's single-scope re-entry round for the spec scope only (`.harness/workflows/track/review.md` §Single-scope re-entry round) to `zero_findings`; do not invoke `review-fix-lead` directly or launch the all-required-scopes review wave here. Re-evaluate the Phase 1 signal gate again so it reflects any review-driven repair; if it no longer satisfies the gate specification, return to the Phase 1 loop and re-run the scoped review after its repair. The spec's semantic-verification element asks only for Chain-①-relevant findings, per `.harness/policies/sot-reentry-sequencing.md`: confirm via the chain-scoped read `bin/sotp ref-verify results --chain 1` that no Chain ① finding remains unresolved — Chain ② findings and enumeration failures caused by the catalogues pending regeneration by the upcoming `type-design` re-run do not participate in this judgment (a full `bin/sotp ref-verify run` may abort on such stale pairs; that abort is not a spec-convergence failure). Then re-invoke `type-design`, and immediately after its regeneration run the full `bin/sotp ref-verify run` (the Phase 2 🔵 step) before any further descent; any Chain ① finding it surfaces routes back per the immediate bounce-back rule. The types scope otherwise resumes only after the spec re-converges.
+     c. Re-converge the spec before the re-dispatch. The re-entry prerequisite requires the `spec_adr` reference signal to satisfy `.harness/config/signal-gates.json`'s applicable specification — under a strict designation a 🟡 also blocks, so the plan workflow's general 🟡-advance rule does not apply to this re-entry: resolve the yellow (typically by re-invoking the `spec-design` workflow) before proceeding. Once the signal satisfies the gate specification, run the `review` workflow's single-scope re-entry round for the spec scope only (`.harness/workflows/track/review.md` §Single-scope re-entry round) to `zero_findings`; do not invoke `review-fix-lead` directly or launch the all-required-scopes review wave here. Re-evaluate the Phase 1 signal gate again so it reflects any review-driven repair; if it no longer satisfies the gate specification, return to the Phase 1 loop and re-run the scoped review after its repair. The spec's semantic-verification element asks only for Chain-①-relevant findings, per `.harness/policies/sot-reentry-sequencing.md`: confirm via the chain-scoped read `bin/sotp ref-verify results --chain 1` that no Chain ① finding remains unresolved — Chain ② findings and enumeration failures caused by the catalogues pending regeneration by the upcoming `type-design` re-run do not participate in this judgment (a full `bin/sotp ref-verify run` may abort on such stale pairs; that abort is not a spec-convergence failure). Then re-invoke the `type-design` workflow, and immediately after its regeneration run the full `bin/sotp ref-verify run` (the Phase 2 🔵 step) before any further descent; any Chain ① finding it surfaces routes back per the immediate bounce-back rule. The types scope otherwise resumes only after the spec re-converges.
      d. The Phase 2 retry counter is independent of Phase 1's. Count against `max_retry`.
 
 ### Phase 3 loop: impl-plan workflow
@@ -156,9 +169,9 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
    (`bin/sotp batch-plan check`).
 3. Apply the loop rule:
    - **Both OK**: mark Phase 3 `completed` and proceed to Termination.
-   - **Either ERROR**: re-invoke `impl-plan` with the failing gate's output. Count against
-     `max_retry`; on overflow, stop and present the latest error to the user. Coverage OK
-     with batch-plan ERROR does NOT complete Phase 3.
+   - **Either ERROR**: re-invoke the `impl-plan` workflow with the failing gate's output.
+     Count against `max_retry`; on overflow, stop and present the latest error to the user.
+     Coverage OK with batch-plan ERROR does NOT complete Phase 3.
 
 ### Termination
 
@@ -203,8 +216,8 @@ capability's domain expert judgment. Each capability is the domain expert for it
 | Gate style | Phases | Signals |
 |------------|--------|---------|
 | ADR-baseline review + user adjudication + commit | Phase 0 after `init` | `.harness/policies/pre-track-adr-authoring.md` の手順に従い → commit |
-| SoT Chain signal (🔵🟡🔴) | Phase 1, Phase 2 | Blue = pass, Yellow = warn + proceed, Red = escalate |
-| Binary check (OK / ERROR) | Phase 0 `init`, Phase 3 | OK = pass, ERROR = re-invoke or stop |
+| SoT Chain signal (🔵🟡🔴) | Phase 1, Phase 2 | Blue = pass, Yellow = recover before downstream entry, Red = escalate |
+| Binary check (OK / ERROR) | Phase 0 `init`, Phase 3 | OK = pass, ERROR = re-invoke matching workflow or stop |
 
 Pre-approval exceptions (outside the gate system — user is asked only on irreversible actions):
 `git push` / `git commit`, external API calls (PR / issue creation), destructive filesystem

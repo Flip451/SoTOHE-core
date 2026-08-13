@@ -284,6 +284,7 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
         "track-active-gate",
         "track-local-review",
         "track-local-review-fix",
+        "track-views-sync",
         "track-local-dry-fix",
         "pr-audit-comment",
         "track-commit-message",

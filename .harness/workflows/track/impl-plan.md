@@ -43,10 +43,14 @@ Confirm at least one `track/items/<track-id>/<layer>-types.json` exists for ever
 layer (Phase 2 output). If not, stop and instruct the caller to run the `type-design` workflow
 (`.harness/workflows/track/type-design.md`) first.
 
-**Step 2: Invoke impl-planner capability**
+**Step 2: Review the types scope**
 
-Invoke the `impl-planner` capability (see `.harness/capabilities/impl-planner.md` for the full
-internal pipeline). The briefing must include:
+1. Invoke the `review` workflow's single-scope re-entry round for `types`
+   (`.harness/workflows/track/review.md` §Single-scope re-entry round) to `zero_findings`.
+
+**Step 3: Enter the impl-plan phase**
+
+Prepare the configured writer briefing at `tmp/impl-planner-briefing.md`. It must include:
 
 - Track id and paths to `track/items/<track-id>/spec.json` and each `<layer>-types.json`
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
@@ -55,14 +59,15 @@ The briefing must **not** carry convention paths. The capability's convention se
 from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
 document an input and would leave a zero-document resolution non-authoritative.
 
-The capability owns writing `track/items/<track-id>/impl-plan.json`,
+Then run `bin/sotp phase enter impl-plan`. The phase engine runs the declared pre-entry checks
+and, only when they all succeed, invokes the configured `impl-planner` writer. The workflow
+must not dispatch that writer directly. The writer owns `track/items/<track-id>/impl-plan.json`,
 `track/items/<track-id>/task-coverage.json`, `track/items/<track-id>/task-contract.json`, and
 `track/items/<track-id>/batch-plan.json`, and evaluating both binary gates — the
 task-coverage gate (`bin/sotp verify plan-artifact-refs`) and the batch-plan structural gate
-(`bin/sotp batch-plan check`). Phase 3 passes only when both are OK. The workflow does not
-duplicate these steps.
+(`bin/sotp batch-plan check`). Phase 3 passes only when both are OK.
 
-**Step 3: Receive and surface the gate verdict**
+**Step 4: Receive and surface the gate verdict**
 
 Receive the binary gate verdict (OK / ERROR) from the capability output. Surface the verdict,
 task count, and any gate error details to the caller without re-reading the output files.
@@ -73,6 +78,7 @@ task count, and any gate error details to the caller without re-reading the outp
 |------|---------|
 | `spec.json` exists | ERROR if absent |
 | At least one `<layer>-types.json` exists per TDDD-enabled layer | ERROR if absent |
+| Types-scope fast and final reviews | `zero_findings` / ERROR |
 | Capability task-coverage binary gate | OK / ERROR |
 | Capability batch-plan structural gate (`bin/sotp batch-plan check`) | OK / ERROR |
 
@@ -80,11 +86,17 @@ task count, and any gate error details to the caller without re-reading the outp
 
 - **Missing spec.json**: stop and instruct the caller to run the `spec-design` workflow first.
 - **Missing type catalogues**: stop and instruct the caller to run the `type-design` workflow first.
-- **Capability execution failure**: retry up to 2 times (transient tooling errors). If retries
-  also fail, report to the caller and stop.
+- **Types-scope review findings**: do not enter the phase; return to the `type-design` workflow
+  for catalogue repair. After regeneration, return through the `plan` workflow's Phase 2 🔵 path
+  (including `bin/sotp ref-verify run`) to refresh Chain 2 approval before re-running the
+  types-scope single-scope review or entering `impl-plan`.
+- **Types-scope review blocked_cross_scope**: return to the caller for the direct-upstream
+  rollback route; use the `diagnose` workflow when the routing target is unclear.
+- **Phase-entry failure**: retry up to 2 times for transient execution failures. A failed
+  pre-entry check does not launch the writer; report it to the caller and stop.
 - **Capability returns ERROR (task-coverage or batch-plan gate)**: surface the gate error
-  details to the caller. The caller (`plan` workflow) applies the loop rule (re-invoke
-  `impl-planner` in the same phase). The `max_retry` guard is enforced by the caller.
+  details to the caller. The caller (`plan` workflow) applies the loop rule (re-invoke the
+  `impl-plan` workflow in the same phase). The `max_retry` guard is enforced by the caller.
 
 ## Outputs
 

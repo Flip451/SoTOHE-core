@@ -77,6 +77,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::capability::CapabilityCommand,
     },
+    /// Validate, explain, and enter operator-owned workflow phases.
+    Phase {
+        #[command(subcommand)]
+        cmd: commands::phase::PhaseCommand,
+    },
     /// Local review workflow wrappers.
     Review {
         #[command(subcommand)]
@@ -196,6 +201,7 @@ macro_rules! run_cli_with_context {
             Some(CliCommand::Git { cmd }) => (commands::git::execute(cmd), None),
             Some(CliCommand::Pr { cmd }) => (commands::pr::execute(cmd), None),
             Some(CliCommand::Capability { cmd }) => (commands::capability::execute(cmd), None),
+            Some(CliCommand::Phase { cmd }) => (commands::phase::execute(cmd), None),
             Some(CliCommand::Review { cmd }) => (commands::review::execute(cmd), None),
             Some(CliCommand::File { cmd }) => (commands::file::execute(cmd), None),
             Some(CliCommand::Verify { cmd }) => (execute_verify_with_telemetry(cmd), None),
@@ -507,7 +513,7 @@ mod tests {
 
     use super::{Cli, CliCommand, command_identity_from_args};
     use crate::commands::dry::DryCommand;
-    use crate::commands::ref_verify::RefVerifyCommand;
+    use crate::commands::ref_verify::{RefVerifyCheckChainArg, RefVerifyCommand};
     use crate::commands::track::test_support::{process_env_lock, run_git, run_in_dir, seed_repo};
     use cli_driver::telemetry::completion_eligible as telemetry_completion_eligible;
 
@@ -583,6 +589,29 @@ mod tests {
             matches!(cli.command, Some(CliCommand::Capability { .. })),
             "capability exec must select the Capability variant"
         );
+    }
+
+    #[test]
+    fn test_phase_validate_is_registered_and_dispatched_at_top_level() {
+        let _process_guard = process_env_lock().lock().unwrap();
+        let repository = TempDir::new().unwrap();
+        let config_dir = repository.path().join(".harness/config");
+        fs::create_dir_all(&config_dir).unwrap();
+        fs::write(
+            config_dir.join("phase-commands.json"),
+            r#"{"schema_version":1,"phases":[{"id":"review","writer":{"argv":["true"]},"pre_entry_commands":[]}]}"#,
+        )
+        .unwrap();
+
+        let exit = run_in_dir(repository.path(), || {
+            dispatch_cli_test!(
+                Cli::try_parse_from(["sotp", "phase", "validate"])
+                    .expect("phase validate must parse at the top-level command boundary"),
+                |_cmd| ExitCode::FAILURE,
+            )
+        });
+
+        assert_eq!(exit, ExitCode::SUCCESS);
     }
 
     #[test]
@@ -841,7 +870,7 @@ mod tests {
         let args = vec![
             std::ffi::OsString::from("sotp"),
             std::ffi::OsString::from("review"),
-            std::ffi::OsString::from("codex-local"),
+            std::ffi::OsString::from("local"),
             std::ffi::OsString::from("--prompt"),
             std::ffi::OsString::from("do-not-record-this"),
             std::ffi::OsString::from("--model"),
@@ -852,7 +881,7 @@ mod tests {
             std::ffi::OsString::from("cli"),
         ];
 
-        assert_eq!(command_identity_from_args(&args), "sotp review codex-local");
+        assert_eq!(command_identity_from_args(&args), "sotp review local");
     }
 
     #[test]
@@ -865,6 +894,7 @@ mod tests {
     #[test]
     fn test_telemetry_completion_eligible_excludes_display_only_and_report_commands() {
         assert!(!telemetry_completion_eligible("track resolve"));
+        assert!(!telemetry_completion_eligible("phase explain"));
         assert!(!telemetry_completion_eligible("telemetry report"));
         assert!(!telemetry_completion_eligible("review results"));
         assert!(!telemetry_completion_eligible("verify results"));
@@ -1024,17 +1054,25 @@ mod tests {
         }
     }
 
-    /// `sotp ref-verify check-approved --track-id x` must resolve to
+    /// `sotp ref-verify check-approved --chain 1 --track-id x` must resolve to
     /// `CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved }`.
     #[test]
     fn test_ref_verify_dispatch_check_approved_routes_to_ref_verify_check_approved_variant() {
-        let cli =
-            Cli::try_parse_from(["sotp", "ref-verify", "check-approved", "--track-id", "my-track"])
-                .unwrap();
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "ref-verify",
+            "check-approved",
+            "--chain",
+            "1",
+            "--track-id",
+            "my-track",
+        ])
+        .unwrap();
         let exit = dispatch_cli_with_test!(cli, |_cmd| ExitCode::FAILURE, |cmd| {
             match cmd {
                 RefVerifyCommand::CheckApproved(args) => {
                     assert_eq!(args.track_id.as_deref(), Some("my-track"));
+                    assert_eq!(args.chain, RefVerifyCheckChainArg::Chain1);
                 }
                 other => panic!("expected CheckApproved, got {other:?}"),
             }
@@ -1043,16 +1081,24 @@ mod tests {
         assert_eq!(exit, ExitCode::from(43));
     }
 
-    /// `sotp ref-verify check-approved --track-id x` must parse into
+    /// `sotp ref-verify check-approved --chain 2 --track-id x` must parse into
     /// `CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved }`.
     #[test]
     fn test_ref_verify_dispatch_check_approved_parses_to_ref_verify_check_approved_variant() {
-        let cli =
-            Cli::try_parse_from(["sotp", "ref-verify", "check-approved", "--track-id", "my-track"])
-                .unwrap();
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "ref-verify",
+            "check-approved",
+            "--chain",
+            "2",
+            "--track-id",
+            "my-track",
+        ])
+        .unwrap();
         match cli.command {
             Some(CliCommand::RefVerify { cmd: RefVerifyCommand::CheckApproved(args) }) => {
                 assert_eq!(args.track_id.as_deref(), Some("my-track"));
+                assert_eq!(args.chain, RefVerifyCheckChainArg::Chain2);
             }
             _ => panic!("expected RefVerify {{ CheckApproved }}, got a different variant"),
         }

@@ -1,0 +1,1110 @@
+{
+  "entries": [
+    {
+      "claim_hash": "83504726bb05e59d1513ce2156c42d23000dafb32815be2de54b9a6955f8bea2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "83504726bb05e59d1513ce2156c42d23000dafb32815be2de54b9a6955f8bea2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "83504726bb05e59d1513ce2156c42d23000dafb32815be2de54b9a6955f8bea2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "83504726bb05e59d1513ce2156c42d23000dafb32815be2de54b9a6955f8bea2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "10d8230e61b6aba9716501dade77e0b3f7e2446bf1793291d45bbc32d568d564",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityExecDriverInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "10d8230e61b6aba9716501dade77e0b3f7e2446bf1793291d45bbc32d568d564",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityExecDriverInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "10d8230e61b6aba9716501dade77e0b3f7e2446bf1793291d45bbc32d568d564",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityExecDriverInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "10d8230e61b6aba9716501dade77e0b3f7e2446bf1793291d45bbc32d568d564",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityExecDriverInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0db6c6c10cecaca06e4778a2d9b96c3d56e95afdf97cdc3035d6db3b0d95bd50",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CommandOutcome",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0db6c6c10cecaca06e4778a2d9b96c3d56e95afdf97cdc3035d6db3b0d95bd50",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CommandOutcome",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9120887564f93a2ad27f4dca8855179001e8504db2454069383aa686a9562882",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9120887564f93a2ad27f4dca8855179001e8504db2454069383aa686a9562882",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9120887564f93a2ad27f4dca8855179001e8504db2454069383aa686a9562882",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41b68f81362a3c45f4a3dea5448ee7dcf068f08245b2ed11fcd3d213f5143d4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41b68f81362a3c45f4a3dea5448ee7dcf068f08245b2ed11fcd3d213f5143d4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-11",
+          "section": "in_scope",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41b68f81362a3c45f4a3dea5448ee7dcf068f08245b2ed11fcd3d213f5143d4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41b68f81362a3c45f4a3dea5448ee7dcf068f08245b2ed11fcd3d213f5143d4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41b68f81362a3c45f4a3dea5448ee7dcf068f08245b2ed11fcd3d213f5143d4c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3643415a2d5e6b767dab3be49f568e1188560910a41b121656f1571262d76028",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseIdArg",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "411409e93ad2b9dbec98e4c1ee218a8efd197cd40533950936cae5c69fe1f2b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RefVerifyChainSelect",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "411409e93ad2b9dbec98e4c1ee218a8efd197cd40533950936cae5c69fe1f2b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RefVerifyChainSelect",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e43015288e671c73d57f0b87e08d79b0cadfea90d43b97a06fa6d87171eacb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RefVerifyCheckApprovedInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e43015288e671c73d57f0b87e08d79b0cadfea90d43b97a06fa6d87171eacb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RefVerifyCheckApprovedInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9cb087d80db87733487907e6de76b28705ecf070c2b53e2d6f6ff7c31a69c40d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RefVerifyDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9cb087d80db87733487907e6de76b28705ecf070c2b53e2d6f6ff7c31a69c40d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RefVerifyDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e68f249f43a45ee6358a15eb325af5a153dad4f76b6fc04a38093484aadb4328",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckRoundSelect",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e68f249f43a45ee6358a15eb325af5a153dad4f76b6fc04a38093484aadb4328",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckRoundSelect",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8653bd755cdf4c97b915d119bae5ae86280cf2cc26ada44f644c91b33e3e6432",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-08",
+          "section": "constraint",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8653bd755cdf4c97b915d119bae5ae86280cf2cc26ada44f644c91b33e3e6432",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8653bd755cdf4c97b915d119bae5ae86280cf2cc26ada44f644c91b33e3e6432",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6ad2297408a79d60512820a83ef856e351a2391e1b9cfd75b70e5819f3aeb8da",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6ad2297408a79d60512820a83ef856e351a2391e1b9cfd75b70e5819f3aeb8da",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6ad2297408a79d60512820a83ef856e351a2391e1b9cfd75b70e5819f3aeb8da",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6ad2297408a79d60512820a83ef856e351a2391e1b9cfd75b70e5819f3aeb8da",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-18",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "54551b22cd6464497459c61867064e0184e46da8016396096b01cf0eeb40aab7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-09",
+          "section": "constraint",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "54551b22cd6464497459c61867064e0184e46da8016396096b01cf0eeb40aab7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "54551b22cd6464497459c61867064e0184e46da8016396096b01cf0eeb40aab7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixDriver",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8d912374a2a062652229cff3d989e22d73f6cc3e6f8ea11537d49fe01f105c39",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8d912374a2a062652229cff3d989e22d73f6cc3e6f8ea11537d49fe01f105c39",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-09",
+          "section": "constraint",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8d912374a2a062652229cff3d989e22d73f6cc3e6f8ea11537d49fe01f105c39",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "221230ff9c46a0a2879ade5bc3472caefa55ec3e8bd9d8f906225b8130d8043c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-18",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d23ac0b0c60e754201c7d0fd616925e40dc95a1fe02f542a5e075d87b67783e3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewResultsInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`Named` は validated `--scope <name>` で選ばれる。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d23ac0b0c60e754201c7d0fd616925e40dc95a1fe02f542a5e075d87b67783e3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewResultsInput",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-18",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 1
+}

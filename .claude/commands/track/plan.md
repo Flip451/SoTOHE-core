@@ -24,29 +24,18 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 - **Phase 0 governing convention**: apply
   `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
   normative source for Phase 0. This adapter states no procedure of its own for that phase.
-- **Phase writer dispatch** — write the phase briefing, then invoke the matching
-  `bin/sotp capability exec <capability> --host claude --briefing-file <path>` command. The
-  dispatcher resolves the capability's provider internally from
-  `.harness/config/agent-profiles.json` and returns one of two outcomes:
-  - `CAPABILITY_EXEC_OUTCOME: executed` — the subprocess dispatch already ran. Exit code 0
-    only proves the provider exited cleanly; **parse the capability's terminal status /
-    gate verdict from its output** (e.g. `IMPL_PLAN_STATUS: completed` + task-coverage
-    gate OK + batch-plan structural gate OK, per-phase writer completion contract).
-    Advance to the next phase ONLY on the
-    capability's explicit success verdict; on `blocked` / `failed` or a red signal, run the
-    corresponding back-and-forth loop instead.
-  - `CAPABILITY_EXEC_OUTCOME: delegate-in-host` — an in-host delegation instruction with
-    `capability`, `briefing_file`, and `discipline` fields. **You MUST then invoke the
-    matching Claude Agent tool** with `subagent_type: "<capability>"` and pass the briefing
-    path + discipline body as its task prompt; do NOT proceed to the next phase without
-    that Agent invocation, otherwise the phase artifact is never written.
-
-| Phase | Capability | Briefing path |
-|---|---|---|
-| 1 | spec-designer | `tmp/spec-designer-briefing.md` |
-| 2 | type-designer | `tmp/type-designer-briefing.md` |
-| 3 | impl-planner | `tmp/impl-planner-briefing.md` |
-| B&F | adr-editor / adr-diagnoser | capability-specific briefing path |
+- **Phase writer entry** — write the configured briefing, then enter the matching phase:
+  `bin/sotp phase enter spec-design`, `bin/sotp phase enter type-design`, or
+  `bin/sotp phase enter impl-plan`. Phase entry runs the declared convergence checks and
+  launches the configured writer only after they pass. Parse its terminal status / gate verdict
+  before advancing; on `blocked` / `failed` or a red signal, run the corresponding
+  back-and-forth loop. Do not launch a phase writer from this adapter. Back-and-forth
+  `adr-editor` / `adr-diagnoser` dispatch remains capability-specific: invoke
+  `bin/sotp capability exec adr-editor --host claude --briefing-file <path>` or
+  `bin/sotp capability exec adr-diagnoser --host claude --briefing-file <path>`. The
+  dispatcher resolves each provider from `.harness/config/agent-profiles.json`; only on
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host` invoke the matching Claude Agent tool with the
+  briefing path and discipline body. Pass `--resume` only when continuing the same assignment.
 
 - **Semantic review check**: `bin/sotp ref-verify run`
 

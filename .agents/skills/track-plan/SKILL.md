@@ -27,20 +27,19 @@ or failure-recovery procedures here.
   transition rules and inputs are owned by the plan workflow SSoT. Phase 0 follows
   `.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権 as its sole
   normative source; this skill states no procedure of its own for that phase.
-- Phase 1 is delegated to `$track-spec-design` (which dispatches the `spec-designer`
-  capability through `bin/sotp capability exec`, provider resolved from
-  `.harness/config/agent-profiles.json`).
-- Phase 2 is delegated to `$track-type-design` (which dispatches the `type-designer`
-  capability the same way).
-- Phase 3 is delegated to `$track-impl-plan` (which dispatches the `impl-planner`
-  capability the same way).
+- Phase 1 is delegated to `$track-spec-design`, which enters `spec-design` through
+  `bin/sotp phase enter spec-design` after preparing its configured briefing.
+- Phase 2 is delegated to `$track-type-design`, which enters `type-design` through
+  `bin/sotp phase enter type-design` after preparing its configured briefing.
+- Phase 3 is delegated to `$track-impl-plan`, which enters `impl-plan` through
+  `bin/sotp phase enter impl-plan` after preparing its configured briefing.
 - Back-and-forth escalation transitions (lifecycle branching, guardian judgment, retry
-  counters) are owned by the plan workflow SSoT. When the SSoT selects a capability to dispatch
-  (`adr-editor`, `adr-diagnoser`, or a phase writer), invoke it through
-  `bin/sotp capability exec <capability> --host codex --briefing-file <path>` (invoke the
+  counters) are owned by the plan workflow SSoT. When the SSoT selects `adr-editor` or
+  `adr-diagnoser`, invoke `bin/sotp capability exec adr-editor --host codex --briefing-file <path>`
+  or `bin/sotp capability exec adr-diagnoser --host codex --briefing-file <path>`. Invoke the
   matching `.codex/agents/<capability>.toml` in-host only on
-  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`); upstream phase re-invocations go through the
-  matching `$track-*` skill.
+  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`; upstream phase re-invocations go through the
+  matching `$track-*` skill and its phase-entry path.
 
 ### (4) Reporting format
 
