@@ -19,6 +19,61 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:33:33Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 92,
+              "message": "`open-set covering contract` omits the third permitted resolution, strict implementation with an acknowledged depth estimate. As written, it would report a type contract that legitimately chooses that option, contradicting the three-option policy in `adr.md`, `impl-plan.md`, and the workflow SSoT.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3347dfe5e85dedb1f072107d691b3dda9d160bd9959e66d809cfddb6aff3b6bf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:35:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4df6e52c317dbbab2be4023e40879986759c354dd4b41bef75e56f6366377ef7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:39:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 96,
+              "message": "`open-set covering contract` only exempts resolutions explicitly declared by the catalogue entry. This conflicts with the immediately preceding `upstream restatement` rule, which requires upstream behavior to be represented by an anchor cite rather than repeated, and with `impl-plan.md`, which accepts resolutions recorded anywhere in the upstream chain. Consequently, an entry citing an upstream delegation or strict-depth decision can be falsely reported unless it duplicates that decision. Treat an upstream-recorded resolution as sufficient.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4df6e52c317dbbab2be4023e40879986759c354dd4b41bef75e56f6366377ef7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:41:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1c05c935512cb691ba414d47cc52cc12fcde8db041bcf03507ef7b605bb764",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:43:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1c05c935512cb691ba414d47cc52cc12fcde8db041bcf03507ef7b605bb764",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -32,6 +87,20 @@
           "at": "2026-08-13T19:17:47Z",
           "findings": [],
           "hash": "rvw1:sha256:a30de42c959680ccd5211f9df4e68059e0718f5bce805048a079ab4aa391ad3b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:35:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcb7238d9387a24e161bae6ccd61c112a5ced4d3cbdd47455f4dcfdacae71e3a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:39:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcb7238d9387a24e161bae6ccd61c112a5ced4d3cbdd47455f4dcfdacae71e3a",
           "type": "final",
           "verdict": "zero_findings"
         }
