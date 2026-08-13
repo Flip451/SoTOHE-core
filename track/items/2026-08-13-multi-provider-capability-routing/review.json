@@ -198,6 +198,35 @@
           "hash": "rvw1:sha256:4e1997a5fd880f44cdac21656a23e6f319e11093757caf977e20ab2bfc241f99",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:30:17Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "README.md",
+              "line": 199,
+              "message": "The new policy states that setting `model_provider` on any capability sends its source, briefing, and diff to the external provider, but the preceding README explicitly says `typed-pipeline` capabilities do not forward `model_provider` and cannot be routed externally. This contradiction can cause consumers to make incorrect data-residency decisions; qualify the statement to only capabilities/paths where external routing is actually effective.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf32907b852280d02c903f5e5fbef089ce529b825d9050355c603b29cf4d5e9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T22:33:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6aad6ac8d3aaacc3a3c71801439e5781f83432df0fd7ea3afd26c492fbf38509",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:38:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6aad6ac8d3aaacc3a3c71801439e5781f83432df0fd7ea3afd26c492fbf38509",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -343,6 +372,20 @@
           "at": "2026-08-13T22:20:04Z",
           "findings": [],
           "hash": "rvw1:sha256:156c99c0179bc4654aabddce7cd198111adb09fde18801ae388287df92716358",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:29:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ec25c652f3b62b4633c01a4909fd92ab5222978bdb3c759edaab370dc74aa4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:32:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ec25c652f3b62b4633c01a4909fd92ab5222978bdb3c759edaab370dc74aa4",
           "type": "final",
           "verdict": "zero_findings"
         }

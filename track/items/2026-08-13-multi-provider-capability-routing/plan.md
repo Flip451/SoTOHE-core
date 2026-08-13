@@ -6,7 +6,7 @@
 GO-01 -> T001, T002, T003.
 GO-02 -> T004, T005, T006.
 
-## Tasks (5/6 resolved)
+## Tasks (6/6 resolved)
 
 ### typed-routing-binding — Typed routing binding
 
@@ -21,5 +21,5 @@ GO-02 -> T004, T005, T006.
 > Modify `README.md` documentation. [IN-03; IN-04; CN-02; CN-03; AC-03; AC-04; AC-05]
 
 - [x] **T004**: Modify `README.md` documentation. [IN-03; OUT-03; CN-02; AC-03] (`bae7f06af282aee8040d468674b3c829f1561ae4`)
-- [x] **T005**: Modify `README.md` documentation. [CN-02; AC-04]
-- [ ] **T006**: Modify `README.md` documentation. [IN-04; OUT-04; CN-03; AC-05]
+- [x] **T005**: Modify `README.md` documentation. [CN-02; AC-04] (`1b23fcd178de49f27c97ba8dc763b91d2fb92b58`)
+- [x] **T006**: Modify `README.md` documentation. [IN-04; OUT-04; CN-03; AC-05]

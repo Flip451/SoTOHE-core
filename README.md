@@ -194,6 +194,12 @@ endpoint とモデル ID は provider 側で更新されるため、利用前に
 [Z.AI のツール連携ドキュメント](https://docs.z.ai/devpack/tool/others)、[DashScope の base URL 一覧](https://help.aliyun.com/en/model-studio/base-url)
 を確認する。
 
+### データ所在と採用判断
+
+外部 provider への routing が実際に有効な capability/経路（`model_provider` を転送する generic `orchestrator-output` など）を実行すると、その capability に渡されるソースコード、briefing、diff は、選択した外部 provider のサーバーへ送信される。`typed-pipeline` のように `model_provider` を generic dispatch のようには転送しない経路や、外部 provider を選択していない実行は、この説明の対象ではない。利用地域、保存期間、学習への利用、第三者アクセスなどを含む data residency の可否は consumer が判断する。permissions allowlist と同じく、SoTOHE は選択肢と判断材料を提供するが、provider の採否と運用上の責任は consumer にある。
+
+テンプレートの既定 profile は `model_provider` を指定せず、custom な外部 provider を指さない。CI は data residency を検査・強制せず、consumer のポリシーに基づく profile と provider 側設定の管理を妨げない。open weights の self-host provider 経路の実装・運用はこのテンプレートの対象外である。
+
 ## はじめ方
 
 ### 初回セットアップ

@@ -64,6 +64,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1b23fcd178de49f27c97ba8dc763b91d2fb92b58",
       "description": "Modify `README.md` documentation. [CN-02; AC-04]",
       "id": "T005",
       "status": "done"
@@ -71,7 +72,7 @@
     {
       "description": "Modify `README.md` documentation. [IN-04; OUT-04; CN-03; AC-05]",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }
