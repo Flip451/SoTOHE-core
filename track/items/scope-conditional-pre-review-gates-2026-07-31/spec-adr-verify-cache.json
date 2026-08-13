@@ -1,0 +1,2466 @@
+{
+  "entries": [
+    {
+      "claim_hash": "83f8c4210f5f62d388f63a0571a6c68e4dfe79a519376a9775efd14c24444696",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "config を書くテンプレート利用者は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "83f8c4210f5f62d388f63a0571a6c68e4dfe79a519376a9775efd14c24444696",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "argv 配列にする理由は D1 と同じである。gate-kind から内部処理への見えない対応表を置かず、config を読めば実行する command と順序を監査できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5f06457592cbea35eca821280789c39a156cb9dbfbc96ac3cb37d83239bba370",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "phase engine が宣言済みの pre-entry command を順番に通過させてから canonical writer を一度だけ起動し、SoT 再入の順次処理を機械実行可能にする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2d1947e7251b3b41bd334fd9a540772c7a828fc41758b05a4aeccc4aebb29fcb",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-03",
+          "section": "goal",
+          "text_label": "command configuration と実行を fail-closed に扱い、無効または危険な invocation を writer や reviewer の起動前に可観測な失敗として止める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テンプレート利用者の config は疑ってから実行する。検証できなければ実行前に non-zero で止まり、黙って続行しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c5c354a53a8bb35d22102c5fceb5a1a9c4d09371c531ad0bcc494426712ebd29",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-04",
+          "section": "goal",
+          "text_label": "planning scope を下流 implementation liveness から独立に review 可能に保ちつつ、implementation scope では必要な implementation-to-catalogue と task-contract の検査を reviewer dispatch 前に順序どおり実施する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既定は「gate は当該 scope の上流 chain に由来する検査のみ適用」: types / spec など計画系 scope には chain ③ 由来の liveness 検査を適用せず、実装系 scope には現行どおり適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c5c354a53a8bb35d22102c5fceb5a1a9c4d09371c531ad0bcc494426712ebd29",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-04",
+          "section": "goal",
+          "text_label": "planning scope を下流 implementation liveness から独立に review 可能に保ちつつ、implementation scope では必要な implementation-to-catalogue と task-contract の検査を reviewer dispatch 前に順序どおり実施する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "scope ごとに宣言するのは、必要な検査が scope によって異なるためである。cargo-make の `dependencies` は CLI が scope を解決する前に動くため、planning / SoT scope で downstream liveness の検査だけを省けない。そこで coverage-before-check の順序は保ったまま、その所有を scope-blind な cargo-make `dependencies` から、`sotp review local` が scope を解決した後のテンプレート利用者所有の argv 実行へ移す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "555f1ff3f1156133f1c7f54fe732292035d1c47f180eaa2ca5f324328934fb02",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-05",
+          "section": "goal",
+          "text_label": "task-contract は catalogue entry の task attribution を記録し、baseline 復元の source-only Red は implementation review の scope-resolved ordered argv sequence における直接的な impl-catalog 再計算・検査で reviewer dispatch 前に検出する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "555f1ff3f1156133f1c7f54fe732292035d1c47f180eaa2ca5f324328934fb02",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-05",
+          "section": "goal",
+          "text_label": "task-contract は catalogue entry の task attribution を記録し、baseline 復元の source-only Red は implementation review の scope-resolved ordered argv sequence における直接的な impl-catalog 再計算・検査で reviewer dispatch 前に検出する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「sotp review local」は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e6980fe3b6a1e6100917557176ff5e7fb7f2e31bcd411dbef7329146433545f3",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき事前 command の順序付き list を持つ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "643eaff95d4192a37dcf476f6db92b77ce2f2e75996b92d97b3038c022fd3fa0",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-19",
+          "section": "in_scope",
+          "text_label": "phase command config は command を literal な per-argument argv 配列で宣言し、command 全体を一つの文字列として受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "command 全体を一つの文字列で書く形式は受理しない。引数ごとに分けた配列だけを受理する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0ec134a27109dbccbdd2de01147ddba5c911e0a92cfccdaf89eb1854d9b3bddc",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-20",
+          "section": "in_scope",
+          "text_label": "phase command config は declaration id の一意性、各 argv の non-empty、command ごとの明示 timeout または約 60 分の既定 timeout を fail-closed に検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "- 各 argv の非空 — 空の宣言が「何もせず成功」として通過しないため。\n- phase または scope declaration の一意性 — 同じ対象の宣言が重複し、どれを使うか曖昧にならないため。\n- 明示 timeout または約 60 分の既定 timeout — 終わらない command が phase や review 全体を止め続けないため。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "phase declaration を解決し、事前 command を一つずつ順に実行して、最初の non-zero exit で残りを止める。すべて成功した場合だけ writer を一度起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5766f2233e51df7dd5a39554022688b7364647b79f00722e6c78f0cde48989fa",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。stdout/stderr は bounded に捕捉する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "- repository-root 固定 cwd — command を呼び出した場所によって結果が変わらないため。\n- bounded output — command の出力が上限なく増え続けないため。\n\n判定できない場合は拒否に倒す。検証不能、重複、再帰、または上限超過は、実行前または検出時に non-zero で停止し、\nその結果を D2 / D4 の first-failure stop へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "config を書くテンプレート利用者は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「個々の command の意味は知らず、argv を順に runner へ渡す。」また、「infrastructure layer は…argv…を受け取る汎用の `ProgramInvocation` runner を実装してよい。CLI subcommand を解釈せず、Clap/CLI grammar に依存しない。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fcf6947ce3a1288ef78c920282154efdd8d7a5123976adbe3f41e1fd6b4540a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "config author/operator は公開 `bin/sotp` command の有効性と順序を所有し、engine は config に保存・解決された literal argv を書き換えず、subcommand grammar や command の意味論を解釈しない。ただし D3 の dispatch boundary では、caller-supplied optional host が present の場合に限り configured writer の `capability exec` invocation の実行時 argv へその `--host` と値だけを追加できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "invocation surface は dispatch boundary で、caller-supplied optional `--host` 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。それ以外の argv を書き換えたり意味解釈したりしない規則と、config が provider-neutral な literal argv を宣言する決定も維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c600677df01b23fc21e331a509de2c22f16a0ef63e6ef1cb2ef604999640d2bb",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "CLI layer は phase の enter / explain / validate の表玄関だけを公開し、宣言された実行体が持つ command の意味を重複して実装しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "signal-gates.json（chain × gate の strictness 宣言）と同型に、review scope × pre-review gate の適用有無を config で宣言する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review local` が scope を解決した上で D1 のマトリクスに従い必要な gate を内部発火する。Makefile wrapper は薄い委譲のみとし、scope-blind な dependency 前置を廃する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2d038fd353544f17e7a06349e641179077a9bf3489237160b864e9f69642820",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "`pre-review-gates.json` は review scope ごとに ordered literal `bin/sotp` argv 配列を宣言し、`sotp review local` が scope を解決してその配列を順次 dispatch する。Makefile review wrapper は scope 条件分岐または gate dependency を持たない薄い委譲に留める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5ccee94b62a5a40f8395ace1a7c7439c5b16e0481a55242983887e902558159e",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "planning/SoT scope の pre-review command sequence は downstream implementation liveness または task-contract 成果物を要求しない。implementation scope は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check の順に実行する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既定は「gate は当該 scope の上流 chain に由来する検査のみ適用」: types / spec など計画系 scope には chain ③ 由来の liveness 検査を適用せず、実装系 scope には現行どおり適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5ccee94b62a5a40f8395ace1a7c7439c5b16e0481a55242983887e902558159e",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "planning/SoT scope の pre-review command sequence は downstream implementation liveness または task-contract 成果物を要求しない。implementation scope は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check の順に実行する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "scope ごとに宣言するのは、必要な検査が scope によって異なるためである。cargo-make の `dependencies` は CLI が scope を解決する前に動くため、planning / SoT scope で downstream liveness の検査だけを省けない。そこで coverage-before-check の順序は保ったまま、その所有を scope-blind な cargo-make `dependencies` から、`sotp review local` が scope を解決した後のテンプレート利用者所有の argv 実行へ移す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3d1538bde700052ce1f5b200477709588b7fec97a383899bfca37fb449ee0a7c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既定は「gate は当該 scope の上流 chain に由来する検査のみ適用」: types / spec など計画系 scope には chain ③ 由来の liveness 検査を適用せず、実装系 scope には現行どおり適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9d1fb103e8260e0214bf6c2f2293b3ce735d9c1fabd94cf3f3c6bd849d418c61",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "`capability exec` は `--host` が omitted の場合、provider-match judgment または in-host delegation を行わず、常に subprocess dispatch を選ぶ。subprocess target provider は `.harness/config/agent-profiles.json` の requested capability の `capabilities.<name>.provider` から解決し、`capabilities.orchestrator.provider` を使わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`--host` が omitted の場合、caller の runtime host は未申告である。この dispatch は provider の一致判定を行わず、in-host 委譲を選ばず、常に subprocess dispatch する。実際に起動する provider は既存の capability routing を維持し、`.harness/config/agent-profiles.json` にある requested capability の `capabilities.<name>.provider` から解決する。`capabilities.orchestrator.provider` は subprocess target の選択には使わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`--host` が supplied の場合、その値は caller が自己申告した実際の runtime host として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "26f934ed9f173908b19c41a6a7c8bf86ed13a723887e021cb6a21dba011e71b2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "supplied `--host` は caller の runtime-host self-declaration としてそのまま扱い、profile 値で override または normalize しない。in-host delegation は capability contract を保持できる provider-match の場合だけ候補にできる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "明示された `--host` と `capabilities.orchestrator.provider` が異なっても、明示値を profile 値へ正規化しない。supplied 値は D1 の runtime-host 自己申告として D7 の分岐に使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e9f8e82c5561af5f9ded63ec8b3220fe37f99b81c0352e8256321e704ba538f5",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-11",
+          "section": "in_scope",
+          "text_label": "operator-owned command config は provider host または `--host` を保持しない。config を消費する invocation surface は caller-supplied optional host を受け取り、値が present の場合だけ configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値を追加して forward できる。保存・解決された literal argv の他の要素は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "このため、テンプレート利用者所有の command config は provider host を固定せず、`--host` を保持しない。保存する literal argv は provider-neutral のままにする。phase-engine entry command など、その config を使う invocation surface が caller-supplied optional host parameter を受け取る。値がある場合だけ、configured writer の `capability exec` 呼び出しへその値を転送する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b4c3f4734549516874260aadc28ec779f4da1cff3af16248bd52eca0c9521e0",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-12",
+          "section": "in_scope",
+          "text_label": "phase command config は各 declared phase に direct-upstream convergence の ordered literal pre-entry argv matrix を持つ。現在の `spec-design` は `signal check-adr-user --gate commit` と ADR scope の current final `zero_findings` review check を、`type-design` は `signal check-spec-adr --gate commit`、Chain ① semantic verification check、spec scope の current final `zero_findings` review check を、`impl-plan` は `signal check-catalog-spec --gate commit`、Chain ② semantic verification check、types scope の current final `zero_findings` review check を順に通過する。ADR-user chain に semantic verification は追加しない。将来 config に追加される phase も、その direct upstream chain の signal gate、適用される semantic verification、current final `zero_findings` review check を同じ順で宣言する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "配布する `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を次の順で宣言する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b9705a31f7c0d6d796d41b0f16651e18fe9eb97a5af9351e05a5e089d15a5ee8",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-13",
+          "section": "in_scope",
+          "text_label": "canonical `/track:*` workflow が phase writer を起動するときは、writer の `capability exec` argv を直接 dispatch せず、`bin/sotp phase enter <phase-id>` を起動する。phase engine は config に宣言された convergence pre-entry sequence を first non-zero で fail-closed にし、全て zero の場合だけ canonical writer を一度起動する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` だけを入口に使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f9ae50549ced0880c35614fc920b8e9fd0d3aef53822e0e5ce81d29cb859856",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-14",
+          "section": "in_scope",
+          "text_label": "catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review check-approved` は無変更（stateless gate として責務が独立）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f9ae50549ced0880c35614fc920b8e9fd0d3aef53822e0e5ce81d29cb859856",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-14",
+          "section": "in_scope",
+          "text_label": "catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`review check-approved` | approved/blocked の 2 値（exit code） | commit guard",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`[--scope <name>|--all]              # 既定: --all`",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出力の scope 一覧は **`scope_config.all_scope_names()` が返す scope universe を完全に列挙する**",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3b3dd76911bde35b84bff50a13a491737d0aeb1e535177f590b6d3b5bde3925a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の scope selection boundary は `Named(validated ScopeName)` または `All` の排他的な表現とする。`All` は明示的な `--all` または selector omission で選ばれ、`scope_config.all_scope_names()` が返す configured scope universe 全体を列挙する。`Named` は validated `--scope <name>` で選ばれ、その scope だけを表示する。`--scope` と `--all` の同時指定、および invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2cf461e5c3cb1998d9090b7500d538182058c3e75d1fd4a4b64ae8077f69f890",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-10-0814-review-results-scope-selection.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「sotp review results」の scope selection は `All | Named(validated ScopeName)` とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18278485a3c3031e3875170de472610003a1c3f641ddd69de06e48716a5295dd",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-16",
+          "section": "in_scope",
+          "text_label": "review-fix command family の delivery boundary を、wire-only の review composition root、usecase を invoke して outcome を render する primary adapter、および outcome の emit に限定する thin bin に分離する。composition root は primary adapter を構築・返却するだけで invoke または render を行わない。primary adapter は raw delivery value を usecase-owned command/request に渡し、usecase の typed result を `CommandOutcome` に render する。bin は raw delivery value を primary adapter に渡して outcome を emit するだけとし、domain/usecase 型を直接構築または re-export せず、usecase invocation または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "96a57dcf0c83070859487ec59897a5db65ed5011969791489ae397d36a25a08e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli が必要とするデータ・操作はすべて usecase 層を経由してアクセスする。usecase は domain 型をそのまま外部に再公開せず（`pub use domain::...` を介した re-export を禁ずる）、cli が消費する形に整えた DTO / Command / Query / Result 型を usecase 自身が定義してそれを公開する。`",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7989adf055d6bce07b9fe79c3f52dd63820401b99e63252408d8377cf182ffda",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-18",
+          "section": "in_scope",
+          "text_label": "review-fix のように track artifact へ書き込む操作では、explicit track id がある場合に current `track/<id>` branch から導出した id との一致を要求し、不一致または non-track branch を fail-closed に拒否する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "998af877c919750c1b2b745c08ec9e9b45a81004b3c7afe99d05e50265b598e2",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "explicit `--track-id` が渡された場合、その値を現在ブランチから導出した track-id と照合する。一致しなければ fail-closed エラーとして停止する。非トラックブランチ（`main` など `track/<id>` 形式でないブランチ）では導出 id が存在しないため、同様に fail-closed で停止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7983a7ed6011d5c3afc0fbdad95b5fc3dc5a0a6ea754fdd915a50b736424498d",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-17",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`--limit N (> 0)` 指定時 — 各 scope の最新 round の findings 詳細 + 過去 round の履歴を展開:",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7983a7ed6011d5c3afc0fbdad95b5fc3dc5a0a6ea754fdd915a50b736424498d",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-17",
+          "section": "in_scope",
+          "text_label": "`bin/sotp review results` の per-scope output content として、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` と `findings_remain` を区別し、`findings_remain` の場合は該当 findings の detail を保持して表示する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`review results` | scope 別の state + 最新 round の verdict（既定 `--limit 0`）/ 過去 N round の詳細（`--limit N` 指定時）+ commit hint",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実行体に固有の制限は、sotp basename と phase enter / review local / review fix-local の組み合わせを拒否する再帰呼び出し denylist、および D5 の fail-closed validation だけである。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "argv 配列にする理由は D1 と同じである。gate-kind から内部処理への見えない対応表を置かず、config を読めば実行する command と順序を監査できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "phase engine の再帰呼び出し — config が sotp を宣言し、sotp が sotp を繰り返し起動しないため。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24a8c219670eb739e89c51f4cd2b271a593ed799b52a989b1f57bb698674bcaa",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "phase engine または pre-review dispatcher が arbitrary または full な `bin/sotp` subcommand grammar、gate predicate、config に保存・解決された literal argv の rewrite、または hidden executable mapping を実装・再現することは含まない。ただし、D5 が義務付ける config safety validation として executable の normalized basename が `sotp`（case-insensitive な `.exe` を含む）であることを認識して finite listed subcommand set に適用する recursion denylist と、D3 による caller-supplied optional host の configured writer `capability exec` invocation への dispatch-boundary での実行時追加はこれに含まれず、command semantic interpretation ではない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "\"invocation surface は dispatch boundary で、caller-supplied optional `--host` 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。それ以外の argv を書き換えたり意味解釈したりしない規則\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c29d9e39ed0557b2ecc7970c60dafadad75eeb0cc90ddd31e2170735becb87e6",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "shell command string、shell interpolation、pipe、または implicit `sh -c` による command 実行を導入することは含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "command 全体を一つの文字列で書く形式は受理しない。引数ごとに分けた配列だけを受理する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c29d9e39ed0557b2ecc7970c60dafadad75eeb0cc90ddd31e2170735becb87e6",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "shell command string、shell interpolation、pipe、または implicit `sh -c` による command 実行を導入することは含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "argv は shell を経由せず、そのまま実行する。機構は shell interpolation、pipe、暗黙の `sh -c` を提供しないため、config の文字列を暗黙に展開・分解・注入する経路を作らない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9da26c616a5dec37a12d189a012a20fcc06769cd38113045d5d1868eb170b655",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "task-contract の task-to-catalogue-entry attribution を `task-coverage.json` に統合することは含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "型カタログ（Phase 2 / type-designer）にも `task-coverage.json` にも混ぜない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "171c3130c53bd26367078c6a3c1237996df443cf0c670763a04500a9a06847f3",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-04",
+          "section": "out_of_scope",
+          "text_label": "pre-review command declaration を `signal-gates.json` と統合すること、または todo-lane / declaration-ahead attribution semantics を変更することは含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "signal-gates.json（chain × gate の strictness 宣言）と同型に、review scope × pre-review gate の適用有無を config で宣言する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc4c36c0b12e3f599b6d91ae80da50311b0c5a96e833d1f935e384c85e1c9cdf",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。phase command config validation と pre-review config validation は、configured writer、pre-entry、pre-review argv のいずれにも shared finite recursion denylist を適用する。argv executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）の場合、続く subcommand が `phase enter`、`review local`、または `review fix-local` である argv を configured command、writer、reviewer の起動前に non-zero で拒否する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「phase command config と pre-review gate config は、少なくとも次を検証する。」および「明示 timeout または約 60 分の既定 timeout」ならびに「phase engine の再帰呼び出し — config が sotp を宣言し、sotp が sotp を繰り返し起動しないため。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "command execution は repository-root cwd と literal argv に限定し、per command で stdout を最大 1 MiB (1,048,576 bytes)、stderr を独立に最大 1 MiB (1,048,576 bytes) capture する。いずれかの output bound を超えた場合は当該 command を terminate し output-limit outcome の non-zero を返す。default timeout は 3,600 seconds とし、explicit timeout は positive integer かつ 3,600 seconds 以下に限る。timeout 時は当該 command を terminate し non-zero を返す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "infrastructure layer は、「一つのプロセスを制限付きで安全に最後まで動かすこと」を受け持つ。argv、repository-root cwd、timeout、output bound を受け取る汎用の `ProgramInvocation` runner を実装してよい。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "21d9371c5ac714d4a549a0fb8d87382c3bab75abdb2d63fe60fd48e84eaf8108",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "command execution は repository-root cwd と literal argv に限定し、per command で stdout を最大 1 MiB (1,048,576 bytes)、stderr を独立に最大 1 MiB (1,048,576 bytes) capture する。いずれかの output bound を超えた場合は当該 command を terminate し output-limit outcome の non-zero を返す。default timeout は 3,600 seconds とし、explicit timeout は positive integer かつ 3,600 seconds 以下に限る。timeout 時は当該 command を terminate し non-zero を返す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "- repository-root 固定 cwd — command を呼び出した場所によって結果が変わらないため。\n- bounded output — command の出力が上限なく増え続けないため。\n- 明示 timeout または約 60 分の既定 timeout — 終わらない command が phase や review 全体を止め続けないため。\nargv は shell を経由せず、そのまま実行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して\n残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3a5e9bfe0d346bd4954b8a1b5e75e3144ca58519d0d0207e5f5861d453dfc660",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "pre-entry または scope command が non-zero を返した場合、dispatcher は後続 command、writer、または reviewer を起動せず、失敗した argv と outcome を operator が識別できる形で返す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review local` は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7df184c579178c5464a18299e832ea77e1d6ce6de6cb72fdf00b4162e21c5dea",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "scope-aware dispatch の所有権は CLI に置き、Makefile に scope 条件分岐または review policy を実装しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review local` が scope を解決した上で D1 のマトリクスに従い必要な gate を内部発火する。Makefile wrapper は薄い委譲のみとし、scope-blind な dependency 前置を廃する（Makefile にロジックを書かない既定方針に従う）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7df184c579178c5464a18299e832ea77e1d6ce6de6cb72fdf00b4162e21c5dea",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "scope-aware dispatch の所有権は CLI に置き、Makefile に scope 条件分岐または review policy を実装しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Makefile wrapper は薄い委譲に留め、scope 条件分岐や gate dependency を重複して所有しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c4317bf2926f72cef14651149b43dec1b5a7460c08763b1cb0717114de93d2f3",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "implementation review では、scope-resolved ordered argv sequence が task-contract coverage/check を実行する前に impl-catalog signal を再計算して検査する。task-contract は catalogue-entry attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "たとえば usecase scope では、`bin/sotp signal calc-impl-catalog` → `bin/sotp signal check-impl-catalog --gate commit` → `bin/sotp task-contract coverage` → `bin/sotp task-contract check` の順に宣言する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c4317bf2926f72cef14651149b43dec1b5a7460c08763b1cb0717114de93d2f3",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "implementation review では、scope-resolved ordered argv sequence が task-contract coverage/check を実行する前に impl-catalog signal を再計算して検査する。task-contract は catalogue-entry attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`task-contract.json` は「pre-review ゲートに見せたい信号を漏れなくタスクに紐付けたか」だけを言う契約。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "収束を終了コードで判定できるように、公開 `bin/sotp` check command を二つ設ける。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e2fb1beed3372ec7fb5280e157a8149cd832682ccbf7923cea19b79426fa43f0",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review check-approved` は無変更（stateless gate として責務が独立）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e2fb1beed3372ec7fb5280e157a8149cd832682ccbf7923cea19b79426fa43f0",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "既存の `bin/sotp review check-approved` は引数と approved / bypass / blocked の exit-code semantics を維持する。catalogue-v5 の name uniqueness 対応は、内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名することだけであり、command surface、approval judgment、または commit guard としての独立責務を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`review check-approved` | approved/blocked の 2 値（exit code） | commit guard",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-08",
+          "section": "constraint",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "96a57dcf0c83070859487ec59897a5db65ed5011969791489ae397d36a25a08e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "usecase は domain 型をそのまま外部に再公開せず（`pub use domain::...` を介した re-export を禁ずる）、cli が消費する形に整えた DTO / Command / Query / Result 型を usecase 自身が定義してそれを公開する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-09",
+          "section": "constraint",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-09",
+          "section": "constraint",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-09",
+          "section": "constraint",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "96a57dcf0c83070859487ec59897a5db65ed5011969791489ae397d36a25a08e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-04-30-0848-cli-via-usecase-only.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "cli が必要とするデータ・操作はすべて usecase 層を経由してアクセスする。usecase は domain 型をそのまま外部に再公開せず（`pub use domain::...` を介した re-export を禁ずる）、cli が消費する形に整えた DTO / Command / Query / Result 型を usecase 自身が定義してそれを公開する。usecase の内部実装では domain 型を扱ってよいが、その型は usecase の public API には出てこない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "48caff72a08f5c7f3a750ee9e782f8c6b92bd2de861f6409139ca290852a304d",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-09",
+          "section": "constraint",
+          "text_label": "review composition root は wire-only の driver factory とし、dependency を配線して `ReviewFixDriver` を構築・返却するだけで、review-fix usecase の invoke または結果の render を行わない。`ReviewFixDriver` は driver-owned raw delivery DTO `ReviewFixInput` を `handle(ReviewFixInput)` で受け、raw values を usecase-owned `RunReviewFixRequest::try_new` に渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。format-level validation を通過した request に対して、`RunReviewFixService` は write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch と non-track branch を fail-closed に拒否してから runner を invoke し、typed usecase result/error を返す。`ReviewFixDriver` はその typed result/error を `CommandOutcome` に render する。bin は raw delivery values だけを渡して outcome を emit し、domain/usecase 型を直接構築または re-export せず、driver・service・presentation を coordination しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "998af877c919750c1b2b745c08ec9e9b45a81004b3c7afe99d05e50265b598e2",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「WRITE 操作における explicit `--track-id` の扱い」: explicit `--track-id` が渡された場合、その値を現在ブランチから導出した track-id と照合する。一致しなければ fail-closed エラーとして停止する。非トラックブランチ（`main` など `track/<id>` 形式でないブランチ）では導出 id が存在しないため、同様に fail-closed で停止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "509542c97f616c090ebfc5f87e41037913fcc75d905ecae263a8e02c1805083d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "validate は invalid schema、duplicate declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、ならびに executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion を、configured command、writer、reviewer の起動前に fail-closed に non-zero で報告する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「検証できなければ実行前に non-zero で止まり、黙って続行しない。」および「phase engine の再帰呼び出し — config が sotp を宣言し、sotp が sotp を繰り返し起動しないため。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "71fe166aa9c3ec7cc54fe3d56ba5ccab000400d6165bc3e52637258498ce1f79",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-21",
+          "section": "acceptance_criteria",
+          "text_label": "phase command config は canonical writer 一件と ordered pre-entry command 群を machine-readable に表す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき事前 command の順序付き list を持つ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5773491ff90ff69467c60a27081f4daec5d77ce112a74edf22f8042cabe37d47",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-22",
+          "section": "acceptance_criteria",
+          "text_label": "phase command config は command を literal な per-argument argv 配列として machine-readable に表す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "phase command config は、実行内容を表す Rust 内部の enum 値、検査を識別する内部 ID、または型付きの内部対応表を引く key ではなく、任意の実行体の literal argv 配列を保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各 phase declaration は canonical writer command を一つと、writer の前に通過すべき事前 command の順序付き list を持つ。phase engine は事前 command を宣言順に一つずつ実行し、最初の non-zero exit で停止して残りと writer を実行しない。すべてが zero の場合に限り writer を一度実行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b49fb65c90adaab174287b910af03a5d2c7e928cd33ff55fd2b16efaa3957c33",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "phase enter は repository root で pre-entry argv を宣言順に実行し、最初の non-zero の後に remaining command と writer を実行せず、全て zero の場合だけ canonical writer を一度実行する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "phase declaration を解決し、事前 command を一つずつ順に実行して、最初の non-zero exit で残りを止める。すべて成功した場合だけ writer を一度起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "CLI layer は phase の enter / explain / validate の表玄関だけを公開し、宣言された実行体が持つ command の意味を重複して実装しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "574c686246d7577d3ab00fe3d015a1ba12dac480d60fd748ff40da6e914bd3dc",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "validate、explain、enter の CLI outcome により、operator は展開後の writer/pre-entry argv、実行順、default 3,600-second timeout または explicit timeout、その positive-integer / 3,600-second 上限、stdout/stderr 各 1 MiB (1,048,576-byte) capture limit、validation failure、first failing command、および output-limit または timeout outcome を監査できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「bounded output — command の出力が上限なく増え続けないため。」および「明示 timeout または約 60 分の既定 timeout — 終わらない command が phase や review 全体を止め続けないため。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "config を書くテンプレート利用者は有効な command と順序を選び、engine は argv を書き換えたり意味解釈したりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "argv は shell を経由せず、そのまま実行する。機構は shell interpolation、pipe、暗黙の `sh -c` を提供しないため、config の文字列を暗黙に展開・分解・注入する経路を作らない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "eed55e184aa24849ff134ac46577b3efe86f7cc48072dacbfa95545682b2805d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "phase と pre-review command は shell string ではなく literal argv として起動され、shell interpolation、pipe、implicit `sh -c`、config に保存・解決された literal argv の rewrite、または command semantic interpretation を経由しない。ただし D3 により caller-supplied optional host が present の場合は、configured writer の `capability exec` invocation の dispatch boundary でその `--host` と値だけを実行時 argv に追加できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`invocation surface は dispatch boundary で、caller-supplied optional --host 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。それ以外の argv を書き換えたり意味解釈したりしない規則も維持する。`",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "“`sotp review local` が scope を解決した上で D1 のマトリクスに従い必要な gate を内部発火する。”",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。」また、「`sotp review local` は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。すべてが zero の場合は reviewer を起動する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b172941a624dc3e345bef08b8dc7680dcf193481927c8a7f2372e6e9b856945e",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "`pre-review-gates.json` は scope ごとの ordered literal `bin/sotp` argv を表示可能にし、`sotp review local` は selected/current `pre-review-gates.json` を configured command または reviewer 起動前に validate する。invalid schema、duplicate scope declaration、empty argv、positive integer でないまたは 3,600 seconds を超える timeout、または executable の basename が `sotp`（`bin/sotp`、`./bin/sotp`、`target/debug/sotp`、absolute path を含む）で続く subcommand が `phase enter`、`review local`、または `review fix-local` である recursion は deterministically non-zero で拒否し、その失敗時には configured command、writer、reviewer を起動しない。validation 成功後だけ resolved scope の sequence を順番に dispatch し、最初の non-zero で reviewer 入口を閉じる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テンプレート利用者の config は疑ってから実行する。検証できなければ実行前に non-zero で止まり、黙って続行しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d6764ba1d77c3187ae808aa73610199b9f3650d54d3fcba5ab91b44911ce6444",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "spec と types を含む planning/SoT scope の local review は、downstream implementation liveness または task-contract artifact が未存在でも、当該 scope の宣言済み上流 prerequisite を満たせば開始できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既定は「gate は当該 scope の上流 chain に由来する検査のみ適用」: types / spec など計画系 scope には chain ③ 由来の liveness 検査を適用せず",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実装系 scope には現行どおり適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d0f30d4ab455e24767d843ecdc8b43030b44ec715b9ca194ba2c7f84ff396fd8",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "implementation scope の local review は reviewer dispatch 前に `bin/sotp signal calc-impl-catalog`、`bin/sotp signal check-impl-catalog`、task-contract coverage、task-contract check を順に実行し、いずれかの non-zero で停止する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「reviewer を起動する前に何を検査するかは、review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。」\n\n「`sotp review local` は scope を解決し、その scope に宣言された argv を上から順に実行する。最初の non-zero exit で review 入口を閉じ、reviewer を起動しない。」\n\n「たとえば usecase scope では、`bin/sotp signal calc-impl-catalog` → `bin/sotp signal check-impl-catalog --gate commit` → `bin/sotp task-contract coverage` → `bin/sotp task-contract check` の順に宣言する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3141d4ffb9c7e0016f3e255b27b25b4f4733b41099567a239973e3b149fedba5",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-06-27-0852-pre-review-task-contract-conformance-gate.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「どのタスクがどの型契約 entry を履行するか」のマッピングを、Phase 3 の **新規 artifact `task-contract.json`**（作業名）に持つ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dcb8aaa72ad8e71f6ad83e5c468ae0c9da138e631c89c90199c5e6b3b399bb85",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "source-only Red が残る implementation review は、reviewer dispatch 前の scope-resolved ordered argv sequence における direct impl-catalog recalculation/check で検出される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「reviewer を起動する前に何を検査するかは、review scope ごとに、任意の実行体の argv 配列として `pre-review-gates.json` に実行順で宣言する。」また、「sotp review local は scope を解決し、その scope に宣言された argv を上から順に実行する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a7c8b3267199d51b0530478844b49c15c7bc0d1f9c5c2aaf407d37e326fe6a92",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b52c0a4f649dd4b1663250fa71ec842a60d74fe845e9aeb8a2f2a04184adec82",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-07-30-1036-scope-conditional-pre-review-gates.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "既定は「gate は当該 scope の上流 chain に由来する検査のみ適用」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "005bd186a6eb5fe08e7c40ce463a4e982b6b66a3c20255527581fa60d3acff82",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を `--host` なしで起動すると、provider-match judgment または in-host delegation を行わず subprocess dispatch となる。subprocess target は requested capability の `capabilities.<name>.provider` から解決され、`capabilities.orchestrator.provider` の値が異なっても target 選択に使われない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`--host` が omitted の場合、caller の runtime host は未申告である。この dispatch は provider の一致判定を行わず、in-host 委譲を選ばず、常に subprocess dispatch する。実際に起動する provider は既存の capability routing を維持し、`.harness/config/agent-profiles.json` にある requested capability の `capabilities.<name>.provider` から解決する。`capabilities.orchestrator.provider` は subprocess target の選択には使わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`--host` が supplied の場合、その値は caller が自己申告した実際の runtime host として扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "明示された `--host` と `capabilities.orchestrator.provider` が異なっても、明示値を profile 値へ正規化しない。supplied 値は D1 の runtime-host 自己申告として D7 の分岐に使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "32ccf2f80b51804ac615744587822439e958defe9cba8036d71d7994da78c8fb",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "`capability exec` を explicit `--host` とともに起動すると、supplied value は profile 値へ normalize または override されず caller runtime-host self-declaration として provider-match evaluation に渡される。supplied host と requested capability の `capabilities.<name>.provider` がともに `claude` の場合だけ、agent definition に `model:` と `tools:` があり、`model:` が profile model と完全一致し、delegation output が capability name・briefing path・読み込み済み discipline payload を含むと検証できたときに in-host delegation instruction を返す。それ以外の provider match（`codex` を含む）、definition/payload validation failure、または provider mismatch では subprocess dispatch を選ぶ。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "b94aa5d4ac9de3ee3eaa22a54b1364e14268116b53138e8f298335872f6901c5",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「--host <provider> は**呼び出し元が自己申告する必須フラグ**とする。」「**一致 かつ host の native adapter 機構が capability 契約を保持できる場合**（現行 provider では **claude のみ**…）…委譲指示を返す前に agent md の `model:` と `tools:` の存在、および `model:` と profile model の完全一致を検証し、欠如・不一致なら fail-closed とする。」「**codex==codex（一致だが契約を保持できない）**: subprocess dispatch を実行する。」「**不一致**: D3〜D6 の cross-provider subprocess dispatch を実行する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7d00562f1197f62211fcda52438425b296bc3d85ad921bcac89edccfb67b5aa1",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "operator-owned config には provider host または `--host` を保存しない。invocation surface に optional host が supplied の場合だけ、configured writer の `capability exec` invocation に dispatch boundary でその `--host` と値を追加して forward し、omitted の場合は追加しない。その他の configured literal argv 要素は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a6da1182801ba14e5135e546a1020af5383c0459acb36b58f4c219fc2c6b5527",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-03-1010-capability-exec-omitted-host-dispatch.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "このため、テンプレート利用者所有の command config は provider host を固定せず、`--host` を保持しない。…その config を使う invocation surface が caller-supplied optional host parameter を受け取る。値がある場合だけ、configured writer の `capability exec` 呼び出しへその値を転送する。…invocation surface は dispatch boundary で、caller-supplied optional `--host` 一つだけを実行時 argv に追加できる。config に保存・解決された literal argv 自体は変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "78ce9c6a3c9eae40fed82c06eed1f9658d13d3326589ea804dbb7a34bd4155ed",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "phase enter は `spec-design` で ADR signal gate と ADR final-review check を、`type-design` で spec signal gate、Chain ① semantic verification check、spec final-review check を、`impl-plan` で catalogue signal gate、Chain ② semantic verification check、types final-review check を config declaration order で実行する。各 required check が zero の場合だけ次の command に進み、最初の non-zero で remaining command と writer を起動しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "配布する `.harness/config/phase-commands.json` は、各 declared phase の pre-entry commands を次の順で宣言する。\n適用されない要素は省く。\n\n1. direct-upstream signal gate\n2. 適用される chain-scoped semantic verification check\n3. upstream scope の current final `zero_findings` review check。\n\n- `spec-design`: `adr_user` signal gate、ADR scope の current final `zero_findings` review check。\n- `type-design`: `spec_adr` signal gate、Chain ① semantic verification check、spec scope の current final\n  `zero_findings` review check。\n- `impl-plan`: `catalog_spec` signal gate、Chain ② semantic verification check、types scope の current final\n  `zero_findings` review check。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d3c306763b47bf58494c816b4fba15046782f9b0f1ef03c6ad4ef5c10d321eda",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "canonical `/track:*` workflow の writer-launch path は `bin/sotp phase enter <phase-id>` だけを呼び、direct `bin/sotp capability exec <writer>` invocation を含まない。phase enter が validation または pre-entry failure を返した場合、その workflow は writer を起動せず non-zero で終了する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "config に宣言された `spec-design`、`type-design`、`impl-plan` の canonical `/track:*` workflow は、対応する writer を起動するとき `bin/sotp phase enter <phase-id>` だけを入口に使う。複合 workflow も同じ入口を使う。workflow SSoT や provider adapter から `bin/sotp capability exec` で writer を直接起動すると、宣言された pre-entry command を通らずに進めるため、この直接起動は行わない。\n\nphase engine は pre-entry command がすべて zero の場合に限り、configured writer を一度起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7d210e4215aa267100c9190054676536b7ddd872efd648fa6f7442623d309856",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-04-0001-phase-enter-adoption-and-check-commands.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "review convergence check: 対象 scope の current final verdict が `zero_findings` の場合だけ exit zero とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-17",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review check-approved` は無変更（stateless gate として責務が独立）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-17",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`review check-approved` | approved/blocked の 2 値（exit code） | commit guard",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-18",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`[--scope <name>|--all]              # 既定: --all`",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-18",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "出力の scope 一覧は **`scope_config.all_scope_names()` が返す scope universe を完全に列挙する**。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c87d0438c984e9cb4da639fc81b4d6d55b7f5db795a4ec037844e860f6ffb2e9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-18",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results --scope <scope>` は validated `ScopeName` の `Named` selection としてその scope だけを表示し、`--all` または selector omission は `All` selection として `scope_config.all_scope_names()` が返す configured scope universe 全体を表示する。`--scope` と `--all` を同時に指定する input、または invalid scope 名は受理しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2cf461e5c3cb1998d9090b7500d538182058c3e75d1fd4a4b64ae8077f69f890",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-10-0814-review-results-scope-selection.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`All` は明示的な `--all` または selector の省略で選ばれ、`scope_config.all_scope_names()` が返す scope universe を省略なく完全に列挙する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli_composition` の責務を **DI（object graph の組み立て）のみ**に絞る。」「use case を driving adapter に**注入**する。**use case を invoke しない**（invoke は cli_driver の責務）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`cli_driver` の各 driving adapter は **注入された use case を保持**し、`handle(input)` で **use case を呼び（invoke）、続けて結果を整形して（render）`CommandOutcome` を返す**。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2e2c9eb454c6f53575505dca991d5fa885fc140f4033ed556182524e4cbce848",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "bin は composition root から driving adapter を受け取り、`driver.handle(input)` を呼んで `CommandOutcome` を emit するのみで、`usecase` / `domain` を import しない（thin-bin）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "f6ff79a7b336c62bcce348b746df2b4372ac1ef50ff549f5c34ddddb3544df3d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「usecase 層に boundary 用 DTO（command / output）を置く。」「cli-composition が profiles.resolve_execution(\"review-fix-lead\", round_type) で provider を解決し adapter を wiring する」「契約と orchestration は usecase、wiring は composition root、引数表面は cli。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "546deb8be81bcdf2aa7783fd1485553398fe3ed4c9dc4a7043d4e522ff435e49",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-19",
+          "section": "acceptance_criteria",
+          "text_label": "review-fix CLI invocation では、review composition root が wired `ReviewFixDriver` を提供し、bin が raw delivery values から driver-owned `ReviewFixInput` を渡す。driver の `handle(ReviewFixInput)` は raw values を usecase-owned `RunReviewFixRequest::try_new` へ渡す。boundary は、空または形式不正の scope name、空または形式不正の track ID、または `fast` / `final` 以外の round type を拒否し、それぞれ offending field を特定する focused validation error とする。ただし catch-all `other` は大文字小文字を区別せず implicit Other scope を選択するため、scope validation error としない。driver は validation error を non-zero `CommandOutcome` として render する。valid request では `RunReviewFixService` が write-side resolver で current `track/<id>` を解決し、optional explicit track id の mismatch または non-track branch を fail-closed に拒否してから runner を invoke し、review-results を含む結果を driver 内で render して `CommandOutcome` として返す。bin はその outcome を emit し、domain/usecase 型の直接構築または re-export、usecase invocation、または presentation coordination を行わない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "998af877c919750c1b2b745c08ec9e9b45a81004b3c7afe99d05e50265b598e2",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-05-26-1813-track-id-default-active-track.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「WRITE 操作における explicit `--track-id` の扱い: explicit `--track-id` が渡された場合、その値を現在ブランチから導出した track-id と照合する。一致しなければ fail-closed エラーとして停止する。非トラックブランチ（`main` など `track/<id>` 形式でないブランチ）では導出 id が存在しないため、同様に fail-closed で停止する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "107ab241ab1aaa1eb6e0fe6bf7546bc92c24594fbe9604447ff57b1a80205281",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-20",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`--limit N (> 0)` 指定時 — 各 scope の最新 round の findings 詳細 + 過去 round の履歴を展開:",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "107ab241ab1aaa1eb6e0fe6bf7546bc92c24594fbe9604447ff57b1a80205281",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-20",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review results` は各 displayed scope について、state summary の latest round と `--limit` で表示する history round を round type、timestamp、verdict とともに text で表示する。verdict は `zero_findings` または `findings_remain` として区別し、`findings_remain` の場合は該当 findings を保持して detail として表示する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "33cc2dba5ce0c832364f9749b70fb4af1fe77a8c805879c10f7846d6ea220519",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-04-28-1905-review-results-command.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`review results` | scope 別の state + 最新 round の verdict（既定 `--limit 0`）/ 過去 N round の詳細（`--limit N` 指定時）+ commit hint",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

@@ -13,7 +13,9 @@ pub(super) fn create_safe_home() -> Result<PathBuf, ReviewFixRunnerError> {
         let ts = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_err(|e| {
-                ReviewFixRunnerError::Unexpected(format!("failed to compute timestamp: {e}"))
+                ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(
+                    format!("failed to compute timestamp: {e}"),
+                ))
             })?
             .as_nanos();
         let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
@@ -29,16 +31,18 @@ pub(super) fn create_safe_home() -> Result<PathBuf, ReviewFixRunnerError> {
             Ok(()) => return Ok(path),
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
             Err(e) => {
-                return Err(ReviewFixRunnerError::Unexpected(format!(
-                    "failed to create safe HOME {}: {e}",
-                    path.display()
-                )));
+                return Err(ReviewFixRunnerError::Unexpected(
+                    usecase::git_workflow::DiagnosticText::new(format!(
+                        "failed to create safe HOME {}: {e}",
+                        path.display()
+                    )),
+                ));
             }
         }
     }
-    Err(ReviewFixRunnerError::Unexpected(
-        "failed to create a unique safe HOME after repeated attempts".to_owned(),
-    ))
+    Err(ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(
+        "failed to create a unique safe HOME after repeated attempts",
+    )))
 }
 
 pub(super) fn make_absolute(path: PathBuf) -> Result<PathBuf, ReviewFixRunnerError> {
@@ -46,9 +50,9 @@ pub(super) fn make_absolute(path: PathBuf) -> Result<PathBuf, ReviewFixRunnerErr
         return Ok(path);
     }
     let cwd = std::env::current_dir().map_err(|e| {
-        ReviewFixRunnerError::Unexpected(format!(
+        ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(format!(
             "failed to resolve current directory while absolutizing CODEX_HOME: {e}"
-        ))
+        )))
     })?;
     Ok(cwd.join(path))
 }
@@ -58,16 +62,16 @@ pub(super) fn resolve_codex_home() -> Result<PathBuf, ReviewFixRunnerError> {
         if !explicit.is_empty() {
             if let Some(rest) = explicit.strip_prefix("~/") {
                 let home = std::env::var("HOME").map_err(|e| {
-                    ReviewFixRunnerError::Unexpected(format!(
-                        "CODEX_HOME starts with ~/ but HOME is not set: {e}"
+                    ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(
+                        format!("CODEX_HOME starts with ~/ but HOME is not set: {e}"),
                     ))
                 })?;
                 return make_absolute(PathBuf::from(home).join(rest));
             }
             if explicit == "~" {
                 let home = std::env::var("HOME").map_err(|e| {
-                    ReviewFixRunnerError::Unexpected(format!(
-                        "CODEX_HOME is ~ but HOME is not set: {e}"
+                    ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(
+                        format!("CODEX_HOME is ~ but HOME is not set: {e}"),
                     ))
                 })?;
                 return make_absolute(PathBuf::from(home).join(".codex"));
@@ -76,9 +80,9 @@ pub(super) fn resolve_codex_home() -> Result<PathBuf, ReviewFixRunnerError> {
         }
     }
     let home = std::env::var("HOME").map_err(|e| {
-        ReviewFixRunnerError::Unexpected(format!(
+        ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(format!(
             "HOME env var is not set (cannot resolve default CODEX_HOME): {e}"
-        ))
+        )))
     })?;
     make_absolute(PathBuf::from(home).join(".codex"))
 }
@@ -140,10 +144,10 @@ pub(super) fn prepend_dir_to_path(dir: &Path) -> Result<OsString, ReviewFixRunne
         }
     }
     std::env::join_paths(paths).map_err(|e| {
-        ReviewFixRunnerError::Unexpected(format!(
+        ReviewFixRunnerError::Unexpected(usecase::git_workflow::DiagnosticText::new(format!(
             "failed to prepend {} to PATH for codex fixer: {e}",
             dir.display()
-        ))
+        )))
     })
 }
 

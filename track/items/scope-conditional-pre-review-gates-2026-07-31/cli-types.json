@@ -1,0 +1,1580 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::capability::into_driver_input": {
+      "action": "modify",
+      "docs": "Capability argument-to-driver-input mapping with optional host field (IN-09, IN-10, AC-11, AC-12).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "CapabilityExecArgs"
+        }
+      ],
+      "returns": "cli_driver::capability::CapabilityExecDriverInput",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::phase::execute": {
+      "action": "add",
+      "docs": "Dispatches the phase command through the fully wired primary adapter (IN-04, AC-03).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "PhaseCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::phase::execute_with_driver": {
+      "action": "add",
+      "docs": "Dispatches a phase command through an injected driver for boundary-level reuse and verification (IN-04, AC-03).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "PhaseCommand"
+        },
+        {
+          "name": "driver",
+          "ty": "&cli_driver::phase_command::PhaseCommandDriver"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::phase::input_from_command": {
+      "action": "add",
+      "docs": "Phase-command input mapping with host-bearing Enter fields (IN-04, IN-11, AC-03, AC-13).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "PhaseCommand"
+        }
+      ],
+      "returns": "cli_driver::phase_command::PhaseCommandInput",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::ref_verify::execute_check_approved_with_driver": {
+      "action": "add",
+      "docs": "Ref-verify check-approved execution through an injected driver (CN-06, AC-16).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&CheckApprovedArgs"
+        },
+        {
+          "name": "driver",
+          "ty": "&cli_driver::ref_verify::RefVerifyDriver"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::claude_local::execute_claude_local": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::claude_local::run_execute_claude_local": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::codex_local::emit_outcome_output": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::codex_local::emit_outcome_output_to": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::codex_local::execute_codex_local": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::codex_local::review_input_from_args": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::codex_local::run_execute_codex_local": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::execute_check_approved": {
+      "action": "modify",
+      "docs": "CLI handler for the behavior-preserving `review check-approved` operation (CN-07, AC-17).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&ReviewCheckApprovedArgs"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::execute_check_zero_findings": {
+      "action": "add",
+      "docs": "CLI handler for the `review check-zero-findings` operation (CN-06, AC-16).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "args",
+          "ty": "&CheckZeroFindingsArgs"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::validate_auto_record_args": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::validate_auto_record_args_raw": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli::commands::review::validate_claude_auto_record_args": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [],
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ReviewCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseValidateArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "PhaseIdArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PhaseIdArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "PhaseIdArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "PhaseEnterArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckApprovedArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckApprovedArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckApprovedArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckZeroFindingsArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckZeroFindingsArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "add",
+      "for_type": "CheckZeroFindingsArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckRoundArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckRoundArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckRoundArg",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckRoundArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckRoundArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckRoundArg",
+      "trait_ref": "clap_builder::derive::ValueEnum"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCheckChainArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCheckChainArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCheckChainArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCheckChainArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "RefVerifyCheckChainArg",
+      "trait_ref": "clap_builder::derive::ValueEnum"
+    },
+    {
+      "for_type": "ReviewCheckApprovedArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewCheckApprovedArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "ReviewCheckApprovedArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityExecArgs": {
+      "action": "modify",
+      "docs": "Capability-execution CLI arguments with optional host field (IN-09, IN-10, AC-11, AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "cli_driver::capability::CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "Option<cli_driver::capability::ProviderNameArg>"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "cli_driver::capability::CapabilityFilePathArg"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<cli_driver::capability::TimeoutSecondsArg>"
+            },
+            {
+              "name": "resume",
+              "ty": "bool"
+            },
+            {
+              "name": "target_artifacts",
+              "ty": "Vec<cli_driver::capability::TargetArtifactPathArg>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CheckApprovedArgs": {
+      "action": "modify",
+      "docs": "Arguments for the ref-verify approval gate, extended with a required Chain 1 or Chain 2 selector (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "chain",
+              "ty": "RefVerifyCheckChainArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CheckZeroFindingsArgs": {
+      "action": "add",
+      "docs": "Clap argument DTO for the `review check-zero-findings` operation (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "round",
+              "ty": "ReviewCheckRoundArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ClaudeLocalArgs": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "commands::review",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CliCommand": {
+      "action": "modify",
+      "docs": "Top-level CLI command family, modified to expose the operator-owned phase command surface (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Arch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ArchCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AdrBaseline",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "AdrBaselineCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Conventions",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ConventionsCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Domain",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DomainCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Guard",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GuardCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Hook",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "HookCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Maintenance",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "MaintenanceCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Track",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TrackCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Git",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GitCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "PrCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Capability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CapabilityCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Phase",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "PhaseCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Review",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ReviewCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "File",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "FileCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Verify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "VerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FindSimilar",
+            "payload": {
+              "fields": [
+                "FindSimilarArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DupIndex",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DupIndexCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DupCheck",
+            "payload": {
+              "fields": [
+                "DupCheckArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Telemetry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TelemetryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Dry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RefVerify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "RefVerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TestObligation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TestObligationSubcommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Signal",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "SignalCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TaskContract",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TaskContractCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Catalog",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogueLintCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Template",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TemplateCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CodexRuntime",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CodexRuntimeCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "BatchPlan",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "BatchPlanCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+      }
+    ]
+      },
+      "methods": [],
+      "module_path": "",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CodexLocalArgs": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "commands::review",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommand": {
+      "action": "add",
+      "docs": "Public phase-command family with enter-specific arguments (IN-04, IN-11, AC-03, AC-13).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Validate",
+            "payload": {
+              "fields": [
+                "PhaseValidateArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Explain",
+            "payload": {
+              "fields": [
+                "PhaseIdArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Enter",
+            "payload": {
+              "fields": [
+                "PhaseEnterArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseEnterArgs": {
+      "action": "add",
+      "docs": "Phase-enter CLI arguments with optional host field (IN-04, IN-11, AC-02, AC-03, AC-13).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_id",
+              "ty": "cli_driver::phase_command::PhaseIdArg"
+            },
+            {
+              "name": "host",
+              "ty": "Option<cli_driver::capability::ProviderNameArg>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseIdArgs": {
+      "action": "add",
+      "docs": "Shared phase-id CLI arguments (IN-04, AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_id",
+              "ty": "cli_driver::phase_command::PhaseIdArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseValidateArgs": {
+      "action": "add",
+      "docs": "Phase-validation CLI arguments (AC-01, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::phase",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCheckChainArg": {
+      "action": "add",
+      "docs": "Clap chain selector for the `ref-verify check-approved` operation (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Chain1",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Chain2",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::ref_verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckApprovedArgs": {
+      "action": "add",
+      "docs": "Clap argument DTO for `review check-approved` (CN-07, AC-17).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckRoundArg": {
+      "action": "add",
+      "docs": "Clap-facing transport enum mirrored by `cli_driver::review::ReviewCheckRoundSelect`; `cli::commands::review::execute_check_zero_findings` owns the exhaustive conversion (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Final",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCommand": {
+      "action": "modify",
+      "docs": "Selects the config-driven local review workflow and its supporting review commands.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Local",
+            "payload": {
+              "fields": [
+                "LocalArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FixLocal",
+            "payload": {
+              "fields": [
+                "FixLocalArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "fields": [
+                "ReviewCheckApprovedArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckZeroFindings",
+            "payload": {
+              "fields": [
+                "CheckZeroFindingsArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "fields": [
+                "ResultsArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Classify",
+            "payload": {
+              "fields": [
+                "ClassifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Files",
+            "payload": {
+              "fields": [
+                "FilesArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ValidatedAutoRecordArgs": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "commands::review",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

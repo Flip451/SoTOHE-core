@@ -440,16 +440,19 @@ bin/sotp track views sync
 ''']
 
 [tasks.track-local-review]
-description = "[wrapper] Run task-contract gates, refresh track artifacts, then invoke one local reviewer round"
-dependencies = ["task-contract-check", "track-active-gate"]
+description = "[wrapper] Delegate one reviewer round to bin/sotp review local. The CLI resolves the review scope and dispatches its operator-owned pre-review command sequence."
 script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
 
 [tasks.track-local-review-fix]
-description = "[wrapper] Run task-contract gates, refresh track artifacts, then invoke the local review fixer"
-dependencies = ["task-contract-check", "track-active-gate"]
+description = "[wrapper] Delegate reviewer fixes to bin/sotp review fix-local. Provider/model resolution remains CLI-owned; pre-review gating is dispatched per scope by bin/sotp review local inside the fix loop."
 script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review fix-local "$@"']
+
+[tasks.track-views-sync]
+description = "[wrapper] Regenerate rendered track views only (plan.md, contract-map.md, and catalogue views). This is an explicit fixer refresh route; it performs no signal, lint, catalogue, or task-contract gate."
+command = "bin/sotp"
+args = ["track", "views", "sync"]
 
 [tasks.track-local-dry-fix]
 description = "[wrapper] Launch the Codex dry-fix-lead fixer"

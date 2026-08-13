@@ -14006,7 +14006,7 @@
       },
       "key": {
         "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
-        "bound_tests_set_hash": "87e739c44cfc0141c7165d5f7e638b7384db9fe39d10660701581f62e212770a",
+        "bound_tests_set_hash": "52c3b6654e7c81125db57b2e4eea5fa465c43dd4eb9402305a650ae35b70be09",
         "declaration_hash": "e4ce972ada742c04d944410677290d561be2e1908425a180b8dc485c2437f55d"
       },
       "obligation_id": {
@@ -14015,7 +14015,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(branch_state(repo.path()), before); ... assert!(!artifact.exists(), \"the untracked artifact must be stashed\"); ... assert_eq!(fs::read_to_string(&artifact).unwrap(), \"untracked track artifact\\n\"); ... assert_eq!(branch_state(repo.path()), before);",
+        "citation": "let outcome = adapter.push().expect(\"guarded push must include untracked artifacts\");\n        assert_eq!(branch_state(repo.path()), before);\n        assert!(!artifact.exists(), \"the untracked artifact must be stashed\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14113,7 +14113,7 @@
       },
       "key": {
         "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
-        "bound_tests_set_hash": "83baf6a09cede738652303201300373259cae83b66a9705e87f462d0d315a21c",
+        "bound_tests_set_hash": "93ae8710f6b6936de27cf5d1f17c576c3a953ab47990e27e00d5bdf16648f907",
         "declaration_hash": "e4ce972ada742c04d944410677290d561be2e1908425a180b8dc485c2437f55d"
       },
       "obligation_id": {
@@ -14210,7 +14210,7 @@
       },
       "key": {
         "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
-        "bound_tests_set_hash": "cc85e5b7df3f51dfbaea5353172faeef806636c8a0173e20211ec7f5a0a3036a",
+        "bound_tests_set_hash": "175da581b45612e61dfba5f18e03addead68f8e67ab951f1a87fd178c1115b61",
         "declaration_hash": "6bc8b73275055354dd3d2328455b7521e56773d1ce4e3dc53dca81c6de076b2a"
       },
       "obligation_id": {
@@ -14219,7 +14219,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists()); ... assert_eq!(fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(), \"artifact\\n\"); ... assert!(matches!(error, GitStashPopError::NoPendingGuardedStash)); ... assert!(matches!(error, GitStashPopError::StashIdentityMissing(identity) if identity == expected)); ... \"the paired stash OID must remain independently addressable\"",
+        "citation": "fs::write(dir.path().join(\"track-artifact.json\"), \"artifact\\n\").unwrap();\n        let before = run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]);\n\n        let _guard = CurrentDirGuard::change_to(dir.path());\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14261,7 +14261,7 @@
       },
       "key": {
         "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
-        "bound_tests_set_hash": "16c514af611ccfafe689202328e25eb5716d2432e15cc0911c02d4b9f9607e2d",
+        "bound_tests_set_hash": "5bae8a3375dee6a84b49f33e2a818accf676bb973741d6a528cb571957e06f38",
         "declaration_hash": "6bc8b73275055354dd3d2328455b7521e56773d1ce4e3dc53dca81c6de076b2a"
       },
       "obligation_id": {
@@ -14270,7 +14270,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists()); ... assert_eq!(fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(), \"artifact\\n\"); ... assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before); ... assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(), \"main\");",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14297,7 +14297,7 @@
       },
       "key": {
         "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
-        "bound_tests_set_hash": "54660b3d226b7f9e5b0fd058858d691a137c49c48e52fdc5e938674c5da371d1",
+        "bound_tests_set_hash": "96a448693951d7c22cf9b4604eae6a59434097d225d57ed9c0d0fa4b1021d0f6",
         "declaration_hash": "cade63c8a351ba5b2856438211642e80bec089b82a01cd48f2e81f287e9fbd88"
       },
       "obligation_id": {
@@ -14306,7 +14306,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            *stash_service.inputs.lock().unwrap(),\n            vec![GitStashInput::Push, GitStashInput::Pop]\n        );",
+        "citation": "super::execute(super::GitCommand::Stash(super::GitStashAction::Push))",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14333,7 +14333,7 @@
       },
       "key": {
         "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
-        "bound_tests_set_hash": "54660b3d226b7f9e5b0fd058858d691a137c49c48e52fdc5e938674c5da371d1",
+        "bound_tests_set_hash": "96a448693951d7c22cf9b4604eae6a59434097d225d57ed9c0d0fa4b1021d0f6",
         "declaration_hash": "cade63c8a351ba5b2856438211642e80bec089b82a01cd48f2e81f287e9fbd88"
       },
       "obligation_id": {
@@ -14369,7 +14369,7 @@
       },
       "key": {
         "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
-        "bound_tests_set_hash": "267235abbee494607a2b05e23bc7e22b5db3599ab9abf36fcc394f2233b50994",
+        "bound_tests_set_hash": "4c616fbca36d0b76b09997e901d66d53ce724026656c9ce111fac37157f82e70",
         "declaration_hash": "b3fb002a2d30f2ce25aea88c778ddacffd69d9b4a3fcd51c9069e51bbf2e0df8"
       },
       "obligation_id": {
@@ -14378,7 +14378,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );",
+        "citation": "assert_ne!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14405,7 +14405,7 @@
       },
       "key": {
         "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
-        "bound_tests_set_hash": "267235abbee494607a2b05e23bc7e22b5db3599ab9abf36fcc394f2233b50994",
+        "bound_tests_set_hash": "4c616fbca36d0b76b09997e901d66d53ce724026656c9ce111fac37157f82e70",
         "declaration_hash": "b3fb002a2d30f2ce25aea88c778ddacffd69d9b4a3fcd51c9069e51bbf2e0df8"
       },
       "obligation_id": {
@@ -14414,7 +14414,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n...\nassert_eq!(\n    fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n    \"artifact\\n\"\n);\nassert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n...\nfs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n...\nrun_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14441,7 +14441,7 @@
       },
       "key": {
         "anchor_text_hash": "40fb790a171142c23ffe21f60c84d0bdda3dfb110ddbcc7eaf91fa8a11931046",
-        "bound_tests_set_hash": "267235abbee494607a2b05e23bc7e22b5db3599ab9abf36fcc394f2233b50994",
+        "bound_tests_set_hash": "4c616fbca36d0b76b09997e901d66d53ce724026656c9ce111fac37157f82e70",
         "declaration_hash": "b91c0c216c9cebe862711613951fb02bb42130573f31626c548c6f2c50a6d621"
       },
       "obligation_id": {
@@ -14450,7 +14450,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\n        assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );",
+        "citation": "assert_ne!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n...\nassert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Push)),\n            ExitCode::SUCCESS\n        );\nassert!(!dir.path().join(\"track-artifact.json\").exists());\n...\nassert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\nassert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -14477,7 +14477,7 @@
       },
       "key": {
         "anchor_text_hash": "af63acff7463717426f966678838bfd6289b703b542922e6ae2aba2a6ca9e8ff",
-        "bound_tests_set_hash": "267235abbee494607a2b05e23bc7e22b5db3599ab9abf36fcc394f2233b50994",
+        "bound_tests_set_hash": "4c616fbca36d0b76b09997e901d66d53ce724026656c9ce111fac37157f82e70",
         "declaration_hash": "b91c0c216c9cebe862711613951fb02bb42130573f31626c548c6f2c50a6d621"
       },
       "obligation_id": {
@@ -14486,7 +14486,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before);\n\n        assert_eq!(\n            super::execute(super::GitCommand::Stash(super::GitStashAction::Pop)),\n            ExitCode::SUCCESS\n        );\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        );\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
+        "citation": "assert!(!dir.path().join(\"track-artifact.json\").exists());\n        assert_eq!(run_git_output(dir.path(), &[\"rev-parse\", \"HEAD\"]), before); ...\n        assert_eq!(\n            fs::read_to_string(dir.path().join(\"track-artifact.json\")).unwrap(),\n            \"artifact\\n\"\n        ); ...\n        assert_eq!(\n            run_git_output(dir.path(), &[\"rev-parse\", \"--abbrev-ref\", \"HEAD\"]).trim(),\n            \"main\"\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

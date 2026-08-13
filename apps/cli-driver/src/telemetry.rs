@@ -368,6 +368,7 @@ pub fn completion_eligible(subcommand: &str) -> bool {
     !matches!(
         normalized,
         "conventions resolve"
+            | "phase explain"
             | "review results"
             | "review classify"
             | "review files"

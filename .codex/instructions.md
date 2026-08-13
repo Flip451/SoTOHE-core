@@ -67,6 +67,7 @@ Use the gate aggregates via `cargo make` and single workflow operations via guar
 - `cargo make track-local-review-fix`
 - `cargo make track-local-review`
 - `cargo make track-local-dry-fix`
+- `cargo make track-views-sync`
 - `bin/sotp git add-all`
 - `bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup`
 - `bin/sotp git note-from-file tmp/track-commit/note.md --cleanup`

@@ -119,6 +119,21 @@ pub struct CheckApprovedArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
     pub items_dir: PathBuf,
+
+    /// Required semantic verification chain: `1` (spec↔ADR) or `2` (catalogue↔spec).
+    #[arg(long, value_enum)]
+    pub chain: RefVerifyCheckChainArg,
+}
+
+/// Clap chain selector for `sotp ref-verify check-approved`.
+#[derive(Debug, Clone, PartialEq, Eq, ValueEnum)]
+pub enum RefVerifyCheckChainArg {
+    /// Chain-1 (spec↔ADR).
+    #[value(name = "1")]
+    Chain1,
+    /// Chain-2 (catalogue↔spec).
+    #[value(name = "2")]
+    Chain2,
 }
 
 // ── sotp ref-verify results ───────────────────────────────────────────────────
@@ -188,6 +203,14 @@ fn execute_run(args: &RunArgs) -> ExitCode {
 }
 
 fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
+    let driver = RefVerifyCompositionRoot::new().ref_verify_driver();
+    execute_check_approved_with_driver(args, &driver)
+}
+
+fn execute_check_approved_with_driver(
+    args: &CheckApprovedArgs,
+    driver: &cli_driver::ref_verify::RefVerifyDriver,
+) -> ExitCode {
     let track_id =
         match crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir) {
             Ok(id) => id,
@@ -196,12 +219,16 @@ fn execute_check_approved(args: &CheckApprovedArgs) -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
-    driver_outcome_to_exit(RefVerifyCompositionRoot::new().ref_verify_driver().handle(
-        RefVerifyInput::CheckApproved(RefVerifyCheckApprovedInput {
+    driver_outcome_to_exit(driver.handle(RefVerifyInput::CheckApproved(
+        RefVerifyCheckApprovedInput {
             track_id,
             items_dir: args.items_dir.clone(),
-        }),
-    ))
+            chain: match &args.chain {
+                RefVerifyCheckChainArg::Chain1 => RefVerifyChainSelect::Chain1,
+                RefVerifyCheckChainArg::Chain2 => RefVerifyChainSelect::Chain2,
+            },
+        },
+    )))
 }
 
 fn execute_results(args: &RefVerifyResultsArgs) -> ExitCode {
@@ -242,7 +269,14 @@ fn execute_results(args: &RefVerifyResultsArgs) -> ExitCode {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::path::Path;
+    use std::sync::{Arc, Mutex};
+
     use clap::Parser;
+    use usecase::ref_verify::{
+        RefVerifyAggregateService, RefVerifyChainFilter, RefVerifyCheckApprovedDriverService,
+        RefVerifyCheckApprovedOutcome, RefVerifyDriverError, RefVerifyRunOutcome,
+    };
 
     use super::*;
 
@@ -255,6 +289,58 @@ mod tests {
 
     fn parse_ref_verify(args: &[&str]) -> RefVerifyCommand {
         TestCli::parse_from(args).cmd
+    }
+
+    struct CheckApprovedStub {
+        outcome: RefVerifyCheckApprovedOutcome,
+        selected_chains: Mutex<Vec<RefVerifyChainFilter>>,
+    }
+
+    impl RefVerifyCheckApprovedDriverService for CheckApprovedStub {
+        fn check_approved(
+            &self,
+            _track_id: &str,
+            _items_dir: &Path,
+            chain: RefVerifyChainFilter,
+        ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> {
+            self.selected_chains
+                .lock()
+                .map_err(|_| {
+                    RefVerifyDriverError::Wiring(
+                        "check-approved test stub lock poisoned".to_owned(),
+                    )
+                })?
+                .push(chain);
+            Ok(self.outcome.clone())
+        }
+    }
+
+    impl RefVerifyAggregateService for CheckApprovedStub {
+        fn run(
+            &self,
+            _track_id: &str,
+            _items_dir: &Path,
+        ) -> Result<RefVerifyRunOutcome, RefVerifyDriverError> {
+            Err(RefVerifyDriverError::Unavailable(
+                "run is not used by check-approved tests".to_owned(),
+            ))
+        }
+    }
+
+    fn check_approved_driver(
+        outcome: RefVerifyCheckApprovedOutcome,
+    ) -> (Arc<CheckApprovedStub>, cli_driver::ref_verify::RefVerifyDriver) {
+        let service = Arc::new(CheckApprovedStub { outcome, selected_chains: Mutex::new(vec![]) });
+        let driver = cli_driver::ref_verify::RefVerifyDriver::new(service.clone());
+        (service, driver)
+    }
+
+    fn check_approved_args(chain: RefVerifyCheckChainArg) -> CheckApprovedArgs {
+        CheckApprovedArgs {
+            track_id: Some("check-approved-cli-test".to_owned()),
+            items_dir: PathBuf::from("track/items"),
+            chain,
+        }
     }
 
     // ── sotp ref-verify run: arg parsing ──────────────────────────────────────
@@ -312,12 +398,30 @@ mod tests {
     // ── sotp ref-verify check-approved: arg parsing ───────────────────────────
 
     #[test]
-    fn test_ref_verify_check_approved_parses_with_no_args() {
-        let cmd = parse_ref_verify(&["ref-verify", "check-approved"]);
+    fn test_ref_verify_check_approved_requires_chain() {
+        let parsed = TestCli::try_parse_from(["ref-verify", "check-approved"]);
+        assert!(parsed.is_err(), "check-approved must reject an omitted --chain selector");
+    }
+
+    #[test]
+    fn test_ref_verify_check_approved_parses_required_chain1() {
+        let cmd = parse_ref_verify(&["ref-verify", "check-approved", "--chain", "1"]);
         match cmd {
             RefVerifyCommand::CheckApproved(args) => {
                 assert!(args.track_id.is_none(), "track_id must be None when omitted");
                 assert_eq!(args.items_dir, PathBuf::from("track/items"));
+                assert_eq!(args.chain, RefVerifyCheckChainArg::Chain1);
+            }
+            other => panic!("expected CheckApproved, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_ref_verify_check_approved_parses_required_chain2() {
+        let cmd = parse_ref_verify(&["ref-verify", "check-approved", "--chain", "2"]);
+        match cmd {
+            RefVerifyCommand::CheckApproved(args) => {
+                assert_eq!(args.chain, RefVerifyCheckChainArg::Chain2);
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
@@ -325,10 +429,18 @@ mod tests {
 
     #[test]
     fn test_ref_verify_check_approved_parses_explicit_track_id() {
-        let cmd = parse_ref_verify(&["ref-verify", "check-approved", "--track-id", "my-track"]);
+        let cmd = parse_ref_verify(&[
+            "ref-verify",
+            "check-approved",
+            "--track-id",
+            "my-track",
+            "--chain",
+            "1",
+        ]);
         match cmd {
             RefVerifyCommand::CheckApproved(args) => {
                 assert_eq!(args.track_id.as_deref(), Some("my-track"));
+                assert_eq!(args.chain, RefVerifyCheckChainArg::Chain1);
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
@@ -339,15 +451,44 @@ mod tests {
         let cmd = parse_ref_verify(&[
             "ref-verify",
             "check-approved",
+            "--chain",
+            "2",
             "--items-dir",
             "custom/track/items",
         ]);
         match cmd {
             RefVerifyCommand::CheckApproved(args) => {
                 assert_eq!(args.items_dir, PathBuf::from("custom/track/items"));
+                assert_eq!(args.chain, RefVerifyCheckChainArg::Chain2);
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_ref_verify_check_approved_chain1_all_approved_returns_success_exit_code() {
+        let (service, driver) = check_approved_driver(RefVerifyCheckApprovedOutcome::AllApproved);
+        let exit = execute_check_approved_with_driver(
+            &check_approved_args(RefVerifyCheckChainArg::Chain1),
+            &driver,
+        );
+
+        assert_eq!(exit, ExitCode::SUCCESS);
+        assert_eq!(*service.selected_chains.lock().unwrap(), vec![RefVerifyChainFilter::Chain1]);
+    }
+
+    #[test]
+    fn test_ref_verify_check_approved_chain2_not_approved_returns_failure_exit_code() {
+        let (service, driver) = check_approved_driver(RefVerifyCheckApprovedOutcome::NotApproved {
+            missing_or_non_pass: vec!["selected Chain-2 pair is pending".to_owned()],
+        });
+        let exit = execute_check_approved_with_driver(
+            &check_approved_args(RefVerifyCheckChainArg::Chain2),
+            &driver,
+        );
+
+        assert_eq!(exit, ExitCode::FAILURE);
+        assert_eq!(*service.selected_chains.lock().unwrap(), vec![RefVerifyChainFilter::Chain2]);
     }
 
     #[test]

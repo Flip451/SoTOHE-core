@@ -19,6 +19,7 @@ use super::driver_adapter_results::{
     inspect_chain2_catalogue_set, inspect_chain2_catalogue_set_for_targets,
     load_results_tddd_bindings, resolve_chain1_only_scope, resolve_results_chain2_target_layers,
 };
+use super::selected_check_approved::check_selected_chain_approved;
 use super::{
     AgentRefVerifierAdapter, RefVerifyCacheAdapter, RefVerifyPairSourceAdapter,
     RefVerifyScopeResolver, make_ref_verifier_process_runner,
@@ -339,14 +340,6 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
         FsRefVerifyRunAdapter::new().run(track_id, items_dir)
     }
 
-    fn check_approved(
-        &self,
-        track_id: &str,
-        items_dir: &Path,
-    ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> {
-        FsRefVerifyCheckApprovedAdapter::new().check_approved(track_id, items_dir)
-    }
-
     fn results(
         &self,
         track_id_str: &str,
@@ -373,6 +366,17 @@ impl usecase::ref_verify::RefVerifyAggregateService for FsRefVerifyAggregateAdap
             current_git_branch(&canonical_root).unwrap_or_else(|_| "<detached>".to_owned());
 
         results_core(&canonical_root, track_id, chain, layer, verdict, current_branch)
+    }
+}
+
+impl RefVerifyCheckApprovedDriverService for FsRefVerifyAggregateAdapter {
+    fn check_approved(
+        &self,
+        track_id: &str,
+        items_dir: &Path,
+        chain: usecase::ref_verify::RefVerifyChainFilter,
+    ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> {
+        FsRefVerifyCheckApprovedAdapter::new().check_approved(track_id, items_dir, chain)
     }
 }
 
@@ -598,6 +602,7 @@ impl RefVerifyCheckApprovedDriverService for FsRefVerifyCheckApprovedAdapter {
         &self,
         track_id_str: &str,
         items_dir: &Path,
+        chain: usecase::ref_verify::RefVerifyChainFilter,
     ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError> {
         let project_root = resolve_project_root(items_dir)
             .map_err(|e| RefVerifyDriverError::Wiring(e.to_string()))?;
@@ -617,6 +622,10 @@ impl RefVerifyCheckApprovedDriverService for FsRefVerifyCheckApprovedAdapter {
                 "ref-verify check-approved failed: track is not active: current branch \
                  '{current_branch}', expected '{expected_branch}'"
             )));
+        }
+
+        if !matches!(chain, usecase::ref_verify::RefVerifyChainFilter::All) {
+            return check_selected_chain_approved(&canonical_root, track_id, chain, current_branch);
         }
 
         let resolver = RefVerifyScopeResolver::new(canonical_root.clone());

@@ -52,7 +52,7 @@ typo が実行時までエラーにならず、provider × effort の fail-close
 
 ## Consequences
 
-- 良: 最終 verdict 系レーンでプロバイダー提供の最上位段（Ultra 除く）まで宣言可能になる。
+- 良: `Max` は schema / enum の能力として、各 provider declaration が対応状況に応じて列挙できる。既定 profile で Luna Max へ移すのは `implementer`、`review-fix-lead`、`dry-fix-lead` だけであり、最終 verdict 系レーンは既存の model / effort を維持する。
 - 良: 実装・修正レーンの token 単価と credits 消費係数を Terra の 10 分の 1へ下げられる。
 - 負: enum variant 追加は全 match site の追従を強制する（網羅 match ゆえコンパイルで検出される — 漏れは起きない）。
 - 負: Luna の単価が低くても、max effort による reasoning token と所要時間の増加で、実際のコストパフォーマンスが期待どおり改善しない可能性がある。

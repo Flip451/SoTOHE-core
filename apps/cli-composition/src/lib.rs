@@ -27,6 +27,7 @@ mod git;
 mod guard;
 mod hook;
 mod maintenance;
+mod phase_command;
 mod pr;
 mod ref_verify;
 pub mod review_v2;
@@ -57,14 +58,7 @@ pub mod telemetry_wiring;
 
 pub use domain::ExportSchemaInput;
 pub use error::CompositionError;
-pub use ref_verify::{
-    RefVerifyChainFilter, RefVerifyCheckApprovedInput, RefVerifyResultsInput, RefVerifyRunInput,
-    RefVerifyVerdictFilter,
-};
-pub use review_v2::{
-    ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
-    RunReviewFixLocalInput,
-};
+pub use review_v2::{ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput};
 #[cfg(feature = "semantic-dup")]
 pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
@@ -93,6 +87,7 @@ pub use git::GitCompositionRoot;
 pub use guard::GuardCompositionRoot;
 pub use hook::HookCompositionRoot;
 pub use maintenance::MaintenanceCompositionRoot;
+pub use phase_command::PhaseCompositionRoot;
 pub use pr::PrCompositionRoot;
 pub use ref_verify::RefVerifyCompositionRoot;
 pub use review_v2::ReviewCompositionRoot;

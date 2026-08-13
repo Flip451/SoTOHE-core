@@ -124,8 +124,15 @@ impl RefVerifyCheckApprovedService for RefVerifyCheckApprovedInteractor {
                     .iter()
                     .any(|entry| !matches!(entry.verdict, SemanticVerdict::Pass { .. }))
                 {
+                    let failure_reason =
+                        matching_entries.iter().find_map(|entry| match &entry.verdict {
+                            SemanticVerdict::Fail { reason } => Some(reason.as_str()),
+                            SemanticVerdict::Pass { .. } | SemanticVerdict::Pending => None,
+                        });
+                    let suffix =
+                        failure_reason.map_or_else(String::new, |reason| format!(": {reason}"));
                     missing_or_non_pass.push(format!(
-                        "pair ({}, {}) has non-Pass cache entry",
+                        "pair ({}, {}) has non-Pass cache entry{suffix}",
                         pair.claim_hash.to_hex(),
                         pair.evidence_hash.to_hex()
                     ));
@@ -146,7 +153,7 @@ impl RefVerifyCheckApprovedService for RefVerifyCheckApprovedInteractor {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 #[cfg(test)]
 mod tests {
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
 
     use domain::ContentHash;
     use domain::tddd::semantic_verify::{
@@ -272,6 +279,30 @@ mod tests {
         }
     }
 
+    struct ReplacingCache {
+        snapshots: Mutex<Vec<Vec<SemanticVerifyEntry>>>,
+    }
+
+    impl RefVerifyCachePort for ReplacingCache {
+        fn load_entries(
+            &self,
+            _cmd: &RefVerifyCommand,
+            _scope: &RefVerifyCacheScope,
+        ) -> Result<Vec<SemanticVerifyEntry>, RefVerifyError> {
+            let mut snapshots = self.snapshots.lock().unwrap();
+            Ok(snapshots.remove(0))
+        }
+
+        fn save_entries(
+            &self,
+            _cmd: &RefVerifyCommand,
+            _scope: &RefVerifyCacheScope,
+            _entries: Vec<SemanticVerifyEntry>,
+        ) -> Result<(), RefVerifyError> {
+            Ok(())
+        }
+    }
+
     // ── invariant tests ───────────────────────────────────────────────────────
 
     /// Cache has two Pass entries with the same hashes but different origins.
@@ -326,5 +357,22 @@ mod tests {
             matches!(outcome, CheckApprovedOutcome::NotApproved { .. }),
             "expected NotApproved when origin mismatches hash-only cache entry, got {outcome:?}"
         );
+    }
+
+    #[test]
+    fn check_approved_uses_one_cache_snapshot_per_scope() {
+        let pair = make_pair(1, 2, origin_a_claim(), origin_a_evidence());
+        let pass = make_entry(1, 2, pass_verdict(), origin_a_claim(), origin_a_evidence());
+        let cache =
+            Arc::new(ReplacingCache { snapshots: Mutex::new(vec![vec![pass], Vec::new()]) });
+        let interactor = RefVerifyCheckApprovedInteractor::new(
+            Arc::new(StubPairSource { pairs: vec![pair] }),
+            cache.clone(),
+        );
+
+        let outcome = interactor.check_approved(&track_cmd()).unwrap();
+
+        assert_eq!(outcome, CheckApprovedOutcome::AllApproved);
+        assert_eq!(cache.snapshots.lock().unwrap().len(), 1);
     }
 }

@@ -12,8 +12,6 @@ use infrastructure::review_v2::{
     SystemReviewHasher, load_v2_scope_config,
 };
 use thiserror::Error;
-use usecase::capability_exec::ReasoningEffort;
-use usecase::dry_write_driver::CapabilityName;
 use usecase::review_v2::{ReviewCycle, ScopeQueryInteractor};
 
 use super::null_reviewer::NullReviewer;
@@ -52,7 +50,7 @@ pub enum ReviewSharedError {
 /// `commit_hash_store` is retained for future commands that need to read or
 /// reset the diff base without going through the full composition.
 #[allow(dead_code)]
-pub struct ReviewV2Composition {
+pub(crate) struct ReviewV2Composition {
     pub(super) cycle: ReviewCycle<NullReviewer, SystemReviewHasher, GitDiffGetter>,
     pub(super) review_store: FsReviewStore,
     pub(super) commit_hash_store: FsCommitHashStore,
@@ -96,7 +94,12 @@ pub(crate) struct ReviewV2CompositionWithClaude {
 /// Returned by `run_codex_review_str` so the CLI can emit output without
 /// importing `domain::review_v2::Verdict`, `FastVerdict`, or `ReviewOutcome`
 /// directly (CN-01 / AC-03).
-pub enum CodexReviewOutcome {
+pub(crate) enum CodexReviewOutcome {
+    /// Non-fatal diagnostics collected while composing a review run.
+    ///
+    /// The local-review path exposes these through `ReviewRunLocalOutput`; provider-specific
+    /// `RunReviewOutput` results deliberately omit them.
+    WithDiagnostics { diagnostics: Vec<String>, outcome: Box<CodexReviewOutcome> },
     /// The scope had no diff files — review was skipped (no subprocess ran).
     Skipped { scope_label: String },
     /// A final review completed: verdict JSON to emit and the exit code (0 or 2).
@@ -138,14 +141,17 @@ pub enum CodexReviewOutcome {
 
 /// Shared setup logic for both `build_review_v2` and `build_review_v2_with_reviewer`.
 ///
-/// Returns `(scope_config, review_store, commit_hash_store, base)`.
+/// Returns `(scope_config, review_store, commit_hash_store, base, diagnostics)`.
 ///
 /// # Errors
 /// Returns `ReviewSharedError` on failure.
 pub(super) fn build_v2_shared(
     track_id: &TrackId,
     items_dir: &Path,
-) -> Result<(ReviewScopeConfig, FsReviewStore, FsCommitHashStore, CommitHash), ReviewSharedError> {
+) -> Result<
+    (ReviewScopeConfig, FsReviewStore, FsCommitHashStore, CommitHash, Vec<String>),
+    ReviewSharedError,
+> {
     let git = discover_repo_from_items_dir(items_dir)?;
     let root = git.root().to_path_buf();
 
@@ -239,11 +245,11 @@ pub(super) fn build_v2_shared(
     let review_store = FsReviewStore::new(review_json_path, canonical_root.clone());
     let commit_hash_store = FsCommitHashStore::new(commit_hash_path, canonical_root.clone());
 
-    let base = with_repo_cwd(&canonical_root, || {
+    let (base, diagnostics) = with_repo_cwd(&canonical_root, || {
         resolve_diff_base(&commit_hash_store, &git, &base_branch)
     })?;
 
-    Ok((scope_config, review_store, commit_hash_store, base))
+    Ok((scope_config, review_store, commit_hash_store, base, diagnostics))
 }
 
 fn discover_repo_from_items_dir(items_dir: &Path) -> Result<SystemGitRepo, ReviewSharedError> {
@@ -316,9 +322,7 @@ pub(super) fn with_repo_cwd<T>(
 ) -> Result<T, ReviewSharedError> {
     let mut guard = RepoCwdGuard::change_to(repo_root)?;
     let result = f();
-    if let Err(e) = guard.restore() {
-        eprintln!("[warn] {e}");
-    }
+    guard.restore()?;
     result
 }
 
@@ -327,17 +331,32 @@ pub(super) fn resolve_diff_base(
     store: &FsCommitHashStore,
     _git: &SystemGitRepo,
     base_branch: &str,
-) -> Result<CommitHash, ReviewSharedError> {
+) -> Result<(CommitHash, Vec<String>), ReviewSharedError> {
     use std::sync::Arc;
 
     use infrastructure::FsGitWorkflowAdapter;
     use usecase::git_workflow::{GitPrimitivePort, ReviewGitInteractor};
 
     match store.read() {
-        Ok(Some(hash)) => return Ok(hash),
+        Ok(Some(hash)) => return Ok((hash, Vec::new())),
         Ok(None) => {}
         Err(e) => {
-            eprintln!("[warn] failed to read .commit_hash, falling back to {base_branch}: {e}");
+            let diagnostic =
+                format!("[warn] failed to read .commit_hash, falling back to {base_branch}: {e}");
+            let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+            let interactor = ReviewGitInteractor::new(port);
+            let hash = match interactor
+                .resolve_diff_base(base_branch)
+                .map_err(|e| ReviewSharedError::Git(format!("git rev-parse {base_branch}: {e}")))?
+            {
+                Some(hash) => hash,
+                None => {
+                    return Err(ReviewSharedError::Git(format!(
+                        "git rev-parse {base_branch} failed"
+                    )));
+                }
+            };
+            return Ok((hash, vec![diagnostic]));
         }
     }
 
@@ -350,7 +369,7 @@ pub(super) fn resolve_diff_base(
         .resolve_diff_base(base_branch)
         .map_err(|e| ReviewSharedError::Git(format!("git rev-parse {base_branch}: {e}")))?
     {
-        Some(hash) => Ok(hash),
+        Some(hash) => Ok((hash, Vec::new())),
         None => Err(ReviewSharedError::Git(format!("git rev-parse {base_branch} failed"))),
     }
 }
@@ -365,7 +384,7 @@ pub(crate) fn build_review_v2_with_reviewer(
     items_dir: &Path,
     reviewer: CodexReviewer,
 ) -> Result<ReviewV2CompositionWithCodex, ReviewSharedError> {
-    let (scope_config, review_store, commit_hash_store, base) =
+    let (scope_config, review_store, commit_hash_store, base, _diagnostics) =
         build_v2_shared(track_id, items_dir)?;
     let cycle =
         ReviewCycle::new(base.clone(), scope_config, reviewer, GitDiffGetter, SystemReviewHasher);
@@ -387,7 +406,7 @@ pub(crate) fn build_review_v2(
     track_id: &TrackId,
     items_dir: &Path,
 ) -> Result<ReviewV2Composition, ReviewSharedError> {
-    let (scope_config, review_store, commit_hash_store, base) =
+    let (scope_config, review_store, commit_hash_store, base, _diagnostics) =
         build_v2_shared(track_id, items_dir)?;
     let cycle = ReviewCycle::new(
         base.clone(),
@@ -399,22 +418,6 @@ pub(crate) fn build_review_v2(
     Ok(ReviewV2Composition { cycle, review_store, commit_hash_store, base })
 }
 
-/// String-accepting variant of `build_review_v2`.
-///
-/// Converts `track_id_str` to `TrackId` and delegates. Callers that must not
-/// import `domain::TrackId` use this entry point (CN-01 / AC-03).
-///
-/// # Errors
-/// Returns `ReviewSharedError` on failure.
-pub fn build_review_v2_str(
-    track_id_str: &str,
-    items_dir: &Path,
-) -> Result<ReviewV2Composition, ReviewSharedError> {
-    let track_id = TrackId::try_new(track_id_str)
-        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid --track-id: {e}")))?;
-    build_review_v2(&track_id, items_dir)
-}
-
 /// Builds the v2 review composition with a real `ClaudeReviewer`.
 ///
 /// # Errors
@@ -424,7 +427,7 @@ pub(crate) fn build_review_v2_with_claude_reviewer(
     items_dir: &Path,
     reviewer: ClaudeReviewer,
 ) -> Result<ReviewV2CompositionWithClaude, ReviewSharedError> {
-    let (scope_config, review_store, commit_hash_store, base) =
+    let (scope_config, review_store, commit_hash_store, base, _diagnostics) =
         build_v2_shared(track_id, items_dir)?;
     let cycle =
         ReviewCycle::new(base.clone(), scope_config, reviewer, GitDiffGetter, SystemReviewHasher);
@@ -457,7 +460,7 @@ pub(crate) fn resolve_diff_base_and_getter(
     track_id: &TrackId,
     items_dir: &Path,
 ) -> Result<(GitDiffGetter, CommitHash), ReviewSharedError> {
-    let (_scope_config, _review_store, _commit_hash_store, base) =
+    let (_scope_config, _review_store, _commit_hash_store, base, _diagnostics) =
         build_v2_shared(track_id, items_dir)?;
     Ok((GitDiffGetter, base))
 }
@@ -551,41 +554,6 @@ pub(crate) fn load_agent_profiles_from_repo(
     })
 }
 
-pub(crate) struct ResolvedAgentExecution {
-    pub(crate) provider: String,
-    pub(crate) model: String,
-    pub(crate) effort: ReasoningEffort,
-}
-
-/// Resolves an agent capability execution from `agent-profiles.json`, applying
-/// the caller's optional model override.
-///
-/// # Errors
-/// Returns `Err` when profiles cannot be loaded, the capability is missing, or
-/// neither the caller nor profile supplies a model.
-pub(crate) fn resolve_agent_execution(
-    items_dir: Option<&Path>,
-    capability: &str,
-    round_type: infrastructure::agent_profiles::RoundType,
-    model_override: Option<&str>,
-) -> Result<ResolvedAgentExecution, ReviewSharedError> {
-    let profiles = load_agent_profiles_from_repo(items_dir)?;
-    let capability_name = CapabilityName::try_new(capability)
-        .map_err(|error| ReviewSharedError::InvalidInput(error.to_string()))?;
-    let resolved = profiles
-        .resolve_execution(&capability_name, round_type)
-        .map_err(|error| ReviewSharedError::Config(error.to_string()))?;
-    let infrastructure::agent_profiles::ResolvedExecution::ProviderCli { provider, model, effort } =
-        resolved
-    else {
-        return Err(ReviewSharedError::Config(format!(
-            "[ERROR] {capability} must resolve to a provider CLI execution"
-        )));
-    };
-    let model = model_override.map(str::to_owned).unwrap_or_else(|| model.as_str().to_owned());
-    Ok(ResolvedAgentExecution { provider: provider.as_str().to_owned(), model, effort })
-}
-
 /// Parses a `round_type` string (`"fast"` or `"final"`) into the infra
 /// `RoundType` enum.
 ///
@@ -617,7 +585,7 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_with_repo_cwd_restore_failure_preserves_primary_result() {
+    fn test_with_repo_cwd_restore_failure_returns_restore_error() {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
         let saved_cwd = std::env::current_dir().unwrap();
         let _cwd_restore = CwdRestore(saved_cwd);
@@ -632,6 +600,6 @@ mod tests {
             Ok::<u32, ReviewSharedError>(42)
         });
 
-        assert_eq!(result, Ok(42));
+        assert!(matches!(result, Err(ReviewSharedError::Path(_))));
     }
 }

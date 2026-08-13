@@ -9,8 +9,8 @@ use domain::review_v2::{
 };
 
 use super::{
-    FindingEntry, PersistenceError, ReviewJsonV2, ScopeEntry, WriteGuard, reject_symlinks_below,
-    write_atomic,
+    FindingEntry, MAX_REVIEW_JSON_BYTES, PersistenceError, ReviewJsonV2, ScopeEntry, WriteGuard,
+    reject_symlinks_below, write_atomic,
 };
 
 /// Filesystem-based review.json v2 reader/writer with fs4 file locking.
@@ -50,16 +50,18 @@ impl FsReviewStore {
             }
         })?;
 
-        let content = match std::fs::read_to_string(&self.path) {
-            Ok(c) => c,
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                return Ok(ReviewJsonV2::empty());
-            }
-            Err(e) => {
+        let content = match crate::trusted_file::read_bounded_regular_file(
+            &self.path,
+            &self.trusted_root,
+            MAX_REVIEW_JSON_BYTES,
+        ) {
+            Ok(Some(content)) => content,
+            Ok(None) => return Ok(ReviewJsonV2::empty()),
+            Err(source) => {
                 return Err(PersistenceError::Io {
-                    operation: "read",
+                    operation: "read bounded review state",
                     path: self.path.clone(),
-                    source: e,
+                    source,
                 });
             }
         };
@@ -293,6 +295,16 @@ impl ReviewExistsPort for FsReviewStore {
     /// Returns `Ok(false)` on `NotFound`, `Err(ReviewReaderError::Io)` on other I/O errors
     /// (e.g. `PermissionDenied`).
     fn review_json_exists(&self) -> Result<bool, ReviewReaderError> {
+        reject_symlinks_below(&self.path, &self.trusted_root).map_err(|source| {
+            if source.kind() == std::io::ErrorKind::InvalidInput {
+                ReviewReaderError::SymlinkDetected { path: self.path.display().to_string() }
+            } else {
+                ReviewReaderError::Io {
+                    path: self.path.display().to_string(),
+                    detail: format!("symlink check: {source}"),
+                }
+            }
+        })?;
         match std::fs::metadata(&self.path) {
             Ok(_) => Ok(true),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),

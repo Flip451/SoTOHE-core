@@ -23,9 +23,11 @@ pub enum CapabilityCommand {
 pub struct CapabilityExecArgs {
     /// Capability name resolved from `.harness/config/agent-profiles.json`.
     pub capability: CapabilityNameArg,
-    /// Actual provider of the host invoking this command.
+    /// Provider of the host invoking this command.
+    ///
+    /// Omission selects subprocess dispatch through the requested capability profile.
     #[arg(long)]
-    pub host: ProviderNameArg,
+    pub host: Option<ProviderNameArg>,
     /// Path to a non-empty UTF-8 briefing file.
     #[arg(long)]
     pub briefing_file: CapabilityFilePathArg,
@@ -59,8 +61,8 @@ fn execute_with(
 fn execute_exec(args: CapabilityExecArgs) -> ExitCode {
     let root = match CapabilityCompositionRoot::discover() {
         Ok(root) => root,
-        Err(error) => {
-            eprintln!("failed to initialize capability command: {error}");
+        Err(_) => {
+            eprintln!("failed to initialize capability command");
             return ExitCode::FAILURE;
         }
     };
@@ -127,7 +129,10 @@ mod tests {
                     capability,
                     "implementer".parse::<CapabilityNameArg>().expect("valid test capability")
                 );
-                assert_eq!(host, "codex".parse::<ProviderNameArg>().expect("valid test provider"));
+                assert_eq!(
+                    host,
+                    Some("codex".parse::<ProviderNameArg>().expect("valid test provider"))
+                );
                 assert_eq!(
                     briefing_file,
                     "tmp/briefing.md"
@@ -137,6 +142,60 @@ mod tests {
                 assert_eq!(timeout_seconds, None, "omitted timeout parses as no limit");
             }
         }
+    }
+
+    #[test]
+    fn test_capability_exec_omits_host_for_composition_resolution() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--briefing-file",
+            "tmp/briefing.md",
+        ])
+        .expect("host is optional at the CLI boundary");
+
+        let CapabilityCommand::Exec(args) = cli.command;
+        assert_eq!(args.host, None);
+    }
+
+    #[test]
+    fn test_capability_exec_preserves_omitted_host_in_driver_input() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--briefing-file",
+            "tmp/briefing.md",
+        ])
+        .expect("host is optional at the CLI boundary");
+
+        let CapabilityCommand::Exec(args) = cli.command;
+        let input = into_driver_input(args);
+
+        assert_eq!(input.host, None);
+    }
+
+    #[test]
+    fn test_capability_exec_preserves_supplied_host_in_driver_input() {
+        let cli = TestCli::try_parse_from([
+            "sotp",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+        ])
+        .expect("explicit host parses at the CLI boundary");
+
+        let CapabilityCommand::Exec(args) = cli.command;
+        let input = into_driver_input(args);
+
+        assert_eq!(
+            input.host,
+            Some("codex".parse::<ProviderNameArg>().expect("valid test provider"))
+        );
     }
 
     #[test]
@@ -311,7 +370,7 @@ mod tests {
     fn test_capability_execute_routes_exec_to_concrete_execution_helper() {
         let command = CapabilityCommand::Exec(CapabilityExecArgs {
             capability: "implementer".parse().expect("valid test capability"),
-            host: "codex".parse().expect("valid test provider"),
+            host: Some("codex".parse().expect("valid test provider")),
             briefing_file: "tmp/briefing.md".parse().expect("valid test briefing path"),
             timeout_seconds: None,
             resume: false,
@@ -330,7 +389,10 @@ mod tests {
             args.capability,
             "implementer".parse::<CapabilityNameArg>().expect("valid test capability")
         );
-        assert_eq!(args.host, "codex".parse::<ProviderNameArg>().expect("valid test provider"));
+        assert_eq!(
+            args.host,
+            Some("codex".parse::<ProviderNameArg>().expect("valid test provider"))
+        );
         assert_eq!(
             args.briefing_file,
             "tmp/briefing.md".parse::<CapabilityFilePathArg>().expect("valid test briefing path")

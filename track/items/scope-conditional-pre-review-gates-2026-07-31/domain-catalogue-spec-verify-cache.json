@@ -1,0 +1,558 @@
+{
+  "entries": [
+    {
+      "claim_hash": "72b0660d93c22e01bfa8a09a3c17607ccf9593e896658c3753dae0d06cd5bde0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ContractedEntryRef",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "72b0660d93c22e01bfa8a09a3c17607ccf9593e896658c3753dae0d06cd5bde0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ContractedEntryRef",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6d4e56165678025cc2e7769b9e93a948716fda42c515531dfbed268a7ff4ebd1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CoverageVerifyOutcome",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3d1538bde700052ce1f5b200477709588b7fec97a383899bfca37fb449ee0a7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6d4e56165678025cc2e7769b9e93a948716fda42c515531dfbed268a7ff4ebd1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CoverageVerifyOutcome",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a7c8b3267199d51b0530478844b49c15c7bc0d1f9c5c2aaf407d37e326fe6a92",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2cde2e471fd152df66d21a4ce543b8c76ba54697ca8765d8cd6c64f4d77bd088",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CoverageViolation",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2cde2e471fd152df66d21a4ce543b8c76ba54697ca8765d8cd6c64f4d77bd088",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CoverageViolation",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d2459d5c1a2c96b44feac67fbe67b17479dc564228ca41fee247bdea6178a58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MainScopeName",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-08",
+          "section": "constraint",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "usecase が domain `ScopeName` を内部で構築する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d2459d5c1a2c96b44feac67fbe67b17479dc564228ca41fee247bdea6178a58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MainScopeName",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d2459d5c1a2c96b44feac67fbe67b17479dc564228ca41fee247bdea6178a58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MainScopeName",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "65af73b3ee2e4bdabcd371e8122b1a4e2967523f485f8e7963c7a545507751bf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PreReviewGateOutcome",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3d1538bde700052ce1f5b200477709588b7fec97a383899bfca37fb449ee0a7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "65af73b3ee2e4bdabcd371e8122b1a4e2967523f485f8e7963c7a545507751bf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PreReviewGateOutcome",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a7c8b3267199d51b0530478844b49c15c7bc0d1f9c5c2aaf407d37e326fe6a92",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bac4a030dc56592a609bdfea8fc93edfb4ca2c69d8e0638435843d0ca31445cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PreReviewGateViolation",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3d1538bde700052ce1f5b200477709588b7fec97a383899bfca37fb449ee0a7c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-08",
+          "section": "in_scope",
+          "text_label": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bac4a030dc56592a609bdfea8fc93edfb4ca2c69d8e0638435843d0ca31445cf",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PreReviewGateViolation",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a7c8b3267199d51b0530478844b49c15c7bc0d1f9c5c2aaf407d37e326fe6a92",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bde30dc518a58e84a3e81bf8783aa07e8e4728ddbfada84d9ec33823c4980f98",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeName",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-08",
+          "section": "constraint",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bde30dc518a58e84a3e81bf8783aa07e8e4728ddbfada84d9ec33823c4980f98",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeName",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bde30dc518a58e84a3e81bf8783aa07e8e4728ddbfada84d9ec33823c4980f98",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeName",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9b29e38c4197b97bd9115bc33255229513213744f8e7b9081bc658c6fc285a4b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeNameError",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f91359fed2be615f09bac070ee9e94ed6f7e5435a2008fcb38d7280b5a69e875",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-08",
+          "section": "constraint",
+          "text_label": "zero-findings review check の driver→usecase boundary は domain 型を `pub use` で再公開しない。driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "driver は raw boundary value を usecase-owned boundary DTO または Query constructor に渡し、usecase が domain `ScopeName` を内部で構築する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9b29e38c4197b97bd9115bc33255229513213744f8e7b9081bc658c6fc285a4b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeNameError",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8fa587f6b3cb186fc083494e54ed3db92fa82015011b1fec6c54d72cfb0b3e46",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-06",
+          "section": "constraint",
+          "text_label": "pre-entry matrix で使う public check command は exit code で判定可能でなければならない。`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。`bin/sotp ref-verify check-approved --chain <1|2>` は指定 Chain の current production reference pair が全て verified pass の場合だけ zero を返す。display-only result command を convergence 判定に使わず、未解決、stale、または対象外 chain の状態で false success を返さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`bin/sotp review check-zero-findings --scope <scope> --round final` は指定 scope の current artifact に対応する final review verdict が `zero_findings` の場合だけ zero を返す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9b29e38c4197b97bd9115bc33255229513213744f8e7b9081bc658c6fc285a4b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeNameError",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94934398148874b5290b24f7a6cf5b694fb5081a27244d13290a946a74a4abea",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "`bin/sotp review check-zero-findings --scope <scope> --round final` returns zero only for a current final `zero_findings` verdict for that scope, and non-zero for absent, stale, non-final, or findings-present review state. `bin/sotp ref-verify check-approved --chain <1|2>` returns zero only when the selected Chain's current production reference pairs are all verified pass, and non-zero when any selected pair is absent, stale, pending, or failed. Both commands are usable as literal pre-entry argv without parsing display output."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Both commands are usable as literal pre-entry argv without parsing display output.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0559e68a790a150a6b95e90591b2d587dc665f29bc0f661323dca552f9dd1765",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TaskContractDocument",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c143de30de6b47fb7b910fbb24265432752aaef12fa57d8f92fae838f6f6e0c7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "task-contract は task と catalogue entry の attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "task-contract は task と catalogue entry の attribution を記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0559e68a790a150a6b95e90591b2d587dc665f29bc0f661323dca552f9dd1765",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TaskContractDocument",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0c0d9a6d201a562e513918a277b9e09670a07a78db7031e425d315b92d40b889",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "task-contract は task-to-catalogue-entry attribution を記録する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "104337cb9c11234ff8ef1ec9902db18a2470ed208c8fdfa4a736a07201c7d969",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::review_v2::types::derive_review_approval_verdict",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7f9ae50549ced0880c35614fc920b8e9fd0d3aef53822e0e5ce81d29cb859856",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-14",
+          "section": "in_scope",
+          "text_label": "catalogue-v5 の name uniqueness 対応として、既存の `bin/sotp review check-approved` の内部 Rust DTO を `ReviewCheckApprovedArgs` へ改名し、既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の command arguments、approved / bypass / blocked の exit-code semantics、および commit guard としての独立責務を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "104337cb9c11234ff8ef1ec9902db18a2470ed208c8fdfa4a736a07201c7d969",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::review_v2::types::derive_review_approval_verdict",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a6ea86816599c722ab0f56bb53c99c4514d4fda465d8930cb7b6dd861690d60c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-17",
+          "section": "acceptance_criteria",
+          "text_label": "catalogue-v5 name-uniqueness 対応後も、`bin/sotp review check-approved` は既存の引数を受理し、approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。Rust DTO の `ReviewCheckApprovedArgs` への rename 以外で command invocation、exit-code contract、または commit guard behavior に観測可能な変更を生じさせない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "「approved と approved-by-bypass の場合は zero、blocked の場合は non-zero を返す。」",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 1
+}

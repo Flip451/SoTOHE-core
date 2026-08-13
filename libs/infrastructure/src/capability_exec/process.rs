@@ -575,10 +575,8 @@ fn wait_for_provider_process(
 #[path = "process/termination.rs"]
 mod termination;
 
-use termination::{
-    configure_process_group, terminate_bounded_process_group, terminate_provider_process,
-    terminate_provider_process_group,
-};
+pub(crate) use termination::{configure_process_group, terminate_bounded_process_group};
+use termination::{terminate_provider_process, terminate_provider_process_group};
 
 #[cfg(test)]
 mod tests {

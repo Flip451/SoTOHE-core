@@ -7,13 +7,11 @@
 
 use std::collections::BTreeMap;
 
-use crate::ValidationError;
 use crate::ids::{TaskId, TrackId};
+use crate::tddd::catalogue_v2::NonEmptyVec;
 use crate::tddd::layer_id::LayerId;
 use crate::tddd::semantic_verify::CatalogueEntryKey;
-
-/// Schema version constant for `task-contract.json` serialization.
-pub const TASK_CONTRACT_SCHEMA_VERSION: u32 = 1;
+use crate::{FreeText, ValidationError};
 
 // ---------------------------------------------------------------------------
 // ContractedEntryRef
@@ -88,10 +86,10 @@ impl TaskContractDocument {
         Ok(Self { track_id, entries })
     }
 
-    /// Returns the schema version constant for `task-contract.json` serialization.
+    /// Returns the schema version for `task-contract.json` serialization.
     #[must_use]
     pub fn schema_version(&self) -> u32 {
-        TASK_CONTRACT_SCHEMA_VERSION
+        1
     }
 
     /// Returns a reference to the track ID this contract belongs to.
@@ -129,12 +127,7 @@ pub enum PreReviewGateViolation {
 
     /// A contracted entry exists in the `TypeSignalsDocument` but its
     /// `impl_catalog` signal is not `Blue` for a current/done task.
-    NonBlueSignal {
-        /// The contracted entry whose signal is not blue.
-        entry: ContractedEntryRef,
-        /// The actual confidence signal recorded in the type-signals document.
-        signal: crate::ConfidenceSignal,
-    },
+    NonBlueSignal(ContractedEntryRef, crate::ConfidenceSignal),
 }
 
 // ---------------------------------------------------------------------------
@@ -170,41 +163,24 @@ pub enum CoverageViolation {
 
     /// A catalogue entry exists but has no task attribution in
     /// `task-contract.json`.
-    OrphanEntry {
-        /// The catalogue entry that has no corresponding task attribution.
-        entry: ContractedEntryRef,
-    },
+    OrphanEntry(ContractedEntryRef),
 
     /// A contracted entry's `entry_key` does not exist in the
     /// `TypeSignalsDocument` for the reviewed layer.
-    InvalidEntryRef {
-        /// The contracted entry that cannot be found in the signal document.
-        entry: ContractedEntryRef,
-        /// Opaque diagnostic message explaining why the reference is invalid.
-        reason: String,
-    },
+    InvalidEntryRef(ContractedEntryRef, FreeText),
 
     /// The per-layer `<layer>-type-signals.json` document is absent for this
     /// canonical TDDD layer. Emitted by `CoverageVerifyInteractor` whenever
     /// `read_optional_signals` returns `None`, regardless of whether any
     /// entries are attributed to that layer, so that the coverage gate fails
     /// closed when a signal document cannot be located.
-    MissingSignalDocument {
-        /// The canonical TDDD layer whose signal document is absent.
-        layer: LayerId,
-    },
+    MissingSignalDocument(LayerId),
 
     /// A task key in `task-contract.json` does not exist in the current
     /// `impl-plan.json` task list. Emitted when the contract attributes
     /// catalogue entries to a task that has been renamed or removed from
     /// `impl-plan.json` (referential integrity failure on the task dimension).
-    InvalidTaskRef {
-        /// The orphaned task id referenced by `task-contract.json` but absent
-        /// from `impl-plan.json`.
-        task_id: TaskId,
-        /// All catalogue entries currently attributed to that task id.
-        entry_keys: Vec<ContractedEntryRef>,
-    },
+    InvalidTaskRef(TaskId, Vec<ContractedEntryRef>),
 }
 
 // ---------------------------------------------------------------------------
@@ -215,23 +191,15 @@ pub enum CoverageViolation {
 ///
 /// `Passed` is a binary OK signal — all current/done attributed entries have
 /// blue `impl_catalog` signals, no further data attached. `Blocked` carries
-/// the list of liveness violations (`MissingTaskContract`, `NonBlueSignal`).
-/// The `Blocked` variant is `#[non_exhaustive]`. Use
-/// [`PreReviewGateOutcome::blocked`] to construct a `Blocked` outcome so the
-/// non-empty invariant is checked.
+/// a non-empty list of liveness violations (`MissingTaskContract`,
+/// `NonBlueSignal`). The public tuple payload can be destructured by adapters
+/// for read-only diagnostic access.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PreReviewGateOutcome {
     /// All current/done attributed entries have blue impl_catalog signals.
     Passed,
     /// One or more liveness gate violations were found.
-    ///
-    /// Use [`PreReviewGateOutcome::blocked`] to construct this variant so the
-    /// non-empty invariant is checked at the crate boundary.
-    #[non_exhaustive]
-    Blocked {
-        /// All liveness violations collected during the gate check.
-        violations: Vec<PreReviewGateViolation>,
-    },
+    Blocked(NonEmptyVec<PreReviewGateViolation>),
 }
 
 impl PreReviewGateOutcome {
@@ -241,10 +209,9 @@ impl PreReviewGateOutcome {
     ///
     /// Returns [`ValidationError::EmptyString`] when `violations` is empty.
     pub fn blocked(violations: Vec<PreReviewGateViolation>) -> Result<Self, ValidationError> {
-        if violations.is_empty() {
-            return Err(ValidationError::EmptyString);
-        }
-        Ok(Self::Blocked { violations })
+        NonEmptyVec::try_new(violations)
+            .map(Self::Blocked)
+            .map_err(|_| ValidationError::EmptyString)
     }
 }
 
@@ -256,23 +223,15 @@ impl PreReviewGateOutcome {
 ///
 /// `Passed` means all catalogue entries are attributed to at least one task,
 /// and all attributed entries exist in the catalogue. `Blocked` carries the
-/// list of attribution violations (`MissingTaskContract`, `OrphanEntry`,
-/// `InvalidEntryRef`). The `Blocked` variant is `#[non_exhaustive]`. Use
-/// [`CoverageVerifyOutcome::blocked`] to construct a `Blocked` outcome so the
-/// non-empty invariant is checked.
+/// non-empty list of attribution violations (`MissingTaskContract`,
+/// `OrphanEntry`, `InvalidEntryRef`). The public tuple payload can be
+/// destructured by adapters for read-only diagnostic access.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CoverageVerifyOutcome {
     /// All catalogue entries are attributed and referentially consistent.
     Passed,
     /// One or more attribution-completeness violations were found.
-    ///
-    /// Use [`CoverageVerifyOutcome::blocked`] to construct this variant so the
-    /// non-empty invariant is checked at the crate boundary.
-    #[non_exhaustive]
-    Blocked {
-        /// All attribution violations collected during the coverage check.
-        violations: Vec<CoverageViolation>,
-    },
+    Blocked(NonEmptyVec<CoverageViolation>),
 }
 
 impl CoverageVerifyOutcome {
@@ -282,10 +241,9 @@ impl CoverageVerifyOutcome {
     ///
     /// Returns [`ValidationError::EmptyString`] when `violations` is empty.
     pub fn blocked(violations: Vec<CoverageViolation>) -> Result<Self, ValidationError> {
-        if violations.is_empty() {
-            return Err(ValidationError::EmptyString);
-        }
-        Ok(Self::Blocked { violations })
+        NonEmptyVec::try_new(violations)
+            .map(Self::Blocked)
+            .map_err(|_| ValidationError::EmptyString)
     }
 }
 
@@ -319,27 +277,27 @@ mod tests {
     }
 
     #[test]
-    fn contracted_entry_ref_new_stores_fields() {
+    fn test_contracted_entry_ref_new_stores_fields() {
         let e = ContractedEntryRef::new(layer("domain"), entry_key("Foo"));
         assert_eq!(e.layer().as_ref(), "domain");
         assert_eq!(e.entry_key().as_str(), "Foo");
     }
 
     #[test]
-    fn contracted_entry_ref_clone_eq() {
+    fn test_contracted_entry_ref_clone_preserves_value() {
         let a = sample_entry();
         let b = a.clone();
         assert_eq!(a, b);
     }
 
     #[test]
-    fn task_contract_document_accepts_empty_entries() {
+    fn test_task_contract_document_empty_entries_is_accepted() {
         let result = TaskContractDocument::new(track_id("my-track"), BTreeMap::new());
         assert!(result.is_ok());
     }
 
     #[test]
-    fn task_contract_document_accepts_empty_task_entry_list() {
+    fn test_task_contract_document_empty_task_entry_list_is_accepted() {
         let mut entries = BTreeMap::new();
         entries.insert(task_id("T001"), Vec::new());
         let result = TaskContractDocument::new(track_id("my-track"), entries);
@@ -347,17 +305,17 @@ mod tests {
     }
 
     #[test]
-    fn task_contract_document_accepts_non_empty_entries() {
+    fn test_task_contract_document_valid_entries_are_preserved() {
         let mut entries = BTreeMap::new();
         entries.insert(task_id("T001"), vec![sample_entry()]);
         let doc = TaskContractDocument::new(track_id("my-track"), entries).unwrap();
         assert_eq!(doc.track_id().as_ref(), "my-track");
-        assert_eq!(doc.schema_version(), TASK_CONTRACT_SCHEMA_VERSION);
+        assert_eq!(doc.schema_version(), 1);
         assert_eq!(doc.entries().len(), 1);
     }
 
     #[test]
-    fn task_contract_document_clone_eq() {
+    fn test_task_contract_document_clone_preserves_value() {
         let mut entries = BTreeMap::new();
         entries.insert(task_id("T001"), vec![sample_entry()]);
         let a = TaskContractDocument::new(track_id("my-track"), entries).unwrap();
@@ -366,72 +324,90 @@ mod tests {
     }
 
     #[test]
-    fn pre_review_gate_violation_debug_and_clone() {
+    fn test_pre_review_gate_violation_non_blue_signal_preserves_arguments() {
         let v = PreReviewGateViolation::MissingTaskContract;
         let c = v.clone();
         assert_eq!(v, c);
 
-        let v2 = PreReviewGateViolation::NonBlueSignal {
-            entry: sample_entry(),
-            signal: crate::ConfidenceSignal::Yellow,
-        };
+        let v2 =
+            PreReviewGateViolation::NonBlueSignal(sample_entry(), crate::ConfidenceSignal::Yellow);
         let c2 = v2.clone();
         assert_eq!(v2, c2);
+
+        match v2 {
+            PreReviewGateViolation::NonBlueSignal(entry, signal) => {
+                assert_eq!(entry.entry_key().as_str(), "MyType");
+                assert_eq!(signal, crate::ConfidenceSignal::Yellow);
+            }
+            PreReviewGateViolation::MissingTaskContract => panic!("expected NonBlueSignal"),
+        }
     }
 
     #[test]
-    fn coverage_violation_debug_and_clone() {
+    fn test_coverage_violation_tuple_variants_preserve_arguments() {
         let v = CoverageViolation::MissingTaskContract;
         assert_eq!(v.clone(), v);
 
-        let v2 = CoverageViolation::OrphanEntry { entry: sample_entry() };
+        let v2 = CoverageViolation::OrphanEntry(sample_entry());
         assert_eq!(v2.clone(), v2);
 
-        let v3 = CoverageViolation::InvalidEntryRef {
-            entry: sample_entry(),
-            reason: "not found".to_owned(),
-        };
+        let v3 = CoverageViolation::InvalidEntryRef(sample_entry(), FreeText::new("not found"));
         assert_eq!(v3.clone(), v3);
 
-        let v4 = CoverageViolation::MissingSignalDocument { layer: layer("domain") };
+        let v4 = CoverageViolation::MissingSignalDocument(layer("domain"));
         assert_eq!(v4.clone(), v4);
+
+        let v5 = CoverageViolation::InvalidTaskRef(task_id("T001"), vec![sample_entry()]);
+        assert_eq!(v5.clone(), v5);
+
+        match v5 {
+            CoverageViolation::InvalidTaskRef(task_id, entries) => {
+                assert_eq!(task_id.as_ref(), "T001");
+                assert_eq!(entries.len(), 1);
+            }
+            _ => panic!("expected InvalidTaskRef"),
+        }
     }
 
     #[test]
-    fn coverage_verify_outcome_passed() {
+    fn test_coverage_verify_outcome_passed_is_preserved() {
         let outcome = CoverageVerifyOutcome::Passed;
         assert!(matches!(outcome, CoverageVerifyOutcome::Passed));
     }
 
     #[test]
-    fn coverage_verify_outcome_blocked() {
+    fn test_coverage_verify_outcome_non_empty_violations_is_blocked() {
         let outcome =
             CoverageVerifyOutcome::blocked(vec![CoverageViolation::MissingTaskContract]).unwrap();
-        assert!(matches!(outcome, CoverageVerifyOutcome::Blocked { .. }));
+        assert!(
+            matches!(outcome, CoverageVerifyOutcome::Blocked(violations) if violations.as_slice().len() == 1)
+        );
     }
 
     #[test]
-    fn coverage_verify_outcome_rejects_empty_blocked_violations() {
+    fn test_coverage_verify_outcome_empty_violations_is_rejected() {
         let result = CoverageVerifyOutcome::blocked(Vec::new());
         assert!(result.is_err());
     }
 
     #[test]
-    fn pre_review_gate_outcome_passed() {
+    fn test_pre_review_gate_outcome_passed_is_preserved() {
         let outcome = PreReviewGateOutcome::Passed;
         assert!(matches!(outcome, PreReviewGateOutcome::Passed));
     }
 
     #[test]
-    fn pre_review_gate_outcome_blocked() {
+    fn test_pre_review_gate_outcome_non_empty_violations_is_blocked() {
         let outcome =
             PreReviewGateOutcome::blocked(vec![PreReviewGateViolation::MissingTaskContract])
                 .unwrap();
-        assert!(matches!(outcome, PreReviewGateOutcome::Blocked { .. }));
+        assert!(
+            matches!(outcome, PreReviewGateOutcome::Blocked(violations) if violations.as_slice().len() == 1)
+        );
     }
 
     #[test]
-    fn pre_review_gate_outcome_rejects_empty_blocked_violations() {
+    fn test_pre_review_gate_outcome_empty_violations_is_rejected() {
         let result = PreReviewGateOutcome::blocked(Vec::new());
         assert!(result.is_err());
     }

@@ -44,10 +44,7 @@ fn measure_failed(message: impl Into<String>) -> ScopeDiffMeasureError {
     ScopeDiffMeasureError::MeasureFailed { message: FreeText::new(message.into()) }
 }
 
-/// Measures a track's actual per-scope diff through git.
-///
-/// Constructed with no arguments so composition roots stay zero-argument
-/// wiring accessors; the items directory arrives with each call.
+/// Measures a track's per-scope diff; each call supplies the items directory.
 #[derive(Debug, Default)]
 pub struct GitScopeDiffMeasurer;
 

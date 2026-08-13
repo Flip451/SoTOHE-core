@@ -1,0 +1,166 @@
+{
+  "catalogue_declaration_hash": "dfb2cd22148eef302a8cdd78768fb49a928ad5eb1a7cd25a336b1c65694b6874",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "c97a55aa3b9371e100730d21342d271fef746a67bc41f39f22f0b3a7524d5303",
+      "signal": "blue",
+      "type_name": "CapabilityExecArgs"
+    },
+    {
+      "entry_hash": "60cae9703dff75e73955546e6363fb789787823509af8a7f3d04fa4ed314e9a1",
+      "signal": "blue",
+      "type_name": "CheckApprovedArgs"
+    },
+    {
+      "entry_hash": "3112e8d13c8d031ef8669f08a3becfcb6a8f7918a4498f6c23da6bd27898d872",
+      "signal": "blue",
+      "type_name": "CheckZeroFindingsArgs"
+    },
+    {
+      "entry_hash": "7d4ec401fccc1bedcaf0e04ad7d0bb44dc78230dcf89036cbb98fa5783b72a72",
+      "signal": "blue",
+      "type_name": "CliCommand"
+    },
+    {
+      "entry_hash": "62c69f43d824ca22dfde0731c953444f49ac1a87c48e1e7d7c8cbdb7b11134b8",
+      "signal": "blue",
+      "type_name": "PhaseCommand"
+    },
+    {
+      "entry_hash": "5ecc64065efb5223876df072e2831084225e5080598c236e5f410bda3078614f",
+      "signal": "blue",
+      "type_name": "PhaseEnterArgs"
+    },
+    {
+      "entry_hash": "4735a8d789898d7839c2bb3985fe605e76ef276ece91aff92bcf432454e470ef",
+      "signal": "blue",
+      "type_name": "PhaseIdArgs"
+    },
+    {
+      "entry_hash": "079521ac57ccf0ce57502eaa781898372387fa8f3645071f87b49241f935caf0",
+      "signal": "blue",
+      "type_name": "PhaseValidateArgs"
+    },
+    {
+      "entry_hash": "0134a2d8975d9e738f75bd2cfbd9485dd8119793fa0db9ee90ea023cbf568d49",
+      "signal": "blue",
+      "type_name": "RefVerifyCheckChainArg"
+    },
+    {
+      "entry_hash": "e5806dc64bade4a2443e5f482b2d4c56a3a33b71545e302927ee8df355fa92a5",
+      "signal": "blue",
+      "type_name": "ReviewCheckApprovedArgs"
+    },
+    {
+      "entry_hash": "9846cd032d59ee22f9c513171e9d90eda348c66c8057ff29d418de044a118082",
+      "signal": "blue",
+      "type_name": "ReviewCheckRoundArg"
+    },
+    {
+      "entry_hash": "55c675db14bbbba4d64a8210986311c7a5b9b677d0e1772030b00b7a727a49ec",
+      "signal": "blue",
+      "type_name": "ReviewCommand"
+    },
+    {
+      "entry_hash": "7e4563097a686c8d4b4b95abe03c6976e816d036169ec3c3cb1a5df4867257c5",
+      "signal": "blue",
+      "type_name": "cli::commands::capability::into_driver_input"
+    },
+    {
+      "entry_hash": "955fb94b17596f754de7eeafa04a687ab0aa35fc145f29b219729c174b613833",
+      "signal": "blue",
+      "type_name": "cli::commands::phase::execute"
+    },
+    {
+      "entry_hash": "d82e856d1db9f91642585535701910c9d7cd31dda36ddb58f9dd8f090f67870d",
+      "signal": "blue",
+      "type_name": "cli::commands::phase::execute_with_driver"
+    },
+    {
+      "entry_hash": "df2c7dfdcc69beaa64cac01abb71ec0bb02b5a192ca1189bf4c419d7f3c1f87a",
+      "signal": "blue",
+      "type_name": "cli::commands::phase::input_from_command"
+    },
+    {
+      "entry_hash": "35c069b49ed7778028de02b2edbe02974fc6ccd3f770db083c24af57e6ec6986",
+      "signal": "blue",
+      "type_name": "cli::commands::ref_verify::execute_check_approved_with_driver"
+    },
+    {
+      "entry_hash": "2ae16597ed7efc7b3bd7acae268f571d12c3ecc33937fb366bf1496eb3b7502b",
+      "signal": "blue",
+      "type_name": "cli::commands::review::execute_check_approved"
+    },
+    {
+      "entry_hash": "d005ddf319ba41665ebce9911df1adbb500ad461e9575c2913a7166c6ee906d7",
+      "signal": "blue",
+      "type_name": "cli::commands::review::execute_check_zero_findings"
+    },
+    {
+      "entry_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
+      "signal": "blue",
+      "type_name": "ClaudeLocalArgs"
+    },
+    {
+      "entry_hash": "e0360e823d38e83c8a398315e3d90423bb2c93980d1fa9bf02ff7290a461b69c",
+      "signal": "blue",
+      "type_name": "CodexLocalArgs"
+    },
+    {
+      "entry_hash": "70733e5f2ccac3b7dfcc8c2eead3d592005334b0ac7387471f7cb430e8b601cd",
+      "signal": "blue",
+      "type_name": "ValidatedAutoRecordArgs"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::claude_local::execute_claude_local"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::claude_local::run_execute_claude_local"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::codex_local::emit_outcome_output"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::codex_local::emit_outcome_output_to"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::codex_local::execute_codex_local"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::codex_local::review_input_from_args"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::codex_local::run_execute_codex_local"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::validate_auto_record_args"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::validate_auto_record_args_raw"
+    },
+    {
+      "entry_hash": "80f92e70395bc37f2059197ae0a19452cf820d7474501c5e041f5d3a4bd9af51",
+      "signal": "blue",
+      "type_name": "cli::commands::review::validate_claude_auto_record_args"
+    }
+  ]
+}

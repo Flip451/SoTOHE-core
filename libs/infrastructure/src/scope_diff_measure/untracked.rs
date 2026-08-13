@@ -13,7 +13,7 @@ use crate::track::symlink_guard::reject_symlinks_below;
 pub(super) const MAX_UNTRACKED_FILE_BYTES: u64 = 16 * 1024 * 1024;
 const GIT_EXCLUDE_PATHSPEC_PREFIX: &str = ":(top,exclude)";
 /// Generated build, cache, and credential outputs excluded before collection.
-pub(super) const IGNORED_NON_REVIEW_PATHS: [&str; 32] = [
+pub(super) const IGNORED_NON_REVIEW_PATHS: [&str; 33] = [
     ":(top,exclude)target/**",
     ":(top,exclude)target-*/**",
     ":(top,exclude)**/*.rs.bk",
@@ -24,6 +24,9 @@ pub(super) const IGNORED_NON_REVIEW_PATHS: [&str; 32] = [
     ":(top,exclude).semantic_index/**",
     ":(top,exclude)**/.semantic_index/**",
     ":(top,exclude).semantic_index.*",
+    // Git reports an ignored nested repository as the directory itself; exclude
+    // that exact path as well as its descendants before regular-file inspection.
+    ":(top,exclude).cache",
     ":(top,exclude)sotp-dry-index-*/**",
     ":(top,exclude).env",
     ":(top,exclude).env.*",

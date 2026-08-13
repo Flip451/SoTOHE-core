@@ -20,13 +20,9 @@ Do not put convention paths in the briefing: the capability dispatcher resolves 
 `type-designer` convention set and delivers it with the dispatch, and that resolution is the
 complete convention input (workflow SSoT § Inputs).
 
-Then run `bin/sotp capability exec type-designer --host claude --briefing-file tmp/type-designer-briefing.md`.
-The dispatcher resolves `capabilities.type-designer` internally from
-`.harness/config/agent-profiles.json` and either completes the provider dispatch or returns
-`CAPABILITY_EXEC_OUTCOME: delegate-in-host`; only on that outcome invoke the Agent tool
-(`subagent_type: "type-designer"`, `run_in_background: true`) with the briefing path and
-discipline body as the task prompt. Never invoke the Agent-tool subagent without that
-delegation outcome; this adapter must not resolve or assume the provider itself.
+Then run `bin/sotp phase enter type-design`. Phase entry runs its declared convergence checks
+and launches the configured writer only after they pass. Do not launch the writer from this
+adapter.
 
 The capability owns: baseline capture, each `<layer>-types.json` write, all rendered views, and the type → spec signal evaluation (🔵🟡🔴).
 

@@ -23,11 +23,9 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- The spec.json authoring is delegated to the `spec-designer` capability via
-  `bin/sotp capability exec spec-designer --host codex --briefing-file <path>`; the dispatcher
-  resolves the provider from `.harness/config/agent-profiles.json`. Invoke
-  `.codex/agents/spec-designer.toml` in-host only when the dispatcher returns
-  `CAPABILITY_EXEC_OUTCOME: delegate-in-host`.
+- Write the configured briefing, then run `bin/sotp phase enter spec-design`. Phase entry runs
+  its declared convergence checks and launches the configured writer only after they pass. Do
+  not launch the writer from this skill.
 - This skill is single-shot per the workflow SSoT: when the spec → ADR signal turns red,
   surface the failing element ids and cited ADR paths back to the caller (`$track-plan`), which
   owns the back-and-forth escalation (adr-editor dispatch, retry counters). Do not dispatch

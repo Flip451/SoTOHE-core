@@ -72,16 +72,16 @@ fn run_execute_local(args: &LocalArgs) -> Result<u8, crate::CliError> {
         CodexRoundTypeArg::Final => "final".to_owned(),
     };
 
-    let input = ReviewInput::RunLocal {
-        model: args.model.clone(),
-        timeout_seconds: args.timeout_seconds,
-        briefing_file: args.briefing_file.clone(),
-        prompt: args.prompt.clone(),
-        track_id: args.track_id.clone(),
+    let input = ReviewInput::RunLocal(
+        args.model.clone(),
+        args.timeout_seconds,
+        args.briefing_file.clone(),
+        args.prompt.clone(),
+        args.track_id.clone(),
         round_type,
-        group: args.group.clone(),
-        items_dir: args.items_dir.clone(),
-    };
+        args.group.clone(),
+        args.items_dir.clone(),
+    );
 
     let outcome = cli_composition::ReviewCompositionRoot::new().review_driver().handle(input);
 
