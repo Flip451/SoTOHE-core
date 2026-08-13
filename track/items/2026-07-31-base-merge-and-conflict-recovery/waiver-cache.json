@@ -82,7 +82,7 @@
       },
       "key": {
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5",
-        "declaration_hash": "1ba535091109714b1944d7fdcce98d0d8f94dd3f1611ed448d453c69f95e3a59",
+        "declaration_hash": "fd182f115e8b20fae5e8bac36d3f2d17ce954177dcc15fa7598bb46fbd22d1bf",
         "waived_reason_hash": "e93900cb50b7586b8b1d5cb59c8e70e5933359b376f758818181e8abae005fc8"
       },
       "obligation_id": {
@@ -91,31 +91,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "VariantDecl { name: VariantName(Identifier(\"ActiveTrackMismatch\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"current\")), ty: TypeRef(\"domain::TrackBranch\") }, FieldDecl { name: FieldName(Identifier(\"expected\")), ty: TypeRef(\"domain::TrackBranch\") }]) }",
-        "kind": "waived"
-      },
-      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
-    },
-    {
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-04",
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        "entry_key": "BaseMergeError"
-      },
-      "key": {
-        "anchor_text_hash": "c3378f0137ffc251962e2e9d8bdce0072fc09796143e5519d64217f14429353d",
-        "declaration_hash": "1ba535091109714b1944d7fdcce98d0d8f94dd3f1611ed448d453c69f95e3a59",
-        "waived_reason_hash": "c18a578e29299335039b40b3c25142adfa4016e3d539e78d5f718bdf54a20e2f"
-      },
-      "obligation_id": {
-        "entry_key": "BaseMergeError",
-        "item_identifier": "voluntary:AC-04",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "\"variants: [VariantDecl { name: VariantName(Identifier(\"Context\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }, VariantDecl { name: VariantName(Identifier(\"ActiveTrackMismatch\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"current\")), ty: TypeRef(\"domain::TrackBranch\") }, FieldDecl { name: FieldName(Identifier(\"expected\")), ty: TypeRef(\"domain::TrackBranch\") }]) }, VariantDecl { name: VariantName(Identifier(\"Git\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }, VariantDecl { name: VariantName(Identifier(\"DirtyWorktree\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }, VariantDecl { name: VariantName(Identifier(\"PostMergeCleanup\")), payload: Tuple([TypeRef(\"PostMergeCleanupError\")]) }]\"",
+        "citation": "methods: [], generics: [], where_predicates: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

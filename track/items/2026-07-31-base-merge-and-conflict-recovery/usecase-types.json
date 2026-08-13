@@ -1174,7 +1174,7 @@
     },
     "BaseMergeError": {
       "action": "add",
-      "docs": "IN-01 / IN-02 / IN-06 / CN-01 / CN-05 / CN-06 / CN-07 / AC-01 / AC-02 / AC-03 / AC-04 / AC-10 / AC-12.",
+      "docs": "IN-01 / IN-02 / IN-06 / CN-01 / CN-05 / CN-06 / CN-07 / AC-01 / AC-02 / AC-03 / AC-04 / AC-10 / AC-12. Conflict-cleanup failure payload: PostMergeCleanupError.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1224,6 +1224,15 @@
           },
           {
             "name": "PostMergeCleanup",
+            "payload": {
+              "fields": [
+                "PostMergeCleanupError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ConflictedCleanupFailed",
             "payload": {
               "fields": [
                 "PostMergeCleanupError"

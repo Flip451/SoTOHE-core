@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "5a28cbe60f0187bc092d30d25e993c38c8fa759ab1b03189af5d5788af4cefe3",
+  "catalogue_declaration_hash": "a11befee2f24e2301973883b9fd119caf42e813634413a39f2645f59299c3217",
   "schema_version": 1,
   "signals": [
     {
@@ -23,7 +23,7 @@
       "type_name": "BaseMergeContextError"
     },
     {
-      "entry_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "entry_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "signal": "blue",
       "type_name": "BaseMergeError"
     },

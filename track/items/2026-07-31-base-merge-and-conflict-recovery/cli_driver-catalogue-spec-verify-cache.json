@@ -193,7 +193,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -217,7 +217,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -241,7 +241,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -265,7 +265,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -289,7 +289,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -308,12 +308,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure.",
+        "citation": "A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -337,7 +337,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -361,7 +361,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -385,7 +385,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -409,7 +409,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -433,7 +433,7 @@
       }
     },
     {
-      "claim_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",

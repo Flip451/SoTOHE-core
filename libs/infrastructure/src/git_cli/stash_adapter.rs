@@ -77,37 +77,49 @@ fn pop_record_error(detail: impl Into<String>) -> GitStashPopError {
     )))
 }
 
-fn stash_state_dir(repo: &SystemGitRepo) -> Result<PathBuf, StashOperationError> {
-    let args = ["rev-parse", "--path-format=absolute", "--git-common-dir"];
+fn git_directory(
+    repo: &SystemGitRepo,
+    directory_flag: &str,
+    description: &str,
+) -> Result<PathBuf, StashOperationError> {
+    let args = ["rev-parse", "--path-format=absolute", directory_flag];
     let output = run_git(repo, &args)?;
     if !output.status.success() {
         return Err(command_failure(&args, &output));
     }
     let path_text = String::from_utf8(output.stdout).map_err(|error| {
-        unavailable(format!("git rev-parse returned an invalid Git common directory: {error}"))
+        unavailable(format!("git rev-parse returned an invalid {description}: {error}"))
     })?;
     let path_text = path_text.trim();
     if path_text.is_empty() {
-        return Err(unavailable("git rev-parse returned an empty Git common directory"));
+        return Err(unavailable(format!("git rev-parse returned an empty {description}")));
     }
     let path = PathBuf::from(path_text);
     let path = if path.is_absolute() { path } else { repo.root().join(path) };
     crate::track::symlink_guard::reject_symlinks_up_to_root(&path).map_err(|error| {
-        unavailable(format!("Git common directory contains an unsafe path component: {error}"))
+        unavailable(format!("{description} contains an unsafe path component: {error}"))
     })?;
-    let canonical = path.canonicalize().map_err(|error| {
-        unavailable(format!("cannot canonicalize Git common directory: {error}"))
-    })?;
+    let canonical = path
+        .canonicalize()
+        .map_err(|error| unavailable(format!("cannot canonicalize {description}: {error}")))?;
     if !canonical.is_dir() {
-        return Err(unavailable("Git common directory is not a directory"));
+        return Err(unavailable(format!("{description} is not a directory")));
     }
     Ok(canonical)
+}
+
+fn stash_state_dir(repo: &SystemGitRepo) -> Result<PathBuf, StashOperationError> {
+    git_directory(repo, "--absolute-git-dir", "worktree Git directory")
+}
+
+fn stash_common_dir(repo: &SystemGitRepo) -> Result<PathBuf, StashOperationError> {
+    git_directory(repo, "--git-common-dir", "Git common directory")
 }
 
 fn stash_lock(
     repo: &SystemGitRepo,
 ) -> Result<stash_record::StashOperationLock, StashOperationError> {
-    let path = stash_state_dir(repo)?.join(stash_record::STASH_LOCK_FILE);
+    let path = stash_common_dir(repo)?.join(stash_record::STASH_LOCK_FILE);
     stash_record::acquire_lock(&path).map_err(record_error)
 }
 
@@ -236,7 +248,17 @@ fn pending_record(repo: &SystemGitRepo) -> Result<StashRecord, GitStashPopError>
 
 fn persist_record(repo: &SystemGitRepo, record: &StashRecord) -> Result<(), StashOperationError> {
     let state_dir = stash_state_dir(repo)?;
-    stash_record::write(&state_dir, record).map_err(record_error)
+    stash_record::write(&state_dir, record).map_err(|error| {
+        let detail = match &record.outcome {
+            GitStashPushOutcome::Created(oid) => format!(
+                "{error}; created stash OID {} was not paired — recover manually with `git stash list` and `git stash apply {}`",
+                oid.as_ref(),
+                oid.as_ref()
+            ),
+            GitStashPushOutcome::NothingToStash => error,
+        };
+        record_error(detail)
+    })
 }
 
 fn clear_record(repo: &SystemGitRepo, record: &StashRecord) -> Result<(), GitStashPopError> {
@@ -394,9 +416,9 @@ impl GitStashPort for FsGitStashAdapter {
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unwrap_used)]
 mod tests {
-    use super::{FsGitStashAdapter, MAX_STASH_OUTPUT_BYTES, stash_state_dir};
+    use super::{FsGitStashAdapter, MAX_STASH_OUTPUT_BYTES, stash_common_dir, stash_state_dir};
     use crate::git_cli::SystemGitRepo;
-    use crate::git_cli::stash_record::{self, STASH_RECORD_FILE, StashRecord};
+    use crate::git_cli::stash_record::{self, STASH_LOCK_FILE, STASH_RECORD_FILE, StashRecord};
     use domain::CommitHash;
     use std::fs;
     use std::path::{Path, PathBuf};
@@ -459,10 +481,18 @@ mod tests {
     }
 
     fn record_path(root: &Path) -> PathBuf {
-        let common_dir = PathBuf::from(
-            output(root, &["rev-parse", "--path-format=absolute", "--git-common-dir"]).trim(),
+        let git_dir = PathBuf::from(
+            output(root, &["rev-parse", "--path-format=absolute", "--absolute-git-dir"]).trim(),
         );
-        common_dir.join(STASH_RECORD_FILE)
+        git_dir.join(STASH_RECORD_FILE)
+    }
+
+    fn lock_path(root: &Path) -> PathBuf {
+        let _cwd = CurrentDirGuard::enter(root);
+        let repository = SystemGitRepo::discover().expect("repository must be discoverable");
+        stash_common_dir(&repository)
+            .expect("common Git directory must be readable")
+            .join(STASH_LOCK_FILE)
     }
 
     fn branch_state(root: &Path) -> (String, String, String) {
@@ -494,6 +524,37 @@ mod tests {
 
         assert!(matches!(adapter.push(), Err(GitStashPushError::PendingGuardedStashExists)));
         assert!(record_path(repo.path()).is_file(), "the pending record must be retained");
+    }
+
+    #[test]
+    fn test_fs_git_stash_adapter_linked_worktree_does_not_read_other_worktree_record() {
+        let repo = init_repo();
+        let linked = repo.path().join("linked");
+        let linked_text = linked.to_str().expect("linked worktree path must be UTF-8");
+        run_git(repo.path(), &["worktree", "add", "-q", "-b", "linked", linked_text]);
+
+        fs::write(repo.path().join("tracked.txt"), "saved in main\n")
+            .expect("stash change must be written");
+        {
+            let _cwd = CurrentDirGuard::enter(repo.path());
+            FsGitStashAdapter::new().push().expect("main worktree stash must succeed");
+        }
+
+        let main_record = record_path(repo.path());
+        let linked_record = record_path(&linked);
+        let main_lock = lock_path(repo.path());
+        let linked_lock = lock_path(&linked);
+        assert!(main_record.is_file(), "main worktree must retain its pairing record");
+        assert_ne!(main_record, linked_record, "linked worktrees need separate record paths");
+        assert_eq!(main_lock, linked_lock, "linked worktrees must share the stash mutation lock");
+        assert!(!linked_record.exists(), "linked worktree must not see main's record");
+
+        let error = {
+            let _cwd = CurrentDirGuard::enter(&linked);
+            FsGitStashAdapter::new().pop().expect_err("linked pop must not consume main's record")
+        };
+        assert!(matches!(error, GitStashPopError::NoPendingGuardedStash));
+        assert!(main_record.is_file(), "main worktree pairing record must remain pending");
     }
 
     #[test]
@@ -554,6 +615,41 @@ mod tests {
                 .lines()
                 .any(|line| line.ends_with("refs/heads/stash-drift")),
             "the hook must create the branch-ref drift"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_fs_git_stash_adapter_persist_failure_reports_created_oid_recovery() {
+        let repo = init_repo();
+        fs::write(repo.path().join("tracked.txt"), "saved\n")
+            .expect("stash change must be written");
+        let hooks = repo.path().join(".githooks");
+        fs::create_dir_all(&hooks).expect("hook directory must be created");
+        write_executable(
+            &hooks.join("reference-transaction"),
+            "#!/bin/sh\nset -eu\nif [ \"$1\" = committed ]; then\n    git_dir=$(git rev-parse --absolute-git-dir)\n    record=\"$git_dir/.sotp-guarded-stash.json\"\n    if [ ! -e \"$record\" ]; then\n        mkdir \"$record\"\n    fi\nfi\n",
+        );
+        run_git(repo.path(), &["config", "core.hooksPath", ".githooks"]);
+
+        let error = {
+            let _cwd = CurrentDirGuard::enter(repo.path());
+            FsGitStashAdapter::new().push().expect_err("record persistence must fail")
+        };
+        let message = match error {
+            GitStashPushError::Unavailable(detail) => detail.as_str().to_owned(),
+            other => panic!("expected persistence failure, got {other:?}"),
+        };
+        let stash_list = output(repo.path(), &["stash", "list", "--format=%H"]);
+        let oid = stash_list.lines().next().expect("the successful stash must remain available");
+        assert!(message.contains(oid), "the created stash OID must be reported: {message}");
+        assert!(
+            message.contains("git stash list"),
+            "manual listing recovery is required: {message}"
+        );
+        assert!(
+            message.contains(&format!("git stash apply {oid}")),
+            "manual apply recovery is required: {message}"
         );
     }
 

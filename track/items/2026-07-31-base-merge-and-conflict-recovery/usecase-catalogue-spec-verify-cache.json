@@ -553,7 +553,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -577,7 +577,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -601,7 +601,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -625,7 +625,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -649,7 +649,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -673,7 +673,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -697,7 +697,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -716,12 +716,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "it reports any stage failure and surfaces the canonical recovery workflow entry point.",
+        "citation": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point.",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -745,7 +745,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -769,7 +769,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -793,7 +793,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -817,7 +817,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -841,7 +841,7 @@
       }
     },
     {
-      "claim_hash": "af8a87d0c4530fe276bcb6cc6958e10f067684332416df1871941274433625e6",
+      "claim_hash": "6f7c6ced9b1da5e5d7bb8a22ada3b7cd1ac024a52b6c6909f32df0b1b5cd48bb",
       "claim_origin": {
         "data": {
           "entry_key": "BaseMergeError",
@@ -860,7 +860,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"any stage failure is reported\"",
+        "citation": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported.",
         "kind": "pass"
       }
     },

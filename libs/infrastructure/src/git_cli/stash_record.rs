@@ -20,9 +20,9 @@ use usecase::git_stash::GitStashPushOutcome;
 
 use crate::git_cli::terminate_bounded_git_child;
 
-/// Git-common-directory filename for the pending guarded stash pairing.
+/// Worktree Git-directory filename for the pending guarded stash pairing.
 pub(crate) const STASH_RECORD_FILE: &str = ".sotp-guarded-stash.json";
-/// Git-common-directory filename for the guarded stash operation lock.
+/// Shared Git-common-directory filename for the guarded stash operation lock.
 pub(crate) const STASH_LOCK_FILE: &str = ".sotp-guarded-stash.lock";
 
 const MAX_STASH_RECORD_BYTES: u64 = 4 * 1024;

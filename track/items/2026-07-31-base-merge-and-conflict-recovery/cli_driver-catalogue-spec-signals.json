@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "a0176aee2726f3520c8a3e7b22d9c7bdcf335d0ffc1dd287c5e50afa054dfe37",
+  "catalogue_declaration_hash": "7bb5ce32d0c1ab5a00ebb7eab808581a3e4b7df57253d215f3e6cb7a8bb7b81f",
   "schema_version": 1,
   "signals": [
     {
@@ -18,7 +18,7 @@
       "type_name": "GitStashInput"
     },
     {
-      "entry_hash": "0ab8ccbe271509fc673175603b1af825961a9e61d3b38de41f1456b84791a261",
+      "entry_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
       "signal": "blue",
       "type_name": "TrackDriver"
     }

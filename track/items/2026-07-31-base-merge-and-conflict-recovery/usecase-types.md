@@ -13,7 +13,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BaseMergeContextError | error_type | add | Unavailable, ActiveTrackMismatch | 🔵 | 🔵 |
-| BaseMergeError | error_type | add | Context, ActiveTrackMismatch, Git, DirtyWorktree, PostMergeCleanup | 🔵 | 🔵 |
+| BaseMergeError | error_type | add | Context, ActiveTrackMismatch, Git, DirtyWorktree, PostMergeCleanup, ConflictedCleanupFailed | 🔵 | 🔵 |
 | BaseMergeGitError | error_type | add | Execution, DirtyWorktree | 🔵 | 🔵 |
 | BaselineReplacementError | error_type | add | Isolation, Generation, Validation, Publish, Restoration | 🔵 | 🔵 |
 | GitStashPopError | error_type | add | ForbiddenBranchRefUpdate, NoPendingGuardedStash, Unavailable, StashIdentityMissing | 🔵 | 🔵 |

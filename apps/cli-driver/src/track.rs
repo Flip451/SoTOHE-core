@@ -203,13 +203,20 @@ fn render_fixpoint_resolve_outcome(outcome: FixpointResolveDriverOutcome) -> Com
 fn render_base_merge_result(
     result: Result<BaseMergeOutcome, usecase::base_merge::BaseMergeError>,
 ) -> CommandOutcome {
+    const CONFLICT_RECOVERY_HANDOFF: &str = "continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)";
+
     match result {
         Ok(BaseMergeOutcome::Completed) => {
             CommandOutcome::success(Some("base merge completed".to_owned()))
         }
-        Ok(BaseMergeOutcome::Conflicted) => CommandOutcome::failure(Some(
-            "base merge conflicted; continue with the recover workflow (/track:recover on Claude Code, $track-recover on Codex)".to_owned(),
-        )),
+        Ok(BaseMergeOutcome::Conflicted) => CommandOutcome::failure(Some(format!(
+            "base merge conflicted; {CONFLICT_RECOVERY_HANDOFF}"
+        ))),
+        Err(usecase::base_merge::BaseMergeError::ConflictedCleanupFailed(error)) => {
+            CommandOutcome::failure(Some(format!(
+                "base merge conflicted; cleanup failed: {error}; {CONFLICT_RECOVERY_HANDOFF}"
+            )))
+        }
         Err(error) => CommandOutcome::failure(Some(format!("base merge failed: {error}"))),
     }
 }
@@ -379,7 +386,8 @@ mod tests {
     use usecase::base_merge::{
         BaseMergeAttemptOutcome, BaseMergeCleanupPort, BaseMergeCleanupRequest,
         BaseMergeContextError, BaseMergeContextPort, BaseMergeGitError, BaseMergeGitPort,
-        BaselineReplacementError, SyncBaseRecordError, ViewsRegenerationError,
+        BaselineReplacementError, PostMergeCleanupError, SyncBaseRecordError,
+        ViewsRegenerationError,
     };
 
     struct UnusedTrackService;
@@ -699,6 +707,42 @@ mod tests {
             outcome.stderr.as_deref(),
             Some("base merge failed: base-merge context failed: missing active track")
         );
+    }
+
+    #[test]
+    fn test_render_base_merge_result_conflicted_cleanup_failure_keeps_recovery_handoff() {
+        let error = usecase::base_merge::BaseMergeError::ConflictedCleanupFailed(
+            PostMergeCleanupError::Views(ViewsRegenerationError::Regeneration(
+                usecase::git_workflow::DiagnosticText::new("views failed"),
+            )),
+        );
+        let outcome = render_base_merge_result(Err(error));
+
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.as_deref().expect("conflict failure must render stderr");
+        assert!(stderr.contains("base merge conflicted"));
+        assert!(stderr.contains("views failed"));
+        assert!(stderr.contains("/track:recover on Claude Code"));
+        assert!(stderr.contains("$track-recover on Codex"));
+    }
+
+    #[test]
+    fn test_track_driver_handle_base_merge_renders_conflicted_cleanup_failure_handoff() {
+        let error = usecase::base_merge::BaseMergeError::ConflictedCleanupFailed(
+            PostMergeCleanupError::Views(ViewsRegenerationError::Regeneration(
+                usecase::git_workflow::DiagnosticText::new("views failed"),
+            )),
+        );
+        let outcome = base_merge_driver(Arc::new(StubBaseMergeService::new(Err(error))))
+            .handle_base_merge(BaseMergeInput { workspace_root: PathBuf::from("/workspace") });
+
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.as_deref().expect("conflict failure must render stderr");
+        assert!(stderr.contains("base merge conflicted"));
+        assert!(stderr.contains("views failed"));
+        assert!(stderr.contains("/track:recover on Claude Code"));
+        assert!(stderr.contains("$track-recover on Codex"));
+        assert_ne!(outcome.stdout.as_deref(), Some("base merge completed"));
     }
 
     #[test]

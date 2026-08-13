@@ -34,6 +34,8 @@ use usecase::verify_adr_signals::{
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 
+use super::merge_gate_freshness::read_branch_evaluation_commit;
+pub use super::merge_gate_reader::GitShowTrackBlobReader;
 use crate::git_cli::isolation::isolated_bounded_git_output;
 use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind_isolated};
 
@@ -42,17 +44,6 @@ const MAX_SPEC_BYTES: usize = 16 * 1024 * 1024;
 const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
 const MAX_IMPL_PLAN_BYTES: usize = 16 * 1024 * 1024;
 const MAX_SIGNAL_BYTES: usize = 16 * 1024 * 1024;
-
-/// Adapter that reads track documents from the local git repository via
-/// `git show origin/<branch>:<path>`.
-///
-/// Construct with `GitShowTrackBlobReader::new(repo_root)`. The adapter
-/// is stateless apart from the repo root path, so a single instance can
-/// be shared across multiple usecase calls (e.g. merge_gate +
-/// task_completion from the same `pr.rs::wait_and_merge` invocation).
-pub struct GitShowTrackBlobReader {
-    repo_root: PathBuf,
-}
 
 impl GitShowTrackBlobReader {
     /// Creates a new adapter rooted at the given repository path.
@@ -473,7 +464,21 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Err(result) => return result,
         };
         match crate::tddd::type_signals_codec::decode(&text) {
-            Ok(doc) => BlobFetchResult::Found(doc),
+            Ok(doc) => {
+                let evaluation_commit = match read_branch_evaluation_commit(&self.repo_root, branch)
+                {
+                    Ok(commit) => commit,
+                    Err(error) => return BlobFetchResult::FetchError(error),
+                };
+                if doc.cache_key().head_commit() != &evaluation_commit {
+                    return BlobFetchResult::FetchError(format!(
+                        "{path}: type-signals head_commit mismatch (recorded={}, evaluation={}) — re-run `sotp signal calc-impl-catalog` and commit the refreshed evaluation result",
+                        doc.cache_key().head_commit().as_ref(),
+                        evaluation_commit.as_ref()
+                    ));
+                }
+                BlobFetchResult::Found(doc)
+            }
             Err(e) => {
                 BlobFetchResult::FetchError(format!("{path}: {signal_filename} decode error: {e}"))
             }
@@ -717,6 +722,28 @@ mod tests {
         git(repo, &["commit", "--quiet", "-m", "initial"]);
         git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
         git(repo, &["fetch", "--quiet", "origin"]);
+        dir
+    }
+
+    fn git_output(root: &Path, args: &[&str]) -> String {
+        let output =
+            std::process::Command::new("git").args(args).current_dir(root).output().unwrap();
+        assert!(output.status.success(), "git {} failed", args.join(" "));
+        String::from_utf8(output.stdout).unwrap()
+    }
+
+    fn setup_repo_with_type_signals_at_evaluation_commit() -> tempfile::TempDir {
+        let dir = setup_repo_with_track("foo", &[]);
+        let evaluation_commit = git_output(dir.path(), &["rev-parse", "HEAD"]).trim().to_owned();
+        let track_dir = dir.path().join("track/items/foo");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        let recorded_head = format!("\"head_commit\": \"{}\"", "0".repeat(40));
+        let signal = TYPE_SIGNALS_MINIMAL
+            .replace(&recorded_head, &format!("\"head_commit\": \"{evaluation_commit}\""));
+        std::fs::write(track_dir.join("domain-type-signals.json"), signal).unwrap();
+        git(dir.path(), &["add", "track"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "add type signals"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
         dir
     }
 
@@ -1568,10 +1595,7 @@ decisions:
     fn test_read_type_signals_found_decodes_document() {
         // Happy path: signals file exists and decodes correctly.
         // `domain-types.json` → signal file name = `domain-type-signals.json`.
-        let dir = setup_repo_with_track(
-            "foo",
-            &[("domain-type-signals.json", TYPE_SIGNALS_MINIMAL.as_bytes())],
-        );
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         match reader.read_type_signals("main", "foo", "domain") {
             BlobFetchResult::Found(doc) => {
@@ -1583,7 +1607,7 @@ decisions:
                 );
                 assert_eq!(
                     doc.cache_key().head_commit().as_ref(),
-                    "0000000000000000000000000000000000000000"
+                    git_output(dir.path(), &["rev-parse", "HEAD^1"]).trim()
                 );
                 assert_eq!(
                     doc.cache_key().baseline_hash().as_digest().as_str(),
@@ -1591,6 +1615,24 @@ decisions:
                 );
             }
             other => panic!("expected Found, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_type_signals_rejects_old_document_after_implementation_only_commit() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        std::fs::write(dir.path().join("implementation-only.rs"), "changed\n").unwrap();
+        git(dir.path(), &["add", "implementation-only.rs"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "implementation-only change"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_signals("main", "foo", "domain") {
+            BlobFetchResult::FetchError(message) => {
+                assert!(message.contains("head_commit mismatch"), "{message}");
+                assert!(message.contains("sotp signal calc-impl-catalog"), "{message}");
+            }
+            other => panic!("expected stale head_commit rejection, got {other:?}"),
         }
     }
 

@@ -951,6 +951,13 @@
           "hash": "rvw1:sha256:b22a8b2ccea18943825d515d25d901930f97e160fff876a45412050df2142ed0",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T02:40:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f4a92658bdf1f23c6bb8539eb707f232aff98227694c7eb9d68a07e174fc50a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -7728,6 +7735,35 @@
           "hash": "rvw1:sha256:3fa6e6b35bf74b852d16d75fe4ada531ac22cb27ea019f7f85e573f2b756186c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T02:14:37Z",
+          "findings": [
+            {
+              "category": "adapter correctness / concurrency",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 110,
+              "message": "`stash_state_dir()` now places the operation lock under each worktree's `--absolute-git-dir`, but linked worktrees still share `refs/stash`. Concurrent guarded pushes can therefore bypass each other's locks, observe the same initial stash ref, and both persist whichever OID is newest after the interleaving, pairing one worktree with another's stash. Keep the record worktree-local, but anchor the mutation lock under `--git-common-dir` so shared stash operations remain serialized.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture / module size",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 147,
+              "message": "The current production portion of this module is 721 lines, so `bin/sotp verify module-size` fails the repository's hard 700-line architecture limit. Extract the new evaluation-commit Git operation or another cohesive adapter responsibility into a sibling module.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3f39e4b06b965dd65b28ee46ee6baf48ebe05ee1135bdd3b36d8ea8c5527e287",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T02:42:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d5e7a8c5ba586bd65509b5b8f0d93e0b86d4087e5a4da288c79b02ecc1cd6205",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -8840,6 +8876,42 @@
           "at": "2026-08-12T23:58:53Z",
           "findings": [],
           "hash": "rvw1:sha256:e50be0ce7929ce2c4a4375536524d9dc9e3a908aed2581de7775c3283d6d6f98",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T02:47:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9085412f7f09f734e3e627f011ce07acd21b14c765790cb86f20c7e57127b5a8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T03:29:53Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/test-bindings.json",
+              "line": 7418,
+              "message": "The three newly added infrastructure tests here exercise only successful clean-merge cleanup: two require `BaseMergeOutcome::Completed`, and the adapter test writes a sync-base record. AC-12 exclusively describes the conflicted path and requires that no sync-base record be written, so these tests are false evidence in both the `TrackCommand` and `TrackDriver` AC-12 bindings. Remove them from both AC-12 records and retain the conflict-specific tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:121fdb2e20d6291cfbd48a5ccbf91b65e6f5f67f9a313da2c680a900b85c52b0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T03:34:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d005cd48ea9ce1e1844be87f535b2a30ad1f91579b66b6d838a54426ccefd449",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T03:47:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d005cd48ea9ce1e1844be87f535b2a30ad1f91579b66b6d838a54426ccefd449",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -10278,6 +10350,35 @@
           "hash": "rvw1:sha256:b9651a3d10be02ae82ec0f1a737121322f70afa513b6e4987ee526ce0cbff69b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T02:48:21Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+              "line": 181,
+              "message": "Entry `cli_driver::TrackDriver` restates AC-04's behavioral contract in prose by specifying how conflicted-cleanup failures are rendered and handed off to recovery. This violates `.harness/policies/no-upstream-restatement.md`; retain the anchor citations and remove or reduce the added sentence to a short type-surface identifier.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1177,
+              "message": "Entry `usecase::BaseMergeError` restates the conflict-recovery and stage-reporting behavior governed by AC-04/CN-07/AC-12. Under `.harness/policies/no-upstream-restatement.md`, keep the anchors and, if needed for error precision, describe only the concise payload subset rather than reproducing the upstream behavioral rationale.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6165547eb206765b095139a38135214df0f6c7249741d202f7fe88e285f8de45",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T03:03:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5281fe4739d701799db857d8dbeb13da78b103e21f009a94e306a0e58459618a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -10627,6 +10728,13 @@
           "at": "2026-08-12T21:36:23Z",
           "findings": [],
           "hash": "rvw1:sha256:0bf8593d38dfae860257b8960fc50a015481bbabf228eae9daee4bb881d2cfcd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T02:08:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b02c1e6665b5b6bfcfbbf5cc89a83081be7e94fa14c14fb98afdd6785cf43a6a",
           "type": "final",
           "verdict": "zero_findings"
         }

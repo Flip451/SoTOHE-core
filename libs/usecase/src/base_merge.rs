@@ -176,6 +176,9 @@ pub enum BaseMergeError {
     /// A required clean-merge cleanup stage failed.
     #[error("base-merge cleanup failed: {0}")]
     PostMergeCleanup(PostMergeCleanupError),
+    /// The merge is already conflicted, but conflict cleanup failed.
+    #[error("base-merge conflicted; cleanup failed: {0}")]
+    ConflictedCleanupFailed(PostMergeCleanupError),
 }
 
 /// Loads the authoritative active-track direction for a merge.
@@ -295,10 +298,10 @@ impl BaseMergeService for BaseMergeInteractor {
                     base_commit,
                 };
                 self.cleanup.replace_baselines(&request).map_err(|error| {
-                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(error))
+                    BaseMergeError::ConflictedCleanupFailed(PostMergeCleanupError::Baseline(error))
                 })?;
                 self.cleanup.regenerate_views(&request).map_err(|error| {
-                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error))
+                    BaseMergeError::ConflictedCleanupFailed(PostMergeCleanupError::Views(error))
                 })?;
                 Ok(BaseMergeOutcome::Conflicted)
             }
@@ -953,7 +956,7 @@ mod tests {
 
         assert!(matches!(
             error,
-            BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Baseline(
+            BaseMergeError::ConflictedCleanupFailed(PostMergeCleanupError::Baseline(
                 BaselineReplacementError::Generation(detail)
             )) if detail.as_str() == "baseline generation failed"
         ));
@@ -985,7 +988,7 @@ mod tests {
 
         assert!(matches!(
             error,
-            BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(
+            BaseMergeError::ConflictedCleanupFailed(PostMergeCleanupError::Views(
                 ViewsRegenerationError::Regeneration(detail)
             )) if detail.as_str() == "cleanup failed"
         ));
@@ -1608,6 +1611,14 @@ mod tests {
                 ViewsRegenerationError::Regeneration(DiagnosticText::new("views failed")),
             )),
             BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(
+                ViewsRegenerationError::Regeneration(detail),
+            )) if detail.as_str() == "views failed"
+        ));
+        assert!(matches!(
+            BaseMergeError::ConflictedCleanupFailed(PostMergeCleanupError::Views(
+                ViewsRegenerationError::Regeneration(DiagnosticText::new("views failed")),
+            )),
+            BaseMergeError::ConflictedCleanupFailed(PostMergeCleanupError::Views(
                 ViewsRegenerationError::Regeneration(detail),
             )) if detail.as_str() == "views failed"
         ));
