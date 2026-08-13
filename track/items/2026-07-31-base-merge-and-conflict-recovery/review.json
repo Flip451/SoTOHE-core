@@ -7930,6 +7930,43 @@
           "hash": "rvw1:sha256:fd79a8f84f05ee9bed2d2f65baf8c0eb80db22c98fb31d55883b239ad0faad09",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T09:56:54Z",
+          "findings": [
+            {
+              "category": "freshness-gate",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 335,
+              "message": "`git diff --name-only` proves only that the path changed, not that a regenerated signal blob exists at the tip; deletions and mode-only changes also produce output. Because this adapter reads the working-tree file, a tip can delete or only chmod the committed signal while an old copy with `head_commit == HEAD^1` remains in the worktree, and the stale document is accepted as fresh. Bind the worktree document to an existing regular-file blob at `HEAD` and require that blob's object ID to differ from `HEAD^1` (and apply the same blob-level predicate in `merge_gate_freshness.rs`).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1efd83a64e83fd392a8bfc4bd00addf331c95332e745417aae91c0806299c1bc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T10:28:16Z",
+          "findings": [
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/signal_report/mod.rs",
+              "line": 735,
+              "message": "The production portion of this module is now 734 lines, exceeding `architecture-rules.json`'s hard 700-line limit; `bin/sotp verify module-size --project-root .` fails on this file. Split the newly added freshness/blob-reading logic into a sibling production module so the gate passes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fa6f2e7bf93e3e7800fd71ee801cc44e084e48e86e35d65059024ca401941cde",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T10:44:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc7f5106fb21ad5254ea215fcbf69ceb875e37a1fe4d730dcd6b2a2634c9516a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

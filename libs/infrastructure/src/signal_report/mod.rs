@@ -28,6 +28,9 @@ use crate::verify::catalogue_spec_signals::{
 };
 use crate::verify::tddd_layers;
 
+mod freshness;
+use freshness::validate_impl_catalog_freshness;
+
 /// Secondary adapter that reads persisted signal artifacts and derives the two
 /// non-persisted occurrence chains in memory.
 pub struct SystemSignalReportSourceAdapter;
@@ -246,12 +249,10 @@ impl SystemSignalReportSourceAdapter {
         for binding in bindings {
             let signals_path =
                 track_file(root, track_id, &binding.signal_file(), SignalReportChain::ImplCatalog)?;
-            let document = type_signals_codec::decode(&read_text(
-                root,
-                &signals_path,
-                SignalReportChain::ImplCatalog,
-            )?)
-            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
+            let signal_text = read_text(root, &signals_path, SignalReportChain::ImplCatalog)?;
+            let document = type_signals_codec::decode(&signal_text).map_err(|_| {
+                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+            })?;
             let catalogue_path = track_file(
                 root,
                 track_id,
@@ -282,6 +283,12 @@ impl SystemSignalReportSourceAdapter {
             {
                 return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
             }
+            validate_impl_catalog_freshness(
+                root,
+                &signals_path,
+                document.cache_key().head_commit(),
+                signal_text.as_bytes(),
+            )?;
             validate_impl_catalog_coverage(&catalogue, &document)?;
             let location = relative(root, &signals_path, SignalReportChain::ImplCatalog)?;
             for signal in document.signals() {
@@ -603,6 +610,8 @@ mod tests {
     use std::process::Command;
     use std::sync::Mutex;
 
+    use domain::CommitHash;
+
     use super::*;
 
     static CWD_LOCK: Mutex<()> = Mutex::new(());
@@ -665,6 +674,21 @@ mod tests {
         );
     }
 
+    fn git_output(root: &Path, args: &[&str]) -> String {
+        let output = Command::new("git")
+            .args(args)
+            .current_dir(root)
+            .output()
+            .expect("git must run for the fixture repository");
+        assert!(
+            output.status.success(),
+            "git {:?} failed: {}",
+            args,
+            String::from_utf8_lossy(&output.stderr)
+        );
+        String::from_utf8(output.stdout).expect("git fixture output must be UTF-8")
+    }
+
     fn infrastructure_catalogue() -> &'static str {
         include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
@@ -703,14 +727,37 @@ mod tests {
     /// `baseline_hash` must be the hash of exactly these bytes.
     const FIXTURE_BASELINE_BYTES: &[u8] = b"fixture-baseline";
 
-    fn fresh_impl_catalog_signals(_root: &Path, catalogue_text: &str) -> String {
+    fn current_head(root: &Path) -> String {
+        let mut output = Command::new("git")
+            .args(["rev-parse", "--verify", "HEAD"])
+            .current_dir(root)
+            .output()
+            .expect("git must run for the fixture repository");
+        if !output.status.success() {
+            run_git(root, &["add", "."]);
+            run_git(root, &["commit", "--no-gpg-sign", "-m", "fixture inputs"]);
+            output = Command::new("git")
+                .args(["rev-parse", "--verify", "HEAD"])
+                .current_dir(root)
+                .output()
+                .expect("git must run for the fixture repository");
+        }
+        assert!(output.status.success(), "fixture HEAD must resolve");
+        String::from_utf8(output.stdout).expect("fixture HEAD must be UTF-8").trim().to_owned()
+    }
+
+    fn fresh_impl_catalog_signals_with_timestamp(
+        root: &Path,
+        catalogue_text: &str,
+        generated_at: &str,
+    ) -> String {
         serde_json::to_string_pretty(&serde_json::json!({
             "schema_version": 4,
-            "generated_at": "2026-07-31T00:00:00Z",
+            "generated_at": generated_at,
             "declaration_hash": type_signals_codec::declaration_hash(catalogue_text.as_bytes())
                 .as_digest()
                 .as_str(),
-            "head_commit": "a".repeat(40),
+            "head_commit": current_head(root),
             "baseline_hash": type_signals_codec::baseline_hash(FIXTURE_BASELINE_BYTES)
                 .as_digest()
                 .as_str(),
@@ -722,6 +769,33 @@ mod tests {
             }],
         }))
         .expect("fixture signals must serialize")
+    }
+
+    fn fresh_impl_catalog_signals(root: &Path, catalogue_text: &str) -> String {
+        fresh_impl_catalog_signals_with_timestamp(root, catalogue_text, "2026-07-31T00:00:00Z")
+    }
+
+    fn commit_signal_artifact(root: &Path, signal_path: &Path, signal: &str, message: &str) {
+        fs::write(signal_path, signal).expect("fixture signal artifact must be written");
+        let relative_path = signal_path
+            .strip_prefix(root)
+            .expect("signal path must be inside fixture root")
+            .to_str()
+            .expect("signal path must be UTF-8")
+            .to_owned();
+        run_git(root, &["add", &relative_path]);
+        run_git(root, &["commit", "--no-gpg-sign", "-m", message]);
+    }
+
+    fn setup_committed_impl_signal_fixture() -> (tempfile::TempDir, TrackId, PathBuf, String) {
+        let root = tempfile::tempdir().expect("fixture root must be created");
+        let track = TrackId::try_new("report-test").expect("fixture track id must be valid");
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let signal_path = track_dir.join("infrastructure-type-signals.json");
+        let initial_signal = fresh_impl_catalog_signals(root.path(), &catalogue);
+        commit_signal_artifact(root.path(), &signal_path, &initial_signal, "initial signals");
+        (root, track, signal_path, catalogue)
     }
 
     fn prepare_catalogue_spec_source_with_catalogue(
@@ -1408,6 +1482,140 @@ mod tests {
                 .expect_err("changed type baseline must stale the persisted artifact");
         assert!(matches!(
             stale_baseline,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_signal_from_implementation_only_commit() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        fs::write(
+            track_dir.join("infrastructure-type-signals.json"),
+            fresh_impl_catalog_signals(root.path(), &catalogue),
+        )
+        .unwrap();
+
+        fs::write(root.path().join("implementation-only.rs"), "changed\n").unwrap();
+        run_git(root.path(), &["add", "implementation-only.rs"]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "implementation-only"]);
+
+        let error = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("an implementation-only commit must stale the signal artifact");
+        assert!(matches!(
+            error,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_accepts_signal_regenerated_in_all_in_one_commit() {
+        let (root, track, signal_path, catalogue) = setup_committed_impl_signal_fixture();
+        let regenerated = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-01T00:00:00Z",
+        );
+        fs::write(&signal_path, regenerated).unwrap();
+        fs::write(root.path().join("implementation.rs"), "changed\n").unwrap();
+        let relative_signal_path = signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap();
+        run_git(root.path(), &["add", relative_signal_path, "implementation.rs"]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "implementation and signals"]);
+
+        let occurrences = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect("a regenerated signal in the guarded commit must be accepted");
+        assert!(matches!(
+            occurrences.as_slice(),
+            [SignalReportOccurrence {
+                chain: SignalReportChain::ImplCatalog,
+                level: SignalReportLevel::Yellow,
+                ..
+            }]
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_stale_worktree_copy_over_fresh_commit() {
+        let (root, track, signal_path, catalogue) = setup_committed_impl_signal_fixture();
+        let stale = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-01T00:00:00Z",
+        );
+        let fresh = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-02T00:00:00Z",
+        );
+        fs::write(&signal_path, fresh).unwrap();
+        fs::write(root.path().join("implementation.rs"), "changed\n").unwrap();
+        let relative_signal_path = signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap();
+        run_git(root.path(), &["add", relative_signal_path, "implementation.rs"]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "fresh signals"]);
+        fs::write(&signal_path, stale).unwrap();
+
+        let error = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("a stale worktree copy must not ride on a fresh committed signal");
+        assert!(matches!(
+            error,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_signal_deleted_at_tip() {
+        let (root, track, signal_path, catalogue) = setup_committed_impl_signal_fixture();
+        let worktree_copy = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-03T00:00:00Z",
+        );
+        let relative_signal_path =
+            signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap().to_owned();
+        fs::remove_file(&signal_path).unwrap();
+        run_git(root.path(), &["add", "-u", &relative_signal_path]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "delete signals"]);
+        fs::write(&signal_path, worktree_copy).unwrap();
+
+        let error = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("a deleted committed signal must not be accepted from the worktree");
+        assert!(matches!(
+            error,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_signal_report_freshness_rejects_mode_only_signal_change() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let (root, _track, signal_path, _catalogue) = setup_committed_impl_signal_fixture();
+        let worktree_bytes = fs::read(&signal_path).unwrap();
+        let relative_signal_path =
+            signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap().to_owned();
+        run_git(root.path(), &["config", "core.filemode", "true"]);
+        let mut permissions = fs::metadata(&signal_path).unwrap().permissions();
+        permissions.set_mode(permissions.mode() | 0o111);
+        fs::set_permissions(&signal_path, permissions).unwrap();
+        run_git(root.path(), &["add", &relative_signal_path]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "mode-only signal change"]);
+
+        let recorded_head = CommitHash::try_new(
+            git_output(root.path(), &["rev-parse", "HEAD^1"]).trim().to_owned(),
+        )
+        .unwrap();
+        let error = validate_impl_catalog_freshness(
+            root.path(),
+            &signal_path,
+            &recorded_head,
+            &worktree_bytes,
+        )
+        .expect_err("a mode-only signal commit must not satisfy freshness");
+        assert!(matches!(
+            error,
             SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
         ));
     }

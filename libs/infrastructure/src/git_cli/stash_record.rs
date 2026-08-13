@@ -275,6 +275,12 @@ fn encode(record: &StashRecord) -> Result<Vec<u8>, String> {
     Ok(encoded)
 }
 
+fn sync_state_directory(state_dir: &Path) -> Result<(), String> {
+    File::open(state_dir)
+        .and_then(|directory| directory.sync_all())
+        .map_err(|error| format!("cannot persist guarded stash record directory: {error}"))
+}
+
 /// Hold the repository-wide lock for one guarded stash transaction.
 pub(crate) struct StashOperationLock {
     _file: File,
@@ -336,7 +342,8 @@ pub(crate) fn write(state_dir: &Path, record: &StashRecord) -> Result<(), String
         .map_err(|error| format!("cannot create guarded stash record: {error}"))?;
     file.write_all(&encoded)
         .map_err(|error| format!("cannot write guarded stash record: {error}"))?;
-    file.sync_all().map_err(|error| format!("cannot persist guarded stash record: {error}"))
+    file.sync_all().map_err(|error| format!("cannot persist guarded stash record: {error}"))?;
+    sync_state_directory(state_dir)
 }
 
 /// Clear a pairing record only when it still contains the expected outcome.
@@ -351,7 +358,8 @@ pub(crate) fn clear(state_dir: &Path, expected: &StashRecord) -> Result<(), Stri
         .map_err(|error| format!("cannot inspect guarded stash record before clear: {error}"))?;
     reject_non_regular(&path, &metadata)?;
     fs::remove_file(&path)
-        .map_err(|error| format!("cannot clear guarded stash pairing record: {error}"))
+        .map_err(|error| format!("cannot clear guarded stash pairing record: {error}"))?;
+    sync_state_directory(state_dir)
 }
 
 #[cfg(test)]

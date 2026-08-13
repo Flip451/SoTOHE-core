@@ -34,7 +34,10 @@ use usecase::verify_adr_signals::{
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 
-use super::merge_gate_freshness::{read_branch_evaluation_commit, signal_file_name_for};
+use super::merge_gate_freshness::{
+    read_branch_evaluation_commit, read_branch_signal_blob_id, signal_artifact_changed_in_tip,
+    signal_file_name_for,
+};
 pub use super::merge_gate_reader::GitShowTrackBlobReader;
 use crate::git_cli::isolation::isolated_bounded_git_output;
 use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind_isolated};
@@ -446,6 +449,10 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Ok(s) => s,
             Err(result) => return result,
         };
+        let tip_object_id = match read_branch_signal_blob_id(&self.repo_root, branch, &path) {
+            Ok(object_id) => object_id,
+            Err(error) => return BlobFetchResult::FetchError(error),
+        };
         match crate::tddd::type_signals_codec::decode(&text) {
             Ok(doc) => {
                 let evaluation_commit = match read_branch_evaluation_commit(&self.repo_root, branch)
@@ -458,6 +465,20 @@ impl TrackBlobReader for GitShowTrackBlobReader {
                         "{path}: type-signals head_commit mismatch (recorded={}, evaluation={}) — re-run `sotp signal calc-impl-catalog` and commit the refreshed evaluation result",
                         doc.cache_key().head_commit().as_ref(),
                         evaluation_commit.as_ref()
+                    ));
+                }
+                let signal_changed = match signal_artifact_changed_in_tip(
+                    &self.repo_root,
+                    branch,
+                    &path,
+                    &tip_object_id,
+                ) {
+                    Ok(changed) => changed,
+                    Err(error) => return BlobFetchResult::FetchError(error),
+                };
+                if !signal_changed {
+                    return BlobFetchResult::FetchError(format!(
+                        "{path}: type-signals artifact was not regenerated in the tip commit — re-run `sotp signal calc-impl-catalog` and commit the refreshed evaluation result"
                     ));
                 }
                 BlobFetchResult::Found(doc)
@@ -1626,11 +1647,44 @@ decisions:
     }
 
     #[test]
-    fn test_read_type_signals_allows_all_in_one_commit() {
+    fn test_read_type_signals_rejects_old_document_after_implementation_only_commit() {
         let dir = setup_repo_with_type_signals_at_evaluation_commit();
         std::fs::write(dir.path().join("implementation-only.rs"), "changed\n").unwrap();
         git(dir.path(), &["add", "implementation-only.rs"]);
-        git(dir.path(), &["commit", "--quiet", "--amend", "--no-edit"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "implementation-only change"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_signals("main", "foo", "domain") {
+            BlobFetchResult::FetchError(message) => {
+                assert!(message.contains("head_commit mismatch"), "{message}");
+                assert!(message.contains("sotp signal calc-impl-catalog"), "{message}");
+            }
+            other => panic!("expected stale head_commit rejection, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_type_signals_allows_all_in_one_commit() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        let signal_path = dir.path().join("track/items/foo/domain-type-signals.json");
+        let previous_signal = std::fs::read_to_string(&signal_path).unwrap();
+        let previous_evaluation =
+            git_output(dir.path(), &["rev-parse", "HEAD^1"]).trim().to_owned();
+        let current_evaluation = git_output(dir.path(), &["rev-parse", "HEAD"]).trim().to_owned();
+        let regenerated_signal = previous_signal
+            .replace(
+                &format!("\"head_commit\": \"{previous_evaluation}\""),
+                &format!("\"head_commit\": \"{current_evaluation}\""),
+            )
+            .replace("2026-04-18T12:00:00Z", "2026-04-19T12:00:00Z");
+        std::fs::write(&signal_path, regenerated_signal).unwrap();
+        std::fs::write(dir.path().join("implementation-only.rs"), "changed\n").unwrap();
+        git(
+            dir.path(),
+            &["add", "track/items/foo/domain-type-signals.json", "implementation-only.rs"],
+        );
+        git(dir.path(), &["commit", "--quiet", "-m", "implementation and signals"]);
         git(dir.path(), &["fetch", "--quiet", "origin"]);
 
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
@@ -1640,6 +1694,67 @@ decisions:
             }
             other => panic!("expected all-in-one commit to pass, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_read_type_signals_not_found_when_deleted_at_tip() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        git(dir.path(), &["rm", "--quiet", "track/items/foo/domain-type-signals.json"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "delete signals"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(matches!(
+            reader.read_type_signals("main", "foo", "domain"),
+            BlobFetchResult::NotFound
+        ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_signal_artifact_changed_in_tip_rejects_mode_only_change() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        git(dir.path(), &["config", "core.filemode", "true"]);
+        let signal_path = dir.path().join("track/items/foo/domain-type-signals.json");
+        let mut permissions = std::fs::metadata(&signal_path).unwrap().permissions();
+        permissions.set_mode(permissions.mode() | 0o111);
+        std::fs::set_permissions(&signal_path, permissions).unwrap();
+        git(dir.path(), &["add", "track/items/foo/domain-type-signals.json"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "mode-only signal change"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let signal_path = "track/items/foo/domain-type-signals.json";
+        let tip_object_id = read_branch_signal_blob_id(dir.path(), "main", signal_path)
+            .expect("tip signal blob id must be readable");
+        assert!(
+            !signal_artifact_changed_in_tip(dir.path(), "main", signal_path, &tip_object_id,)
+                .expect("parent signal blob id must be readable")
+        );
+    }
+
+    #[test]
+    fn test_signal_artifact_changed_in_tip_is_limited_to_requested_path() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+
+        assert!(
+            signal_artifact_changed_in_tip(
+                dir.path(),
+                "main",
+                "track/items/foo/domain-type-signals.json",
+                git_output(
+                    dir.path(),
+                    &[
+                        "rev-parse",
+                        "--verify",
+                        "origin/main:track/items/foo/domain-type-signals.json"
+                    ],
+                )
+                .trim(),
+            )
+            .expect("signal diff must be readable")
+        );
     }
 
     #[test]
