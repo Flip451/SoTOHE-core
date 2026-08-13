@@ -34,11 +34,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "bae7f06af282aee8040d468674b3c829f1561ae4",
       "description": "Modify `usecase::capability_exec::{ModelProviderName, CapabilityProviderBinding, CapabilityProfile, CapabilityInputValidationError}` and unit coverage. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "bae7f06af282aee8040d468674b3c829f1561ae4",
       "depends_on": [
         "T001"
       ],
@@ -47,6 +49,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "bae7f06af282aee8040d468674b3c829f1561ae4",
       "depends_on": [
         "T001"
       ],
@@ -55,6 +58,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "bae7f06af282aee8040d468674b3c829f1561ae4",
       "description": "Modify `README.md` documentation. [IN-03; OUT-03; CN-02; AC-03]",
       "id": "T004",
       "status": "done"
@@ -62,7 +66,7 @@
     {
       "description": "Modify `README.md` documentation. [CN-02; AC-04]",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Modify `README.md` documentation. [IN-04; OUT-04; CN-03; AC-05]",

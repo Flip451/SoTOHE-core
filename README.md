@@ -136,7 +136,25 @@ dispatch 経路だけが行う。
 typed-pipeline の provider gate は `codex` のままであり、外部 provider への routing を設定で
 有効化できない。DeepSeek、GLM (Z.ai)、Qwen (DashScope) の typed-pipeline capability としての
 verdict envelope / structured output 準拠も未検証である。この未検証状態は、接続経路が実際に
-選択されることを意味しない。
+選択されることを意味しない。provider ごとの status と更新条件は、次の表で管理する。
+
+### typed-pipeline の検証ステータス
+
+`typed-pipeline` の provider gate が `codex` のまま維持されることと、外部 provider が
+typed-pipeline の出力契約に準拠することは別の判定である。現時点では、次の provider は
+すべて **未検証** として扱う。
+
+| 外部 provider | typed-pipeline 準拠 | status の扱いと、別に扱う既知の制約 |
+|---|---|---|
+| DeepSeek | 未検証 | provider 固有の実行で `verdict envelope` と `structured output` の両方が受理されるまで未検証。 |
+| GLM (Z.ai) | 未検証 | Chat Completions / Responses の互換性とは別に、typed-pipeline 準拠は未検証。 |
+| Qwen (DashScope) | 未検証 | Anthropic 互換経路の system-message gap とは別に、typed-pipeline 準拠は未検証。 |
+
+ここで `検証済み` に更新できるのは、対象 provider を使った typed-pipeline の実行が実際に
+成功し、`verdict envelope` と `structured output` の両方を pipeline が受理した場合だけである。
+`config.toml` の接続確認、通常の会話応答、Anthropic 互換 subprocess の動作確認だけでは
+検証済みとはしない。検証結果が得られたら、この README の表の該当行を provider 単位で更新する。
+`agent-profiles.json` の `model_provider` 設定や `sotp` の provider gate は、この status を自動更新しない。
 
 GLM (Z.ai) を Codex の custom provider として直接使うことは、現行の公式 OpenAI 互換 endpoint
 （Chat Completions）と Codex の Responses-only 制約が一致しないため未対応である。
