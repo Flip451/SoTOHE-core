@@ -31,21 +31,25 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "900b1387c72fc2e58ec864d6eef5d96126d18c3d",
       "description": "Amend `.harness/workflows/adr/add.md` `Conduct the hearing` Full-hearing sequence with the D1 check. [D1; IN-01; CN-01; AC-01; AC-03]",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "900b1387c72fc2e58ec864d6eef5d96126d18c3d",
       "description": "Amend `.harness/custom/review-prompts/adr.md` `What to report` criteria with the D1 check. [D1; IN-01; CN-01; AC-01; AC-03]",
       "id": "T002",
       "status": "done"
     },
     {
+      "commit_hash": "900b1387c72fc2e58ec864d6eef5d96126d18c3d",
       "description": "Amend `.harness/custom/review-prompts/types.md` reviewer criteria with the D2 check. [D2; IN-02; CN-02; AC-02]",
       "id": "T003",
       "status": "done"
     },
     {
+      "commit_hash": "900b1387c72fc2e58ec864d6eef5d96126d18c3d",
       "description": "Amend `.harness/custom/review-prompts/impl-plan.md` reviewer criteria with the D2 check. [D2; IN-02; CN-02; AC-02]",
       "id": "T004",
       "status": "done"
