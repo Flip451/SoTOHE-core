@@ -1,0 +1,174 @@
+{
+  "entries": [
+    {
+      "claim_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsOutcome",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "028210a3ea326fbaa75892c4e2c6351d13d97edb7e9a1e248fd76667c9109677",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "`check-zero-findings` が `NotRequired(Empty)` を pass と判定し、pass 出力で対象 scope が空であることを明示する振る舞いを実現する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "`check-zero-findings` が `NotRequired(Empty)` を pass と判定し、pass 出力で対象 scope が空であることを明示する振る舞いを実現する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsOutcome",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "04d82f29ab7536fb1d8be65dbb1add211c51dc96afa5fb96f8166d471836faa9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "empty diff の scope に対する `check-zero-findings --scope <scope> --round final` は pass となり、その出力に scope が empty である旨が含まれる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "empty diff の scope に対する `check-zero-findings --scope <scope> --round final` は pass となり、その出力に scope が empty である旨が含まれる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsOutcome",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2d60ba86643671437ec830cea40762755986624385bd61fbb38420d093614adf",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "非空 scope において従来 failure となる `check-zero-findings` の条件は、empty scope pass の導入後も failure となる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "非空 scope において従来 failure となる `check-zero-findings` の条件は、empty scope pass の導入後も failure となる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsOutcome",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d6e880eeab045856f90be32c647be580756f68a47be02b063fcf3832bfec3bfd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "empty scope は final zero_findings verdict の記録がなくても、empty であることだけを理由として pass となる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "empty scope は final zero_findings verdict の記録がなくても、empty であることだけを理由として pass となる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsOutcome",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "44f06e282595b0ec3d2c2c39d2b8ae68ca835925f53041c80546e586b970e7f2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "空 scope のみを `NotRequired(Empty)` から pass に写し、非空 scope に対する failure の振る舞いは変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "空 scope のみを `NotRequired(Empty)` から pass に写し、非空 scope に対する failure の振る舞いは変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsOutcome",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f653171f01b39a93ffb2ab86f10ec18b2044c23ed869feecaada4edccd28fd82",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "空 scope による pass の出力は、pass の理由が empty scope であることを利用者に明示しなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "空 scope による pass の出力は、pass の理由が empty scope であることを利用者に明示しなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewCheckZeroFindingsOutcome",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "69f4fa7b012e882e18f11138df323178689c454299038d0263b4308991e6ab2e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "空 scope pass の健全性は、commit が guarded 経路だけを通り、commit gate が review approval を要求する既存の保証を前提とし、この前提を緩和または代替する変更は含めない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "空 scope pass の健全性は、commit が guarded 経路だけを通り、commit gate が review approval を要求する既存の保証を前提とし、この前提を緩和または代替する変更は含めない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

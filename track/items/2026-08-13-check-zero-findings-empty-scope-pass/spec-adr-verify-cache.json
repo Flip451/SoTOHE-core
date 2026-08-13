@@ -1,0 +1,304 @@
+{
+  "entries": [
+    {
+      "claim_hash": "d11928603c8000814de84c5125b2508cf0222013df63a4d96cbb0007875c3291",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "正規の guarded commit 後の phase pre-entry で `check-zero-findings --scope <scope> --round final` を実行しても、対象 scope の diff が空であることを整合的な不在として扱い、phase entry を妨げないようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "非空 scope に対する fail は不変。pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "028210a3ea326fbaa75892c4e2c6351d13d97edb7e9a1e248fd76667c9109677",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "`check-zero-findings` が `NotRequired(Empty)` を pass と判定し、pass 出力で対象 scope が空であることを明示する振る舞いを実現する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`NotRequired(Empty)` を pass に写す\n\n非空 scope に対する fail は不変。pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9d014b17c6740cdafbc894f5ff33bad2223f06354767043b7873a9ac62aa3ab0",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "D1 の振る舞いを実装した後、`.harness/config/phase-commands.json` に一時的に除去された pre-entry の `check-zero-findings` エントリを復旧する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D1 実装後、除去済みの pre-entry エントリを `.harness/config/phase-commands.json` に戻す。除去状態を恒久化しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "80d1af1042adfdd7fab4b55719d3d544553954093c6cdca2f49e13ef94cbce97",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "空 scope を pass とするために、最新 round が final zero_findings であるという履歴要件を追加することは本 track の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`NotRequired(Empty)` を pass に写す",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f51754faec3d5fbf53165f22c9600a35e5e4d77c3be20b729ecce5d5597b00ae",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "phase gate のために scope diff の base 意味論を再定義することは本 track の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "非空 scope に対する fail は不変。pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6934c51585ff345b244ac74329cdea29ce9864b004388f3c40945b605a025cd9",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "pre-entry の `check-zero-findings` エントリを phase 宣言から恒久的に除去することは本 track の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "除去状態を恒久化しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44f06e282595b0ec3d2c2c39d2b8ae68ca835925f53041c80546e586b970e7f2",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "空 scope のみを `NotRequired(Empty)` から pass に写し、非空 scope に対する failure の振る舞いは変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "非空 scope に対する fail は不変。pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f653171f01b39a93ffb2ab86f10ec18b2044c23ed869feecaada4edccd28fd82",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "空 scope による pass の出力は、pass の理由が empty scope であることを利用者に明示しなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "69f4fa7b012e882e18f11138df323178689c454299038d0263b4308991e6ab2e",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "空 scope pass の健全性は、commit が guarded 経路だけを通り、commit gate が review approval を要求する既存の保証を前提とし、この前提を緩和または代替する変更は含めない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "### D1: `NotRequired(Empty)` を pass に写す\n\n非空 scope に対する fail は不変。pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "04d82f29ab7536fb1d8be65dbb1add211c51dc96afa5fb96f8166d471836faa9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "empty diff の scope に対する `check-zero-findings --scope <scope> --round final` は pass となり、その出力に scope が empty である旨が含まれる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2d60ba86643671437ec830cea40762755986624385bd61fbb38420d093614adf",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "非空 scope において従来 failure となる `check-zero-findings` の条件は、empty scope pass の導入後も failure となる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "非空 scope に対する fail は不変。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d6e880eeab045856f90be32c647be580756f68a47be02b063fcf3832bfec3bfd",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "empty scope は final zero_findings verdict の記録がなくても、empty であることだけを理由として pass となる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "非空 scope に対する fail は不変。pass 出力には empty scope である旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1960d9654fc7521b10ad4b0c0d66b1174e788644d3fc38e48bcc0f13f3d2aec0",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "D1 の実装後、`.harness/config/phase-commands.json` に pre-entry の `check-zero-findings` エントリが存在し、canonical phase entry がその検査を実行できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "db32d54eb1be4332f029778d844e998c38c4422a04c394e55a6ffd89cd5db067",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1736-check-zero-findings-empty-scope-pass.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D1 実装後、除去済みの pre-entry エントリを `.harness/config/phase-commands.json` に戻す。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}
