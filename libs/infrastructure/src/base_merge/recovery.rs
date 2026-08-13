@@ -238,17 +238,10 @@ fn run_exact_commit_replacement(
     let removal = remove_commit_pinned_worktree(&repository_root, &worktree)
         .map_err(|error| format!("cannot unregister detached cleanup worktree: {error}"));
     let directory_cleanup = cleanup_directory(&worktree, "detached cleanup worktree");
-    // Clean merge retains the exchanged prior tree for the later sync-base
-    // transaction.
-    let replacement_cleanup = if result.is_err()
-        && !published
-        && !exchanged
-        && !matches!(
-            &result,
-            Err(ExactCommitReplacementError::Baseline(
-                BaselineReplacementError::Restoration { .. }
-            ))
-        ) {
+    // A failed publication is report-only. Remove the staging tree without
+    // attempting to restore the prior baseline; manual baseline capture is
+    // the sanctioned recovery route.
+    let replacement_cleanup = if result.is_err() && !published {
         cleanup_directory(&replacement, "baseline replacement staging directory")
     } else {
         Ok(())
@@ -343,9 +336,6 @@ fn append_cleanup_failure(
         }
         BaselineReplacementError::Publish(detail) => {
             BaselineReplacementError::Publish(append(detail))
-        }
-        BaselineReplacementError::Restoration { publish, restoration } => {
-            BaselineReplacementError::Restoration { publish, restoration: append(restoration) }
         }
     }
 }

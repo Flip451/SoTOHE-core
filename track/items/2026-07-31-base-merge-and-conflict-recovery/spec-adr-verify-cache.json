@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "0db41d34a6e3806224f7642dc754e4d071070e340838abb0d681d12b3f5e56a2",
+      "claim_hash": "27adb3eb84cc7687b6631f27fcfae3d641d0661b51ebce1fced70db07e460736",
       "claim_origin": {
         "data": {
           "element_id": "GO-01",
@@ -24,7 +24,7 @@
       }
     },
     {
-      "claim_hash": "0db41d34a6e3806224f7642dc754e4d071070e340838abb0d681d12b3f5e56a2",
+      "claim_hash": "27adb3eb84cc7687b6631f27fcfae3d641d0661b51ebce1fced70db07e460736",
       "claim_origin": {
         "data": {
           "element_id": "GO-01",
@@ -33,7 +33,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -47,7 +47,7 @@
       }
     },
     {
-      "claim_hash": "0db41d34a6e3806224f7642dc754e4d071070e340838abb0d681d12b3f5e56a2",
+      "claim_hash": "27adb3eb84cc7687b6631f27fcfae3d641d0661b51ebce1fced70db07e460736",
       "claim_origin": {
         "data": {
           "element_id": "GO-01",
@@ -56,30 +56,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "0db41d34a6e3806224f7642dc754e4d071070e340838abb0d681d12b3f5e56a2",
-      "claim_origin": {
-        "data": {
-          "element_id": "GO-01",
-          "section": "goal",
-          "text_label": "Permit an active track to safely incorporate the base branch recorded in its branch-strategy snapshot and complete its cleanup against the exact merged base commit, while preserving the prohibition on merging a track into its base branch."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -88,7 +65,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。",
+        "citation": "競合した merge の後始末も Baseline → Views の順でのみ完了し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。",
         "kind": "pass"
       }
     },
@@ -185,12 +162,12 @@
       }
     },
     {
-      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
+      "claim_hash": "3e297fa8d3dbe8947e4eedfd5beb64a948a2de09aaa83db4d668c50fefdb43c6",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views."
         },
         "kind": "spec_element"
       },
@@ -208,16 +185,16 @@
       }
     },
     {
-      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
+      "claim_hash": "3e297fa8d3dbe8947e4eedfd5beb64a948a2de09aaa83db4d668c50fefdb43c6",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -231,39 +208,16 @@
       }
     },
     {
-      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
+      "claim_hash": "3e297fa8d3dbe8947e4eedfd5beb64a948a2de09aaa83db4d668c50fefdb43c6",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
-      "claim_origin": {
-        "data": {
-          "element_id": "IN-02",
-          "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -272,53 +226,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7bf749a6d9682efb36aef1627911df2cec8e6cc4390ff1fbdc856f17797fb15c",
-      "claim_origin": {
-        "data": {
-          "element_id": "IN-06",
-          "section": "in_scope",
-          "text_label": "Persist synchronization of the exact base commit incorporated by a successful guarded merge only after its baseline and view stages succeed."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "7bf749a6d9682efb36aef1627911df2cec8e6cc4390ff1fbdc856f17797fb15c",
-      "claim_origin": {
-        "data": {
-          "element_id": "IN-06",
-          "section": "in_scope",
-          "text_label": "Persist synchronization of the exact base commit incorporated by a successful guarded merge only after its baseline and view stages succeed."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D3",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
+        "citation": "競合なしの merge の後始末は Baseline → Views の順でのみ完了する。",
         "kind": "pass"
       }
     },
@@ -530,12 +438,12 @@
       }
     },
     {
-      "claim_hash": "c5325f5246825998e31960130e1fa9a212630f14117fe343d0e090d6523d4a60",
+      "claim_hash": "72f5a94fdd1b4f5899fbfb86e77e9d5b69623c0564393a6f4076cb1fd538a07e",
       "claim_origin": {
         "data": {
           "element_id": "CN-02",
           "section": "constraint",
-          "text_label": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages; conflicted merge outcomes do not write a sync-base record."
+          "text_label": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages."
         },
         "kind": "spec_element"
       },
@@ -553,16 +461,16 @@
       }
     },
     {
-      "claim_hash": "c5325f5246825998e31960130e1fa9a212630f14117fe343d0e090d6523d4a60",
+      "claim_hash": "72f5a94fdd1b4f5899fbfb86e77e9d5b69623c0564393a6f4076cb1fd538a07e",
       "claim_origin": {
         "data": {
           "element_id": "CN-02",
           "section": "constraint",
-          "text_label": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages; conflicted merge outcomes do not write a sync-base record."
+          "text_label": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -571,7 +479,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\nSyncBaseStamp は競合なしの merge に限る。",
+        "citation": "競合した merge の後始末も Baseline → Views の順でのみ完了し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。",
         "kind": "pass"
       }
     },
@@ -654,7 +562,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -677,7 +585,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -686,67 +594,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
+        "citation": "競合した merge の後始末も Baseline → Views の順でのみ完了し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "fec9f51822fa405898d85893766aebb116d434e197689026e6028703cdb42813",
-      "claim_origin": {
-        "data": {
-          "element_id": "CN-06",
-          "section": "constraint",
-          "text_label": "The sync-base record must use the exact base commit incorporated by the guarded merge and be written only after that clean merge's baseline and view stages succeed."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "fec9f51822fa405898d85893766aebb116d434e197689026e6028703cdb42813",
-      "claim_origin": {
-        "data": {
-          "element_id": "CN-06",
-          "section": "constraint",
-          "text_label": "The sync-base record must use the exact base commit incorporated by the guarded merge and be written only after that clean merge's baseline and view stages succeed."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D3",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "218fe049b3f5391fbe9ebd9605f7a1934ff6fa06d51f2cc6c98351f615eb94f6",
+      "claim_hash": "432083447df59f23c7dc2faaee26416aff5a00ede4d8a550d780975f50906863",
       "claim_origin": {
         "data": {
           "element_id": "CN-07",
           "section": "constraint",
-          "text_label": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure."
+          "text_label": "Both clean and conflicted merge cleanup may complete only in the order Baseline then Views. A conflicted merge's views read only persisted signals, baseline, and track artifacts, and either stage reports failure when it fails."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -755,7 +617,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。\n\n競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nSyncBaseStamp は競合なしの merge に限る。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
+        "citation": "競合なしの merge の後始末は Baseline → Views の順でのみ完了する。\n\n競合した merge の後始末も Baseline → Views の順でのみ完了し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
         "kind": "pass"
       }
     },
@@ -806,12 +668,12 @@
       }
     },
     {
-      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
+      "claim_hash": "58becbe0f1c596be1377430428840be620ed8637e9fa43a6c8dd08ef8ccf7f87",
       "claim_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage."
         },
         "kind": "spec_element"
       },
@@ -829,16 +691,16 @@
       }
     },
     {
-      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
+      "claim_hash": "58becbe0f1c596be1377430428840be620ed8637e9fa43a6c8dd08ef8ccf7f87",
       "claim_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -847,44 +709,21 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "baseline は merge が取り込んだ exact base commit から再生成する。",
+        "citation": "baseline はガード付き merge コマンドが実際に取り込んだ base commit から再生成する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
+      "claim_hash": "58becbe0f1c596be1377430428840be620ed8637e9fa43a6c8dd08ef8ccf7f87",
       "claim_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
-      "claim_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -893,17 +732,17 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
+        "citation": "競合なしの merge の後始末は Baseline → Views の順でのみ完了する。\n\n表示用ファイルは baseline の確定後に一度だけ生成する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "3c33695aa5ec09085a3265ae03d1114da000072e324b6a71f2dd73a96fa3d0fe",
+      "claim_hash": "7e9ce9e2e686833a8a221dec57678a0cffd5be4da84cf031b426702852e57340",
       "claim_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit."
         },
         "kind": "spec_element"
       },
@@ -921,16 +760,16 @@
       }
     },
     {
-      "claim_hash": "3c33695aa5ec09085a3265ae03d1114da000072e324b6a71f2dd73a96fa3d0fe",
+      "claim_hash": "7e9ce9e2e686833a8a221dec57678a0cffd5be4da84cf031b426702852e57340",
       "claim_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -939,7 +778,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nSyncBaseStamp は競合なしの merge に限る。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
+        "citation": "競合した merge の後始末も Baseline → Views の順でのみ完了し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nいずれかの段階が失敗した場合は失敗を報告する。\n\nbaseline は手動で再取得できるため、差し替え失敗のための専用回復機構は設けず、競合解消の正規回復 workflow とは区別する。",
         "kind": "pass"
       }
     },
@@ -1068,7 +907,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -1082,62 +921,16 @@
       }
     },
     {
-      "claim_hash": "5c11a380b5604cad3eef4ab1b89817c128104488df8ac05d563b618d3655d8cc",
-      "claim_origin": {
-        "data": {
-          "element_id": "AC-11",
-          "section": "acceptance_criteria",
-          "text_label": "Following successful baseline and view stages of a clean guarded merge, the sync-base record contains the exact base commit that merge incorporated."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "sync-base stamp はガード付き merge コマンドが実際に取り込んだ base commit を記録する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "5c11a380b5604cad3eef4ab1b89817c128104488df8ac05d563b618d3655d8cc",
-      "claim_origin": {
-        "data": {
-          "element_id": "AC-11",
-          "section": "acceptance_criteria",
-          "text_label": "Following successful baseline and view stages of a clean guarded merge, the sync-base record contains the exact base commit that merge incorporated."
-        },
-        "kind": "spec_element"
-      },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
-      "evidence_origin": {
-        "data": {
-          "decision_id": "D3",
-          "file_path": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        "kind": "adr_decision"
-      },
-      "verdict": {
-        "citation": "競合なしの merge の後始末は Baseline → Views → SyncBaseStamp の順で実行する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6fc35b2994fa9c46b8fd998ea21543540371efab54383c52e180b40658614d37",
+      "claim_hash": "ae4678fe713ebfb484c98539f7c25791b8dd52d8e56a54087e36c1962f975de8",
       "claim_origin": {
         "data": {
           "element_id": "AC-12",
           "section": "acceptance_criteria",
-          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported."
+          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; any stage failure is reported."
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "155f960815811b78811e4c0eb5c76b6843a648664ac505802f8bfed46de86036",
+      "evidence_hash": "1b483f17c92f7b7aa3df51c0ee5b26bedf5bef0957189f1ff05b659e0fe61366",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -1146,7 +939,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "競合した merge の後始末は Baseline → Views の順で実行し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nSyncBaseStamp は競合なしの merge に限る。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
+        "citation": "競合した merge の後始末も Baseline → Views の順でのみ完了し、Baseline の供給源には競合中の作業ツリーではなく、ガード付き merge コマンドが実際に取り込んだ base commit を用いる。\n\n競合した merge の Views は永続済みの信号、baseline、track 成果物のみを読み、競合中のソースコードには依存しない。\n\nいずれかの段階が失敗した場合は失敗を報告する。",
         "kind": "pass"
       }
     },

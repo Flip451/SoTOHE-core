@@ -68,10 +68,7 @@
       {"layer": "usecase", "entry_key": "BaseMergeCleanupRequest"},
       {"layer": "usecase", "entry_key": "PostMergeCleanupError"},
       {"layer": "usecase", "entry_key": "ViewsRegenerationError"},
-      {"layer": "usecase", "entry_key": "BaselineReplacementError"},
-      {"layer": "usecase", "entry_key": "SyncBaseRecordError"},
-      {"layer": "infrastructure", "entry_key": "SyncBaseRecordSchemaVersion"},
-      {"layer": "infrastructure", "entry_key": "SyncBaseRecord"}
+      {"layer": "usecase", "entry_key": "BaselineReplacementError"}
     ],
     "T011": [
       {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"}
@@ -116,6 +113,19 @@
       {"layer": "usecase", "entry_key": "BaseMergeError"},
       {"layer": "usecase", "entry_key": "BaseMergeGitError"},
       {"layer": "infrastructure", "entry_key": "FsBaseMergeGitAdapter"}
+    ],
+    "T026": [
+      {"layer": "domain", "entry_key": "TypeSignalsReuseInput"},
+      {"layer": "domain", "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeService"},
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupPort"},
+      {"layer": "usecase", "entry_key": "BaselineReplacementError"},
+      {"layer": "usecase", "entry_key": "PostMergeCleanupError"},
+      {"layer": "usecase", "entry_key": "TrackBlobReader"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"}
     ]
   }
 }

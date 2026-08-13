@@ -38,7 +38,7 @@ baseline はガード付き merge コマンドが実際に取り込んだ base c
 
 いずれかの段階が失敗した場合は失敗を報告する。
 
-baseline は手動で再取得できるため、差し替え失敗のための専用回復機構は設けず、競合解消の正規回復 workflow とは区別する。
+baseline は手動で再取得できるため、失敗からの回復手段は設けない。
 
 ### Existing decision relationship
 

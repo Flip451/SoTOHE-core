@@ -386,8 +386,7 @@ mod tests {
     use usecase::base_merge::{
         BaseMergeAttemptOutcome, BaseMergeCleanupPort, BaseMergeCleanupRequest,
         BaseMergeContextError, BaseMergeContextPort, BaseMergeGitError, BaseMergeGitPort,
-        BaselineReplacementError, PostMergeCleanupError, SyncBaseRecordError,
-        ViewsRegenerationError,
+        BaselineReplacementError, PostMergeCleanupError, ViewsRegenerationError,
     };
 
     struct UnusedTrackService;
@@ -613,14 +612,6 @@ mod tests {
             self.record("baseline", request);
             Ok(())
         }
-
-        fn write_sync_base_record(
-            &self,
-            request: &BaseMergeCleanupRequest,
-        ) -> Result<(), SyncBaseRecordError> {
-            self.record("sync-base", request);
-            Ok(())
-        }
     }
 
     // ── render_fixpoint_resolve_outcome ─────────────────────────────────────
@@ -787,7 +778,7 @@ mod tests {
         let cleanup_calls = cleanup_calls.lock().unwrap();
         assert_eq!(
             cleanup_calls.iter().map(|(stage, _)| *stage).collect::<Vec<_>>(),
-            vec!["baseline", "views", "sync-base"]
+            vec!["baseline", "views"]
         );
         for (_, request) in cleanup_calls.iter() {
             assert_eq!(request.workspace_root, workspace);

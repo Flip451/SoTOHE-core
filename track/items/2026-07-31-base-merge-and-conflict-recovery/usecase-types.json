@@ -205,18 +205,6 @@
       "trait_ref": "core::error::Error"
     },
     {
-      "for_type": "SyncBaseRecordError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "SyncBaseRecordError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "SyncBaseRecordError",
-      "trait_ref": "core::error::Error"
-    },
-    {
       "for_type": "PostMergeCleanupError",
       "trait_ref": "core::fmt::Debug"
     },
@@ -292,7 +280,7 @@
   "traits": {
     "BaseMergeCleanupPort": {
       "action": "add",
-      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12). Synchronous by design: sequential cleanup stages over local filesystem and process boundaries.",
+      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12). Synchronous by design: sequential baseline and view stages over local filesystem and process boundaries.",
       "informal_grounds": [],
       "methods": [
         {
@@ -322,20 +310,6 @@
           ],
           "receiver": "&self",
           "returns": "Result<(), BaselineReplacementError>"
-        },
-        {
-          "docs": "[IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "write_sync_base_record",
-          "params": [
-            {
-              "name": "request",
-              "ty": "&BaseMergeCleanupRequest"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<(), SyncBaseRecordError>"
         }
       ],
       "module_path": "base_merge",
@@ -352,10 +326,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
@@ -369,10 +339,6 @@
         },
         {
           "anchor": "AC-10",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -430,7 +396,7 @@
     },
     "BaseMergeGitPort": {
       "action": "add",
-      "docs": "Synchronous port by design. IN-01 / IN-02 / CN-01 / CN-06 / AC-01 / AC-02 / AC-03 / AC-04 / AC-11.",
+      "docs": "Synchronous port by design. IN-01 / IN-02 / CN-01 / AC-01 / AC-02 / AC-03 / AC-04.",
       "informal_grounds": [],
       "methods": [
         {
@@ -496,15 +462,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ],
@@ -515,7 +473,7 @@
     },
     "BaseMergeService": {
       "action": "add",
-      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "methods": [
         {
@@ -546,19 +504,11 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-01",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
           "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -583,10 +533,6 @@
         },
         {
           "anchor": "AC-10",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1040,15 +986,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1061,10 +999,6 @@
         },
         {
           "anchor": "AC-10",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1174,7 +1108,7 @@
     },
     "BaseMergeError": {
       "action": "add",
-      "docs": "IN-01 / IN-02 / IN-06 / CN-01 / CN-05 / CN-06 / CN-07 / AC-01 / AC-02 / AC-03 / AC-04 / AC-10 / AC-12. Conflict-cleanup failure payload: PostMergeCleanupError.",
+      "docs": "IN-01 / IN-02 / CN-01 / CN-05 / CN-07 / AC-01 / AC-02 / AC-03 / AC-04 / AC-10 / AC-12. Conflict-cleanup failure payload: PostMergeCleanupError.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1277,15 +1211,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1355,7 +1281,7 @@
     },
     "BaseMergeInteractor": {
       "action": "add",
-      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1380,19 +1306,11 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-01",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
           "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1420,10 +1338,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "AC-11",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-12",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
@@ -1431,7 +1345,7 @@
     },
     "BaseMergeOutcome": {
       "action": "add",
-      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [IN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-06), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-06), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-11](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-11), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1465,19 +1379,11 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-01",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
           "anchor": "CN-05",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1505,10 +1411,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "AC-11",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-12",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
@@ -1516,7 +1418,7 @@
     },
     "BaselineReplacementError": {
       "action": "add",
-      "docs": "Error type for baseline replacement.",
+      "docs": "Error type for baseline replacement failures.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1556,22 +1458,6 @@
               ],
               "kind": "tuple"
             }
-          },
-          {
-            "name": "Restoration",
-            "payload": {
-              "fields": [
-                {
-                  "name": "publish",
-                  "ty": "DiagnosticText"
-                },
-                {
-                  "name": "restoration",
-                  "ty": "DiagnosticText"
-                }
-              ],
-              "kind": "struct"
-            }
           }
         ]
       },
@@ -1582,19 +1468,11 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-05",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
           "anchor": "CN-07",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-03",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
@@ -1816,15 +1694,6 @@
               ],
               "kind": "tuple"
             }
-          },
-          {
-            "name": "SyncBaseStamp",
-            "payload": {
-              "fields": [
-                "SyncBaseRecordError"
-              ],
-              "kind": "tuple"
-            }
           }
         ]
       },
@@ -1843,10 +1712,6 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "CN-07",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
@@ -1856,91 +1721,6 @@
         },
         {
           "anchor": "AC-10",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-12",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        }
-      ]
-    },
-    "SyncBaseRecordError": {
-      "action": "add",
-      "docs": "Error type for sync-base record operations.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Generation",
-            "payload": {
-              "fields": [
-                "DiagnosticText"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "Validation",
-            "payload": {
-              "fields": [
-                "DiagnosticText"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "Write",
-            "payload": {
-              "fields": [
-                "DiagnosticText"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "Replacement",
-            "payload": {
-              "fields": [
-                "DiagnosticText"
-              ],
-              "kind": "tuple"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "base_merge",
-      "role": {
-        "ErrorType": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-02",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-07",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {

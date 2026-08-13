@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "72179f7e02f2f232dfcb2ed21a07d672633acb927c74a9934bf23436fb589e1a",
+  "catalogue_declaration_hash": "90ed0d2999fb96d7e22967dff2fe5d9a0ce286ee3a985d256958137b263a2d96",
   "schema_version": 1,
   "signals": [
     {
@@ -23,7 +23,7 @@
       "type_name": "BaselineHash"
     },
     {
-      "entry_hash": "ca568831dc2b0359bede7d343df2de0feaa29ac998ae32117c71ebeab2b097cf",
+      "entry_hash": "2a82ee201a0c66e4b88c5bfeaa19860a52a22c87b73fac499a44b54f87130634",
       "signal": "blue",
       "type_name": "CommitHash"
     },

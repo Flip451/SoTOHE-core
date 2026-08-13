@@ -153,6 +153,10 @@ pub(super) fn regenerate_views_transactionally(
         )?;
         clear_active_view_phase_marker(&track_dir)?;
         write_view_transaction_phase(&transaction, VIEW_TRANSACTION_PHASE_COMPLETE)?;
+        let recovery_slot = recovery_root.join(request.track_id.as_ref());
+        remove_tree_bounded(&recovery_slot, &recovery_root)
+            .and_then(|()| sync_directory(&recovery_root))
+            .map_err(|error| format!("cannot clear baseline recovery slot after views: {error}"))?;
         // The complete phase is durable before cleanup begins. Cleanup only
         // reclaims a recoverable transaction; it must never turn a published
         // view transaction back into a failed stage after its rollback tree
@@ -393,11 +397,8 @@ fn prepare_render_workspace(
         .map_err(|error| format!("cannot create rendered-view staging tree: {error}"))?;
 
     let rules = workspace_root.join("architecture-rules.json");
-    let rules_content = super::sync_base::read_regular_file_bounded(
-        &rules,
-        workspace_root,
-        MAX_CLEANUP_FILE_BYTES,
-    )?;
+    let rules_content =
+        super::read_regular_file_bounded(&rules, workspace_root, MAX_CLEANUP_FILE_BYTES)?;
     atomic_write_file(&staging.join("architecture-rules.json"), &rules_content)
         .map_err(|error| format!("cannot stage architecture-rules.json: {error}"))?;
 

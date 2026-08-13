@@ -1,23 +1,11 @@
 <!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY -->
 
-## Enums
-
-| Name | Kind | Action | Details | Signal | Cat-Spec |
-|------|------|--------|---------|--------|----------|
-| SyncBaseRecordSchemaVersion | enum | add | V1 | 🔵 | 🔵 |
-
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | EvaluateSignalsError | error_type | modify | AuthoritativeInput, Evaluation, CacheWrite | 🔵 | 🔵 |
 | TypeSignalsCodecError | error_type | modify | Json, UnsupportedSchemaVersion, InvalidSchemaVersion, InvalidTimestamp, InvalidDigest, InvalidSignal | 🔵 | 🔵 |
-
-## DTOs
-
-| Name | Kind | Action | Details | Signal | Cat-Spec |
-|------|------|--------|---------|--------|----------|
-| SyncBaseRecord | dto | add | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 

@@ -407,6 +407,13 @@
           "hash": "rvw1:sha256:2e4eeb86d5c36afb0c4dde6507661bc0ea96dcb03dc18c7a7b2c9b5761a7e17a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:08:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc10b18986b6e6f5490f61737f9a32eed532ade8b38c502a00cdadb3b117c945",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -581,6 +588,13 @@
           "at": "2026-08-12T15:22:03Z",
           "findings": [],
           "hash": "rvw1:sha256:dd0783316ad2e8a84776e389d4af83b72c0de56729237cd2de32928d646c70a0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:08:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bb90d1477ecae554a2174020b187076feb1852beb515b26eb2d09acaaf35e795",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -956,6 +970,13 @@
           "at": "2026-08-13T02:40:21Z",
           "findings": [],
           "hash": "rvw1:sha256:6f4a92658bdf1f23c6bb8539eb707f232aff98227694c7eb9d68a07e174fc50a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:09:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:54b2713b3bd44d02ef93061a71f3a0593798bceb6dbed039235de9c46e372be8",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2032,6 +2053,28 @@
           "at": "2026-08-13T00:13:06Z",
           "findings": [],
           "hash": "rvw1:sha256:5651a29e5b771dbcff7f5f5df88dc6be2359a1762987e1587f58b9c4c73d0f62",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:09:15Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 66,
+              "message": "ADR D3 now defines the same Baseline → Views cleanup for both clean and conflicted merges, but Step 3 and the failure route still call it “clean-merge cleanup” (also line 114). This leaves the workflow implying a clean-only cleanup path after the surrounding text was updated. Rename both occurrences to the provider-neutral “merge cleanup stages” (or equivalent).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:135ff1aacb7bd8593c47f37b2c5657745a4fe9b7e6cb4f20b339ab26119fa13c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T07:08:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12453463b933f72fff25b9fdc1435d32e15022e13d637cb3255eb270b846e6ba",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3530,6 +3573,78 @@
           "at": "2026-08-12T23:41:12Z",
           "findings": [],
           "hash": "rvw1:sha256:2769f050d49603a97041ed9984e90fb70cd89f4164e9e4185a8532a4feec6e36",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:13:10Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 411,
+              "message": "T026 names operations and anchors but no target file or symbol. The executor must infer whether the boundary includes base_merge, impl_catalog_signal_reader, merge_gate_freshness, the evaluator, and CLI/workflow surfaces. Add exact targets for each operation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/impl-plan.json",
+              "line": 175,
+              "message": "S17 and T026 restate the behavioral contracts “clean and conflicted ... Baseline then Views” and “signal-only commits.” Under `.harness/policies/no-upstream-restatement.md`, these descriptions must contain only targets, operations, and anchor citations.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 8,
+              "message": "T026 explicitly owns cache-reuse and merge-gate freshness, but it is absent from IN-05, CN-03, CN-04, AC-07, and AC-09 mappings and from the GO-02 summary. The freshness portion therefore lacks upstream traceability; map T026 to those elements or split it into a separately traced task.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-contract.json",
+              "line": 117,
+              "message": "T026's attribution omits catalogue entries directly changed by its stated work: stamp removal changes `PostMergeCleanupError`, while cache-reuse enforcement changes `infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer`. Attribute these entries to T026 so this round's task-to-catalogue traceability is complete.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4c72dceb0f294cbd8b8305aba58cc645cf42e7d66e1740249a92df37769d021f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T07:14:02Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 31,
+              "message": "T026 adds the focused atomic cache-write regression for AC-08 and updates the evaluator, but AC-08 still maps only through T025 and T026's description omits the AC-08 anchor. Add T026 to the AC-08 mapping and anchor list.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/task-coverage.json",
+              "line": 20,
+              "message": "T026 explicitly changes report-only baseline publication failure and is attributed to BaselineReplacementError and PostMergeCleanupError, but it is not mapped to CN-05, AC-10, or AC-12—the failure-reporting contracts carried by those entries. Add T026 to those mappings and cite the anchors in its description.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/batch-plan.json",
+              "line": 205,
+              "message": "B20 estimates T026 only for domain, usecase, and infrastructure even though T026 explicitly modifies `apps/cli-driver/src/track.rs` and `.harness/workflows/track/recover.md`. The batch therefore omits the cli_driver and harness-policy scope estimates required for every touched review scope.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5e9f434a6670fe82b6b6c3ea13524a310d392274526f88323de53c469d260e89",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T07:32:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77ad82640a2cf4fdd0513e0e59d5893991594e258ab4989c7c23ad19f836dee3",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -7764,6 +7879,57 @@
           "hash": "rvw1:sha256:d5e7a8c5ba586bd65509b5b8f0d93e0b86d4087e5a4da288c79b02ecc1cd6205",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:14:14Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 345,
+              "message": "The reader applies cache-reuse cleanliness rules to freshly regenerated pre-review signals. During the normal review workflow, implementation changes and the regenerated signal artifact are uncommitted, so `worktree_is_clean` is false and every signal read fails. After committing, HEAD advances while the artifact records its parent, so the same read fails on `head_commit`. This makes the normal task-contract/review gate unsatisfiable; freshly evaluated signals need a consumable provenance model distinct from cache reuse.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/verify/merge_gate_freshness.rs",
+              "line": 53,
+              "message": "This rejects any branch-tip commit containing a non-signal path, but the guarded commit workflow regenerates signals, stages the entire implementation diff, and commits source plus signal artifacts together. Consequently, the merge gate rejects every normally produced track commit even when each signal document correctly records the tip's parent. Either the workflow must create a dedicated signal-only follow-up commit or this validation must support the existing all-in-one commit model.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8ab9a995588c0c078ee8cf98dbfa443ca0dd891b985a64a762726212cf3e7eaa",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T07:16:09Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 496,
+              "message": "`read_type_signals` now requires `<layer>-types-baseline.json` from `origin/<branch>`, but `.gitignore` deliberately excludes all `track/items/**/*-baseline.json` files and this active track has no baseline blobs in HEAD. Normal guarded staging therefore leaves them absent, so every enabled layer returns `FetchError` and the strict merge gate cannot pass for new tracks. Use an authority available to the merge gate or introduce a coherent committed attestation lifecycle.",
+              "severity": "P0"
+            },
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/verify/merge_gate_adapter.rs",
+              "line": 494,
+              "message": "This diff increases the production portion of the module from 687 to 726 lines, exceeding the repository's 700-line production-code maximum. Move the new freshness/baseline adapter logic into a focused module such as `merge_gate_freshness.rs`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55d95a65b9792e50d43591603420e39d849f440d42c78b048846c16954869a39",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T07:35:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fd79a8f84f05ee9bed2d2f65baf8c0eb80db22c98fb31d55883b239ad0faad09",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -8914,6 +9080,13 @@
           "hash": "rvw1:sha256:d005cd48ea9ce1e1844be87f535b2a30ad1f91579b66b6d838a54426ccefd449",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T07:44:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8827758887babafa8482f062960831bc231dfa7d67d0507ba13aadabedeeb0b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -9204,6 +9377,13 @@
           "at": "2026-08-12T22:10:41Z",
           "findings": [],
           "hash": "rvw1:sha256:acba30424da3e11d7878ea6df9dea99bb03c0c33cf8b0a7110133140e8b2b7c3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:09:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2a527e52f7183f1346988233cc5e7947160f304cac7198676e09a77d42fc0498",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -10379,6 +10559,50 @@
           "hash": "rvw1:sha256:5281fe4739d701799db857d8dbeb13da78b103e21f009a94e306a0e58459618a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:12:22Z",
+          "findings": [
+            {
+              "category": "SoT integrity/spec_refs off-topic",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1463,
+              "message": "`usecase::BaselineReplacementError::Restoration` still exposes an automatic-restoration contract, although the revised ADR D3 explicitly rejects a dedicated replacement-failure recovery mechanism and requires failures to be reported. Its cited CN-05/CN-07/AC-10/AC-12 elements establish reporting and stage order, not restoration. Remove this stale variant so the Phase 2 contract matches the revised SoT.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ad07396bd1c846da6514617a9d5e0ed5132d6787b246ea625a153940c1a2a86c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T07:09:18Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/infrastructure-types.json",
+              "line": 314,
+              "message": "`infrastructure::FsBaseMergeCleanupAdapter` restates CN-07’s Baseline → Views ordering and the ADR’s report-only/no-restoration behavior in `docs`. Per `.harness/policies/no-upstream-restatement.md`, retain the entry’s purpose and anchor citations but remove the reproduced behavioral contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/usecase-types.json",
+              "line": 1421,
+              "message": "`usecase::BaselineReplacementError` restates the upstream report-only/no-automatic-restoration decision in `docs`. Per `.harness/policies/no-upstream-restatement.md`, describe only the type’s purpose and rely on CN-05/CN-07/AC-10/AC-12 for that behavior.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4d7a77e8ecde875579d587764e8cee7d6b62e937cf99852e167b8be4bf3b8fae",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T07:31:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e920b3aa634bb85aca5b99653808c1202f0c596ea0fc9ea4419c2a3a91c1e60c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -10735,6 +10959,20 @@
           "at": "2026-08-13T02:08:09Z",
           "findings": [],
           "hash": "rvw1:sha256:b02c1e6665b5b6bfcfbbf5cc89a83081be7e94fa14c14fb98afdd6785cf43a6a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T06:10:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:85c753659b9a0a0d55649c954545aa54625084310761af76896421827df5aeef",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T07:10:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6cb46356558ab28d080c7d36ac854fa21a59f4b5b693bcf705e5de65ff8034fc",
           "type": "final",
           "verdict": "zero_findings"
         }

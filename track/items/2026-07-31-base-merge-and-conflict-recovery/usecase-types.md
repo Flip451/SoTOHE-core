@@ -15,11 +15,10 @@
 | BaseMergeContextError | error_type | add | Unavailable, ActiveTrackMismatch | 🔵 | 🔵 |
 | BaseMergeError | error_type | add | Context, ActiveTrackMismatch, Git, DirtyWorktree, PostMergeCleanup, ConflictedCleanupFailed | 🔵 | 🔵 |
 | BaseMergeGitError | error_type | add | Execution, DirtyWorktree | 🔵 | 🔵 |
-| BaselineReplacementError | error_type | add | Isolation, Generation, Validation, Publish, Restoration | 🔵 | 🔵 |
+| BaselineReplacementError | error_type | add | Isolation, Generation, Validation, Publish | 🔵 | 🔵 |
 | GitStashPopError | error_type | add | ForbiddenBranchRefUpdate, NoPendingGuardedStash, Unavailable, StashIdentityMissing | 🔵 | 🔵 |
 | GitStashPushError | error_type | add | ForbiddenBranchRefUpdate, PendingGuardedStashExists, Unavailable | 🔵 | 🔵 |
-| PostMergeCleanupError | error_type | add | Views, Baseline, SyncBaseStamp | 🔵 | 🔵 |
-| SyncBaseRecordError | error_type | add | Generation, Validation, Write, Replacement | 🔵 | 🔵 |
+| PostMergeCleanupError | error_type | add | Views, Baseline | 🔵 | 🔵 |
 | TypeSignalsError | error_type | modify | BranchTrackMismatch, LayerBindingsLoad, NoLayers, FeatureDeclaration, AuthoritativeInputFailed, EvaluationFailed, CacheWriteFailed, InconsistentRequest | 🔵 | 🔵 |
 | TypeSignalsExecutionError | error_type | modify | AuthoritativeInput, Evaluation, CacheWrite | 🔵 | 🔵 |
 | ViewsRegenerationError | error_type | add | Regeneration | 🔵 | 🔵 |
@@ -28,7 +27,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaseMergeCleanupPort | secondary_port | add | fn regenerate_views(&self, request: &BaseMergeCleanupRequest) -> Result<(), ViewsRegenerationError>, fn replace_baselines(&self, request: &BaseMergeCleanupRequest) -> Result<(), BaselineReplacementError>, fn write_sync_base_record(&self, request: &BaseMergeCleanupRequest) -> Result<(), SyncBaseRecordError> | 🔵 | 🔵 |
+| BaseMergeCleanupPort | secondary_port | add | fn regenerate_views(&self, request: &BaseMergeCleanupRequest) -> Result<(), ViewsRegenerationError>, fn replace_baselines(&self, request: &BaseMergeCleanupRequest) -> Result<(), BaselineReplacementError> | 🔵 | 🔵 |
 | BaseMergeContextPort | secondary_port | add | fn load_direction(&self, workspace_root: &std::path::Path) -> Result<domain::branch_strategy::BaseMergeDirection, BaseMergeContextError> | 🔵 | 🔵 |
 | BaseMergeGitPort | secondary_port | add | fn ensure_worktree_clean(&self, workspace_root: &std::path::Path) -> Result<(), BaseMergeGitError>, fn merge_base(&self, workspace_root: &std::path::Path, direction: &domain::branch_strategy::BaseMergeDirection) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError> | 🔵 | 🔵 |
 | GitStashPort | secondary_port | add | fn push(&self) -> Result<GitStashPushOutcome, GitStashPushError>, fn pop(&self) -> Result<(), GitStashPopError> | 🔵 | 🔵 |

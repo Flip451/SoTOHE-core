@@ -332,6 +332,8 @@ impl ImplCatalogSignalReaderPort for FsImplCatalogSignalReader {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use std::fs;
+    use std::path::{Path, PathBuf};
+    use std::sync::{Mutex, OnceLock};
 
     use domain::TrackId;
     use domain::tddd::LayerId;
@@ -371,10 +373,69 @@ mod tests {
     }
 
     fn temp_items_dir() -> tempfile::TempDir {
-        tempfile::Builder::new()
+        let repo = crate::git_cli::SystemGitRepo::discover().unwrap();
+        let temp_root = repo.root().join("tmp");
+        fs::create_dir_all(&temp_root).unwrap();
+        let dir = tempfile::Builder::new()
             .prefix("impl-catalog-signal-reader-")
-            .tempdir_in(std::env::current_dir().unwrap())
-            .unwrap()
+            .tempdir_in(temp_root)
+            .unwrap();
+        crate::verify::test_support::git_init(dir.path());
+        fs::copy(
+            repo.root().join("architecture-rules.json"),
+            dir.path().join("architecture-rules.json"),
+        )
+        .unwrap();
+        fs::write(dir.path().join(".gitignore"), "my-track/\n").unwrap();
+        fs::write(dir.path().join(".gitkeep"), b"fixture\n").unwrap();
+        crate::verify::test_support::git_with_identity(
+            dir.path(),
+            &["add", "architecture-rules.json", ".gitignore", ".gitkeep"],
+        );
+        crate::verify::test_support::git_with_identity(
+            dir.path(),
+            &["commit", "--quiet", "-m", "fixture repository"],
+        );
+        dir
+    }
+
+    fn current_head_for(path: &Path) -> String {
+        let repository = crate::git_cli::SystemGitRepo::discover_from(path).unwrap();
+        let output = repository.output(&["rev-parse", "--verify", "HEAD^{commit}"]).unwrap();
+        assert!(output.status.success(), "test repository HEAD must resolve");
+        String::from_utf8(output.stdout).unwrap().trim().to_owned()
+    }
+
+    struct CurrentDirGuard {
+        original: PathBuf,
+    }
+
+    impl CurrentDirGuard {
+        fn enter(path: &Path) -> Self {
+            let original = std::env::current_dir().unwrap();
+            std::env::set_current_dir(path).unwrap();
+            Self { original }
+        }
+    }
+
+    impl Drop for CurrentDirGuard {
+        fn drop(&mut self) {
+            std::env::set_current_dir(&self.original).unwrap();
+        }
+    }
+
+    fn current_dir_lock() -> &'static Mutex<()> {
+        static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+        LOCK.get_or_init(|| Mutex::new(()))
+    }
+
+    fn with_reader_repository<T>(
+        reader: &FsImplCatalogSignalReader,
+        action: impl FnOnce() -> T,
+    ) -> T {
+        let _lock = current_dir_lock().lock().unwrap();
+        let _current_dir = CurrentDirGuard::enter(&reader.items_dir);
+        action()
     }
 
     #[cfg(unix)]
@@ -410,7 +471,9 @@ mod tests {
         track_id: &TrackId,
         layer: &LayerId,
     ) -> Result<TypeSignalsDocument, ImplCatalogSignalReadError> {
-        with_structurally_absent_nightly(|| reader.read_signals(track_id, layer))
+        with_reader_repository(reader, || {
+            with_structurally_absent_nightly(|| reader.read_signals(track_id, layer))
+        })
     }
 
     fn read_optional_signals_without_local_nightly(
@@ -418,7 +481,9 @@ mod tests {
         track_id: &TrackId,
         layer: &LayerId,
     ) -> Result<Option<TypeSignalsDocument>, ImplCatalogSignalReadError> {
-        with_structurally_absent_nightly(|| reader.read_optional_signals(track_id, layer))
+        with_reader_repository(reader, || {
+            with_structurally_absent_nightly(|| reader.read_optional_signals(track_id, layer))
+        })
     }
 
     const SAMPLE_CATALOGUE_JSON: &str = r#"{
@@ -430,7 +495,7 @@ mod tests {
   "functions": {}
 }"#;
 
-    fn signal_json(baseline_hash: &str) -> String {
+    fn signal_json(baseline_hash: &str, head_commit: &str) -> String {
         let declaration_hash =
             type_signals_codec::declaration_hash(SAMPLE_CATALOGUE_JSON.as_bytes());
         format!(
@@ -450,7 +515,7 @@ mod tests {
   ]
 }}"#,
             declaration_hash.as_digest().as_str(),
-            "a".repeat(40),
+            head_commit,
         )
     }
 
@@ -467,8 +532,11 @@ mod tests {
             .as_digest()
             .as_str()
             .to_owned();
-        fs::write(track_dir.join("domain-type-signals.json"), signal_json(&recorded_baseline_hash))
-            .unwrap();
+        fs::write(
+            track_dir.join("domain-type-signals.json"),
+            signal_json(&recorded_baseline_hash, &current_head_for(track_dir)),
+        )
+        .unwrap();
     }
 
     const SAMPLE_SIGNALS_JSON: &str = r#"{
@@ -501,6 +569,46 @@ mod tests {
         assert_eq!(doc.signals().len(), 1);
         let first_signal = doc.signals().first().expect("should have one signal");
         assert_eq!(first_signal.type_name(), "MyType");
+    }
+
+    #[test]
+    fn test_read_signals_allows_uncommitted_implementation_edit_after_content_binding() {
+        let dir = temp_items_dir();
+        let track_dir = dir.path().join("my-track");
+        fs::create_dir_all(&track_dir).unwrap();
+        write_signal_fixture(&track_dir, None, b"fixture-baseline");
+        fs::write(dir.path().join(".gitkeep"), b"implementation edit\n").unwrap();
+
+        let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
+        let document =
+            read_signals_without_local_nightly(&reader, &track_id("my-track"), &layer("domain"))
+                .unwrap();
+
+        assert_eq!(document.signals().len(), 1);
+    }
+
+    #[test]
+    fn test_read_signals_allows_implementation_only_commit_after_content_binding() {
+        let dir = temp_items_dir();
+        let track_dir = dir.path().join("my-track");
+        fs::create_dir_all(&track_dir).unwrap();
+        write_signal_fixture(&track_dir, None, b"fixture-baseline");
+        fs::write(dir.path().join("implementation-only.rs"), b"changed\n").unwrap();
+        crate::verify::test_support::git_with_identity(
+            dir.path(),
+            &["add", "implementation-only.rs"],
+        );
+        crate::verify::test_support::git_with_identity(
+            dir.path(),
+            &["commit", "--quiet", "-m", "implementation-only change"],
+        );
+
+        let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
+        let document =
+            read_signals_without_local_nightly(&reader, &track_id("my-track"), &layer("domain"))
+                .unwrap();
+
+        assert_eq!(document.signals().len(), 1);
     }
 
     #[test]

@@ -82,7 +82,7 @@
       },
       "key": {
         "anchor_text_hash": "40f4d9f0d37fa58dfb35671b5faada2feea33e0d3a44c57a471647c25bc0d4f5",
-        "declaration_hash": "fd182f115e8b20fae5e8bac36d3f2d17ce954177dcc15fa7598bb46fbd22d1bf",
+        "declaration_hash": "8cef5df9bfe1a28e0213cbf368f55b9190a09bb42c4fc30298008af6d36ab74f",
         "waived_reason_hash": "e93900cb50b7586b8b1d5cb59c8e70e5933359b376f758818181e8abae005fc8"
       },
       "obligation_id": {
@@ -91,7 +91,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "methods: [], generics: [], where_predicates: []",
+        "citation": "\"methods: [], generics: [], where_predicates: []\"",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -202,7 +202,7 @@
       },
       "key": {
         "anchor_text_hash": "008a36faed29453afb25460ea4db3d92210eddc427c7d565839f29f1cce2e93e",
-        "declaration_hash": "7c0cfd00ded5d19059dcb6fa920936926a5500f6acaff3d076ced80a023c674b",
+        "declaration_hash": "24d5f275a6ab7d95f6651d0fd4369be62ac3a3c703396ff56ea1a680679f401f",
         "waived_reason_hash": "5e884b84d54500bce9728aa6108e34f4a95d4ab5cf97fd6445e41a3c1f8fbdb8"
       },
       "obligation_id": {
@@ -211,7 +211,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"only Completed and Conflicted variants\"",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Completed\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Conflicted\")), payload: Unit }]",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -225,8 +225,8 @@
         "entry_key": "BaseMergeOutcome"
       },
       "key": {
-        "anchor_text_hash": "c3378f0137ffc251962e2e9d8bdce0072fc09796143e5519d64217f14429353d",
-        "declaration_hash": "7c0cfd00ded5d19059dcb6fa920936926a5500f6acaff3d076ced80a023c674b",
+        "anchor_text_hash": "2cd39e84a76ea04814d00766e8a5c5c29e8c33cd137e599609f5cfb7d048899a",
+        "declaration_hash": "24d5f275a6ab7d95f6651d0fd4369be62ac3a3c703396ff56ea1a680679f401f",
         "waived_reason_hash": "0ac972a755997168d93738fface37db91ae30eceb16e0657e082c2434b31e6e6"
       },
       "obligation_id": {
@@ -235,7 +235,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"It does not write a sync-base record or record cleanup completion.\"",
+        "citation": "methods: []",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

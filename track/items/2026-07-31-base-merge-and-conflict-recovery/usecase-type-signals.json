@@ -1,8 +1,8 @@
 {
   "baseline_hash": "3c056326b041c38a08bf52ea17e348deef249ea2c8f29234c31161487bcb1df4",
-  "declaration_hash": "a11befee2f24e2301973883b9fd119caf42e813634413a39f2645f59299c3217",
-  "generated_at": "2026-08-13T03:47:20Z",
-  "head_commit": "ea4bbc97ad67573b858ada6e91219794b5bf6659",
+  "declaration_hash": "57428f4abaa6a0d837eb8f9025e5b8148227b00982306a0f2462940a78757fc0",
+  "generated_at": "2026-08-13T07:45:11Z",
+  "head_commit": "772f7ec60025fd70bb0d380a18df6e470406d78a",
   "schema_version": 4,
   "signals": [
     {
@@ -196,17 +196,6 @@
       "kind_tag": "error_type",
       "signal": "blue",
       "type_name": "PostMergeCleanupError"
-    },
-    {
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ],
-      "found_type": true,
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "type_name": "SyncBaseRecordError"
     },
     {
       "found_type": true,

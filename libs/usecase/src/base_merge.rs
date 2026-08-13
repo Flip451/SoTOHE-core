@@ -32,7 +32,7 @@ pub enum BaseMergeAttemptOutcome {
 pub enum BaseMergeOutcome {
     /// The merge and every required cleanup stage completed.
     Completed,
-    /// The merge conflicted and therefore did not run clean-merge cleanup.
+    /// The merge conflicted after completing the ordered cleanup stages.
     Conflicted,
 }
 
@@ -43,7 +43,7 @@ pub struct BaseMergeCommand {
     pub workspace_root: PathBuf,
 }
 
-/// Request passed to every clean-merge cleanup stage.
+/// Request passed to every post-merge cleanup stage.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BaseMergeCleanupRequest {
     /// Workspace containing the active track.
@@ -108,31 +108,6 @@ pub enum BaselineReplacementError {
     /// Atomic baseline publication failed.
     #[error("baseline publication failed: {0}")]
     Publish(DiagnosticText),
-    /// A failed publication could not restore the prior baseline.
-    #[error("baseline publication failed: {publish}; restoration failed: {restoration}")]
-    Restoration {
-        /// Publication failure diagnostic.
-        publish: DiagnosticText,
-        /// Restoration failure diagnostic.
-        restoration: DiagnosticText,
-    },
-}
-
-/// Failures while persisting the sync-base record.
-#[derive(Debug, Error)]
-pub enum SyncBaseRecordError {
-    /// Record generation failed.
-    #[error("sync-base record generation failed: {0}")]
-    Generation(DiagnosticText),
-    /// Record validation failed.
-    #[error("sync-base record validation failed: {0}")]
-    Validation(DiagnosticText),
-    /// Writing the replacement candidate failed.
-    #[error("sync-base record write failed: {0}")]
-    Write(DiagnosticText),
-    /// Atomically replacing the prior record failed.
-    #[error("sync-base record replacement failed: {0}")]
-    Replacement(DiagnosticText),
 }
 
 /// Error type for the ordered post-merge cleanup stages.
@@ -144,9 +119,6 @@ pub enum PostMergeCleanupError {
     /// Baseline replacement failed.
     #[error("baseline replacement failed: {0}")]
     Baseline(BaselineReplacementError),
-    /// Sync-base recording failed.
-    #[error("sync-base record failed: {0}")]
-    SyncBaseStamp(SyncBaseRecordError),
 }
 
 /// Error returned by [`BaseMergeService::execute`].
@@ -218,7 +190,7 @@ pub trait BaseMergeGitPort: Send + Sync {
     ) -> Result<BaseMergeAttemptOutcome, BaseMergeGitError>;
 }
 
-/// Runs the cleanup stages that follow only a clean base merge.
+/// Runs the ordered cleanup stages that follow a base merge.
 pub trait BaseMergeCleanupPort: Send + Sync {
     /// Regenerates the active track's derived views.
     ///
@@ -239,22 +211,11 @@ pub trait BaseMergeCleanupPort: Send + Sync {
         &self,
         request: &BaseMergeCleanupRequest,
     ) -> Result<(), BaselineReplacementError>;
-
-    /// Writes the active track's schema-versioned sync-base record.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`SyncBaseRecordError`] when record generation, validation,
-    /// writing, or atomic replacement fails.
-    fn write_sync_base_record(
-        &self,
-        request: &BaseMergeCleanupRequest,
-    ) -> Result<(), SyncBaseRecordError>;
 }
 
 /// Application-service boundary for guarded base merges.
 pub trait BaseMergeService: Send + Sync {
-    /// Executes a guarded base merge and any clean-merge cleanup.
+    /// Executes a guarded base merge and its post-merge cleanup.
     ///
     /// # Errors
     ///
@@ -318,9 +279,6 @@ impl BaseMergeService for BaseMergeInteractor {
                 self.cleanup.regenerate_views(&request).map_err(|error| {
                     BaseMergeError::PostMergeCleanup(PostMergeCleanupError::Views(error))
                 })?;
-                self.cleanup.write_sync_base_record(&request).map_err(|error| {
-                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(error))
-                })?;
                 Ok(BaseMergeOutcome::Completed)
             }
         }
@@ -358,7 +316,6 @@ mod tests {
     enum CleanupStage {
         Baseline,
         Views,
-        SyncBaseStamp,
     }
 
     struct SuccessfulContext {
@@ -625,19 +582,11 @@ mod tests {
             self.record(CleanupStage::Baseline, request)
                 .map_err(BaselineReplacementError::Generation)
         }
-
-        fn write_sync_base_record(
-            &self,
-            request: &BaseMergeCleanupRequest,
-        ) -> Result<(), SyncBaseRecordError> {
-            self.record(CleanupStage::SyncBaseStamp, request).map_err(SyncBaseRecordError::Write)
-        }
     }
 
     struct StatefulCleanup {
         state: Arc<Mutex<StatefulCleanupState>>,
         baseline_failure: Option<BaselineFailure>,
-        sync_record_failure: Option<SyncRecordFailure>,
     }
 
     #[derive(Debug, Clone, Copy)]
@@ -646,15 +595,6 @@ mod tests {
         Generation,
         Validation,
         Publish,
-        Restoration,
-    }
-
-    #[derive(Debug, Clone, Copy)]
-    enum SyncRecordFailure {
-        Generation,
-        Validation,
-        Write,
-        Replacement,
     }
 
     #[derive(Debug)]
@@ -662,8 +602,6 @@ mod tests {
         calls: Vec<CleanupCall>,
         active_baseline: String,
         type_signals_cache: String,
-        sync_base_record: Option<CommitHash>,
-        idempotent_sync_retries: usize,
     }
 
     impl StatefulCleanup {
@@ -704,45 +642,9 @@ mod tests {
                     BaselineFailure::Publish => BaselineReplacementError::Publish(
                         DiagnosticText::new("replacement publication failed"),
                     ),
-                    BaselineFailure::Restoration => BaselineReplacementError::Restoration {
-                        publish: DiagnosticText::new("replacement publication failed"),
-                        restoration: DiagnosticText::new("baseline restoration failed"),
-                    },
                 });
             }
             state.active_baseline = format!("baseline@{}", request.base_commit.as_ref());
-            Ok(())
-        }
-
-        fn write_sync_base_record(
-            &self,
-            request: &BaseMergeCleanupRequest,
-        ) -> Result<(), SyncBaseRecordError> {
-            let mut state = self.state.lock().unwrap();
-            state
-                .calls
-                .push(CleanupCall { stage: CleanupStage::SyncBaseStamp, request: request.clone() });
-            if let Some(failure) = self.sync_record_failure {
-                return Err(match failure {
-                    SyncRecordFailure::Generation => SyncBaseRecordError::Generation(
-                        DiagnosticText::new("record generation failed"),
-                    ),
-                    SyncRecordFailure::Validation => SyncBaseRecordError::Validation(
-                        DiagnosticText::new("record validation failed"),
-                    ),
-                    SyncRecordFailure::Write => {
-                        SyncBaseRecordError::Write(DiagnosticText::new("record write failed"))
-                    }
-                    SyncRecordFailure::Replacement => SyncBaseRecordError::Replacement(
-                        DiagnosticText::new("record replacement failed"),
-                    ),
-                });
-            }
-            if state.sync_base_record.as_ref() == Some(&request.base_commit) {
-                state.idempotent_sync_retries += 1;
-            } else {
-                state.sync_base_record = Some(request.base_commit.clone());
-            }
             Ok(())
         }
     }
@@ -826,7 +728,6 @@ mod tests {
             vec![
                 CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() },
                 CleanupCall { stage: CleanupStage::Views, request: cleanup_request() },
-                CleanupCall { stage: CleanupStage::SyncBaseStamp, request: cleanup_request() },
             ]
         );
     }
@@ -850,10 +751,10 @@ mod tests {
         assert_eq!(outcome, BaseMergeOutcome::Completed);
         assert_eq!(git_calls.lock().unwrap().len(), 1);
         let cleanup_calls = cleanup_calls.lock().unwrap();
-        assert_eq!(cleanup_calls.len(), 3);
+        assert_eq!(cleanup_calls.len(), 2);
         assert_eq!(
             cleanup_calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
+            vec![CleanupStage::Baseline, CleanupStage::Views,]
         );
         for call in cleanup_calls.iter() {
             assert_eq!(call.request.workspace_root, PathBuf::from("/workspace"));
@@ -879,10 +780,7 @@ mod tests {
 
         let stages =
             cleanup_calls.lock().unwrap().iter().map(|call| call.stage).collect::<Vec<_>>();
-        assert_eq!(
-            stages,
-            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp]
-        );
+        assert_eq!(stages, vec![CleanupStage::Baseline, CleanupStage::Views]);
         assert_eq!(stages.iter().filter(|stage| **stage == CleanupStage::Views).count(), 1);
     }
 
@@ -965,11 +863,10 @@ mod tests {
         assert_eq!(state.calls.len(), 1);
         assert_eq!(only_call.stage, CleanupStage::Baseline);
         assert_eq!(only_call.request.base_commit, exact_base_commit);
-        assert!(state.sync_base_record.is_none());
     }
 
     #[test]
-    fn test_base_merge_execute_conflict_views_failure_is_reported_without_sync() {
+    fn test_base_merge_execute_conflict_views_failure_is_reported() {
         let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
         let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
         let interactor = BaseMergeInteractor::new(
@@ -998,7 +895,6 @@ mod tests {
             vec![CleanupStage::Baseline, CleanupStage::Views]
         );
         assert!(cleanup_calls.iter().all(|call| call.request.base_commit == exact_base_commit));
-        assert!(!cleanup_calls.iter().any(|call| call.stage == CleanupStage::SyncBaseStamp));
     }
 
     #[test]
@@ -1166,10 +1062,6 @@ mod tests {
         for (failure, expected_stages) in [
             (CleanupStage::Baseline, vec![CleanupStage::Baseline]),
             (CleanupStage::Views, vec![CleanupStage::Baseline, CleanupStage::Views]),
-            (
-                CleanupStage::SyncBaseStamp,
-                vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp],
-            ),
         ] {
             let git_calls = Arc::new(Mutex::new(Vec::new()));
             let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
@@ -1200,12 +1092,6 @@ mod tests {
                 ) => {
                     matches!(error, BaselineReplacementError::Generation(detail) if detail.as_str() == "cleanup failed")
                 }
-                (
-                    CleanupStage::SyncBaseStamp,
-                    BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(error)),
-                ) => {
-                    matches!(error, SyncBaseRecordError::Write(detail) if detail.as_str() == "cleanup failed")
-                }
                 _ => false,
             });
             assert_eq!(git_calls.lock().unwrap().len(), 1);
@@ -1221,8 +1107,6 @@ mod tests {
             calls: Vec::new(),
             active_baseline: "prior-valid-baseline".to_owned(),
             type_signals_cache: "current-type-signals-cache".to_owned(),
-            sync_base_record: None,
-            idempotent_sync_retries: 0,
         }))
     }
 
@@ -1230,7 +1114,7 @@ mod tests {
         state: Arc<Mutex<StatefulCleanupState>>,
         baseline_failure: Option<BaselineFailure>,
     ) -> Arc<StatefulCleanup> {
-        Arc::new(StatefulCleanup { state, baseline_failure, sync_record_failure: None })
+        Arc::new(StatefulCleanup { state, baseline_failure })
     }
 
     #[test]
@@ -1326,181 +1210,7 @@ mod tests {
     }
 
     #[test]
-    fn test_base_merge_execute_baseline_restoration_failure_fails_closed() {
-        let state = stateful_cleanup_state();
-        let interactor = BaseMergeInteractor::new(
-            Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(RecordingGit {
-                response: GitResponse::Clean,
-                calls: Arc::new(Mutex::new(Vec::new())),
-            }),
-            stateful_cleanup(Arc::clone(&state), Some(BaselineFailure::Restoration)),
-        );
-
-        let result = interactor.execute(command());
-
-        assert!(matches!(result, Err(BaseMergeError::PostMergeCleanup(
-            PostMergeCleanupError::Baseline(BaselineReplacementError::Restoration {
-                publish,
-                restoration,
-            })
-        )) if publish.as_str() == "replacement publication failed"
-            && restoration.as_str() == "baseline restoration failed"));
-        let state = state.lock().unwrap();
-        assert_eq!(state.active_baseline, "prior-valid-baseline");
-        assert_eq!(
-            state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Baseline]
-        );
-    }
-
-    #[test]
-    fn test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit() {
-        let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
-        let state = stateful_cleanup_state();
-        let interactor = BaseMergeInteractor::new(
-            Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(ExactCommitGit {
-                base_commit: exact_base_commit.clone(),
-                calls: Arc::new(Mutex::new(Vec::new())),
-            }),
-            stateful_cleanup(Arc::clone(&state), None),
-        );
-
-        assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
-        assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
-
-        let state = state.lock().unwrap();
-        assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit));
-        assert_eq!(state.idempotent_sync_retries, 1);
-        assert!(state.calls.iter().all(|call| call.request.base_commit == exact_base_commit));
-    }
-
-    #[test]
-    fn test_base_merge_execute_sync_record_later_commit_replaces_prior_record() {
-        let first_commit = CommitHash::try_new("0123456789abcdef").unwrap();
-        let later_commit = CommitHash::try_new("fedcba9876543210").unwrap();
-        let state = stateful_cleanup_state();
-        let cleanup: Arc<dyn BaseMergeCleanupPort> = stateful_cleanup(Arc::clone(&state), None);
-        let first_merge = BaseMergeInteractor::new(
-            Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(ExactCommitGit {
-                base_commit: first_commit.clone(),
-                calls: Arc::new(Mutex::new(Vec::new())),
-            }),
-            Arc::clone(&cleanup),
-        );
-        let later_merge = BaseMergeInteractor::new(
-            Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(ExactCommitGit {
-                base_commit: later_commit.clone(),
-                calls: Arc::new(Mutex::new(Vec::new())),
-            }),
-            cleanup,
-        );
-
-        assert_eq!(first_merge.execute(command()).unwrap(), BaseMergeOutcome::Completed);
-        assert_eq!(later_merge.execute(command()).unwrap(), BaseMergeOutcome::Completed);
-
-        let state = state.lock().unwrap();
-        assert_eq!(state.sync_base_record.as_ref(), Some(&later_commit));
-        assert_ne!(state.sync_base_record.as_ref(), Some(&first_commit));
-        assert_eq!(
-            state
-                .calls
-                .iter()
-                .filter(|call| call.stage == CleanupStage::SyncBaseStamp)
-                .map(|call| call.request.base_commit.clone())
-                .collect::<Vec<_>>(),
-            vec![first_commit, later_commit]
-        );
-    }
-
-    #[test]
-    fn test_base_merge_execute_sync_record_write_failure_fails_closed() {
-        let state = stateful_cleanup_state();
-        let interactor = BaseMergeInteractor::new(
-            Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(RecordingGit {
-                response: GitResponse::Clean,
-                calls: Arc::new(Mutex::new(Vec::new())),
-            }),
-            Arc::new(StatefulCleanup {
-                state: Arc::clone(&state),
-                baseline_failure: None,
-                sync_record_failure: Some(SyncRecordFailure::Write),
-            }),
-        );
-
-        let result = interactor.execute(command());
-
-        assert!(matches!(result, Err(BaseMergeError::PostMergeCleanup(
-            PostMergeCleanupError::SyncBaseStamp(SyncBaseRecordError::Write(detail))
-        )) if detail.as_str() == "record write failed"));
-        let state = state.lock().unwrap();
-        assert!(state.sync_base_record.is_none());
-        assert_eq!(
-            state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
-        );
-    }
-
-    #[test]
-    fn test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed() {
-        for failure in [
-            SyncRecordFailure::Generation,
-            SyncRecordFailure::Validation,
-            SyncRecordFailure::Replacement,
-        ] {
-            let state = stateful_cleanup_state();
-            let interactor = BaseMergeInteractor::new(
-                Arc::new(SuccessfulContext::new(direction())),
-                Arc::new(RecordingGit {
-                    response: GitResponse::Clean,
-                    calls: Arc::new(Mutex::new(Vec::new())),
-                }),
-                Arc::new(StatefulCleanup {
-                    state: Arc::clone(&state),
-                    baseline_failure: None,
-                    sync_record_failure: Some(failure),
-                }),
-            );
-
-            let result = interactor.execute(command());
-
-            assert!(!matches!(result, Ok(BaseMergeOutcome::Completed)));
-            assert!(match (failure, result) {
-                (
-                    SyncRecordFailure::Generation,
-                    Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(
-                        SyncBaseRecordError::Generation(detail),
-                    ))),
-                ) => detail.as_str() == "record generation failed",
-                (
-                    SyncRecordFailure::Validation,
-                    Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(
-                        SyncBaseRecordError::Validation(detail),
-                    ))),
-                ) => detail.as_str() == "record validation failed",
-                (
-                    SyncRecordFailure::Replacement,
-                    Err(BaseMergeError::PostMergeCleanup(PostMergeCleanupError::SyncBaseStamp(
-                        SyncBaseRecordError::Replacement(detail),
-                    ))),
-                ) => detail.as_str() == "record replacement failed",
-                _ => false,
-            });
-            let state = state.lock().unwrap();
-            assert!(state.sync_base_record.is_none());
-            assert_eq!(
-                state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-                vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
-            );
-        }
-    }
-
-    #[test]
-    fn test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages() {
+    fn test_base_merge_attempt_outcome_clean_completes_after_all_cleanup_stages() {
         let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
         let attempt = BaseMergeAttemptOutcome::Clean { base_commit: exact_base_commit.clone() };
         assert!(matches!(attempt, BaseMergeAttemptOutcome::Clean { base_commit }
@@ -1519,10 +1229,9 @@ mod tests {
         assert_eq!(interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
 
         let state = state.lock().unwrap();
-        assert_eq!(state.sync_base_record.as_ref(), Some(&exact_base_commit));
         assert_eq!(
             state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
+            vec![CleanupStage::Baseline, CleanupStage::Views,]
         );
         assert!(state.calls.iter().all(|call| call.request.base_commit == exact_base_commit));
     }
@@ -1557,9 +1266,7 @@ mod tests {
 
     #[test]
     fn test_base_merge_cleanup_request_failure_preserves_prior_state_and_never_completes() {
-        let prior_record = CommitHash::try_new("aaaaaaaaaaaaaaaa").unwrap();
         let state = stateful_cleanup_state();
-        state.lock().unwrap().sync_base_record = Some(prior_record.clone());
         let interactor = BaseMergeInteractor::new(
             Arc::new(SuccessfulContext::new(direction())),
             Arc::new(RecordingGit {
@@ -1577,7 +1284,6 @@ mod tests {
         )) if detail.as_str() == "baseline generation failed"));
         let state = state.lock().unwrap();
         assert_eq!(state.active_baseline, "prior-valid-baseline");
-        assert_eq!(state.sync_base_record.as_ref(), Some(&prior_record));
         assert_eq!(
             state.calls.as_slice(),
             [CleanupCall { stage: CleanupStage::Baseline, request: cleanup_request() }]
@@ -1641,12 +1347,12 @@ mod tests {
         assert!(matches!(outcome, BaseMergeOutcome::Completed));
         assert_eq!(
             state.lock().unwrap().calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
+            vec![CleanupStage::Baseline, CleanupStage::Views,]
         );
     }
 
     #[test]
-    fn test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync() {
+    fn test_base_merge_outcome_conflicted_runs_baseline_then_views() {
         let cleanup_calls = Arc::new(Mutex::new(Vec::new()));
         let interactor = BaseMergeInteractor::new(
             Arc::new(SuccessfulContext::new(direction())),
@@ -1685,74 +1391,5 @@ mod tests {
             PostMergeCleanupError::Baseline(BaselineReplacementError::Validation(detail))
                 if detail.as_str() == "baseline failed"
         ));
-        assert!(matches!(
-            PostMergeCleanupError::SyncBaseStamp(SyncBaseRecordError::Replacement(
-                DiagnosticText::new("record failed"),
-            )),
-            PostMergeCleanupError::SyncBaseStamp(SyncBaseRecordError::Replacement(detail))
-                if detail.as_str() == "record failed"
-        ));
-    }
-
-    #[test]
-    fn test_sync_base_record_error_variants_preserve_record_and_stamp_after_cleanup() {
-        assert!(matches!(
-            SyncBaseRecordError::Generation(DiagnosticText::new("generation failed")),
-            SyncBaseRecordError::Generation(detail) if detail.as_str() == "generation failed"
-        ));
-        assert!(matches!(
-            SyncBaseRecordError::Validation(DiagnosticText::new("validation failed")),
-            SyncBaseRecordError::Validation(detail) if detail.as_str() == "validation failed"
-        ));
-        assert!(matches!(
-            SyncBaseRecordError::Write(DiagnosticText::new("write failed")),
-            SyncBaseRecordError::Write(detail) if detail.as_str() == "write failed"
-        ));
-        assert!(matches!(
-            SyncBaseRecordError::Replacement(DiagnosticText::new("replacement failed")),
-            SyncBaseRecordError::Replacement(detail) if detail.as_str() == "replacement failed"
-        ));
-
-        let prior_record = CommitHash::try_new("aaaaaaaaaaaaaaaa").unwrap();
-        let failed_state = stateful_cleanup_state();
-        failed_state.lock().unwrap().sync_base_record = Some(prior_record.clone());
-        let failed_interactor = BaseMergeInteractor::new(
-            Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(RecordingGit {
-                response: GitResponse::Clean,
-                calls: Arc::new(Mutex::new(Vec::new())),
-            }),
-            Arc::new(StatefulCleanup {
-                state: Arc::clone(&failed_state),
-                baseline_failure: None,
-                sync_record_failure: Some(SyncRecordFailure::Replacement),
-            }),
-        );
-
-        let failure = failed_interactor.execute(command());
-
-        assert!(matches!(failure, Err(BaseMergeError::PostMergeCleanup(
-            PostMergeCleanupError::SyncBaseStamp(SyncBaseRecordError::Replacement(detail))
-        )) if detail.as_str() == "record replacement failed"));
-        assert_eq!(failed_state.lock().unwrap().sync_base_record.as_ref(), Some(&prior_record));
-
-        let exact_base_commit = CommitHash::try_new("fedcba9876543210").unwrap();
-        let success_state = stateful_cleanup_state();
-        let successful_interactor = BaseMergeInteractor::new(
-            Arc::new(SuccessfulContext::new(direction())),
-            Arc::new(ExactCommitGit {
-                base_commit: exact_base_commit.clone(),
-                calls: Arc::new(Mutex::new(Vec::new())),
-            }),
-            stateful_cleanup(Arc::clone(&success_state), None),
-        );
-
-        assert_eq!(successful_interactor.execute(command()).unwrap(), BaseMergeOutcome::Completed);
-        let success_state = success_state.lock().unwrap();
-        assert_eq!(success_state.sync_base_record.as_ref(), Some(&exact_base_commit));
-        assert_eq!(
-            success_state.calls.iter().map(|call| call.stage).collect::<Vec<_>>(),
-            vec![CleanupStage::Baseline, CleanupStage::Views, CleanupStage::SyncBaseStamp,]
-        );
     }
 }

@@ -249,58 +249,6 @@
       "action": "reference",
       "for_type": "TypeSignalsCodecError",
       "trait_ref": "core::convert::From<serde_json::Error>"
-    },
-    {
-      "for_type": "SyncBaseRecordSchemaVersion",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "SyncBaseRecordSchemaVersion",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "SyncBaseRecordSchemaVersion",
-      "trait_ref": "core::marker::Copy"
-    },
-    {
-      "for_type": "SyncBaseRecordSchemaVersion",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "SyncBaseRecordSchemaVersion",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "SyncBaseRecordSchemaVersion",
-      "trait_ref": "serde::Serialize"
-    },
-    {
-      "for_type": "SyncBaseRecordSchemaVersion",
-      "trait_ref": "serde::Deserialize"
-    },
-    {
-      "for_type": "SyncBaseRecord",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "SyncBaseRecord",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "SyncBaseRecord",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "SyncBaseRecord",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "SyncBaseRecord",
-      "trait_ref": "serde::Serialize"
-    },
-    {
-      "for_type": "SyncBaseRecord",
-      "trait_ref": "serde::Deserialize"
     }
   ],
   "traits": {},
@@ -363,7 +311,7 @@
     },
     "FsBaseMergeCleanupAdapter": {
       "action": "add",
-      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12). Secondary adapter for guarded base-merge cleanup.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -480,15 +428,7 @@
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         },
         {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
           "anchor": "AC-03",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]
@@ -519,90 +459,6 @@
         },
         {
           "anchor": "AC-13",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        }
-      ]
-    },
-    "SyncBaseRecord": {
-      "action": "add",
-      "docs": "DTO for the sync-base record.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [
-            {
-              "name": "schema_version",
-              "ty": "SyncBaseRecordSchemaVersion"
-            },
-            {
-              "name": "track_id",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "base_branch",
-              "ty": "domain::branch_strategy::BaseBranchName"
-            },
-            {
-              "name": "base_commit",
-              "ty": "domain::CommitHash"
-            }
-          ],
-          "has_stripped_fields": false,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "base_merge",
-      "role": {
-        "Dto": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        }
-      ]
-    },
-    "SyncBaseRecordSchemaVersion": {
-      "action": "add",
-      "docs": "Persistence DTO for the sync-base record schema version.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "V1",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "base_merge",
-      "role": {
-        "Dto": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "CN-06",
-          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
-        },
-        {
-          "anchor": "AC-11",
           "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
         }
       ]

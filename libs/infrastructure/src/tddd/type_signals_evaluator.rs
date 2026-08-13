@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 #[path = "type_signals_evaluator/freshness.rs"]
-mod freshness;
+pub(crate) mod freshness;
 #[path = "type_signals_evaluator/inputs.rs"]
 pub(crate) mod inputs;
 #[path = "type_signals_evaluator/signal_builder.rs"]
@@ -15,12 +15,9 @@ pub(crate) mod signal_tags;
 
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::CrateName;
-use domain::tddd::type_signals_doc::{
-    BaselineHash, TypeSignalsCacheKey, TypeSignalsDocument, TypeSignalsReuseDecision,
-    decide_type_signals_reuse,
-};
+use domain::tddd::type_signals_doc::{BaselineHash, TypeSignalsCacheKey, TypeSignalsDocument};
 use domain::{FreeText, Timestamp, TrackId};
-use freshness::{RustdocJsonPathProvider, reuse_input_for_recorded_document};
+use freshness::{RustdocJsonPathProvider, decide_reuse_for_recorded_document};
 use inputs::{
     read_head_commit, read_utf8_file_limited, verify_evaluation_inputs_unchanged, worktree_is_clean,
 };
@@ -199,16 +196,13 @@ fn execute_with_dependencies(
     let recorded = read_utf8_file_limited(&signal_path, MAX_TYPE_SIGNALS_BYTES)
         .ok()
         .and_then(|text| type_signals_codec::decode(&text).ok());
-    let reuse_input = reuse_input_for_recorded_document(
+    let reuse_decision = decide_reuse_for_recorded_document(
         recorded.as_ref(),
         &current_key,
         worktree_is_clean(&canonical_workspace)?,
     );
-    let reuse_decision = reuse_input
-        .as_ref()
-        .map_or(TypeSignalsReuseDecision::ReextractAndEvaluate, decide_type_signals_reuse);
     match reuse_decision {
-        TypeSignalsReuseDecision::SkipEvaluation => {
+        domain::TypeSignalsReuseDecision::SkipEvaluation => {
             verify_evaluation_inputs_unchanged(
                 &canonical_workspace,
                 &catalogue_path,
@@ -220,8 +214,8 @@ fn execute_with_dependencies(
         // Cargo's shared rustdoc output path is not keyed by the cache identity
         // or feature selection. Re-extract rather than trusting an unrelated
         // producer's valid JSON document.
-        TypeSignalsReuseDecision::ReevaluateWithoutExtraction => {}
-        TypeSignalsReuseDecision::ReextractAndEvaluate => {}
+        domain::TypeSignalsReuseDecision::ReevaluateWithoutExtraction => {}
+        domain::TypeSignalsReuseDecision::ReextractAndEvaluate => {}
     }
     let target_crate_name = CrateName::new(target_crate).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!(
@@ -667,6 +661,46 @@ mod tests {
                 "{label} cache must be atomically replaced with current identities"
             );
         }
+    }
+
+    #[test]
+    fn test_execute_type_signals_cache_write_failure_preserves_prior_cache() {
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let original = write_cache(
+            &items_dir,
+            &track_id,
+            domain::CommitHash::try_new("b".repeat(40)).unwrap(),
+        );
+        let signal_path = signal_path(&items_dir, &track_id);
+        let temporary_path = signal_path.parent().unwrap().join(format!(
+            ".tmp-{}-{}",
+            signal_path.file_name().unwrap().to_string_lossy(),
+            std::process::id()
+        ));
+        std::fs::create_dir(&temporary_path).unwrap();
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+        let error = match execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        ) {
+            Ok(status) => panic!("a failed atomic cache write returned {status:?}"),
+            Err(error) => error,
+        };
+
+        assert!(
+            matches!(&error, EvaluateSignalsError::CacheWrite(_)),
+            "signal write failure must be reported as a cache-write error: {error:?}"
+        );
+        assert_eq!(
+            std::fs::read(&signal_path).unwrap(),
+            original.as_bytes(),
+            "failed replacement must preserve the prior cache bytes"
+        );
     }
 
     #[test]

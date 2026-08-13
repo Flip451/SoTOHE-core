@@ -1,8 +1,8 @@
 {
   "baseline_hash": "7683b57e902824b078eb3091bdbc0b24a2ff5c379124674e4d0c7b611bdd7178",
-  "declaration_hash": "5da9bfe87716f24e31d896962228a2f1f2001deec8b676b8216e7843fa23c0a2",
-  "generated_at": "2026-08-13T03:47:23Z",
-  "head_commit": "ea4bbc97ad67573b858ada6e91219794b5bf6659",
+  "declaration_hash": "b34abe14e19b03d5948c3345e3547cc21fff43bdf40962db11c3b75fc326b52d",
+  "generated_at": "2026-08-13T07:45:14Z",
+  "head_commit": "772f7ec60025fd70bb0d380a18df6e470406d78a",
   "schema_version": 4,
   "signals": [
     {
@@ -47,35 +47,6 @@
       "kind_tag": "secondary_adapter",
       "signal": "blue",
       "type_name": "FsGitStashAdapter"
-    },
-    {
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Deserialize",
-        "Eq",
-        "PartialEq",
-        "Serialize"
-      ],
-      "found_type": true,
-      "kind_tag": "dto",
-      "signal": "blue",
-      "type_name": "SyncBaseRecord"
-    },
-    {
-      "found_items": [
-        "Clone",
-        "Copy",
-        "Debug",
-        "Deserialize",
-        "Eq",
-        "PartialEq",
-        "Serialize"
-      ],
-      "found_type": true,
-      "kind_tag": "enum",
-      "signal": "blue",
-      "type_name": "SyncBaseRecordSchemaVersion"
     },
     {
       "found_type": true,

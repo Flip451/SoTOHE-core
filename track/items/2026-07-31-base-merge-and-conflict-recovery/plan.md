@@ -3,10 +3,10 @@
 
 ## Summary
 
-GO-01 → T001–T004, T010, T011, T013, T014, T020, T023, and T025.
-GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, T022, T024, and T025.
+GO-01 → T001–T004, T010, T011, T013, T014, T020, T023, T025, and T026.
+GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, T022, T024, T025, and T026.
 
-## Tasks (25/25 resolved)
+## Tasks (25/26 resolved)
 
 ### S1 — Guarded base merge
 
@@ -112,3 +112,9 @@ GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, T022, T024, and
 > Modify the T025-attributed targets in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/{base_merge.rs,git_stash.rs,merge_gate.rs}`, `libs/infrastructure/src/{base_merge.rs,tddd/type_signals_evaluator.rs,tddd/type_signals_evaluator/{inputs.rs,freshness.rs},git_cli/{stash_adapter.rs,stash_record.rs}}`, and `apps/cli-driver/src/git.rs`; delete the T025-attributed obsolete symbols in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/infrastructure/src/verify/spec_states.rs`, `libs/usecase/src/base_merge.rs`, `apps/cli-driver/src/track.rs`, `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `apps/cli-composition/src/track/composition_root.rs`; add focused regression coverage. IN-01; IN-02; IN-03; IN-04; IN-05; IN-06; CN-01; CN-02; CN-03; CN-04; CN-05; CN-06; CN-07; AC-01; AC-02; AC-03; AC-04; AC-06; AC-07; AC-08; AC-09; AC-10; AC-11; AC-12; AC-13.
 
 - [x] **T025**: Modify the T025-attributed targets in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/usecase/src/{base_merge.rs,git_stash.rs,merge_gate.rs}`, `libs/infrastructure/src/{base_merge.rs,tddd/type_signals_evaluator.rs,tddd/type_signals_evaluator/{inputs.rs,freshness.rs},git_cli/{stash_adapter.rs,stash_record.rs}}`, and `apps/cli-driver/src/git.rs`; delete the T025-attributed obsolete symbols in `libs/domain/src/tddd/type_signals_doc.rs`, `libs/infrastructure/src/verify/spec_states.rs`, `libs/usecase/src/base_merge.rs`, `apps/cli-driver/src/track.rs`, `apps/cli/src/commands/track/{mod.rs,dispatch.rs}`, and `apps/cli-composition/src/track/composition_root.rs`; add focused regression coverage. IN-01; IN-02; IN-03; IN-04; IN-05; IN-06; CN-01; CN-02; CN-03; CN-04; CN-05; CN-06; CN-07; AC-01; AC-02; AC-03; AC-04; AC-06; AC-07; AC-08; AC-09; AC-10; AC-11; AC-12; AC-13. (`8dfff7460a78926d80c38e71674fcc43605263b4`)
+
+### S17 — Sync-base stamp removal and reuse-contract freshness
+
+> Update the T026 targets across the base-merge, type-signals, merge-gate, CLI-driver, and recovery-workflow surfaces; delete the obsolete sync-base modules; add focused regression coverage. IN-02; IN-05; CN-01; CN-03; CN-04; CN-05; CN-07; AC-03; AC-04; AC-07; AC-08; AC-09; AC-10; AC-12.
+
+- [ ] **T026**: Update `libs/usecase/src/base_merge.rs`; `libs/infrastructure/src/base_merge.rs` and `base_merge/{publication,recovery,view_transaction,baseline_support}.rs` for stamp removal, cleanup staging, and report-only publish failure; delete `libs/infrastructure/src/base_merge/{sync_base.rs,sync_base_record.rs}`; update `libs/infrastructure/src/tddd/type_signals_evaluator.rs` and `type_signals_evaluator/{freshness,inputs}.rs` for `TypeSignalsReuseInput` and `decide_type_signals_reuse`; update `libs/infrastructure/src/impl_catalog_signal_reader.rs` for read content binding; update `libs/infrastructure/src/{verify/merge_gate_freshness.rs,merge_gate_adapter.rs}`, `libs/usecase/src/merge_gate.rs`, `apps/cli-driver/src/track.rs`, and `.harness/workflows/track/recover.md` for evaluation-commit binding; add focused regression coverage. IN-02; IN-05; CN-01; CN-03; CN-04; CN-05; CN-07; AC-03; AC-04; AC-07; AC-08; AC-09; AC-10; AC-12.

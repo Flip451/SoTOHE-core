@@ -269,132 +269,44 @@ pub(super) fn publish_baseline_replacements(
         &recovery_parent_file,
         generated_baseline_files,
     ) {
-        return retain_after_baseline_exchange(
-            track_dir,
-            &active_parent,
-            &recovery_parent_file,
-            replacement,
-            track_parent,
-            replacement_parent,
-            DiagnosticText::new(format!(
-                "active track changed during baseline publication: {error}"
-            )),
-        );
+        return Err(BaselineReplacementError::Publish(DiagnosticText::new(format!(
+            "active track changed during baseline publication: {error}"
+        ))));
     }
 
-    // Persist the destination first, then the source, so a crash cannot lose
-    // the recovery slot after the source entry has been removed.
+    // Persist the destination first, then the source. A failure after the
+    // exchange is reported directly; the sanctioned recovery route is a
+    // subsequent manual baseline capture.
     if let Err(error) = recovery_parent_file.sync_all() {
-        return retain_after_baseline_exchange(
-            track_dir,
-            &active_parent,
-            &recovery_parent_file,
-            replacement,
-            track_parent,
-            replacement_parent,
-            DiagnosticText::new(format!(
-                "published baseline replacement but cannot persist recovery directory: {error}"
-            )),
-        );
+        return Err(BaselineReplacementError::Publish(DiagnosticText::new(format!(
+            "published baseline replacement but cannot persist recovery directory: {error}"
+        ))));
     }
     if let Err(error) = active_parent.sync_all() {
-        return retain_after_baseline_exchange(
-            track_dir,
-            &active_parent,
-            &recovery_parent_file,
-            replacement,
-            track_parent,
-            replacement_parent,
-            DiagnosticText::new(format!(
-                "published baseline replacement but cannot persist active directory: {error}"
-            )),
-        );
+        return Err(BaselineReplacementError::Publish(DiagnosticText::new(format!(
+            "published baseline replacement but cannot persist active directory: {error}"
+        ))));
     }
 
-    // The exchange is durable before the phase marker is cleared. If the
-    // marker cleanup itself fails, retain both trees; if a crash occurs in
-    // this window, restart sees the marker plus the deterministic recovery
-    // copy and completes the transaction.
+    // The exchange is durable before the phase marker is cleared. Any marker
+    // cleanup failure is reported without attempting automatic restoration.
     let active_phase_marker = track_dir.join(BASELINE_REPLACEMENT_PHASE_MARKER);
     if let Err(error) = fs::remove_file(&active_phase_marker) {
-        return retain_after_baseline_exchange(
-            track_dir,
-            &active_parent,
-            &recovery_parent_file,
-            replacement,
-            track_parent,
-            replacement_parent,
-            DiagnosticText::new(format!(
-                "published baseline replacement but cannot clear phase marker: {error}"
-            )),
-        );
+        return Err(BaselineReplacementError::Publish(DiagnosticText::new(format!(
+            "published baseline replacement but cannot clear phase marker: {error}"
+        ))));
     }
     if let Err(error) = fs::File::open(track_dir).and_then(|directory| directory.sync_all()) {
-        return retain_after_baseline_exchange(
-            track_dir,
-            &active_parent,
-            &recovery_parent_file,
-            replacement,
-            track_parent,
-            replacement_parent,
-            DiagnosticText::new(format!(
-                "published baseline replacement but cannot persist phase marker removal: {error}"
-            )),
-        );
+        return Err(BaselineReplacementError::Publish(DiagnosticText::new(format!(
+            "published baseline replacement but cannot persist phase marker removal: {error}"
+        ))));
     }
     if let Err(error) = active_parent.sync_all() {
-        return retain_after_baseline_exchange(
-            track_dir,
-            &active_parent,
-            &recovery_parent_file,
-            replacement,
-            track_parent,
-            replacement_parent,
-            DiagnosticText::new(format!(
-                "published baseline replacement but cannot persist phase marker removal in parent: {error}"
-            )),
-        );
+        return Err(BaselineReplacementError::Publish(DiagnosticText::new(format!(
+            "published baseline replacement but cannot persist phase marker removal in parent: {error}"
+        ))));
     }
     Ok(())
-}
-
-fn retain_after_baseline_exchange(
-    active_track: &Path,
-    active_parent: &fs::File,
-    recovery_parent: &fs::File,
-    replacement: &Path,
-    active_trusted_root: &Path,
-    replacement_trusted_root: &Path,
-    publish: DiagnosticText,
-) -> Result<(), BaselineReplacementError> {
-    // The exchange has already made both complete trees reachable. Never
-    // exchange them back after this point: a writer may have changed either
-    // tree through a path or descriptor that was valid before the exchange.
-    // Retain both paths so the next guarded run can reconcile the pending
-    // recovery copy without deleting either writer's update.
-    let retention = sync_tree(active_track, active_trusted_root)
-        .and_then(|()| sync_tree(replacement, replacement_trusted_root))
-        .and_then(|()| {
-            active_parent
-                .sync_all()
-                .map_err(|error| format!("cannot persist active directory: {error}"))
-        })
-        .and_then(|()| {
-            recovery_parent
-                .sync_all()
-                .map_err(|error| format!("cannot persist recovery directory: {error}"))
-        });
-    match retention {
-        Ok(()) => Err(BaselineReplacementError::Publish(DiagnosticText::new(format!(
-            "{publish}; active and prior track trees retained for recovery"
-        )))),
-        Err(retention) => Err(BaselineReplacementError::Restoration {
-            publish,
-            restoration: DiagnosticText::new(format!(
-                "cannot durably retain active and prior track trees after publication failure: {retention}"
-            )),
-        }),
-    }
 }
 
 fn link_writer_lock_into_replacement(
@@ -533,7 +445,7 @@ pub(super) fn promote_baseline_recovery_slot(
     // it predates this run and therefore need not match its telemetry or
     // other non-baseline content. The active-track drift checks in
     // `publish_baseline_replacements` still guard this publication window.
-    let staged_recovery = stage_recovery_copy_for_sync(recovery_slot, recovery_root, recovery_root)
+    let staged_recovery = stage_recovery_copy(recovery_slot, recovery_root, recovery_root)
         .map_err(|error| {
             BaselineReplacementError::Publish(DiagnosticText::new(format!(
                 "cannot stage retained baseline recovery slot: {error}"
@@ -589,8 +501,8 @@ impl StagedRecoveryCopy {
     }
 }
 
-/// Moves the recovery slot to reversible staging before SyncBase publication.
-pub(super) fn stage_recovery_copy_for_sync(
+/// Moves the recovery slot to reversible staging before publication.
+pub(super) fn stage_recovery_copy(
     path: &Path,
     trusted_root: &Path,
     temporary_parent: &Path,
@@ -701,124 +613,6 @@ pub(super) fn validate_recovery_cleanup_target(
 mod tests {
     use super::*;
     use std::collections::BTreeSet;
-
-    fn restore_after_baseline_exchange(
-        active_parent: &fs::File,
-        recovery_parent: &fs::File,
-        track_name: &std::ffi::OsStr,
-        replacement_name: &std::ffi::OsStr,
-        replacement: &Path,
-        replacement_parent: &Path,
-        publish: DiagnosticText,
-    ) -> Result<(), BaselineReplacementError> {
-        let restoration = rustix::fs::renameat_with(
-            active_parent,
-            track_name,
-            recovery_parent,
-            replacement_name,
-            rustix::fs::RenameFlags::EXCHANGE,
-        )
-        .map_err(|error| {
-            DiagnosticText::new(format!(
-                "cannot restore prior track after publication failure: {error}"
-            ))
-        })
-        .and_then(|()| {
-            active_parent.sync_all().map_err(|error| {
-                DiagnosticText::new(format!(
-                    "cannot persist restored active directory after publication failure: {error}"
-                ))
-            })
-        })
-        .and_then(|()| {
-            recovery_parent.sync_all().map_err(|error| {
-                DiagnosticText::new(format!(
-                    "cannot persist restored recovery directory after publication failure: {error}"
-                ))
-            })
-        });
-        if let Err(restoration) = restoration {
-            return Err(BaselineReplacementError::Restoration { publish, restoration });
-        }
-        if let Err(marker) = write_replacement_phase_marker(replacement) {
-            return Err(BaselineReplacementError::Restoration {
-                publish,
-                restoration: DiagnosticText::new(format!(
-                    "prior track restored but cannot persist prepared replacement phase: {marker:?}"
-                )),
-            });
-        }
-        if let Err(error) = remove_tree_bounded(replacement, replacement_parent) {
-            return Err(BaselineReplacementError::Restoration {
-                publish,
-                restoration: DiagnosticText::new(format!(
-                    "prior track restored but failed to remove staged replacement: {error}"
-                )),
-            });
-        }
-        if let Err(error) = recovery_parent.sync_all() {
-            return Err(BaselineReplacementError::Restoration {
-                publish,
-                restoration: DiagnosticText::new(format!(
-                    "prior track restored but cannot persist recovery-slot removal: {error}"
-                )),
-            });
-        }
-        Err(BaselineReplacementError::Publish(publish))
-    }
-
-    #[test]
-    fn test_restore_after_exchange_restores_prior_track_and_removes_staged_tree() {
-        let fixture = tempfile::tempdir().unwrap();
-        let items = fixture.path().join("track/items");
-        let active = items.join("cleanup-test");
-        let replacement = items.join(".replacement");
-        std::fs::create_dir_all(&active).unwrap();
-        std::fs::create_dir_all(&replacement).unwrap();
-        std::fs::write(active.join("marker"), "new").unwrap();
-        std::fs::write(replacement.join("marker"), "prior").unwrap();
-        let active_parent = fs::File::open(&items).unwrap();
-        let recovery_parent = fs::File::open(&items).unwrap();
-
-        let result = restore_after_baseline_exchange(
-            &active_parent,
-            &recovery_parent,
-            active.file_name().unwrap(),
-            replacement.file_name().unwrap(),
-            &replacement,
-            &items,
-            DiagnosticText::new("injected publication failure"),
-        );
-
-        assert!(matches!(result, Err(BaselineReplacementError::Publish(_))));
-        assert_eq!(std::fs::read_to_string(active.join("marker")).unwrap(), "prior");
-        assert!(!replacement.exists(), "the staged replacement must be removed after rollback");
-    }
-
-    #[test]
-    fn test_restore_after_exchange_reports_typed_failure_when_prior_tree_is_missing() {
-        let fixture = tempfile::tempdir().unwrap();
-        let items = fixture.path().join("track/items");
-        let active = items.join("cleanup-test");
-        let replacement = items.join(".replacement");
-        std::fs::create_dir_all(&active).unwrap();
-        std::fs::write(active.join("marker"), "new").unwrap();
-        let active_parent = fs::File::open(&items).unwrap();
-        let recovery_parent = fs::File::open(&items).unwrap();
-
-        let result = restore_after_baseline_exchange(
-            &active_parent,
-            &recovery_parent,
-            active.file_name().unwrap(),
-            replacement.file_name().unwrap(),
-            &replacement,
-            &items,
-            DiagnosticText::new("injected publication failure"),
-        );
-
-        assert!(matches!(result, Err(BaselineReplacementError::Restoration { .. })));
-        assert_eq!(std::fs::read_to_string(active.join("marker")).unwrap(), "new");
-    }
 
     #[test]
     fn test_reconcile_interrupted_replacement_preserves_divergent_recovery_copy() {

@@ -75,7 +75,7 @@ pub(super) fn read_optional_rendered_file(
         .map_err(|error| format!("cannot inspect rendered file {}: {error}", path.display()))?;
     match fs::symlink_metadata(path) {
         Ok(metadata) if metadata.file_type().is_file() => {
-            super::sync_base::read_regular_file_bounded(path, trusted_root, limit).map(Some)
+            super::read_regular_file_bounded(path, trusted_root, limit).map(Some)
         }
         Ok(_) => Err(format!("rendered file is not a regular file: {}", path.display())),
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
@@ -298,12 +298,8 @@ fn read_optional_file(path: &Path, workspace_root: &Path) -> Result<Option<Vec<u
         .map_err(|error| format!("cannot inspect rendered registry: {error}"))?;
     match fs::symlink_metadata(path) {
         Ok(metadata) if metadata.is_file() && !metadata.file_type().is_symlink() => {
-            super::sync_base::read_regular_file_bounded(
-                path,
-                workspace_root,
-                super::MAX_CLEANUP_FILE_BYTES,
-            )
-            .map(Some)
+            super::read_regular_file_bounded(path, workspace_root, super::MAX_CLEANUP_FILE_BYTES)
+                .map(Some)
         }
         Ok(_) => Err("rendered registry is not a regular file".to_owned()),
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),

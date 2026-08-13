@@ -420,8 +420,10 @@ where
     //      FetchError → fail-closed.
     //   3. Compare `signals_doc.declaration_hash()` to the catalogue hash from
     //      step 1 — a mismatch means the signals file is stale (fail-closed, CN-11).
-    //   4. Read and compare the authoritative baseline hash. A mismatch means
-    //      reverse-filter inputs changed and the signals file is stale.
+    //   4. The infrastructure reader binds baseline_hash to the authoritative
+    //      baseline blob at the same branch tip before returning the document.
+    //      A mismatch means reverse-filter inputs changed and the signals file
+    //      is stale.
     //   5. Evaluate `check_type_signals(&signals_doc, strict)` with strictness
     //      resolved from gate_matrix.impl_catalog at GateKind::Merge.
     //

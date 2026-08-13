@@ -4,7 +4,7 @@
 
 ## Mission
 
-Recover an active track after `bin/sotp track merge-base` reports a conflict. The orchestrator coordinates resolution through each artifact's designated owner, then drives the normal review and guarded-commit lanes. A conflicted merge already replaced the type baselines from the exact merged base commit and regenerated the derived views (cleanup-state ADR D3); the sync-base stamp stages are exclusive to the successful guarded merge command, and this workflow never runs them.
+Recover an active track after `bin/sotp track merge-base` reports a conflict. The orchestrator coordinates resolution through each artifact's designated owner, then drives the normal review and guarded-commit lanes. A conflicted merge already replaced the type baselines from the exact merged base commit and regenerated the derived views (cleanup-state ADR D3); this workflow does not repeat either cleanup stage.
 
 ## Inputs
 
@@ -63,7 +63,7 @@ Run the applicable implementation verification, then invoke the canonical provid
 workflow until every required scope reports `zero_findings`; the active adapter supplies the
 provider-specific invocation.
 
-If verification or review fails, repair the resolution and repeat this step. Do not run clean-merge cleanup from this workflow.
+If verification or review fails, repair the resolution and repeat this step. Do not run the merge cleanup stages from this workflow.
 
 **Step 4: Guarded commit (staging and commit)**
 
@@ -111,7 +111,7 @@ branch.
 
 - **No conflicted guarded-merge context**: stop and report that recovery is not authorized for the current worktree.
 - **Parseability preparation failure**: retain the conflict; do not launch a scoped review or descend to a downstream writer.
-- **Resolution or verification failure**: retain the conflict for correction; do not claim completion and do not run clean-merge cleanup.
+- **Resolution or verification failure**: retain the conflict for correction; do not claim completion and do not run the merge cleanup stages.
 - **Designated writer or regeneration failure**: retain the conflict and use that surface's failure route; do not substitute an orchestrator edit.
 - **Review finding**: repair through the normal review/fix loop, then repeat review.
 - **Staging or guarded commit failure**: follow the commit workflow's failure handling and retry only through its guarded staging and commit surfaces.
@@ -120,4 +120,4 @@ branch.
 
 - A conflict resolution that has passed the normal verification and review gates.
 - A guarded commit and its normal repository note.
-- No sync-base cleanup from this workflow; the type baselines and derived views were already refreshed by the conflicted merge itself.
+- No cleanup from this workflow; the type baselines and derived views were already refreshed by the conflicted merge itself.

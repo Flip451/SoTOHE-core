@@ -588,13 +588,13 @@ fn test_run_source_workspace_replaces_baseline_without_sync_or_view_side_effects
 
     let prior_baseline = b"baseline-before-recovery";
     let recovered_baseline = b"baseline-from-exact-merged-base";
-    let prior_sync_base = b"{\"schema_version\":1,\"base_commit\":\"prior\"}";
+    let prior_unrelated_file = b"operator-owned-state";
     let prior_rendered_view = b"# rendered view before recovery\n";
     let baseline_path = track_dir.join("domain-types-baseline.json");
-    let sync_base_path = track_dir.join(".sync-base.json");
+    let unrelated_path = track_dir.join("operator-state.txt");
     let rendered_view_path = track_dir.join("plan.md");
     std::fs::write(&baseline_path, prior_baseline).unwrap();
-    std::fs::write(&sync_base_path, prior_sync_base).unwrap();
+    std::fs::write(&unrelated_path, prior_unrelated_file).unwrap();
     std::fs::write(&rendered_view_path, prior_rendered_view).unwrap();
     std::fs::write(source_workspace.path().join("baseline.json"), recovered_baseline).unwrap();
 
@@ -612,6 +612,6 @@ fn test_run_source_workspace_replaces_baseline_without_sync_or_view_side_effects
         .unwrap();
 
     assert_eq!(std::fs::read(&baseline_path).unwrap(), recovered_baseline);
-    assert_eq!(std::fs::read(&sync_base_path).unwrap(), prior_sync_base);
+    assert_eq!(std::fs::read(&unrelated_path).unwrap(), prior_unrelated_file);
     assert_eq!(std::fs::read(&rendered_view_path).unwrap(), prior_rendered_view);
 }

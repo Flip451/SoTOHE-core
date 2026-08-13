@@ -34,7 +34,7 @@ use usecase::verify_adr_signals::{
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 
-use super::merge_gate_freshness::read_branch_evaluation_commit;
+use super::merge_gate_freshness::{read_branch_evaluation_commit, signal_file_name_for};
 pub use super::merge_gate_reader::GitShowTrackBlobReader;
 use crate::git_cli::isolation::isolated_bounded_git_output;
 use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind_isolated};
@@ -129,23 +129,6 @@ impl GitShowTrackBlobReader {
             )),
         }
     }
-}
-
-/// Derives the signal filename for a declaration filename by the same rule
-/// as `TdddLayerBinding::signal_file()` (infrastructure/verify/tddd_layers,
-/// T003): strip `.json`, drop a trailing `s` if present, append
-/// `-signals.json`. Mirrored here so the merge-gate adapter can compute the
-/// signal path without constructing a full `TdddLayerBinding` (which would
-/// require re-parsing `architecture-rules.json` after `resolve_catalogue_filename`
-/// already did so).
-fn signal_file_name_for(catalogue_filename: &str) -> String {
-    let stem = catalogue_filename.strip_suffix(".json").unwrap_or(catalogue_filename);
-    let signal_stem = if let Some(trimmed) = stem.strip_suffix('s') {
-        format!("{trimmed}-signals")
-    } else {
-        format!("{stem}-signals")
-    };
-    format!("{signal_stem}.json")
 }
 
 pub(crate) fn fetch_branch_blob_limited(
@@ -737,11 +720,36 @@ mod tests {
         let evaluation_commit = git_output(dir.path(), &["rev-parse", "HEAD"]).trim().to_owned();
         let track_dir = dir.path().join("track/items/foo");
         std::fs::create_dir_all(&track_dir).unwrap();
+        const ARCHITECTURE_RULES: &str = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": { "enabled": true }
+    }
+  ]
+}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), ARCHITECTURE_RULES).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_V3_MINIMAL).unwrap();
+        let declaration_hash =
+            crate::tddd::type_signals_codec::declaration_hash(DOMAIN_TYPES_V3_MINIMAL.as_bytes());
+        let baseline_hash = crate::tddd::type_signals_codec::baseline_hash(b"baseline fixture\n");
         let recorded_head = format!("\"head_commit\": \"{}\"", "0".repeat(40));
         let signal = TYPE_SIGNALS_MINIMAL
+            .replace(
+                &format!("\"declaration_hash\": \"{}\"", "0".repeat(64)),
+                &format!("\"declaration_hash\": \"{}\"", declaration_hash.as_digest().as_str()),
+            )
+            .replace(
+                &format!("\"baseline_hash\": \"{}\"", "0".repeat(64)),
+                &format!("\"baseline_hash\": \"{}\"", baseline_hash.as_digest().as_str()),
+            )
             .replace(&recorded_head, &format!("\"head_commit\": \"{evaluation_commit}\""));
         std::fs::write(track_dir.join("domain-type-signals.json"), signal).unwrap();
-        git(dir.path(), &["add", "track"]);
+        git(dir.path(), &["add", "architecture-rules.json", "track"]);
         git(dir.path(), &["commit", "--quiet", "-m", "add type signals"]);
         git(dir.path(), &["fetch", "--quiet", "origin"]);
         dir
@@ -1576,10 +1584,9 @@ decisions:
 
     /// A minimal valid `<layer>-type-signals.json` payload.
     ///
-    /// `declaration_hash` is all-zeroes — valid per the codec (any 64-char
-    /// lowercase hex string is accepted; freshness checking lives in the
-    /// caller, not the codec). Used by `read_type_signals` tests that only
-    /// need successful decoding.
+    /// The hashes are all-zeroes before the complete fixture helper binds them
+    /// to the catalogue bytes and evaluation commit. This keeps the fixture
+    /// readable while still exercising the branch-tip freshness checks.
     const TYPE_SIGNALS_MINIMAL: &str = r#"{
   "schema_version": 4,
   "generated_at": "2026-04-18T12:00:00Z",
@@ -1603,15 +1610,15 @@ decisions:
                 assert_eq!(doc.signals()[0].type_name(), "TrackId");
                 assert_eq!(
                     doc.cache_key().declaration_hash().as_digest().as_str(),
-                    "0000000000000000000000000000000000000000000000000000000000000000"
+                    crate::tddd::type_signals_codec::declaration_hash(
+                        DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
+                    )
+                    .as_digest()
+                    .as_str()
                 );
                 assert_eq!(
                     doc.cache_key().head_commit().as_ref(),
                     git_output(dir.path(), &["rev-parse", "HEAD^1"]).trim()
-                );
-                assert_eq!(
-                    doc.cache_key().baseline_hash().as_digest().as_str(),
-                    "0000000000000000000000000000000000000000000000000000000000000000"
                 );
             }
             other => panic!("expected Found, got {other:?}"),
@@ -1619,20 +1626,19 @@ decisions:
     }
 
     #[test]
-    fn test_read_type_signals_rejects_old_document_after_implementation_only_commit() {
+    fn test_read_type_signals_allows_all_in_one_commit() {
         let dir = setup_repo_with_type_signals_at_evaluation_commit();
         std::fs::write(dir.path().join("implementation-only.rs"), "changed\n").unwrap();
         git(dir.path(), &["add", "implementation-only.rs"]);
-        git(dir.path(), &["commit", "--quiet", "-m", "implementation-only change"]);
+        git(dir.path(), &["commit", "--quiet", "--amend", "--no-edit"]);
         git(dir.path(), &["fetch", "--quiet", "origin"]);
 
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         match reader.read_type_signals("main", "foo", "domain") {
-            BlobFetchResult::FetchError(message) => {
-                assert!(message.contains("head_commit mismatch"), "{message}");
-                assert!(message.contains("sotp signal calc-impl-catalog"), "{message}");
+            BlobFetchResult::Found(doc) => {
+                assert_eq!(doc.signals().len(), 1);
             }
-            other => panic!("expected stale head_commit rejection, got {other:?}"),
+            other => panic!("expected all-in-one commit to pass, got {other:?}"),
         }
     }
 

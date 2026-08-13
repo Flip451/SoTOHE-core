@@ -47,7 +47,7 @@ const MAX_GIT_OUTPUT_BYTES: usize = 8 * 1024;
 const GIT_PROBE_TIMEOUT: Duration = Duration::from_secs(10);
 const GIT_PROBE_POLL_INTERVAL: Duration = Duration::from_millis(10);
 
-pub(super) fn read_head_commit(workspace_root: &Path) -> Result<CommitHash, EvaluateSignalsError> {
+pub(crate) fn read_head_commit(workspace_root: &Path) -> Result<CommitHash, EvaluateSignalsError> {
     let output = crate::git_cli::isolation::isolated_bounded_git_output(
         workspace_root,
         &["rev-parse", "--verify", "HEAD^{commit}"],
@@ -72,7 +72,7 @@ pub(super) fn read_head_commit(workspace_root: &Path) -> Result<CommitHash, Eval
     .map_err(|error| EvaluateSignalsError::authoritative_input(format!("HEAD is invalid: {error}")))
 }
 
-pub(super) fn worktree_is_clean(workspace_root: &Path) -> Result<bool, EvaluateSignalsError> {
+pub(crate) fn worktree_is_clean(workspace_root: &Path) -> Result<bool, EvaluateSignalsError> {
     drain_worktree_status(workspace_root).map_err(|error| {
         EvaluateSignalsError::authoritative_input(format!(
             "cannot inspect worktree status: {error}"

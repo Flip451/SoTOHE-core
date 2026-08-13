@@ -733,11 +733,6 @@
           "layer": "usecase",
           "module_path": "usecase::merge_gate::tests",
           "test_name": "test_u7_spec_blue_dt_all_blue_passes"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::verify::merge_gate_adapter::tests",
-          "test_name": "test_read_type_signals_rejects_old_document_after_implementation_only_commit"
         }
       ]
     },
@@ -1767,6 +1762,11 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_cache_write_failure_preserves_prior_cache"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
           "test_name": "test_execute_type_signals_unreadable_authority_does_not_reuse_cache"
         },
         {
@@ -2120,7 +2120,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -2145,21 +2145,6 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_worktree_probe_failure_fails_closed_before_merge_attempt"
         },
         {
@@ -2170,7 +2155,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         },
         {
           "layer": "usecase",
@@ -2181,6 +2166,11 @@
           "layer": "usecase",
           "module_path": "usecase::baseline_capture::interactor_tests",
           "test_name": "test_run_source_workspace_replaces_baseline_without_sync_or_view_side_effects"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_conflicted_views_ignore_unpersisted_workspace_source"
         },
         {
           "layer": "usecase",
@@ -2215,27 +2205,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_base_merge_interactor_unchanged_baseline_keeps_rendered_type_view_stable"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_retry_reconciles_retained_recovery_after_telemetry_drift"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_conflict_replaces_baseline_then_regenerates_views"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
         },
         {
           "layer": "infrastructure",
@@ -2250,22 +2225,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
         },
         {
           "layer": "infrastructure",
@@ -2280,17 +2240,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_retains_writer_lock_until_sync_base_record"
+          "test_name": "test_fs_base_merge_cleanup_releases_writer_lock_after_view_publication"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_is_schema_versioned_and_idempotent"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+          "test_name": "test_fs_base_merge_cleanup_conflicted_views_ignore_unpersisted_workspace_source"
         },
         {
           "layer": "infrastructure",
@@ -2300,7 +2255,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages"
+          "test_name": "test_base_merge_attempt_outcome_clean_completes_after_all_cleanup_stages"
         },
         {
           "layer": "usecase",
@@ -2316,11 +2271,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_replacement_preserves_type_signals_cache"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
         },
         {
           "layer": "usecase",
@@ -2360,12 +2310,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -2375,7 +2320,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         },
         {
           "layer": "usecase",
@@ -2409,11 +2354,6 @@
         },
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::sync_base::tests",
-          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
-        },
-        {
-          "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_base_merge_interactor_rerenders_type_views_after_changed_baseline_publication"
         },
@@ -2430,47 +2370,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_is_schema_versioned_and_idempotent"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
         },
         {
           "layer": "infrastructure",
@@ -2480,7 +2385,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages"
+          "test_name": "test_base_merge_attempt_outcome_clean_completes_after_all_cleanup_stages"
         },
         {
           "layer": "usecase",
@@ -2496,11 +2401,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_replacement_preserves_type_signals_cache"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
         },
         {
           "layer": "usecase",
@@ -2540,17 +2440,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -2560,7 +2450,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         },
         {
           "layer": "usecase",
@@ -2581,191 +2471,11 @@
           "layer": "usecase",
           "module_path": "usecase::baseline_capture::interactor_tests",
           "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
-        }
-      ]
-    },
-    {
-      "kind": "fulfillment",
-      "obligation_id": {
-        "entry_key": "BaseMergeCleanupPort",
-        "item_identifier": "trait_method:write_sync_base_record",
-        "obligation_kind": "contract"
-      },
-      "tests": [
-        {
-          "layer": "cli",
-          "module_path": "cli::commands::track::tddd::baseline::tests",
-          "test_name": "test_baseline_capture_source_workspace_in_different_tree_is_not_rejected_by_containment"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::track::tests",
-          "test_name": "test_track_driver_handle_base_merge_renders_conflicted_cleanup_failure_handoff"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::sync_base::tests",
-          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_interactor_rerenders_type_views_after_changed_baseline_publication"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_interactor_unchanged_baseline_keeps_rendered_type_view_stable"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_is_schema_versioned_and_idempotent"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::baseline_capture::tests",
-          "test_name": "test_capture_worktree_flow_items_dir_outside_source_workspace_not_rejected"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_conflicted_runs_baseline_then_views"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_replacement_preserves_type_signals_cache"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_passes_snapshot_direction_and_workspace_to_git_port"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_regenerates_views_once_after_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_baseline_failure_is_reported_without_completion"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::baseline_capture::interactor_tests",
-          "test_name": "test_run_source_workspace_is_passed_to_capture"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::baseline_capture::interactor_tests",
-          "test_name": "test_run_with_dotdot_source_workspace_returns_symlink_rejected"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::baseline_capture::interactor_tests",
-          "test_name": "test_run_with_symlinked_source_workspace_returns_symlink_rejected"
+          "test_name": "test_fs_base_merge_cleanup_conflicted_views_ignore_unpersisted_workspace_source"
         }
       ]
     },
@@ -2911,26 +2621,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
         }
       ]
     },
@@ -2955,22 +2645,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_is_schema_versioned_and_idempotent"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages"
+          "test_name": "test_base_merge_attempt_outcome_clean_completes_after_all_cleanup_stages"
         },
         {
           "layer": "usecase",
@@ -3020,7 +2700,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -3050,26 +2730,6 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_unavailable_context_returns_context_error"
         },
         {
@@ -3085,7 +2745,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -3124,7 +2784,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages"
+          "test_name": "test_base_merge_attempt_outcome_clean_completes_after_all_cleanup_stages"
         },
         {
           "layer": "usecase",
@@ -3348,6 +3008,16 @@
         }
       },
       "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
@@ -3610,28 +3280,6 @@
       "reason": "Conflicted is a handoff state that deliberately means clean-merge cleanup has not run. BaseMergeOutcome has no operation or state for executing or completing the downstream conflict-recovery workflow, so AC-04 is not entry-local behavior of this enum."
     },
     {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecord",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-11"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_decode_rejects_unknown_fields_and_invalid_domain_values"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_encode_decode_v1_preserves_validated_fields"
-        }
-      ]
-    },
-    {
       "kind": "fulfillment",
       "obligation_id": {
         "entry_key": "FsBaseMergeContextAdapter",
@@ -3753,26 +3401,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
         }
       ]
     },
@@ -3811,7 +3439,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages"
+          "test_name": "test_base_merge_attempt_outcome_clean_completes_after_all_cleanup_stages"
         },
         {
           "layer": "usecase",
@@ -3831,7 +3459,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -3858,7 +3486,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_attempt_outcome_clean_stamps_exact_commit_after_all_cleanup_stages"
+          "test_name": "test_base_merge_attempt_outcome_clean_completes_after_all_cleanup_stages"
         },
         {
           "layer": "usecase",
@@ -3883,7 +3511,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -3894,23 +3522,6 @@
         "anchor_id": {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "IN-02"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeCleanupRequest",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-06"
         }
       },
       "tests": [
@@ -3944,23 +3555,6 @@
         "entry_key": "BaseMergeCleanupRequest",
         "anchor_id": {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeCleanupRequest",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "CN-07"
         }
       },
@@ -3998,12 +3592,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -4052,23 +3646,6 @@
         "entry_key": "BaseMergeCleanupRequest",
         "anchor_id": {
           "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-11"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeCleanupRequest",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
           "element_id": "AC-12"
         }
       },
@@ -4106,7 +3683,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         },
         {
           "layer": "infrastructure",
@@ -4116,39 +3693,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::track::tests",
-          "test_name": "test_track_driver_handle_base_merge_renders_conflicted_cleanup_failure_handoff"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         }
       ]
     },
@@ -4166,38 +3711,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
         }
       ]
     },
@@ -4224,7 +3737,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         }
       ]
     },
@@ -4242,11 +3755,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
         }
       ]
     },
@@ -4273,24 +3781,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeOutcome",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         }
       ]
     },
@@ -4312,59 +3803,12 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeOutcome",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
         },
         {
           "layer": "usecase",
@@ -4406,11 +3850,6 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
         },
         {
@@ -4436,7 +3875,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -4454,23 +3893,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaseMergeOutcome",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-11"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
         }
       ]
     },
@@ -4507,59 +3929,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaselineReplacementError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-02"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_isolation_failure_preserves_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -4582,11 +3952,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_isolation_failure_preserves_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
         }
       ]
     },
@@ -4609,63 +3974,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_isolation_failure_preserves_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "BaselineReplacementError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_isolation_failure_preserves_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
         }
       ]
     },
@@ -4688,11 +3996,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_isolation_failure_preserves_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
         }
       ]
     },
@@ -4715,11 +4018,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_isolation_failure_preserves_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
         }
       ]
     },
@@ -4754,58 +4052,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "PostMergeCleanupError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
         }
       ]
     },
@@ -4832,7 +4078,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         }
       ]
     },
@@ -4846,6 +4092,21 @@
         }
       },
       "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_rerenders_type_views_after_changed_baseline_publication"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_clean_regenerates_views_once_after_baseline"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
@@ -4867,38 +4128,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_generation_validation_and_publish_failures_preserve_prior_baseline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "PostMergeCleanupError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-11"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_post_merge_cleanup_error_variants_match_declared_nested_errors"
         }
       ]
     },
@@ -4925,196 +4154,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-02"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_sync_base_record_error_variants_preserve_record_and_stamp_after_cleanup"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-07"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_sync_base_record_error_variants_preserve_record_and_stamp_after_cleanup"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-11"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::sync_base::tests",
-          "test_name": "test_write_sync_base_record_atomically_replaces_existing_record_without_partial_or_temp"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_items_root_for_sync_stamp"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_rejects_symlinked_sync_stamp"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordError",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-12"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         }
       ]
     },
@@ -5192,161 +4232,6 @@
       ]
     },
     {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecord",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_decode_rejects_unknown_fields_and_invalid_domain_values"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_encode_decode_v1_preserves_validated_fields"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecord",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_decode_rejects_unknown_fields_and_invalid_domain_values"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_encode_decode_v1_preserves_validated_fields"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_clean_propagates_exact_commit_to_every_cleanup_request"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordSchemaVersion",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "IN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_deserialize_rejects_unknown_schema_version"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_encode_decode_v1_preserves_validated_fields"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordSchemaVersion",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "CN-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_deserialize_rejects_unknown_schema_version"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_encode_decode_v1_preserves_validated_fields"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "SyncBaseRecordSchemaVersion",
-        "anchor_id": {
-          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json",
-          "element_id": "AC-11"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_regenerates_views_replaces_pinned_baselines_and_preserves_type_signals"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_baseline_replacement_isolated_at_exact_commit_and_atomically_published"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_deserialize_rejects_unknown_schema_version"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_sync_base_record_encode_decode_v1_preserves_validated_fields"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
-        }
-      ]
-    },
-    {
       "kind": "fulfillment",
       "obligation_id": {
         "entry_key": "FsBaseMergeCleanupAdapter",
@@ -5357,17 +4242,17 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline_and_sync_stamp"
+          "test_name": "test_fs_base_merge_cleanup_conflicted_views_ignore_unpersisted_workspace_source"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_base_merge_interactor_clean_merge_baseline_failure_preserves_baseline"
         },
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_base_merge_interactor_rerenders_type_views_after_changed_baseline_publication"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
         },
         {
           "layer": "infrastructure",
@@ -5378,11 +4263,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_conflict_replaces_baseline_then_regenerates_views"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
         },
         {
           "layer": "infrastructure",
@@ -5407,22 +4287,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
         },
         {
           "layer": "infrastructure",
@@ -5651,21 +4516,6 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_interactor_sync_stamp_failure_preserves_complete_published_track"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_base_merge_retry_reconciles_retained_recovery_after_telemetry_drift"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_generation_failure_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_publication_failure_preserves_prior_complete_track"
         },
         {
@@ -5676,22 +4526,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_rejects_malformed_or_non_regular_stamp_without_replacing_prior_record"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_restoration_failure_stays_typed_and_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
           "test_name": "test_fs_base_merge_cleanup_adapter_validation_failure_preserves_prior_complete_track"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_adapter_writes_v1_idempotently_and_replaces_later_commit"
         },
         {
           "layer": "infrastructure",
@@ -5706,17 +4541,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_retains_writer_lock_until_sync_base_record"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_is_schema_versioned_and_idempotent"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::base_merge::tests",
-          "test_name": "test_fs_base_merge_cleanup_sync_stamp_rejects_symlinked_recovery_root"
+          "test_name": "test_fs_base_merge_cleanup_releases_writer_lock_after_view_publication"
         },
         {
           "layer": "usecase",
@@ -5727,11 +4552,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_baseline_replacement_preserves_type_signals_cache"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_baseline_restoration_failure_fails_closed"
         },
         {
           "layer": "usecase",
@@ -5747,26 +4567,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_cleanup_failure_preserves_each_failed_stage"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
         }
       ]
     },
@@ -5879,7 +4679,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -6503,6 +5303,31 @@
       },
       "tests": [
         {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_conflicted_views_ignore_unpersisted_workspace_source"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_orders_cleanup_at_exact_commit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflicted_cleanup_failure_handoff"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_passes_exact_commit_to_baseline_and_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
+        },
+        {
           "layer": "cli",
           "module_path": "cli::commands::track::dispatch::tests",
           "test_name": "test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome"
@@ -6516,11 +5341,6 @@
           "layer": "cli",
           "module_path": "cli::commands::track::dispatch::tests",
           "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::track::tests",
-          "test_name": "test_track_driver_handle_base_merge_real_interactor_orders_cleanup_at_exact_commit"
         },
         {
           "layer": "cli_driver",
@@ -6565,7 +5385,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views_without_sync"
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
         }
       ]
     },
@@ -6651,26 +5471,6 @@
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_snapshot_source_mismatch_context_rejection_skips_git_and_cleanup"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_generation_validation_replacement_fail_closed"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_later_commit_replaces_prior_record"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_retry_is_idempotent_for_exact_commit"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_sync_record_write_failure_fails_closed"
         },
         {
           "layer": "usecase",
@@ -6763,6 +5563,16 @@
         }
       },
       "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::base_merge::tests",
+          "test_name": "test_base_merge_outcome_conflicted_runs_baseline_then_views"
+        },
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
@@ -7286,7 +6096,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7358,7 +6168,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7435,7 +6245,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7512,7 +6322,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7599,7 +6409,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7686,7 +6496,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7733,7 +6543,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7780,7 +6590,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7827,7 +6637,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
@@ -7857,6 +6667,31 @@
       },
       "tests": [
         {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_real_interactor_orders_cleanup_at_exact_commit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_handle_base_merge_renders_conflicted_cleanup_failure_handoff"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::base_merge::tests",
+          "test_name": "test_fs_base_merge_cleanup_conflicted_views_ignore_unpersisted_workspace_source"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::dispatch::tests",
+          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
+        },
+        {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_execute_conflict_replaces_baseline_then_regenerates_views"
@@ -7874,27 +6709,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
           "test_name": "test_base_merge_outcome_completed_after_all_ordered_cleanup_successes"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::track::tests",
-          "test_name": "test_track_driver_handle_base_merge_renders_conflict_recovery_handoff"
-        },
-        {
-          "layer": "cli",
-          "module_path": "cli::commands::track::dispatch::tests",
-          "test_name": "test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure"
-        },
-        {
-          "layer": "cli_driver",
-          "module_path": "cli_driver::track::tests",
-          "test_name": "test_track_driver_handle_base_merge_renders_conflicted_cleanup_failure_handoff"
         }
       ]
     },
@@ -7926,7 +6746,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::base_merge::tests",
-          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported_without_sync"
+          "test_name": "test_base_merge_execute_conflict_views_failure_is_reported"
         },
         {
           "layer": "usecase",

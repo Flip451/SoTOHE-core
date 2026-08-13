@@ -226,17 +226,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "ca38a224f1cc1e8ff45541d09359ecb4d06ac2fa7fedb422662be1ecceb33fd1",
+      "evidence_hash": "3e297fa8d3dbe8947e4eedfd5beb64a948a2de09aaa83db4d668c50fefdb43c6",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit.",
+        "citation": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views.",
         "kind": "pass"
       }
     },
@@ -298,17 +298,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "218fe049b3f5391fbe9ebd9605f7a1934ff6fa06d51f2cc6c98351f615eb94f6",
+      "evidence_hash": "432083447df59f23c7dc2faaee26416aff5a00ede4d8a550d780975f50906863",
       "evidence_origin": {
         "data": {
           "element_id": "CN-07",
           "section": "constraint",
-          "text_label": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure."
+          "text_label": "Both clean and conflicted merge cleanup may complete only in the order Baseline then Views. A conflicted merge's views read only persisted signals, baseline, and track artifacts, and either stage reports failure when it fails."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure.",
+        "citation": "Both clean and conflicted merge cleanup may complete only in the order Baseline then Views. A conflicted merge's views read only persisted signals, baseline, and track artifacts, and either stage reports failure when it fails.",
         "kind": "pass"
       }
     },
@@ -370,17 +370,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "6f908f58a1a65151f2b7f04bd906ffa815e5a3cbd1e4900e6fcf207ea017c37e",
+      "evidence_hash": "58becbe0f1c596be1377430428840be620ed8637e9fa43a6c8dd08ef8ccf7f87",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit.",
+        "citation": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage.",
         "kind": "pass"
       }
     },
@@ -394,12 +394,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "3c33695aa5ec09085a3265ae03d1114da000072e324b6a71f2dd73a96fa3d0fe",
+      "evidence_hash": "7e9ce9e2e686833a8a221dec57678a0cffd5be4da84cf031b426702852e57340",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit."
         },
         "kind": "spec_element"
       },
@@ -442,17 +442,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "6fc35b2994fa9c46b8fd998ea21543540371efab54383c52e180b40658614d37",
+      "evidence_hash": "ae4678fe713ebfb484c98539f7c25791b8dd52d8e56a54087e36c1962f975de8",
       "evidence_origin": {
         "data": {
           "element_id": "AC-12",
           "section": "acceptance_criteria",
-          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported."
+          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; any stage failure is reported."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported.",
+        "citation": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; any stage failure is reported.",
         "kind": "pass"
       }
     }

@@ -31,16 +31,12 @@
           "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
         },
         {
-          "anchor": "D2",
-          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        {
           "anchor": "D3",
           "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
         }
       ],
       "id": "AC-03",
-      "text": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated, derived views are generated once after that baseline stage, and the sync-base record then records that exact commit."
+      "text": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage."
     },
     {
       "adr_refs": [
@@ -54,7 +50,7 @@
         }
       ],
       "id": "AC-04",
-      "text": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit. It does not write a sync-base record or record cleanup completion."
+      "text": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit."
     },
     {
       "adr_refs": [
@@ -119,26 +115,12 @@
     {
       "adr_refs": [
         {
-          "anchor": "D2",
-          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        {
-          "anchor": "D3",
-          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        }
-      ],
-      "id": "AC-11",
-      "text": "Following successful baseline and view stages of a clean guarded merge, the sync-base record contains the exact base commit that merge incorporated."
-    },
-    {
-      "adr_refs": [
-        {
           "anchor": "D3",
           "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
         }
       ],
       "id": "AC-12",
-      "text": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; it does not write a sync-base record, and any stage failure is reported."
+      "text": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; any stage failure is reported."
     },
     {
       "adr_refs": [
@@ -174,7 +156,7 @@
         }
       ],
       "id": "CN-02",
-      "text": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages; conflicted merge outcomes do not write a sync-base record."
+      "text": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline and view stages."
     },
     {
       "adr_refs": [
@@ -217,26 +199,12 @@
     {
       "adr_refs": [
         {
-          "anchor": "D2",
-          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        {
-          "anchor": "D3",
-          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        }
-      ],
-      "id": "CN-06",
-      "text": "The sync-base record must use the exact base commit incorporated by the guarded merge and be written only after that clean merge's baseline and view stages succeed."
-    },
-    {
-      "adr_refs": [
-        {
           "anchor": "D3",
           "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
         }
       ],
       "id": "CN-07",
-      "text": "Clean-merge cleanup may complete only in the order Baseline, Views, then SyncBaseStamp. A conflicted merge executes Baseline then Views, with views reading only persisted signals, baseline, and track artifacts; it does not write a SyncBaseStamp and reports any stage failure."
+      "text": "Both clean and conflicted merge cleanup may complete only in the order Baseline then Views. A conflicted merge's views read only persisted signals, baseline, and track artifacts, and either stage reports failure when it fails."
     }
   ],
   "goal": [
@@ -248,10 +216,6 @@
         },
         {
           "anchor": "D1",
-          "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-        },
-        {
-          "anchor": "D2",
           "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
         },
         {
@@ -315,30 +279,12 @@
             "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
           },
           {
-            "anchor": "D2",
-            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-          },
-          {
             "anchor": "D3",
             "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
           }
         ],
         "id": "IN-02",
-        "text": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit, generate derived views, and then record synchronization of that commit."
-      },
-      {
-        "adr_refs": [
-          {
-            "anchor": "D2",
-            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-          },
-          {
-            "anchor": "D3",
-            "file": "knowledge/adr/2026-08-02-0715-base-merge-cleanup-state.md"
-          }
-        ],
-        "id": "IN-06",
-        "text": "Persist synchronization of the exact base commit incorporated by a successful guarded merge only after its baseline and view stages succeed."
+        "text": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views."
       },
       {
         "adr_refs": [
@@ -413,7 +359,7 @@
     ]
   },
   "signals": {
-    "blue": 31,
+    "blue": 28,
     "red": 0,
     "yellow": 0
   },
