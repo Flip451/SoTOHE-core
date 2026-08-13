@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-07-31-base-merge-and-conflict-recovery",
+  "title": "Base Merge and Conflict Recovery",
+  "branch": "track/2026-07-31-base-merge-and-conflict-recovery",
+  "created_at": "2026-07-31T22:44:46Z",
+  "updated_at": "2026-07-31T22:44:46Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

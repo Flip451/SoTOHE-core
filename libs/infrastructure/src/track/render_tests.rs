@@ -587,6 +587,34 @@ fn sync_rendered_views_writes_plan_and_registry() {
     assert!(dir.path().join("track/registry.md").is_file());
 }
 
+#[test]
+fn sync_rendered_views_serializes_concurrent_registry_writers() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join("track/items")).unwrap();
+    let registry_path = dir.path().join("track/registry.md");
+    let first_lock =
+        crate::track::registry_lock::acquire_registry_lock(&registry_path, dir.path()).unwrap();
+    let (started_tx, started_rx) = std::sync::mpsc::channel();
+    let (finished_tx, finished_rx) = std::sync::mpsc::channel();
+    let root = dir.path().to_path_buf();
+    let handle = std::thread::spawn(move || {
+        started_tx.send(()).unwrap();
+        let result = sync_rendered_views(&root, None).is_ok();
+        finished_tx.send(result).unwrap();
+    });
+
+    started_rx.recv_timeout(std::time::Duration::from_secs(1)).unwrap();
+    assert!(
+        finished_rx.recv_timeout(std::time::Duration::from_millis(100)).is_err(),
+        "the normal registry writer must wait for the shared lock"
+    );
+    drop(first_lock);
+
+    assert!(finished_rx.recv_timeout(std::time::Duration::from_secs(1)).unwrap());
+    handle.join().unwrap();
+    assert!(registry_path.is_file());
+}
+
 // --- registry / snapshot boundary tests ---
 
 #[test]
@@ -1641,17 +1669,18 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
     std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
     write_minimal_style_config_to_root(dir.path());
 
-    // Schema-v2 companion signal file with a Blue signal for the declared TrackId.
+    // Current-schema companion signal file with a Blue signal for the declared TrackId.
     let decl_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
     let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes)
         .as_digest()
         .as_str()
         .to_owned();
     let signal_file = serde_json::json!({
-        "schema_version": 3,
+        "schema_version": 4,
         "generated_at": "2026-04-19T00:00:00Z",
         "declaration_hash": hash,
-        "implementation_input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "baseline_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "signals": [
             {
                 "type_name": "TrackId",
@@ -1674,6 +1703,81 @@ fn sync_rendered_views_populates_signal_emojis_from_signal_file() {
         md.contains('\u{1f535}'),
         "rendered markdown must include the Blue emoji populated from the signal file, got:\n{md}"
     );
+}
+
+#[test]
+fn sync_rendered_views_requires_present_baseline_to_match_signal_document() {
+    // A declaration-stable signal document is still stale after local baseline
+    // recapture when its recorded baseline hash does not match the present
+    // baseline authority. The renderer must show the existing placeholder until
+    // the signal document is regenerated for that baseline.
+    let dir = tempfile::tempdir().unwrap();
+    init_git_repo_on_track_branch(dir.path(), "track-a");
+    let track_dir = dir.path().join("track/items/track-a");
+    std::fs::create_dir_all(&track_dir).unwrap();
+
+    std::fs::write(
+        track_dir.join("metadata.json"),
+        sample_metadata_json(
+            "track-a",
+            "planned",
+            "2026-03-13T02:00:00Z",
+            r#"[{"id":"T001","description":"First task","status":"todo"}]"#,
+        ),
+    )
+    .unwrap();
+    std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_JSON_MINIMAL).unwrap();
+    std::fs::write(dir.path().join("architecture-rules.json"), DOMAIN_ARCH_RULES).unwrap();
+    write_minimal_style_config_to_root(dir.path());
+
+    let declaration_bytes = std::fs::read(track_dir.join("domain-types.json")).unwrap();
+    let declaration_hash = crate::tddd::type_signals_codec::declaration_hash(&declaration_bytes)
+        .as_digest()
+        .as_str()
+        .to_owned();
+    let baseline_bytes = vec![b'x'; 4 * 1024 * 1024 + 1];
+    std::fs::write(track_dir.join("domain-types-baseline.json"), &baseline_bytes).unwrap();
+
+    let write_signal_file = |baseline_hash: String| {
+        let signal_file = serde_json::json!({
+            "schema_version": 4,
+            "generated_at": "2026-04-19T00:00:00Z",
+            "declaration_hash": declaration_hash.clone(),
+            "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "baseline_hash": baseline_hash,
+            "signals": [
+                {
+                    "type_name": "TrackId",
+                    "kind_tag": "value_object",
+                    "signal": "blue",
+                    "found_type": true
+                }
+            ],
+        });
+        std::fs::write(
+            track_dir.join("domain-type-signals.json"),
+            serde_json::to_string_pretty(&signal_file).unwrap(),
+        )
+        .unwrap();
+    };
+
+    write_signal_file(
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_owned(),
+    );
+    sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+    let stale_render = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+    assert!(!stale_render.contains('\u{1f535}'));
+    assert!(stale_render.contains('—'));
+
+    write_signal_file(
+        crate::tddd::type_signals_codec::baseline_hash(&baseline_bytes)
+            .as_digest()
+            .as_str()
+            .to_owned(),
+    );
+    sync_rendered_views(dir.path(), Some("track-a")).unwrap();
+    let fresh_render = std::fs::read_to_string(track_dir.join("domain-types.md")).unwrap();
+    assert!(fresh_render.contains('\u{1f535}'));
 }
 
 #[test]

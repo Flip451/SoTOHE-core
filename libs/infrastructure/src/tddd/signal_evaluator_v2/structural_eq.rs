@@ -194,44 +194,56 @@ fn type_alias_targets_lexically_equal(a: &rustdoc_types::Type, b: &rustdoc_types
     ) else {
         return false;
     };
-    normalize_alias_target_paths(&mut a_value);
-    normalize_alias_target_paths(&mut b_value);
+    normalize_alias_target_path_pairs(&mut a_value, &mut b_value);
     a_value == b_value
 }
 
-/// Reduces every serialized rustdoc `Path` name to its last segment.
+/// Normalizes only the qualified-vs-short path representation difference.
 ///
 /// The caller has already produced the alias lexical signature, so rustdoc
 /// IDs and the signature's other deliberate normalizations remain intact.
 /// A serialized `Path` is the only target object with both `path` and `args`;
 /// this covers resolved paths and trait paths in dyn, impl-trait, qualified,
-/// and nested bound forms without changing other target strings.
-fn normalize_alias_target_paths(value: &mut serde_json::Value) {
-    match value {
-        serde_json::Value::Array(values) => {
-            for value in values {
-                normalize_alias_target_paths(value);
+/// and nested bound forms without changing other target strings.  Qualified
+/// paths are shortened only when their counterpart is already short.  Two
+/// qualified paths retain their crate/module identity and therefore cannot
+/// compare equal merely because their final segments happen to match.
+fn normalize_alias_target_path_pairs(a: &mut serde_json::Value, b: &mut serde_json::Value) {
+    match (a, b) {
+        (serde_json::Value::Array(a_values), serde_json::Value::Array(b_values)) => {
+            for (a_value, b_value) in a_values.iter_mut().zip(b_values.iter_mut()) {
+                normalize_alias_target_path_pairs(a_value, b_value);
             }
         }
-        serde_json::Value::Object(values) => {
-            if values.contains_key("args") {
-                if let Some(short_name) = values
-                    .get("path")
-                    .and_then(serde_json::Value::as_str)
-                    .and_then(|path| path.rsplit("::").next())
-                    .map(ToOwned::to_owned)
-                {
-                    values.insert("path".to_owned(), serde_json::Value::String(short_name));
+        (serde_json::Value::Object(a_values), serde_json::Value::Object(b_values)) => {
+            let a_path = a_values.get("path").and_then(serde_json::Value::as_str);
+            let b_path = b_values.get("path").and_then(serde_json::Value::as_str);
+            if a_values.contains_key("args")
+                && b_values.contains_key("args")
+                && let (Some(a_path), Some(b_path)) = (a_path, b_path)
+                && a_path.contains("::") != b_path.contains("::")
+            {
+                let qualified_path = if a_path.contains("::") { a_path } else { b_path };
+                if let Some(short_name) = qualified_path.rsplit("::").next() {
+                    let short_name = serde_json::Value::String(short_name.to_owned());
+                    if a_path.contains("::") {
+                        a_values.insert("path".to_owned(), short_name);
+                    } else {
+                        b_values.insert("path".to_owned(), short_name);
+                    }
                 }
             }
-            for value in values.values_mut() {
-                normalize_alias_target_paths(value);
+
+            let keys: Vec<String> = a_values.keys().cloned().collect();
+            for key in keys {
+                if let (Some(a_value), Some(b_value)) =
+                    (a_values.get_mut(&key), b_values.get_mut(&key))
+                {
+                    normalize_alias_target_path_pairs(a_value, b_value);
+                }
             }
         }
-        serde_json::Value::Null
-        | serde_json::Value::Bool(_)
-        | serde_json::Value::Number(_)
-        | serde_json::Value::String(_) => {}
+        _ => {}
     }
 }
 
@@ -1337,6 +1349,28 @@ mod tests {
                 "my_crate",
             ),
             "a qualified catalogue alias target must match rustdoc's short path name"
+        );
+    }
+
+    #[test]
+    fn test_type_alias_distinct_qualified_target_paths_remain_mismatch() {
+        let target = |path: &str| {
+            Type::ResolvedPath(Path {
+                path: path.to_string(),
+                id: Id(55),
+                args: Some(Box::new(GenericArgs::AngleBracketed {
+                    args: vec![GenericArg::Type(Type::Generic("T".to_string()))],
+                    constraints: vec![],
+                })),
+            })
+        };
+        let params = vec![make_type_param("T", vec![])];
+        let left = make_type_alias_item(Id(56), target("foo::Item"), params.clone());
+        let right = make_type_alias_item(Id(57), target("bar::Item"), params);
+
+        assert!(
+            !items_structurally_equal(&left, &right, &HashMap::new(), &HashMap::new(), "my_crate",),
+            "distinct qualified alias target paths must not collapse to their shared short name"
         );
     }
 

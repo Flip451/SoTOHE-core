@@ -152,9 +152,16 @@ impl TypeSignalsService for TypeSignalsInteractor {
             })?;
             self.executor
                 .evaluate_layer(&items_dir, &track_id, &workspace_root, binding, features)
-                .map_err(|e| TypeSignalsError::EvaluationFailed {
-                    layer_id,
-                    reason: DiagnosticText::new(e.to_string()),
+                .map_err(|error| match error {
+                    super::ports::TypeSignalsExecutionError::AuthoritativeInput(reason) => {
+                        TypeSignalsError::AuthoritativeInputFailed { layer_id, reason }
+                    }
+                    super::ports::TypeSignalsExecutionError::Evaluation(reason) => {
+                        TypeSignalsError::EvaluationFailed { layer_id, reason }
+                    }
+                    super::ports::TypeSignalsExecutionError::CacheWrite(reason) => {
+                        TypeSignalsError::CacheWriteFailed { layer_id, reason }
+                    }
                 })?;
         }
 

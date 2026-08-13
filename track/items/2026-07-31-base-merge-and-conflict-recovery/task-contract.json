@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-07-31-base-merge-and-conflict-recovery",
+  "entries": {
+    "T001": [
+      {"layer": "domain", "entry_key": "BaseBranchName"},
+      {"layer": "domain", "entry_key": "BaseMergeDirection"},
+      {"layer": "domain", "entry_key": "BaseMergeDirectionError"},
+      {"layer": "domain", "entry_key": "TrackMetadata"},
+      {"layer": "domain", "entry_key": "domain::branch_strategy::derive_base_merge_direction"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "BaseMergeService"},
+      {"layer": "usecase", "entry_key": "BaseMergeCommand"},
+      {"layer": "usecase", "entry_key": "BaseMergeContextError"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitError"},
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
+      {"layer": "usecase", "entry_key": "BaseMergeOutcome"}
+    ],
+    "T003": [
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeContextAdapter"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeGitAdapter"}
+    ],
+    "T004": [
+      {"layer": "cli_driver", "entry_key": "BaseMergeInput"}
+    ],
+    "T005": [],
+    "T006": [],
+    "T021": [
+      {"layer": "usecase", "entry_key": "GitStashService"},
+      {"layer": "usecase", "entry_key": "GitStashPushError"},
+      {"layer": "usecase", "entry_key": "GitStashPushOutcome"},
+      {"layer": "infrastructure", "entry_key": "FsGitStashAdapter"},
+      {"layer": "cli_driver", "entry_key": "GitDriver"},
+      {"layer": "cli_driver", "entry_key": "GitStashInput"},
+      {"layer": "cli", "entry_key": "GitCommand"},
+      {"layer": "cli", "entry_key": "GitStashAction"},
+      {"layer": "cli", "entry_key": "cli::commands::git::execute"}
+    ],
+    "T022": [
+      {"layer": "infrastructure", "entry_key": "FsGitStashAdapter"}
+    ],
+    "T023": [
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"}
+    ],
+    "T024": [],
+    "T007": [
+      {"layer": "domain", "entry_key": "BaselineHash"},
+      {"layer": "domain", "entry_key": "TypeSignalsDocument"}
+    ],
+    "T008": [
+      {"layer": "usecase", "entry_key": "TypeSignalsError"},
+      {"layer": "usecase", "entry_key": "TypeSignalsExecutionError"},
+      {"layer": "usecase", "entry_key": "TypeSignalsInteractor"},
+      {"layer": "usecase", "entry_key": "TypeSignalsExecutorPort"}
+    ],
+    "T009": [
+      {"layer": "infrastructure", "entry_key": "TypeSignalsExecutorAdapter"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::decode"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::encode"},
+      {"layer": "infrastructure", "entry_key": "EvaluateSignalsError"},
+      {"layer": "infrastructure", "entry_key": "TypeSignalsCodecError"}
+    ],
+    "T010": [
+      {"layer": "domain", "entry_key": "CommitHash"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeError"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupRequest"},
+      {"layer": "usecase", "entry_key": "PostMergeCleanupError"},
+      {"layer": "usecase", "entry_key": "ViewsRegenerationError"},
+      {"layer": "usecase", "entry_key": "BaselineReplacementError"}
+    ],
+    "T011": [
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"}
+    ],
+    "T012": [],
+    "T013": [],
+    "T014": [],
+    "T015": [],
+    "T016": [],
+    "T017": [],
+    "T018": [],
+    "T019": [],
+    "T025": [
+      {"layer": "domain", "entry_key": "TypeSignalsCacheKey"},
+      {"layer": "domain", "entry_key": "ImplementationInputHash"},
+      {"layer": "domain", "entry_key": "TypeSignalsReuseInput"},
+      {"layer": "domain", "entry_key": "TypeSignalsAuthorityStatus"},
+      {"layer": "domain", "entry_key": "TypeSignalsWorktreeStatus"},
+      {"layer": "domain", "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"},
+      {"layer": "usecase", "entry_key": "BaseMergeAttemptOutcome"},
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeContextPort"},
+      {"layer": "usecase", "entry_key": "TrackBlobReader"},
+      {"layer": "usecase", "entry_key": "GitStashPopError"},
+      {"layer": "usecase", "entry_key": "GitStashPort"},
+      {"layer": "usecase", "entry_key": "GitStashInteractor"},
+      {"layer": "cli_driver", "entry_key": "GitDriver"},
+      {"layer": "cli_driver", "entry_key": "TrackDriver"},
+      {"layer": "cli", "entry_key": "TrackCommand"},
+      {"layer": "cli", "entry_key": "cli::commands::track::dispatch::dispatch_track_cmd_with_dependencies"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeContextAdapter"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeGitAdapter"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"},
+      {"layer": "infrastructure", "entry_key": "FsGitStashAdapter"}
+    ],
+    "T020": [
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeError"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitError"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeGitAdapter"}
+    ],
+    "T026": [
+      {"layer": "domain", "entry_key": "TypeSignalsReuseInput"},
+      {"layer": "domain", "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"},
+      {"layer": "usecase", "entry_key": "BaseMergeGitPort"},
+      {"layer": "usecase", "entry_key": "BaseMergeService"},
+      {"layer": "usecase", "entry_key": "BaseMergeInteractor"},
+      {"layer": "usecase", "entry_key": "BaseMergeCleanupPort"},
+      {"layer": "usecase", "entry_key": "BaselineReplacementError"},
+      {"layer": "usecase", "entry_key": "PostMergeCleanupError"},
+      {"layer": "usecase", "entry_key": "TrackBlobReader"},
+      {"layer": "infrastructure", "entry_key": "FsBaseMergeCleanupAdapter"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"}
+    ]
+  }
+}

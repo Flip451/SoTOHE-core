@@ -4,6 +4,7 @@
 //! reads the sibling `domain-types.json` and verifies its entries.
 //! Otherwise falls back to the markdown table scan (legacy path).
 
+use std::io::Read as _;
 use std::path::{Path, PathBuf};
 
 use domain::spec::{SpecDocument, check_spec_doc_signals};
@@ -14,8 +15,10 @@ use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard;
 
 use super::frontmatter::parse_yaml_frontmatter;
-use super::path_safety::check_signals_file;
+use super::path_safety::{check_signals_file, lexical_normalize};
 use super::tddd_layers::{TdddLayerBinding, parse_tddd_layers};
+
+const MAX_TYPE_BASELINE_BYTES: u64 = 64 * 1024 * 1024;
 
 /// Verifies spec.json Stage 1 signals (chain ① `check-spec-adr`).
 ///
@@ -217,6 +220,72 @@ fn load_tddd_layers(trusted_root: &Path) -> Result<Vec<TdddLayerBinding>, Verify
     Ok(bindings)
 }
 
+/// Normalize and guard the optional local type-baseline path used by the
+/// explicit-path check.
+///
+/// A missing baseline is a supported fresh-checkout state, so this helper
+/// preserves that structural absence as `Ok(None)`. Existing paths must still
+/// be lexically contained by the discovered repository root before the
+/// symlink guard or any read can occur.
+fn normalize_optional_baseline_path(
+    baseline_path: &Path,
+    workspace_root: &Path,
+) -> Result<Option<PathBuf>, VerifyFinding> {
+    let absolute_path = if baseline_path.is_absolute() {
+        baseline_path.to_path_buf()
+    } else {
+        workspace_root.join(baseline_path)
+    };
+    let normalized_root = lexical_normalize(workspace_root);
+    let normalized_path = lexical_normalize(&absolute_path);
+    if !normalized_path.starts_with(&normalized_root) {
+        return Err(VerifyFinding::error(format!(
+            "'{}' resolves outside workspace root '{}'. Only paths under the workspace are allowed.",
+            baseline_path.display(),
+            workspace_root.display()
+        )));
+    }
+
+    match symlink_guard::reject_symlinks_below(&normalized_path, &normalized_root) {
+        Ok(true) => Ok(Some(normalized_path)),
+        Ok(false) => Ok(None),
+        Err(e) => Err(VerifyFinding::error(format!("{}: {e}", baseline_path.display()))),
+    }
+}
+
+fn read_baseline_bytes(path: &Path) -> Result<Vec<u8>, String> {
+    let metadata =
+        std::fs::symlink_metadata(path).map_err(|error| format!("metadata error: {error}"))?;
+    if metadata.file_type().is_symlink() {
+        return Err("refused symlink".to_owned());
+    }
+    if !metadata.file_type().is_file() {
+        return Err("baseline is not a regular file".to_owned());
+    }
+    if metadata.len() > MAX_TYPE_BASELINE_BYTES {
+        return Err(format!(
+            "baseline file exceeds maximum size of {MAX_TYPE_BASELINE_BYTES} bytes: {} bytes",
+            metadata.len()
+        ));
+    }
+
+    let file = std::fs::File::open(path).map_err(|error| format!("I/O error: {error}"))?;
+    let opened_metadata = file.metadata().map_err(|error| format!("metadata error: {error}"))?;
+    if !opened_metadata.file_type().is_file() {
+        return Err("baseline is not a regular file".to_owned());
+    }
+    let mut bytes = Vec::new();
+    file.take(MAX_TYPE_BASELINE_BYTES.saturating_add(1))
+        .read_to_end(&mut bytes)
+        .map_err(|error| format!("I/O error: {error}"))?;
+    if u64::try_from(bytes.len()).map_or(true, |length| length > MAX_TYPE_BASELINE_BYTES) {
+        return Err(format!(
+            "baseline file exceeds maximum size of {MAX_TYPE_BASELINE_BYTES} bytes"
+        ));
+    }
+    Ok(bytes)
+}
+
 /// Runs Stage 2 signal evaluation for a single enabled TDDD layer.
 ///
 /// `dir` is the track directory that contains the catalogue file.
@@ -308,14 +377,43 @@ fn evaluate_layer_catalogue(
                 }
             };
             let current_hash = type_signals_codec::declaration_hash(&declaration_bytes);
-            if *doc.declaration_hash() != current_hash {
+            if *doc.cache_key().declaration_hash() != current_hash {
                 return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "{}: declaration_hash mismatch (recorded={}, current={}) — \
                      re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
                     signal_path.display(),
-                    doc.declaration_hash().as_digest().as_str(),
+                    doc.cache_key().declaration_hash().as_digest().as_str(),
                     current_hash.as_digest().as_str()
                 ))]);
+            }
+            // A baseline recapture (e.g. a clean merge-base) changes reverse
+            // filtering without touching the catalogue, so the cached signals
+            // are only current when the available local baseline matches.
+            let baseline_path = dir.join(binding.baseline_file());
+            let normalized_baseline =
+                match normalize_optional_baseline_path(&baseline_path, trusted_root) {
+                    Ok(path) => path,
+                    Err(finding) => return VerifyOutcome::from_findings(vec![finding]),
+                };
+            if let Some(baseline_path) = normalized_baseline {
+                let baseline_bytes = match read_baseline_bytes(&baseline_path) {
+                    Ok(bytes) => bytes,
+                    Err(error) => {
+                        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                            "cannot read {}: {error}",
+                            baseline_path.display()
+                        ))]);
+                    }
+                };
+                let current_baseline_hash = type_signals_codec::baseline_hash(&baseline_bytes);
+                if *doc.cache_key().baseline_hash() != current_baseline_hash {
+                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "{}: baseline_hash mismatch (recorded={}, current={}) — re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
+                        signal_path.display(),
+                        doc.cache_key().baseline_hash().as_digest().as_str(),
+                        current_baseline_hash.as_digest().as_str()
+                    ))]);
+                }
             }
             doc
         }
@@ -343,14 +441,17 @@ fn evaluate_layer_catalogue(
 
 /// Evaluate chain ③ (`check-impl-catalog`) gate for a single layer with explicit paths.
 ///
-/// Called by `signal check-impl-catalog --signals-path P --catalog-hash H --gate commit|merge`.
-/// Performs symlink guards, `declaration_hash` freshness, and the Red/Yellow/Blue domain gate.
+/// Called by the live `signal check-impl-catalog` path with explicit signal,
+/// baseline, and catalogue paths/hashes. Performs symlink guards,
+/// declaration and baseline freshness, and the
+/// Red/Yellow/Blue domain gate.
 ///
 /// # Errors
 ///
 /// Returns a `VerifyOutcome` with error findings on I/O, decode, or gate failures.
-pub fn check_impl_catalog_from_signals_file(
+pub(crate) fn check_impl_catalog_from_signals_file(
     signals_path: &Path,
+    baseline_path: &Path,
     catalog_hash_hex: &str,
     strict: bool,
 ) -> VerifyOutcome {
@@ -362,7 +463,7 @@ pub fn check_impl_catalog_from_signals_file(
             signals_path.display()
         ),
         |text| type_signals_codec::decode(text).map_err(|e| e.to_string()),
-        |doc| doc.declaration_hash().as_digest().as_str().to_owned(),
+        |doc| doc.cache_key().declaration_hash().as_digest().as_str().to_owned(),
         |recorded, current, path| {
             format!(
                 "{}: declaration_hash mismatch (recorded={}, current={}) — \
@@ -372,7 +473,33 @@ pub fn check_impl_catalog_from_signals_file(
                 current
             )
         },
-        |doc, _normalized_signals, _workspace_root| {
+        |doc, _normalized_signals, workspace_root| {
+            // A missing type-baseline is a supported fresh-CI boundary.
+            let normalized_baseline =
+                match normalize_optional_baseline_path(baseline_path, &workspace_root) {
+                    Ok(path) => path,
+                    Err(finding) => return VerifyOutcome::from_findings(vec![finding]),
+                };
+            if let Some(baseline_path) = normalized_baseline {
+                let baseline_bytes = match read_baseline_bytes(&baseline_path) {
+                    Ok(bytes) => bytes,
+                    Err(error) => {
+                        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                            "cannot read {}: {error}",
+                            baseline_path.display()
+                        ))]);
+                    }
+                };
+                let current_baseline_hash = type_signals_codec::baseline_hash(&baseline_bytes);
+                if *doc.cache_key().baseline_hash() != current_baseline_hash {
+                    return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                        "{}: baseline_hash mismatch (recorded={}, current={}) — re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
+                        _normalized_signals.display(),
+                        doc.cache_key().baseline_hash().as_digest().as_str(),
+                        current_baseline_hash.as_digest().as_str()
+                    ))]);
+                }
+            }
             let strictness = if strict { Strictness::Strict } else { Strictness::Interim };
             check_type_signals(&doc, strictness)
         },
@@ -382,23 +509,11 @@ pub fn check_impl_catalog_from_signals_file(
 /// Verifies that `spec.md` contains a `## Domain States` section with a markdown table
 /// that has at least one data row (beyond the header and separator rows).
 ///
-/// When a sibling `spec.json` exists next to `spec_path`, delegates to
-/// `verify_from_spec_json` (Stage 1, chain ①) and then
-/// `verify_type_signals_from_spec_json` (Stage 2, chain ③), merging the
-/// results. Both stages use the same `strict` parameter here because this
-/// combined entrypoint does not yet receive per-chain strictness. Independent
-/// per-chain strictness is wired in T009-T011 via `signal check-spec-adr` and
-/// `signal check-impl-catalog`. Otherwise falls back to the markdown table scan.
+/// Uses the sibling JSON stages when present, merging their findings; otherwise
+/// falls back to the legacy markdown table scan.
 ///
-/// See [`verify_from_spec_json`] for the `trusted_root` contract.
-///
-/// # Errors
-///
-/// Returns findings when:
-/// - The file cannot be read.
-/// - The `## Domain States` heading is absent from the body.
-/// - The section exists but contains no markdown table.
-/// - The table has no data rows (header + separator only).
+/// See [`verify_from_spec_json`] for the `trusted_root` contract. Returns findings
+/// when the file or required table is invalid.
 pub fn verify(spec_path: &Path, strict: bool, trusted_root: &Path) -> VerifyOutcome {
     if let Some(outcome) = verify_sibling_json_stages(spec_path, strict, trusted_root) {
         return outcome;
@@ -570,14 +685,14 @@ mod tests {
         (dir, path)
     }
 
-    // Helper: write a `<layer>-type-signals.json` (schema_version 3) whose
+    // Helper: write a current-schema `<layer>-type-signals.json` whose
     // `declaration_hash` matches the on-disk bytes of the companion
     // `<layer>-types.json` file. The `signals` field is copied verbatim from
     // the declaration file's legacy `signals` array (raw JSON) so that fixture
     // declaration files with inline signals still exercise the intended
     // Blue/Yellow/Red paths in `check_type_signals` via the signal file.
-    // The implementation hash reuses the declaration hash because these
-    // fixtures only need a decodable current-schema document.
+    // The cache document records the repository identity; this verifier only
+    // checks the declaration and local baseline authorities.
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
@@ -587,11 +702,22 @@ mod tests {
             .as_digest()
             .as_str()
             .to_owned();
+        let baseline_bytes: &[u8] = b"fixture-baseline";
+        let baseline_name = format!(
+            "{}-baseline.json",
+            catalogue_name.strip_suffix(".json").unwrap_or(catalogue_name)
+        );
+        std::fs::write(track_dir.join(baseline_name), baseline_bytes).unwrap();
+        let baseline_hash = crate::tddd::type_signals_codec::baseline_hash(baseline_bytes)
+            .as_digest()
+            .as_str()
+            .to_owned();
         let signal_file = serde_json::json!({
-            "schema_version": 3,
+            "schema_version": 4,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": hash,
-            "implementation_input_hash": hash,
+            "head_commit": "a".repeat(40),
+            "baseline_hash": baseline_hash,
             "signals": signals_array,
         });
         let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
@@ -782,6 +908,8 @@ mod tests {
   "layers": [
     {
       "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
       "tddd": { "enabled": true, "catalogue_file": "domain-types.json" }
     }
   ]
@@ -1420,10 +1548,11 @@ mod tests {
     }
 
     const DOMAIN_TYPE_SIGNALS_STALE_HASH: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "implementation_input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "head_commit": "0000000000000000000000000000000000000000",
+  "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
@@ -1554,6 +1683,73 @@ mod tests {
     }
 
     #[test]
+    fn test_signal_file_with_stale_baseline_hash_fails_closed() {
+        // A baseline recapture (e.g. a clean merge-base) changes reverse
+        // filtering without touching the catalogue; the cached signals must
+        // fail closed instead of gating an obsolete result.
+        let dir = tempfile::tempdir().unwrap();
+        write_domain_tddd_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
+        std::fs::write(dir.path().join("domain-types-baseline.json"), b"recaptured-baseline")
+            .unwrap();
+
+        let outcome =
+            verify_type_signals_from_spec_json(spec_json_path, false, dir.path().to_path_buf());
+
+        assert!(
+            outcome.has_errors(),
+            "a recaptured baseline must stale the cached signals: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_signal_file_with_oversized_baseline_fails_closed() {
+        let dir = tempfile::tempdir().unwrap();
+        write_domain_tddd_rules(dir.path());
+        let spec_json_path = dir.path().join("spec.json");
+        std::fs::write(&spec_json_path, SPEC_JSON_MINIMAL).unwrap();
+        std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_ALL_BLUE_SIGNALS)
+            .unwrap();
+        write_matching_signal_file(dir.path(), "domain-types.json", "domain-type-signals.json");
+
+        let baseline_path = dir.path().join("domain-types-baseline.json");
+        let baseline = std::fs::File::create(&baseline_path).unwrap();
+        baseline.set_len((64 * 1024 * 1024_u64).saturating_add(1)).unwrap();
+
+        let outcome =
+            verify_type_signals_from_spec_json(spec_json_path, false, dir.path().to_path_buf());
+        assert!(outcome.has_errors(), "an oversized baseline must fail closed: {outcome:?}");
+    }
+
+    #[test]
+    fn test_check_impl_catalog_oversized_baseline_fails_closed() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let baseline_path = signals_path.parent().unwrap().join("domain-types-baseline.json");
+        std::fs::File::create(&baseline_path)
+            .unwrap()
+            .set_len(MAX_TYPE_BASELINE_BYTES + 1)
+            .unwrap();
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
+                .as_digest()
+                .as_str()
+                .to_owned();
+
+        let outcome = check_impl_catalog_from_signals_file(
+            &signals_path,
+            &baseline_path,
+            &catalog_hash,
+            false,
+        );
+
+        assert!(outcome.has_errors(), "an oversized baseline must fail closed: {outcome:?}");
+    }
+
+    #[test]
     fn test_signal_file_overrides_inline_declaration_signals() {
         // Stage 2 (chain ③): when the signal file carries Blue signals but the
         // declaration file has stale Red inline signals, the evaluation result
@@ -1565,18 +1761,23 @@ mod tests {
 
         // Declaration file has inline Red signals for legacy compatibility.
         std::fs::write(dir.path().join("domain-types.json"), DOMAIN_TYPES_WITH_RED_SIGNAL).unwrap();
-
         // Signal file overrides with a Blue signal for the same entry at the
         // current declaration hash.
         let decl_bytes = std::fs::read(dir.path().join("domain-types.json")).unwrap();
         let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
         let digest = hash.as_digest().as_str().to_owned();
+        std::fs::write(dir.path().join("domain-types-baseline.json"), b"fixture-baseline").unwrap();
+        let baseline_digest = crate::tddd::type_signals_codec::baseline_hash(b"fixture-baseline")
+            .as_digest()
+            .as_str()
+            .to_owned();
         let blue_signal_file = format!(
             r#"{{
-              "schema_version": 3,
+              "schema_version": 4,
               "generated_at": "2026-04-18T12:00:00Z",
               "declaration_hash": "{digest}",
-              "implementation_input_hash": "{digest}",
+              "head_commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "baseline_hash": "{baseline_digest}",
               "signals": [
                 {{
                   "type_name": "TrackId",
@@ -1685,17 +1886,25 @@ mod tests {
     /// Minimal catalogue bytes for a type-signals fixture.
     const MINIMAL_CATALOGUE_JSON: &str = r#"{"schema_version":5,"crate_name":"domain","layer":"domain","types":{"Foo":{"action":"add","role":{"ValueObject":{}},"kind":{"kind":"struct","shape":{"kind":"plain"}},"docs":"A value object."}},"traits":{},"functions":{}}"#;
 
-    /// Build a fresh `<layer>-type-signals.json` JSON string whose
-    /// `declaration_hash` matches the given catalogue bytes.
-    fn build_fresh_type_signals(catalogue_bytes: &[u8], signal: &str) -> String {
-        let hash = crate::tddd::type_signals_codec::declaration_hash(catalogue_bytes)
+    /// Build a fresh `<layer>-type-signals.json` JSON string whose declaration
+    /// and baseline identities match the supplied authoritative input bytes.
+    fn build_fresh_type_signals(
+        catalogue_bytes: &[u8],
+        baseline_bytes: &[u8],
+        signal: &str,
+    ) -> String {
+        let declaration_hash = crate::tddd::type_signals_codec::declaration_hash(catalogue_bytes)
+            .as_digest()
+            .as_str()
+            .to_owned();
+        let baseline_hash = crate::tddd::type_signals_codec::baseline_hash(baseline_bytes)
             .as_digest()
             .as_str()
             .to_owned();
         // `TypeSignalDto` requires `kind_tag`, `signal`, and `found_type` fields
         // (deny_unknown_fields; missing fields fail decoding).
         format!(
-            r#"{{"schema_version":3,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{hash}","implementation_input_hash":"{hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
+            r#"{{"schema_version":4,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{declaration_hash}","head_commit":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","baseline_hash":"{baseline_hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
         )
     }
 
@@ -1705,10 +1914,19 @@ mod tests {
     fn setup_type_signals_git_repo(signal: &str) -> (tempfile::TempDir, PathBuf) {
         let dir = tempfile::tempdir().unwrap();
         git_init(dir.path());
+        std::fs::write(
+            dir.path().join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","may_depend_on":[],"tddd":{"enabled":true,"schema_export":{"method":"rustdoc","targets":["domain"]}}}]}"#,
+        )
+        .unwrap();
         let catalogue_bytes = MINIMAL_CATALOGUE_JSON.as_bytes();
-        std::fs::write(dir.path().join("domain-types.json"), catalogue_bytes).unwrap();
-        let signals_json = build_fresh_type_signals(catalogue_bytes, signal);
-        let signals_path = dir.path().join("domain-type-signals.json");
+        let baseline_bytes = b"fixture-baseline";
+        let track_dir = dir.path().join("track/items/impl-catalog-test");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), catalogue_bytes).unwrap();
+        std::fs::write(track_dir.join("domain-types-baseline.json"), baseline_bytes).unwrap();
+        let signals_json = build_fresh_type_signals(catalogue_bytes, baseline_bytes, signal);
+        let signals_path = track_dir.join("domain-type-signals.json");
         std::fs::write(&signals_path, signals_json).unwrap();
         (dir, signals_path)
     }
@@ -1716,13 +1934,19 @@ mod tests {
     #[test]
     fn test_check_impl_catalog_blue_signal_non_strict_passes() {
         let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let baseline_path = signals_path.parent().unwrap().join("domain-types-baseline.json");
         let catalog_hash =
             crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
                 .as_digest()
                 .as_str()
                 .to_owned();
 
-        let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, false);
+        let outcome = check_impl_catalog_from_signals_file(
+            &signals_path,
+            &baseline_path,
+            &catalog_hash,
+            false,
+        );
 
         assert!(
             !outcome.has_errors(),
@@ -1733,9 +1957,11 @@ mod tests {
     #[test]
     fn test_check_impl_catalog_stale_hash_returns_error() {
         let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let baseline_path = signals_path.parent().unwrap().join("domain-types-baseline.json");
         let stale_hash = "0000000000000000000000000000000000000000000000000000000000000000";
 
-        let outcome = check_impl_catalog_from_signals_file(&signals_path, stale_hash, false);
+        let outcome =
+            check_impl_catalog_from_signals_file(&signals_path, &baseline_path, stale_hash, false);
 
         let has_mismatch =
             outcome.findings().iter().any(|f| f.message().contains("declaration_hash mismatch"));
@@ -1746,13 +1972,126 @@ mod tests {
     }
 
     #[test]
+    fn test_check_impl_catalog_stale_baseline_hash_returns_error() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let baseline_path = signals_path.parent().unwrap().join("domain-types-baseline.json");
+        std::fs::write(&baseline_path, b"recaptured-baseline").unwrap();
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
+                .as_digest()
+                .as_str()
+                .to_owned();
+
+        let outcome = check_impl_catalog_from_signals_file(
+            &signals_path,
+            &baseline_path,
+            &catalog_hash,
+            false,
+        );
+
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|finding| { finding.message().contains("baseline_hash mismatch") }),
+            "a recaptured baseline must invalidate the cached signal document: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_baseline_outside_workspace_fails_closed() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let outside = tempfile::tempdir().unwrap();
+        let outside_baseline = outside.path().join("outside-baseline.json");
+        std::fs::write(&outside_baseline, b"untrusted baseline").unwrap();
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
+                .as_digest()
+                .as_str()
+                .to_owned();
+
+        let outcome = check_impl_catalog_from_signals_file(
+            &signals_path,
+            &outside_baseline,
+            &catalog_hash,
+            false,
+        );
+
+        assert!(outcome.has_errors(), "an outside baseline must fail closed: {outcome:?}");
+        assert!(
+            outcome
+                .findings()
+                .iter()
+                .any(|finding| finding.message().contains("outside workspace root")),
+            "the failure must identify the trusted-root violation: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_missing_type_baseline_is_supported() {
+        // A fresh checkout can lack the local type-baseline snapshot. The
+        // declaration and signal document remain sufficient for this check.
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let baseline_path = signals_path.parent().unwrap().join("domain-types-baseline.json");
+        std::fs::remove_file(&baseline_path).unwrap();
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
+                .as_digest()
+                .as_str()
+                .to_owned();
+
+        let outcome = check_impl_catalog_from_signals_file(
+            &signals_path,
+            &baseline_path,
+            &catalog_hash,
+            false,
+        );
+
+        assert!(
+            !outcome.has_errors(),
+            "absent local baselines must still validate committed authorities: {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_unreadable_baseline_fails_closed() {
+        let (_dir, signals_path) = setup_type_signals_git_repo("blue");
+        let baseline_path = signals_path.parent().unwrap().join("domain-types-baseline.json");
+        std::fs::remove_file(&baseline_path).unwrap();
+        std::fs::create_dir(&baseline_path).unwrap();
+        let catalog_hash =
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
+                .as_digest()
+                .as_str()
+                .to_owned();
+
+        let outcome = check_impl_catalog_from_signals_file(
+            &signals_path,
+            &baseline_path,
+            &catalog_hash,
+            false,
+        );
+
+        assert!(
+            outcome.has_errors(),
+            "an unreadable authoritative baseline must fail closed: {outcome:?}"
+        );
+        assert!(
+            outcome.findings().iter().any(|finding| finding.message().contains("cannot read")),
+            "the failure must identify the unreadable baseline: {outcome:?}"
+        );
+    }
+
+    #[test]
     fn test_check_impl_catalog_signals_file_not_found_returns_error() {
         let dir = tempfile::tempdir().unwrap();
         git_init(dir.path());
         let missing_path = dir.path().join("domain-type-signals.json");
         let any_hash = "0000000000000000000000000000000000000000000000000000000000000000";
 
-        let outcome = check_impl_catalog_from_signals_file(&missing_path, any_hash, false);
+        let baseline_path = dir.path().join("domain-types-baseline.json");
+        let outcome =
+            check_impl_catalog_from_signals_file(&missing_path, &baseline_path, any_hash, false);
 
         assert!(outcome.has_errors(), "missing signals file must return an error: {outcome:?}");
     }
@@ -1760,13 +2099,19 @@ mod tests {
     #[test]
     fn test_check_impl_catalog_yellow_strict_returns_error() {
         let (_dir, signals_path) = setup_type_signals_git_repo("yellow");
+        let baseline_path = signals_path.parent().unwrap().join("domain-types-baseline.json");
         let catalog_hash =
             crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
                 .as_digest()
                 .as_str()
                 .to_owned();
 
-        let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, true);
+        let outcome = check_impl_catalog_from_signals_file(
+            &signals_path,
+            &baseline_path,
+            &catalog_hash,
+            true,
+        );
 
         let has_error =
             outcome.findings().iter().any(|f| f.severity() == domain::verify::Severity::Error);

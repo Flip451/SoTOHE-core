@@ -1,0 +1,61 @@
+{
+  "catalogue_declaration_hash": "b34abe14e19b03d5948c3345e3547cc21fff43bdf40962db11c3b75fc326b52d",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "abb3a2aeb883ad5defb7133cb00229a66a3adea8e009177b4d3491f27a88cf61",
+      "signal": "blue",
+      "type_name": "EvaluateSignalsError"
+    },
+    {
+      "entry_hash": "9f71d713871b90a8e464b825ae8fdc9eacfae011a8005f4f554e36ffe8cb2261",
+      "signal": "blue",
+      "type_name": "FsBaseMergeCleanupAdapter"
+    },
+    {
+      "entry_hash": "1acfa22df1f90327c3cbec9a05605e1f0415f3b7ec490d9836123a999c776184",
+      "signal": "blue",
+      "type_name": "FsBaseMergeContextAdapter"
+    },
+    {
+      "entry_hash": "fe5981405fd604c71ab5ad3399b43a83d71b09ea675ead8a150ae83427d43051",
+      "signal": "blue",
+      "type_name": "FsBaseMergeGitAdapter"
+    },
+    {
+      "entry_hash": "04ec074aa5571907998bff8d60a3a614229e430dc9b320ba38f03061ec6eec61",
+      "signal": "blue",
+      "type_name": "FsGitStashAdapter"
+    },
+    {
+      "entry_hash": "9356b774bfe7bf5775d86ced5f7ed2f4a942a78300ec65098396aff8a567e8cd",
+      "signal": "blue",
+      "type_name": "TypeSignalsCodecError"
+    },
+    {
+      "entry_hash": "1e657dd622d3dba16705867ff63c48d67329feb42d68ed5498e7c037b95d567a",
+      "signal": "blue",
+      "type_name": "TypeSignalsExecutorAdapter"
+    },
+    {
+      "entry_hash": "1308d1e8b13266d16637c22d6da05b19a68ccae02398608978235b52e24ce3f0",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_codec::decode"
+    },
+    {
+      "entry_hash": "f8f0d7a925867446dbd12c45957d33429eb6a7af29bcd116f4542ba62d594453",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_codec::encode"
+    },
+    {
+      "entry_hash": "2688348460da63a890b222cf5940f2ffaf88b48961029c4f9aa8f04dd976b925",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+    },
+    {
+      "entry_hash": "9f0e276b6d8a85b1856fc093839c2cffc2e36d93c494d43651bb01ccfdb12242",
+      "signal": "blue",
+      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file"
+    }
+  ]
+}

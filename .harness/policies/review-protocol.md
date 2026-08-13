@@ -65,7 +65,7 @@ bypass が動かすのは判定の**時期**だけで、判定の要否ではな
 - P1 deviation の受け入れはユーザー承認が必要
 - テスト失敗を「既存の問題」として片付けない。そう主張するにはベースラインの実測が要る: 設定済み base branch を、**その変更を一切含まないツリー**で走らせること。untracked な新規ファイルもツリーから外れていなければならない
 
-  in-place の往復手段は無い — `bin/sotp git` に stash 相当のサブコマンドは無く、`git switch` は guard でブロックされる。`git stash` は `-u` なしでは untracked を残すため、base 側の実行が変更入りのツリーで走り、測ったものがベースラインでなくなる。base branch の独立した clean checkout で測ること。それが用意できないなら、「既存の問題」と断定せず未分類のまま報告する
+  baseline の測定は、現在の作業ツリーに触れない base branch の独立した clean checkout（測定対象の base commit に固定）で行う。in-place の guarded stash push / pop は baseline の往復手段に使わない。この wrapper は push が作成した stash の commit OID を記録し、pop はその記録された OID だけを適用して無関係な stash entry には触れないが、`--index` 相当の staged 状態の復元は行わないため、staged 状態の損失は防げない。直接の `git stash` / `git switch` は guard の対象で代替にならない。独立した clean checkout を用意できないなら、「既存の問題」と断定せず未分類のまま報告する
 
 ### レビュー対象サイズ
 

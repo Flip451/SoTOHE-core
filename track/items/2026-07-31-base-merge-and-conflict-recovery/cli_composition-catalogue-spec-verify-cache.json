@@ -1,0 +1,78 @@
+{
+  "entries": [
+    {
+      "claim_hash": "d7a9eac0e0e989612c799179b8dbeeae6a0fcb052f9bc2e90843fdedc57626f6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RecoverBaselinesCompositionRoot",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ed3a944687a361098c2ee196108b66f8ca2414acbd97373b59232d0c644c863c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow, with both `/track:recover` and `$track-recover` adapters shipping as provider-framing-only entry points."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide orchestrator-owned conflict recovery through the canonical recovery workflow",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d7a9eac0e0e989612c799179b8dbeeae6a0fcb052f9bc2e90843fdedc57626f6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RecoverBaselinesCompositionRoot",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9de00b5ba508fc9926b45e524a7f13ef3759969c1779e455c9b334f6050661d9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline stage; conflicted merge outcomes do not generate views or write a sync-base record."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Conflict recovery must follow the canonical workflow under orchestrator ownership after the guarded merge has completed its conflict-time baseline stage; conflicted merge outcomes do not generate views or write a sync-base record.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d7a9eac0e0e989612c799179b8dbeeae6a0fcb052f9bc2e90843fdedc57626f6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "RecoverBaselinesCompositionRoot",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bf3b0fa1b708554562769f70fac1c4d03ca6e1da5b4f37a1a553477c850ee5f5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated, reports any baseline-stage failure, and surfaces the canonical recovery workflow entry point. It does not generate derived views, write a sync-base record, or record cleanup completion."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"surfaces the canonical recovery workflow entry point\"",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 1
+}

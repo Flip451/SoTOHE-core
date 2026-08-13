@@ -405,6 +405,8 @@ pub enum TrackCommand {
         #[arg(long, default_value = ".")]
         project_root: PathBuf,
     },
+    /// Merge the configured base branch into the active track branch.
+    MergeBase,
 }
 
 #[derive(Debug, Subcommand)]
@@ -558,6 +560,7 @@ mod tests {
     use crate::commands::track::test_support::{
         create_track_dir, process_env_lock, run_in_dir, seed_repo,
     };
+    use clap::Parser;
     use std::process::ExitCode;
     use std::sync::Arc;
     use usecase::track_resolution::{
@@ -957,5 +960,37 @@ mod tests {
         let result =
             resolve_track_id_from_root_for_write_with_reader(None, branch_reader(Some("main")));
         assert!(result.is_err(), "expected Err on non-track branch with no explicit id");
+    }
+
+    #[test]
+    #[allow(clippy::expect_used, clippy::panic)]
+    fn test_track_command_merge_base_is_argument_free() {
+        let cli = crate::Cli::try_parse_from(["sotp", "track", "merge-base"])
+            .expect("merge-base must parse without arguments");
+
+        let command = match cli.command {
+            Some(crate::CliCommand::Track { cmd }) => cmd,
+            _ => panic!("expected a track command"),
+        };
+        assert!(matches!(command, TrackCommand::MergeBase));
+    }
+
+    #[test]
+    #[allow(clippy::expect_used)]
+    fn test_track_command_merge_base_accepts_active_snapshot_base_before_cleanup() {
+        let cli = crate::Cli::try_parse_from(["sotp", "track", "merge-base"])
+            .expect("merge-base must enter the guarded driver path without CLI arguments");
+
+        assert!(matches!(
+            cli.command,
+            Some(crate::CliCommand::Track { cmd: TrackCommand::MergeBase })
+        ));
+    }
+
+    #[test]
+    fn test_track_command_merge_base_rejects_stale_snapshot_base_without_merge() {
+        let parsed = crate::Cli::try_parse_from(["sotp", "track", "merge-base", "release"]);
+
+        assert!(parsed.is_err(), "merge-base must not accept a caller-supplied source branch");
     }
 }

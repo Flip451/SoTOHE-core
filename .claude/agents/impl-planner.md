@@ -1,7 +1,7 @@
 ---
 name: impl-planner
 model: claude-opus-5
-effort: medium
+effort: high
 tools:
   - Read
   - Grep

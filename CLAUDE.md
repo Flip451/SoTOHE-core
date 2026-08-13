@@ -62,7 +62,7 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 
 - Public UI is `/track:*`; never use legacy aliases.
 - No direct `git add` / `commit` / `merge` / `rebase` / `switch` — use `/track:*` or the guarded `bin/sotp git`, `bin/sotp track branch`, and `bin/sotp pr` workflow commands (`.claude/rules/guardrails.md`).
-- The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` / `task-coverage.json` / `task-contract.json` / `batch-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
+- One-file/one-writer governs SoT meaning; the designated writer mapping and guarded conflict-preparation boundary are defined in `.harness/policies/sot-reentry-sequencing.md` and `.harness/workflows/track/recover.md`. Task state transitions go through `bin/sotp track transition`.
 - No change reaches merge without a reviewer-capability verdict; the default is a local cycle to `zero_findings` before every commit (plan artifacts included), and the PR-review lane defers that verdict rather than waiving it. Inline self-review is never a substitute (`.harness/policies/review-protocol.md`).
 - Do not manually copy, edit, or remove ADR baseline records. A missing init snapshot blocks review and commit; a byte mismatch blocks commit and track-aware CI (not review — a Phase 0 draft divergence is normal). Use the sanctioned snapshot, restore, and diagnoser routes.
 - Read `.claude/rules/orchestration.md` and `.claude/rules/guardrails.md` before making changes.

@@ -233,22 +233,24 @@ fn resolve_project_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, Tele
                     ))
                 },
             )?;
-            let supplied_absolute_items_dir = if items_dir.is_absolute() {
-                items_dir.to_path_buf()
-            } else {
-                absolute_root.join("track").join("items")
-            };
-            crate::track::symlink_guard::reject_symlinks_below(
-                &supplied_absolute_items_dir,
-                &absolute_root,
-            )
-            .map(|_| ())
-            .map_err(|e| {
-                TelemetryAdapterError(format!(
-                    "items_dir path rejected before use at '{}': {e}",
-                    items_dir.display()
-                ))
-            })?;
+            if !default_items_dir {
+                let supplied_absolute_items_dir = if items_dir.is_absolute() {
+                    items_dir.to_path_buf()
+                } else {
+                    absolute_root.join("track").join("items")
+                };
+                crate::track::symlink_guard::reject_symlinks_below(
+                    &supplied_absolute_items_dir,
+                    &absolute_root,
+                )
+                .map(|_| ())
+                .map_err(|e| {
+                    TelemetryAdapterError(format!(
+                        "items_dir path rejected before use at '{}': {e}",
+                        items_dir.display()
+                    ))
+                })?;
+            }
             let canonical_project_root = absolute_root.canonicalize().map_err(|e| {
                 TelemetryAdapterError(format!(
                     "failed to canonicalize project root {}: {e}",
@@ -442,22 +444,23 @@ mod tests {
         tempfile::Builder::new().prefix("items-").tempdir_in(target_dir).unwrap()
     }
 
+    fn run_git(path: &Path, args: &[&str]) {
+        let output = Command::new("git").args(args).current_dir(path).output().unwrap();
+        assert!(
+            output.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
     fn init_repository(path: &Path) {
-        let run_git = |args: &[&str]| {
-            let output = Command::new("git").args(args).current_dir(path).output().unwrap();
-            assert!(
-                output.status.success(),
-                "git {args:?}: {}",
-                String::from_utf8_lossy(&output.stderr)
-            );
-        };
-        run_git(&["init", "--quiet", "--initial-branch=main"]);
-        run_git(&["config", "user.email", "test@example.invalid"]);
-        run_git(&["config", "user.name", "Telemetry Adapter Test"]);
+        run_git(path, &["init", "--quiet", "--initial-branch=main"]);
+        run_git(path, &["config", "user.email", "test@example.invalid"]);
+        run_git(path, &["config", "user.name", "Telemetry Adapter Test"]);
         std::fs::create_dir_all(path.join("track/items")).unwrap();
         std::fs::write(path.join("README.md"), "fixture\n").unwrap();
-        run_git(&["add", "."]);
-        run_git(&["commit", "--quiet", "-m", "fixture"]);
+        run_git(path, &["add", "."]);
+        run_git(path, &["commit", "--quiet", "-m", "fixture"]);
     }
 
     #[test]
@@ -514,6 +517,7 @@ mod tests {
         init_repository(ambient_repo.path());
         let nested_dir = repo.path().join("nested");
         std::fs::create_dir_all(&nested_dir).unwrap();
+        std::fs::write(nested_dir.join("track"), "shadow\n").unwrap();
         let status = Command::new(std::env::current_exe().unwrap())
             .args([
                 "--exact",
@@ -678,34 +682,12 @@ mod tests {
 
     #[test]
     fn test_emit_active_appends_completed_command_to_existing_track_telemetry_jsonl() {
-        let repo = crate::git_cli::SystemGitRepo::discover().unwrap();
-        let Some(branch) = repo.current_branch().unwrap() else {
-            return;
-        };
-        let Ok(track_id) = usecase::track_resolution::resolve_track_id_from_branch(Some(&branch))
-        else {
-            return;
-        };
-        let items_dir = repo.root().join("track").join("items");
-        let path = items_dir.join(&track_id).join("logs").join("telemetry.jsonl");
-        let original = std::fs::read(&path).ok();
-        struct RestoreFile {
-            path: std::path::PathBuf,
-            original: Option<Vec<u8>>,
-        }
-        impl Drop for RestoreFile {
-            fn drop(&mut self) {
-                match &self.original {
-                    Some(bytes) => {
-                        let _ = std::fs::write(&self.path, bytes);
-                    }
-                    None => {
-                        let _ = std::fs::remove_file(&self.path);
-                    }
-                }
-            }
-        }
-        let _restore = RestoreFile { path: path.clone(), original };
+        let repo = tempfile::tempdir().unwrap();
+        init_repository(repo.path());
+        run_git(repo.path(), &["switch", "--quiet", "--create", "track/telemetry-test"]);
+        let track_id = "telemetry-test";
+        let items_dir = repo.path().join("track").join("items");
+        let path = items_dir.join(track_id).join("logs").join("telemetry.jsonl");
         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
         std::fs::write(&path, b"{\"event_type\":\"Existing\"}\n").unwrap();
         let adapter = FsTelemetryEmitDynamicAdapter::new();
@@ -713,7 +695,7 @@ mod tests {
             adapter
                 .emit_active(
                     &items_dir,
-                    Some(&track_id),
+                    Some(track_id),
                     "sotp dry".to_owned(),
                     17,
                     240,

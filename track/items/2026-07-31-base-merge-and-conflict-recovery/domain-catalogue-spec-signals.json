@@ -1,0 +1,76 @@
+{
+  "catalogue_declaration_hash": "90ed0d2999fb96d7e22967dff2fe5d9a0ce286ee3a985d256958137b263a2d96",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "fb50a6e9a66a01083f12a2b8dd001796e7e6d55c73a30bad46c045e51ea0bf69",
+      "signal": "blue",
+      "type_name": "BaseBranchName"
+    },
+    {
+      "entry_hash": "6fd74c0707d2fe272c8773b6ea81badcbfb1ab2bfb40bd88da96446114f0defb",
+      "signal": "blue",
+      "type_name": "BaseMergeDirection"
+    },
+    {
+      "entry_hash": "7e829ee2faee43537b8b6d5ba45a92c2d67da8355d0a396b297322a131099c64",
+      "signal": "blue",
+      "type_name": "BaseMergeDirectionError"
+    },
+    {
+      "entry_hash": "1f086893c905a07613ed6b7e6d0a30b076be3436c8ca2c8b025043337c7820ca",
+      "signal": "blue",
+      "type_name": "BaselineHash"
+    },
+    {
+      "entry_hash": "2a82ee201a0c66e4b88c5bfeaa19860a52a22c87b73fac499a44b54f87130634",
+      "signal": "blue",
+      "type_name": "CommitHash"
+    },
+    {
+      "entry_hash": "7e183ebf4eb0bb250a83af8a24df57e7220eafb68a731f57952dc8433015fff4",
+      "signal": "blue",
+      "type_name": "TrackMetadata"
+    },
+    {
+      "entry_hash": "635851a52967309d3ec50896053a2795352d682c2d76d7cbb81997628338e24a",
+      "signal": "blue",
+      "type_name": "TypeSignalsAuthorityStatus"
+    },
+    {
+      "entry_hash": "382638e54881a8e3b1d9dd47c956d954605ca86c73f810ef1eaa7e0626975b51",
+      "signal": "blue",
+      "type_name": "TypeSignalsCacheKey"
+    },
+    {
+      "entry_hash": "2b80b3073b2c3770f99aca9497ac4f5faaf533a660a2ebab05e5dcb22693bb0b",
+      "signal": "blue",
+      "type_name": "TypeSignalsDocument"
+    },
+    {
+      "entry_hash": "0a7e2283ce3959f02ce7cb3c2bd66b656bddfd10fd87484a4a76dd9ed6156aa3",
+      "signal": "blue",
+      "type_name": "TypeSignalsReuseInput"
+    },
+    {
+      "entry_hash": "4b34c700d685a077c327bc8ede0a8d292d9c7e59cfdc98f6782e310cc4c68d64",
+      "signal": "blue",
+      "type_name": "TypeSignalsWorktreeStatus"
+    },
+    {
+      "entry_hash": "6ec3bf9d294130b8e18f49d306c8d6fee85f07efa817e8a14b2c9c2db938eaad",
+      "signal": "blue",
+      "type_name": "domain::branch_strategy::derive_base_merge_direction"
+    },
+    {
+      "entry_hash": "1a6487ca2b1a71bfe87142d60988a10f3a3773b81f985c301c3a188e479d7a59",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+    },
+    {
+      "entry_hash": "6bc71ee3accaa99846fa85c9f0cd952b2a8349b44ae47afe3d620fe127c81bca",
+      "signal": "blue",
+      "type_name": "ImplementationInputHash"
+    }
+  ]
+}

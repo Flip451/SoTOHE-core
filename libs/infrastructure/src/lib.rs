@@ -6,6 +6,7 @@ extern crate self as infrastructure;
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
+pub mod base_merge;
 pub mod batch_plan_codec;
 pub mod batch_plan_reader;
 pub mod branch_reader;
@@ -66,6 +67,7 @@ pub(crate) mod track_artifact;
 mod trusted_file;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
+pub use git_cli::stash_adapter::FsGitStashAdapter;
 pub use git_cli::workflow_adapter::FsGitWorkflowAdapter;
 pub use pr_review::SystemSleepAdapter;
 #[cfg(feature = "semantic-dup")]

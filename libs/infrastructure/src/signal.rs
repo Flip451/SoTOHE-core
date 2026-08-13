@@ -227,8 +227,11 @@ impl SystemSignalCommandAdapter {
                 crate::verify::tddd_layers::catalogue_spec_signals_path(binding, &root, track_id)
             };
             if impl_catalog {
+                let baseline_path =
+                    root.join("track/items").join(track_id).join(binding.baseline_file());
                 crate::verify::spec_states::check_impl_catalog_from_signals_file(
                     &path,
+                    &baseline_path,
                     hash_hex,
                     strictness == domain::Strictness::Strict,
                 )
@@ -570,6 +573,21 @@ mod tests {
             .unwrap();
         assert!(init.success(), "test workspace git init must succeed");
         std::fs::create_dir_all(root.join("track/items").join(track_id)).unwrap();
+        std::fs::create_dir_all(root.join("libs/domain/src")).unwrap();
+        std::fs::write(
+            root.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/domain\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("Cargo.lock"), "version = 4\n").unwrap();
+        std::fs::write(root.join(".test-nightly-toolchain-identity"), "rustc fixture-nightly\n")
+            .unwrap();
+        std::fs::write(
+            root.join("libs/domain/Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("libs/domain/src/lib.rs"), "pub struct Fixture;\n").unwrap();
         std::fs::create_dir_all(root.join(".harness/config")).unwrap();
         std::fs::write(root.join("architecture-rules.json"), ONE_LAYER_ARCHITECTURE_RULES).unwrap();
         std::fs::write(
@@ -597,6 +615,18 @@ mod tests {
   "traits": {},
   "functions": {}
 }"#,
+        )
+        .unwrap();
+        let feature_declaration =
+            "{\n  \"schema_version\": 1,\n  \"layers\": {\n    \"domain\": []\n  }\n}\n";
+        std::fs::write(
+            root.join("track/items").join(track_id).join("tddd-features.json"),
+            feature_declaration,
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("track/items").join(track_id).join("tddd-features-baseline.json"),
+            feature_declaration,
         )
         .unwrap();
         let commit = std::process::Command::new("git")
@@ -1091,7 +1121,24 @@ mod tests {
             track_dir.join("domain-types.json"),
         )
         .unwrap();
+        let baseline_bytes = b"fixture-baseline";
+        std::fs::write(track_dir.join("domain-types-baseline.json"), baseline_bytes).unwrap();
         let signals_path = track_dir.join("domain-type-signals.json");
+        let mut persisted: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&signals_path).unwrap()).unwrap();
+        let object = persisted.as_object_mut().unwrap();
+        object.insert(
+            "schema_version".to_owned(),
+            serde_json::json!(domain::TYPE_SIGNALS_SCHEMA_VERSION),
+        );
+        let baseline_hash = crate::tddd::type_signals_codec::baseline_hash(baseline_bytes)
+            .as_digest()
+            .as_str()
+            .to_owned();
+        object.insert("baseline_hash".to_owned(), serde_json::json!(baseline_hash));
+        object.insert("head_commit".to_owned(), serde_json::json!("a".repeat(40)));
+        object.remove("implementation_input_hash");
+        std::fs::write(&signals_path, serde_json::to_string_pretty(&persisted).unwrap()).unwrap();
         let persisted_before_check = std::fs::read_to_string(&signals_path).unwrap();
 
         let check = SystemSignalCommandAdapter::new()
@@ -1105,5 +1152,65 @@ mod tests {
             "impl-catalog check must read the persisted signals document: {check:?}"
         );
         assert_eq!(std::fs::read_to_string(signals_path).unwrap(), persisted_before_check);
+    }
+
+    #[test]
+    fn test_system_signal_command_adapter_impl_catalog_check_rejects_stale_baseline() {
+        let track_id = "impl-catalog-stale-baseline";
+        let workspace = setup_track_workspace(track_id);
+        let root = workspace.path().to_path_buf();
+        let track_dir = root.join("track/items").join(track_id);
+        let source_track_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .unwrap()
+            .join("track/items/pr-signal-pure-di-2026-07-26");
+        std::fs::copy(
+            source_track_dir.join("domain-type-signals.json"),
+            track_dir.join("domain-type-signals.json"),
+        )
+        .unwrap();
+        std::fs::copy(
+            source_track_dir.join("domain-types.json"),
+            track_dir.join("domain-types.json"),
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("domain-types-baseline.json"), b"current-baseline").unwrap();
+
+        let signals_path = track_dir.join("domain-type-signals.json");
+        let mut persisted: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&signals_path).unwrap()).unwrap();
+        let stale_baseline_hash = crate::tddd::type_signals_codec::baseline_hash(b"stale-baseline")
+            .as_digest()
+            .as_str()
+            .to_owned();
+        let object = persisted.as_object_mut().unwrap();
+        object.insert(
+            "schema_version".to_owned(),
+            serde_json::json!(domain::TYPE_SIGNALS_SCHEMA_VERSION),
+        );
+        object.insert("baseline_hash".to_owned(), serde_json::json!(stale_baseline_hash));
+        object.insert("head_commit".to_owned(), serde_json::json!("a".repeat(40)));
+        object.remove("implementation_input_hash");
+        std::fs::write(&signals_path, serde_json::to_string_pretty(&persisted).unwrap()).unwrap();
+
+        let check = SystemSignalCommandAdapter::new()
+            .execute(ResolvedSignalChainCommand::CheckImplCatalog {
+                strictness: Strictness::Strict,
+                workspace_root: Some(root),
+            })
+            .unwrap();
+        assert!(
+            check.outcome.has_errors(),
+            "a stale baseline must block the live impl-catalog check: {check:?}"
+        );
+        assert!(
+            check
+                .outcome
+                .findings()
+                .iter()
+                .any(|finding| finding.message().contains("baseline_hash mismatch")),
+            "the live check must report baseline freshness failure: {check:?}"
+        );
     }
 }

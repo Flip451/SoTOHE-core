@@ -231,7 +231,7 @@ pub trait TrackBlobReader {
     /// no ADR directory means no decisions to evaluate) so that mocks that have
     /// not been updated continue to work without modification. `GitShowTrackBlobReader`
     /// overrides this in T006 to perform the actual ADR scan.
-    fn read_adr_verify_report(&self, _branch: String) -> BlobFetchResult<AdrVerifyReport> {
+    fn read_adr_verify_report(&self, _branch: &str) -> BlobFetchResult<AdrVerifyReport> {
         BlobFetchResult::NotFound
     }
 }
@@ -259,9 +259,11 @@ pub trait TrackBlobReader {
 ///      resolved from `gate_matrix.spec_adr` at `GateKind::Merge`
 ///    - `NotFound` → BLOCKED (spec.json is required for every track)
 ///    - `FetchError` → BLOCKED
-/// 5. If Stage 1 passes, read `domain-types.json` (Chain ③, Stage 2):
-///    - `Found(doc)` → delegate to [`check_type_signals`] with `strict`
-///      resolved from `gate_matrix.impl_catalog` at `GateKind::Merge`
+/// 5. If Stage 1 passes, read each enabled layer's catalogue, baseline, and
+///    type-signals document (Chain ③, Stage 2):
+///    - `Found` catalogue/signals → compare declaration and baseline hashes,
+///      then delegate to [`check_type_signals`] with `strict` resolved from
+///      `gate_matrix.impl_catalog` at `GateKind::Merge`
 ///    - `NotFound` → skip (TDDD opt-in)
 ///    - `FetchError` → BLOCKED
 ///
@@ -289,7 +291,7 @@ where
     //    dependency: Chain ⓪ does not gate the remaining stages — its findings
     //    are accumulated into `outcome` but do not short-circuit Chains ①②③.
     let adr_strictness: Strictness = gate_matrix.resolve(ChainId::AdrUser, GateKind::Merge);
-    let chain0_outcome = match reader.read_adr_verify_report(branch.to_owned()) {
+    let chain0_outcome = match reader.read_adr_verify_report(branch) {
         BlobFetchResult::Found(report) => {
             crate::chain::adr_user::adr_report_to_outcome(&report, adr_strictness)
         }
@@ -368,7 +370,8 @@ where
     //    For each layer:
     //      - NotFound → TDDD opt-out for that layer (no finding)
     //      - FetchError → fail-closed
-    //      - Found → run `check_type_signals` with strict=true
+    //      - Found → compare declaration and baseline hashes, then run
+    //        `check_type_signals` with the resolved strictness
     //    All findings are merged (AND-aggregation across layers) so one
     //    diagnostic shows every problem.
     let layer_ids = match reader.read_enabled_layers(branch) {
@@ -417,7 +420,11 @@ where
     //      FetchError → fail-closed.
     //   3. Compare `signals_doc.declaration_hash()` to the catalogue hash from
     //      step 1 — a mismatch means the signals file is stale (fail-closed, CN-11).
-    //   4. Evaluate `check_type_signals(&signals_doc, strict)` with strictness
+    //   4. The infrastructure reader binds baseline_hash to the authoritative
+    //      baseline blob at the same branch tip before returning the document.
+    //      A mismatch means reverse-filter inputs changed and the signals file
+    //      is stale.
+    //   5. Evaluate `check_type_signals(&signals_doc, strict)` with strictness
     //      resolved from gate_matrix.impl_catalog at GateKind::Merge.
     //
     // The catalogue's TDDD opt-out check (step 1 NotFound) preserves the pre-T022
@@ -464,12 +471,14 @@ where
         };
 
         // Step 3: freshness check — declaration_hash must match (CN-11).
-        if signals_doc.declaration_hash().as_digest().as_str() != declaration_hash_from_catalogue {
+        if signals_doc.cache_key().declaration_hash().as_digest().as_str()
+            != declaration_hash_from_catalogue
+        {
             outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "layer '{layer_id}': type-signals declaration_hash mismatch \
                  (recorded={}, current={}) — re-run `sotp signal calc-impl-catalog` \
                  and commit the refreshed evaluation result",
-                signals_doc.declaration_hash().as_digest().as_str(),
+                signals_doc.cache_key().declaration_hash().as_digest().as_str(),
                 declaration_hash_from_catalogue
             ))]));
             continue;
@@ -704,8 +713,11 @@ mod tests {
         let digest = domain::Sha256Digest::try_new(ZERO_HASH.to_owned()).unwrap();
         TypeSignalsDocument::new(
             ts,
-            domain::CatalogueDeclarationHash::new(digest.clone()),
-            domain::ImplementationInputHash::new(digest),
+            domain::TypeSignalsCacheKey::new(
+                domain::CatalogueDeclarationHash::new(digest.clone()),
+                domain::CommitHash::try_new("a".repeat(40)).unwrap(),
+                domain::BaselineHash::new(digest),
+            ),
             sigs,
         )
     }
@@ -882,8 +894,8 @@ mod tests {
     }
 
     impl TrackBlobReader for RecordingTrackBlobReader {
-        fn read_adr_verify_report(&self, branch: String) -> BlobFetchResult<AdrVerifyReport> {
-            *self.recorded_adr_branch.borrow_mut() = Some(branch);
+        fn read_adr_verify_report(&self, branch: &str) -> BlobFetchResult<AdrVerifyReport> {
+            *self.recorded_adr_branch.borrow_mut() = Some(branch.to_owned());
             self.adr_result.clone()
         }
 
@@ -1059,6 +1071,25 @@ mod tests {
         );
         let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
         assert!(!outcome.has_errors(), "all-Blue type-signals must pass: {outcome:?}");
+    }
+
+    #[test]
+    fn test_u45_stage2_matching_declaration_and_baseline_consumes_cached_signals() {
+        // The fixture carries matching declaration and baseline identities. The
+        // merge gate must accept the cache and evaluate its Yellow signal. If
+        // the cached document is skipped or either freshness input is ignored,
+        // this observable signal is lost.
+        let reader = MockTrackBlobReader::new(
+            BlobFetchResult::Found(all_blue_spec()),
+            BlobFetchResult::Found(dt_with_yellow()),
+        );
+        let outcome = check_strict_merge_gate("track/foo", &reader, &all_strict_matrix());
+
+        assert!(
+            outcome.findings().iter().any(|finding| finding.message().contains("Yellow")),
+            "a fresh cached Yellow signal must be consumed by the merge gate: {outcome:?}"
+        );
+        assert!(reader.dt.borrow().is_none(), "the cached signals document must be read");
     }
 
     #[test]
@@ -2263,7 +2294,7 @@ mod tests {
     // Found (layer is enrolled in Stage 2) but the signals file is either
     // absent (U40) or carries a stale declaration_hash (U41).  These are
     // the two fail-closed branches that live between Step 1 (opt-out check)
-    // and Step 4 (signal gate) in the Stage 2 loop.
+    // and Step 5 (signal gate) in the Stage 2 loop.
     // ===============================================================
 
     #[test]
@@ -2402,6 +2433,78 @@ mod tests {
                 .iter()
                 .any(|f| f.message().contains("layer 'domain'") && f.message().contains("mismatch")),
             "error must mention the layer name and 'mismatch': {outcome:?}"
+        );
+    }
+
+    #[test]
+    fn test_u47_stage2_unreadable_type_signals_does_not_reuse_cached_document() {
+        struct Stage2UnreadableSignalsMock;
+
+        impl SpecElementHashReader for Stage2UnreadableSignalsMock {
+            fn read_spec_element_hashes(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<std::collections::BTreeMap<domain::SpecElementId, ContentHash>>
+            {
+                BlobFetchResult::Found(std::collections::BTreeMap::new())
+            }
+        }
+
+        impl TrackBlobReader for Stage2UnreadableSignalsMock {
+            fn read_spec_document(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<SpecDocument> {
+                BlobFetchResult::Found(all_blue_spec())
+            }
+
+            fn read_type_catalogue(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<(Vec<u8>, String)> {
+                BlobFetchResult::Found((vec![], ZERO_HASH.to_owned()))
+            }
+
+            fn read_type_signals(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+                _layer_id: &str,
+            ) -> BlobFetchResult<TypeSignalsDocument> {
+                BlobFetchResult::FetchError(
+                    "authoritative type-signals cache is unreadable".to_owned(),
+                )
+            }
+
+            fn read_impl_plan(
+                &self,
+                _branch: &str,
+                _track_id: &str,
+            ) -> BlobFetchResult<domain::ImplPlanDocument> {
+                panic!("read_impl_plan must not be called by the stage-2 unreadable-cache test")
+            }
+
+            fn read_enabled_layers(&self, _branch: &str) -> BlobFetchResult<Vec<String>> {
+                BlobFetchResult::Found(vec!["domain".to_owned()])
+            }
+        }
+
+        let outcome = check_strict_merge_gate(
+            "track/foo",
+            &Stage2UnreadableSignalsMock,
+            &all_strict_matrix(),
+        );
+
+        assert!(outcome.has_errors(), "an unreadable cache must fail closed: {outcome:?}");
+        assert!(
+            outcome.findings().iter().any(|finding| finding
+                .message()
+                .contains("authoritative type-signals cache is unreadable")),
+            "the unreadable cache must not be silently reused: {outcome:?}"
         );
     }
 

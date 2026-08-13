@@ -4,7 +4,6 @@ use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use domain::review_v2::types::FilePath;
-use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::TdddLayerBindingsPort;
 use domain::{
     AdrDecisionCommon, AdrDecisionEntry, ConfidenceSignal, DecisionGrounds, NonEmptyString,
@@ -16,13 +15,11 @@ use usecase::signal_report::{
     SignalReportLocation, SignalReportOccurrence, SignalReportReason, SignalReportReference,
     SignalReportSourcePort,
 };
-use usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 
 use crate::capability_exec::bounded_read_utf8_file;
 use crate::git_cli::{SystemGitRepo, isolated_bounded_git_output};
 use crate::tddd::{
     catalogue_document_codec::CatalogueDocumentCodec, catalogue_spec_signals_codec,
-    feature_declaration_adapter::FsTdddFeatureDeclarationAdapter,
     tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter, type_signals_codec,
 };
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -31,6 +28,9 @@ use crate::verify::catalogue_spec_signals::{
 };
 use crate::verify::tddd_layers;
 
+mod freshness;
+use freshness::validate_impl_catalog_freshness;
+
 /// Secondary adapter that reads persisted signal artifacts and derives the two
 /// non-persisted occurrence chains in memory.
 pub struct SystemSignalReportSourceAdapter;
@@ -38,6 +38,7 @@ pub struct SystemSignalReportSourceAdapter;
 const MAX_BRANCH_NAME_BYTES: usize = 4 * 1024;
 const MAX_ADR_FILES: usize = 1_024;
 const MAX_ADR_TOTAL_BYTES: usize = 8 * 1024 * 1024;
+const MAX_TYPE_BASELINE_BYTES: u64 = 64 * 1024 * 1024;
 
 impl SystemSignalReportSourceAdapter {
     /// Creates the system-backed signal report source.
@@ -244,34 +245,14 @@ impl SystemSignalReportSourceAdapter {
         let bindings = FsTdddLayerBindingsAdapter::new()
             .load(root, None)
             .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
-        let track_dir = root.join("track/items").join(track_id.as_ref());
-        let feature_declaration = FsTdddFeatureDeclarationAdapter::new()
-            .load_for_actual(&track_dir, root, &bindings)
-            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
         let mut occurrences = Vec::new();
         for binding in bindings {
-            let layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|_| {
-                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-            })?;
-            let features = feature_declaration.features_for(&layer_id).map_err(|_| {
-                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-            })?;
-            let target_crate = match binding.targets.as_slice() {
-                [target] => target.as_str(),
-                _ => {
-                    return Err(SignalReportError::SourceUnavailable(
-                        SignalReportChain::ImplCatalog,
-                    ));
-                }
-            };
             let signals_path =
                 track_file(root, track_id, &binding.signal_file(), SignalReportChain::ImplCatalog)?;
-            let document = type_signals_codec::decode(&read_text(
-                root,
-                &signals_path,
-                SignalReportChain::ImplCatalog,
-            )?)
-            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
+            let signal_text = read_text(root, &signals_path, SignalReportChain::ImplCatalog)?;
+            let document = type_signals_codec::decode(&signal_text).map_err(|_| {
+                SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+            })?;
             let catalogue_path = track_file(
                 root,
                 track_id,
@@ -283,23 +264,31 @@ impl SystemSignalReportSourceAdapter {
                 .map_err(|_| {
                     SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
                 })?;
-            if *document.declaration_hash()
+            if *document.cache_key().declaration_hash()
                 != type_signals_codec::declaration_hash(catalogue_text.as_bytes())
             {
                 return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
             }
-            let implementation_input_hash =
-                crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-                    root,
-                    target_crate,
-                    features,
-                )
-                .map_err(|_| {
-                    SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
-                })?;
-            if *document.implementation_input_hash() != implementation_input_hash {
+            // A baseline recapture can change reverse filtering without touching
+            // the catalogue, so the cached signals must still match the local baseline.
+            let baseline_text = crate::track_artifact::read_track_artifact(
+                &root.join("track/items"),
+                track_id,
+                &binding.baseline_file,
+                MAX_TYPE_BASELINE_BYTES,
+            )
+            .map_err(|_| SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog))?;
+            if *document.cache_key().baseline_hash()
+                != type_signals_codec::baseline_hash(baseline_text.as_bytes())
+            {
                 return Err(SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog));
             }
+            validate_impl_catalog_freshness(
+                root,
+                &signals_path,
+                document.cache_key().head_commit(),
+                signal_text.as_bytes(),
+            )?;
             validate_impl_catalog_coverage(&catalogue, &document)?;
             let location = relative(root, &signals_path, SignalReportChain::ImplCatalog)?;
             for signal in document.signals() {
@@ -621,6 +610,8 @@ mod tests {
     use std::process::Command;
     use std::sync::Mutex;
 
+    use domain::CommitHash;
+
     use super::*;
 
     static CWD_LOCK: Mutex<()> = Mutex::new(());
@@ -683,6 +674,21 @@ mod tests {
         );
     }
 
+    fn git_output(root: &Path, args: &[&str]) -> String {
+        let output = Command::new("git")
+            .args(args)
+            .current_dir(root)
+            .output()
+            .expect("git must run for the fixture repository");
+        assert!(
+            output.status.success(),
+            "git {:?} failed: {}",
+            args,
+            String::from_utf8_lossy(&output.stderr)
+        );
+        String::from_utf8(output.stdout).expect("git fixture output must be UTF-8")
+    }
+
     fn infrastructure_catalogue() -> &'static str {
         include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
@@ -717,21 +723,44 @@ mod tests {
         .expect("fixture signals must serialize")
     }
 
-    fn fresh_impl_catalog_signals(root: &Path, catalogue_text: &str) -> String {
-        let implementation_input_hash =
-            crate::tddd::type_signals_evaluator::inputs::hash_workspace_inputs(
-                root,
-                "infrastructure",
-                &[],
-            )
-            .expect("fixture implementation inputs must hash");
+    /// Bytes of the fixture type baseline; the persisted signal fixture's
+    /// `baseline_hash` must be the hash of exactly these bytes.
+    const FIXTURE_BASELINE_BYTES: &[u8] = b"fixture-baseline";
+
+    fn current_head(root: &Path) -> String {
+        let mut output = Command::new("git")
+            .args(["rev-parse", "--verify", "HEAD"])
+            .current_dir(root)
+            .output()
+            .expect("git must run for the fixture repository");
+        if !output.status.success() {
+            run_git(root, &["add", "."]);
+            run_git(root, &["commit", "--no-gpg-sign", "-m", "fixture inputs"]);
+            output = Command::new("git")
+                .args(["rev-parse", "--verify", "HEAD"])
+                .current_dir(root)
+                .output()
+                .expect("git must run for the fixture repository");
+        }
+        assert!(output.status.success(), "fixture HEAD must resolve");
+        String::from_utf8(output.stdout).expect("fixture HEAD must be UTF-8").trim().to_owned()
+    }
+
+    fn fresh_impl_catalog_signals_with_timestamp(
+        root: &Path,
+        catalogue_text: &str,
+        generated_at: &str,
+    ) -> String {
         serde_json::to_string_pretty(&serde_json::json!({
-            "schema_version": 3,
-            "generated_at": "2026-07-31T00:00:00Z",
+            "schema_version": 4,
+            "generated_at": generated_at,
             "declaration_hash": type_signals_codec::declaration_hash(catalogue_text.as_bytes())
                 .as_digest()
                 .as_str(),
-            "implementation_input_hash": implementation_input_hash.as_digest().as_str(),
+            "head_commit": current_head(root),
+            "baseline_hash": type_signals_codec::baseline_hash(FIXTURE_BASELINE_BYTES)
+                .as_digest()
+                .as_str(),
             "signals": [{
                 "type_name": "SystemSignalReportSourceAdapter",
                 "kind_tag": "secondary_adapter",
@@ -742,11 +771,41 @@ mod tests {
         .expect("fixture signals must serialize")
     }
 
+    fn fresh_impl_catalog_signals(root: &Path, catalogue_text: &str) -> String {
+        fresh_impl_catalog_signals_with_timestamp(root, catalogue_text, "2026-07-31T00:00:00Z")
+    }
+
+    fn commit_signal_artifact(root: &Path, signal_path: &Path, signal: &str, message: &str) {
+        fs::write(signal_path, signal).expect("fixture signal artifact must be written");
+        let relative_path = signal_path
+            .strip_prefix(root)
+            .expect("signal path must be inside fixture root")
+            .to_str()
+            .expect("signal path must be UTF-8")
+            .to_owned();
+        run_git(root, &["add", &relative_path]);
+        run_git(root, &["commit", "--no-gpg-sign", "-m", message]);
+    }
+
+    fn setup_committed_impl_signal_fixture() -> (tempfile::TempDir, TrackId, PathBuf, String) {
+        let root = tempfile::tempdir().expect("fixture root must be created");
+        let track = TrackId::try_new("report-test").expect("fixture track id must be valid");
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let signal_path = track_dir.join("infrastructure-type-signals.json");
+        let initial_signal = fresh_impl_catalog_signals(root.path(), &catalogue);
+        commit_signal_artifact(root.path(), &signal_path, &initial_signal, "initial signals");
+        (root, track, signal_path, catalogue)
+    }
+
     fn prepare_catalogue_spec_source_with_catalogue(
         root: &Path,
         track_dir: &Path,
         catalogue: &str,
     ) -> String {
+        if !root.join(".git").exists() {
+            crate::verify::test_support::git_init(root);
+        }
         fs::create_dir_all(track_dir).expect("track fixture directory must exist");
         fs::create_dir_all(root.join("libs/infrastructure/src"))
             .expect("fixture crate source directory must exist");
@@ -768,7 +827,7 @@ mod tests {
             .expect("fixture crate source must be written");
         fs::write(
             root.join("architecture-rules.json"),
-            r#"{"version":2,"layers":[{"crate":"infrastructure","tddd":{"enabled":true,"catalogue_file":"infrastructure-types.json","catalogue_spec_signal":{"enabled":true}}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"infrastructure","path":"libs/infrastructure","may_depend_on":[],"tddd":{"enabled":true,"catalogue_file":"infrastructure-types.json","catalogue_spec_signal":{"enabled":true}}}]}"#,
         )
         .expect("architecture rules fixture must be written");
         fs::write(track_dir.join("infrastructure-types.json"), catalogue)
@@ -779,6 +838,8 @@ mod tests {
             .expect("feature declaration fixture must be written");
         fs::write(track_dir.join("tddd-features-baseline.json"), feature_declaration)
             .expect("feature declaration baseline fixture must be written");
+        fs::write(track_dir.join("infrastructure-types-baseline.json"), FIXTURE_BASELINE_BYTES)
+            .expect("type baseline fixture must be written");
         catalogue.to_owned()
     }
 
@@ -1404,7 +1465,7 @@ mod tests {
     }
 
     #[test]
-    fn test_signal_report_adapter_rejects_stale_impl_source_and_feature_inputs() {
+    fn test_signal_report_adapter_rejects_stale_type_baseline() {
         let root = tempfile::tempdir().unwrap();
         let track = TrackId::try_new("report-test").unwrap();
         let track_dir = root.path().join("track/items/report-test");
@@ -1412,25 +1473,185 @@ mod tests {
         let signals_path = track_dir.join("infrastructure-type-signals.json");
         fs::write(&signals_path, fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
 
-        let source_path = root.path().join("libs/infrastructure/src/lib.rs");
-        fs::write(&source_path, "pub struct ChangedFixture;\n").unwrap();
-        let stale_source = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
-            .expect_err("changed implementation source must stale the persisted artifact");
+        // A baseline recapture changes reverse filtering without touching the
+        // catalogue or the implementation; the cached signals must go stale.
+        fs::write(track_dir.join("infrastructure-types-baseline.json"), b"recaptured-baseline")
+            .unwrap();
+        let stale_baseline =
+            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+                .expect_err("changed type baseline must stale the persisted artifact");
         assert!(matches!(
-            stale_source,
+            stale_baseline,
             SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
         ));
+    }
 
-        fs::write(&source_path, "pub struct Fixture;\n").unwrap();
-        let selected_feature = "{\n  \"schema_version\": 1,\n  \"layers\": {\n    \"infrastructure\": [\"freshness\"]\n  }\n}\n";
-        fs::write(track_dir.join("tddd-features.json"), selected_feature).unwrap();
-        fs::write(track_dir.join("tddd-features-baseline.json"), selected_feature).unwrap();
-        let stale_features =
-            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
-                .expect_err("changed feature selection must stale the persisted artifact");
+    #[test]
+    fn test_signal_report_adapter_rejects_signal_from_implementation_only_commit() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        fs::write(
+            track_dir.join("infrastructure-type-signals.json"),
+            fresh_impl_catalog_signals(root.path(), &catalogue),
+        )
+        .unwrap();
+
+        fs::write(root.path().join("implementation-only.rs"), "changed\n").unwrap();
+        run_git(root.path(), &["add", "implementation-only.rs"]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "implementation-only"]);
+
+        let error = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("an implementation-only commit must stale the signal artifact");
         assert!(matches!(
-            stale_features,
+            error,
             SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_accepts_signal_regenerated_in_all_in_one_commit() {
+        let (root, track, signal_path, catalogue) = setup_committed_impl_signal_fixture();
+        let regenerated = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-01T00:00:00Z",
+        );
+        fs::write(&signal_path, regenerated).unwrap();
+        fs::write(root.path().join("implementation.rs"), "changed\n").unwrap();
+        let relative_signal_path = signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap();
+        run_git(root.path(), &["add", relative_signal_path, "implementation.rs"]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "implementation and signals"]);
+
+        let occurrences = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect("a regenerated signal in the guarded commit must be accepted");
+        assert!(matches!(
+            occurrences.as_slice(),
+            [SignalReportOccurrence {
+                chain: SignalReportChain::ImplCatalog,
+                level: SignalReportLevel::Yellow,
+                ..
+            }]
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_stale_worktree_copy_over_fresh_commit() {
+        let (root, track, signal_path, catalogue) = setup_committed_impl_signal_fixture();
+        let stale = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-01T00:00:00Z",
+        );
+        let fresh = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-02T00:00:00Z",
+        );
+        fs::write(&signal_path, fresh).unwrap();
+        fs::write(root.path().join("implementation.rs"), "changed\n").unwrap();
+        let relative_signal_path = signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap();
+        run_git(root.path(), &["add", relative_signal_path, "implementation.rs"]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "fresh signals"]);
+        fs::write(&signal_path, stale).unwrap();
+
+        let error = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("a stale worktree copy must not ride on a fresh committed signal");
+        assert!(matches!(
+            error,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_rejects_signal_deleted_at_tip() {
+        let (root, track, signal_path, catalogue) = setup_committed_impl_signal_fixture();
+        let worktree_copy = fresh_impl_catalog_signals_with_timestamp(
+            root.path(),
+            &catalogue,
+            "2026-08-03T00:00:00Z",
+        );
+        let relative_signal_path =
+            signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap().to_owned();
+        fs::remove_file(&signal_path).unwrap();
+        run_git(root.path(), &["add", "-u", &relative_signal_path]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "delete signals"]);
+        fs::write(&signal_path, worktree_copy).unwrap();
+
+        let error = SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track)
+            .expect_err("a deleted committed signal must not be accepted from the worktree");
+        assert!(matches!(
+            error,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_signal_report_freshness_rejects_mode_only_signal_change() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let (root, _track, signal_path, _catalogue) = setup_committed_impl_signal_fixture();
+        let worktree_bytes = fs::read(&signal_path).unwrap();
+        let relative_signal_path =
+            signal_path.strip_prefix(root.path()).unwrap().to_str().unwrap().to_owned();
+        run_git(root.path(), &["config", "core.filemode", "true"]);
+        let mut permissions = fs::metadata(&signal_path).unwrap().permissions();
+        permissions.set_mode(permissions.mode() | 0o111);
+        fs::set_permissions(&signal_path, permissions).unwrap();
+        run_git(root.path(), &["add", &relative_signal_path]);
+        run_git(root.path(), &["commit", "--no-gpg-sign", "-m", "mode-only signal change"]);
+
+        let recorded_head = CommitHash::try_new(
+            git_output(root.path(), &["rev-parse", "HEAD^1"]).trim().to_owned(),
+        )
+        .unwrap();
+        let error = validate_impl_catalog_freshness(
+            root.path(),
+            &signal_path,
+            &recorded_head,
+            &worktree_bytes,
+        )
+        .expect_err("a mode-only signal commit must not satisfy freshness");
+        assert!(matches!(
+            error,
+            SignalReportError::SourceUnavailable(SignalReportChain::ImplCatalog)
+        ));
+    }
+
+    #[test]
+    fn test_signal_report_adapter_accepts_type_baseline_above_capability_exec_limit() {
+        let root = tempfile::tempdir().unwrap();
+        let track = TrackId::try_new("report-test").unwrap();
+        let track_dir = root.path().join("track/items/report-test");
+        let catalogue = prepare_catalogue_spec_source(root.path(), &track_dir);
+        let baseline =
+            vec![b'b'; crate::capability_exec::MAX_CAPABILITY_EXEC_TEXT_BYTES as usize + 1];
+        fs::write(track_dir.join("infrastructure-types-baseline.json"), &baseline).unwrap();
+
+        let mut signals: serde_json::Value =
+            serde_json::from_str(&fresh_impl_catalog_signals(root.path(), &catalogue)).unwrap();
+        signal_document_object(&mut signals).insert(
+            "baseline_hash".to_owned(),
+            serde_json::json!(type_signals_codec::baseline_hash(&baseline).as_digest().as_str()),
+        );
+        fs::write(
+            track_dir.join("infrastructure-type-signals.json"),
+            serde_json::to_string(&signals).unwrap(),
+        )
+        .unwrap();
+
+        let occurrences =
+            SystemSignalReportSourceAdapter::read_impl_catalog(root.path(), &track).unwrap();
+
+        assert!(matches!(
+            occurrences.as_slice(),
+            [SignalReportOccurrence {
+                chain: SignalReportChain::ImplCatalog,
+                level: SignalReportLevel::Yellow,
+                ..
+            }]
         ));
     }
 
@@ -1469,7 +1690,7 @@ mod tests {
         let track = TrackId::try_new("report-test").unwrap();
         fs::write(
             root.path().join("architecture-rules.json"),
-            r#"{"version":2,"layers":[{"crate":"infrastructure","tddd":{"enabled":true}}]}"#,
+            r#"{"version":2,"layers":[{"crate":"infrastructure","path":"libs/infrastructure","may_depend_on":[],"tddd":{"enabled":true}}]}"#,
         )
         .unwrap();
 

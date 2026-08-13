@@ -1,0 +1,462 @@
+{
+  "entries": [
+    {
+      "claim_hash": "57b51725c7224efcbbe84c085ffabaca24841c64633398d2b17abb88e18dfb07",
+      "claim_origin": {
+        "data": {
+          "entry_key": "BaseMergeInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c04c25ac8797b57a56b46079c14b00823ac3b1b860495b5d228d67b89b00db7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "57b51725c7224efcbbe84c085ffabaca24841c64633398d2b17abb88e18dfb07",
+      "claim_origin": {
+        "data": {
+          "entry_key": "BaseMergeInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "57b51725c7224efcbbe84c085ffabaca24841c64633398d2b17abb88e18dfb07",
+      "claim_origin": {
+        "data": {
+          "entry_key": "BaseMergeInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d1a8d3e43a11bbad62882da88d0ebfbaced67f21758977ebd741d2beb5bf6129",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c5d840ad4bec01ed25d1f190b2a618ac6dfa720f720596c74c4b2b30781be34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c5d840ad4bec01ed25d1f190b2a618ac6dfa720f720596c74c4b2b30781be34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c5d840ad4bec01ed25d1f190b2a618ac6dfa720f720596c74c4b2b30781be34",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "aa68fd2f5c5c96775736d7540c0fd8702241c99737e819f6cb87c3496e89e145",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push records the created stash commit OID or that no stash was created. A guarded stash-pop applies only the recorded OID and clears the record after success; for a no-stash record it applies nothing and clears the record. An absent record or missing OID reports failure and stops, and unrelated stash entries are untouched."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push records the created stash commit OID or that no stash was created. A guarded stash-pop applies only the recorded OID and clears the record after success; for a no-stash record it applies nothing and clears the record. An absent record or missing OID reports failure and stops, and unrelated stash entries are untouched.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41b5aef01374a2569c432a68bd6cb831c6b4f1a32b52503b933a16bc17575431",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "811dffbfe6c154c64a05cb5078ee27984d045e8fbc791e0d8392b80a1a33bbcb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Provide guarded stash push and stash-pop support that explicitly includes untracked track artifacts, pairs each pop exclusively with its push result, and preserves repository safety gates."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide guarded stash push and stash-pop support",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "41b5aef01374a2569c432a68bd6cb831c6b4f1a32b52503b933a16bc17575431",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GitStashInput",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1f12b418336768a51faaa1e1e37648cafc70e80abbb84e51eadeedd6ed9781e0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded stash push records untracked track artifacts. Guarded stash operations do not change branch history, update branch refs, or change the active track branch; the stash-internal objects and `refs/stash` updates required by stash and stash-pop are permitted.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c04c25ac8797b57a56b46079c14b00823ac3b1b860495b5d228d67b89b00db7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a guarded base-merge operation that runs only when the current branch is the active `track/<id>` branch and its source is that track's branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3e297fa8d3dbe8947e4eedfd5beb64a948a2de09aaa83db4d668c50fefdb43c6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After every clean guarded base merge, regenerate the baseline from the exact incorporated base commit and then generate derived views.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ec10995aa47e8531cbd5645e1c378863fa0617b440210cba4f0929d62416aaa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The base-merge guard must reject reverse-direction merges, a non-track current branch, and any source branch that differs from the active track's recorded base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3ff212f6a7a3ff02906a56e726b92b5a1318d1c5af8fd66a33421c938b3875fc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Baseline regeneration must use the exact base commit incorporated by the guarded merge, and a failure must be reported.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "432083447df59f23c7dc2faaee26416aff5a00ede4d8a550d780975f50906863",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-07",
+          "section": "constraint",
+          "text_label": "Both clean and conflicted merge cleanup may complete only in the order Baseline then Views. A conflicted merge's views read only persisted signals, baseline, and track artifacts, and either stage reports failure when it fails."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Both clean and conflicted merge cleanup may complete only in the order Baseline then Views. A conflicted merge's views read only persisted signals, baseline, and track artifacts, and either stage reports failure when it fails.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d5914c88f34ebe09359d33c2238a2158fe5f2350d2a22258922277f31f29cb76",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A guarded base merge succeeds only from the currently active `track/<id>` branch and only when the requested source equals its branch-strategy snapshot base branch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d1a8d3e43a11bbad62882da88d0ebfbaced67f21758977ebd741d2beb5bf6129",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A reverse-direction merge, an invalid current branch, or a source that differs from the snapshot base branch is rejected without performing the merge.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "58becbe0f1c596be1377430428840be620ed8637e9fa43a6c8dd08ef8ccf7f87",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After a clean guarded base merge, the baseline is regenerated from the exact base commit the merge incorporated and derived views are generated once after that baseline stage.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7e9ce9e2e686833a8a221dec57678a0cffd5be4da84cf031b426702852e57340",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point. After those stages, the canonical recovery workflow directs conflict-resolution editing, the normal review workflow through zero findings, and a guarded commit."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "When a guarded base merge conflicts, its conflict outcome regenerates the baseline from the exact base commit it incorporated and then generates derived views from persisted signals, baseline, and track artifacts only; it reports any stage failure and surfaces the canonical recovery workflow entry point.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "63419c88b93818a74e560a9208095d5aeeccac151b54d33be7244b75ec73426c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "If baseline regeneration fails, the operation reports failure rather than cleanup completion."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If baseline regeneration fails, the operation reports failure rather than cleanup completion.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cdd2ea2ae6ccce2b7cf8415ef1ef362a0a7e411f6b614d6d99ddf5ed8bd440a9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-07-31-base-merge-and-conflict-recovery/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ae4678fe713ebfb484c98539f7c25791b8dd52d8e56a54087e36c1962f975de8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; any stage failure is reported."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A conflicted guarded merge runs the baseline stage from its exact incorporated base commit and then generates views from persisted signals, baseline, and track artifacts only; any stage failure is reported.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 1
+}

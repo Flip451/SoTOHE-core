@@ -33,13 +33,14 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 - 下流作業中に、収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る。回帰先が自明でなければ diagnose ルート (`/track:diagnose`) を経由する。
 - 「後でまとめて直す」「変更の有無を判定して続行する」は禁止する — 収束の有効性判定という裁量を挟まない。
 - 上流 SoT への編集は適用された時点で当該フェーズの収束を即座に失効させる。再収束 (上記 3 要素) まで、その下流のフェーズは再開禁止。意味論検証要素の判定は item 2 のとおり当該 chain の指摘に限る — 列挙 abort 中に fresh 検証を生成できないことは再開を妨げず、列挙可能になり次第の検証で当該 chain の指摘が出れば即時に上流へ戻る。
-- **artifact 編集に対する唯一の例外**: `impl-plan.json` は review 収束後も `bin/sotp track transition` による task ステータス遷移のみ許容される。この例外は本規律 (順次処理) 上のものに限る — 遷移は上流 rollback も下流停止も要求しない。ただし hash ベースの commit gate が要求する impl-plan final `zero_findings` review refresh (`.harness/workflows/track/full-cycle.md` の lifecycle tail) は引き続き必須であり、本例外はそれを免除しない。それ以外の impl-plan 変更は通常どおり失効・再収束を要する。この例外を他の SoT へ一般化しない。
+- **artifact 編集に対する例外**: `impl-plan.json` は review 収束後も `bin/sotp track transition` による task ステータス遷移のみ許容される。この例外は本規律 (順次処理) 上のものに限る — 遷移は上流 rollback も下流停止も要求しない。ただし hash ベースの commit gate が要求する impl-plan final `zero_findings` review refresh (`.harness/workflows/track/full-cycle.md` の lifecycle tail) は引き続き必須であり、本例外はそれを免除しない。それ以外の impl-plan 変更は通常どおり失効・再収束を要する。
+- **guarded base-merge conflict source-repair exception**: guarded merge conflict 中に限り、orchestrator は既存 hunk の選択・編集を pre-gate 実行可能化のためだけに行える。placeholder・意味追加は禁止し、対象 path を記録する。既存 hunk の選択だけで pre-gate を通せない場合は、designated writer を `conflict-preparation` mode で起動し、既存 hunk の解消と derived artifact の再生成だけを許す。base-induced drift が conflict hunk を持たない場合は、影響 chain の順序に従う normal writer/implementer reconciliation と chain-limited review を先に実行し、global pre-gate はその chain 再収束後に要求する。上流再収束後には designated writer を通常 mode で必ず再実行する。ADR に触れた場合は直ちに `adr-diagnoser` の verdict を取得する。この境界を通常の Phase 再入へ一般化しない。
 
 ## 役割分担
 
 - **回帰先の判定**: `rollback-diagnoser`。出力は勧告であり、orchestrator が `reason` を不十分と判断すれば override し得る (既存どおり)。
 - **Prerequisite の充足確認と降下順序の遵守**: dispatch する orchestrator。
-- **各 writer capability**: 自分の再開 Prerequisite が briefing 上満たされていない場合、作業せず orchestrator へ差し戻す。
+- **各 writer capability**: 自分の再開 Prerequisite が briefing 上満たされていない場合、通常 mode では作業せず orchestrator へ差し戻す。`conflict-preparation` mode のみ、guarded merge conflict の既存 hunk 解消と derived artifact 再生成に限り起動できる。
 
 ## Examples
 
@@ -52,14 +53,14 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 
 ## Exceptions
 
-- `impl-plan` の task ステータス遷移 (上記「即時突き返し規則」の artifact 編集に対する明示例外) のみ。意味論検証の chain 限定 (item 2) は例外ではなく判定基準そのものである。追加の例外は ADR の Reassess When に従い、実証を伴う別 ADR で検討する。
+- `impl-plan` の task ステータス遷移または guarded base-merge conflict source-repair (上記「即時突き返し規則」の明示例外) のみ。意味論検証の chain 限定 (item 2) は例外ではなく判定基準そのものである。追加の例外は別途裁定する。
 
 ## Review Checklist
 
 - [ ] 上流 SoT の編集後、その下流フェーズを再開する前に、当該 chain に適用される再収束要素を確認したか
 - [ ] 再開 Prerequisite の検査を直上流 1 層に限定しているか (上位層の再検査を重複させない)
 - [ ] 上流編集の必要性の発見時に下流作業を即時中断したか
-- [ ] 収束失効時の再開例外を impl-plan の task ステータス遷移以外に拡張していないか。意味論検証の判定を当該 chain の指摘に限定し、他 chain の指摘・列挙失敗を混入させていないか
+- [ ] 収束失効時の再開例外を impl-plan の task ステータス遷移または D2 conflict-recovery source-repair 以外に拡張していないか。意味論検証の判定を当該 chain の指摘に限定し、他 chain の指摘・列挙失敗を混入させていないか
 - [ ] 信号の許容値や ref-verify の対応表を本書や下流文書に複製していないか
 
 ## Decision Reference

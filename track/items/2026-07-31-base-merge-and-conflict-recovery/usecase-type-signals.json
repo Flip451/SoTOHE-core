@@ -1,0 +1,253 @@
+{
+  "baseline_hash": "50c349d6f5c262488a7c7425fc83009b7d33133a05efa0d592a6c3bc36b1c208",
+  "declaration_hash": "57428f4abaa6a0d837eb8f9025e5b8148227b00982306a0f2462940a78757fc0",
+  "generated_at": "2026-08-13T13:53:46Z",
+  "head_commit": "633de68ce30f768d44c24a4b172f58f2ecd8a4c1",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "BaseMergeAttemptOutcome"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "BaseMergeCleanupPort"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "BaseMergeCleanupRequest"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "command",
+      "signal": "blue",
+      "type_name": "BaseMergeCommand"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "BaseMergeContextError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "BaseMergeContextPort"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "BaseMergeError"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "BaseMergeGitError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "BaseMergeGitPort"
+    },
+    {
+      "found_items": [
+        "BaseMergeService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "BaseMergeInteractor"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "BaseMergeOutcome"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "BaseMergeService"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "BaselineReplacementError"
+    },
+    {
+      "found_items": [
+        "GitStashService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "GitStashInteractor"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "GitStashPopError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "GitStashPort"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "GitStashPushError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "GitStashPushOutcome"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "GitStashService"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "PostMergeCleanupError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "TrackBlobReader"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "TypeSignalsError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "TypeSignalsExecutionError"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ViewsRegenerationError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "TypeSignalsExecutorPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "TypeSignalsInteractor"
+    }
+  ]
+}

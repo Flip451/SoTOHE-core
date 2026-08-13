@@ -88,6 +88,25 @@ track/items/**/*-graph-d*/
 track/items/**/.commit_hash
 track/items/**/.commit_hash.tmp
 
+# --- Base-merge sync stamp (local operational state written by clean-merge cleanup) ---
+track/items/**/.sync-base.json
+# The atomic writer's temporary record can survive a crash mid-write; it must never be
+# staged by guarded add-all.
+track/items/**/.tmp-.sync-base.json-*
+# The baseline replacement phase marker survives a crash between exchange and marker
+# removal; it is machine-owned recovery state and must never be staged.
+track/items/**/.sotp-baseline-replacement-phase
+# Detached cleanup worktrees are removed by the cleanup run; a leftover from a failed
+# removal must never be staged as an embedded-repository gitlink by guarded add-all.
+/.sotp-base-merge-worktree-*/
+# Baseline recovery state retained when a cleanup stage fails (operational backup,
+# adopted and cleaned up by a later cleanup run; never version-controlled).
+track/.sotp-baseline-recovery/
+
+# --- Guarded stash pairing (machine-owned repository-local single slot) ---
+/.sotp-guarded-stash.json
+/.tmp-.sotp-guarded-stash.json-*
+
 # --- Provider session resume cache (runtime session state, not version-controlled) ---
 track/items/**/.provider-sessions/
 

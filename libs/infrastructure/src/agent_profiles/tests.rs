@@ -422,43 +422,12 @@ fn test_committed_profiles_subprocess_entries_resolve_explicit_effort() {
     ));
 }
 
-#[test]
-fn test_committed_profiles_limited_rollout_resolves_luna_max_and_preserves_terra() {
-    let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
-    let workspace_root = manifest_dir
-        .parent()
-        .and_then(std::path::Path::parent)
-        .expect("infrastructure crate is nested under the workspace");
-    let profiles = AgentProfiles::load(workspace_root, &workspace_root.join(AGENT_PROFILES_PATH))
-        .expect("committed profile loads");
-
-    for capability_name in ["implementer", "review-fix-lead", "dry-fix-lead"] {
-        assert!(matches!(
-            profiles.resolve_execution(&capability(capability_name), RoundType::Final),
-            Ok(ResolvedExecution::ProviderCli { provider, model, effort })
-                if provider.as_str() == "codex"
-                    && model.as_str() == "gpt-5.6-luna"
-                    && effort == ReasoningEffort::Max
-        ));
-    }
-
-    for (capability_name, expected_effort) in [
-        ("spec-designer", ReasoningEffort::High),
-        ("impl-planner", ReasoningEffort::High),
-        ("researcher", ReasoningEffort::High),
-        ("dry-checker", ReasoningEffort::XHigh),
-        ("obligation-fulfillment-verifier", ReasoningEffort::XHigh),
-        ("waiver-verifier", ReasoningEffort::XHigh),
-    ] {
-        assert!(matches!(
-            profiles.resolve_execution(&capability(capability_name), RoundType::Final),
-            Ok(ResolvedExecution::ProviderCli { provider, model, effort })
-                if provider.as_str() == "codex"
-                    && model.as_str() == "gpt-5.6-terra"
-                    && effort == expected_effort
-        ));
-    }
-}
+// NOTE: no test may pin the committed profile's tunable values (provider /
+// model / effort). `.harness/config/agent-profiles.json` is consumer-owned
+// configuration that must be changeable without touching Rust code; tests
+// against the committed file assert only the structural contract (every
+// capability resolves, efforts are valid), as
+// `test_committed_profiles_subprocess_entries_resolve_explicit_effort` does.
 
 #[test]
 fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
@@ -497,8 +466,8 @@ fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
                 })
             ));
         }
-        // Contract only, not the tunable values — see the note on the same
-        // assertion in the committed-profiles test above.
+        // Contract only, not the tunable values — see the NOTE above this
+        // test about never pinning committed-profile configuration.
         for round_type in [RoundType::Fast, RoundType::Final] {
             assert!(matches!(
                 profiles.resolve_execution(&capability("reviewer"), round_type),
@@ -507,15 +476,15 @@ fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
         }
     }
 
+    // Both round types must resolve for the chain verifiers; the effort values
+    // themselves are tunable configuration and are deliberately not pinned.
     for capability_name in ["ref-verifier-chain1", "ref-verifier-chain2"] {
-        assert!(matches!(
-            committed.resolve_execution(&capability(capability_name), RoundType::Fast),
-            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })
-        ));
-        assert!(matches!(
-            committed.resolve_execution(&capability(capability_name), RoundType::Final),
-            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })
-        ));
+        for round_type in [RoundType::Fast, RoundType::Final] {
+            assert!(matches!(
+                committed.resolve_execution(&capability(capability_name), round_type),
+                Ok(ResolvedExecution::ProviderCli { .. })
+            ));
+        }
     }
 }
 

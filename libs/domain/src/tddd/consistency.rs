@@ -127,11 +127,13 @@ pub fn check_type_signals(
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing)]
 mod tests {
     use super::*;
+    use crate::CommitHash;
     use crate::ConfidenceSignal;
     use crate::Timestamp;
     use crate::tddd::catalogue::TypeSignal;
     use crate::tddd::type_signals_doc::{
-        CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest, TypeSignalsDocument,
+        BaselineHash, CatalogueDeclarationHash, Sha256Digest, TypeSignalsCacheKey,
+        TypeSignalsDocument,
     };
 
     fn ts() -> Timestamp {
@@ -149,8 +151,11 @@ mod tests {
         .unwrap();
         TypeSignalsDocument::new(
             ts(),
-            CatalogueDeclarationHash::new(digest.clone()),
-            ImplementationInputHash::new(digest),
+            TypeSignalsCacheKey::new(
+                CatalogueDeclarationHash::new(digest.clone()),
+                CommitHash::try_new("a".repeat(40)).unwrap(),
+                BaselineHash::new(digest),
+            ),
             signals,
         )
     }
