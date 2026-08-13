@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-14-adr-open-set-depth-check",
+  "title": "ADR 起草とレビューに開集合検査を追加する",
+  "branch": "track/2026-08-14-adr-open-set-depth-check",
+  "created_at": "2026-08-13T18:04:23Z",
+  "updated_at": "2026-08-13T18:04:23Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
