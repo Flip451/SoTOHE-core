@@ -70,6 +70,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "b3472dc6a80f01244cfbb939af11edc76d4608de",
       "description": "Modify `README.md` documentation. [IN-04; OUT-04; CN-03; AC-05]",
       "id": "T006",
       "status": "done"
