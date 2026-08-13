@@ -27,6 +27,10 @@ use crate::conventions_resolve::directory_walk::{
     ListingError, bounded_entries, open_directory_at,
 };
 
+#[path = "cleanup_tree_children.rs"]
+mod cleanup_tree_children;
+pub(super) use cleanup_tree_children::copy_tree_children_with_budget;
+
 pub(super) fn copy_cleanup_inputs_with_baselines(
     source_workspace: &Path,
     target_workspace: &Path,
@@ -409,6 +413,7 @@ fn copy_tree_with_budget(
         generated_baseline_files,
         0,
         false,
+        true,
     )
 }
 
@@ -422,6 +427,7 @@ fn copy_tree_at_depth(
     generated_baseline_files: &BTreeSet<String>,
     depth: usize,
     already_counted: bool,
+    is_copy_root: bool,
 ) -> Result<(), String> {
     if !already_counted {
         budget.inspect_entry(source, depth)?;
@@ -448,7 +454,9 @@ fn copy_tree_at_depth(
             if depth == 0 && name == TRACK_WRITER_LOCK_FILE {
                 continue;
             }
-            if depth == 0 && !include_baselines && generated_baseline_files.contains(name.as_ref())
+            if is_copy_root
+                && !include_baselines
+                && generated_baseline_files.contains(name.as_ref())
             {
                 continue;
             }
@@ -461,6 +469,7 @@ fn copy_tree_at_depth(
                 generated_baseline_files,
                 depth + 1,
                 true,
+                false,
             )?;
         }
         fs::File::open(target).and_then(|directory| directory.sync_all()).map_err(|error| {

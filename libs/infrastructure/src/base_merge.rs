@@ -1912,6 +1912,46 @@ git update-ref refs/heads/develop "$advanced" "$parent"
     }
 
     #[test]
+    fn test_fs_base_merge_cleanup_view_staging_scopes_baselines_to_active_track() {
+        let fixture = setup_cleanup_repository();
+        let root = fixture.path();
+        write_metadata(root, "cleanup-sibling", "develop");
+        write_cleanup_render_inputs(root, b"prior-baseline");
+
+        let oversized_length = MAX_CLEANUP_FILE_BYTES + 1;
+        let sibling_baseline = root.join("track/items/cleanup-sibling/domain-types-baseline.json");
+        let sibling_file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(&sibling_baseline)
+            .unwrap();
+        sibling_file.set_len(oversized_length).unwrap();
+
+        let request = usecase::base_merge::BaseMergeCleanupRequest {
+            workspace_root: root.to_path_buf(),
+            track_id: TrackId::try_new("cleanup-test").unwrap(),
+            base_branch: BaseBranchName::try_new("develop".to_owned()).unwrap(),
+            base_commit: CommitHash::try_new(current_commit(root, "develop^{commit}")).unwrap(),
+        };
+        let adapter = FsBaseMergeCleanupAdapter::new();
+
+        adapter.regenerate_views(&request).unwrap();
+
+        let active_baseline = root.join("track/items/cleanup-test/domain-types-baseline.json");
+        let active_file =
+            OpenOptions::new().write(true).truncate(true).open(&active_baseline).unwrap();
+        active_file.set_len(oversized_length).unwrap();
+        let result = adapter.regenerate_views(&request);
+
+        let error = result.unwrap_err();
+        assert!(
+            error.to_string().contains("cleanup input file exceeds byte limit"),
+            "active-track baseline must retain the cleanup size guard: {error}"
+        );
+    }
+
+    #[test]
     fn test_base_merge_interactor_clean_merge_view_failure_follows_baseline_stage() {
         let fixture = setup_cleanup_repository();
         let root = fixture.path();

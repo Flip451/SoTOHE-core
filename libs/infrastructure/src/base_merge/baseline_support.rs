@@ -7,9 +7,13 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use domain::CommitHash;
 use usecase::base_merge::BaseMergeCleanupRequest;
 
-use super::cleanup_tree::{copy_tree_with_baselines, remove_tree_bounded};
+use super::cleanup_tree::{
+    CleanupTraversalBudget, copy_tree_children_with_budget, copy_tree_with_baselines,
+    remove_tree_bounded,
+};
 use super::publication::{
-    path_exists, publish_baseline_replacements, sync_directory, write_replacement_phase_marker,
+    generated_baseline_file_names, path_exists, publish_baseline_replacements, sync_directory,
+    write_replacement_phase_marker,
 };
 use super::view_transaction::{
     publish_registry_if_unchanged, read_optional_rendered_file,
@@ -415,22 +419,26 @@ fn prepare_render_workspace(
             .map_err(|error| format!("cannot stage contract-map style config: {error}"))?;
     }
 
+    let generated_baseline_files = generated_baseline_file_names(workspace_root)?;
+    let mut budget = CleanupTraversalBudget::new();
     let source_items = workspace_root.join("track/items");
-    copy_tree_with_baselines(
+    copy_tree_children_with_budget(
         &source_items,
         &stage_track_root.join("items"),
-        true,
+        Some(track_id),
         staging,
-        &BTreeSet::new(),
+        &mut budget,
+        &generated_baseline_files,
     )?;
     let source_archive = workspace_root.join("track/archive");
     match fs::symlink_metadata(&source_archive) {
-        Ok(_) => copy_tree_with_baselines(
+        Ok(_) => copy_tree_children_with_budget(
             &source_archive,
             &stage_track_root.join("archive"),
-            true,
+            None,
             staging,
-            &BTreeSet::new(),
+            &mut budget,
+            &generated_baseline_files,
         )?,
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
         Err(error) => {
