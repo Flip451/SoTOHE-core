@@ -1130,14 +1130,8 @@
               ],
               "kind": "struct"
             }
-          },
-          {
-            "name": "Demo",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
+      }
+    ]
       },
       "methods": [],
       "module_path": "",

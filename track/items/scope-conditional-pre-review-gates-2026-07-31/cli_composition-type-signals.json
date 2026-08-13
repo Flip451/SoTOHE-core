@@ -1,120 +1,120 @@
 {
-  "schema_version": 3,
-  "generated_at": "2026-08-12T04:13:27Z",
   "declaration_hash": "7e212bd5334fb651854d188e4fe711ecc9e6520bc4807442c4ef2f3f1aa154d2",
-  "implementation_input_hash": "4723c56c4dddf9c86645c4f97626b80f91f9fba1804dc8a2be9aa6fc3e888139",
+  "generated_at": "2026-08-13T03:14:45Z",
+  "implementation_input_hash": "734f5849d5e61156ee2e5cbf8617c66faa7ce802a520690304f53246a842ef27",
+  "schema_version": 3,
   "signals": [
     {
-      "type_name": "PhaseCompositionRoot",
-      "kind_tag": "composition_root",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Default"
-      ]
-    },
-    {
-      "type_name": "RefVerifyCompositionRoot",
+      ],
+      "found_type": true,
       "kind_tag": "composition_root",
       "signal": "blue",
-      "found_type": true
+      "type_name": "PhaseCompositionRoot"
     },
     {
-      "type_name": "ReviewCompositionRoot",
+      "found_type": true,
       "kind_tag": "composition_root",
       "signal": "blue",
-      "found_type": true
+      "type_name": "RefVerifyCompositionRoot"
     },
     {
-      "type_name": "CodexReviewOutcome",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "RefVerifyChainFilter",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "RefVerifyCheckApprovedInput",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "RefVerifyResultsInput",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "RefVerifyRunInput",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "RefVerifyVerdictFilter",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "ReviewResultsInput",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "ReviewSharedError",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "ReviewV2Composition",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "RunReviewFixLocalInput",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "cli_composition::review_v2::briefing::append_scope_briefing_reference_str",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "cli_composition::review_v2::scope::validate_review_group_name_str",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "cli_composition::review_v2::scope::validate_track_id_str",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "cli_composition::review_v2::shared::build_review_v2_str",
-      "kind_tag": "unknown",
-      "signal": "blue",
-      "found_type": false
-    },
-    {
-      "type_name": "CapabilityCompositionRoot",
+      "found_type": true,
       "kind_tag": "composition_root",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewCompositionRoot"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "CodexReviewOutcome"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "RefVerifyChainFilter"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "RefVerifyCheckApprovedInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "RefVerifyResultsInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "RefVerifyRunInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "RefVerifyVerdictFilter"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "ReviewResultsInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "ReviewSharedError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "ReviewV2Composition"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "RunReviewFixLocalInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "cli_composition::review_v2::briefing::append_scope_briefing_reference_str"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "cli_composition::review_v2::scope::validate_review_group_name_str"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "cli_composition::review_v2::scope::validate_track_id_str"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "cli_composition::review_v2::shared::build_review_v2_str"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "type_name": "CapabilityCompositionRoot"
     }
   ]
 }

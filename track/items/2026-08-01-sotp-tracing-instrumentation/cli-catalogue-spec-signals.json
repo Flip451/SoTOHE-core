@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "340bb3e5bc5f0982871ff461cb7c97d7641c5c1e83f623aee69b55e979aff8d0",
+  "signals": [
+    {
+      "type_name": "CatalogCommand",
+      "signal": "blue",
+      "entry_hash": "b6451176ac3df31477d32d60e2be7252f963dea0ef3e06fc0fdadfda642bf81e"
+    },
+    {
+      "type_name": "CatalogueLintCommand",
+      "signal": "blue",
+      "entry_hash": "85696249ca6fdb1f349b96ec108a32d27c2bc3a1eec22af67a2b6dd101fd4531"
+    },
+    {
+      "type_name": "TrackCommand",
+      "signal": "blue",
+      "entry_hash": "1185512fa86b65c1011c5fd04f53acce432356801205153e40c997ad1f77dc63"
+    },
+    {
+      "type_name": "cli::command_identity_from_args",
+      "signal": "blue",
+      "entry_hash": "3ce057802f8125a11aef7c14506a5e011ff78a5db060ea86706b57f654b4440e"
+    },
+    {
+      "type_name": "cli::run_cli",
+      "signal": "blue",
+      "entry_hash": "c0045c1e5d76b37e12628915289145cf566530e7defae9ba0c1d2f0a20dd5db0"
+    },
+    {
+      "type_name": "cli::run_cli_with",
+      "signal": "blue",
+      "entry_hash": "76e2cde61161314fe2573ca4d98ed73a3d9d42196e00f8fee83984b0664f98e8"
+    },
+    {
+      "type_name": "cli::emit_archived_track_subcommand",
+      "signal": "blue",
+      "entry_hash": "b5129e12628ba2b9a1ac3b65df66fea930f168465ca56c20ae544ced710da0cd"
+    },
+    {
+      "type_name": "cli::execute_track_with_telemetry",
+      "signal": "blue",
+      "entry_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea"
+    },
+    {
+      "type_name": "cli::is_display_only_track_command",
+      "signal": "blue",
+      "entry_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea"
+    },
+    {
+      "type_name": "cli::telemetry_dir_override_is_set",
+      "signal": "blue",
+      "entry_hash": "21e5a23992a4f6dc965ad36b31e8dcd48f549ac740907f1bececfc6b2ec9a05c"
+    },
+    {
+      "type_name": "cli::track_command_label",
+      "signal": "blue",
+      "entry_hash": "6f62fff98ccc05b6365a9e5ed726b3cdd800f09c8ac31a9344f3c357476889ea"
+    }
+  ]
+}

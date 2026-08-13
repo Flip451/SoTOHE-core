@@ -622,6 +622,7 @@ mod tests {
     /// `parse_tddd_layers`.  `catalogue_spec_signal` is an object (`{ "enabled": true }`)
     /// because the parser deserialises it as `CatalogueSpecSignalBlock`, not a bool.
     const ARCH_RULES_WITH_DOMAIN: &str = r#"{
+  "version": 2,
   "layers": [
     {
       "crate": "domain",

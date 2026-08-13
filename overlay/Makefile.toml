@@ -417,7 +417,7 @@ description = "[gate] Run repository-wide CI checks. Track-aware gates live in c
 dependencies = ["fmt-check", "clippy", "test", "test-cli-feature-off", "test-doc", "deny", "check-layers", "verify-arch-docs", "verify-doc-links", "verify-track-metadata", "verify-hooks-path", "verify-canonical-modules", "verify-latest-track", "verify-module-size", "verify-domain-strings", "verify-domain-purity", "verify-usecase-purity", "verify-view-freshness", "verify-plan-artifact-refs", "verify-adr-signals"]
 
 [tasks.ci-track]
-description = "[gate] Run track-aware CI gates. Requires a track/<id> branch."
+description = "[gate] Run local early-detection track-aware CI gates. Remote CI plus branch protection enforce merge eligibility. Requires a track/<id> branch."
 dependencies = ["task-contract-check-local", "verify-spec-states-current", "signal-check-impl-catalog", "verify-catalogue-spec-refs", "check-catalogue-spec-signals"]
 script_runner = "@shell"
 script = ['bin/sotp adr-baseline check-commit']

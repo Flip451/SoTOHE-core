@@ -265,7 +265,7 @@ mod tests {
         fs::create_dir_all(directory.path().join(".harness/config")).expect("config directory");
         fs::write(
             directory.path().join(".harness/config/agent-profiles.json"),
-            r#"{"schema_version":1,"providers":{"claude":{"label":"Claude"}},"capabilities":{"review-fix-lead":{"provider":"claude","model":"claude-test","fast_provider":"claude","fast_model":"claude-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
+            r#"{"schema_version":1,"providers":{"claude":{"label":"Claude","supported_reasoning_efforts":["low","medium","high","xhigh","max"]}},"capabilities":{"review-fix-lead":{"provider":"claude","model":"claude-test","fast_provider":"claude","fast_model":"claude-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
         )
         .expect("agent profiles");
         directory
@@ -415,7 +415,7 @@ mod tests {
         fs::create_dir_all(directory.path().join(".harness/config")).expect("config directory");
         fs::write(
             directory.path().join(".harness/config/agent-profiles.json"),
-            r#"{"schema_version":1,"providers":{"claude":{"label":"Claude"}},"capabilities":{"review-fix-lead":{"provider":"claude","model":"claude-test","fast_provider":"claude","fast_model":"claude-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
+            r#"{"schema_version":1,"providers":{"claude":{"label":"Claude","supported_reasoning_efforts":["low","medium","high","xhigh","max"]}},"capabilities":{"review-fix-lead":{"provider":"claude","model":"claude-test","fast_provider":"claude","fast_model":"claude-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
         )
         .expect("agent profiles");
 
@@ -503,7 +503,7 @@ mod tests {
         fs::create_dir_all(directory.path().join(".harness/config")).expect("config directory");
         fs::write(
             directory.path().join(".harness/config/agent-profiles.json"),
-            r#"{"schema_version":1,"providers":{"claude":{"label":"Claude"}},"capabilities":{"review-fix-lead":{"provider":"claude","model":"claude-test","fast_provider":"claude","fast_model":"claude-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
+            r#"{"schema_version":1,"providers":{"claude":{"label":"Claude","supported_reasoning_efforts":["low","medium","high","xhigh","max"]}},"capabilities":{"review-fix-lead":{"provider":"claude","model":"claude-test","fast_provider":"claude","fast_model":"claude-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
         )
         .expect("agent profiles");
         fs::write(outside.path().join("briefing.md"), "outside").expect("outside briefing");

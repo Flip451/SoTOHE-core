@@ -1,0 +1,59 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SystemSignalReportSourceAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SystemSignalReportSourceAdapter",
+      "trait_ref": "usecase::signal_report::SignalReportSourcePort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "SystemSignalReportSourceAdapter": {
+      "action": "add",
+      "docs": "Add the secondary adapter implementing SignalReportSourcePort. IN-04, CN-01, AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_report",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/signal-report-command-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

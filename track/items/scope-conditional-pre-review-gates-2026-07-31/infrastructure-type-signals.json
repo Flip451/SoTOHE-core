@@ -1,98 +1,94 @@
 {
-  "schema_version": 3,
-  "generated_at": "2026-08-12T17:23:46Z",
   "declaration_hash": "b7009eb9aa9026d774fc44618d5040763df80b2ef1458313f0441d5887475826",
-  "implementation_input_hash": "df96ae0e6650355f5a5a07c0a830b6f51ed41dbcd02b1ed4bf71db4d63be7078",
+  "generated_at": "2026-08-13T03:14:27Z",
+  "implementation_input_hash": "7bfa52aa9a39c0b89bf57c821689e00509d32f04dc8f065c06eba9d83daeb827",
+  "schema_version": 3,
   "signals": [
     {
-      "type_name": "CommandArgumentDto",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandArgvDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandArgumentDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandConfigSchemaVersionDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandArgvDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandDeclarationIdDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandConfigSchemaVersionDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandTimeoutSecondsDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandDeclarationIdDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ConfiguredCommandDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandTimeoutSecondsDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ContractedEntryRefDto",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "EntryKeyDto",
-      "kind_tag": "dto",
-      "signal": "blue",
+      ],
       "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ConfiguredCommandDto"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ContractedEntryRefDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
@@ -100,64 +96,64 @@
         "Eq",
         "PartialEq",
         "Serialize"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "EntryKeyDto"
     },
     {
-      "type_name": "FsPhaseCommandConfigLoader",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Default",
         "usecase::phase_command::PhaseCommandConfigLoaderPort"
-      ]
-    },
-    {
-      "type_name": "FsPreReviewCommandConfigLoader",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "FsPhaseCommandConfigLoader"
+    },
+    {
       "found_items": [
         "Debug",
         "Default",
         "usecase::pre_review_command::PreReviewCommandConfigLoaderPort"
-      ]
-    },
-    {
-      "type_name": "FsRefVerifyAggregateAdapter",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "FsPreReviewCommandConfigLoader"
+    },
+    {
       "found_items": [
         "usecase::ref_verify::driver_service::RefVerifyCheckApprovedDriverService"
-      ]
-    },
-    {
-      "type_name": "GitCurrentReviewTrackResolver",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "FsRefVerifyAggregateAdapter"
+    },
+    {
       "found_items": [
         "Debug",
         "Default",
         "usecase::pre_review_command::CurrentReviewTrackResolverPort"
-      ]
-    },
-    {
-      "type_name": "GitReviewFixTrackResolver",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
-      ]
+      "type_name": "GitCurrentReviewTrackResolver"
     },
     {
-      "type_name": "LayerIdDto",
-      "kind_tag": "dto",
-      "signal": "blue",
+      "found_items": [
+        "usecase::review_v2::run_review_fix::ReviewFixTrackResolverPort"
+      ],
       "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "GitReviewFixTrackResolver"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
@@ -165,140 +161,140 @@
         "Eq",
         "PartialEq",
         "Serialize"
-      ]
-    },
-    {
-      "type_name": "PhaseCommandConfigDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "LayerIdDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PhaseCommandDeclarationDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "PhaseCommandConfigDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewCommandConfigDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "PhaseCommandDeclarationDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewScopeCommandDeclarationDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "PreReviewCommandConfigDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "PreReviewScopeCommandDeclarationDto"
     },
     {
-      "type_name": "ProcessProgramRunner",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Default",
         "usecase::program_runner::ProgramRunnerPort"
-      ]
-    },
-    {
-      "type_name": "ResultsRoundAdapter",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ProcessProgramRunner"
+    },
+    {
       "found_items": [
         "usecase::review_v2::review_aux::ReviewResultsRoundPort"
-      ]
-    },
-    {
-      "type_name": "ResultsScopeAdapter",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ResultsRoundAdapter"
+    },
+    {
       "found_items": [
         "usecase::review_v2::review_aux::ReviewResultsScopePort"
-      ]
-    },
-    {
-      "type_name": "ResultsStateAdapter",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ResultsScopeAdapter"
+    },
+    {
       "found_items": [
         "usecase::review_v2::review_aux::ReviewResultsStatePort"
-      ]
-    },
-    {
-      "type_name": "ReviewCheckZeroFindingsStateAdapter",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ResultsStateAdapter"
+    },
+    {
       "found_items": [
         "usecase::review_v2::check_zero_findings::ReviewCheckZeroFindingsStatePort"
-      ]
-    },
-    {
-      "type_name": "ReviewFixRunnerAdapter",
+      ],
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "usecase::review_v2::run_review_fix::ReviewFixRunner"
-      ]
+      "type_name": "ReviewCheckZeroFindingsStateAdapter"
     },
     {
-      "type_name": "ReviewScopeNameDto",
-      "kind_tag": "dto",
-      "signal": "blue",
+      "found_items": [
+        "usecase::review_v2::run_review_fix::ReviewFixRunner"
+      ],
       "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "ReviewFixRunnerAdapter"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "TaskContractDocumentDto",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "TaskContractSchemaVersionDto",
-      "kind_tag": "dto",
-      "signal": "blue",
+      ],
       "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewScopeNameDto"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TaskContractDocumentDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Copy",
@@ -307,13 +303,13 @@
         "Eq",
         "PartialEq",
         "Serialize"
-      ]
-    },
-    {
-      "type_name": "TaskIdDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "TaskContractSchemaVersionDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
@@ -323,13 +319,13 @@
         "PartialEq",
         "PartialOrd",
         "Serialize"
-      ]
-    },
-    {
-      "type_name": "TrackIdDto",
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "TaskIdDto"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
@@ -337,25 +333,29 @@
         "Eq",
         "PartialEq",
         "Serialize"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TrackIdDto"
     },
     {
-      "type_name": "infrastructure::operator_command_config::decode_phase_command_config",
+      "found_type": true,
       "kind_tag": "free_function",
       "signal": "blue",
-      "found_type": true
+      "type_name": "infrastructure::operator_command_config::decode_phase_command_config"
     },
     {
-      "type_name": "infrastructure::operator_command_config::decode_pre_review_command_config",
+      "found_type": true,
       "kind_tag": "free_function",
       "signal": "blue",
-      "found_type": true
+      "type_name": "infrastructure::operator_command_config::decode_pre_review_command_config"
     },
     {
-      "type_name": "CodexReviewFixRunner",
+      "found_type": true,
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true
+      "type_name": "CodexReviewFixRunner"
     }
   ]
 }

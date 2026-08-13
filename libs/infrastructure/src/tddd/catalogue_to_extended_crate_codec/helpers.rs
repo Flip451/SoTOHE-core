@@ -1,5 +1,4 @@
 //! Free helper functions used across the codec sub-modules.
-
 use std::collections::HashMap;
 
 use domain::tddd::catalogue_v2::SelfReceiver;
@@ -13,7 +12,6 @@ use crate::tddd::catalogue_to_extended_crate_codec_error::CatalogueToExtendedCra
 use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 
 use super::encoder::EncoderState;
-
 // ---------------------------------------------------------------------------
 // Item construction helpers
 // ---------------------------------------------------------------------------
@@ -230,7 +228,6 @@ pub(super) fn rewrite_generic_types(ty: Type, generic_names: &[&str]) -> Type {
         other => other,
     }
 }
-
 /// Rewrites method-generic names that appear as type arguments inside a `GenericBound`.
 ///
 /// `encode_bound_str` produces `GenericBound::TraitBound { trait_: Path, ... }`.
@@ -266,7 +263,6 @@ pub(super) fn rewrite_generic_types_in_bound(
 pub(super) fn rewrite_generic_args(args: GenericArgs, generic_names: &[&str]) -> GenericArgs {
     rewrite_generic_args_with(args, generic_names, rewrite_generic_types, rewrite_assoc_constraint)
 }
-
 /// Recursively rewrites generic args using caller-supplied type and constraint
 /// rewriters.
 pub(super) fn rewrite_generic_args_with<RewriteType, RewriteConstraint>(
@@ -303,7 +299,6 @@ where
         GenericArgs::ReturnTypeNotation => GenericArgs::ReturnTypeNotation,
     }
 }
-
 /// Rewrites method-generic names inside an `AssocItemConstraint`.
 ///
 /// Handles all three constraint variants:
@@ -472,8 +467,11 @@ impl EncoderState {
         trait_generic_names: &[&str],
     ) -> Result<GenericBound, CatalogueToExtendedCrateCodecError> {
         let shadowed_generics = self.shadow_local_type_names(trait_generic_names);
-        let raw =
-            self.encode_bound_str_with_suppressed_external_prefixes(bound_str, trait_generic_names);
+        let raw = self.encode_bound_str_with_suppressed_external_prefixes_and_generics(
+            bound_str,
+            trait_generic_names,
+            trait_generic_names,
+        );
         self.restore_local_type_names(shadowed_generics);
         let raw = raw?;
         if trait_generic_names.is_empty() {

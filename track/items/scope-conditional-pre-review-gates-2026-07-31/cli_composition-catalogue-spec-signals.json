@@ -1,96 +1,96 @@
 {
-  "schema_version": 1,
   "catalogue_declaration_hash": "7e212bd5334fb651854d188e4fe711ecc9e6520bc4807442c4ef2f3f1aa154d2",
+  "schema_version": 1,
   "signals": [
     {
-      "type_name": "CapabilityCompositionRoot",
+      "entry_hash": "cc7790bccce13aaeb749f0191b248d61df98eb70969591f6ce9c82746d455eda",
       "signal": "blue",
-      "entry_hash": "cc7790bccce13aaeb749f0191b248d61df98eb70969591f6ce9c82746d455eda"
+      "type_name": "CapabilityCompositionRoot"
     },
     {
-      "type_name": "PhaseCompositionRoot",
+      "entry_hash": "0ec9dcaa0216ebdc38542a319623057167ffff0183f270d18093a24339c8571f",
       "signal": "blue",
-      "entry_hash": "0ec9dcaa0216ebdc38542a319623057167ffff0183f270d18093a24339c8571f"
+      "type_name": "PhaseCompositionRoot"
     },
     {
-      "type_name": "RefVerifyCompositionRoot",
+      "entry_hash": "ecaba0e448916267967f52d3c0c4f4e644087b780680da82025cf32231dd87b5",
       "signal": "blue",
-      "entry_hash": "ecaba0e448916267967f52d3c0c4f4e644087b780680da82025cf32231dd87b5"
+      "type_name": "RefVerifyCompositionRoot"
     },
     {
-      "type_name": "ReviewCompositionRoot",
+      "entry_hash": "7591b6b86a5ed329e9c516601b97916c1835429616ff4b9ca776381a14b2efef",
       "signal": "blue",
-      "entry_hash": "7591b6b86a5ed329e9c516601b97916c1835429616ff4b9ca776381a14b2efef"
+      "type_name": "ReviewCompositionRoot"
     },
     {
-      "type_name": "CodexReviewOutcome",
+      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5",
       "signal": "blue",
-      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5"
+      "type_name": "CodexReviewOutcome"
     },
     {
-      "type_name": "RefVerifyChainFilter",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9",
       "signal": "blue",
-      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+      "type_name": "RefVerifyChainFilter"
     },
     {
-      "type_name": "RefVerifyCheckApprovedInput",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9",
       "signal": "blue",
-      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+      "type_name": "RefVerifyCheckApprovedInput"
     },
     {
-      "type_name": "RefVerifyResultsInput",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9",
       "signal": "blue",
-      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+      "type_name": "RefVerifyResultsInput"
     },
     {
-      "type_name": "RefVerifyRunInput",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9",
       "signal": "blue",
-      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+      "type_name": "RefVerifyRunInput"
     },
     {
-      "type_name": "RefVerifyVerdictFilter",
+      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9",
       "signal": "blue",
-      "entry_hash": "fb69c9a89e37e7c23d453a285ec403a807586e5360055b522ab03e3fa5d388b9"
+      "type_name": "RefVerifyVerdictFilter"
     },
     {
-      "type_name": "ReviewResultsInput",
+      "entry_hash": "50aadc06fa460e3ff1ebb3be29c9d3b9c8136263af27ebc3e4ceec6373bc8039",
       "signal": "blue",
-      "entry_hash": "50aadc06fa460e3ff1ebb3be29c9d3b9c8136263af27ebc3e4ceec6373bc8039"
+      "type_name": "ReviewResultsInput"
     },
     {
-      "type_name": "ReviewSharedError",
+      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5",
       "signal": "blue",
-      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5"
+      "type_name": "ReviewSharedError"
     },
     {
-      "type_name": "ReviewV2Composition",
+      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5",
       "signal": "blue",
-      "entry_hash": "ffcee9bef80d9d8c67c7509adc744ac96f58eb3861636cf5d0b37836247c47d5"
+      "type_name": "ReviewV2Composition"
     },
     {
-      "type_name": "RunReviewFixLocalInput",
+      "entry_hash": "ef4600434a50e7fad4474ae3d43b7cb5b592bf27d08f5491e5517a399371d78c",
       "signal": "blue",
-      "entry_hash": "ef4600434a50e7fad4474ae3d43b7cb5b592bf27d08f5491e5517a399371d78c"
+      "type_name": "RunReviewFixLocalInput"
     },
     {
-      "type_name": "cli_composition::review_v2::briefing::append_scope_briefing_reference_str",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba",
       "signal": "blue",
-      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
+      "type_name": "cli_composition::review_v2::briefing::append_scope_briefing_reference_str"
     },
     {
-      "type_name": "cli_composition::review_v2::scope::validate_review_group_name_str",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba",
       "signal": "blue",
-      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
+      "type_name": "cli_composition::review_v2::scope::validate_review_group_name_str"
     },
     {
-      "type_name": "cli_composition::review_v2::scope::validate_track_id_str",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba",
       "signal": "blue",
-      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
+      "type_name": "cli_composition::review_v2::scope::validate_track_id_str"
     },
     {
-      "type_name": "cli_composition::review_v2::shared::build_review_v2_str",
+      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba",
       "signal": "blue",
-      "entry_hash": "7a0543adb8bdc70ad431a5fd18f61a58c42b8e610002ef31b8002748d84c57ba"
+      "type_name": "cli_composition::review_v2::shared::build_review_v2_str"
     }
   ]
 }

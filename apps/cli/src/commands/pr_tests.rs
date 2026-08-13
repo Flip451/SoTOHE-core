@@ -141,7 +141,7 @@ fn checks_summary_maps_normalized_cli_checks_to_pending() {
 }
 
 #[test]
-fn wait_and_merge_with_merges_after_all_checks_pass() {
+fn test_wait_and_merge_with_green_checks_merges_exactly_once() {
     let client = FakeGhClient {
         checks: RefCell::new(vec![Ok(vec![PrCheckRecord {
             name: "ci".to_owned(),
@@ -160,7 +160,52 @@ fn wait_and_merge_with_merges_after_all_checks_pass() {
 }
 
 #[test]
-fn wait_and_merge_with_returns_failure_when_checks_api_errors() {
+fn test_wait_and_merge_with_failed_checks_does_not_merge() {
+    let client = FakeGhClient {
+        checks: RefCell::new(vec![Ok(vec![PrCheckRecord {
+            name: "ci".to_owned(),
+            state: "FAILURE".to_owned(),
+            bucket: String::new(),
+        }])]),
+        ..FakeGhClient::default_for_pr()
+    };
+    let result = wait_and_merge_with("123", 15, 600, "merge", &client, &|_| {
+        panic!("sleep should not be called")
+    });
+
+    assert_eq!(result, ExitCode::FAILURE);
+    assert!(client.merge_calls.into_inner().is_empty());
+}
+
+#[test]
+fn test_wait_and_merge_with_pending_then_green_merges_without_confirmation() {
+    let sleeps = RefCell::new(Vec::new());
+    let client = FakeGhClient {
+        checks: RefCell::new(vec![
+            Ok(vec![PrCheckRecord {
+                name: "ci".to_owned(),
+                state: "PENDING".to_owned(),
+                bucket: "pending".to_owned(),
+            }]),
+            Ok(vec![PrCheckRecord {
+                name: "ci".to_owned(),
+                state: "SUCCESS".to_owned(),
+                bucket: String::new(),
+            }]),
+        ]),
+        ..FakeGhClient::default_for_pr()
+    };
+    let result = wait_and_merge_with("123", 15, 600, "rebase", &client, &|duration| {
+        sleeps.borrow_mut().push(duration)
+    });
+
+    assert_eq!(result, ExitCode::SUCCESS);
+    assert_eq!(sleeps.into_inner(), vec![std::time::Duration::from_secs(15)]);
+    assert_eq!(client.merge_calls.into_inner(), vec![("123".to_owned(), "rebase".to_owned())]);
+}
+
+#[test]
+fn test_wait_and_merge_with_checks_api_error_returns_failure() {
     let client = FakeGhClient {
         checks: RefCell::new(vec![Err(GhError::CommandFailed {
             command: "pr checks 123".to_owned(),
@@ -173,10 +218,11 @@ fn wait_and_merge_with_returns_failure_when_checks_api_errors() {
     });
 
     assert_eq!(result, ExitCode::FAILURE);
+    assert!(client.merge_calls.into_inner().is_empty());
 }
 
 #[test]
-fn wait_and_merge_with_times_out_pending_checks_without_sleep_when_deadline_reached() {
+fn test_wait_and_merge_with_deadline_reached_times_out_without_sleep() {
     let sleeps = RefCell::new(Vec::new());
     let client = FakeGhClient {
         checks: RefCell::new(vec![Ok(vec![PrCheckRecord {
@@ -192,6 +238,7 @@ fn wait_and_merge_with_times_out_pending_checks_without_sleep_when_deadline_reac
 
     assert_eq!(result, ExitCode::FAILURE);
     assert!(sleeps.borrow().is_empty());
+    assert!(client.merge_calls.into_inner().is_empty());
 }
 
 // --- ensure_pr_with tests ---

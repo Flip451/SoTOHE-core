@@ -1,0 +1,385 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
+          "at": "2026-07-31T13:52:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a735d9e5bdc7187e44934e2cae9136dbdc41122c42d19f58e28c941e9efe889",
+          "at": "2026-07-31T13:56:09Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:29:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f59d66bc491c4a186b33f9521f050f2866cfae38d621838448514f8ecf03a6cd",
+          "at": "2026-07-31T11:32:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0c4a3e3b3d4192d829f03502ad2ff540435b099415e300b110fd5cad6629f17f",
+          "at": "2026-07-31T12:24:17Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 の説明は「既存の CLI / composition 回帰試験」と層名しか示さず、対象ファイルまたはシンボルを特定していないため、実装者が変更境界を発明する必要がある。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 の説明は、ID形式・既存ID非移行という spec の挙動契約を散文で再記述している。許可される形式は対象＋操作＋anchor cite のみ（no-upstream-restatement policy）。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 の説明は、新旧IDの利用可能性と公開API非追加という upstream/spec 契約を散文で再記述している。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "plan.summary の記述が GO-01 の生成規則・互換性契約を散文で再記述している。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 22,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section S1 の description が T001 の対象操作を越えて、既存IDを変更しないという upstream/spec 契約を再記述している。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section S2 の description が日付プレフィックス・旧形式の branch、配置、解決の挙動契約を再記述している。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 39,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "実装開始前の T002 は、AC-02 の新形式ID経路の回帰証明と AC-03 の既存形式互換性の回帰証明という独立して検証可能な行動単位を1タスクに束ねている。これらを別タスクへ分割すべきである。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 12,
+              "category": "pre-implementation split proposal"
+            },
+            {
+              "message": "AC-03 が T001 にも割り当てられているが、T001 は workflow 文書更新のみで、既存 branch・item-directory・branch-bound 解決を検証する手順を含まない。互換性の実証は T002 に限定するか、T001 に検証ステップを追加すべきである。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/task-coverage.json",
+              "line": 37,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:1c7b838c31b3efda587eb8301585b938c358a74467551ac6e6a9e1247d320ed9",
+          "at": "2026-07-31T12:46:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 は T001 に割り当てられているが、T001 は `.harness/workflows/track/init.md` の生成手順を更新するだけで、異なる日付の2つの track/branch を一覧表示して順序を検証する手順を含まない。AC-04 の実証を T002 の date-prefixed fixture 回帰試験へ割り当て、検証内容をタスク記述に含める必要がある。",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/task-coverage.json",
+              "line": 38,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:7de971072c26169e1677a471f9494542224140f41cf650fc93645902a894a903",
+          "at": "2026-07-31T13:04:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f769c24936af484f693eaedf2533c4485abf6e61509ad4a650e5a0965d2d1c5",
+          "at": "2026-07-31T13:05:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` says only `D1 → T001–T003`, so the spec goal `GO-01` has no direct goal-to-task traceability. Record `GO-01 → T001–T003` here; goals are intentionally excluded from `task-coverage.json`.",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "`AC-01` is mapped only to `T001`, but T001 merely edits the workflow instruction and names no validation step. T002 tests already-constructed date-prefixed fixtures, so it cannot detect an incorrect generation order. Add an AC-01 validation step to T001 or map AC-01 to a task that verifies the generated ID.",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/task-coverage.json",
+              "line": 29,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9f769c24936af484f693eaedf2533c4485abf6e61509ad4a650e5a0965d2d1c5",
+          "at": "2026-07-31T13:10:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9309adc17aaf01735c9f2135c6fa7b126a681ccb99e99cd871fb5931ea85373a",
+          "at": "2026-07-31T13:14:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9309adc17aaf01735c9f2135c6fa7b126a681ccb99e99cd871fb5931ea85373a",
+          "at": "2026-07-31T13:15:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d713472d860bd6b0e9e192d5191557ff1e5d5f4bb856eea4140a5cbe8f8eb7a5",
+          "at": "2026-07-31T13:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d713472d860bd6b0e9e192d5191557ff1e5d5f4bb856eea4140a5cbe8f8eb7a5",
+          "at": "2026-07-31T13:56:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec2f43915df1a3b3b9780d874fb98ba975622c28816552f257b818063793aa87",
+          "at": "2026-07-31T14:44:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec2f43915df1a3b3b9780d874fb98ba975622c28816552f257b818063793aa87",
+          "at": "2026-07-31T14:48:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49ec3eca419fea7ad73a329f9bb2f8eca2da5a2ce210cfd2326167af88180492",
+          "at": "2026-07-31T15:34:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49ec3eca419fea7ad73a329f9bb2f8eca2da5a2ce210cfd2326167af88180492",
+          "at": "2026-07-31T15:36:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53eb3d9fdae6fe8ff5ba54914f3d07594004894a6878a7734c7cf435d3079dc6",
+          "at": "2026-07-31T15:59:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:53eb3d9fdae6fe8ff5ba54914f3d07594004894a6878a7734c7cf435d3079dc6",
+          "at": "2026-07-31T16:01:32Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e991a98880f85b1550d29dd7ce8397736a5190702ed2fb41423fcf3d49df35",
+          "at": "2026-07-31T12:45:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c7e991a98880f85b1550d29dd7ce8397736a5190702ed2fb41423fcf3d49df35",
+          "at": "2026-07-31T12:49:16Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 claims chronological ordering in track and branch listings, but no acceptance criterion deterministically verifies either listing order; the goal therefore has an acceptance-coverage gap.",
+              "severity": "P1",
+              "file": "track/items/track-id-date-prefix-2026-07-31/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:d90b285878ed3b1ac3558ebb33e1ab8e3266060a0cf8c9318c329732b4c8816c",
+          "at": "2026-07-31T12:45:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:787eecae16e7a3debade1761a5cf12eba0fc5056162db14913fa4304398da30d",
+          "at": "2026-07-31T12:53:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:787eecae16e7a3debade1761a5cf12eba0fc5056162db14913fa4304398da30d",
+          "at": "2026-07-31T12:55:20Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
+          "at": "2026-07-31T14:45:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d86c496f64206f588aa70570173f8bc4099088d684ba883ce27b415f117445b1",
+          "at": "2026-07-31T14:49:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b25651b78f89f5fa62a38b33c9d15e996e138ccc0438d59d18e00715a861a9e2",
+          "at": "2026-07-31T15:34:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b25651b78f89f5fa62a38b33c9d15e996e138ccc0438d59d18e00715a861a9e2",
+          "at": "2026-07-31T15:36:56Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c52d3b858b3eb4cef525f13463e8455da97ee8cc3b334ee2523ba4201c6b650",
+          "at": "2026-07-31T12:46:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c52d3b858b3eb4cef525f13463e8455da97ee8cc3b334ee2523ba4201c6b650",
+          "at": "2026-07-31T12:50:20Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:01:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`capabilities.orchestrator.reasoning_effort` declares `medium`, but Codex root orchestration is configured by `.codex/config.toml`, which still pins `model_reasoning_effort = \"low\"`; the generic capability dispatcher does not execute this typed-pipeline row. The routing SSoT therefore disagrees with actual orchestrator execution. Align the profile with `low` or update the provider-native Codex configuration in the same change.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 18,
+              "category": "capability_routing_mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:d81bc22fba35f2b0b0dbaeb5f526e0526e42d65f5f85f52f8219a454c9feb736",
+          "at": "2026-07-31T12:06:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20d7607c725320a347f91c3a940f85ae9a48868208f94bf9c40c7f05621ce0d",
+          "at": "2026-07-31T12:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ea84c222608422af3125d67b77181033ea895c71c09e301c96ddf7ebe882d9b",
+          "at": "2026-07-31T13:52:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ea84c222608422af3125d67b77181033ea895c71c09e301c96ddf7ebe882d9b",
+          "at": "2026-07-31T13:55:04Z"
+        }
+      ]
+    }
+  }
+}

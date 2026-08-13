@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "325c5c6f147e12b04bf58c74a1fff5675ebddb4e05224d0ef95f0e712917aa00",
+  "signals": [
+    {
+      "type_name": "CommandDurationMillis",
+      "signal": "blue",
+      "entry_hash": "543c0bd7cd986767e30424372c4c091a8417666fe84e3e3e5716b1e77a2bd602"
+    },
+    {
+      "type_name": "CommandExecutionCount",
+      "signal": "blue",
+      "entry_hash": "48dffc8f96fd1aaa54729c3b7a8f57cecac977dac11f96fbfa0680dcbbc0d722"
+    },
+    {
+      "type_name": "CommandExecutionMetric",
+      "signal": "blue",
+      "entry_hash": "cc5465f4ec56114829340b68e35a8b88213d3d1f44d7dbd686196ed518d4f3c3"
+    },
+    {
+      "type_name": "CommandFailureRateBasisPoints",
+      "signal": "blue",
+      "entry_hash": "d3f504cc0410f0d3aa9a74be80657735ecaefbb432988400f0563f9ffd0bd259"
+    },
+    {
+      "type_name": "CommandTraceValueError",
+      "signal": "blue",
+      "entry_hash": "7629cb9872aa149630afb0c915671a2ddcc2ecad3a4146efeaca3720356f6384"
+    },
+    {
+      "type_name": "SotpCommandIdentity",
+      "signal": "blue",
+      "entry_hash": "560b6a62fc352cd4981d5337adcb495a9cc3b6c659e3f87cf3561b59c4ba8c41"
+    },
+    {
+      "type_name": "TelemetryAggregateInteractor",
+      "signal": "blue",
+      "entry_hash": "6080c3f11d161a347c96829b0dfb425b5704cd3aeff6501a4236619fbf3afa7c"
+    },
+    {
+      "type_name": "TelemetryArchiveInteractor",
+      "signal": "blue",
+      "entry_hash": "b52bf525c3192d60ef9b236b736fb1c34bd6ffaaeaf75d602710520ca535b41c"
+    },
+    {
+      "type_name": "TelemetryEmitInteractor",
+      "signal": "blue",
+      "entry_hash": "b4c0fb711446b15da8795e3b9da3c3ac8f001d998bafa36dae94cb3037bb79a4"
+    },
+    {
+      "type_name": "TelemetryReportOutput",
+      "signal": "blue",
+      "entry_hash": "3e225f72b306332000b1197464117be3422fd9fd45975c891dbdd3ee92513781"
+    },
+    {
+      "type_name": "TelemetrySkippedLineCount",
+      "signal": "blue",
+      "entry_hash": "d2278f793dcf87dc995bda2a44e3c72d5d3c44d9354ab65a7da63786f1b841b4"
+    },
+    {
+      "type_name": "TelemetryAggregateService",
+      "signal": "blue",
+      "entry_hash": "58bcbab2da3d1257f988a4dbfa8787858fc1f09f172e3d239e9e49047dbcaf1f"
+    },
+    {
+      "type_name": "TelemetryArchivedService",
+      "signal": "blue",
+      "entry_hash": "2ca317307dc67e6cf803a0083291424e095847c9f9d7ec3189ae98158eb79f01"
+    },
+    {
+      "type_name": "TelemetryEmitDynamicPort",
+      "signal": "blue",
+      "entry_hash": "cc052561efa18192e67f2e97a06742188ff99215c4d6c922447a3ab020b0acda"
+    },
+    {
+      "type_name": "TelemetryEmitService",
+      "signal": "blue",
+      "entry_hash": "f2e243e836cfdf3abdb96b92eee2ab8b3533eb69c0e66a2334627e092d0ccad5"
+    },
+    {
+      "type_name": "TelemetryReportService",
+      "signal": "blue",
+      "entry_hash": "0c385e4113bbff8562c1ea55b02b39cd3a7d3ca118264e4efb08d6dd1f29ef60"
+    }
+  ]
+}

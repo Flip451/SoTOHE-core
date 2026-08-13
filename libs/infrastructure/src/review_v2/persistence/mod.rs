@@ -181,7 +181,14 @@ impl WriteGuard {
 /// Serializes `doc` to pretty JSON and writes it atomically (tmp + fsync + rename).
 /// Must be called while a `WriteGuard` is held.
 fn write_atomic(path: &Path, doc: &ReviewJsonV2) -> Result<(), PersistenceError> {
-    let json = serde_json::to_string_pretty(doc).map_err(|e| PersistenceError::Codec {
+    // Serialize through Value so HashMap-backed scopes and every nested object
+    // use canonical key order before the atomic write.
+    let value = serde_json::to_value(doc).map_err(|e| PersistenceError::Codec {
+        operation: "serialize",
+        path: None,
+        detail: e.to_string(),
+    })?;
+    let json = serde_json::to_string_pretty(&value).map_err(|e| PersistenceError::Codec {
         operation: "serialize",
         path: None,
         detail: e.to_string(),

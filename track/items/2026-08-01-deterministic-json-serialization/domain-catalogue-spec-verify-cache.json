@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "2f2f6e2e70c5b56b6ef2755e7e4fcbe079e5c367aeb6a1824b113f68f1f87364",
+      "evidence_hash": "6d7d4d6b19485275023aee68c576ddac966ede8c295ed8d48ff42cfeb35b8d8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "completed-track artifacts must remain untouched"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FrozenTrackStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+        }
+      }
+    },
+    {
+      "claim_hash": "2f2f6e2e70c5b56b6ef2755e7e4fcbe079e5c367aeb6a1824b113f68f1f87364",
+      "evidence_hash": "cb5cc8d7efdd6fd88c2f8a052d57858178f2ba138443d8e157eb009816eee1f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FrozenTrackStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+        }
+      }
+    },
+    {
+      "claim_hash": "963353c2a69224dd4178125d856368877e0548dbb2fc14f046fca63eafb61aa0",
+      "evidence_hash": "6d7d4d6b19485275023aee68c576ddac966ede8c295ed8d48ff42cfeb35b8d8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationDeriveError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+        }
+      }
+    },
+    {
+      "claim_hash": "963353c2a69224dd4178125d856368877e0548dbb2fc14f046fca63eafb61aa0",
+      "evidence_hash": "cb5cc8d7efdd6fd88c2f8a052d57858178f2ba138443d8e157eb009816eee1f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationDeriveError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+        }
+      }
+    },
+    {
+      "claim_hash": "887e681cd2ed035282b4ca4a49e286f3f262970ed5c5a8e3c31056b780960280",
+      "evidence_hash": "3e67685b397d53ff9bb6597cb7dd72acdebca56fd001a71f34835bbe211632d8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Bulk reserializing JSON artifacts belonging to completed tracks."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "Bulk reserializing JSON artifacts belonging to completed tracks."
+        }
+      }
+    },
+    {
+      "claim_hash": "887e681cd2ed035282b4ca4a49e286f3f262970ed5c5a8e3c31056b780960280",
+      "evidence_hash": "6d7d4d6b19485275023aee68c576ddac966ede8c295ed8d48ff42cfeb35b8d8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "completed-track artifacts must remain untouched"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+        }
+      }
+    },
+    {
+      "claim_hash": "887e681cd2ed035282b4ca4a49e286f3f262970ed5c5a8e3c31056b780960280",
+      "evidence_hash": "cb5cc8d7efdd6fd88c2f8a052d57858178f2ba138443d8e157eb009816eee1f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackStatus"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+        }
+      }
+    },
+    {
+      "claim_hash": "7f6ad2425923da276b1fee4fe9929c9f4873687ac9d72d244f926fc703b33f64",
+      "evidence_hash": "6d7d4d6b19485275023aee68c576ddac966ede8c295ed8d48ff42cfeb35b8d8a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "completed-track artifacts must remain untouched"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackStatusReadFailureKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "Migration effects are limited to the key order of regenerated artifacts on active tracks; completed-track artifacts must remain untouched."
+        }
+      }
+    },
+    {
+      "claim_hash": "7f6ad2425923da276b1fee4fe9929c9f4873687ac9d72d244f926fc703b33f64",
+      "evidence_hash": "cb5cc8d7efdd6fd88c2f8a052d57858178f2ba138443d8e157eb009816eee1f0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/2026-08-01-deterministic-json-serialization/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackStatusReadFailureKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "The implementation does not regenerate or rewrite JSON artifacts for completed tracks solely to normalize key order."
+        }
+      }
+    }
+  ]
+}

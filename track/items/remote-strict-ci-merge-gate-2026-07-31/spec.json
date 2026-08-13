@@ -1,0 +1,192 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Remote Strict CI Merge Gate",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "strict な track-aware merge gate を remote CI と branch protection で強制し、gate を通らない merge を構造的に防ぐ。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "`/track:merge` の発行を merge 承認として一度だけ扱い、重複した確認なしに remote CI green 後の merge へ進める。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "remote CI は merge の判定に strict な track-aware gate を実行し、checkout ref から対象 track を解決する。対象 track を解決できない場合は検査を skip せず失敗として扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "branch protection は remote CI の track-aware gate が失敗した pull request の merge を拒否する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "ローカルでの merge gate 実行は早期検知として維持するが、merge 可否を強制する主体は remote CI と branch protection とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "`/track:merge` は invocation 後に追加のユーザー確認を求めず、remote CI が green になるまで待機して merge を実行する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "remote CI を伴わずローカル merge gate だけで merge 可否を強制する方式へ戻すことは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "対象 track を解決できない remote workflow を成功または graceful skip として扱う例外経路を設けることは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "`/track:merge` の発行後に別の merge 承認確認を再導入することは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "remote strict gate の失敗または対象 track の解決不能は merge を fail-closed で停止させなければならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "`/track:merge` の invocation は merge 承認として扱い、その後の workflow と adapter は追加の確認 prompt を表示してはならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "remote CI 上で merge gate が実行されると、checkout ref に対応する track を用いて strict な track-aware signal 検査が実行される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "checkout ref から対象 track を解決できない remote CI 実行は graceful skip や成功ではなく失敗になり、merge 可と報告されない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "remote strict gate が失敗する pull request は branch protection により merge できず、gate が成功するまで保護 branch へ取り込めない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "ローカルの merge gate 実行経路は早期検知として利用可能なまま残り、remote gate の結果を置き換える唯一の merge 強制手段にはならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "`/track:merge` の発行後、workflow と adapter は追加の確認を求めず、remote CI が green になるのを待って merge を実行する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-remote-strict-ci-merge-gate.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    }
+  ],
+  "signals": {
+    "blue": 16,
+    "yellow": 0,
+    "red": 0
+  }
+}

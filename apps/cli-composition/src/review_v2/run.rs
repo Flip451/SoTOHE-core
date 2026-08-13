@@ -541,11 +541,6 @@ mod tests {
     };
 
     // Mutex so tests that mutate cwd do not race.
-    static ENV_LOCK: std::sync::OnceLock<std::sync::Mutex<()>> = std::sync::OnceLock::new();
-    fn env_lock() -> &'static std::sync::Mutex<()> {
-        ENV_LOCK.get_or_init(|| std::sync::Mutex::new(()))
-    }
-
     /// Sets up a minimal git repo with v2 review-scope.json for testing.
     ///
     /// Creates two commits so that the diff base (first commit SHA) differs from HEAD.
@@ -651,7 +646,7 @@ mod tests {
     fn test_run_claude_review_str_rejects_unknown_round_type() {
         // The "unknown round type" branch is reached only after the composition builds
         // successfully. Use a real git repo + track dir to exercise it.
-        let _guard = env_lock().lock().unwrap();
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
         let base_sha = setup_test_git_repo(dir.path());
         let _cwd = CwdGuard::save_current();
@@ -708,7 +703,7 @@ mod tests {
         round_type: &str,
         expect_message: &str,
     ) -> CodexReviewOutcome {
-        let _guard = env_lock().lock().unwrap();
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
         let base_sha = setup_test_git_repo(dir.path());
         let _cwd = CwdGuard::save_current();
@@ -735,9 +730,98 @@ mod tests {
     }
 
     #[cfg(unix)]
+    fn without_review_timestamp(bytes: Vec<u8>) -> Vec<u8> {
+        let mut json = String::from_utf8(bytes).unwrap();
+        let value_start = json
+            .find("\"at\": \"")
+            .expect("review JSON must contain the persisted round timestamp")
+            + "\"at\": \"".len();
+        let value_end = value_start
+            + json[value_start..].find('"').expect("review JSON timestamp must be quoted");
+        json.replace_range(value_start..value_end, "<execution-time>");
+        json.into_bytes()
+    }
+
+    #[cfg(unix)]
+    fn assert_review_round_writes_canonical_json(round_type: &str) {
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let base_sha = setup_test_git_repo(dir.path());
+        let _cwd = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let script = dir.path().join("deterministic-reviewer.sh");
+        write_fake_claude_script(
+            &script,
+            r#"{"type":"result","structured_output":{"verdict":"zero_findings","findings":[]}}"#,
+        );
+        let items_dir = dir.path().join("track/items");
+        let track_id = format!("deterministic-{round_type}-review");
+        let track_dir = items_dir.join(&track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join(".commit_hash"), &base_sha).unwrap();
+        write_metadata_json(&track_dir, &track_id);
+
+        run_claude_review_str(
+            &track_id,
+            &items_dir,
+            "infra",
+            round_type,
+            make_reviewer_with_bin(&script),
+        )
+        .expect("review round must persist successfully");
+        let review_path = track_dir.join("review.json");
+        let first = std::fs::read(&review_path).unwrap();
+        // Recreate the exact pre-invocation state: a review round is append-only,
+        // so leaving the first output in place would make the second invocation a
+        // deliberately different input.
+        std::fs::remove_file(&review_path).unwrap();
+
+        run_claude_review_str(
+            &track_id,
+            &items_dir,
+            "infra",
+            round_type,
+            make_reviewer_with_bin(&script),
+        )
+        .expect("equivalent review round must persist successfully");
+        let second = std::fs::read(&review_path).unwrap();
+
+        // Each real write records its execution time. Excluding precisely that
+        // volatile field makes the two otherwise identical logical documents
+        // comparable without reimplementing infrastructure canonicalization.
+        assert_eq!(
+            without_review_timestamp(first),
+            without_review_timestamp(second.clone()),
+            "equivalent {round_type} review invocations must write byte-identical stable JSON"
+        );
+        let json = String::from_utf8(second).unwrap();
+        assert!(
+            json.starts_with("{\n  \"schema_version\": 2,\n  \"scopes\": {"),
+            "review document keys must be canonicalized: {json}"
+        );
+        assert!(
+            json.contains("\"rounds\": [\n        {\n          \"at\":"),
+            "nested review-round keys must be canonicalized: {json}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_claude_review_str_fast_write_is_deterministic() {
+        assert_review_round_writes_canonical_json("fast");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_claude_review_str_final_write_is_deterministic() {
+        assert_review_round_writes_canonical_json("final");
+    }
+
+    #[cfg(unix)]
     #[test]
     fn test_run_claude_review_str_accepts_absolute_items_dir_from_outside_repo() {
-        let _guard = env_lock().lock().unwrap();
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let repo_dir = tempfile::tempdir().unwrap();
         let outside_dir = tempfile::tempdir().unwrap();
         let base_sha = setup_test_git_repo(repo_dir.path());
@@ -853,7 +937,7 @@ mod tests {
     fn test_build_review_v2_with_claude_reviewer_rejects_missing_track_dir() {
         // build_review_v2_with_claude_reviewer rejects a well-formed track_id when
         // the track directory does not exist.
-        let _guard = env_lock().lock().unwrap();
+        let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let dir = tempfile::tempdir().unwrap();
         setup_test_git_repo(dir.path());
         let _cwd = CwdGuard::save_current();

@@ -54,6 +54,18 @@ Violations of the role statement above are always reportable. The following prio
 - Output color / table formatting style choices that do not affect correctness
 - Suggestions to split a Driver into sub-Drivers when the current structure
   is one use-case per Driver
+- Only for track `scope-conditional-pre-review-gates-2026-07-31`: the PRE-EXISTING
+  completion-tracing telemetry adapter surface that arrived via the develop→track merge
+  (`apps/cli-driver/src/telemetry.rs`) — a user adjudication (2026-08-13) deferred its
+  architectural remediation (the `begin_completion` second public driver operation
+  returning `TelemetryCompletion`, the adapter-owned `completion_eligible` string
+  admission table, `CompleteCommand` runtime routing between `TelemetryArchivedService`
+  and `TelemetryEmitService`, and the silent discarding of completion-emission errors)
+  to a separate track. The merge-caused admission gap (display-only `phase explain`
+  falling through as eligible) was fixed in-track as part of the same adjudication. Do
+  not report those four deferred concerns on this pre-existing surface when the track's
+  diff makes no semantic change to it beyond that admission-table entry. NEW driver
+  operations or admission logic added by this track remain fully reportable.
 - Only for track `scope-conditional-pre-review-gates-2026-07-31`: claiming that
   `match scope.state` / `matches!(round.round_type, ...)` in the review-results renderer
   moves non-Copy enums out of borrowed values. All matched variants are unit variants;

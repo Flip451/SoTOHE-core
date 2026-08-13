@@ -1160,7 +1160,6 @@ subgraph cli["cli"]
     T18_cli_cli_CliCommand_Template[Template]
     T18_cli_cli_CliCommand_CodexRuntime[CodexRuntime]
     T18_cli_cli_CliCommand_BatchPlan[BatchPlan]
-    T18_cli_cli_CliCommand_Demo[Demo]
   end
   subgraph cli_cli_module_commands["cli::commands"]
     direction TB
@@ -2177,7 +2176,6 @@ class T18_cli_cli_CliCommand_CatalogueLint variant_node
 class T18_cli_cli_CliCommand_Template variant_node
 class T18_cli_cli_CliCommand_CodexRuntime variant_node
 class T18_cli_cli_CliCommand_BatchPlan variant_node
-class T18_cli_cli_CliCommand_Demo variant_node
 class T18_cli_cli_CliCommand__self dto
 class T26_cli_cli_CapabilityExecArgs__self dto
 class T25_cli_cli_CheckApprovedArgs__self dto

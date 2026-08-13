@@ -462,7 +462,7 @@ mod tests {
     fn test_codex_args_explicit_skill_prompt_uses_profile_model_effort_and_sandbox() {
         let args = build_codex_args(
             "gpt-5",
-            ReasoningEffort::XHigh,
+            ReasoningEffort::Max,
             SandboxMode::WorkspaceWrite,
             "$implementer Briefing: Read tmp/briefing.md and perform the task.",
             Path::new("tmp/runtime/final-message.txt"),
@@ -476,7 +476,7 @@ mod tests {
                 "-m",
                 "gpt-5",
                 "--config",
-                "model_reasoning_effort=\"xhigh\"",
+                "model_reasoning_effort=\"max\"",
                 "--sandbox",
                 "workspace-write",
                 "--json",
@@ -502,7 +502,10 @@ mod tests {
             runner.clone(),
         );
 
-        let outcome = adapter.dispatch(&request_from_host("codex")?)?;
+        let mut request = request_from_host("codex")?;
+        request.profile.effort = ReasoningEffort::Max;
+
+        let outcome = adapter.dispatch(&request)?;
 
         assert!(matches!(
             outcome,
@@ -535,7 +538,7 @@ mod tests {
         assert_eq!(model_flag, "-m");
         assert_eq!(model, "gpt-5");
         assert_eq!(config_flag, "--config");
-        assert_eq!(config, "model_reasoning_effort=\"high\"");
+        assert_eq!(config, "model_reasoning_effort=\"max\"");
         assert_eq!(sandbox_flag, "--sandbox");
         assert_eq!(sandbox, "workspace-write");
         assert_eq!(json, "--json");

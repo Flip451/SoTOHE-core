@@ -7,12 +7,13 @@ use domain::tddd::catalogue_v2::{AssocConstName, RustExpression, TypeName, TypeR
 
 use super::CatalogueDocumentCodecError;
 use super::dto::{AssocConstDeclDto, AssocTypeDeclDto};
-use super::validate::{validate_bound_str, validate_type_ref_str};
+use super::validate::{validate_bound_str_with_generics, validate_type_ref_str_with_generics};
 
 pub(super) fn assoc_type_decl_from_dto(
     trait_name: &str,
     idx: usize,
     dto: AssocTypeDeclDto,
+    generic_names: &[&str],
 ) -> Result<AssocTypeDecl, CatalogueDocumentCodecError> {
     let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
         entry_name: trait_name.to_owned(),
@@ -27,7 +28,7 @@ pub(super) fn assoc_type_decl_from_dto(
         .into_iter()
         .enumerate()
         .map(|(bidx, b)| {
-            validate_bound_str(&b)
+            validate_bound_str_with_generics(&b, generic_names)
                 .map_err(|e| err(format!("assoc_types[{idx}].bounds[{bidx}]: {e}")))?;
             TypeRef::new(b.clone())
                 .map_err(|e| err(format!("assoc_types[{idx}].bounds[{bidx}] type ref '{b}': {e}")))
@@ -36,7 +37,7 @@ pub(super) fn assoc_type_decl_from_dto(
     let default = dto
         .default
         .map(|d| {
-            validate_type_ref_str(&d)
+            validate_type_ref_str_with_generics(&d, generic_names)
                 .map_err(|e| err(format!("assoc_types[{idx}].default: {e}")))?;
             TypeRef::new(d.clone())
                 .map_err(|e| err(format!("assoc_types[{idx}].default type ref '{d}': {e}")))
@@ -49,6 +50,7 @@ pub(super) fn assoc_const_decl_from_dto(
     trait_name: &str,
     idx: usize,
     dto: AssocConstDeclDto,
+    generic_names: &[&str],
 ) -> Result<AssocConstDecl, CatalogueDocumentCodecError> {
     let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
         entry_name: trait_name.to_owned(),
@@ -60,7 +62,8 @@ pub(super) fn assoc_const_decl_from_dto(
     if dto.ty.is_empty() {
         return Err(err(format!("assoc_consts[{idx}].ty is empty")));
     }
-    validate_type_ref_str(&dto.ty).map_err(|e| err(format!("assoc_consts[{idx}].ty: {e}")))?;
+    validate_type_ref_str_with_generics(&dto.ty, generic_names)
+        .map_err(|e| err(format!("assoc_consts[{idx}].ty: {e}")))?;
     let ty = TypeRef::new(dto.ty.clone())
         .map_err(|e| err(format!("assoc_consts[{idx}].ty type ref '{}': {e}", dto.ty)))?;
     let default_value = dto

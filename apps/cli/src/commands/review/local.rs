@@ -45,7 +45,7 @@ pub struct LocalArgs {
 
     /// Path to track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// Timeout for the reviewer subprocess in seconds.
     #[arg(long, default_value_t = super::DEFAULT_TIMEOUT_SECONDS)]

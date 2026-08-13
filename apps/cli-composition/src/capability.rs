@@ -164,7 +164,12 @@ mod tests {
             &format!(
                 r#"{{
                 "schema_version": 1,
-                "providers": {{}},
+                "providers": {{
+                    "{provider}": {{
+                        "label": "Test provider",
+                        "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+                    }}
+                }},
                 "capabilities": {{
                     "orchestrator": {{
                         "provider": "{provider}",
@@ -423,7 +428,12 @@ mod tests {
             ".harness/config/agent-profiles.json",
             r#"{
                 "schema_version": 1,
-                "providers": {},
+                "providers": {
+                    "claude": {
+                        "label": "Test provider",
+                        "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+                    }
+                },
                 "capabilities": {
                     "orchestrator": {
                         "provider": "codex",
@@ -479,7 +489,12 @@ mod tests {
             ".harness/config/agent-profiles.json",
             r#"{
                 "schema_version": 1,
-                "providers": {},
+                "providers": {
+                    "claude": {
+                        "label": "Test provider",
+                        "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+                    }
+                },
                 "capabilities": {
                     "orchestrator": {
                         "provider": "codex",

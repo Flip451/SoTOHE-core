@@ -764,7 +764,10 @@ This section must not make D2 a valid ADR ref.
     const REF_VERIFIER_CONFIG: &str = r#"{
         "schema_version": 1,
         "providers": {
-            "claude": { "label": "Claude Code" }
+            "claude": {
+                "label": "Claude Code",
+                "supported_reasoning_efforts": ["low", "high"]
+            }
         },
         "capabilities": {
             "ref-verifier-chain1": {
@@ -841,7 +844,12 @@ This section must not make D2 a valid ADR ref.
         // Point profiles at dir.path() for the prompt template path.
         let profiles_json = r#"{
                 "schema_version": 1,
-                "providers": { "claude": { "label": "Claude" } },
+                "providers": {
+                    "claude": {
+                        "label": "Claude",
+                        "supported_reasoning_efforts": ["low", "high"]
+                    }
+                },
                 "capabilities": {
                     "ref-verifier-chain1": {
                         "provider": "claude",
@@ -883,7 +891,12 @@ This section must not make D2 a valid ADR ref.
     fn verify_pair_returns_verifier_port_error_when_capability_missing() {
         let json = r#"{
             "schema_version": 1,
-            "providers": { "claude": { "label": "Claude" } },
+            "providers": {
+                "claude": {
+                    "label": "Claude",
+                    "supported_reasoning_efforts": ["low", "high"]
+                }
+            },
             "capabilities": {}
         }"#;
         let dir = tempfile::tempdir().unwrap();
@@ -914,7 +927,12 @@ This section must not make D2 a valid ADR ref.
             .unwrap();
         let profiles_json = r#"{
                 "schema_version": 1,
-                "providers": { "claude": { "label": "Claude" } },
+                "providers": {
+                    "claude": {
+                        "label": "Claude",
+                        "supported_reasoning_efforts": ["low", "high"]
+                    }
+                },
                 "capabilities": {
                     "ref-verifier-chain1": {
                         "provider": "claude",
@@ -955,7 +973,12 @@ This section must not make D2 a valid ADR ref.
         std::fs::write(prompt_dir.join("ref-verifier-chain1.md"), "{{claim}}").unwrap();
         let profiles_json = r#"{
                 "schema_version": 1,
-                "providers": { "claude": { "label": "Claude" } },
+                "providers": {
+                    "claude": {
+                        "label": "Claude",
+                        "supported_reasoning_efforts": ["high"]
+                    }
+                },
                 "capabilities": {
                     "ref-verifier-chain1": {
                         "provider": "claude",
@@ -990,7 +1013,12 @@ This section must not make D2 a valid ADR ref.
         std::fs::write(prompt_dir.join("ref-verifier-chain1.md"), "{{claim}}").unwrap();
         let profiles_json = r#"{
                 "schema_version": 1,
-                "providers": { "claude": { "label": "Claude" } },
+                "providers": {
+                    "claude": {
+                        "label": "Claude",
+                        "supported_reasoning_efforts": ["high"]
+                    }
+                },
                 "capabilities": {
                     "ref-verifier-chain1": {
                         "provider": "claude",
@@ -1045,7 +1073,12 @@ This section must not make D2 a valid ADR ref.
 
         let profiles_json = r#"{
                 "schema_version": 1,
-                "providers": { "claude": { "label": "Claude" } },
+                "providers": {
+                    "claude": {
+                        "label": "Claude",
+                        "supported_reasoning_efforts": ["low", "high"]
+                    }
+                },
                 "capabilities": {
                     "ref-verifier-chain2": {
                         "provider": "claude",
@@ -1350,6 +1383,7 @@ This section must not make D2 a valid ADR ref.
     }"#;
 
     const ARCHITECTURE_RULES_DOMAIN_TDDD: &str = r#"{
+        "version": 2,
         "layers": [
             {
                 "crate": "domain",
@@ -1363,6 +1397,7 @@ This section must not make D2 a valid ADR ref.
     }"#;
 
     const ARCHITECTURE_RULES_DOMAIN_CUSTOM_TDDD: &str = r#"{
+        "version": 2,
         "layers": [
             {
                 "crate": "domain",
@@ -1376,6 +1411,7 @@ This section must not make D2 a valid ADR ref.
     }"#;
 
     const ARCHITECTURE_RULES_NO_TDDD: &str = r#"{
+        "version": 2,
         "layers": [
             {
                 "crate": "domain",

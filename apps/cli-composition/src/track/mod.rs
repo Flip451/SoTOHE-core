@@ -652,6 +652,88 @@ mod tests {
     }
 
     #[test]
+    fn test_track_init_date_prefixed_ids_create_sorted_item_directories() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        let composition = crate::track::TrackCompositionRoot::new();
+        for (track_id, title) in [
+            ("2026-07-01-earlier-track", "Earlier Track"),
+            ("2026-07-31-later-track", "Later Track"),
+        ] {
+            let outcome = composition
+                .track_init(items_dir.clone(), track_id.to_owned(), title.to_owned())
+                .unwrap();
+            assert_eq!(outcome.exit_code, 0);
+            assert!(
+                items_dir.join(track_id).join("metadata.json").is_file(),
+                "date-prefixed track ID must remain the item-directory name"
+            );
+        }
+
+        let mut listed_ids = std::fs::read_dir(&items_dir)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name().into_string().unwrap())
+            .collect::<Vec<_>>();
+        listed_ids.sort_unstable();
+
+        assert_eq!(
+            listed_ids,
+            ["2026-07-01-earlier-track", "2026-07-31-later-track"],
+            "ascending item-directory listing must put the earlier date first"
+        );
+    }
+
+    #[test]
+    fn test_track_init_suffix_form_id_preserves_item_directory() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        let track_id = "legacy-suffix-track-2026-07-31";
+        let outcome = crate::track::TrackCompositionRoot::new()
+            .track_init(items_dir.clone(), track_id.to_owned(), "Legacy Suffix Track".to_owned())
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            items_dir.join(track_id).join("metadata.json").is_file(),
+            "a suffix-form ID must remain the item-directory name"
+        );
+    }
+
+    #[test]
     fn test_track_archive_from_subdir_moves_track_and_logs_under_repo_root() {
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let tmp = tempfile::tempdir().unwrap();

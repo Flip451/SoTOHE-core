@@ -1,0 +1,74 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-04T01:29:58Z",
+  "declaration_hash": "340bb3e5bc5f0982871ff461cb7c97d7641c5c1e83f623aee69b55e979aff8d0",
+  "implementation_input_hash": "be44811f73f97dd2b81fa0976609174ffb5ff538119238ff22ef766559a2db95",
+  "signals": [
+    {
+      "type_name": "TrackCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::command_identity_from_args",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::run_cli",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::run_cli_with",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::emit_archived_track_subcommand",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli::execute_track_with_telemetry",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli::is_display_only_track_command",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli::telemetry_dir_override_is_set",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli::track_command_label",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLintCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

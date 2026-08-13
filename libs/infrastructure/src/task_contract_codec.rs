@@ -309,7 +309,10 @@ pub fn encode(doc: &TaskContractDocument) -> Result<Vec<u8>, TaskContractCodecEr
         entries: entries_dto,
     };
 
-    Ok(serde_json::to_vec_pretty(&dto)?)
+    // Serialize through Value so the task-contract envelope and its nested
+    // entry references use canonical JSON map-key order.
+    let value = serde_json::to_value(&dto)?;
+    Ok(serde_json::to_vec_pretty(&value)?)
 }
 
 // ---------------------------------------------------------------------------
@@ -506,5 +509,21 @@ mod tests {
         let bytes = encode(&doc).unwrap();
         let doc2 = decode(&bytes).unwrap();
         assert_eq!(doc, doc2);
+    }
+
+    #[test]
+    fn test_encode_populated_contract_returns_canonical_deterministic_bytes() {
+        let doc = decode(SAMPLE_JSON.as_bytes()).unwrap();
+
+        let first = encode(&doc).unwrap();
+        let second = encode(&doc).unwrap();
+        let json = std::str::from_utf8(&first).unwrap();
+
+        assert_eq!(first, second);
+        assert!(json.starts_with("{\n  \"entries\":"), "root keys must be canonical: {json}");
+        assert!(
+            json.contains("\"entry_key\": \"MyType\",\n        \"layer\": \"domain\""),
+            "nested contract keys must be canonical: {json}"
+        );
     }
 }

@@ -94,14 +94,17 @@ pub fn encode(doc: &TypeSignalsDocument) -> Result<String, TypeSignalsCodecError
     if doc.schema_version().value() != domain::TYPE_SIGNALS_SCHEMA_VERSION {
         return Err(TypeSignalsCodecError::UnsupportedSchemaVersion(doc.schema_version()));
     }
-    serde_json::to_string_pretty(&TypeSignalsDocDto {
+    let dto = TypeSignalsDocDto {
         schema_version: doc.schema_version().value(),
         generated_at: doc.generated_at().as_str().to_owned(),
         declaration_hash: doc.declaration_hash().as_digest().as_str().to_owned(),
         implementation_input_hash: doc.implementation_input_hash().as_digest().as_str().to_owned(),
         signals: doc.signals().iter().map(signal_to_dto).collect(),
-    })
-    .map_err(TypeSignalsCodecError::Json)
+    };
+    // Serialize through Value so every signal object uses canonical key order
+    // before pretty-printing.
+    let value = serde_json::to_value(&dto).map_err(TypeSignalsCodecError::Json)?;
+    serde_json::to_string_pretty(&value).map_err(TypeSignalsCodecError::Json)
 }
 
 /// Computes the SHA-256 digest of declaration file bytes.
@@ -159,7 +162,15 @@ mod tests {
             Timestamp::new("2026-04-18T12:00:00Z").unwrap(),
             CatalogueDeclarationHash::new(digest.clone()),
             ImplementationInputHash::new(digest),
-            vec![],
+            vec![TypeSignal::new(
+                "Example",
+                "struct",
+                ConfidenceSignal::Blue,
+                true,
+                vec!["field".to_owned()],
+                vec![],
+                vec!["unexpected".to_owned()],
+            )],
         )
     }
 
@@ -167,6 +178,35 @@ mod tests {
     fn test_encode_decode_roundtrip_preserves_document() {
         let document = sample_doc();
         assert_eq!(decode(&encode(&document).unwrap()).unwrap(), document);
+    }
+
+    #[test]
+    fn test_encode_canonicalizes_json_keys_and_is_byte_stable() {
+        let document = sample_doc();
+
+        let first = encode(&document).unwrap();
+        let second = encode(&document).unwrap();
+
+        assert_eq!(first, second, "type-signal encoding must not churn JSON bytes");
+        assert!(
+            first.starts_with("{\n  \"declaration_hash\":"),
+            "type-signal keys must be canonicalized: {first}"
+        );
+        let signal = &first[first.find("\"extra_items\"").unwrap()..];
+        let extra_items = signal.find("\"extra_items\"").unwrap();
+        let found_items = signal.find("\"found_items\"").unwrap();
+        let found_type = signal.find("\"found_type\"").unwrap();
+        let kind_tag = signal.find("\"kind_tag\"").unwrap();
+        let signal_key = signal.find("\"signal\"").unwrap();
+        let type_name = signal.find("\"type_name\"").unwrap();
+        assert!(
+            extra_items < found_items
+                && found_items < found_type
+                && found_type < kind_tag
+                && kind_tag < signal_key
+                && signal_key < type_name,
+            "type-signal objects must be recursively canonicalized: {signal}"
+        );
     }
 
     #[test]

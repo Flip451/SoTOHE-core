@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CliCommand | enum | modify | Arch, AdrBaseline, Conventions, Domain, Guard, Hook, Maintenance, Track, Git, Pr, Capability, Phase, Review, File, Verify, FindSimilar, DupIndex, DupCheck, Telemetry, Dry, RefVerify, TestObligation, Signal, TaskContract, Catalog, CatalogueLint, Template, CodexRuntime, BatchPlan, Demo | 🔵 | 🔵 |
+| CliCommand | enum | modify | Arch, AdrBaseline, Conventions, Domain, Guard, Hook, Maintenance, Track, Git, Pr, Capability, Phase, Review, File, Verify, FindSimilar, DupIndex, DupCheck, Telemetry, Dry, RefVerify, TestObligation, Signal, TaskContract, Catalog, CatalogueLint, Template, CodexRuntime, BatchPlan | 🔵 | 🔵 |
 | PhaseCommand | enum | add | Validate, Explain, Enter | 🔵 | 🔵 |
 | RefVerifyCheckChainArg | enum | add | Chain1, Chain2 | 🔵 | 🔵 |
 | ReviewCheckRoundArg | enum | add | Final | 🔵 | 🔵 |

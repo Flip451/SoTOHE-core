@@ -1,0 +1,196 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Signal Report Command",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "4 chain の Yellow / Red の発生箇所を 1 コマンドで横断列挙し、発生単位データが永続化されない chain も含めて、gate が block した原因を手動の JSON 読解なしに診断できるようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`sotp signal report` を追加し、`adr_user`、`spec_adr`、`catalog_spec`、`impl_catalog` の 4 chain における Yellow / Red 信号の発生箇所を報告する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "報告する各 signal occurrence に、entry id、参照文字列、判定理由、および対象ファイル位置を含める。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`--chain <id>` による chain 選択と、Yellow / Red の選択による結果の絞り込みを提供する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "発生単位 signal 成果物がある chain はその成果物を読み、存在しない chain ⓪・①は正規の入力成果物から既存の評価規則で発生単位データをメモリ上に導出する。report は導出した signal または集計値を永続化しない読み取り専用 view とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "`sotp track resolve` の blocker 表示へ signal occurrence の要約を統合することは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "通常の signal 評価規則、signal または集計値の永続化、ならびに gate 合否と strictness の判定規則を変更することは対象外とする。chain ⓪・①で report 表示用に既存の評価規則から発生単位データをメモリ上に導出することは、この除外に含まれない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "report は診断用の読み取り専用 view であり、実行前後で既存の signal calculation artifacts を変更せず、chain ⓪・①で導出した発生単位データも永続化しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "選択条件に一致する occurrence を、診断に必要な entry id、参照文字列、判定理由、対象ファイル位置とともに欠落なく報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`sotp signal report` を実行すると、発生単位 signal 成果物がある chain ではその成果物を用い、chain ⓪・①では正規の入力成果物からメモリ上で導出して、4 chain の Yellow / Red occurrence が報告される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "report の各 occurrence には entry id、参照文字列、判定理由、および対象ファイル位置が表示される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`sotp signal report --chain <id>` は指定した chain の occurrence のみを報告し、Yellow / Red 選択を指定した実行は選択した色の occurrence のみを報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "report の実行は既存の calculation artifacts を読み取り専用で扱い、chain ⓪・①で導出した発生単位データを含め、signal または集計値を persist しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-31-2134-signal-report-occurrence-source.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "`sotp track resolve` の表示は、この report command によって新たな signal occurrence の要約を追加されず従来どおりである。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-signal-report-command.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    }
+  ],
+  "signals": {
+    "blue": 14,
+    "yellow": 0,
+    "red": 0
+  }
+}

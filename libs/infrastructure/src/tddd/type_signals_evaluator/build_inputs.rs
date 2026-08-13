@@ -219,6 +219,16 @@ fn collect_source_files(
 }
 
 fn nightly_toolchain_identifier(workspace_root: &Path) -> Result<Vec<u8>, EvaluateSignalsError> {
+    #[cfg(test)]
+    {
+        let fixture_identity = workspace_root.join(".test-nightly-toolchain-identity");
+        if let Ok(identity) = std::fs::read(&fixture_identity) {
+            if !identity.is_empty() {
+                return Ok(identity);
+            }
+        }
+    }
+
     let mut command = Command::new("rustup");
     command.args(["run", "nightly", "rustc", "-Vv"]).current_dir(workspace_root);
     let output = crate::capability_exec::process::run_command_with_bounded_output(

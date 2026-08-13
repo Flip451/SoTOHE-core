@@ -66,6 +66,7 @@ pub mod semantic_dup_driver;
 pub mod semantic_verdict_core;
 pub mod signal;
 pub mod signal_gate;
+pub mod signal_report;
 pub mod signal_service;
 pub mod skill_compliance;
 pub mod spec_adr_signal;
@@ -90,7 +91,8 @@ pub use branch_strategy::BranchStrategyPort;
 pub use telemetry::{
     ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryError, ArchivedTrackTelemetryInteractor,
     ArchivedTrackTelemetryPort, ArchivedTrackTelemetryService, TelemetryAggregateService,
-    TelemetryEmitDynamicPort, TelemetryReportPort,
+    TelemetryArchivedService, TelemetryEmitDynamicPort, TelemetryEmitService, TelemetryReportPort,
+    TelemetryReportService,
 };
 
 use std::sync::Arc;

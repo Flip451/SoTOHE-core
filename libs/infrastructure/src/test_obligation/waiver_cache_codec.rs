@@ -207,6 +207,11 @@ impl BoundedWaiverCacheBuffer {
     fn into_inner(self) -> Vec<u8> {
         self.bytes
     }
+
+    fn clear(&mut self) {
+        self.bytes.clear();
+        self.exceeded_limit = false;
+    }
 }
 
 impl Write for BoundedWaiverCacheBuffer {
@@ -237,7 +242,22 @@ fn serialize_bounded_waiver_cache(
     dto: &WaiverCacheDocumentDto,
 ) -> Result<Vec<u8>, DiagnosticMessage> {
     let mut writer = BoundedWaiverCacheBuffer::new();
+    // Bound the JSON before constructing the canonical representation so an
+    // oversized cache cannot allocate an unbounded intermediate tree.
     serde_json::to_writer_pretty(&mut writer, dto).map_err(|error| {
+        if writer.exceeded_limit {
+            diagnostic(&format!("waiver cache exceeds {MAX_WAIVER_CACHE_BYTES} bytes"))
+        } else {
+            diagnostic(&format!("failed to encode waiver cache: {error}"))
+        }
+    })?;
+
+    // Reparse only the bounded bytes. `Value` recursively orders every object
+    // map, then the same bounded buffer is reused for the final artifact.
+    let value: serde_json::Value = serde_json::from_slice(&writer.bytes)
+        .map_err(|error| diagnostic(&format!("failed to encode waiver cache: {error}")))?;
+    writer.clear();
+    serde_json::to_writer_pretty(&mut writer, &value).map_err(|error| {
         if writer.exceeded_limit {
             diagnostic(&format!("waiver cache exceeds {MAX_WAIVER_CACHE_BYTES} bytes"))
         } else {
@@ -563,6 +583,36 @@ mod tests {
         });
         codec.save(&doc).unwrap();
         assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));
+    }
+
+    #[test]
+    fn test_waiver_cache_writer_populated_verdict_returns_canonical_deterministic_bytes() {
+        let dir = tempfile::tempdir().unwrap();
+        let codec = JsonWaiverCacheCodec::new(dir.path().to_path_buf());
+        let doc = document(WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("canonical evidence".to_owned()).unwrap(),
+        });
+        let path = dir.path().join(doc.track_id().as_ref()).join(WAIVER_CACHE_ARTIFACT);
+
+        codec.save(&doc).unwrap();
+        let first = std::fs::read(&path).unwrap();
+        codec.save(&doc).unwrap();
+        let second = std::fs::read(path).unwrap();
+        let json = std::str::from_utf8(&first).unwrap();
+
+        assert_eq!(first, second);
+        assert!(json.starts_with("{\n  \"entries\":"), "root keys must be canonical: {json}");
+        assert!(
+            json.contains(
+                "\"key\": {\n        \"anchor_text_hash\": \"0303030303030303030303030303030303030303030303030303030303030303\",\n        \"declaration_hash\": \"0202020202020202020202020202020202020202020202020202020202020202\",\n        \"waived_reason_hash\": \"0404040404040404040404040404040404040404040404040404040404040404\""
+            ),
+            "nested cache-key fields must be canonical: {json}"
+        );
+        let verdict = &json[json.find("\"verdict\"").unwrap()..];
+        assert!(
+            verdict.find("\"citation\"").unwrap() < verdict.find("\"kind\"").unwrap(),
+            "nested waived verdict fields must be canonical: {verdict}"
+        );
     }
 
     // IN-09 / CN-04: the trusted items root itself must not be a symlink.

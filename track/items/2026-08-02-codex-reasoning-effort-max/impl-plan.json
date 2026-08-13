@@ -1,0 +1,106 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Update profile validation and execution-route coverage. [D1; AC-01; AC-02]"
+        ],
+        "id": "provider-compatibility",
+        "task_ids": [
+          "T001",
+          "T005",
+          "T006"
+        ],
+        "title": "Provider compatibility"
+      },
+      {
+        "description": [
+          "Install the completion-recording workflow step. [D2; AC-05]"
+        ],
+        "id": "completion-observation-preparation",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "Completion observation preparation"
+      },
+      {
+        "description": [
+          "Install the recovery workflow and reload boundary. [D2; AC-04]"
+        ],
+        "id": "pre-rollout-recovery",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Pre-rollout recovery"
+      },
+      {
+        "description": [
+          "Update the selected capability profiles. [D2; AC-03]"
+        ],
+        "id": "limited-profile-rollout",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Limited profile rollout"
+      }
+    ],
+    "summary": [
+      "GO-01 → T001, T005, T006.",
+      "GO-02 → T004, T003, T002."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "e3dca232",
+      "description": "Update `libs/infrastructure/src/agent_profiles/profiles.rs::AgentProfiles::resolve_execution` and `tests.rs::test_resolve_execution_unsupported_provider_effort_returns_error` for profile compatibility validation. [D1; IN-01; IN-02; CN-01; AC-01; AC-02]",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "6d1a506f",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "Extend `libs/infrastructure/src/capability_exec/codex.rs::{build_codex_args,test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt}` for capability dispatch. [D1; IN-02; AC-02]",
+      "id": "T005",
+      "status": "done"
+    },
+    {
+      "commit_hash": "17f385a5",
+      "depends_on": [
+        "T001"
+      ],
+      "description": "Extend `apps/cli-composition/src/review_v2/mod.rs::{CliApp::review_run_local,review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry}` for review dispatch and verdict recording. [D1; IN-02; AC-02]",
+      "id": "T006",
+      "status": "done"
+    },
+    {
+      "commit_hash": "c7939d73",
+      "description": "Amend the completion steps in `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md`. [D2; IN-06; AC-05]",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "commit_hash": "93b90c60",
+      "depends_on": [
+        "T004"
+      ],
+      "description": "Amend `.harness/workflows/track/implement.md` and `.harness/workflows/track/full-cycle.md` with the pre-rollout recovery procedure and a stop/reload boundary. [D2; IN-05; CN-03; AC-04]",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "commit_hash": "75248598",
+      "depends_on": [
+        "T001",
+        "T005",
+        "T006",
+        "T003"
+      ],
+      "description": "Update `.harness/config/agent-profiles.json` entries `implementer`, `review-fix-lead`, and `dry-fix-lead`; extend committed-profile resolution coverage. [D2; IN-03; IN-04; CN-02; AC-03]",
+      "id": "T002",
+      "status": "done"
+    }
+  ]
+}

@@ -70,7 +70,7 @@ pub enum CodexRoundTypeArg {
 pub struct ReviewCheckApprovedArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// Track ID.
     /// When omitted, resolved from the current git branch (`track/<id>`).
@@ -155,7 +155,7 @@ impl std::str::FromStr for ResultsLimit {
 pub struct ResultsArgs {
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// Track ID.
     /// When omitted, resolved from the current git branch (`track/<id>`).

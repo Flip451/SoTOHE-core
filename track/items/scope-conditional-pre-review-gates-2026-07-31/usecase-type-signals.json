@@ -1,104 +1,100 @@
 {
-  "schema_version": 3,
-  "generated_at": "2026-08-12T12:04:03Z",
   "declaration_hash": "8168909fa5d0ccddc25fbed27c3dcf619377c3109504458e38bf7fdbe9f86a38",
-  "implementation_input_hash": "5f735acc7e619d3b240bdf6e1784cc27b6c8c4cf685742d58d6366fcbaa4943f",
+  "generated_at": "2026-08-13T03:14:12Z",
+  "implementation_input_hash": "798acc410f96bddd6fb0a57bd44c1c0145b808be85ce750bedbf33dc2f85c747",
+  "schema_version": 3,
   "signals": [
     {
-      "type_name": "CapabilityExecRequest",
+      "found_type": true,
       "kind_tag": "command",
       "signal": "blue",
-      "found_type": true
+      "type_name": "CapabilityExecRequest"
     },
     {
-      "type_name": "CapturedProgramOutput",
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CapturedProgramOutput"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ClassifiedProgramExecutionRecord",
+      ],
+      "found_type": true,
       "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
+      "type_name": "ClassifiedProgramExecutionRecord"
     },
     {
-      "type_name": "CommandArgument",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "AsRef<str>",
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandArgv",
+      ],
+      "found_type": true,
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandArgument"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "CommandArgv"
     },
     {
-      "type_name": "CommandArgvValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
-    },
-    {
-      "type_name": "CommandConfigLoadError",
+      ],
+      "found_type": true,
       "kind_tag": "error_type",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandArgvValidationError"
+    },
+    {
       "found_items": [
         "Debug",
         "Display",
         "Error",
         "From<CommandConfigValidationError>"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CommandConfigLoadError"
     },
     {
-      "type_name": "CommandConfigSchemaVersion",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "CommandConfigSchemaVersion"
     },
     {
-      "type_name": "CommandConfigValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
@@ -106,335 +102,335 @@
         "From<CommandDeclarationIdValidationError>",
         "From<ConfiguredCommandValidationError>",
         "From<PreReviewCommandConfigValidationError>"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CommandConfigValidationError"
     },
     {
-      "type_name": "CommandDeclarationId",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "AsRef<str>",
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "CommandDeclarationId"
     },
     {
-      "type_name": "CommandDeclarationIdValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CommandDeclarationIdValidationError"
     },
     {
-      "type_name": "CommandSequenceIndex",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CommandTimeoutSeconds",
+      ],
+      "found_type": true,
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "CommandSequenceIndex"
+    },
+    {
       "found_items": [
         "Clone",
         "Copy",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "CommandTimeoutSeconds"
     },
     {
-      "type_name": "CommandTimeoutValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CommandTimeoutValidationError"
     },
     {
-      "type_name": "ConfiguredCommand",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "ConfiguredCommand"
     },
     {
-      "type_name": "ConfiguredCommandValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error",
         "From<CommandArgvValidationError>",
         "From<CommandTimeoutValidationError>"
-      ]
-    },
-    {
-      "type_name": "CurrentReviewTrackResolveError",
+      ],
+      "found_type": true,
       "kind_tag": "error_type",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ConfiguredCommandValidationError"
+    },
+    {
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "CurrentReviewTrackResolveError"
     },
     {
-      "type_name": "CurrentReviewTrackResolverPort",
+      "found_type": true,
       "kind_tag": "secondary_port",
       "signal": "blue",
-      "found_type": true
+      "type_name": "CurrentReviewTrackResolverPort"
     },
     {
-      "type_name": "FailedProgramExecutionRecord",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "AsRef<ProgramExecutionRecord>",
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "FailedProgramExecutionRecord"
     },
     {
-      "type_name": "NonEmptyReviewerFindingsOutput",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "OutputCaptureLimitBytes",
+      ],
+      "found_type": true,
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "NonEmptyReviewerFindingsOutput"
+    },
+    {
       "found_items": [
         "Clone",
         "Copy",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PhaseCommandConfig",
+      ],
+      "found_type": true,
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "OutputCaptureLimitBytes"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "PhaseCommandConfig"
     },
     {
-      "type_name": "PhaseCommandConfigLoaderPort",
+      "found_type": true,
       "kind_tag": "secondary_port",
       "signal": "blue",
-      "found_type": true
+      "type_name": "PhaseCommandConfigLoaderPort"
     },
     {
-      "type_name": "PhaseCommandConfigValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "PhaseCommandConfigValidationError"
     },
     {
-      "type_name": "PhaseCommandDeclaration",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "PhaseCommandDeclaration"
     },
     {
-      "type_name": "PhaseCommandEnterError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error",
         "From<CommandConfigLoadError>",
         "From<ProgramRunnerError>"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "PhaseCommandEnterError"
     },
     {
-      "type_name": "PhaseCommandEnterOutcome",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "PhaseCommandEnterOutcome"
     },
     {
-      "type_name": "PhaseCommandExplainError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error",
         "From<CommandConfigLoadError>"
-      ]
-    },
-    {
-      "type_name": "PhaseCommandExplanation",
-      "kind_tag": "dto",
-      "signal": "blue",
+      ],
       "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PhaseCommandInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "PhaseCommandService"
-      ]
-    },
-    {
-      "type_name": "PhaseCommandService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "PhaseEnterCommand",
-      "kind_tag": "command",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PhaseExplainQuery",
-      "kind_tag": "query",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PhaseValidateCommand",
-      "kind_tag": "command",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewCommandConfig",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "PreReviewCommandConfigLoaderPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "PreReviewCommandConfigValidationError",
       "kind_tag": "error_type",
       "signal": "blue",
+      "type_name": "PhaseCommandExplainError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
       "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "PhaseCommandExplanation"
+    },
+    {
+      "found_items": [
+        "PhaseCommandService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "PhaseCommandInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "PhaseCommandService"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "command",
+      "signal": "blue",
+      "type_name": "PhaseEnterCommand"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "query",
+      "signal": "blue",
+      "type_name": "PhaseExplainQuery"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "command",
+      "signal": "blue",
+      "type_name": "PhaseValidateCommand"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "PreReviewCommandConfig"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "PreReviewCommandConfigLoaderPort"
+    },
+    {
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "PreReviewCommandConfigValidationError"
     },
     {
-      "type_name": "PreReviewCommandDispatchCommand",
-      "kind_tag": "command",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "command",
+      "signal": "blue",
+      "type_name": "PreReviewCommandDispatchCommand"
     },
     {
-      "type_name": "PreReviewCommandDispatchError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
@@ -442,680 +438,684 @@
         "From<CommandConfigLoadError>",
         "From<CurrentReviewTrackResolveError>",
         "From<ProgramRunnerError>"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "PreReviewCommandDispatchError"
     },
     {
-      "type_name": "PreReviewCommandDispatchInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "PreReviewCommandDispatchService"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "PreReviewCommandDispatchInteractor"
     },
     {
-      "type_name": "PreReviewCommandDispatchOutcome",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "PreReviewCommandDispatchOutcome"
     },
     {
-      "type_name": "PreReviewCommandDispatchService",
+      "found_type": true,
       "kind_tag": "application_service",
       "signal": "blue",
-      "found_type": true
+      "type_name": "PreReviewCommandDispatchService"
     },
     {
-      "type_name": "PreReviewCommandGatedReviewInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "ReviewService"
-      ]
-    },
-    {
-      "type_name": "PreReviewScopeCommandDeclaration",
-      "kind_tag": "value_object",
-      "signal": "blue",
+      ],
       "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ProgramExecutionRecord",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ProgramExitCode",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ProgramInvocation",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ProgramOutputStream",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ProgramRunOutcome",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ProgramRunnerError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "ProgramRunnerPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "RefVerifyAggregateService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "RefVerifyCheckApprovedDriverService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewCheckZeroFindingsEvaluationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "ReviewCheckZeroFindingsInteractor",
       "kind_tag": "interactor",
       "signal": "blue",
+      "type_name": "PreReviewCommandGatedReviewInteractor"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
       "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "PreReviewScopeCommandDeclaration"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ProgramExecutionRecord"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "ProgramExitCode"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ProgramInvocation"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ProgramOutputStream"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ProgramRunOutcome"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ProgramRunnerError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ProgramRunnerPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "RefVerifyAggregateService"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "RefVerifyCheckApprovedDriverService"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewCheckZeroFindingsEvaluationError"
+    },
+    {
       "found_items": [
         "ReviewCheckZeroFindingsService"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "ReviewCheckZeroFindingsInteractor"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsOutcome",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewCheckZeroFindingsOutcome"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsQuery",
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "query",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
+      "type_name": "ReviewCheckZeroFindingsQuery"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsService",
+      "found_type": true,
       "kind_tag": "application_service",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewCheckZeroFindingsService"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsStatePort",
+      "found_type": true,
       "kind_tag": "secondary_port",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewCheckZeroFindingsStatePort"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
-    },
-    {
-      "type_name": "ReviewFindingsOutputValidationError",
+      ],
+      "found_type": true,
       "kind_tag": "error_type",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ReviewCheckZeroFindingsValidationError"
+    },
+    {
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewFindingsOutputValidationError"
     },
     {
-      "type_name": "ReviewFixResolution",
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
+      "type_name": "ReviewFixResolution"
     },
     {
-      "type_name": "ReviewFixRunnerError",
+      "found_type": true,
       "kind_tag": "error_type",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewFixRunnerError"
     },
     {
-      "type_name": "ReviewFixTrackResolveError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewFixTrackResolveError"
     },
     {
-      "type_name": "ReviewFixTrackResolverPort",
+      "found_type": true,
       "kind_tag": "secondary_port",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewFixTrackResolverPort"
     },
     {
-      "type_name": "ReviewNotRequiredReason",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewRequiredReason",
+      ],
+      "found_type": true,
       "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ReviewNotRequiredReason"
+    },
+    {
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewRequiredReason"
     },
     {
-      "type_name": "ReviewResultsError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewResultsError"
     },
     {
-      "type_name": "ReviewResultsInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "ReviewResultsService"
-      ]
-    },
-    {
-      "type_name": "ReviewResultsOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
+      ],
       "found_type": true,
-      "found_items": [
-        "Debug"
-      ]
-    },
-    {
-      "type_name": "ReviewResultsRoundPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewResultsScopePort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewResultsScopeSnapshot",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug"
-      ]
-    },
-    {
-      "type_name": "ReviewResultsService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewResultsStatePort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewRoundResultOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewRoundResultVerdict",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewRunLocalOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewScopeName",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewScopeNameValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "ReviewScopeResultOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug"
-      ]
-    },
-    {
-      "type_name": "ReviewScopeResultState",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug"
-      ]
-    },
-    {
-      "type_name": "ReviewScopeSelectionRequest",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewScopeSelectionValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "ReviewScopeSelector",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewStoredRound",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewStoredRoundVerdict",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ReviewStoredScopeState",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewStoredScopeStateEntry",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug"
-      ]
-    },
-    {
-      "type_name": "ReviewTrackId",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewTrackIdValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "ReviewTrackSelector",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ReviewerFindingOutput",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "RunReviewFixCommand",
-      "kind_tag": "command",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "RunReviewFixCommandValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "RunReviewFixError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "From<ReviewFixTrackResolveError>"
-      ]
-    },
-    {
-      "type_name": "RunReviewFixInteractor",
       "kind_tag": "interactor",
       "signal": "blue",
-      "found_type": true,
+      "type_name": "ReviewResultsInteractor"
+    },
+    {
       "found_items": [
-        "RunReviewFixService"
-      ]
-    },
-    {
-      "type_name": "RunReviewFixRequest",
-      "kind_tag": "command",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "RunReviewFixService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "SubagentDispatchInstruction",
+        "Debug"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewResultsOutput"
     },
     {
-      "type_name": "SubagentName",
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ReviewResultsRoundPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ReviewResultsScopePort"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewResultsScopeSnapshot"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "ReviewResultsService"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ReviewResultsStatePort"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewRoundResultOutput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewRoundResultVerdict"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewRunLocalOutput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewScopeName"
     },
     {
-      "type_name": "SubagentNameValidationError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Debug",
         "Display",
         "Error"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewScopeNameValidationError"
     },
     {
-      "type_name": "SuccessfulProgramExecutionRecord",
+      "found_items": [
+        "Debug"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
+      "type_name": "ReviewScopeResultOutput"
+    },
+    {
+      "found_items": [
+        "Debug"
+      ],
       "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewScopeResultState"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewScopeSelectionRequest"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewScopeSelectionValidationError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewScopeSelector"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "ReviewService"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewStoredRound"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewStoredRoundVerdict"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewStoredScopeState"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewStoredScopeStateEntry"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "ReviewTrackId"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewTrackIdValidationError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewTrackSelector"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ReviewerFindingOutput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "command",
+      "signal": "blue",
+      "type_name": "RunReviewFixCommand"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "RunReviewFixCommandValidationError"
+    },
+    {
+      "found_items": [
+        "From<ReviewFixTrackResolveError>"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "RunReviewFixError"
+    },
+    {
+      "found_items": [
+        "RunReviewFixService"
+      ],
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "RunReviewFixInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "command",
+      "signal": "blue",
+      "type_name": "RunReviewFixRequest"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "RunReviewFixService"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "SubagentDispatchInstruction"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "SubagentName"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "SubagentNameValidationError"
+    },
+    {
       "found_items": [
         "AsRef<ProgramExecutionRecord>",
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "SuccessfulProgramExecutionRecord"
     },
     {
-      "type_name": "UnvalidatedTimeoutSeconds",
-      "kind_tag": "value_object",
-      "signal": "blue",
-      "found_type": true,
       "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
-      ]
-    },
-    {
-      "type_name": "CapabilityExecInteractor",
-      "kind_tag": "interactor",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "CapabilityExecService",
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "DiagnosticText",
+      ],
+      "found_type": true,
       "kind_tag": "value_object",
       "signal": "blue",
-      "found_type": true
+      "type_name": "UnvalidatedTimeoutSeconds"
     },
     {
-      "type_name": "RefVerifyChainFilter",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "type_name": "CapabilityExecInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "CapabilityExecService"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "DiagnosticText"
+    },
+    {
+      "found_type": true,
       "kind_tag": "enum",
       "signal": "blue",
-      "found_type": true
+      "type_name": "RefVerifyChainFilter"
     },
     {
-      "type_name": "ReviewCheckApprovedService",
+      "found_type": true,
       "kind_tag": "application_service",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewCheckApprovedService"
     },
     {
-      "type_name": "ReviewFixRunner",
+      "found_type": true,
       "kind_tag": "secondary_port",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewFixRunner"
     },
     {
-      "type_name": "ReviewRunLocalService",
+      "found_type": true,
       "kind_tag": "application_service",
       "signal": "blue",
-      "found_type": true
+      "type_name": "ReviewRunLocalService"
     },
     {
-      "type_name": "RunReviewFixOutput",
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "blue",
-      "found_type": true
+      "type_name": "RunReviewFixOutput"
     }
   ]
 }

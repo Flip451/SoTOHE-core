@@ -23,7 +23,7 @@ pub struct FilesArgs {
 
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// Scope name to enumerate (`other` for the implicit unmatched scope).
     #[arg(long)]

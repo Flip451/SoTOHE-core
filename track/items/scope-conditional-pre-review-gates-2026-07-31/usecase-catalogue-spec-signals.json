@@ -1,571 +1,571 @@
 {
-  "schema_version": 1,
   "catalogue_declaration_hash": "8168909fa5d0ccddc25fbed27c3dcf619377c3109504458e38bf7fdbe9f86a38",
+  "schema_version": 1,
   "signals": [
     {
-      "type_name": "CapabilityExecInteractor",
+      "entry_hash": "c8c891ddf06d414559fdee46cb22573c348e3290ea9637c29f7f6657e7fd53d7",
       "signal": "blue",
-      "entry_hash": "c8c891ddf06d414559fdee46cb22573c348e3290ea9637c29f7f6657e7fd53d7"
+      "type_name": "CapabilityExecInteractor"
     },
     {
-      "type_name": "CapabilityExecRequest",
+      "entry_hash": "c8f7c5fde2e89efc3af4fab9aba069ff62939108eecdceccfbd42197d6d11248",
       "signal": "blue",
-      "entry_hash": "c8f7c5fde2e89efc3af4fab9aba069ff62939108eecdceccfbd42197d6d11248"
+      "type_name": "CapabilityExecRequest"
     },
     {
-      "type_name": "CapturedProgramOutput",
+      "entry_hash": "5c18e8a82ea466f1efca8743529e8e4dc0dc09899775ee239adefa6f14b1c7bb",
       "signal": "blue",
-      "entry_hash": "5c18e8a82ea466f1efca8743529e8e4dc0dc09899775ee239adefa6f14b1c7bb"
+      "type_name": "CapturedProgramOutput"
     },
     {
-      "type_name": "ClassifiedProgramExecutionRecord",
+      "entry_hash": "8e571ba8e8aa83e96bfc2a5a0d1c31d954874e57f1a91dd8c786f2f5df08103d",
       "signal": "blue",
-      "entry_hash": "8e571ba8e8aa83e96bfc2a5a0d1c31d954874e57f1a91dd8c786f2f5df08103d"
+      "type_name": "ClassifiedProgramExecutionRecord"
     },
     {
-      "type_name": "CommandArgument",
+      "entry_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de",
       "signal": "blue",
-      "entry_hash": "aa93b3f693e33c368113a573d4594a12cf5d033701c11860501fabe000c684de"
+      "type_name": "CommandArgument"
     },
     {
-      "type_name": "CommandArgv",
+      "entry_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308",
       "signal": "blue",
-      "entry_hash": "4c2a2460acfb3805f64c911ae2510aeaf282035d83c9752f9617bddf03ef5308"
+      "type_name": "CommandArgv"
     },
     {
-      "type_name": "CommandArgvValidationError",
+      "entry_hash": "f6ba4cfb5dfc9d76d9b1abe49a72830cf72fdd2c5cd13ee79566da59a912339b",
       "signal": "blue",
-      "entry_hash": "f6ba4cfb5dfc9d76d9b1abe49a72830cf72fdd2c5cd13ee79566da59a912339b"
+      "type_name": "CommandArgvValidationError"
     },
     {
-      "type_name": "CommandConfigLoadError",
+      "entry_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977",
       "signal": "blue",
-      "entry_hash": "cdb007d4f75285fee14d648b9dc2ab8b4dcdfdf79604d73a04fb1c691122c977"
+      "type_name": "CommandConfigLoadError"
     },
     {
-      "type_name": "CommandConfigSchemaVersion",
+      "entry_hash": "7962885f986e1e99411a7be69d38048bd94c27fcbfb66a7059e5fa29cbbff521",
       "signal": "blue",
-      "entry_hash": "7962885f986e1e99411a7be69d38048bd94c27fcbfb66a7059e5fa29cbbff521"
+      "type_name": "CommandConfigSchemaVersion"
     },
     {
-      "type_name": "CommandConfigValidationError",
+      "entry_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71",
       "signal": "blue",
-      "entry_hash": "997ed9d4a5058085d39076e1087ac7aa28f1f78f36f391e8d16fbfac47ceaf71"
+      "type_name": "CommandConfigValidationError"
     },
     {
-      "type_name": "CommandDeclarationId",
+      "entry_hash": "ba3b72d28bb7a609be27e6eef2a8c9aaa4807ef52ba128f99f8cb2f5f739f429",
       "signal": "blue",
-      "entry_hash": "ba3b72d28bb7a609be27e6eef2a8c9aaa4807ef52ba128f99f8cb2f5f739f429"
+      "type_name": "CommandDeclarationId"
     },
     {
-      "type_name": "CommandDeclarationIdValidationError",
+      "entry_hash": "e0fbfdc8f3feaf17cc9523773d35aae2ff76c7a8de19a246e2d9e4c7436b83a6",
       "signal": "blue",
-      "entry_hash": "e0fbfdc8f3feaf17cc9523773d35aae2ff76c7a8de19a246e2d9e4c7436b83a6"
+      "type_name": "CommandDeclarationIdValidationError"
     },
     {
-      "type_name": "CommandSequenceIndex",
+      "entry_hash": "3fb0aa7dffbe898332d2a3e928f66559d4e860135a83873584806c79da200e0c",
       "signal": "blue",
-      "entry_hash": "3fb0aa7dffbe898332d2a3e928f66559d4e860135a83873584806c79da200e0c"
+      "type_name": "CommandSequenceIndex"
     },
     {
-      "type_name": "CommandTimeoutSeconds",
+      "entry_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7",
       "signal": "blue",
-      "entry_hash": "6270bc21fe9c8bb1b1a6350cd134a474071b386f145ab94aec871dd4a75a92f7"
+      "type_name": "CommandTimeoutSeconds"
     },
     {
-      "type_name": "CommandTimeoutValidationError",
+      "entry_hash": "1a2e81e31a678387be86a89044737d80d74ba65d46d70c73ce66dba7d2d4c9ef",
       "signal": "blue",
-      "entry_hash": "1a2e81e31a678387be86a89044737d80d74ba65d46d70c73ce66dba7d2d4c9ef"
+      "type_name": "CommandTimeoutValidationError"
     },
     {
-      "type_name": "ConfiguredCommand",
+      "entry_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b",
       "signal": "blue",
-      "entry_hash": "192a20315b904044f549e856716ea4ce444287b8ac167d230106d928607e764b"
+      "type_name": "ConfiguredCommand"
     },
     {
-      "type_name": "ConfiguredCommandValidationError",
+      "entry_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8",
       "signal": "blue",
-      "entry_hash": "db9cbd65f6ac9bc9568e79e65121857f5d495490858d426cb450b70e0909b4c8"
+      "type_name": "ConfiguredCommandValidationError"
     },
     {
-      "type_name": "CurrentReviewTrackResolveError",
+      "entry_hash": "1b19f40dec3598c3c701093fcd5e046e8146b0e7661fc66c0ef5198a31bd4b33",
       "signal": "blue",
-      "entry_hash": "1b19f40dec3598c3c701093fcd5e046e8146b0e7661fc66c0ef5198a31bd4b33"
+      "type_name": "CurrentReviewTrackResolveError"
     },
     {
-      "type_name": "DiagnosticText",
+      "entry_hash": "6707641795f4a7dbb940e0f5b86c2c4a6160c7c4f45d6912ec879c8d324d44ec",
       "signal": "blue",
-      "entry_hash": "6707641795f4a7dbb940e0f5b86c2c4a6160c7c4f45d6912ec879c8d324d44ec"
+      "type_name": "DiagnosticText"
     },
     {
-      "type_name": "FailedProgramExecutionRecord",
+      "entry_hash": "27a57f7100fcf056c17b12b91996493881cb6918bdc44530c8dd7dd9b588eed8",
       "signal": "blue",
-      "entry_hash": "27a57f7100fcf056c17b12b91996493881cb6918bdc44530c8dd7dd9b588eed8"
+      "type_name": "FailedProgramExecutionRecord"
     },
     {
-      "type_name": "NonEmptyReviewerFindingsOutput",
+      "entry_hash": "dcc8e57adfbb342d23598982704596ae353a2e55f2d19583e9bf033b30f274ec",
       "signal": "blue",
-      "entry_hash": "dcc8e57adfbb342d23598982704596ae353a2e55f2d19583e9bf033b30f274ec"
+      "type_name": "NonEmptyReviewerFindingsOutput"
     },
     {
-      "type_name": "OutputCaptureLimitBytes",
+      "entry_hash": "016e7b527431d1e448d7d64be7bc966c78cc6b92f889bab06997559a2383525d",
       "signal": "blue",
-      "entry_hash": "016e7b527431d1e448d7d64be7bc966c78cc6b92f889bab06997559a2383525d"
+      "type_name": "OutputCaptureLimitBytes"
     },
     {
-      "type_name": "PhaseCommandConfig",
+      "entry_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429",
       "signal": "blue",
-      "entry_hash": "f38830815fbf3147bee886b162c760abd2413c772278024a016885560bdfe429"
+      "type_name": "PhaseCommandConfig"
     },
     {
-      "type_name": "PhaseCommandConfigValidationError",
+      "entry_hash": "783b11b2819065f10151970e0186da5e6f3100411e24683cc14285bf058fb421",
       "signal": "blue",
-      "entry_hash": "783b11b2819065f10151970e0186da5e6f3100411e24683cc14285bf058fb421"
+      "type_name": "PhaseCommandConfigValidationError"
     },
     {
-      "type_name": "PhaseCommandDeclaration",
+      "entry_hash": "237095863bac08c2c0a2505b26d88edfefeb48da8fb3c6d9ffa0fa7e0f145148",
       "signal": "blue",
-      "entry_hash": "237095863bac08c2c0a2505b26d88edfefeb48da8fb3c6d9ffa0fa7e0f145148"
+      "type_name": "PhaseCommandDeclaration"
     },
     {
-      "type_name": "PhaseCommandEnterError",
+      "entry_hash": "69727a5a0a4239dc6980bd2cf19cc90aba4d8511ad004ff884373ce2eb71f114",
       "signal": "blue",
-      "entry_hash": "69727a5a0a4239dc6980bd2cf19cc90aba4d8511ad004ff884373ce2eb71f114"
+      "type_name": "PhaseCommandEnterError"
     },
     {
-      "type_name": "PhaseCommandEnterOutcome",
+      "entry_hash": "cc2d329bfb0e49bd5630cfe21dd15faf08e98e19f64d6cfc46c796b70902c43e",
       "signal": "blue",
-      "entry_hash": "cc2d329bfb0e49bd5630cfe21dd15faf08e98e19f64d6cfc46c796b70902c43e"
+      "type_name": "PhaseCommandEnterOutcome"
     },
     {
-      "type_name": "PhaseCommandExplainError",
+      "entry_hash": "6d3df6bdf6acc751330d6fea83495adde362d44795747a992d9305e6c6f0bf21",
       "signal": "blue",
-      "entry_hash": "6d3df6bdf6acc751330d6fea83495adde362d44795747a992d9305e6c6f0bf21"
+      "type_name": "PhaseCommandExplainError"
     },
     {
-      "type_name": "PhaseCommandExplanation",
+      "entry_hash": "710c56dc696665626a404289164c6f1dcbbf0a0d102c5f9c2c4079ab10a7a309",
       "signal": "blue",
-      "entry_hash": "710c56dc696665626a404289164c6f1dcbbf0a0d102c5f9c2c4079ab10a7a309"
+      "type_name": "PhaseCommandExplanation"
     },
     {
-      "type_name": "PhaseCommandInteractor",
+      "entry_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf",
       "signal": "blue",
-      "entry_hash": "5f8df3ee532e1258498db049a4b9ce1d9671c8d29b7b37a08b552bbba767adcf"
+      "type_name": "PhaseCommandInteractor"
     },
     {
-      "type_name": "PhaseEnterCommand",
+      "entry_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76",
       "signal": "blue",
-      "entry_hash": "57461c704dd89b23f84d7cd76ded0085aef16941167051458ecfea1694afaf76"
+      "type_name": "PhaseEnterCommand"
     },
     {
-      "type_name": "PhaseExplainQuery",
+      "entry_hash": "8f7d2fc0d046037a49074831d2bba72db763ec2655720c7468515c456c37626e",
       "signal": "blue",
-      "entry_hash": "8f7d2fc0d046037a49074831d2bba72db763ec2655720c7468515c456c37626e"
+      "type_name": "PhaseExplainQuery"
     },
     {
-      "type_name": "PhaseValidateCommand",
+      "entry_hash": "dab244da6e959629f231eda9788286ec9d5a6f66a2912606e7e3b6d4c485fa9a",
       "signal": "blue",
-      "entry_hash": "dab244da6e959629f231eda9788286ec9d5a6f66a2912606e7e3b6d4c485fa9a"
+      "type_name": "PhaseValidateCommand"
     },
     {
-      "type_name": "PreReviewCommandConfig",
+      "entry_hash": "30203cc606bfa131373500553f1ddcc72b39ea512e4c11b5cf55689056e7dcb9",
       "signal": "blue",
-      "entry_hash": "30203cc606bfa131373500553f1ddcc72b39ea512e4c11b5cf55689056e7dcb9"
+      "type_name": "PreReviewCommandConfig"
     },
     {
-      "type_name": "PreReviewCommandConfigValidationError",
+      "entry_hash": "1987512d847b8212b744223b8c5991663ba3d0792387eba2cc35cfd78b7ec3a2",
       "signal": "blue",
-      "entry_hash": "1987512d847b8212b744223b8c5991663ba3d0792387eba2cc35cfd78b7ec3a2"
+      "type_name": "PreReviewCommandConfigValidationError"
     },
     {
-      "type_name": "PreReviewCommandDispatchCommand",
+      "entry_hash": "cf534e804d0c95d2c3d5040fe7c3fbac4230bc1253c03208c4fdb0e77881bf1f",
       "signal": "blue",
-      "entry_hash": "cf534e804d0c95d2c3d5040fe7c3fbac4230bc1253c03208c4fdb0e77881bf1f"
+      "type_name": "PreReviewCommandDispatchCommand"
     },
     {
-      "type_name": "PreReviewCommandDispatchError",
+      "entry_hash": "c0eda485a6ed772686783ab28e6601bc0496ba7da3253554f926d6d69b522773",
       "signal": "blue",
-      "entry_hash": "c0eda485a6ed772686783ab28e6601bc0496ba7da3253554f926d6d69b522773"
+      "type_name": "PreReviewCommandDispatchError"
     },
     {
-      "type_name": "PreReviewCommandDispatchInteractor",
+      "entry_hash": "8e8663e945e754dc0df6177b2aa740e8a64ec63cc9e3723452ecb3f1569c855b",
       "signal": "blue",
-      "entry_hash": "8e8663e945e754dc0df6177b2aa740e8a64ec63cc9e3723452ecb3f1569c855b"
+      "type_name": "PreReviewCommandDispatchInteractor"
     },
     {
-      "type_name": "PreReviewCommandDispatchOutcome",
+      "entry_hash": "efe19d0982dbe9ec810829ec7e2dac09be973c17ac7b18e5deb899c4b9a8da8b",
       "signal": "blue",
-      "entry_hash": "efe19d0982dbe9ec810829ec7e2dac09be973c17ac7b18e5deb899c4b9a8da8b"
+      "type_name": "PreReviewCommandDispatchOutcome"
     },
     {
-      "type_name": "PreReviewCommandGatedReviewInteractor",
+      "entry_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd",
       "signal": "blue",
-      "entry_hash": "1618d44eb77c862d5e0208bd2774ce8730aba10a40d0e32f17fe64647ce1eabd"
+      "type_name": "PreReviewCommandGatedReviewInteractor"
     },
     {
-      "type_name": "PreReviewScopeCommandDeclaration",
+      "entry_hash": "bb2189bdffd63f71f230f2ece0f3121fac14c2e5ef50540b0f61d2550455294f",
       "signal": "blue",
-      "entry_hash": "bb2189bdffd63f71f230f2ece0f3121fac14c2e5ef50540b0f61d2550455294f"
+      "type_name": "PreReviewScopeCommandDeclaration"
     },
     {
-      "type_name": "ProgramExecutionRecord",
+      "entry_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a",
       "signal": "blue",
-      "entry_hash": "b654ae7cb255d804e33ea67b163389f2e4a7fabe32e2bb17b5ac53767e032d3a"
+      "type_name": "ProgramExecutionRecord"
     },
     {
-      "type_name": "ProgramExitCode",
+      "entry_hash": "38a13fd71a4213d87437f0fc41d0a86bcc8bf103d5136b98b314baf966e0046e",
       "signal": "blue",
-      "entry_hash": "38a13fd71a4213d87437f0fc41d0a86bcc8bf103d5136b98b314baf966e0046e"
+      "type_name": "ProgramExitCode"
     },
     {
-      "type_name": "ProgramInvocation",
+      "entry_hash": "6b4e77f60cf94fc2be1ea6ec1f499c158292fdaf20ae0ae233c436af690760af",
       "signal": "blue",
-      "entry_hash": "6b4e77f60cf94fc2be1ea6ec1f499c158292fdaf20ae0ae233c436af690760af"
+      "type_name": "ProgramInvocation"
     },
     {
-      "type_name": "ProgramOutputStream",
+      "entry_hash": "b05555b1ad4a65daa1858b3e76b6589890b2db138227f1e8f57aa8247e6eae74",
       "signal": "blue",
-      "entry_hash": "b05555b1ad4a65daa1858b3e76b6589890b2db138227f1e8f57aa8247e6eae74"
+      "type_name": "ProgramOutputStream"
     },
     {
-      "type_name": "ProgramRunOutcome",
+      "entry_hash": "b5b9ccaab585750daf85e756ab824199a62a35b3511e9acc9bad07dcb811dec0",
       "signal": "blue",
-      "entry_hash": "b5b9ccaab585750daf85e756ab824199a62a35b3511e9acc9bad07dcb811dec0"
+      "type_name": "ProgramRunOutcome"
     },
     {
-      "type_name": "ProgramRunnerError",
+      "entry_hash": "86a2a1f7d56610b8fb4ab377d35e8ae4f239cdd53570a77dd7a91fe9efcfb15a",
       "signal": "blue",
-      "entry_hash": "86a2a1f7d56610b8fb4ab377d35e8ae4f239cdd53570a77dd7a91fe9efcfb15a"
+      "type_name": "ProgramRunnerError"
     },
     {
-      "type_name": "RefVerifyChainFilter",
+      "entry_hash": "78fbb2e7be4b94db0f8593af3f09823fc38b20e7687d3d43ee5b2b6febdf820b",
       "signal": "blue",
-      "entry_hash": "78fbb2e7be4b94db0f8593af3f09823fc38b20e7687d3d43ee5b2b6febdf820b"
+      "type_name": "RefVerifyChainFilter"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsEvaluationError",
+      "entry_hash": "ec884b963812fddf79ec1da1df364f18afab8b7d7bf2321797f412ee6b55a81b",
       "signal": "blue",
-      "entry_hash": "ec884b963812fddf79ec1da1df364f18afab8b7d7bf2321797f412ee6b55a81b"
+      "type_name": "ReviewCheckZeroFindingsEvaluationError"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsInteractor",
+      "entry_hash": "9a370e9cdf5161829eb6ae2a2397c180a90666e04916115052f3cf1ce31f6088",
       "signal": "blue",
-      "entry_hash": "9a370e9cdf5161829eb6ae2a2397c180a90666e04916115052f3cf1ce31f6088"
+      "type_name": "ReviewCheckZeroFindingsInteractor"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsOutcome",
+      "entry_hash": "7f2cb2459c0f6ba0620ba2bc1a99d413f7d8ea9d2a82578781e234dffc800c3c",
       "signal": "blue",
-      "entry_hash": "7f2cb2459c0f6ba0620ba2bc1a99d413f7d8ea9d2a82578781e234dffc800c3c"
+      "type_name": "ReviewCheckZeroFindingsOutcome"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsQuery",
+      "entry_hash": "c4b63610a4cdbcd7bc50882c6e2907a94b4d9cf0b588476ba63972b6b8c78cf9",
       "signal": "blue",
-      "entry_hash": "c4b63610a4cdbcd7bc50882c6e2907a94b4d9cf0b588476ba63972b6b8c78cf9"
+      "type_name": "ReviewCheckZeroFindingsQuery"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsValidationError",
+      "entry_hash": "4dfffefbf7e0d15c4a002c5486bbf8732c0612d109083be27c352367fc28af96",
       "signal": "blue",
-      "entry_hash": "4dfffefbf7e0d15c4a002c5486bbf8732c0612d109083be27c352367fc28af96"
+      "type_name": "ReviewCheckZeroFindingsValidationError"
     },
     {
-      "type_name": "ReviewFindingsOutputValidationError",
+      "entry_hash": "4882c5d00ac1392714f157667f08113510b0af7ff44bf4227b35b3b3d48a97d4",
       "signal": "blue",
-      "entry_hash": "4882c5d00ac1392714f157667f08113510b0af7ff44bf4227b35b3b3d48a97d4"
+      "type_name": "ReviewFindingsOutputValidationError"
     },
     {
-      "type_name": "ReviewFixResolution",
+      "entry_hash": "c7674e9a5984b50d0f01a795fe90677814267bfb3402935b44e3fd02c5adc32f",
       "signal": "blue",
-      "entry_hash": "c7674e9a5984b50d0f01a795fe90677814267bfb3402935b44e3fd02c5adc32f"
+      "type_name": "ReviewFixResolution"
     },
     {
-      "type_name": "ReviewFixRunnerError",
+      "entry_hash": "134f086202caa2c08b759f98846be6731a09937c07bb142351b77762ed038c91",
       "signal": "blue",
-      "entry_hash": "134f086202caa2c08b759f98846be6731a09937c07bb142351b77762ed038c91"
+      "type_name": "ReviewFixRunnerError"
     },
     {
-      "type_name": "ReviewFixTrackResolveError",
+      "entry_hash": "fcc287d117258546dfebe81cc0228b398214348ddf959298618a4bdd5d5fddbd",
       "signal": "blue",
-      "entry_hash": "fcc287d117258546dfebe81cc0228b398214348ddf959298618a4bdd5d5fddbd"
+      "type_name": "ReviewFixTrackResolveError"
     },
     {
-      "type_name": "ReviewNotRequiredReason",
+      "entry_hash": "f393877b71175e4a865200dd2d0f1b636bd57ea984c35cfa21a95dbb1cfda661",
       "signal": "blue",
-      "entry_hash": "f393877b71175e4a865200dd2d0f1b636bd57ea984c35cfa21a95dbb1cfda661"
+      "type_name": "ReviewNotRequiredReason"
     },
     {
-      "type_name": "ReviewRequiredReason",
+      "entry_hash": "bb8ae5466effe4ff49f853565163f79a40a24e7fe0a15fb233f9366925a03d08",
       "signal": "blue",
-      "entry_hash": "bb8ae5466effe4ff49f853565163f79a40a24e7fe0a15fb233f9366925a03d08"
+      "type_name": "ReviewRequiredReason"
     },
     {
-      "type_name": "ReviewResultsError",
+      "entry_hash": "7f920e0e5646ea4df19ecf309146cce9c8b705a0abf161532879df1f41f71fe5",
       "signal": "blue",
-      "entry_hash": "7f920e0e5646ea4df19ecf309146cce9c8b705a0abf161532879df1f41f71fe5"
+      "type_name": "ReviewResultsError"
     },
     {
-      "type_name": "ReviewResultsInteractor",
+      "entry_hash": "4908ea405595d591c63ddd9a4ea0336049bf62609d417b3ec430e26bf235708c",
       "signal": "blue",
-      "entry_hash": "4908ea405595d591c63ddd9a4ea0336049bf62609d417b3ec430e26bf235708c"
+      "type_name": "ReviewResultsInteractor"
     },
     {
-      "type_name": "ReviewResultsOutput",
+      "entry_hash": "5a2ae5abdae41df44bf6bc9032147cff59319bec1a0656bf762ce63f64527a8b",
       "signal": "blue",
-      "entry_hash": "5a2ae5abdae41df44bf6bc9032147cff59319bec1a0656bf762ce63f64527a8b"
+      "type_name": "ReviewResultsOutput"
     },
     {
-      "type_name": "ReviewResultsScopeSnapshot",
+      "entry_hash": "c3f3bd3590e6c7f977f9cd2ef504e82f7acc072ae0552b642941fa7c2c52c17e",
       "signal": "blue",
-      "entry_hash": "c3f3bd3590e6c7f977f9cd2ef504e82f7acc072ae0552b642941fa7c2c52c17e"
+      "type_name": "ReviewResultsScopeSnapshot"
     },
     {
-      "type_name": "ReviewRoundResultOutput",
+      "entry_hash": "4f8a408781c32a78d065b0df60458fafc51155549ea8c0ae93faaf25797b9dd9",
       "signal": "blue",
-      "entry_hash": "4f8a408781c32a78d065b0df60458fafc51155549ea8c0ae93faaf25797b9dd9"
+      "type_name": "ReviewRoundResultOutput"
     },
     {
-      "type_name": "ReviewRoundResultVerdict",
+      "entry_hash": "0ecf57eca5909fe89e325b1115b1a6b477be9b22c9b23b898b7cdabf1d24f780",
       "signal": "blue",
-      "entry_hash": "0ecf57eca5909fe89e325b1115b1a6b477be9b22c9b23b898b7cdabf1d24f780"
+      "type_name": "ReviewRoundResultVerdict"
     },
     {
-      "type_name": "ReviewRunLocalOutput",
+      "entry_hash": "bb571fb730d85afe62d766b66582628b639c81474a7beeec2ebbe454efdd4859",
       "signal": "blue",
-      "entry_hash": "bb571fb730d85afe62d766b66582628b639c81474a7beeec2ebbe454efdd4859"
+      "type_name": "ReviewRunLocalOutput"
     },
     {
-      "type_name": "ReviewScopeName",
+      "entry_hash": "6586ba58329416121f62ba4930904517571ecf76f2cffccf1a786271d64b8ced",
       "signal": "blue",
-      "entry_hash": "6586ba58329416121f62ba4930904517571ecf76f2cffccf1a786271d64b8ced"
+      "type_name": "ReviewScopeName"
     },
     {
-      "type_name": "ReviewScopeNameValidationError",
+      "entry_hash": "821dab81051b1f5132dffaca603de4931de7880399b2df24333dba21b7e0d95a",
       "signal": "blue",
-      "entry_hash": "821dab81051b1f5132dffaca603de4931de7880399b2df24333dba21b7e0d95a"
+      "type_name": "ReviewScopeNameValidationError"
     },
     {
-      "type_name": "ReviewScopeResultOutput",
+      "entry_hash": "e36820508cdd497cfd7323d42ca78ae8c8bf517e95bb6f53a23139b82383a2c0",
       "signal": "blue",
-      "entry_hash": "e36820508cdd497cfd7323d42ca78ae8c8bf517e95bb6f53a23139b82383a2c0"
+      "type_name": "ReviewScopeResultOutput"
     },
     {
-      "type_name": "ReviewScopeResultState",
+      "entry_hash": "d276370d4d47833cc8d0b497ab3a39f4c981d0bab27914a498435305cd0445a0",
       "signal": "blue",
-      "entry_hash": "d276370d4d47833cc8d0b497ab3a39f4c981d0bab27914a498435305cd0445a0"
+      "type_name": "ReviewScopeResultState"
     },
     {
-      "type_name": "ReviewScopeSelectionRequest",
+      "entry_hash": "749714a27a97e92787f715855482e4531a38cde1918fe37987ed16074c5aff31",
       "signal": "blue",
-      "entry_hash": "749714a27a97e92787f715855482e4531a38cde1918fe37987ed16074c5aff31"
+      "type_name": "ReviewScopeSelectionRequest"
     },
     {
-      "type_name": "ReviewScopeSelectionValidationError",
+      "entry_hash": "3c62bcf7f236bc6d682d258d834c1fdf3ef70dd329361524980eb0ac03aa8cfc",
       "signal": "blue",
-      "entry_hash": "3c62bcf7f236bc6d682d258d834c1fdf3ef70dd329361524980eb0ac03aa8cfc"
+      "type_name": "ReviewScopeSelectionValidationError"
     },
     {
-      "type_name": "ReviewScopeSelector",
+      "entry_hash": "9867b51315ba84d48b11e322cc8844020fa5ec21ee3362711c9c2a4155d91e8e",
       "signal": "blue",
-      "entry_hash": "9867b51315ba84d48b11e322cc8844020fa5ec21ee3362711c9c2a4155d91e8e"
+      "type_name": "ReviewScopeSelector"
     },
     {
-      "type_name": "ReviewStoredRound",
+      "entry_hash": "32e6f17ac5186b0a33c8f7ccf8c321ce21b14eced0e78f8c9fca9703a6e71424",
       "signal": "blue",
-      "entry_hash": "32e6f17ac5186b0a33c8f7ccf8c321ce21b14eced0e78f8c9fca9703a6e71424"
+      "type_name": "ReviewStoredRound"
     },
     {
-      "type_name": "ReviewStoredRoundVerdict",
+      "entry_hash": "20ed4ecef3733f903ebbba8a419f8da02bde8c9f07a40fde9d0314b12b1309a0",
       "signal": "blue",
-      "entry_hash": "20ed4ecef3733f903ebbba8a419f8da02bde8c9f07a40fde9d0314b12b1309a0"
+      "type_name": "ReviewStoredRoundVerdict"
     },
     {
-      "type_name": "ReviewStoredScopeState",
+      "entry_hash": "6aa3b09fd6361f018fae6b05a1f9fdf38b00d3584afddf8b017ef6bf9fcef173",
       "signal": "blue",
-      "entry_hash": "6aa3b09fd6361f018fae6b05a1f9fdf38b00d3584afddf8b017ef6bf9fcef173"
+      "type_name": "ReviewStoredScopeState"
     },
     {
-      "type_name": "ReviewStoredScopeStateEntry",
+      "entry_hash": "aaea720a4f9b7a1572607108cf9c58cd1cedb3acfe0f5fc74c6c1dc13be9492c",
       "signal": "blue",
-      "entry_hash": "aaea720a4f9b7a1572607108cf9c58cd1cedb3acfe0f5fc74c6c1dc13be9492c"
+      "type_name": "ReviewStoredScopeStateEntry"
     },
     {
-      "type_name": "ReviewTrackId",
+      "entry_hash": "d37646041e997217eb6bafb99b514494252ef61320e0eef3c38c8a64ee0afb86",
       "signal": "blue",
-      "entry_hash": "d37646041e997217eb6bafb99b514494252ef61320e0eef3c38c8a64ee0afb86"
+      "type_name": "ReviewTrackId"
     },
     {
-      "type_name": "ReviewTrackIdValidationError",
+      "entry_hash": "fe03471204d0f7103e877bc9d4220af695d58b355fecebca837fcc3c0b82e2ef",
       "signal": "blue",
-      "entry_hash": "fe03471204d0f7103e877bc9d4220af695d58b355fecebca837fcc3c0b82e2ef"
+      "type_name": "ReviewTrackIdValidationError"
     },
     {
-      "type_name": "ReviewTrackSelector",
+      "entry_hash": "313abe779b325a79a9e08a32868b5785af23b60274a452f581521c33e8c05f39",
       "signal": "blue",
-      "entry_hash": "313abe779b325a79a9e08a32868b5785af23b60274a452f581521c33e8c05f39"
+      "type_name": "ReviewTrackSelector"
     },
     {
-      "type_name": "ReviewerFindingOutput",
+      "entry_hash": "d34ad60ef03b29f06459aeea458bb12d46eab3db2a90b863649257ac3a20a55a",
       "signal": "blue",
-      "entry_hash": "d34ad60ef03b29f06459aeea458bb12d46eab3db2a90b863649257ac3a20a55a"
+      "type_name": "ReviewerFindingOutput"
     },
     {
-      "type_name": "RunReviewFixCommand",
+      "entry_hash": "960a1776dabbcdcacb4712443c3e6d337e37be8cbbce9be39b88a9ddfa9427c8",
       "signal": "blue",
-      "entry_hash": "960a1776dabbcdcacb4712443c3e6d337e37be8cbbce9be39b88a9ddfa9427c8"
+      "type_name": "RunReviewFixCommand"
     },
     {
-      "type_name": "RunReviewFixCommandValidationError",
+      "entry_hash": "55c2871c2786e52f08bcc89a7fa09cbddc3236cc9c58f88698977602c568279a",
       "signal": "blue",
-      "entry_hash": "55c2871c2786e52f08bcc89a7fa09cbddc3236cc9c58f88698977602c568279a"
+      "type_name": "RunReviewFixCommandValidationError"
     },
     {
-      "type_name": "RunReviewFixError",
+      "entry_hash": "13138307fcc8ebcbf94b0c8fe65c52526fa467588149c8148ba75d6af55daa9f",
       "signal": "blue",
-      "entry_hash": "13138307fcc8ebcbf94b0c8fe65c52526fa467588149c8148ba75d6af55daa9f"
+      "type_name": "RunReviewFixError"
     },
     {
-      "type_name": "RunReviewFixInteractor",
+      "entry_hash": "39062c3411fbf2cebacbce6ee1be2dd2c113ff476270cc17517c52c5bac1a975",
       "signal": "blue",
-      "entry_hash": "39062c3411fbf2cebacbce6ee1be2dd2c113ff476270cc17517c52c5bac1a975"
+      "type_name": "RunReviewFixInteractor"
     },
     {
-      "type_name": "RunReviewFixOutput",
+      "entry_hash": "54416081a913fb0a67cac47c47e0c36dd797269b246024abc6c1009904197a99",
       "signal": "blue",
-      "entry_hash": "54416081a913fb0a67cac47c47e0c36dd797269b246024abc6c1009904197a99"
+      "type_name": "RunReviewFixOutput"
     },
     {
-      "type_name": "RunReviewFixRequest",
+      "entry_hash": "0f22f6b13aa5f1e868d229cc48b97b805db634d85aa4ed27323f73bd2a37a25e",
       "signal": "blue",
-      "entry_hash": "0f22f6b13aa5f1e868d229cc48b97b805db634d85aa4ed27323f73bd2a37a25e"
+      "type_name": "RunReviewFixRequest"
     },
     {
-      "type_name": "SubagentDispatchInstruction",
+      "entry_hash": "fc34c50a4718b677b6e618515314961344657ca46daf4154c94a890364a144b1",
       "signal": "blue",
-      "entry_hash": "fc34c50a4718b677b6e618515314961344657ca46daf4154c94a890364a144b1"
+      "type_name": "SubagentDispatchInstruction"
     },
     {
-      "type_name": "SubagentName",
+      "entry_hash": "4dda558e3821904e5fff1e194c608f28bf003fb6dfdb8ce7540a3096d69c9603",
       "signal": "blue",
-      "entry_hash": "4dda558e3821904e5fff1e194c608f28bf003fb6dfdb8ce7540a3096d69c9603"
+      "type_name": "SubagentName"
     },
     {
-      "type_name": "SubagentNameValidationError",
+      "entry_hash": "81d384b95122c5867f1e34aa63609855b43b5ea9a69bcf5dd7b3bbfd2cdf99bb",
       "signal": "blue",
-      "entry_hash": "81d384b95122c5867f1e34aa63609855b43b5ea9a69bcf5dd7b3bbfd2cdf99bb"
+      "type_name": "SubagentNameValidationError"
     },
     {
-      "type_name": "SuccessfulProgramExecutionRecord",
+      "entry_hash": "e640782b31807269f22f7840dceb8b2f90a80fe7f65409337b15fa95fe0b9b92",
       "signal": "blue",
-      "entry_hash": "e640782b31807269f22f7840dceb8b2f90a80fe7f65409337b15fa95fe0b9b92"
+      "type_name": "SuccessfulProgramExecutionRecord"
     },
     {
-      "type_name": "UnvalidatedTimeoutSeconds",
+      "entry_hash": "50b3041fba24708d09e12d5ef8b3f35b1e8132c9249b009a9912d6b5009aca2b",
       "signal": "blue",
-      "entry_hash": "50b3041fba24708d09e12d5ef8b3f35b1e8132c9249b009a9912d6b5009aca2b"
+      "type_name": "UnvalidatedTimeoutSeconds"
     },
     {
-      "type_name": "CapabilityExecService",
+      "entry_hash": "f7330b6eae435f6c7038dec6d4f972fa0b19fbd8a5cf731fda181960b641dab4",
       "signal": "blue",
-      "entry_hash": "f7330b6eae435f6c7038dec6d4f972fa0b19fbd8a5cf731fda181960b641dab4"
+      "type_name": "CapabilityExecService"
     },
     {
-      "type_name": "CurrentReviewTrackResolverPort",
+      "entry_hash": "d743ab19f804b20bdd68f9d3f6ff0ef9d21b195782bb0db6e71785b9769082d1",
       "signal": "blue",
-      "entry_hash": "d743ab19f804b20bdd68f9d3f6ff0ef9d21b195782bb0db6e71785b9769082d1"
+      "type_name": "CurrentReviewTrackResolverPort"
     },
     {
-      "type_name": "PhaseCommandConfigLoaderPort",
+      "entry_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822",
       "signal": "blue",
-      "entry_hash": "6054419a4325bd249f7c0f312ed657a6a44d00b10141729c6d60aa8e06ff8822"
+      "type_name": "PhaseCommandConfigLoaderPort"
     },
     {
-      "type_name": "PhaseCommandService",
+      "entry_hash": "cca865e959713132e00aabd08881b12b67a2b7a62e5a0ece6e00dfd39a589794",
       "signal": "blue",
-      "entry_hash": "cca865e959713132e00aabd08881b12b67a2b7a62e5a0ece6e00dfd39a589794"
+      "type_name": "PhaseCommandService"
     },
     {
-      "type_name": "PreReviewCommandConfigLoaderPort",
+      "entry_hash": "f1da1828c2002ec4f02b59378a03ae153b881f3a2c91eb4fb54fccbc27816a84",
       "signal": "blue",
-      "entry_hash": "f1da1828c2002ec4f02b59378a03ae153b881f3a2c91eb4fb54fccbc27816a84"
+      "type_name": "PreReviewCommandConfigLoaderPort"
     },
     {
-      "type_name": "PreReviewCommandDispatchService",
+      "entry_hash": "47ebfdd057524bc6213a415107d20513931941b9e84d388818ecf6fed4db7fda",
       "signal": "blue",
-      "entry_hash": "47ebfdd057524bc6213a415107d20513931941b9e84d388818ecf6fed4db7fda"
+      "type_name": "PreReviewCommandDispatchService"
     },
     {
-      "type_name": "ProgramRunnerPort",
+      "entry_hash": "d49b5165ce5926cac4cc005cdff3ae323187a58af0cd34bed74b5586d427dd3f",
       "signal": "blue",
-      "entry_hash": "d49b5165ce5926cac4cc005cdff3ae323187a58af0cd34bed74b5586d427dd3f"
+      "type_name": "ProgramRunnerPort"
     },
     {
-      "type_name": "RefVerifyAggregateService",
+      "entry_hash": "ead4ecb43b1c25827f08a49969f652b3b9f16ac8a034eeb349842d682f3f90ea",
       "signal": "blue",
-      "entry_hash": "ead4ecb43b1c25827f08a49969f652b3b9f16ac8a034eeb349842d682f3f90ea"
+      "type_name": "RefVerifyAggregateService"
     },
     {
-      "type_name": "RefVerifyCheckApprovedDriverService",
+      "entry_hash": "945ab4a1dde7228e33d3e16ddb627212de3179b20cc67731d92945e91e82a528",
       "signal": "blue",
-      "entry_hash": "945ab4a1dde7228e33d3e16ddb627212de3179b20cc67731d92945e91e82a528"
+      "type_name": "RefVerifyCheckApprovedDriverService"
     },
     {
-      "type_name": "ReviewCheckApprovedService",
+      "entry_hash": "5fcd05f7730260d8435dad450ba1950be1e9e64895dcfee7533dc2186756f34e",
       "signal": "blue",
-      "entry_hash": "5fcd05f7730260d8435dad450ba1950be1e9e64895dcfee7533dc2186756f34e"
+      "type_name": "ReviewCheckApprovedService"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsService",
+      "entry_hash": "57ea7e3e9b046ce0726bb8569fa0ebb408889abf4177db9212e32b330bde7f79",
       "signal": "blue",
-      "entry_hash": "57ea7e3e9b046ce0726bb8569fa0ebb408889abf4177db9212e32b330bde7f79"
+      "type_name": "ReviewCheckZeroFindingsService"
     },
     {
-      "type_name": "ReviewCheckZeroFindingsStatePort",
+      "entry_hash": "9bc48797051224999871b072189ed56e79a116e9e367f4a29b5f933250803101",
       "signal": "blue",
-      "entry_hash": "9bc48797051224999871b072189ed56e79a116e9e367f4a29b5f933250803101"
+      "type_name": "ReviewCheckZeroFindingsStatePort"
     },
     {
-      "type_name": "ReviewFixRunner",
+      "entry_hash": "1030beede158c5762b5129158153aa0c3ef19b78727ee75d0dd9222f0345b302",
       "signal": "blue",
-      "entry_hash": "1030beede158c5762b5129158153aa0c3ef19b78727ee75d0dd9222f0345b302"
+      "type_name": "ReviewFixRunner"
     },
     {
-      "type_name": "ReviewFixTrackResolverPort",
+      "entry_hash": "4ea6c3a230751de8c40d0d8fd43894b2010f63b13950cd929031c9931838a47d",
       "signal": "blue",
-      "entry_hash": "4ea6c3a230751de8c40d0d8fd43894b2010f63b13950cd929031c9931838a47d"
+      "type_name": "ReviewFixTrackResolverPort"
     },
     {
-      "type_name": "ReviewResultsRoundPort",
+      "entry_hash": "65f7195a2791481473e22a4b2d34752ae9720be1779075e27b1bb3d8f40f6392",
       "signal": "blue",
-      "entry_hash": "65f7195a2791481473e22a4b2d34752ae9720be1779075e27b1bb3d8f40f6392"
+      "type_name": "ReviewResultsRoundPort"
     },
     {
-      "type_name": "ReviewResultsScopePort",
+      "entry_hash": "f16feaf442ce318f34db9055e0ac23e0c3b6e3cc3380b3c21c3f808ced227488",
       "signal": "blue",
-      "entry_hash": "f16feaf442ce318f34db9055e0ac23e0c3b6e3cc3380b3c21c3f808ced227488"
+      "type_name": "ReviewResultsScopePort"
     },
     {
-      "type_name": "ReviewResultsService",
+      "entry_hash": "ace548f1c26f4d5c45257bd7809d9afd03107bff521129ffc334a289ce471185",
       "signal": "blue",
-      "entry_hash": "ace548f1c26f4d5c45257bd7809d9afd03107bff521129ffc334a289ce471185"
+      "type_name": "ReviewResultsService"
     },
     {
-      "type_name": "ReviewResultsStatePort",
+      "entry_hash": "91cf5453503b463fa98350a28b822aafa07222662a4cbe5bea2b6c9888a6cc18",
       "signal": "blue",
-      "entry_hash": "91cf5453503b463fa98350a28b822aafa07222662a4cbe5bea2b6c9888a6cc18"
+      "type_name": "ReviewResultsStatePort"
     },
     {
-      "type_name": "ReviewRunLocalService",
+      "entry_hash": "df42d1b2e75b19803e1f8aa6758f4c0c1725bc8e6606fd77ce849a25af3060a6",
       "signal": "blue",
-      "entry_hash": "df42d1b2e75b19803e1f8aa6758f4c0c1725bc8e6606fd77ce849a25af3060a6"
+      "type_name": "ReviewRunLocalService"
     },
     {
-      "type_name": "ReviewService",
+      "entry_hash": "4d96290ad026ebc5908bb83620cf4f52c3af06679df91a4a56711ac54481e612",
       "signal": "blue",
-      "entry_hash": "4d96290ad026ebc5908bb83620cf4f52c3af06679df91a4a56711ac54481e612"
+      "type_name": "ReviewService"
     },
     {
-      "type_name": "RunReviewFixService",
+      "entry_hash": "2bbbf3f670302fb29508127d89f5b5b25a15f491795039c8bd88fe87afdd57d4",
       "signal": "blue",
-      "entry_hash": "2bbbf3f670302fb29508127d89f5b5b25a15f491795039c8bd88fe87afdd57d4"
+      "type_name": "RunReviewFixService"
     }
   ]
 }

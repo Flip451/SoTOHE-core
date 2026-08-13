@@ -29,6 +29,11 @@ impl BoundedFulfillmentCacheBuffer {
     fn into_inner(self) -> Vec<u8> {
         self.bytes
     }
+
+    fn clear(&mut self) {
+        self.bytes.clear();
+        self.exceeded_limit = false;
+    }
 }
 
 impl Write for BoundedFulfillmentCacheBuffer {
@@ -54,7 +59,24 @@ pub(super) fn serialize_bounded_fulfillment_cache<T: Serialize>(
     dto: &T,
 ) -> Result<Vec<u8>, DiagnosticMessage> {
     let mut writer = BoundedFulfillmentCacheBuffer::new();
+    // First serialize through the bounded sink. This makes the JSON input to
+    // canonicalization no larger than the artifact limit, rather than
+    // materializing an unbounded `Value` before output is checked.
     serde_json::to_writer_pretty(&mut writer, dto).map_err(|error| {
+        if writer.exceeded_limit {
+            diagnostic(&format!("fulfillment cache exceeds {MAX_FULFILLMENT_CACHE_BYTES} bytes"))
+        } else {
+            diagnostic(&format!("failed to encode fulfillment cache: {error}"))
+        }
+    })?;
+
+    // `serde_json::Value` uses its canonical map-key ordering recursively.
+    // Its source is already limited by the bounded serialization above, and
+    // the same bounded buffer is reused for the final artifact bytes.
+    let value: serde_json::Value = serde_json::from_slice(&writer.bytes)
+        .map_err(|error| diagnostic(&format!("failed to encode fulfillment cache: {error}")))?;
+    writer.clear();
+    serde_json::to_writer_pretty(&mut writer, &value).map_err(|error| {
         if writer.exceeded_limit {
             diagnostic(&format!("fulfillment cache exceeds {MAX_FULFILLMENT_CACHE_BYTES} bytes"))
         } else {
@@ -330,6 +352,32 @@ mod unix_tests {
 
     use super::{open_fulfillment_cache_for_write_guarded, read_bounded_fulfillment_cache};
 
+    #[derive(serde::Serialize)]
+    struct FulfillmentCacheFixture {
+        track_id: String,
+        entries: Vec<FulfillmentCacheEntryFixture>,
+    }
+
+    #[derive(serde::Serialize)]
+    struct FulfillmentCacheEntryFixture {
+        verdict: FulfillmentVerdictFixture,
+        key: FulfillmentCacheKeyFixture,
+    }
+
+    #[derive(serde::Serialize)]
+    struct FulfillmentVerdictFixture {
+        reason: String,
+        kind: String,
+        category: String,
+    }
+
+    #[derive(serde::Serialize)]
+    struct FulfillmentCacheKeyFixture {
+        declaration_hash: String,
+        anchor_text_hash: String,
+        bound_tests_set_hash: String,
+    }
+
     #[test]
     fn test_guarded_cache_write_with_missing_trusted_root_creates_cache() {
         let temporary_directory = tempfile::tempdir().unwrap();
@@ -342,6 +390,38 @@ mod unix_tests {
         drop(cache);
 
         assert_eq!(std::fs::read(cache_path).unwrap(), b"{}");
+    }
+
+    #[test]
+    fn test_fulfillment_cache_writer_nested_verdict_returns_canonical_deterministic_bytes() {
+        let fixture = FulfillmentCacheFixture {
+            track_id: "my-track".to_owned(),
+            entries: vec![FulfillmentCacheEntryFixture {
+                verdict: FulfillmentVerdictFixture {
+                    reason: "missing assertion".to_owned(),
+                    kind: "fail".to_owned(),
+                    category: "substitution".to_owned(),
+                },
+                key: FulfillmentCacheKeyFixture {
+                    declaration_hash: "declaration".to_owned(),
+                    anchor_text_hash: "anchor".to_owned(),
+                    bound_tests_set_hash: "bound-tests".to_owned(),
+                },
+            }],
+        };
+
+        let first = super::serialize_bounded_fulfillment_cache(&fixture).unwrap();
+        let second = super::serialize_bounded_fulfillment_cache(&fixture).unwrap();
+        let json = std::str::from_utf8(&first).unwrap();
+
+        assert_eq!(first, second);
+        assert!(json.starts_with("{\n  \"entries\":"), "root keys must be canonical: {json}");
+        assert!(
+            json.contains(
+                "\"verdict\": {\n        \"category\": \"substitution\",\n        \"kind\": \"fail\",\n        \"reason\": \"missing assertion\""
+            ),
+            "nested verdict keys must be canonical: {json}"
+        );
     }
 
     #[test]

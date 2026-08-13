@@ -161,10 +161,13 @@ pub struct ImplInfoDto {
 /// Returns [`SchemaExportCodecError::Json`] if `serde_json` serialization fails.
 pub fn encode(schema: &SchemaExport, pretty: bool) -> Result<String, SchemaExportCodecError> {
     let dto = SchemaExportDto::from(schema);
+    // Serialize through Value before selecting the output format so every
+    // nested schema object has canonical key order in both formats.
+    let value = serde_json::to_value(&dto).map_err(SchemaExportCodecError::Json)?;
     if pretty {
-        serde_json::to_string_pretty(&dto).map_err(SchemaExportCodecError::Json)
+        serde_json::to_string_pretty(&value).map_err(SchemaExportCodecError::Json)
     } else {
-        serde_json::to_string(&dto).map_err(SchemaExportCodecError::Json)
+        serde_json::to_string(&value).map_err(SchemaExportCodecError::Json)
     }
 }
 
@@ -421,6 +424,41 @@ mod tests {
         let pretty = encode(&schema, true).unwrap();
         assert!(!compact.contains('\n'), "compact JSON must not contain newlines");
         assert!(pretty.contains('\n'), "pretty JSON must contain newlines");
+    }
+
+    #[test]
+    fn test_encode_populated_schema_returns_canonical_deterministic_json_bytes() {
+        let type_info = TypeInfo::new(
+            "Zed".to_owned(),
+            TypeKind::Struct,
+            Some("a documented type".to_owned()),
+            vec![MemberDeclaration::field("z", "u8")],
+        );
+        let function_info = FunctionInfo::new(
+            "build".to_owned(),
+            Some("builds a Zed".to_owned()),
+            vec!["Zed".to_owned()],
+            false,
+            vec![ParamDeclaration::new(ParamName::new("z").unwrap(), TypeRef::new("u8").unwrap())],
+            "Zed".to_owned(),
+            None,
+            true,
+        );
+        let schema = SchemaExport::new(
+            "schema".to_owned(),
+            vec![type_info],
+            vec![function_info],
+            vec![],
+            vec![],
+        );
+
+        let expected_compact = "{\"crate_name\":\"schema\",\"functions\":[{\"docs\":\"builds a Zed\",\"has_self_receiver\":false,\"is_async\":true,\"name\":\"build\",\"params\":[{\"name\":\"z\",\"ty\":\"u8\"}],\"receiver\":null,\"return_type_names\":[\"Zed\"],\"returns\":\"Zed\"}],\"impls\":[],\"traits\":[],\"types\":[{\"alias_target\":null,\"docs\":\"a documented type\",\"kind\":\"Struct\",\"members\":[{\"Field\":{\"name\":\"z\",\"ty\":\"u8\"}}],\"module_path\":null,\"name\":\"Zed\",\"struct_shape\":null}]}";
+        let expected_pretty = "{\n  \"crate_name\": \"schema\",\n  \"functions\": [\n    {\n      \"docs\": \"builds a Zed\",\n      \"has_self_receiver\": false,\n      \"is_async\": true,\n      \"name\": \"build\",\n      \"params\": [\n        {\n          \"name\": \"z\",\n          \"ty\": \"u8\"\n        }\n      ],\n      \"receiver\": null,\n      \"return_type_names\": [\n        \"Zed\"\n      ],\n      \"returns\": \"Zed\"\n    }\n  ],\n  \"impls\": [],\n  \"traits\": [],\n  \"types\": [\n    {\n      \"alias_target\": null,\n      \"docs\": \"a documented type\",\n      \"kind\": \"Struct\",\n      \"members\": [\n        {\n          \"Field\": {\n            \"name\": \"z\",\n            \"ty\": \"u8\"\n          }\n        }\n      ],\n      \"module_path\": null,\n      \"name\": \"Zed\",\n      \"struct_shape\": null\n    }\n  ]\n}";
+
+        assert_eq!(encode(&schema, false).unwrap(), expected_compact);
+        assert_eq!(encode(&schema, false).unwrap(), expected_compact);
+        assert_eq!(encode(&schema, true).unwrap(), expected_pretty);
+        assert_eq!(encode(&schema, true).unwrap(), expected_pretty);
     }
 
     #[test]

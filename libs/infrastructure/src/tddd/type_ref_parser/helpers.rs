@@ -1,5 +1,6 @@
 //! Pure helper functions that do not require a `ParseCtx`.
 
+use quote::ToTokens;
 use rustdoc_types::{Id, Path, Type};
 
 use super::constants::UNRESOLVED_CRATE_ID;
@@ -235,61 +236,116 @@ pub(crate) fn core_canonical_path(short_name: &str) -> String {
 // Expression helpers
 // ---------------------------------------------------------------------------
 
+fn path_expr_to_string(path_expr: &syn::ExprPath) -> String {
+    let path = path_expr
+        .path
+        .segments
+        .iter()
+        .map(|segment| segment.ident.to_string())
+        .collect::<Vec<_>>()
+        .join("::");
+    if path_expr.path.leading_colon.is_some() { format!("::{path}") } else { path }
+}
+
 /// Converts a `syn::Expr` to a textual representation.
 ///
-/// Best-effort: literal integers and paths are rendered verbatim; other forms
-/// fall back to `"<const_expr>"`.
+/// Literal and expression tokens are rendered without semantic evaluation.
 #[must_use]
 pub(crate) fn syn_expr_to_string(expr: &syn::Expr) -> String {
     match expr {
         syn::Expr::Lit(lit_expr) => match &lit_expr.lit {
-            syn::Lit::Int(i) => i.base10_digits().to_string(),
-            syn::Lit::Str(s) => s.value(),
+            syn::Lit::Int(i) => i.to_token_stream().to_string().replace("- ", "-"),
+            syn::Lit::Str(s) => s.to_token_stream().to_string(),
             syn::Lit::Bool(b) => b.value().to_string(),
-            _ => "<const_expr>".to_string(),
+            syn::Lit::Char(c) => c.to_token_stream().to_string(),
+            syn::Lit::Byte(b) => b.to_token_stream().to_string(),
+            _ => expr.to_token_stream().to_string(),
         },
-        syn::Expr::Path(path_expr) => path_expr
-            .path
-            .segments
-            .iter()
-            .map(|s| s.ident.to_string())
-            .collect::<Vec<_>>()
-            .join("::"),
-        _ => "<const_expr>".to_string(),
+        syn::Expr::Path(path_expr) => path_expr_to_string(path_expr),
+        syn::Expr::Tuple(tuple) if tuple.elems.is_empty() => "()".to_string(),
+        syn::Expr::Block(block) => simple_const_block_expr(block).map_or_else(
+            || expr.to_token_stream().to_string(),
+            |inner| format!("{{ {} }}", syn_expr_to_string(inner)),
+        ),
+        syn::Expr::Unary(unary_expr)
+            if matches!(unary_expr.op, syn::UnOp::Neg(_))
+                && matches!(&*unary_expr.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_))) =>
+        {
+            expr_to_token_string(expr)
+        }
+        _ => expr.to_token_stream().to_string(),
     }
+}
+
+pub(super) fn is_literal_const_expr(expr: &syn::Expr) -> bool {
+    matches!(expr, syn::Expr::Lit(_))
+        || matches!(expr, syn::Expr::Unary(unary) if matches!(unary.op, syn::UnOp::Neg(_)) && matches!(&*unary.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_))))
 }
 
 /// Converts a `syn::Expr` const array length to a string representation.
 ///
-/// Preserves integer literals verbatim, named constants, and binary/unary
-/// arithmetic expressions. Falls back to `"<const_len>"` only for forms that
-/// cannot be represented as a simple token string.
+/// Preserves integer literals verbatim, named constants, and supported binary
+/// arithmetic expressions. Unsupported forms are rejected by the parser before
+/// this renderer is used for lexical comparison.
 #[must_use]
 pub(crate) fn array_len_to_string(expr: &syn::Expr) -> String {
-    expr_to_token_string(expr)
+    evaluate_usize_const_expr(expr)
+        .map_or_else(|| expr_to_token_string(expr), |value| value.to_string())
+}
+
+/// Evaluates array-length expressions using Rust's target-width `usize` semantics.
+///
+/// Expressions that cannot be represented without overflowing are kept as tokens
+/// instead of being folded to a value that could differ from rustdoc output.
+fn evaluate_usize_const_expr(expr: &syn::Expr) -> Option<usize> {
+    match expr {
+        syn::Expr::Lit(lit_expr) => match &lit_expr.lit {
+            syn::Lit::Int(value) => value.base10_digits().parse().ok(),
+            _ => None,
+        },
+        syn::Expr::Paren(paren_expr) => evaluate_usize_const_expr(&paren_expr.expr),
+        syn::Expr::Binary(binary_expr) => {
+            let left = evaluate_usize_const_expr(&binary_expr.left)?;
+            let right = evaluate_usize_const_expr(&binary_expr.right)?;
+            match &binary_expr.op {
+                syn::BinOp::Add(_) => left.checked_add(right),
+                syn::BinOp::Sub(_) => left.checked_sub(right),
+                syn::BinOp::Mul(_) => left.checked_mul(right),
+                syn::BinOp::Div(_) => left.checked_div(right),
+                syn::BinOp::Rem(_) => left.checked_rem(right),
+                syn::BinOp::BitAnd(_) => Some(left & right),
+                syn::BinOp::BitOr(_) => Some(left | right),
+                syn::BinOp::BitXor(_) => Some(left ^ right),
+                syn::BinOp::Shl(_) => left.checked_shl(u32::try_from(right).ok()?),
+                syn::BinOp::Shr(_) => left.checked_shr(u32::try_from(right).ok()?),
+                _ => None,
+            }
+        }
+        _ => None,
+    }
 }
 
 /// Renders a `syn::Expr` as a token string suitable for embedding in a type
 /// description.
 ///
 /// Handles literals, path constants, binary ops, unary ops, parenthesized
-/// sub-expressions, and casts. Falls back to `"<const_expr>"` for forms that
-/// are too complex to render without `quote!`.
+/// sub-expressions, casts, and unsupported forms through their source tokens.
 pub(super) fn expr_to_token_string(expr: &syn::Expr) -> String {
     match expr {
         syn::Expr::Lit(lit_expr) => match &lit_expr.lit {
-            syn::Lit::Int(i) => i.base10_digits().to_string(),
-            syn::Lit::Str(s) => format!("{:?}", s.value()),
+            syn::Lit::Int(i) => i.to_token_stream().to_string().replace("- ", "-"),
+            syn::Lit::Str(s) => s.to_token_stream().to_string(),
             syn::Lit::Bool(b) => b.value().to_string(),
-            _ => "<const_expr>".to_string(),
+            syn::Lit::Char(c) => c.to_token_stream().to_string(),
+            syn::Lit::Byte(b) => b.to_token_stream().to_string(),
+            _ => expr.to_token_stream().to_string(),
         },
-        syn::Expr::Path(path_expr) => path_expr
-            .path
-            .segments
-            .iter()
-            .map(|s| s.ident.to_string())
-            .collect::<Vec<_>>()
-            .join("::"),
+        syn::Expr::Path(path_expr) => path_expr_to_string(path_expr),
+        syn::Expr::Tuple(tuple) if tuple.elems.is_empty() => "()".to_string(),
+        syn::Expr::Block(block) => simple_const_block_expr(block).map_or_else(
+            || expr.to_token_stream().to_string(),
+            |inner| format!("{{ {} }}", expr_to_token_string(inner)),
+        ),
         syn::Expr::Binary(bin_expr) => {
             let left = expr_to_token_string(&bin_expr.left);
             let right = expr_to_token_string(&bin_expr.right);
@@ -326,7 +382,44 @@ pub(super) fn expr_to_token_string(expr: &syn::Expr) -> String {
             let target_ty = syn_type_to_string(&cast_expr.ty);
             format!("{inner} as {target_ty}")
         }
-        _ => "<const_expr>".to_string(),
+        _ => expr.to_token_stream().to_string(),
+    }
+}
+
+/// Returns the expression from a block that rustdoc can retain verbatim.
+pub(super) fn simple_const_block_expr(block: &syn::ExprBlock) -> Option<&syn::Expr> {
+    match block.block.stmts.as_slice() {
+        [syn::Stmt::Expr(expr, None)] if is_simple_const_expr(expr) => Some(expr),
+        _ => None,
+    }
+}
+
+pub(super) fn is_simple_const_expr(expr: &syn::Expr) -> bool {
+    match expr {
+        // Stable rustc permits integer, `bool`, and `char` const-generic
+        // parameter types. A byte literal has type `u8`, so it is an integer
+        // const argument; strings, byte strings, and the unit tuple require
+        // unstable const-parameter types.
+        syn::Expr::Lit(lit) => {
+            matches!(
+                lit.lit,
+                syn::Lit::Int(_) | syn::Lit::Bool(_) | syn::Lit::Char(_) | syn::Lit::Byte(_)
+            )
+        }
+        syn::Expr::Path(path) => {
+            path.qself.is_none()
+                && path
+                    .path
+                    .segments
+                    .iter()
+                    .all(|segment| matches!(segment.arguments, syn::PathArguments::None))
+        }
+        syn::Expr::Unary(unary) => {
+            matches!(unary.op, syn::UnOp::Neg(_))
+                && matches!(&*unary.expr, syn::Expr::Lit(lit) if matches!(lit.lit, syn::Lit::Int(_)))
+        }
+        syn::Expr::Block(block) => simple_const_block_expr(block).is_some(),
+        _ => false,
     }
 }
 

@@ -2,13 +2,16 @@
   "schema_version": 1,
   "providers": {
     "claude": {
-      "label": "Claude Code"
+      "label": "Claude Code",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
     },
     "codex": {
-      "label": "Codex CLI"
+      "label": "Codex CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
     },
     "gemini": {
-      "label": "Gemini CLI"
+      "label": "Gemini CLI",
+      "supported_reasoning_efforts": ["low", "medium", "high"]
     }
   },
   "capabilities": {
@@ -56,8 +59,8 @@
     },
     "implementer": {
       "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
@@ -76,8 +79,8 @@
     },
     "review-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "typed-pipeline"
     },
     "dry-checker": {
@@ -90,8 +93,8 @@
     },
     "dry-fix-lead": {
       "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "max",
       "execution_mode": "typed-pipeline"
     },
     "pr-reviewer": {

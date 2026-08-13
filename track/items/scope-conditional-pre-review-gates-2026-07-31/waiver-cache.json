@@ -1,2621 +1,2621 @@
 {
-  "track_id": "scope-conditional-pre-review-gates-2026-07-31",
   "entries": [
     {
       "edge_id": {
-        "entry_key": "CapturedProgramOutput",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CapturedProgramOutput",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CapturedProgramOutput"
       },
       "key": {
-        "waived_reason_hash": "f581fb0c1d03b84143dfd877ea15bb196af0d6551c6898003d80b9ab56026e75",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "63e3279e71bb0eace960b6b6366b6781ba0bdf600d1d78196837e1957375870e",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "f581fb0c1d03b84143dfd877ea15bb196af0d6551c6898003d80b9ab56026e75"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedProgramOutput",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Opaque captured process-output bytes (CN-02, AC-03)."
+        "citation": "Opaque captured process-output bytes (CN-02, AC-03).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CapturedProgramOutput",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CapturedProgramOutput",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CapturedProgramOutput"
       },
       "key": {
-        "waived_reason_hash": "d4090b07a8fdd3d19ccdd74f3685702e461495df3c456ee19802878dde0a75a8",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "63e3279e71bb0eace960b6b6366b6781ba0bdf600d1d78196837e1957375870e",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "d4090b07a8fdd3d19ccdd74f3685702e461495df3c456ee19802878dde0a75a8"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedProgramOutput",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "FieldDecl { name: FieldName(Identifier(\"stdout\")), ty: TypeRef(\"Vec<u8>\") }"
+        "citation": "FieldDecl { name: FieldName(Identifier(\"stdout\")), ty: TypeRef(\"Vec<u8>\") }",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CliCommand",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CliCommand"
+      },
+      "key": {
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
+        "declaration_hash": "0f507ae3952d37dbf0acaa3297834d174fea2b37e783f0b28413328fc5010338",
+        "waived_reason_hash": "f58d9dfc85e21b87abd9cfff48c34bc0af00c592025647f04893bc10a4c8be54"
       },
       "obligation_id": {
         "entry_key": "CliCommand",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
-      },
-      "key": {
-        "waived_reason_hash": "f58d9dfc85e21b87abd9cfff48c34bc0af00c592025647f04893bc10a4c8be54",
-        "declaration_hash": "bc1193758e79b2ef128594ae35a4b75cd4ba9a140d2a2ffb71b4749ef60dd3b8",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "TypeEntry { action: Modify, role: Dto, kind: Enum"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CliCommand",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-04"
-        }
+          "element_id": "IN-04",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CliCommand"
+      },
+      "key": {
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36",
+        "declaration_hash": "0f507ae3952d37dbf0acaa3297834d174fea2b37e783f0b28413328fc5010338",
+        "waived_reason_hash": "9ea90402528669970f7fa63944af08ae45aa00fc839f4a9821886fac5261c792"
       },
       "obligation_id": {
         "entry_key": "CliCommand",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-04"
-      },
-      "key": {
-        "waived_reason_hash": "9ea90402528669970f7fa63944af08ae45aa00fc839f4a9821886fac5261c792",
-        "declaration_hash": "bc1193758e79b2ef128594ae35a4b75cd4ba9a140d2a2ffb71b4749ef60dd3b8",
-        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "CLI は validate、explain、enter の観測可能な outcome を提供し、operator が展開済み phase command、実行順序、validation failure、および command failure を監査できるようにする。"
+        "citation": "methods: [], generics: [], where_predicates: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandArgument",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-04"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandArgument",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-04"
+          "element_id": "AC-04",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandArgument"
       },
       "key": {
-        "waived_reason_hash": "34054518716435d23d175ce44a74179ab501ddef2280b76b5f66fa9a2d7bc3e4",
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9",
         "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
-        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
+        "waived_reason_hash": "34054518716435d23d175ce44a74179ab501ddef2280b76b5f66fa9a2d7bc3e4"
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgument",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Opaque literal command-argument value (IN-03, AC-04)."
+        "citation": "Opaque literal command-argument value (IN-03, AC-04).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandArgument",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandArgument",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-03"
+          "element_id": "IN-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandArgument"
       },
       "key": {
-        "waived_reason_hash": "b12cda0caf5d15eac2ce3ad78d3603e065059f9118521567ea74df227e451bbb",
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7",
         "declaration_hash": "80d3dde9cdb6f97c998131aa73a631e7782fee6f9fadae8699552177c368aa6c",
-        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
+        "waived_reason_hash": "b12cda0caf5d15eac2ce3ad78d3603e065059f9118521567ea74df227e451bbb"
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgument",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Opaque literal command-argument value (IN-03, AC-04)."
+        "citation": "Opaque literal command-argument value (IN-03, AC-04).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandArgumentDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-04"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandArgumentDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-04"
+          "element_id": "AC-04",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandArgumentDto"
       },
       "key": {
-        "waived_reason_hash": "692ab8f5aff10683fbc4a8c558ac717aebf5efc62a90545920f7d8652111c105",
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9",
         "declaration_hash": "ab6f4b6f367d43f6ae7d79e7d6463a14266dfd2a7e14888275afb200258f1d63",
-        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
+        "waived_reason_hash": "692ab8f5aff10683fbc4a8c558ac717aebf5efc62a90545920f7d8652111c105"
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgumentDto",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Serde mirror of an opaque command argument (IN-03, AC-04)."
+        "citation": "Serde mirror of an opaque command argument (IN-03, AC-04).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandArgumentDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandArgumentDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-03"
+          "element_id": "IN-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandArgumentDto"
       },
       "key": {
-        "waived_reason_hash": "32df1710243b81907baa30597ea34065497a040c7389d3a586fe6a0b1b31ab0b",
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7",
         "declaration_hash": "ab6f4b6f367d43f6ae7d79e7d6463a14266dfd2a7e14888275afb200258f1d63",
-        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
+        "waived_reason_hash": "32df1710243b81907baa30597ea34065497a040c7389d3a586fe6a0b1b31ab0b"
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgumentDto",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Serde mirror of an opaque command argument (IN-03, AC-04)."
+        "citation": "Serde mirror of an opaque command argument (IN-03, AC-04).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandArgvDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandArgvDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
+          "element_id": "IN-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandArgvDto"
       },
       "key": {
-        "waived_reason_hash": "f050fce9aba94f525a50417cf343598899c53ace6cbf9c0b944427982536c192",
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d",
         "declaration_hash": "049e287880d9751a457908056a9f12c8af80d3e8120b6bfab7ebc1ebb0a7a707",
-        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
+        "waived_reason_hash": "f050fce9aba94f525a50417cf343598899c53ace6cbf9c0b944427982536c192"
+      },
+      "obligation_id": {
+        "entry_key": "CommandArgvDto",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandConfigLoadError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "GO-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandConfigLoadError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:GO-03"
+          "element_id": "GO-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandConfigLoadError"
       },
       "key": {
-        "waived_reason_hash": "a16964e1a249e7246640c1adf92aaa2fcf67f7da06c2b79257f462884a609346",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b",
         "declaration_hash": "4895fbdf76b681693eb3ec58185283853f1f911f1356d1f552c5fd55a68b90ec",
-        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+        "waived_reason_hash": "a16964e1a249e7246640c1adf92aaa2fcf67f7da06c2b79257f462884a609346"
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigLoadError",
+        "item_identifier": "voluntary:GO-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: ErrorType"
+        "citation": "TypeEntry { action: Add, role: ErrorType",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandConfigValidationError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "GO-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandConfigValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:GO-03"
+          "element_id": "GO-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandConfigValidationError"
       },
       "key": {
-        "waived_reason_hash": "8670e9833956fd12519214193f9e2397869122de98ecc557f093dd53ce4642f2",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b",
         "declaration_hash": "0fdfbc3a8fd6e5fd6698087a7cbc19ae96c11610e8934d3ca5d8836222017e6b",
-        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+        "waived_reason_hash": "8670e9833956fd12519214193f9e2397869122de98ecc557f093dd53ce4642f2"
+      },
+      "obligation_id": {
+        "entry_key": "CommandConfigValidationError",
+        "item_identifier": "voluntary:GO-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandDeclarationId",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandDeclarationId",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
+          "element_id": "IN-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandDeclarationId"
       },
       "key": {
-        "waived_reason_hash": "e70101cb8ab93df2b47e785d58207e64a86f8b6cd2d6d9bc36c30d8f736180e2",
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d",
         "declaration_hash": "c3695d264070cdca0140edcebfd8d8b70bbb4263382efca5d83a6ffa1185a750",
-        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
+        "waived_reason_hash": "e70101cb8ab93df2b47e785d58207e64a86f8b6cd2d6d9bc36c30d8f736180e2"
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationId",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandDeclarationIdDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandDeclarationIdDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
+          "element_id": "IN-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandDeclarationIdDto"
       },
       "key": {
-        "waived_reason_hash": "d8f2b6e00c12f7ca51479a84b48696e3d21724a03386fb243bb7a4261ddb1d9b",
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d",
         "declaration_hash": "fcee672395c2970ad1741645dddb3958456bf1096b913de55d61c0322dad4da8",
-        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
+        "waived_reason_hash": "d8f2b6e00c12f7ca51479a84b48696e3d21724a03386fb243bb7a4261ddb1d9b"
+      },
+      "obligation_id": {
+        "entry_key": "CommandDeclarationIdDto",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandSequenceIndex",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandSequenceIndex",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-02"
+          "element_id": "AC-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandSequenceIndex"
       },
       "key": {
-        "waived_reason_hash": "7088ab7211edb05acf4d9005be3cf8fa01765a7bf06a9821f82ff79dfcd9095c",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671",
         "declaration_hash": "4caa79ad01a31b84aa1926885f8c07a340c8206c55b921efc938327cd33ed84c",
-        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+        "waived_reason_hash": "7088ab7211edb05acf4d9005be3cf8fa01765a7bf06a9821f82ff79dfcd9095c"
+      },
+      "obligation_id": {
+        "entry_key": "CommandSequenceIndex",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Command-sequence position value (IN-02, CN-03)."
+        "citation": "Command-sequence position value (IN-02, CN-03).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandSequenceIndex",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandSequenceIndex",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-03"
+          "element_id": "CN-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandSequenceIndex"
       },
       "key": {
-        "waived_reason_hash": "6519df604dc0d90b4d5a08910fb9b4d84a0a31a8bc5768171274464733776a14",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600",
         "declaration_hash": "4caa79ad01a31b84aa1926885f8c07a340c8206c55b921efc938327cd33ed84c",
-        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+        "waived_reason_hash": "6519df604dc0d90b4d5a08910fb9b4d84a0a31a8bc5768171274464733776a14"
+      },
+      "obligation_id": {
+        "entry_key": "CommandSequenceIndex",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "dispatcher は後続 command、writer、または reviewer を起動せず"
+        "citation": "dispatcher は後続 command、writer、または reviewer を起動せず",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandSequenceIndex",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandSequenceIndex",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-02"
+          "element_id": "IN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandSequenceIndex"
       },
       "key": {
-        "waived_reason_hash": "df7c36a642c16ee832c605054f0c668b9f5b955733b231319863afd043918b96",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d",
         "declaration_hash": "4caa79ad01a31b84aa1926885f8c07a340c8206c55b921efc938327cd33ed84c",
-        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+        "waived_reason_hash": "df7c36a642c16ee832c605054f0c668b9f5b955733b231319863afd043918b96"
+      },
+      "obligation_id": {
+        "entry_key": "CommandSequenceIndex",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Tuple { fields: [], has_stripped_fields: true }, typestate: None }), methods: []"
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Tuple { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandTimeoutSeconds",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTimeoutSeconds",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandTimeoutSeconds"
       },
       "key": {
-        "waived_reason_hash": "2f42210f87e790f1b63ad34bd16ebf87ec288e6dcfcc02520b2f2465ee70d6a4",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "2f42210f87e790f1b63ad34bd16ebf87ec288e6dcfcc02520b2f2465ee70d6a4"
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandTimeoutSeconds",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTimeoutSeconds",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
+          "element_id": "IN-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandTimeoutSeconds"
       },
       "key": {
-        "waived_reason_hash": "daa11ce524dfdfb8bc3c9258d581b4a4bda80cce817102228bab5047288b0b33",
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d",
         "declaration_hash": "16f3ab9961716bad4def761b3fbcf0cccd157b03cedb628f092a60c5aa848502",
-        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
+        "waived_reason_hash": "daa11ce524dfdfb8bc3c9258d581b4a4bda80cce817102228bab5047288b0b33"
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSeconds",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "role: ValueObject; Anchor: \"各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。\""
+        "citation": "role: ValueObject; Anchor: \"各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。\"",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandTimeoutSecondsDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTimeoutSecondsDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandTimeoutSecondsDto"
       },
       "key": {
-        "waived_reason_hash": "011d175f646c652751b5751bc08bf1f581bb726367c3fa5299532f422e8269c4",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "19bc58c1b5533f77d048d52c0d5b67449975446527683cd70d28f5772c12a185",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "011d175f646c652751b5751bc08bf1f581bb726367c3fa5299532f422e8269c4"
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "role: Dto"
+        "citation": "role: Dto",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandTimeoutSecondsDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTimeoutSecondsDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandTimeoutSecondsDto"
       },
       "key": {
-        "waived_reason_hash": "10e8a479783bf82a3218ac2279c1140bd3b3f1023a3b150fd7dac9fd75a0b4c4",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "19bc58c1b5533f77d048d52c0d5b67449975446527683cd70d28f5772c12a185",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "10e8a479783bf82a3218ac2279c1140bd3b3f1023a3b150fd7dac9fd75a0b4c4"
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutSecondsDto",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Serde mirror of a command-timeout value (CN-01, CN-02)."
+        "citation": "Serde mirror of a command-timeout value (CN-01, CN-02).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CommandTimeoutValidationError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CommandTimeoutValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CommandTimeoutValidationError"
       },
       "key": {
-        "waived_reason_hash": "15f85903cd1afd7c6d280c1372be9c07b317e6056514cef442ac9a6ebe37430a",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "7383e09944b2f5f80f542f6b150cdd8cd7373a60d129aa0cf42e8cf53698acc5",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "15f85903cd1afd7c6d280c1372be9c07b317e6056514cef442ac9a6ebe37430a"
+      },
+      "obligation_id": {
+        "entry_key": "CommandTimeoutValidationError",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ConfiguredCommand",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "GO-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ConfiguredCommand",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:GO-01"
+          "element_id": "GO-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ConfiguredCommand"
       },
       "key": {
-        "waived_reason_hash": "3cb71df4478086f34945e8aa24bf0f48c9c7db9af6700f988f816e84bbdec97e",
+        "anchor_text_hash": "a1e016ce093bbabb6246c6dd774292becd988d5453156548ac0e55e73a523abc",
         "declaration_hash": "9a1815f059a46928d65101165749304522a8e8317db6e07d20e2c564faa4c30b",
-        "anchor_text_hash": "a1e016ce093bbabb6246c6dd774292becd988d5453156548ac0e55e73a523abc"
+        "waived_reason_hash": "3cb71df4478086f34945e8aa24bf0f48c9c7db9af6700f988f816e84bbdec97e"
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommand",
+        "item_identifier": "voluntary:GO-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。"
+        "citation": "phase の writer 前 prerequisite と scope 条件付き pre-review gate について、テンプレート利用者が config の literal argv 宣言を読み、何をどの順で実行するか監査できるようにする。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ConfiguredCommandDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ConfiguredCommandDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
+          "element_id": "IN-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ConfiguredCommandDto"
       },
       "key": {
-        "waived_reason_hash": "f9369439111f54520d564a320f000e24568e6f01d2f5955c270329509c37c7d7",
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d",
         "declaration_hash": "e7106f614838efabdf8796fca7f6763c45c76738e90a9edffe73de086e664756",
-        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
+        "waived_reason_hash": "f9369439111f54520d564a320f000e24568e6f01d2f5955c270329509c37c7d7"
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandDto",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Serde mirror of a configured command (IN-01, AC-04)."
+        "citation": "Serde mirror of a configured command (IN-01, AC-04).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ConfiguredCommandValidationError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ConfiguredCommandValidationError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
+          "element_id": "IN-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ConfiguredCommandValidationError"
       },
       "key": {
-        "waived_reason_hash": "48d62fe3a5330e742c9f7ae6ae1b00d6ab0f8aed7f13cb8d230cec7b8171fc23",
+        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d",
         "declaration_hash": "61bb4144685060fc926598ce5c79cda7fb14ffdf8452fbba35dfdc29801008f0",
-        "anchor_text_hash": "948ccce4f463953fbe35f33c34a31d55b63e3e3ea5b95666203d28c5c9f2927d"
+        "waived_reason_hash": "48d62fe3a5330e742c9f7ae6ae1b00d6ab0f8aed7f13cb8d230cec7b8171fc23"
+      },
+      "obligation_id": {
+        "entry_key": "ConfiguredCommandValidationError",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。"
+        "citation": "各 phase は canonical writer command 一件と、writer 前に通す ordered pre-entry command 群を宣言する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CoverageVerifyOutcome",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-10"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CoverageVerifyOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-10"
+          "element_id": "AC-10",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CoverageVerifyOutcome"
       },
       "key": {
-        "waived_reason_hash": "8a8dbd54410d4744ebd4f286885fb840f08cd6be29033a4230bd8c0bce15eda6",
+        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6",
         "declaration_hash": "dac23d731e10e9ee633789215597528db2b2d067587b0066ed3abf05087f0c4e",
-        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
+        "waived_reason_hash": "8a8dbd54410d4744ebd4f286885fb840f08cd6be29033a4230bd8c0bce15eda6"
+      },
+      "obligation_id": {
+        "entry_key": "CoverageVerifyOutcome",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CoverageVerifyOutcome",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CoverageVerifyOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-08"
+          "element_id": "IN-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CoverageVerifyOutcome"
       },
       "key": {
-        "waived_reason_hash": "ec4c24271227dabcd9307549c54ceeb87e2b669743bc4afc4cc3a83c66449298",
+        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0",
         "declaration_hash": "dac23d731e10e9ee633789215597528db2b2d067587b0066ed3abf05087f0c4e",
-        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
+        "waived_reason_hash": "ec4c24271227dabcd9307549c54ceeb87e2b669743bc4afc4cc3a83c66449298"
+      },
+      "obligation_id": {
+        "entry_key": "CoverageVerifyOutcome",
+        "item_identifier": "voluntary:IN-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定"
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CoverageViolation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CoverageViolation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+          "element_id": "AC-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CoverageViolation"
       },
       "key": {
-        "waived_reason_hash": "17b09d12eaa5485160e8d27ce5f7d0895cd8b598954c5c2c7652e5578e18a071",
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225",
         "declaration_hash": "740b8737b2ec8265361041139565bed6c300d22f99a82d9dff1f0b91661650ae",
-        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
+        "waived_reason_hash": "17b09d12eaa5485160e8d27ce5f7d0895cd8b598954c5c2c7652e5578e18a071"
+      },
+      "obligation_id": {
+        "entry_key": "CoverageViolation",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "CoverageViolation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "CoverageViolation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+          "element_id": "IN-07",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "CoverageViolation"
       },
       "key": {
-        "waived_reason_hash": "c193130d4d0757e41100914c14a22d7479e4a09973c4db7db60b106bf472817f",
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41",
         "declaration_hash": "740b8737b2ec8265361041139565bed6c300d22f99a82d9dff1f0b91661650ae",
-        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
+        "waived_reason_hash": "c193130d4d0757e41100914c14a22d7479e4a09973c4db7db60b106bf472817f"
+      },
+      "obligation_id": {
+        "entry_key": "CoverageViolation",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "OutputCaptureLimitBytes",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "OutputCaptureLimitBytes",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "OutputCaptureLimitBytes"
       },
       "key": {
-        "waived_reason_hash": "bcee752d9479f6a3625b1966fb7896011834aa81e9853d2f10f34128e4849557",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "94c75521f52e5e1613ce12f382b5b225c2a012402129163b188b2d896e68d668",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "bcee752d9479f6a3625b1966fb7896011834aa81e9853d2f10f34128e4849557"
+      },
+      "obligation_id": {
+        "entry_key": "OutputCaptureLimitBytes",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "validate、explain、enter の CLI outcome により"
+        "citation": "validate、explain、enter の CLI outcome により",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "OutputCaptureLimitBytes",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "OutputCaptureLimitBytes",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "OutputCaptureLimitBytes"
       },
       "key": {
-        "waived_reason_hash": "77089c74d982aebad2bc74ee6ada35a57fe3d64c647f1ad66a691ac7495a672c",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "94c75521f52e5e1613ce12f382b5b225c2a012402129163b188b2d896e68d668",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "77089c74d982aebad2bc74ee6ada35a57fe3d64c647f1ad66a691ac7495a672c"
+      },
+      "obligation_id": {
+        "entry_key": "OutputCaptureLimitBytes",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Process-output capture-limit value (CN-02, AC-03)."
+        "citation": "Process-output capture-limit value (CN-02, AC-03).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewCommandConfig",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewCommandConfig",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewCommandConfig"
       },
       "key": {
-        "waived_reason_hash": "9e08d56218657fa2d8f447ff5d8cc5b5341a5065c163e16abf97a4869b36c24e",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "ccd9d5e9ce5615e9b325b15113d1f2e43fbd9aa1d97981862db332499bbde752",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "9e08d56218657fa2d8f447ff5d8cc5b5341a5065c163e16abf97a4869b36c24e"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfig",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "`TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [] ... }`"
+        "citation": "`TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [] ... }`",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewCommandConfigDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewCommandConfigDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewCommandConfigDto"
       },
       "key": {
-        "waived_reason_hash": "8bf4a231d391d26417f7dee12b4ad424990fae48051665c9da466a89d8ae113a",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "829d8bab93c7f185066c41dc2940633333126768739b014e3f722e320a624be1",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "8bf4a231d391d26417f7dee12b4ad424990fae48051665c9da466a89d8ae113a"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandConfigDto",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "`sotp review local` が scope を解決してその配列を順次 dispatch する。"
+        "citation": "`sotp review local` が scope を解決してその配列を順次 dispatch する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewCommandDispatchCommand",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewCommandDispatchCommand",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewCommandDispatchCommand"
       },
       "key": {
-        "waived_reason_hash": "9ab488a26e5ede52214e8ba7677359a50d3da4e098b80c8aa8b9f606f23eb902",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "22d5078d3d151b588158e18d081bfafb3e5b29c4199178ba3bad14ac77987366",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "9ab488a26e5ede52214e8ba7677359a50d3da4e098b80c8aa8b9f606f23eb902"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchCommand",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewCommandDispatchError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "GO-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewCommandDispatchError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:GO-03"
+          "element_id": "GO-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewCommandDispatchError"
       },
       "key": {
-        "waived_reason_hash": "74a5db1e6343c042fca07e0224a1ab2b819c46bc3a4599d1e0dcb3c09ee49cfa",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b",
         "declaration_hash": "2b230d201eb2e793522f4abb3a723e3249f5c0f00184e2f7c602fa9f16afc7a2",
-        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+        "waived_reason_hash": "74a5db1e6343c042fca07e0224a1ab2b819c46bc3a4599d1e0dcb3c09ee49cfa"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "item_identifier": "voluntary:GO-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewCommandDispatchError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewCommandDispatchError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewCommandDispatchError"
       },
       "key": {
-        "waived_reason_hash": "8609107c31d46021a9c2dd90d97db84e31298198841123c75c63e76f71f13d1a",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "2b230d201eb2e793522f4abb3a723e3249f5c0f00184e2f7c602fa9f16afc7a2",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "8609107c31d46021a9c2dd90d97db84e31298198841123c75c63e76f71f13d1a"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewCommandDispatchError",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewGateOutcome",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-10"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewGateOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-10"
+          "element_id": "AC-10",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewGateOutcome"
       },
       "key": {
-        "waived_reason_hash": "e0d2923fdb46c1599b268702dafde5ef3b2b97df7e05b8d827a87c376a66e7b2",
+        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6",
         "declaration_hash": "8e7a74b64b207248258ab281465a6458cdfd44d99b2b792ec39395474d31b7b3",
-        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
+        "waived_reason_hash": "e0d2923fdb46c1599b268702dafde5ef3b2b97df7e05b8d827a87c376a66e7b2"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateOutcome",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewGateOutcome",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewGateOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-08"
+          "element_id": "IN-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewGateOutcome"
       },
       "key": {
-        "waived_reason_hash": "4b1cb279d5fc62b00c82cc856084bb807c06b7e6622b1a25eb43a6c5e3237235",
+        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0",
         "declaration_hash": "8e7a74b64b207248258ab281465a6458cdfd44d99b2b792ec39395474d31b7b3",
-        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
+        "waived_reason_hash": "4b1cb279d5fc62b00c82cc856084bb807c06b7e6622b1a25eb43a6c5e3237235"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateOutcome",
+        "item_identifier": "voluntary:IN-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。"
+        "citation": "scope 条件付き review behavior、task-contract の status 別 rule、および既存の NonBlueSignal 判定は、明示した command ownership と ordering の変更以外では維持する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewGateViolation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-10"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewGateViolation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-10"
+          "element_id": "AC-10",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewGateViolation"
       },
       "key": {
-        "waived_reason_hash": "9687fb9d3566201b61817d66556f195631446f0d24e5380cdbc450d134f7c834",
+        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6",
         "declaration_hash": "6df8b382900dc28f27c2890051033cac14f60802e95eb42d8749634cc64e7abd",
-        "anchor_text_hash": "2d0510b1801ea41134f064a97a28f9c742e8a7adacf4920ed051c4f3412d2bf6"
+        "waived_reason_hash": "9687fb9d3566201b61817d66556f195631446f0d24e5380cdbc450d134f7c834"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateViolation",
+        "item_identifier": "voluntary:AC-10",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。"
+        "citation": "scope-conditional applicability と既存 task-contract status rule は維持され、NonBlueSignal の既存判定規則は変更されない。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewGateViolation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewGateViolation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-08"
+          "element_id": "IN-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewGateViolation"
       },
       "key": {
-        "waived_reason_hash": "bd637ac0f17838b39bddec018a7c0975651acadf328a05897b49912eddb0c812",
+        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0",
         "declaration_hash": "6df8b382900dc28f27c2890051033cac14f60802e95eb42d8749634cc64e7abd",
-        "anchor_text_hash": "2e8f1baed5944f5eca9daf1081560f221365cd751f31e041306d0eb4931e74e0"
+        "waived_reason_hash": "bd637ac0f17838b39bddec018a7c0975651acadf328a05897b49912eddb0c812"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateViolation",
+        "item_identifier": "voluntary:IN-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewScopeCommandDeclaration",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewScopeCommandDeclaration",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-01"
+          "element_id": "CN-01",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewScopeCommandDeclaration"
       },
       "key": {
-        "waived_reason_hash": "22a22cf72e18e144f7a048b4f62b56ceeb2429c5cc62f8274e25cd81427a47b7",
+        "anchor_text_hash": "b6a33e51005ea8e00e1cb6e43330574ecae2c284e495c12c67dd198ae1922af9",
         "declaration_hash": "f447c19a5a1f95b150d03fdbaed8ce94f8d2dcb874438d80cee182f9fa6b355c",
-        "anchor_text_hash": "b6a33e51005ea8e00e1cb6e43330574ecae2c284e495c12c67dd198ae1922af9"
+        "waived_reason_hash": "22a22cf72e18e144f7a048b4f62b56ceeb2429c5cc62f8274e25cd81427a47b7"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "\"phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。\""
+        "citation": "\"phase と pre-review config は schema version、declaration id の一意性、non-empty literal argv、および positive integer かつ 3,600 seconds 以下の per-command timeout を fail-closed に検証する。\"",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewScopeCommandDeclaration",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewScopeCommandDeclaration",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewScopeCommandDeclaration"
       },
       "key": {
-        "waived_reason_hash": "eb8b42edf07b009f9db6254e635b55d9b8617bfeae37e88566087674bdee52a4",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "f447c19a5a1f95b150d03fdbaed8ce94f8d2dcb874438d80cee182f9fa6b355c",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "eb8b42edf07b009f9db6254e635b55d9b8617bfeae37e88566087674bdee52a4"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclaration",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "\"Pre-review scope-command declaration (IN-05, AC-05).\""
+        "citation": "\"Pre-review scope-command declaration (IN-05, AC-05).\"",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PreReviewScopeCommandDeclarationDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PreReviewScopeCommandDeclarationDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PreReviewScopeCommandDeclarationDto"
       },
       "key": {
-        "waived_reason_hash": "d2adf3b0a6cfe8a1464e2a293efd98d9332fa4c947cbbb80eff103d9a689f4bf",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "19c55523432ec8c0b313743529bce2f8d4472cf840af46d4bc0f0a28aa7b8664",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "d2adf3b0a6cfe8a1464e2a293efd98d9332fa4c947cbbb80eff103d9a689f4bf"
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewScopeCommandDeclarationDto",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Serde pre-review scope-command declaration (IN-05, AC-05)."
+        "citation": "Serde pre-review scope-command declaration (IN-05, AC-05).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramExitCode",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramExitCode",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramExitCode"
       },
       "key": {
-        "waived_reason_hash": "fc7e4f1db08d2ae068991e03b245bb66086dcf029de758cd93ebdf39dd2492fd",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "cd317901584b90be2b0d9e32d5e2296fc9db42832ab659b4df7728d85cc7cabc",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "fc7e4f1db08d2ae068991e03b245bb66086dcf029de758cd93ebdf39dd2492fd"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExitCode",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Tuple { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [] }"
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Tuple { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [] }",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramExitCode",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramExitCode",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-03"
+          "element_id": "CN-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramExitCode"
       },
       "key": {
-        "waived_reason_hash": "c8cdcee9579c1a47dcaeb208199c701148cb3597daf8463b5fdf26ce62af8cd3",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600",
         "declaration_hash": "cd317901584b90be2b0d9e32d5e2296fc9db42832ab659b4df7728d85cc7cabc",
-        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+        "waived_reason_hash": "c8cdcee9579c1a47dcaeb208199c701148cb3597daf8463b5fdf26ce62af8cd3"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramExitCode",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Opaque operating-system exit-code value (CN-03, AC-03)."
+        "citation": "Opaque operating-system exit-code value (CN-03, AC-03).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramInvocation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-04"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramInvocation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-04"
+          "element_id": "AC-04",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramInvocation"
       },
       "key": {
-        "waived_reason_hash": "16390e196d0bf7c80b9b59b0ab3f3c2c53fbd032140a344764738d1ca64c0fb3",
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9",
         "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
-        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
+        "waived_reason_hash": "16390e196d0bf7c80b9b59b0ab3f3c2c53fbd032140a344764738d1ca64c0fb3"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(...), methods: [], generics: [], where_predicates: [], ... }"
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(...), methods: [], generics: [], where_predicates: [], ... }",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramInvocation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramInvocation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramInvocation"
       },
       "key": {
-        "waived_reason_hash": "82935000964b1e421c2e7c07398175013913499b2a5eaa35afd18c780a2b4287",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "82935000964b1e421c2e7c07398175013913499b2a5eaa35afd18c780a2b4287"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramInvocation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramInvocation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-02"
+          "element_id": "IN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramInvocation"
       },
       "key": {
-        "waived_reason_hash": "8b22d392fcfc1a60183d3aecd4b8c94603b7ff6b3426348b32261228fd2ec59d",
+        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d",
         "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
-        "anchor_text_hash": "ef72acacfb5dc440638dcb1eca6898bd3db2fbdd6150c1af28c56c8594a8958d"
+        "waived_reason_hash": "8b22d392fcfc1a60183d3aecd4b8c94603b7ff6b3426348b32261228fd2ec59d"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。"
+        "citation": "phase engine は repository root を cwd として pre-entry command を宣言順に実行し、最初の non-zero で停止して残りと writer を起動せず、全 command が zero の場合だけ writer を一度実行する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramInvocation",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramInvocation",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-03"
+          "element_id": "IN-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramInvocation"
       },
       "key": {
-        "waived_reason_hash": "05c8544a571eb70bd2d1a3cf737371e1dfc66eb1e351142a9eb42d2764db4999",
+        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7",
         "declaration_hash": "eafb4f4ff7dfee437df5bd35076ddb012bf32868be6983db6c3a70c9ee565f15",
-        "anchor_text_hash": "40dc60e9383fe78e784c70d0531f18bc574b03cbaa5710618f0fcdf56d3382f7"
+        "waived_reason_hash": "05c8544a571eb70bd2d1a3cf737371e1dfc66eb1e351142a9eb42d2764db4999"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramInvocation",
+        "item_identifier": "voluntary:IN-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramOutputStream",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramOutputStream",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramOutputStream"
       },
       "key": {
-        "waived_reason_hash": "301a539234442e664365cddf67fd9fb4f990a602edda71e50db4883955b471f1",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "16fe792938fdba170eb407f7e45886f5f379c4d190ab80258328c4eef379db89",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "301a539234442e664365cddf67fd9fb4f990a602edda71e50db4883955b471f1"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramOutputStream",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Stdout\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Stderr\")), payload: Unit }] }, methods: [], generics: [], where_predicates: []"
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Stdout\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Stderr\")), payload: Unit }] }, methods: [], generics: [], where_predicates: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramOutputStream",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramOutputStream",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramOutputStream"
       },
       "key": {
-        "waived_reason_hash": "d0bdf539c9155816e10732f059ede0003ebbdefeed0197295e0dfe89cb8385a2",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "16fe792938fdba170eb407f7e45886f5f379c4d190ab80258328c4eef379db89",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "d0bdf539c9155816e10732f059ede0003ebbdefeed0197295e0dfe89cb8385a2"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramOutputStream",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: [], invariants: []"
+        "citation": "methods: [], invariants: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramRunOutcome",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramRunOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramRunOutcome"
       },
       "key": {
-        "waived_reason_hash": "6043ed731a0f44b338cfd403ef1128358b0a2d9a8fc5c22a476d99d3f7cf6f29",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "c5e6278ec809829457fcc3b5b510b2f7ec07dc9b487c86e172b840bd1bcf15b0",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "6043ed731a0f44b338cfd403ef1128358b0a2d9a8fc5c22a476d99d3f7cf6f29"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: [], generics: [], where_predicates: []"
+        "citation": "methods: [], generics: [], where_predicates: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramRunOutcome",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramRunOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramRunOutcome"
       },
       "key": {
-        "waived_reason_hash": "0d0d171e63c5e032ea7d19aff6390273320edec065667b2856b491e890d18345",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "c5e6278ec809829457fcc3b5b510b2f7ec07dc9b487c86e172b840bd1bcf15b0",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "0d0d171e63c5e032ea7d19aff6390273320edec065667b2856b491e890d18345"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "kind: Enum"
+        "citation": "kind: Enum",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramRunOutcome",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramRunOutcome",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-03"
+          "element_id": "CN-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramRunOutcome"
       },
       "key": {
-        "waived_reason_hash": "a48f2d967b7ed0f9bafbcf986aeac10565671668b9db2bd5e70e0b5a5504f485",
+        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600",
         "declaration_hash": "c5e6278ec809829457fcc3b5b510b2f7ec07dc9b487c86e172b840bd1bcf15b0",
-        "anchor_text_hash": "6166df4e5cb8aa348e839dc9faf6fdda9446f5782ff3880dec49513621a1e600"
+        "waived_reason_hash": "a48f2d967b7ed0f9bafbcf986aeac10565671668b9db2bd5e70e0b5a5504f485"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "TypeEntry { action: Add, role: Dto, kind: Enum"
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Enum",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramRunnerError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-04"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramRunnerError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-04"
+          "element_id": "AC-04",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramRunnerError"
       },
       "key": {
-        "waived_reason_hash": "3c3f83e5a522d31157bfb1d6ad619ac2bc0f9af38a674e5cd80351f2480bb7cc",
+        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9",
         "declaration_hash": "3f47349b7f6f3606caf0ba5d851e11b4679c94ef9612598a5967ccabb62ad8ba",
-        "anchor_text_hash": "fa7e4f00724359c580b35833faf745f970a7f203d8fbd44a502a13e850af54b9"
+        "waived_reason_hash": "3c3f83e5a522d31157bfb1d6ad619ac2bc0f9af38a674e5cd80351f2480bb7cc"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunnerError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramRunnerError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramRunnerError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramRunnerError"
       },
       "key": {
-        "waived_reason_hash": "da122b41162f4eed3a68b3c966f35686da9618026a7e67b378bcbe90875ad1d3",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "3f47349b7f6f3606caf0ba5d851e11b4679c94ef9612598a5967ccabb62ad8ba",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "da122b41162f4eed3a68b3c966f35686da9618026a7e67b378bcbe90875ad1d3"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunnerError",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ProgramRunnerError",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "GO-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ProgramRunnerError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:GO-03"
+          "element_id": "GO-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ProgramRunnerError"
       },
       "key": {
-        "waived_reason_hash": "758a89b6fdd7e3fd27a653b0b0f708a183f8d264e80c856df04baa716c8577b5",
+        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b",
         "declaration_hash": "3f47349b7f6f3606caf0ba5d851e11b4679c94ef9612598a5967ccabb62ad8ba",
-        "anchor_text_hash": "0203a405476f817ab74879ed006ba32454744fc289e4c38e0d204f4d9ddc995b"
+        "waived_reason_hash": "758a89b6fdd7e3fd27a653b0b0f708a183f8d264e80c856df04baa716c8577b5"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunnerError",
+        "item_identifier": "voluntary:GO-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Generic process-runner failures (GO-03, CN-02)."
+        "citation": "Generic process-runner failures (GO-03, CN-02).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewScopeNameDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ReviewScopeNameDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewScopeNameDto"
       },
       "key": {
-        "waived_reason_hash": "56c6421a162dad5f4a2902e4ac1be942f6e5ac31dc7f9cca6618b3dce17bd9f2",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "8ce40cbd58eef12346a5d377c2816a6a76ca8212d789084e2877bb79af173ae7",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "56c6421a162dad5f4a2902e4ac1be942f6e5ac31dc7f9cca6618b3dce17bd9f2"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewScopeNameDto",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "`methods: []`"
+        "citation": "`methods: []`",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewScopeSelector",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ReviewScopeSelector",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewScopeSelector"
       },
       "key": {
-        "waived_reason_hash": "e17ed577cb25f1286164a44d7fe0e068df2d989527a469fb26faa384b737931a",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "66f64f00a1a765f040a556e01aef497848ba52915384ee5c84f8880a5c43a326",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "e17ed577cb25f1286164a44d7fe0e068df2d989527a469fb26faa384b737931a"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewScopeSelector",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Named\")), payload: Tuple([TypeRef(\"domain::review_v2::MainScopeName\")]) }, VariantDecl { name: VariantName(Identifier(\"Other\")), payload: Unit }] }"
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Named\")), payload: Tuple([TypeRef(\"domain::review_v2::MainScopeName\")]) }, VariantDecl { name: VariantName(Identifier(\"Other\")), payload: Unit }] }",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewTrackSelector",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "ReviewTrackSelector",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-05"
+          "element_id": "IN-05",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewTrackSelector"
       },
       "key": {
-        "waived_reason_hash": "e33fb2ecfafa024aa8996aea1dcca1d7732679e4123233b01f94e7e86dc3d3b5",
+        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb",
         "declaration_hash": "6b303721a1caa7bf4d68c098ea94492e55d166fd39db5c40fe28091f78b421b8",
-        "anchor_text_hash": "c60f3f6591efbbe4a4484aac275ceea60eece81589e608cff02c6eec6e85dbcb"
+        "waived_reason_hash": "e33fb2ecfafa024aa8996aea1dcca1d7732679e4123233b01f94e7e86dc3d3b5"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewTrackSelector",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TaskContractDocumentDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskContractDocumentDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+          "element_id": "AC-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TaskContractDocumentDto"
       },
       "key": {
-        "waived_reason_hash": "dc33735d581ceb7d468f31be3d24fb105186113acf136148ecb54f944ba4cc99",
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225",
         "declaration_hash": "0e94cc1ee3a993794858de15a6cae62190f8dcc850cf79a03595f91c2b7b4713",
-        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
+        "waived_reason_hash": "dc33735d581ceb7d468f31be3d24fb105186113acf136148ecb54f944ba4cc99"
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractDocumentDto",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Serde task-contract attribution document (IN-07, AC-08)."
+        "citation": "Serde task-contract attribution document (IN-07, AC-08).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TaskContractDocumentDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskContractDocumentDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+          "element_id": "IN-07",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TaskContractDocumentDto"
       },
       "key": {
-        "waived_reason_hash": "20f92f6ca158b6f6d6392fa21e0fa47acdf5649739cfc8dc887a83aa24bcbf97",
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41",
         "declaration_hash": "0e94cc1ee3a993794858de15a6cae62190f8dcc850cf79a03595f91c2b7b4713",
-        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
+        "waived_reason_hash": "20f92f6ca158b6f6d6392fa21e0fa47acdf5649739cfc8dc887a83aa24bcbf97"
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractDocumentDto",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Serde task-contract attribution document (IN-07, AC-08)."
+        "citation": "Serde task-contract attribution document (IN-07, AC-08).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TaskContractSchemaVersionDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskContractSchemaVersionDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+          "element_id": "AC-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TaskContractSchemaVersionDto"
       },
       "key": {
-        "waived_reason_hash": "d5f7c3d4b694e1070b8c2bcd0cd67170a8e60e096e4feddaaf57ff18247edf4c",
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225",
         "declaration_hash": "0c64eae3ae3640ad446136fbe1dade285454df9db22516f65f346eece1a9c8db",
-        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
+        "waived_reason_hash": "d5f7c3d4b694e1070b8c2bcd0cd67170a8e60e096e4feddaaf57ff18247edf4c"
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractSchemaVersionDto",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。"
+        "citation": "task-contract は task-to-catalogue-entry attribution を記録する。",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TaskContractSchemaVersionDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskContractSchemaVersionDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+          "element_id": "IN-07",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TaskContractSchemaVersionDto"
       },
       "key": {
-        "waived_reason_hash": "97e536fa890c2477236b94972cc6843afa82de4623264f7e56704e8b3014915c",
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41",
         "declaration_hash": "0c64eae3ae3640ad446136fbe1dade285454df9db22516f65f346eece1a9c8db",
-        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
+        "waived_reason_hash": "97e536fa890c2477236b94972cc6843afa82de4623264f7e56704e8b3014915c"
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractSchemaVersionDto",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "\"Serde mirror of the task-contract schema version (IN-07, AC-08).\""
+        "citation": "\"Serde mirror of the task-contract schema version (IN-07, AC-08).\"",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "UnvalidatedTimeoutSeconds",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "CN-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "UnvalidatedTimeoutSeconds",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:CN-02"
+          "element_id": "CN-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "UnvalidatedTimeoutSeconds"
       },
       "key": {
-        "waived_reason_hash": "fb525d297cd39d2808c37b9a3dfd1cb5f8c1fed8ab739ca473446ed58d203d60",
+        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a",
         "declaration_hash": "b177882a06962c01dbe83ba84c07dcb519384248cc38f582642469035b4c69cc",
-        "anchor_text_hash": "ca4264ace91339e8c6e987c4964bd99937e6d62d3b062c38cba5a5c8515d0f3a"
+        "waived_reason_hash": "fb525d297cd39d2808c37b9a3dfd1cb5f8c1fed8ab739ca473446ed58d203d60"
+      },
+      "obligation_id": {
+        "entry_key": "UnvalidatedTimeoutSeconds",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Unvalidated command-timeout input value (CN-01, CN-02)."
+        "citation": "Unvalidated command-timeout input value (CN-01, CN-02).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TrackIdDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TrackIdDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+          "element_id": "IN-07",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TrackIdDto"
       },
       "key": {
-        "waived_reason_hash": "1288c81ec6fb198e0173586840e3197bd808247739120034a13e4deaa5cb1100",
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41",
         "declaration_hash": "579d39da8308c311b73fd80e09188a33478edce6d75780d7299da4755b279065",
-        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
+        "waived_reason_hash": "1288c81ec6fb198e0173586840e3197bd808247739120034a13e4deaa5cb1100"
+      },
+      "obligation_id": {
+        "entry_key": "TrackIdDto",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Transparent serde mirror for a task-contract track identifier (IN-07, AC-08)."
+        "citation": "Transparent serde mirror for a task-contract track identifier (IN-07, AC-08).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TrackIdDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TrackIdDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+          "element_id": "AC-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TrackIdDto"
       },
       "key": {
-        "waived_reason_hash": "a5d2881ad3eaf00a4a2fd8f183b363509170950f11cb4015da3db2fcb52a2a21",
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225",
         "declaration_hash": "579d39da8308c311b73fd80e09188a33478edce6d75780d7299da4755b279065",
-        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
+        "waived_reason_hash": "a5d2881ad3eaf00a4a2fd8f183b363509170950f11cb4015da3db2fcb52a2a21"
+      },
+      "obligation_id": {
+        "entry_key": "TrackIdDto",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Transparent serde mirror for a task-contract track identifier (IN-07, AC-08)."
+        "citation": "Transparent serde mirror for a task-contract track identifier (IN-07, AC-08).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TaskIdDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-07"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskIdDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-07"
+          "element_id": "IN-07",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TaskIdDto"
       },
       "key": {
-        "waived_reason_hash": "e05b5aa240321e22fcdb58b9f3c40c7f504950f923c50b8fe8b7131df132526d",
+        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41",
         "declaration_hash": "e9b83ef0d9d6047fef81c585c83e0ffec044224c539aed4834ecf21b84796835",
-        "anchor_text_hash": "b924e05eb91cd9247caa65de111b23aaefed61e69a2b259da21bc3ce4115fe41"
+        "waived_reason_hash": "e05b5aa240321e22fcdb58b9f3c40c7f504950f923c50b8fe8b7131df132526d"
+      },
+      "obligation_id": {
+        "entry_key": "TaskIdDto",
+        "item_identifier": "voluntary:IN-07",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Transparent serde mirror for a task-contract task identifier (IN-07, AC-08)."
+        "citation": "Transparent serde mirror for a task-contract task identifier (IN-07, AC-08).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "TaskIdDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "TaskIdDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+          "element_id": "AC-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "TaskIdDto"
       },
       "key": {
-        "waived_reason_hash": "e05b5aa240321e22fcdb58b9f3c40c7f504950f923c50b8fe8b7131df132526d",
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225",
         "declaration_hash": "e9b83ef0d9d6047fef81c585c83e0ffec044224c539aed4834ecf21b84796835",
-        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
+        "waived_reason_hash": "e05b5aa240321e22fcdb58b9f3c40c7f504950f923c50b8fe8b7131df132526d"
+      },
+      "obligation_id": {
+        "entry_key": "TaskIdDto",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Transparent serde mirror for a task-contract task identifier (IN-07, AC-08)."
+        "citation": "Transparent serde mirror for a task-contract task identifier (IN-07, AC-08).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "LayerIdDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "LayerIdDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+          "element_id": "AC-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "LayerIdDto"
       },
       "key": {
-        "waived_reason_hash": "929476f9dede9e9c82029e0271fab24b245a5c86c73e750d597c7c81eeb145c0",
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225",
         "declaration_hash": "0cca728621486453520c134be88d587478a3e1e2d9dab7a60c248e04bbde896a",
-        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
+        "waived_reason_hash": "929476f9dede9e9c82029e0271fab24b245a5c86c73e750d597c7c81eeb145c0"
+      },
+      "obligation_id": {
+        "entry_key": "LayerIdDto",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "shape: Tuple { fields: [TypeRef(\"String\")], has_stripped_fields: false }"
+        "citation": "shape: Tuple { fields: [TypeRef(\"String\")], has_stripped_fields: false }",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "EntryKeyDto",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "EntryKeyDto",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-08"
+          "element_id": "AC-08",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "EntryKeyDto"
       },
       "key": {
-        "waived_reason_hash": "140499a17b9413209c96d812d39720eca6ef2ee174de783e75f15345fb79b7ed",
+        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225",
         "declaration_hash": "0e0bca880b2dbc2950950a3fa09c15614dd62a0a686893813b23116d660773cf",
-        "anchor_text_hash": "3eb2fa807700d97bd198c2ff67e5d0c954f94ca4fac7b8a3b855fe32e895d225"
+        "waived_reason_hash": "140499a17b9413209c96d812d39720eca6ef2ee174de783e75f15345fb79b7ed"
+      },
+      "obligation_id": {
+        "entry_key": "EntryKeyDto",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Transparent serde mirror for a task-contract catalogue-entry key (IN-07, AC-08)."
+        "citation": "Transparent serde mirror for a task-contract catalogue-entry key (IN-07, AC-08).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PhaseCommandInput",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-04"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PhaseCommandInput",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-04"
+          "element_id": "IN-04",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PhaseCommandInput"
       },
       "key": {
-        "waived_reason_hash": "23db180b32a6ea1e046ad4d069cfea395e98e289614f12ca0a26fa04e1cc7a67",
+        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36",
         "declaration_hash": "a12873bd615a6166a0c6efc27f2d23a7f3184a25f4a7077f4be345ea72060e9c",
-        "anchor_text_hash": "3a64b29a92e9e9eeaf1a9ea27e22587c95af88cf00d71369188fd9b70d334f36"
+        "waived_reason_hash": "23db180b32a6ea1e046ad4d069cfea395e98e289614f12ca0a26fa04e1cc7a67"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInput",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "\"role: Dto\"; \"methods: []\""
+        "citation": "\"role: Dto\"; \"methods: []\"",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PhaseCommandInput",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-02"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PhaseCommandInput",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-02"
+          "element_id": "AC-02",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PhaseCommandInput"
       },
       "key": {
-        "waived_reason_hash": "3f888eb72671ac4ebe8a9dbcd9412ac99f07011a5e34bb183a05f3eeb7e5cfe3",
+        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671",
         "declaration_hash": "a12873bd615a6166a0c6efc27f2d23a7f3184a25f4a7077f4be345ea72060e9c",
-        "anchor_text_hash": "edb4e92dab097edf9daf4986f7e535467ff8962fca5911e37dec2e1756d33671"
+        "waived_reason_hash": "3f888eb72671ac4ebe8a9dbcd9412ac99f07011a5e34bb183a05f3eeb7e5cfe3"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInput",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "PhaseCommandInput",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-03"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "PhaseCommandInput",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:AC-03"
+          "element_id": "AC-03",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "PhaseCommandInput"
       },
       "key": {
-        "waived_reason_hash": "1a3e8c32c98aa8135a381d82631b5b06a5020c1938d23a39938c169cdd302c29",
+        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22",
         "declaration_hash": "a12873bd615a6166a0c6efc27f2d23a7f3184a25f4a7077f4be345ea72060e9c",
-        "anchor_text_hash": "662507cdba412272dc1d8cf587557fa919ebb5e52af455c1bbb540f34b3b6a22"
+        "waived_reason_hash": "1a3e8c32c98aa8135a381d82631b5b06a5020c1938d23a39938c169cdd302c29"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandInput",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "methods: []"
+        "citation": "methods: []",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_codex"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:run_codex",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_claude"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:run_claude",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_local"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:run_local",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:check_approved"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:check_approved",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method"
+        "citation": "Aggregate review facade modified by removing its review-results method",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:classify"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:classify",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:files"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:files",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:validate_scope"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:validate_scope",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:get_briefing"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:get_briefing",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-15"
-        }
+          "element_id": "IN-15",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:persist_commit_hash"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "c143a521ed6bfa1bd0ab06da3da7b106697386a61480aadac3e7c9bb5bfd464a"
+        "item_identifier": "trait_method:persist_commit_hash",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_codex"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:run_codex",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "\"Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).\""
+        "citation": "\"Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).\"",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_claude"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:run_claude",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_local"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:run_local",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:check_approved"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:check_approved",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:classify"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:classify",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:files"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:files",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:validate_scope"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:validate_scope",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:get_briefing"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:get_briefing",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method"
+        "citation": "Aggregate review facade modified by removing its review-results method",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-18"
-        }
+          "element_id": "AC-18",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:persist_commit_hash"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "ae3f3e9dcbc8a8da06228b74249e421c66ccd9a00d23f9b57ccc4ed838818411"
+        "item_identifier": "trait_method:persist_commit_hash",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_codex"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:run_codex",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_claude"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:run_claude",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_local"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:run_local",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:check_approved"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:check_approved",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:classify"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:classify",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:files"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:files",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method"
+        "citation": "Aggregate review facade modified by removing its review-results method",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:validate_scope"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:validate_scope",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method"
+        "citation": "Aggregate review facade modified by removing its review-results method",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:get_briefing"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:get_briefing",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "IN-17"
-        }
+          "element_id": "IN-17",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:persist_commit_hash"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "cc2d99535477da6253015ecab300a93a44870be88be975ad820e1eb169cb9de3"
+        "item_identifier": "trait_method:persist_commit_hash",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_codex"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:run_codex",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_claude"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:run_claude",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:run_local"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:run_local",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:check_approved"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:check_approved",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "TraitEntry { action: Modify, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"run_codex\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_local\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"model\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"timeout_seconds\")), ty: TypeRef(\"u64\") }, ParamDeclaration { name: ParamName(Identifier(\"briefing_file\")), ty: TypeRef(\"Option<std::path::PathBuf>\") }, ParamDeclaration { name: ParamName(Identifier(\"prompt\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"group\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf>\") }], returns: TypeRef(\"ReviewRunLocalOutput\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"check_approved\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<ReviewApprovalOutput, ReviewCheckApprovedError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"classify\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: MethodName(Identifier(\"paths\")), ty: TypeRef(\"Vec<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<(String, String)>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"files\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<String>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"review_v2\"), Identifier(\"aggregate_service\")]) }"
+        "citation": "TraitEntry { action: Modify, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"run_codex\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_claude\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"input\")), ty: TypeRef(\"ReviewRunInput\") }], returns: TypeRef(\"Result<RunReviewOutput, RunReviewError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"run_local\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"model\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"timeout_seconds\")), ty: TypeRef(\"u64\") }, ParamDeclaration { name: ParamName(Identifier(\"briefing_file\")), ty: TypeRef(\"Option<std::path::PathBuf>\") }, ParamDeclaration { name: ParamName(Identifier(\"prompt\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"round_type\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"group\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf>\") }], returns: TypeRef(\"ReviewRunLocalOutput\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"check_approved\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<ReviewApprovalOutput, ReviewCheckApprovedError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"classify\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: MethodName(Identifier(\"paths\")), ty: TypeRef(\"Vec<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<(String, String)>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None }, MethodDeclaration { name: MethodName(Identifier(\"files\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"scope\")), ty: TypeRef(\"String\") }, ParamDeclaration { name: ParamName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }, ParamDeclaration { name: ParamName(Identifier(\"items_dir\")), ty: TypeRef(\"std::path::PathBuf\") }], returns: TypeRef(\"Result<Vec<String>, ReviewAuxError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"review_v2\"), Identifier(\"aggregate_service\")]) }",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:classify"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:classify",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService"
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:files"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:files",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:validate_scope"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:validate_scope",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:get_briefing"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:get_briefing",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
     {
       "edge_id": {
-        "entry_key": "ReviewService",
         "anchor_id": {
-          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json",
-          "element_id": "AC-20"
-        }
+          "element_id": "AC-20",
+          "file_path": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        "entry_key": "ReviewService"
+      },
+      "key": {
+        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3",
+        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
+        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371"
       },
       "obligation_id": {
         "entry_key": "ReviewService",
-        "obligation_kind": "result",
-        "item_identifier": "trait_method:persist_commit_hash"
-      },
-      "key": {
-        "waived_reason_hash": "0b86f47cd08ac4f81aee6f40ba5c47c25d1b63852c247afa44043aeb12bf2371",
-        "declaration_hash": "13b8efa5794280d298cce24be0cae655b27ce50b28daeaf1a0c4e14b6cdc1e18",
-        "anchor_text_hash": "e3cb318915f3affb6776d20ff22ad80a208b9a8ba90560e0e17e13414597a1a3"
+        "item_identifier": "trait_method:persist_commit_hash",
+        "obligation_kind": "result"
       },
       "verdict": {
-        "kind": "waived",
-        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20)."
+        "citation": "Aggregate review facade modified by removing its review-results method after that contract moved to the focused ReviewResultsService (IN-15, IN-17, AC-18, AC-20).",
+        "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
-  ]
+  ],
+  "track_id": "scope-conditional-pre-review-gates-2026-07-31"
 }

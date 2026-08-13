@@ -1,0 +1,282 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::telemetry::context::resolve_telemetry_track_id": {
+      "action": "add",
+      "docs": "Resolve a branch-bound track identifier from a validated items directory without performing telemetry file I/O.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Option<String>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "TelemetryConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TelemetryConfig",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsTelemetryEmitDynamicAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "FsTelemetryEmitDynamicAdapter",
+      "trait_ref": "usecase::telemetry::TelemetryEmitDynamicPort"
+    },
+    {
+      "for_type": "TelemetryReportSnapshot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TelemetryReportSnapshot",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TelemetryReport",
+      "trait_ref": "core::fmt::Debug"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "TelemetryConfig": {
+      "action": "modify",
+      "docs": "Resolved telemetry configuration loaded from environment variables at composition-root startup.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_env",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_enabled",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "archive_completion_uses_archive_sink",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "telemetry::config",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "FsTelemetryEmitDynamicAdapter": {
+      "action": "modify",
+      "docs": "Filesystem secondary adapter implementing active-track telemetry emission through TelemetryEmitDynamicPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "telemetry::report_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryReport": {
+      "action": "modify",
+      "docs": "Filesystem telemetry report reader whose aggregate method returns the layer-unique TelemetryReportSnapshot read model.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "aggregate",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TelemetryReportSnapshot, TelemetryReportError>"
+        }
+      ],
+      "module_path": "telemetry::report",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryReportOutput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "telemetry::report",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryReportSnapshot": {
+      "action": "add",
+      "docs": "Infrastructure read-model DTO produced by TelemetryReport::aggregate and converted by FsTelemetryReportAdapter into usecase::telemetry::TelemetryReportOutput.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_durations",
+              "ty": "Vec<PhaseDurationSummary>"
+            },
+            {
+              "name": "errors",
+              "ty": "Vec<TelemetryErrorEntry>"
+            },
+            {
+              "name": "hook_blocks",
+              "ty": "Vec<TelemetryHookBlockEntry>"
+            },
+            {
+              "name": "skipped_lines",
+              "ty": "usecase::telemetry::command_trace::TelemetrySkippedLineCount"
+            },
+            {
+              "name": "command_metrics",
+              "ty": "Vec<usecase::telemetry::command_trace::CommandExecutionMetric>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  }
+}

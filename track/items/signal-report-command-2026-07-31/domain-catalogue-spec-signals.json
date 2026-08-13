@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "ff2a8acf5d49f6b49c9b20e8b27a495696d78522c61f7356ef31521061d044db",
+  "signals": [
+    {
+      "type_name": "FilePath",
+      "signal": "blue",
+      "entry_hash": "346a7a731590997fc781cc48b1ea730dce47345fbec4a3cd728c33ca31409971"
+    },
+    {
+      "type_name": "NonEmptyString",
+      "signal": "blue",
+      "entry_hash": "db0318853470312add25825e32de0d693081c2f606973ce458b6703ff1f0c14b"
+    }
+  ]
+}

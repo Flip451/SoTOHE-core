@@ -34,6 +34,7 @@ pub mod render;
 pub mod review;
 pub mod semantic_dup;
 pub mod signal;
+pub mod signal_report;
 pub mod task_contract;
 pub mod telemetry;
 pub mod template_conventions;

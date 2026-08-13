@@ -63,12 +63,12 @@ mod tests {
 
     fn write_architecture_rules(root: &Path) {
         let rules = serde_json::json!({
-            "schema_version": 2,
+            "version": 2,
             "layers": [
                 {
                     "crate": "test_layer",
                     "path": "libs/test_layer",
-                    "dependencies": [],
+                    "may_depend_on": [],
                     "deny_reason": "",
                     "tddd": {
                         "enabled": true,

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5022c0a3b772ef070ce4194043419dcddd6d8a67696313c33c8ff5915b76341b",
+  "signals": [
+    {
+      "type_name": "DeriveTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "f80f8e84e281470871b2410b7b16b30145591b079865dddd2d7594cee8cbd604"
+    }
+  ]
+}
