@@ -1,0 +1,216 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "consumer-facing documentation は DeepSeek、GLM、Qwen の Codex custom provider 用 config.toml 例と、Anthropic 互換経路の per-subprocess 環境変数注入、delegate-in-host 非 redirect、Qwen の system-message gap を明記する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "各外部 provider の typed-pipeline 準拠は、verdict envelope と structured output を含めて検証されるまで、文書上で未検証として扱われる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "AC-05",
+      "text": "外部 provider への source code・briefing・diff 送信の可否は consumer が判断し、CI は data residency を強制せず、既定 profile は外部 provider を指さない。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "provider 固有の互換性、既知の制約、および typed-pipeline 準拠の未検証状態は consumer documentation で区別して伝える。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "CN-03",
+      "text": "data residency の採否は consumer-owned とし、template は外部 provider を既定化せず、CI enforcement を追加しない。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "capability profile から Codex custom model provider を選択可能にし、capability 単位の provider routing を拡張する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        }
+      ],
+      "id": "GO-02",
+      "text": "外部 provider の選択肢、設定方法、互換性の限界を consumer が data-residency 判断とともに理解して採用できるようにする。"
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "model_provider を利用する profile でも sotp の provider 名を codex に維持し、既存の typed-pipeline provider gate を変更しない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "DeepSeek、GLM、Qwen 向け Codex custom provider の config.toml 例と、Anthropic 互換経路の設定上の注意を consumer documentation として同梱する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "IN-04",
+        "text": "外部 provider 利用時の data residency 判断を consumer の責任として文書化し、外部 provider を選ばない既定 profile を維持する。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "OUT-01",
+        "text": "sotp が custom provider の存在、endpoint、認証、または provider 固有の意味論を検証・解釈することは対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "OUT-02",
+        "text": "sotp に各 provider の API client を直接実装することは対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "OUT-03",
+        "text": "global な環境変数 redirect を provider routing の正規経路として採用することは対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+          }
+        ],
+        "id": "OUT-04",
+        "text": "open weights の self-host provider 経路を実装または運用することは対象外とする。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 18,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "capability routing を Codex custom model provider へ拡張する",
+  "version": "1.0"
+}

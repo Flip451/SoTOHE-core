@@ -1,0 +1,69 @@
+{
+  "baseline_hash": "7a8262c3cece42efd579adb922bdd7c311dec6c62f48759b815d11dec3495c9e",
+  "declaration_hash": "090adf1c8024cc658257def8b67074fd78b7232734e51a2a9dd159264fa081e1",
+  "generated_at": "2026-08-13T19:51:49Z",
+  "head_commit": "7a78be80f6e08fe2d80825c096d1204a3c0027ef",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "type_name": "CapabilityInputValidationError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "CapabilityProfile"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "CapabilityProviderBinding"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "ModelProviderName"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "CapabilityProfilePort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "CapabilityProviderPort"
+    }
+  ]
+}

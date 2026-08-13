@@ -1,0 +1,36 @@
+{
+  "catalogue_declaration_hash": "090adf1c8024cc658257def8b67074fd78b7232734e51a2a9dd159264fa081e1",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "1f104bbb9c2833f8b5ad499ca572429f04896c8de5a999e5373abd3e8d2432f9",
+      "signal": "blue",
+      "type_name": "CapabilityInputValidationError"
+    },
+    {
+      "entry_hash": "d1aae5f485fc1455c63fc05f37588bde2931bc9f405c9188dcf1bdc52eccaf8b",
+      "signal": "blue",
+      "type_name": "CapabilityProfile"
+    },
+    {
+      "entry_hash": "a36f63c21531d0a39d74bcffe3f178cebb0f44958061f852638dad56e3bb6906",
+      "signal": "blue",
+      "type_name": "CapabilityProviderBinding"
+    },
+    {
+      "entry_hash": "4d67b5bdf7ea0487b711489658de091fbb917524f99d2a47ebe4bd9b270598f1",
+      "signal": "blue",
+      "type_name": "ModelProviderName"
+    },
+    {
+      "entry_hash": "dd8f1d8c4e9c4dd97c0cea19a555eba70fc391b41b2d752930636d292bda477a",
+      "signal": "blue",
+      "type_name": "CapabilityProfilePort"
+    },
+    {
+      "entry_hash": "9e42cca70944e9bc81a44ae7f126d160b753056c7e0b8f89b5eb75e2c37d663c",
+      "signal": "blue",
+      "type_name": "CapabilityProviderPort"
+    }
+  ]
+}

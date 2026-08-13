@@ -47,6 +47,388 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:18:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:11de712f05fa5a4fa81a1e2b3db6e790b125d12c1d71769e2665d4b4d40c0959",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:22:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:11de712f05fa5a4fa81a1e2b3db6e790b125d12c1d71769e2665d4b4d40c0959",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:07:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:10:39Z",
+          "findings": [
+            {
+              "category": "branch-wide consistency",
+              "file": ".harness/config/phase-commands.json",
+              "line": 17,
+              "message": "The shipped-config regression test in apps/cli/src/commands/phase.rs still uses include_str! on this file and asserts that spec-design has two pre-entry commands, including the removed adr final-review command. With the current one-command array, test_shipped_phase_commands_declare_direct_upstream_convergence_matrix will fail and block CI. Update that expectation to reflect the adjudicated interim configuration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:15:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f9b349d59758918e29445d0fa94076850aa92dbd7a8596f6facb87775f86af2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:14:29Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/task-contract.json",
+              "line": 4,
+              "message": "`CapabilityProfilePort` is an `action: reference` usecase catalogue entry but is absent from every task attribution (T001/T002 are the relevant convergence tasks). Reference entries still require an owner; the current document produces an `OrphanEntry` from `bin/sotp task-contract coverage`.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/task-contract.json",
+              "line": 4,
+              "message": "`CapabilityProviderPort` is an `action: reference` usecase catalogue entry but is absent from every task attribution (T001/T003 are the relevant convergence tasks). Reference entries still require an owner; the current document produces an `OrphanEntry` from `bin/sotp task-contract coverage`.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/batch-plan.json",
+              "line": 58,
+              "message": "B2 is avoidable serialization. In B1, T001 and T004 are initially ready; placing T001 first makes T002 and T003 ready in that same batch. Their targets do not overlap (`usecase::capability_exec`, `README.md`, agent-profile DTO/adapter files, and the Codex adapter), and the combined per-scope estimates remain within the 500-line ceiling: usecase 170, infrastructure 445, and harness-policy 90. T002 and T003 can therefore join B1 after T001.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f9b349d59758918e29445d0fa94076850aa92dbd7a8596f6facb87775f86af2a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:18:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9a40ad51ba1624b10b547c3444589cecccf8053d4b4c51c858af3fb0e68f4b96",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:23:42Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 12,
+              "message": "T002 names `infrastructure::agent_profiles::AgentProfilesCapabilityAdapter`, but that symbol does not exist there; its catalogue/source target is `infrastructure::capability_exec::agent_profiles::AgentProfilesCapabilityAdapter`, while the DTOs belong under `agent_profiles`. Correct the separate targets so the executor does not have to infer the task boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 30,
+              "message": "T004 bundles three independently verifiable documentation units while still `todo`: provider configuration and compatibility guidance (IN-03/AC-03), typed-pipeline verification status (CN-02/AC-04), and data-residency/default-profile policy (IN-04/CN-03/AC-05). Split these units into separately verifiable tasks and update their coverage, estimates, and batch membership.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9a40ad51ba1624b10b547c3444589cecccf8053d4b4c51c858af3fb0e68f4b96",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:31:44Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 30,
+              "message": "T004のdescriptionはAC-03の具体的なプロバイダー互換性・設定挙動を再記述しています。許可される形式（target + operation + anchor cite）に留め、上流契約の本文を重複させないでください。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 36,
+              "message": "T005のdescriptionはAC-04の「typed-pipeline未検証」および検証条件をそのまま行動契約として再記述しています。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 42,
+              "message": "T006のdescriptionはAC-05のデータレジデンシー、デフォルトプロファイル、CI/self-hosted routeの契約を再記述しています。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 69,
+              "message": "section.id `consumer-provider-guidance` のdescriptionはAC-03〜AC-05の互換性、検証状態、データレジデンシー方針を上流契約として再記述しています。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:431190f417a3d841393482cb0d11ba0cbc3f0035d98638a99ecaa6565365a17f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:37:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:919e3a42185fda6deb330456670df5552c340b0c30aebfa0b9b13220f22a1a99",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:41:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:919e3a42185fda6deb330456670df5552c340b0c30aebfa0b9b13220f22a1a99",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:07:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fdaef51c7cf9105474d0569b40318aed466b155c78932e40e38605689fcfc2ee",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:10:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fdaef51c7cf9105474d0569b40318aed466b155c78932e40e38605689fcfc2ee",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:35:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c767fc9321a8002b845dddf4a7fc33ee700b9de56758af88798a3348cf83cd3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:37:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c767fc9321a8002b845dddf4a7fc33ee700b9de56758af88798a3348cf83cd3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:59:32Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 185,
+              "message": "The `usecase::CapabilityInputValidationError` docs restate the fail-closed behavior contract instead of referring to the upstream anchor; keep the entry description to the changed type/variant and anchor cite per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 262,
+              "message": "The `usecase::CapabilityProfile` docs restate routing behavior and provider-identity preservation; this behavior belongs in the spec, while the catalogue docs should identify the changed field and cite the relevant anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 85,
+              "message": "The `infrastructure::AgentProfilesCapabilityAdapter` docs restate propagation behavior from trusted profiles; replace the behavioral prose with a concise change description plus anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 134,
+              "message": "The `infrastructure::CapabilityConfigDto` docs restate the typed-vs-raw configuration design rationale; catalogue docs must reference the upstream contract rather than reproduce it.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 243,
+              "message": "The `infrastructure::CodexCapabilityAdapter` docs restate the CLI emission and provider-preservation behavior; keep this entry to the changed adapter surface and anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 304,
+              "message": "The `infrastructure::ModelProviderNameDto` docs restate boundary conversion and raw-string avoidance rationale; describe the DTO surface and cite the upstream anchors instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0612921aeb13bef05fb5a01a2e457ddbd5c32a02fc19d042426cea56db51b1a9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:10:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0b52e97f07b73a12b5dc82651b56e8fdd5f8c22b9dec2bd346b78552d1c1e5ff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:18:43Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 84,
+              "message": "`infrastructure::AgentProfilesCapabilityAdapter` is declared `modify`, but the frozen rustdoc baseline already has the same private-field struct shape and the identical `new(PathBuf, PathBuf) -> Self` signature. Only existing port-method behavior is planned to change, so this TypeEntry does not describe a structural modification and is already blue before that work occurs. Declare the baseline-identical type/impl identity as `reference`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 242,
+              "message": "`infrastructure::CodexCapabilityAdapter` is declared `modify`, although its frozen-baseline shape and `new(PathBuf, PathBuf, Arc<dyn ProviderSessionCachePort>, Option<TrackId>) -> CodexCapabilityAdapter` signature are unchanged. The intended dispatch-body change is not a TypeEntry shape change, so this declaration cannot detect implementation progress; use `reference` for the baseline-identical type/impl identity.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 18,
+              "message": "`usecase::ModelProviderName::try_new` can structurally produce only `EmptyModelProviderName`, but its return type exposes all eight `CapabilityInputValidationError` variants. The method docs do not name the exact producible variant or justify that breadth, forcing callers to account for seven impossible cases. Use an operation-specific error or explicitly constrain the documented reachable subset.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 18,
+              "message": "`infrastructure::ModelProviderNameDto::try_new` merely delegates validation to `ModelProviderName::try_new`, so it likewise can produce only `EmptyModelProviderName` while exposing the eight-variant `CapabilityInputValidationError`. Its docs neither enumerate that sole reachable variant nor justify the broad error surface; narrow the error or document the precise subset.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0b52e97f07b73a12b5dc82651b56e8fdd5f8c22b9dec2bd346b78552d1c1e5ff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:26:34Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 277,
+              "message": "`usecase::CapabilityProfile` exposes `provider: ProviderName` and `model_provider: Option<ModelProviderName>` as independent public fields. This permits `model_provider: Some(...)` with a non-Codex provider, even though AC-02 requires profiles using `model_provider` to retain `provider = codex`. No constructor or enum enforces that relationship, so an invalid routing state is representable; encode the binding as a validated composite/enum or use private fields with a validating constructor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b7981357fe1b9481625b75d02ac6deed34eead1a5f64aaea738795700d402a7b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:40:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 278,
+              "message": "The `usecase::CapabilityProfile` docs restate the behavioral invariant that only `CodexCustom` may carry a custom provider. Keep the catalogue description to the changed shape and anchor citation per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 331,
+              "message": "The `usecase::CapabilityProviderBinding` docs restate variant behavior and the provider-pairing invariant. This behavior belongs upstream; the catalogue should identify the type and cite anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 114,
+              "message": "The `infrastructure::AgentProfilesCapabilityAdapter` docs restate the implementation's profile-mapping behavior despite being a baseline reference. Use a concise type/reference description with anchor citation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 163,
+              "message": "The `infrastructure::CapabilityConfigDto` docs restate deserialization flow and the downstream profile-construction behavior. Replace the behavioral prose with the changed surface and anchor citation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 264,
+              "message": "The `infrastructure::CapabilityProviderBindingDto` docs restate variant semantics and the custom-deserialization rejection rule. Catalogue docs must reference the upstream behavior rather than reproduce it.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 319,
+              "message": "The `infrastructure::CodexCapabilityAdapter` docs restate dispatch behavior while declaring a baseline reference. Keep the description limited to the reference surface and anchor citation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ce10b58320765af3a1936c68c8f6e784a10434beac26f501cc7e1478029b83f8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:54:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42adf7451d59f88a1ecf63d79cf5ca35970811d8413ecfac07fd6a2fdb83b7a1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:01:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42adf7451d59f88a1ecf63d79cf5ca35970811d8413ecfac07fd6a2fdb83b7a1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }
