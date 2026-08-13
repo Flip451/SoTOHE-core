@@ -2161,6 +2161,35 @@
           "hash": "rvw1:sha256:3501e7e3a880f53f800cba9c735f03b37e776a517aa65c4090a3b7012a1a230d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T13:51:19Z",
+          "findings": [
+            {
+              "category": "command wiring breakage",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 9,
+              "message": "The promised manual recapture is not executable through the named surface. `bin/sotp track baseline-capture` is first-write-wins and skips existing baseline files, while a failed baseline replacement can leave the prior stale files in place. This workflow neither removes/replaces them through a sanctioned surface nor provides an allowed way to resolve and check out the exact merged commit; the adapters prohibit direct Git/filesystem recovery. The cleanup-failure path can therefore sync views from stale baselines. Define an allowed end-to-end exact-commit baseline replacement sequence or guarded recovery command before Step 2.",
+              "severity": "P1"
+            },
+            {
+              "category": "workflow state inconsistency",
+              "file": ".harness/workflows/track/recover.md",
+              "line": 53,
+              "message": "The cleanup-failure exception is not propagated through the rest of the workflow. Step 2 still says the merge itself replaced the baselines, later instructions categorically prohibit cleanup, and the output contract says both artifacts were already refreshed by the merge. Those statements are false for `ConflictedCleanupFailed`, where lines 9 and 115 require manual cleanup. Scope every successful-cleanup assertion consistently and make the failure-path output record the manual baseline/view recovery.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1a89993cdbc112e4c1bdd5c446be71393d4c04df9cb28c583ae1133edf7b679f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T13:53:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:745ded9df4f9ae52c8f95232cddf5cc2f08ea93bb2b16d70fde2aaaaae4fec82",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

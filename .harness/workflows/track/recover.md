@@ -6,6 +6,8 @@
 
 Recover an active track after `bin/sotp track merge-base` reports a conflict. The orchestrator coordinates resolution through each artifact's designated owner, then drives the normal review and guarded-commit lanes. A conflicted merge already replaced the type baselines from the exact merged base commit and regenerated the derived views (cleanup-state ADR D3); this workflow does not repeat either cleanup stage.
 
+**Cleanup-failure entry.** When the merge instead reported `cleanup failed` (`ConflictedCleanupFailed`), the cleanup stages did NOT complete, and every statement in this workflow that assumes replaced baselines or regenerated views does not yet hold. Per cleanup-state ADR D3 the failure is reported only and recovery is manual and operator-owned: the orchestrator stops here and reports the failure to the user; it does not attempt filesystem or VCS recovery itself, and no agent-invocable surface performs it (the baseline-capture surface is first-write-wins and does not replace retained stale files). The operator completes both stages by hand — replacing the type baselines from the exact merged base commit in a separate checkout and regenerating the views with `bin/sotp track views sync` — and confirms completion; only then does the rest of this workflow, pre-gates included, apply.
+
 ## Inputs
 
 - **Current branch** — must be the active `track/<id>` branch with a merge conflict left by `bin/sotp track merge-base`.
@@ -49,8 +51,9 @@ mode may resolve existing hunks and regenerate derived artifacts only, never mea
 placeholders. Do not claim SoT convergence during preparation. After upstream reconvergence,
 invoke the same writer in normal mode. Base-induced signal drift is not a gate-bypass case: the
 conflicted guarded merge itself already replaced the type baselines from the exact merged base
-commit (cleanup-state ADR D3), so the normal pre-gates and the canonical review workflow apply
-throughout the recovery. If the pre-gates still cannot pass, retain the conflict and fail closed.
+commit (cleanup-state ADR D3) — or, after a reported cleanup failure, the operator has completed
+that replacement per the cleanup-failure entry — so the normal pre-gates and the canonical review
+workflow apply throughout the recovery. If the pre-gates still cannot pass, retain the conflict and fail closed.
 
 Whenever direct hunk selection or a `conflict-preparation` dispatch touches an ADR, immediately
 dispatch `adr-diagnoser` for the lifecycle-specific two-box verdict required by
@@ -110,6 +113,7 @@ branch.
 ## Failure / recovery
 
 - **No conflicted guarded-merge context**: stop and report that recovery is not authorized for the current worktree.
+- **Merge reported `cleanup failed`**: stop and escalate to the user per the cleanup-failure entry above; the operator completes both cleanup stages manually before any pre-gate or Step 2 work runs, and the recovery report records that the baselines and views were manually recovered.
 - **Parseability preparation failure**: retain the conflict; do not launch a scoped review or descend to a downstream writer.
 - **Resolution or verification failure**: retain the conflict for correction; do not claim completion and do not run the merge cleanup stages.
 - **Designated writer or regeneration failure**: retain the conflict and use that surface's failure route; do not substitute an orchestrator edit.
@@ -120,4 +124,4 @@ branch.
 
 - A conflict resolution that has passed the normal verification and review gates.
 - A guarded commit and its normal repository note.
-- No cleanup from this workflow; the type baselines and derived views were already refreshed by the conflicted merge itself.
+- No cleanup from this workflow; the type baselines and derived views were already refreshed by the conflicted merge itself — or, after a reported cleanup failure, by the operator's manual recovery, which the recovery report records.
