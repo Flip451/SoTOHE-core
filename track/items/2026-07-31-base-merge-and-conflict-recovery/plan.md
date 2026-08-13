@@ -6,7 +6,7 @@
 GO-01 → T001–T004, T010, T011, T013, T014, T020, T023, T025, and T026.
 GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, T022, T024, T025, and T026.
 
-## Tasks (25/26 resolved)
+## Tasks (26/26 resolved)
 
 ### S1 — Guarded base merge
 
@@ -117,4 +117,4 @@ GO-02 → T005–T009, T012, T015, T016, T017, T018, T019, T021, T022, T024, T02
 
 > Update the T026 targets across the base-merge, type-signals, merge-gate, CLI-driver, and recovery-workflow surfaces; delete the obsolete sync-base modules; add focused regression coverage. IN-02; IN-05; CN-01; CN-03; CN-04; CN-05; CN-07; AC-03; AC-04; AC-07; AC-08; AC-09; AC-10; AC-12.
 
-- [ ] **T026**: Update `libs/usecase/src/base_merge.rs`; `libs/infrastructure/src/base_merge.rs` and `base_merge/{publication,recovery,view_transaction,baseline_support}.rs` for stamp removal, cleanup staging, and report-only publish failure; delete `libs/infrastructure/src/base_merge/{sync_base.rs,sync_base_record.rs}`; update `libs/infrastructure/src/tddd/type_signals_evaluator.rs` and `type_signals_evaluator/{freshness,inputs}.rs` for `TypeSignalsReuseInput` and `decide_type_signals_reuse`; update `libs/infrastructure/src/impl_catalog_signal_reader.rs` for read content binding; update `libs/infrastructure/src/{verify/merge_gate_freshness.rs,merge_gate_adapter.rs}`, `libs/usecase/src/merge_gate.rs`, `apps/cli-driver/src/track.rs`, and `.harness/workflows/track/recover.md` for evaluation-commit binding; add focused regression coverage. IN-02; IN-05; CN-01; CN-03; CN-04; CN-05; CN-07; AC-03; AC-04; AC-07; AC-08; AC-09; AC-10; AC-12.
+- [x] **T026**: Update `libs/usecase/src/base_merge.rs`; `libs/infrastructure/src/base_merge.rs` and `base_merge/{publication,recovery,view_transaction,baseline_support}.rs` for stamp removal, cleanup staging, and report-only publish failure; delete `libs/infrastructure/src/base_merge/{sync_base.rs,sync_base_record.rs}`; update `libs/infrastructure/src/tddd/type_signals_evaluator.rs` and `type_signals_evaluator/{freshness,inputs}.rs` for `TypeSignalsReuseInput` and `decide_type_signals_reuse`; update `libs/infrastructure/src/impl_catalog_signal_reader.rs` for read content binding; update `libs/infrastructure/src/{verify/merge_gate_freshness.rs,merge_gate_adapter.rs}`, `libs/usecase/src/merge_gate.rs`, `apps/cli-driver/src/track.rs`, and `.harness/workflows/track/recover.md` for evaluation-commit binding; add focused regression coverage. IN-02; IN-05; CN-01; CN-03; CN-04; CN-05; CN-07; AC-03; AC-04; AC-07; AC-08; AC-09; AC-10; AC-12. (`90fbbc38a1928cd66c1a22b8fb014c52e455eb69`)
