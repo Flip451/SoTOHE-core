@@ -360,18 +360,20 @@ impl GitStashPort for FsGitStashAdapter {
         if !output.status.success() {
             return Err(command_failure(&args, &output).into());
         }
-        let after_refs = branch_ref_snapshot(&repo)?;
-        if before_refs != after_refs {
-            return Err(GitStashPushError::ForbiddenBranchRefUpdate);
-        }
         let after_stash = stash_ref_snapshot(&repo)?;
         let outcome = if before_stash == after_stash {
             GitStashPushOutcome::NothingToStash
         } else {
             created_stash_outcome(&after_stash)?
         };
+        // Persist the pairing record before the ref comparison so a drift
+        // failure never leaves a created stash without its pop pairing.
         let record = StashRecord::new(outcome);
         persist_record(&repo, &record)?;
+        let after_refs = branch_ref_snapshot(&repo)?;
+        if before_refs != after_refs {
+            return Err(GitStashPushError::ForbiddenBranchRefUpdate);
+        }
         Ok(record.outcome.clone())
     }
 
@@ -445,6 +447,17 @@ mod tests {
         String::from_utf8(result.stdout).expect("git output must be UTF-8")
     }
 
+    #[cfg(unix)]
+    fn write_executable(path: &Path, body: &str) {
+        use std::os::unix::fs::PermissionsExt;
+
+        fs::write(path, body).expect("hook must be written");
+        let mut permissions =
+            fs::metadata(path).expect("hook metadata must be readable").permissions();
+        permissions.set_mode(0o755);
+        fs::set_permissions(path, permissions).expect("hook must be executable");
+    }
+
     fn record_path(root: &Path) -> PathBuf {
         let common_dir = PathBuf::from(
             output(root, &["rev-parse", "--path-format=absolute", "--git-common-dir"]).trim(),
@@ -507,6 +520,40 @@ mod tests {
                 .lines()
                 .any(|line| line == expected.as_ref()),
             "the paired stash OID must remain independently addressable"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_fs_git_stash_adapter_branch_ref_drift_after_push_retains_pairing_record() {
+        let repo = init_repo();
+        fs::write(repo.path().join("tracked.txt"), "saved\n")
+            .expect("stash change must be written");
+        let hooks = repo.path().join(".githooks");
+        fs::create_dir_all(&hooks).expect("hook directory must be created");
+        write_executable(
+            &hooks.join("reference-transaction"),
+            "#!/bin/sh\nset -eu\nif [ \"$1\" = committed ] && ! git show-ref --verify --quiet refs/heads/stash-drift; then\n    git update-ref refs/heads/stash-drift HEAD\nfi\n",
+        );
+        run_git(repo.path(), &["config", "core.hooksPath", ".githooks"]);
+
+        let _cwd = CurrentDirGuard::enter(repo.path());
+        let adapter = FsGitStashAdapter::new();
+        let error = adapter.push().expect_err("branch-ref drift must fail closed");
+
+        assert!(matches!(error, GitStashPushError::ForbiddenBranchRefUpdate));
+        let repository = SystemGitRepo::discover().expect("repository must be discoverable");
+        let state_dir = stash_state_dir(&repository).expect("state directory must be readable");
+        let persisted = stash_record::read(&state_dir)
+            .expect("pairing record must be readable")
+            .expect("created stash must retain its pairing record");
+        assert!(matches!(persisted.outcome, GitStashPushOutcome::Created(_)));
+        assert!(record_path(repo.path()).is_file(), "the pairing record must be retained");
+        assert!(
+            output(repo.path(), &["show-ref", "--verify", "refs/heads/stash-drift"])
+                .lines()
+                .any(|line| line.ends_with("refs/heads/stash-drift")),
+            "the hook must create the branch-ref drift"
         );
     }
 

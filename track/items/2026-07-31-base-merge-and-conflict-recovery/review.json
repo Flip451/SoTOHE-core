@@ -7706,6 +7706,28 @@
           "hash": "rvw1:sha256:c2a70065bf19959240500d26aa8b05bbe7809c01cf8724410adc01476d0e2f98",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T00:33:47Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/git_cli/stash_adapter.rs",
+              "line": 372,
+              "message": "This behavioral fix is untested: no adapter test forces branch-ref drift after `git stash push` and verifies that `push()` returns `ForbiddenBranchRefUpdate` while retaining the pairing record. The existing tests cover only unchanged-ref success paths, so moving persistence back after validation could again orphan a created stash without failing tests. Add a focused regression for this error path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:48a6b246b5a1672fc4da05111ce9eb9a5643f0eb545d1fbca0e33a7ead96d268",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T00:41:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3fa6e6b35bf74b852d16d75fe4ada531ac22cb27ea019f7f85e573f2b756186c",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
