@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Amend `.harness/workflows/adr/add.md` `Conduct the hearing` Full-hearing sequence with the D1 check. [D1; IN-01; CN-01; AC-01; AC-03]",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Amend `.harness/custom/review-prompts/adr.md` `What to report` criteria with the D1 check. [D1; IN-01; CN-01; AC-01; AC-03]",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Amend `.harness/custom/review-prompts/types.md` reviewer criteria with the D2 check. [D2; IN-02; CN-02; AC-02]",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Amend `.harness/custom/review-prompts/impl-plan.md` reviewer criteria with the D2 check. [D2; IN-02; CN-02; AC-02]",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01 → T001, T002, T003, T004."
+    ],
+    "sections": [
+      {
+        "id": "d1-authoring-and-adr-review",
+        "title": "D1 authoring and ADR review surfaces",
+        "description": [
+          "Amend the Full-hearing workflow and ADR review briefing. [D1; IN-01; CN-01; AC-01; AC-03]"
+        ],
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "id": "d2-plan-and-types-review",
+        "title": "D2 plan and types review surfaces",
+        "description": [
+          "Amend the types and impl-plan review briefings. [D2; IN-02; CN-02; AC-02]"
+        ],
+        "task_ids": [
+          "T003",
+          "T004"
+        ]
+      }
+    ]
+  }
+}
