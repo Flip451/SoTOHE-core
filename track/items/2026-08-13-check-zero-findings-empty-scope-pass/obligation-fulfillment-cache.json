@@ -1,4 +1,211 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_empty_scope_state_returns_empty_scope_success"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "ae1039b60c52cd768a745390960c87e53d883e76d2ce63b43880b28d69a77a6d",
+        "bound_tests_set_hash": "13e01fe65eefb4f720e4c708628b2fc0b7f4b2568972bbb4d00414b1247f964a",
+        "declaration_hash": "16e438adee6b67153e62df07286be892346d0be106629ed6200660dffa26ac3f"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(outcome, ReviewCheckZeroFindingsOutcome::EmptyScope);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_empty_scope_success"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "a878a520507c58b21cc8f21a8bc47414d1a9eba85d1652cfd793015441dea43e",
+        "bound_tests_set_hash": "6fca6cb653ac9afe41e35ec8938374c2674a29e03d6ed26ac4fd54aab54287dd",
+        "declaration_hash": "16e438adee6b67153e62df07286be892346d0be106629ed6200660dffa26ac3f"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(command_outcome.exit_code, 0, \"{command_outcome:?}\");\n        assert!(command_outcome.stdout.as_deref().is_some_and(|message| {\n            message.contains(\"empty\") && message.contains(\"no final review verdict is required\")\n        }));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_non_passing_review_states_are_preserved"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "36e5da3fb9999b9ada3c4ced19fcf0eaceacff9048738a4998cec7df8070f9c2",
+        "bound_tests_set_hash": "6d3b2111fa8f247f399a57954437ac0928df1b068d1e1c1eeb2dbc48d2a6872b",
+        "declaration_hash": "16e438adee6b67153e62df07286be892346d0be106629ed6200660dffa26ac3f"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_ne!(outcome.exit_code, 0);\nassert!(outcome.stderr.is_some());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_empty_scope_state_returns_empty_scope_success"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "e9e63e1abf0b9861c31b4805d76c571567587fce854133c01bacc24e330e2dce",
+        "bound_tests_set_hash": "13e01fe65eefb4f720e4c708628b2fc0b7f4b2568972bbb4d00414b1247f964a",
+        "declaration_hash": "16e438adee6b67153e62df07286be892346d0be106629ed6200660dffa26ac3f"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let outcome = interactor.check_zero_findings(&query()).unwrap();\n\n        assert_eq!(outcome, ReviewCheckZeroFindingsOutcome::EmptyScope);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_empty_scope_state_returns_empty_scope_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_non_passing_review_states_are_preserved"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "b76e54b62e89c56544e0cb3af74c1d5d783c75febe1227a44c10740cde7ca881",
+        "bound_tests_set_hash": "01ba466c4ddfe35587e86f9562cd145563be112bc9c44ecd596a7937f7cd7511",
+        "declaration_hash": "16e438adee6b67153e62df07286be892346d0be106629ed6200660dffa26ac3f"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(outcome, ReviewCheckZeroFindingsOutcome::EmptyScope);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_empty_scope_returns_success_with_explicit_message"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "a3640959339cbe5fc5e60fee69ca25a98fd9edbaa3707fb3787c6a37748c42eb",
+        "bound_tests_set_hash": "c91a0958c63f1e4a6df14f564f5f7ec3560affdf0cf9653f33db17722130991a",
+        "declaration_hash": "16e438adee6b67153e62df07286be892346d0be106629ed6200660dffa26ac3f"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "outcome.stdout.as_deref(),\n            Some(\"review scope is empty; no final review verdict is required\")",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ],
   "track_id": "2026-08-13-check-zero-findings-empty-scope-pass"
 }

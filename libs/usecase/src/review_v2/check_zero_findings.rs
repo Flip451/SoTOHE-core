@@ -48,6 +48,7 @@ impl ReviewCheckZeroFindingsQuery {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ReviewCheckZeroFindingsOutcome {
     CurrentFinalZeroFindings,
+    EmptyScope,
     MissingFinalVerdict,
     StaleFinalVerdict,
     FindingsRemain,
@@ -139,9 +140,11 @@ impl ReviewCheckZeroFindingsService for ReviewCheckZeroFindingsInteractor {
             Some(ReviewState::Required(RequiredReason::FindingsRemain)) => {
                 Ok(ReviewCheckZeroFindingsOutcome::FindingsRemain)
             }
-            Some(ReviewState::Required(RequiredReason::NotStarted))
-            | Some(ReviewState::NotRequired(NotRequiredReason::Empty)) => {
+            Some(ReviewState::Required(RequiredReason::NotStarted)) => {
                 Ok(ReviewCheckZeroFindingsOutcome::MissingFinalVerdict)
+            }
+            Some(ReviewState::NotRequired(NotRequiredReason::Empty)) => {
+                Ok(ReviewCheckZeroFindingsOutcome::EmptyScope)
             }
             None => Ok(ReviewCheckZeroFindingsOutcome::MissingFinalVerdict),
         }
@@ -192,6 +195,17 @@ mod tests {
         let outcome = interactor.check_zero_findings(&query()).unwrap();
 
         assert_eq!(outcome, ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings);
+    }
+
+    #[test]
+    fn test_check_zero_findings_empty_scope_state_returns_empty_scope_success() {
+        let interactor = ReviewCheckZeroFindingsInteractor::new(Arc::new(StubStatePort::State(
+            Some(ReviewState::NotRequired(NotRequiredReason::Empty)),
+        )));
+
+        let outcome = interactor.check_zero_findings(&query()).unwrap();
+
+        assert_eq!(outcome, ReviewCheckZeroFindingsOutcome::EmptyScope);
     }
 
     #[test]

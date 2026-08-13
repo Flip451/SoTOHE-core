@@ -1,41 +1,45 @@
 {
-  "schema_version": 2,
-  "tasks": [
-    {
-      "id": "T1",
-      "description": "Modify the `EmptyScope` outcome in `libs/usecase/src/review_v2/check_zero_findings.rs`; deliver it from `apps/cli-driver/src/review.rs`; and update focused usecase, driver, and composition regressions. [IN-01; OS-01; OS-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T2",
-      "description": "Verify that `.harness/config/phase-commands.json` declares the spec-design pre-entry command `check-zero-findings --scope adr --round final`. [IN-02; OS-03; AC-04]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T1"]
-    }
-  ],
   "plan": {
-    "summary": [
-      "GO-01: T1-T2."
-    ],
     "sections": [
       {
-        "id": "empty-scope-outcome-and-delivery",
-        "title": "Empty-scope outcome and command delivery",
-          "description": [
+        "description": [
           "Modify the `EmptyScope` outcome in `libs/usecase/src/review_v2/check_zero_findings.rs`; deliver it from `apps/cli-driver/src/review.rs`; and update focused usecase, driver, and composition regressions. [IN-01; OS-01; OS-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03]"
         ],
-        "task_ids": ["T1"]
+        "id": "empty-scope-outcome-and-delivery",
+        "task_ids": [
+          "T1"
+        ],
+        "title": "Empty-scope outcome and command delivery"
       },
       {
-        "id": "restore-spec-design-pre-entry",
-        "title": "Restore the spec-design pre-entry declaration",
         "description": [
           "Verify that `.harness/config/phase-commands.json` declares the spec-design pre-entry command `check-zero-findings --scope adr --round final`. [IN-02; OS-03; AC-04]"
         ],
-        "task_ids": ["T2"]
+        "id": "restore-spec-design-pre-entry",
+        "task_ids": [
+          "T2"
+        ],
+        "title": "Restore the spec-design pre-entry declaration"
       }
+    ],
+    "summary": [
+      "GO-01: T1-T2."
     ]
-  }
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "description": "Modify the `EmptyScope` outcome in `libs/usecase/src/review_v2/check_zero_findings.rs`; deliver it from `apps/cli-driver/src/review.rs`; and update focused usecase, driver, and composition regressions. [IN-01; OS-01; OS-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03]",
+      "id": "T1",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T1"
+      ],
+      "description": "Verify that `.harness/config/phase-commands.json` declares the spec-design pre-entry command `check-zero-findings --scope adr --round final`. [IN-02; OS-03; AC-04]",
+      "id": "T2",
+      "status": "done"
+    }
+  ]
 }

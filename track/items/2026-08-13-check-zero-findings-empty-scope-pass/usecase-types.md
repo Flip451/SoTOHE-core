@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ReviewCheckZeroFindingsOutcome | enum | modify | CurrentFinalZeroFindings, EmptyScope, MissingFinalVerdict, StaleFinalVerdict, FindingsRemain | 🟡 | 🔵 |
+| ReviewCheckZeroFindingsOutcome | enum | modify | CurrentFinalZeroFindings, EmptyScope, MissingFinalVerdict, StaleFinalVerdict, FindingsRemain | 🔵 | 🔵 |
 
