@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-13T16:43:11Z",
+          "findings": [
+            {
+              "category": "scope leakage into ADR body",
+              "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md",
+              "line": 53,
+              "message": "ADRが未定義のトラック内識別子「G24実装」を参照し、上流のADRから将来の実装成果物へ逆方向の依存を作っています。G24への言及を削除するか、永続的なADR上の設計決定として参照してください（同じ問題がReassess Whenにもあります）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7b8189a00cc86b2135d76868b02de67fa78a15b7ddf9bda9b12a4a5871d3a9b8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T16:48:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5a7204daa9d0d41e957417a892268e2b30f929177c859036b3b333de66b2d1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T16:51:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5a7204daa9d0d41e957417a892268e2b30f929177c859036b3b333de66b2d1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:00:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1cf25ba399627ca714108bad453616ee52410401f1482f383937af86027aa1d2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:02:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1cf25ba399627ca714108bad453616ee52410401f1482f383937af86027aa1d2",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
