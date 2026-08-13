@@ -1,79 +1,73 @@
 {
-  "schema_version": 2,
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "Modify `usecase::capability_exec::{ModelProviderName, CapabilityProviderBinding, CapabilityProfile, CapabilityInputValidationError}` and unit coverage. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "Modify `infrastructure::agent_profiles::{ModelProviderNameDto, CapabilityProviderBindingDto, CapabilityConfigDto}` and `infrastructure::capability_exec::agent_profiles::AgentProfilesCapabilityAdapter`; add coverage. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": [
-        "T001"
-      ]
-    },
-    {
-      "id": "T003",
-      "description": "Modify `infrastructure::capability_exec::codex::CodexCapabilityAdapter` and dispatch coverage. [IN-01; IN-02; OUT-02; CN-01; AC-01; AC-02]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": [
-        "T001"
-      ]
-    },
-    {
-      "id": "T004",
-      "description": "Modify `README.md` documentation. [IN-03; OUT-03; CN-02; AC-03]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T005",
-      "description": "Modify `README.md` documentation. [CN-02; AC-04]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T006",
-      "description": "Modify `README.md` documentation. [IN-04; OUT-04; CN-03; AC-05]",
-      "status": "todo",
-      "commit_hash": null
-    }
-  ],
   "plan": {
-    "summary": [
-      "GO-01 -> T001, T002, T003.",
-      "GO-02 -> T004, T005, T006."
-    ],
     "sections": [
       {
-        "id": "typed-routing-binding",
-        "title": "Typed routing binding",
         "description": [
           "Modify `usecase::capability_exec` and `infrastructure::capability_exec`. [IN-01; IN-02; CN-01; AC-01; AC-02]"
         ],
+        "id": "typed-routing-binding",
         "task_ids": [
           "T001",
           "T002",
           "T003"
-        ]
+        ],
+        "title": "Typed routing binding"
       },
       {
-        "id": "consumer-provider-guidance",
-        "title": "Consumer provider guidance",
         "description": [
           "Modify `README.md` documentation. [IN-03; IN-04; CN-02; CN-03; AC-03; AC-04; AC-05]"
         ],
+        "id": "consumer-provider-guidance",
         "task_ids": [
           "T004",
           "T005",
           "T006"
-        ]
+        ],
+        "title": "Consumer provider guidance"
       }
+    ],
+    "summary": [
+      "GO-01 -> T001, T002, T003.",
+      "GO-02 -> T004, T005, T006."
     ]
-  }
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "description": "Modify `usecase::capability_exec::{ModelProviderName, CapabilityProviderBinding, CapabilityProfile, CapabilityInputValidationError}` and unit coverage. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T001"
+      ],
+      "description": "Modify `infrastructure::agent_profiles::{ModelProviderNameDto, CapabilityProviderBindingDto, CapabilityConfigDto}` and `infrastructure::capability_exec::agent_profiles::AgentProfilesCapabilityAdapter`; add coverage. [IN-01; IN-02; OUT-01; CN-01; AC-01; AC-02]",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T001"
+      ],
+      "description": "Modify `infrastructure::capability_exec::codex::CodexCapabilityAdapter` and dispatch coverage. [IN-01; IN-02; OUT-02; CN-01; AC-01; AC-02]",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "description": "Modify `README.md` documentation. [IN-03; OUT-03; CN-02; AC-03]",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "description": "Modify `README.md` documentation. [CN-02; AC-04]",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "description": "Modify `README.md` documentation. [IN-04; OUT-04; CN-03; AC-05]",
+      "id": "T006",
+      "status": "todo"
+    }
+  ]
 }

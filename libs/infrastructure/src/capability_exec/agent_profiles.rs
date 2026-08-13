@@ -41,11 +41,12 @@ impl CapabilityProfilePort for AgentProfilesCapabilityAdapter {
                 "only orchestrator-output capabilities are eligible for generic dispatch",
             ));
         }
+        let provider = config.provider_binding().clone().into_domain();
         match profiles
             .resolve_execution(capability, RoundType::Final)
             .map_err(|error| execution_profile_error(capability, error))?
         {
-            ResolvedExecution::ProviderCli { provider, model, effort } => {
+            ResolvedExecution::ProviderCli { model, effort, .. } => {
                 Ok(CapabilityProfile { provider, model, effort, execution_mode })
             }
             ResolvedExecution::HostedService { .. } => Err(profile_error_message(
@@ -409,7 +410,9 @@ mod tests {
     use std::fs;
 
     use super::*;
-    use usecase::capability_exec::{CapabilityExecError, CapabilityProfilePort, ReasoningEffort};
+    use usecase::capability_exec::{
+        CapabilityExecError, CapabilityProfilePort, CapabilityProviderBinding, ReasoningEffort,
+    };
 
     fn resolve_profile(
         contents: &str,
@@ -445,8 +448,44 @@ mod tests {
         )
         .expect("explicit profile resolves");
 
-        assert_eq!(profile.provider.as_str(), "codex");
+        assert!(matches!(
+            profile.provider,
+            CapabilityProviderBinding::Standard(provider) if provider.as_str() == "codex"
+        ));
         assert_eq!(profile.model.as_str(), "gpt-5.6-terra");
+        assert_eq!(profile.effort, ReasoningEffort::High);
+    }
+
+    #[test]
+    fn test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port() {
+        let profile = resolve_profile(
+            r#"{
+                "schema_version": 1,
+                "providers": {
+                    "codex": {
+                        "label": "Codex CLI",
+                        "supported_reasoning_efforts": ["high"]
+                    }
+                },
+                "capabilities": {
+                    "implementer": {
+                        "provider": "codex",
+                        "model_provider": "deepseek",
+                        "model": "deepseek-chat",
+                        "reasoning_effort": "high",
+                        "execution_mode": "orchestrator-output"
+                    }
+                }
+            }"#,
+        )
+        .expect("custom provider profile resolves");
+
+        assert!(matches!(
+            profile.provider,
+            CapabilityProviderBinding::CodexCustom(model_provider)
+                if model_provider.as_str() == "deepseek"
+        ));
+        assert_eq!(profile.model.as_str(), "deepseek-chat");
         assert_eq!(profile.effort, ReasoningEffort::High);
     }
 

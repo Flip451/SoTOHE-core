@@ -1,1 +1,689 @@
-{"track_id": "2026-08-13-multi-provider-capability-routing", "records": []}
+{
+  "track_id": "2026-08-13-multi-provider-capability-routing",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_whitespace_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_valid_value_preserved"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_whitespace_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_valid_value_preserved"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityInputValidationError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_whitespace_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_valid_value_preserved"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_custom_model_provider_adds_only_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_profile_valid_values_retained"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_standard_binding_omits_model_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProfile",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_custom_model_provider_adds_only_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBinding",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_provider_binding_standard_retains_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_provider_binding_codex_custom_retains_model_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBinding",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_provider_binding_codex_custom_retains_model_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBinding",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_provider_binding_codex_custom_retains_model_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_custom_model_provider_adds_only_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBinding",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_provider_binding_standard_retains_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_standard_binding_omits_model_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBinding",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_provider_binding_codex_custom_retains_model_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_custom_model_provider_adds_only_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ModelProviderName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_whitespace_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_valid_value_preserved"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ModelProviderName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_whitespace_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_valid_value_preserved"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_custom_model_provider_adds_only_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ModelProviderName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_whitespace_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_model_provider_name_valid_value_preserved"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_codex_custom_binding_selects_codex_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_custom_model_provider_adds_only_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_dispatches_native_skill_with_profile_model_and_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::codex::tests",
+          "test_name": "test_codex_capability_adapter_custom_model_provider_adds_only_provider_config"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_codex_model_provider_decodes_to_custom_binding"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_codex_model_provider_decodes_to_custom_binding"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_without_model_provider_decodes_to_standard_binding"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_resolve_explicit_effort_returns_typed_profile"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityConfigDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_empty_model_provider_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_codex_model_provider_decodes_to_custom_binding"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBindingDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_provider_binding_dto_converts_to_codex_custom_binding"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBindingDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_resolve_execution_codex_custom_binding_keeps_codex_provider"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBindingDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_provider_binding_dto_converts_to_codex_custom_binding"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBindingDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_without_model_provider_decodes_to_standard_binding"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityProviderBindingDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_provider_binding_dto_converts_to_codex_custom_binding"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_model_provider_name_dto_accepts_arbitrary_non_empty_value_without_interpretation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_empty_model_provider_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ModelProviderNameDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_model_provider_name_dto_accepts_arbitrary_non_empty_value_without_interpretation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ModelProviderNameDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_model_provider_name_dto_accepts_arbitrary_non_empty_value_without_interpretation"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_model_provider_name_dto_deserialization_rejects_empty_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::agent_profiles::tests",
+          "test_name": "test_agent_profiles_adapter_resolves_codex_custom_binding_through_profile_port"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ModelProviderNameDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_model_provider_name_dto_try_new_rejects_whitespace"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_capability_config_empty_model_provider_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::agent_profiles::tests",
+          "test_name": "test_model_provider_name_dto_accepts_arbitrary_non_empty_value_without_interpretation"
+        }
+      ]
+    }
+  ]
+}

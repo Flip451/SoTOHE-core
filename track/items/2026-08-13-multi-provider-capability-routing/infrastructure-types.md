@@ -4,14 +4,14 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityProviderBindingDto | enum | add | Standard, CodexCustom | 🟡 | 🔵 |
+| CapabilityProviderBindingDto | enum | add | Standard, CodexCustom | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityConfigDto | dto | modify | — | 🟡 | 🔵 |
-| ModelProviderNameDto | dto | add | — | 🟡 | 🔵 |
+| CapabilityConfigDto | dto | modify | — | 🔵 | 🔵 |
+| ModelProviderNameDto | dto | add | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 

@@ -1,7 +1,9 @@
 use std::fs;
 
 use super::*;
-use usecase::capability_exec::ReasoningEffort;
+use usecase::capability_exec::{
+    CapabilityInputValidationError, CapabilityProviderBinding, ReasoningEffort,
+};
 use usecase::dry_write_driver::CapabilityName;
 
 fn capability(value: &str) -> CapabilityName {
@@ -52,6 +54,150 @@ fn test_resolve_execution_final_provider_cli_has_explicit_effort() {
             if provider.as_str() == "codex"
                 && model.as_str() == "gpt-5.6-sol"
                 && effort == ReasoningEffort::XHigh
+    ));
+}
+
+#[test]
+fn test_capability_config_codex_model_provider_decodes_to_custom_binding() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["high"] } },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model_provider": "deepseek",
+                    "model": "deepseek-chat",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+    let config = profiles
+        .resolve_capability(&capability("implementer"))
+        .expect("implementer configuration exists");
+
+    assert!(matches!(
+        config.provider_binding(),
+        CapabilityProviderBindingDto::CodexCustom(model_provider)
+            if model_provider.clone().into_domain().as_str() == "deepseek"
+    ));
+}
+
+#[test]
+fn test_capability_config_without_model_provider_decodes_to_standard_binding() {
+    let profiles = load_profiles(CODEX_PROFILE);
+    let config = profiles
+        .resolve_capability(&capability("reviewer"))
+        .expect("reviewer configuration exists");
+
+    assert!(matches!(
+        config.provider_binding(),
+        CapabilityProviderBindingDto::Standard(provider)
+            if provider.clone().into_domain().as_str() == "codex"
+    ));
+}
+
+#[test]
+fn test_model_provider_name_dto_accepts_arbitrary_non_empty_value_without_interpretation() {
+    let dto: ModelProviderNameDto = serde_json::from_str(r#""consumer-defined-provider-id""#)
+        .expect("model provider DTO deserializes");
+
+    assert_eq!(dto.into_domain().as_str(), "consumer-defined-provider-id");
+}
+
+#[test]
+fn test_model_provider_name_dto_deserialization_rejects_empty_value() {
+    let result = serde_json::from_str::<ModelProviderNameDto>(r#"""#);
+
+    assert!(result.is_err(), "empty model_provider values must fail DTO deserialization");
+}
+
+#[test]
+fn test_model_provider_name_dto_try_new_rejects_whitespace() {
+    assert!(matches!(
+        ModelProviderNameDto::try_new(" \t\n ".to_owned()),
+        Err(CapabilityInputValidationError::EmptyModelProviderName)
+    ));
+}
+
+#[test]
+fn test_capability_provider_binding_dto_converts_to_codex_custom_binding() {
+    let dto = CapabilityProviderBindingDto::CodexCustom(
+        ModelProviderNameDto::try_new("glm".to_owned()).expect("model provider is valid"),
+    );
+
+    assert!(matches!(
+        dto.into_domain(),
+        CapabilityProviderBinding::CodexCustom(model_provider)
+            if model_provider.as_str() == "glm"
+    ));
+}
+
+#[test]
+fn test_capability_config_model_provider_with_non_codex_provider_is_rejected() {
+    let result = load_profiles_result(
+        r#"{
+            "schema_version": 1,
+            "providers": { "claude": { "label": "Claude Code", "supported_reasoning_efforts": ["high"] } },
+            "capabilities": {
+                "implementer": {
+                    "provider": "claude",
+                    "model_provider": "deepseek",
+                    "model": "deepseek-chat",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(result, Err(AgentProfilesError::Parse(_))));
+}
+
+#[test]
+fn test_capability_config_empty_model_provider_is_rejected() {
+    let result = load_profiles_result(
+        r#"{
+            "schema_version": 1,
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["high"] } },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model_provider": " \t ",
+                    "model": "deepseek-chat",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(result, Err(AgentProfilesError::Parse(_))));
+}
+
+#[test]
+fn test_resolve_execution_codex_custom_binding_keeps_codex_provider() {
+    let profiles = load_profiles(
+        r#"{
+            "schema_version": 1,
+            "providers": { "codex": { "label": "Codex CLI", "supported_reasoning_efforts": ["high"] } },
+            "capabilities": {
+                "implementer": {
+                    "provider": "codex",
+                    "model_provider": "qwen",
+                    "model": "qwen-max",
+                    "reasoning_effort": "high",
+                    "execution_mode": "orchestrator-output"
+                }
+            }
+        }"#,
+    );
+
+    assert!(matches!(
+        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        Ok(ResolvedExecution::ProviderCli { provider, .. }) if provider.as_str() == "codex"
     ));
 }
 

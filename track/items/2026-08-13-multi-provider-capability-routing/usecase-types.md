@@ -4,19 +4,19 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityProviderBinding | enum | add | Standard, CodexCustom | 🟡 | 🔵 |
+| CapabilityProviderBinding | enum | add | Standard, CodexCustom | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ModelProviderName | value_object | add | — | 🟡 | 🔵 |
+| ModelProviderName | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityInputValidationError | error_type | modify | EmptyProviderName, EmptyModelName, EmptyModelProviderName, EmptyFilePath, InvalidFilePath, EmptyTargetArtifactSet, EmptyContent, ZeroTimeoutSeconds | 🟡 | 🔵 |
+| CapabilityInputValidationError | error_type | modify | EmptyProviderName, EmptyModelName, EmptyModelProviderName, EmptyFilePath, InvalidFilePath, EmptyTargetArtifactSet, EmptyContent, ZeroTimeoutSeconds | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -29,5 +29,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityProfile | dto | modify | — | 🟡 | 🔵 |
+| CapabilityProfile | dto | modify | — | 🔵 | 🔵 |
 

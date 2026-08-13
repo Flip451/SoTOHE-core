@@ -11,7 +11,8 @@ use domain::TrackId;
 use serde::Deserialize;
 use usecase::capability_exec::{
     CODEX_PROVIDER_NAME, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
-    CapabilityProviderPort, ProviderName, ReasoningEffort,
+    CapabilityProviderBinding, CapabilityProviderPort, ModelProviderName, ProviderName,
+    ReasoningEffort,
 };
 use usecase::provider_session::ProviderSessionCachePort;
 
@@ -178,13 +179,21 @@ impl CodexCapabilityAdapter {
         };
         let prompt = capability_prompt(request);
         let session =
-            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
+            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone())
+                .map_err(|error| {
+                    adapter_preflight_error(request, &self.provider, error.to_string())
+                })?;
         let resume_id = session.resumable_id(&request.request.resume);
         let output_last_message = self.output_last_message_path();
-        let args = build_codex_args_with_resume(
+        let model_provider = match &request.profile.provider {
+            CapabilityProviderBinding::Standard(_) => None,
+            CapabilityProviderBinding::CodexCustom(model_provider) => Some(model_provider),
+        };
+        let args = build_codex_args_with_provider(
             request.profile.model.as_str(),
             request.profile.effort,
             sandbox,
+            model_provider,
             resume_id.as_deref(),
             &prompt,
             &output_last_message,
@@ -210,10 +219,12 @@ impl CodexCapabilityAdapter {
             (Some(_), Ok(output)) if output.exit_code != 0 => self.process_runner.run(
                 &binary,
                 path_prefix.as_deref(),
-                &build_codex_args(
+                &build_codex_args_with_provider(
                     request.profile.model.as_str(),
                     request.profile.effort,
                     sandbox,
+                    model_provider,
+                    None,
                     &prompt,
                     &output_last_message,
                 ),
@@ -226,10 +237,12 @@ impl CodexCapabilityAdapter {
             (Some(_), Err(_)) => self.process_runner.run(
                 &binary,
                 path_prefix.as_deref(),
-                &build_codex_args(
+                &build_codex_args_with_provider(
                     request.profile.model.as_str(),
                     request.profile.effort,
                     sandbox,
+                    model_provider,
+                    None,
                     &prompt,
                     &output_last_message,
                 ),
@@ -268,6 +281,7 @@ fn sandbox_mode_from_skill(
     }
 }
 
+#[cfg(test)]
 fn build_codex_args(
     model: &str,
     effort: ReasoningEffort,
@@ -275,13 +289,14 @@ fn build_codex_args(
     prompt: &str,
     output_last_message: &std::path::Path,
 ) -> Vec<OsString> {
-    build_codex_args_with_resume(model, effort, sandbox, None, prompt, output_last_message)
+    build_codex_args_with_provider(model, effort, sandbox, None, None, prompt, output_last_message)
 }
 
-fn build_codex_args_with_resume(
+fn build_codex_args_with_provider(
     model: &str,
     effort: ReasoningEffort,
     sandbox: SandboxMode,
+    model_provider: Option<&ModelProviderName>,
     resume_id: Option<&str>,
     prompt: &str,
     output_last_message: &std::path::Path,
@@ -292,16 +307,49 @@ fn build_codex_args_with_resume(
         OsString::from(model),
         OsString::from("--config"),
         OsString::from(format!("model_reasoning_effort=\"{}\"", reasoning_effort_value(effort))),
+    ]
+    .into_iter()
+    .chain(model_provider.into_iter().flat_map(|provider| {
+        [
+            OsString::from("--config"),
+            OsString::from(format!("model_provider=\"{}\"", toml_basic_string(provider.as_str()))),
+        ]
+    }))
+    .chain([
         OsString::from("--sandbox"),
         OsString::from(sandbox.as_cli_value()),
         OsString::from("--json"),
         OsString::from("--output-last-message"),
         output_last_message.as_os_str().to_owned(),
-    ]
-    .into_iter()
+    ])
     .chain(resume_id.into_iter().flat_map(|id| [OsString::from("resume"), OsString::from(id)]))
     .chain([OsString::from(prompt)])
     .collect()
+}
+
+fn toml_basic_string(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+    for character in value.chars() {
+        match character {
+            '\\' => escaped.push_str("\\\\"),
+            '"' => escaped.push_str("\\\""),
+            '\u{0008}' => escaped.push_str("\\b"),
+            '\t' => escaped.push_str("\\t"),
+            '\n' => escaped.push_str("\\n"),
+            '\u{000C}' => escaped.push_str("\\f"),
+            '\r' => escaped.push_str("\\r"),
+            character if character.is_control() => {
+                let code = character as u32;
+                if code <= 0xFFFF {
+                    escaped.push_str(&format!("\\u{code:04X}"));
+                } else {
+                    escaped.push_str(&format!("\\U{code:08X}"));
+                }
+            }
+            character => escaped.push(character),
+        }
+    }
+    escaped
 }
 
 fn reasoning_effort_value(effort: ReasoningEffort) -> &'static str {
@@ -325,14 +373,18 @@ mod tests {
 
     use super::super::process::ProviderProcessOutput;
     use super::super::{MAX_CAPABILITY_EXEC_TEXT_BYTES, ProviderProcessRunner};
-    use super::{CodexCapabilityAdapter, SandboxMode, build_codex_args, sandbox_mode_from_skill};
+    use super::{
+        CodexCapabilityAdapter, SandboxMode, build_codex_args, build_codex_args_with_provider,
+        sandbox_mode_from_skill,
+    };
     use crate::provider_session::FsProviderSessionCacheAdapter;
     use domain::TrackId;
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
-        CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderPort,
-        CapabilityResumeRequest, DisciplineText, ExecutionMode, ModelName, ProviderName,
-        ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
+        CapabilityExecRequest, CapabilityFilePath, CapabilityProfile, CapabilityProviderBinding,
+        CapabilityProviderPort, CapabilityResumeRequest, DisciplineText, ExecutionMode, ModelName,
+        ModelProviderName, ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet,
+        TimeoutSeconds,
     };
     use usecase::dry_write_driver::CapabilityName;
     use usecase::provider_session::{
@@ -403,7 +455,7 @@ mod tests {
                 resume: usecase::capability_exec::CapabilityResumeRequest::Fresh,
             },
             profile: CapabilityProfile {
-                provider: ProviderName::try_new("codex")?,
+                provider: CapabilityProviderBinding::Standard(ProviderName::try_new("codex")?),
                 model: ModelName::try_new("gpt-5")?,
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
@@ -417,6 +469,15 @@ mod tests {
         host: &str,
     ) -> Result<CapabilityDispatchRequest, Box<dyn std::error::Error>> {
         request_with_capability_from_host("implementer", host)
+    }
+
+    fn request_with_custom_model_provider(
+        model_provider: &str,
+    ) -> Result<CapabilityDispatchRequest, Box<dyn std::error::Error>> {
+        let mut request = request_from_host("codex")?;
+        request.profile.provider =
+            CapabilityProviderBinding::CodexCustom(ModelProviderName::try_new(model_provider)?);
+        Ok(request)
     }
 
     fn write_skill(root: &Path, definition: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -554,6 +615,112 @@ mod tests {
     }
 
     #[test]
+    fn test_codex_capability_adapter_custom_model_provider_adds_only_provider_config()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        let arbitrary_model_provider = "consumer-defined-provider-id";
+        let outcome =
+            adapter.dispatch(&request_with_custom_model_provider(arbitrary_model_provider)?)?;
+
+        assert!(matches!(
+            outcome,
+            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 0 }
+                if provider.as_str() == "codex"
+        ));
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let invocation = invocations.first().expect("one process invocation is recorded");
+        let args: Vec<_> =
+            invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+        assert_eq!(args.iter().filter(|arg| arg.as_str() == "--config").count(), 2);
+        assert!(
+            args.windows(2).any(|pair| { pair == ["--config", "model_reasoning_effort=\"high\""] })
+        );
+        assert!(args.windows(2).any(|pair| {
+            pair == ["--config", &format!("model_provider=\"{arbitrary_model_provider}\"")]
+        }));
+        assert!(args.windows(2).any(|pair| pair == ["--sandbox", "workspace-write"]));
+        assert!(args.windows(2).any(|pair| pair == ["--json", "--output-last-message"]));
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_custom_model_provider_argv_escapes_toml_value()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ModelProviderName::try_new("provider\"\\\nname")?;
+        let args = build_codex_args_with_provider(
+            "gpt-5",
+            ReasoningEffort::High,
+            SandboxMode::ReadOnly,
+            Some(&provider),
+            None,
+            "prompt",
+            Path::new("tmp/runtime/final-message.txt"),
+        );
+        let args: Vec<_> = args.iter().map(|value| value.to_string_lossy()).collect();
+        let provider_config = args
+            .iter()
+            .find(|argument| argument.starts_with("model_provider="))
+            .expect("model provider config")
+            .to_string();
+
+        assert_eq!(provider_config, r#"model_provider="provider\"\\\nname""#);
+        let value = provider_config.strip_prefix("model_provider=").expect("config key");
+        let parsed: toml::Value = toml::from_str(&format!("model_provider = {value}"))?;
+        assert_eq!(
+            parsed.get("model_provider").and_then(toml::Value::as_str),
+            Some(provider.as_str())
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_codex_capability_adapter_standard_binding_omits_model_provider_config()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_skill(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nsandbox: workspace-write\n---\nskill body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner::default());
+        let adapter = CodexCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        let request = request_from_host("codex")?;
+        assert!(matches!(request.profile.provider, CapabilityProviderBinding::Standard(_)));
+        let outcome = adapter.dispatch(&request)?;
+
+        assert!(matches!(
+            outcome,
+            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 0 }
+                if provider.as_str() == "codex"
+        ));
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        let invocation = invocations.first().expect("one process invocation is recorded");
+        let args: Vec<_> =
+            invocation.1.iter().map(|value| value.to_string_lossy().into_owned()).collect();
+        assert_eq!(args.iter().filter(|arg| arg.as_str() == "--config").count(), 1);
+        assert!(
+            args.iter().all(|arg| !arg.starts_with("model_provider=")),
+            "a standard binding must not select an external Codex custom provider"
+        );
+        Ok(())
+    }
+
+    #[test]
     fn test_codex_capability_adapter_resumes_workspace_session_with_explicit_flags()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
@@ -584,7 +751,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("prior-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("codex")?,
                 request.profile.model.clone(),
                 request.profile.effort,
             ),
@@ -684,7 +851,7 @@ mod tests {
             capability: request.request.capability.clone(),
             target_artifacts: targets,
         };
-        let current_provider = request.profile.provider.clone();
+        let current_provider = ProviderName::try_new("codex")?;
         let recorded_provider = ProviderName::try_new("claude")?;
         assert_ne!(current_provider, recorded_provider);
         cache.save(
@@ -748,7 +915,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("stale-model-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("codex")?,
                 recorded_model,
                 request.profile.effort,
             ),
@@ -807,7 +974,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("prior-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("codex")?,
                 request.profile.model.clone(),
                 request.profile.effort,
             ),
@@ -871,7 +1038,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("prior-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("codex")?,
                 request.profile.model.clone(),
                 request.profile.effort,
             ),
