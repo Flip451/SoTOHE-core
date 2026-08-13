@@ -270,6 +270,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 | [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
 | [ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化](2026-07-20-1608-disk-footprint-and-dry-feature-gating.md) | Proposed | 2026-07-20 |
+| [ワークフロー副産物によるディスク衛生の修繕 — scope diff の untracked ディレクトリ計測失敗と template export テストの /tmp scaffold リーク](2026-08-02-0643-workflow-byproduct-disk-hygiene.md) | Proposed | 2026-08-02 |
 
 ### DRY / リファクタ
 
