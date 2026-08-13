@@ -29,11 +29,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "1ecfadb99072155b7ed87fc7b771a2fe1a3e105e",
       "description": "Modify the `EmptyScope` outcome in `libs/usecase/src/review_v2/check_zero_findings.rs`; deliver it from `apps/cli-driver/src/review.rs`; and update focused usecase, driver, and composition regressions. [IN-01; OS-01; OS-02; CN-01; CN-02; CN-03; AC-01; AC-02; AC-03]",
       "id": "T1",
       "status": "done"
     },
     {
+      "commit_hash": "1ecfadb99072155b7ed87fc7b771a2fe1a3e105e",
       "depends_on": [
         "T1"
       ],
