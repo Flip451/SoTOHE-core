@@ -1,0 +1,138 @@
+{
+  "track_id": "2026-08-13-check-zero-findings-empty-scope-pass",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_empty_scope_state_returns_empty_scope_success"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_check_zero_findings_interactor_empty_scope_returns_empty_scope_success"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_non_passing_review_states_are_preserved"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_missing_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_stale_final_verdict_returns_nonzero_exit"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_findings_remain_returns_nonzero_exit"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_empty_scope_state_returns_empty_scope_success"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_empty_scope_state_returns_empty_scope_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::check_zero_findings::tests",
+          "test_name": "test_check_zero_findings_non_passing_review_states_are_preserved"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::review::tests",
+          "test_name": "test_review_check_zero_findings_empty_scope_returns_success_with_explicit_message"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "reason": "ReviewCheckZeroFindingsOutcome is a usecase DTO enum with a unit EmptyScope variant. CN-03 specifies an operational invariant about guarded commits and commit-gate review approval, which is outside this DTO's declaration and cannot be verified by a test bound to this entry. The edge is waived rather than claimed as behavior of the enum."
+    }
+  ]
+}
