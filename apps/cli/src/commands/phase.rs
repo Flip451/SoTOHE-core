@@ -663,13 +663,20 @@ fi
                 .collect::<Vec<_>>()
         };
 
-        // Interim: the adr check-zero-findings pre-entry is removed until an
-        // empty-scope pass lane exists — after the Phase 0 ADR-baseline commit
-        // the adr scope is always empty, which the check fail-closes on, so the
-        // shipped two-command matrix was impassable at spec-design entry.
         assert_eq!(
             commands_for("spec-design"),
-            vec![serde_json::json!(["bin/sotp", "signal", "check-adr-user", "--gate", "commit"]),]
+            vec![
+                serde_json::json!(["bin/sotp", "signal", "check-adr-user", "--gate", "commit"]),
+                serde_json::json!([
+                    "bin/sotp",
+                    "review",
+                    "check-zero-findings",
+                    "--scope",
+                    "adr",
+                    "--round",
+                    "final"
+                ]),
+            ]
         );
         assert_eq!(
             commands_for("type-design"),

@@ -25,3 +25,10 @@ Phase 0 の収束実体は存在する: commit `7a78be80` 前に adr scope final
 用 diff base の再定義）。type-design / impl-plan の同種 check は spec / types scope が
 phase 直前に非空（uncommitted 成果物あり）となる想定のため影響しない見込みだが、
 再発時は同じ判断枠組みで扱う。
+
+**2026-08-13 追記（解消）**: 恒久修正が別 track
+（`2026-08-13-check-zero-findings-empty-scope-pass`、専用 ADR で決定記録済み、PR #241
+として base branch に merge 済み）で landed。guarded base merge で取り込み、
+`.harness/config/phase-commands.json` の spec-design adr check-zero-findings pre-entry と
+`apps/cli/src/commands/phase.rs` の two-command expectation を base branch の canonical
+文面へ復元（byte 一致確認済み）。本暫定措置はこれで終結。
