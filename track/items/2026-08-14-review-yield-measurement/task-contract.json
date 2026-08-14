@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-14-review-yield-measurement",
+  "entries": {
+    "T001": [
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewDetectionRateBasisPoints"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewExecutionCount"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewFindingCount"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewYieldMetric"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewYieldValue"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewYieldValueError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TelemetryReportOutput"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "StructuredReviewRoundDto"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "TelemetryEvent"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "TelemetryReportSnapshot"
+      }
+    ],
+    "T004": [],
+    "T005": []
+  }
+}

@@ -1,0 +1,366 @@
+{
+  "entries": [
+    {
+      "claim_hash": "1ed5b4f21ab3149560184f18a30cdc44fee841e794df9ea0f89db6adf526404e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewDetectionRateBasisPoints",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "45e115fe25f1fe0b646d7789fb40501a849f6a98a27424afbc6db96e6e3f6368",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1ed5b4f21ab3149560184f18a30cdc44fee841e794df9ea0f89db6adf526404e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewDetectionRateBasisPoints",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82be00871ac7b85c56edc2d073fa7aaf7f717f99e71ffb68d18cc533ba9341d1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The aggregation surface can report execution counts and detection rates for any selected recorded axis without changing stored telemetry or review execution; the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "87adfd30a608cc8dab2e0320c92d0076decb8aa3ea0a1e2e2f900eb9c34020f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewExecutionCount",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "45e115fe25f1fe0b646d7789fb40501a849f6a98a27424afbc6db96e6e3f6368",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "87adfd30a608cc8dab2e0320c92d0076decb8aa3ea0a1e2e2f900eb9c34020f9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewExecutionCount",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82be00871ac7b85c56edc2d073fa7aaf7f717f99e71ffb68d18cc533ba9341d1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The aggregation surface can report execution counts and detection rates for any selected recorded axis without changing stored telemetry or review execution; the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The aggregation surface can report execution counts and detection rates for any selected recorded axis",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "93e9faf9bc433f294119e85e42b00a080ce8c745fea42302d75fb6346412e9fe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFindingCount",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "44d8f3d856f3244878d193002c4ec78ba37f0d233e82d2f3f54310692f542d26",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "93e9faf9bc433f294119e85e42b00a080ce8c745fea42302d75fb6346412e9fe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFindingCount",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1adf3f06c76c92ca4f572d7e445e3038dbba5842033359dc2314eafff5c8df3d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e1a66088c497d8b8b37e067b5d69ce8a95c2a56982e428e4eeedab66ff398dd0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldMetric",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "45e115fe25f1fe0b646d7789fb40501a849f6a98a27424afbc6db96e6e3f6368",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e1a66088c497d8b8b37e067b5d69ce8a95c2a56982e428e4eeedab66ff398dd0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldMetric",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82be00871ac7b85c56edc2d073fa7aaf7f717f99e71ffb68d18cc533ba9341d1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The aggregation surface can report execution counts and detection rates for any selected recorded axis without changing stored telemetry or review execution; the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The aggregation surface can report execution counts and detection rates for any selected recorded axis",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1ac3e195f0ee048cfbea580fea7eb8375ec36b27d5cdd9fff06ecbd9332992ed",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldValue",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "45e115fe25f1fe0b646d7789fb40501a849f6a98a27424afbc6db96e6e3f6368",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1ac3e195f0ee048cfbea580fea7eb8375ec36b27d5cdd9fff06ecbd9332992ed",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldValue",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82be00871ac7b85c56edc2d073fa7aaf7f717f99e71ffb68d18cc533ba9341d1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The aggregation surface can report execution counts and detection rates for any selected recorded axis without changing stored telemetry or review execution; the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The aggregation surface can report execution counts and detection rates for any selected recorded axis",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae646e156ae280786505345d444b1c5fc055d875d373f650b743673df0490cbe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldValueError",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "45e115fe25f1fe0b646d7789fb40501a849f6a98a27424afbc6db96e6e3f6368",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "reports execution counts and detection rates grouped or filtered by any recorded measurement axis",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae646e156ae280786505345d444b1c5fc055d875d373f650b743673df0490cbe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldValueError",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82be00871ac7b85c56edc2d073fa7aaf7f717f99e71ffb68d18cc533ba9341d1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The aggregation surface can report execution counts and detection rates for any selected recorded axis without changing stored telemetry or review execution; the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "the detection rate is the proportion of matching recorded rounds with one or more findings",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b191ec58c2d24cc5983c6fef96330ea5f144fe7a0cbc869860f561c15f6ed9e0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TelemetryReportOutput",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "45e115fe25f1fe0b646d7789fb40501a849f6a98a27424afbc6db96e6e3f6368",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b191ec58c2d24cc5983c6fef96330ea5f144fe7a0cbc869860f561c15f6ed9e0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TelemetryReportOutput",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "82be00871ac7b85c56edc2d073fa7aaf7f717f99e71ffb68d18cc533ba9341d1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The aggregation surface can report execution counts and detection rates for any selected recorded axis without changing stored telemetry or review execution; the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The aggregation surface can report execution counts and detection rates for any selected recorded axis",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b191ec58c2d24cc5983c6fef96330ea5f144fe7a0cbc869860f561c15f6ed9e0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TelemetryReportOutput",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "39edb999ea7e64b173f56998fb0e1727d7ff4e0b0799718493f618e5feb1eab9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "The aggregation surface must not mutate telemetry, review results, configuration, or inspection behavior."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The aggregation surface must not mutate telemetry, review results, configuration, or inspection behavior.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

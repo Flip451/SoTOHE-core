@@ -1,0 +1,35 @@
+{
+  "baseline_hash": "1365829f6203c24bb43342294ab9b66d89b60b88164858a9d564a0de700d46d2",
+  "declaration_hash": "c4e6f4b484abfad8fb09a1e88008640d1a6e120b3ea88bc00d7849c7895399bd",
+  "generated_at": "2026-08-14T08:21:43Z",
+  "head_commit": "2be2a5dcfd1e34f340f1966fff32e616aeb397c7",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Deserialize",
+        "Eq",
+        "PartialEq",
+        "Serialize"
+      ],
+      "signal": "yellow",
+      "type_name": "StructuredReviewRoundDto"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TelemetryEvent"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TelemetryReportSnapshot"
+    }
+  ]
+}

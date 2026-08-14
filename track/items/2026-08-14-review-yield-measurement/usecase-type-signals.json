@@ -1,0 +1,91 @@
+{
+  "baseline_hash": "5e93a76a483c33b0975a43bd78ecbd4d6bfee290025ad608810a2aa1e2be23f8",
+  "declaration_hash": "bc4282fa640e29f501a176450fa1b0c21adef65f361efe1eb24597bd9c9d66e2",
+  "generated_at": "2026-08-14T08:21:40Z",
+  "head_commit": "2be2a5dcfd1e34f340f1966fff32e616aeb397c7",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "ReviewDetectionRateBasisPoints"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "ReviewExecutionCount"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "ReviewFindingCount"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "ReviewYieldMetric"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "ReviewYieldValue"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "ReviewYieldValueError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TelemetryReportOutput"
+    }
+  ]
+}

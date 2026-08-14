@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-14-review-yield-measurement",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 200,
+          "test_lines": 140
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 120,
+          "test_lines": 100
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 100,
+          "test_lines": 80
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {
+          "scope": "cli_composition",
+          "production_lines": 140,
+          "test_lines": 120
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T005",
+      "scope_estimates": [
+        {
+          "scope": "cli",
+          "production_lines": 40,
+          "test_lines": 30
+        },
+        {
+          "scope": "cli_driver",
+          "production_lines": 110,
+          "test_lines": 90
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T005"
+      ]
+    }
+  ]
+}

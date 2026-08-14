@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Implement `libs/usecase/src/telemetry/review_yield.rs` and extend `libs/usecase/src/telemetry/report.rs::TelemetryReportOutput`; add focused aggregation and error regressions in `libs/usecase/src/telemetry.rs`. IN-02; AC-02; CO-02.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Add `libs/infrastructure/src/telemetry/review_yield.rs::StructuredReviewRoundDto` and extend `libs/infrastructure/src/telemetry/mod.rs::TelemetryEvent`; add focused persistence and serialization regressions in those modules. IN-01; AC-01; AC-03; CO-01.",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T001"
+      ]
+    },
+    {
+      "id": "T003",
+      "description": "Extend `libs/infrastructure/src/telemetry/report.rs::TelemetryReportSnapshot` and update `libs/infrastructure/src/telemetry/report_adapter.rs::FsTelemetryReportAdapter::aggregate` to project `review_yield_metrics`; add focused projection regressions in those modules. IN-02; AC-02; CO-02.",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T001",
+        "T002"
+      ]
+    },
+    {
+      "id": "T004",
+      "description": "Update `apps/cli-composition/src/review_v2/mod.rs::ReviewCompositionRoot::review_run_local_ungated` and `apps/cli-composition/src/telemetry_wiring.rs::emit_review_round`; add focused telemetry-wiring regressions in these modules. IN-01; OUT-01; OUT-02; AC-01; AC-03; CO-01; CO-02.",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T002"
+      ]
+    },
+    {
+      "id": "T005",
+      "description": "Extend `apps/cli-driver/src/telemetry.rs::{TelemetryDriver::telemetry_report,format_report}` and `apps/cli/src/commands/telemetry.rs::{TelemetryCommand,execute}`; add focused command and renderer regressions in these modules. IN-02; OUT-02; AC-02; CO-02.",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T003"
+      ]
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01 → T001, T002, T003, T004, T005."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Review-yield aggregation model",
+        "description": [
+          "`libs/usecase/src/telemetry/review_yield.rs` and `libs/usecase/src/telemetry/report.rs::TelemetryReportOutput`. IN-02; AC-02; CO-02."
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Structured-review telemetry persistence",
+        "description": [
+          "`libs/infrastructure/src/telemetry/review_yield.rs::StructuredReviewRoundDto` and `libs/infrastructure/src/telemetry/mod.rs::TelemetryEvent`. IN-01; AC-01; AC-03; CO-01."
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Review-yield report projection",
+        "description": [
+          "`libs/infrastructure/src/telemetry/report.rs::TelemetryReportSnapshot` and `libs/infrastructure/src/telemetry/report_adapter.rs::FsTelemetryReportAdapter::aggregate`. IN-02; AC-02; CO-02."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Structured-review telemetry wiring",
+        "description": [
+          "`apps/cli-composition/src/review_v2/mod.rs::ReviewCompositionRoot::review_run_local_ungated` and `apps/cli-composition/src/telemetry_wiring.rs::emit_review_round`. IN-01; OUT-01; OUT-02; AC-01; AC-03; CO-01; CO-02."
+        ],
+        "task_ids": [
+          "T004"
+        ]
+      },
+      {
+        "id": "S5",
+        "title": "Telemetry report rendering and command handling",
+        "description": [
+          "`apps/cli-driver/src/telemetry.rs::{TelemetryDriver::telemetry_report,format_report}` and `apps/cli/src/commands/telemetry.rs::{TelemetryCommand,execute}`. IN-02; OUT-02; AC-02; CO-02."
+        ],
+        "task_ids": [
+          "T005"
+        ]
+      }
+    ]
+  }
+}

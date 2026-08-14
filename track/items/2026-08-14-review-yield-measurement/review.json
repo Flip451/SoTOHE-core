@@ -40,6 +40,383 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-14T07:29:50Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 6,
+              "message": "T001 の説明は変更対象を「usecase telemetry modules」としか示さず、具体的なファイルまたはシンボルを特定していません。実行者が変更境界を発明する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 の説明は「structured local-review execution」「CLI telemetry surface」と抽象的に記述しており、apps/cli・cli-composition・cli-driver のどのファイル／シンボルを変更するか特定していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 の「record only structured local-review rounds」「read-only report metrics」「excluded entry points and review behavior are unchanged」は、IN-01、CO-02、AC-03 の挙動契約を下流の散文として再記述しています。変更対象＋操作＋anchor cite に限定してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 48,
+              "message": "S2 の「project them into the report snapshot without changing review execution」は、AC-02／CO-02／OUT-02 の挙動契約を plan section に再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 58,
+              "message": "S3 の「Record only structured local-review rounds」「existing read-only report surface」「excluded review and gate entry points」は、IN-01／IN-02／CO-02／AC-03 の上流契約を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/task-coverage.json",
+              "line": 35,
+              "message": "task-coverage.json は AC-01 を T001 に割り当てていますが、T001 の説明は集計モデルとレポート出力だけで、各 structured local review round の telemetry 記録・永続化を実装または検証しません。AC-01 のこの load-bearing 部分は T002/T003 側の作業として明示し、T001 の割当を再評価してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6cc639f13a4a312129b0d2a7836ea32fd9ad209ced0864cebe074dee2f859ec2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:35:00Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 の説明は「infrastructure structured-review-round DTO」「telemetry report snapshots」としか記述せず、具体的な対象ファイルまたはシンボルを示していません。実行者が変更境界を発明する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 38,
+              "message": "S1 の「typed, read-only aggregation values」は CO-02 の挙動契約を plan section に再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、変更対象・操作・anchor cite のみにしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/task-coverage.json",
+              "line": 4,
+              "message": "task-coverage.json は IN-01 を T001 に割り当てていますが、T001 は usecase の集計モデルとレポート DTO の実装のみで、structured local review round の telemetry 記録を実装・検証しません。IN-01 の割当は T002/T003 に限定すべきです。",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 は、AC-01 を満たす local-review telemetry wiring と、AC-02 を満たす report rendering を同一タスクに束ねています。両者は個別に検証可能な独立 behavior unit なので、実装開始前に recording（AC-01）と report surface（AC-02）へ分割してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c23de0ee990fd62073216a3f1e3b16454293b02cd74dd9ab8c8cb23d0b2bdab8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:37:28Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 bundles two independently verifiable behavior units: recording structured local-review telemetry (AC-01) and rendering/querying the read-only report surface (AC-02). Split these into separate pre-implementation tasks; the plan already identifies distinct wiring and renderer targets.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:71bcac79049c2303d930c9c731d73e83bd3acb4f6c0b9ec378b092710551b92d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:45:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0663a04f6d95abd1dc7192168099c2479692e7322d109f36e2fe02576b683f4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:56:19Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 omits a required projection target. `FsTelemetryReportAdapter::aggregate` in `libs/infrastructure/src/telemetry/report_adapter.rs` constructs `TelemetryReportOutput`, so it must transfer the new `review_yield_metrics` from `TelemetryReportSnapshot`; none of T001, T002, or T004 names that file/symbol and operation. Add this target to the task responsible for AC-02 so the executor does not have to invent ownership.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 bundles two independently verifiable behavior units: structured review-round persistence (`StructuredReviewRoundDto` and `TelemetryEvent`: IN-01/AC-01/AC-03/CO-01) and review-yield report projection (`TelemetryReportSnapshot`: IN-02/AC-02/CO-02). Split these todo units before implementation, partition their catalogue attributions, and declare the projection unit's dependency on the event/persistence unit as needed.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/batch-plan.json",
+              "line": 36,
+              "message": "T003 declares 110 production and 90 test lines in `cli_driver`, but its description names only `cli-composition` targets and explicitly places regressions in those modules; T004 separately owns the CLI-driver work. T003 therefore has no target or operation for its claimed `cli_driver` scope. Remove the stale estimate or name concrete, non-overlapping CLI-driver work.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d0663a04f6d95abd1dc7192168099c2479692e7322d109f36e2fe02576b683f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:01:58Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 still bundles two independently verifiable behavior units: structured review-round persistence (`StructuredReviewRoundDto` and `TelemetryEvent`: IN-01/AC-01/AC-03/CO-01) and review-yield aggregation/projection (`TelemetryReportSnapshot` and `FsTelemetryReportAdapter::aggregate`: IN-02/AC-02/CO-02). Split these todo units before implementation, partition their catalogue attributions, and declare the projection unit's dependency on the persistence/event unit as needed.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/batch-plan.json",
+              "line": 36,
+              "message": "T003 declares 110 production and 90 test lines in `cli_driver`, but its description names only `cli-composition` targets and places its regressions in those modules; T004 separately owns the CLI-driver work. T003 therefore has no target or operation for its claimed `cli_driver` scope. Remove the stale estimate or name concrete, non-overlapping CLI-driver work.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6462298c3f60da5d54e537d4b778d7804b8f776ae8ac1ec2a74df57f624db8e9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:10:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69edf1366f5d88384599412183d2815c863564d544509b4ae66114dccc1b6e60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:15:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69edf1366f5d88384599412183d2815c863564d544509b4ae66114dccc1b6e60",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-14T07:30:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4167e0b04dfcd74bf33f55b6418158af3a0e60ce8ab11b4cf70878f1f7293eb7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:38:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4167e0b04dfcd74bf33f55b6418158af3a0e60ce8ab11b4cf70878f1f7293eb7",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:43:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcfe9d8d3c407e3463f4d91bc5f3b5dbdb5aba06c9fa59d45c6e48bfae00bad4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:46:55Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-14-review-yield-measurement/spec.json",
+              "line": 25,
+              "message": "AC-02 requires reporting a “detection rate” but never defines its numerator, denominator, or zero-execution behavior. Implementations could plausibly report rounds with at least one finding divided by executions, findings per execution, or another value, so the criterion cannot deterministically verify aggregation correctness and downstream phases must invent the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fcfe9d8d3c407e3463f4d91bc5f3b5dbdb5aba06c9fa59d45c6e48bfae00bad4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:51:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d44d40692932f6216f5df8a7c98250992771fdb4e447bd012af71d63bbe512e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-14T06:20:01Z",
+          "findings": [
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 133,
+              "message": "`StructuredReviewRoundDto` の docs が、構造化 local review の対象範囲と DRY/PR/obligation/binary-gate 除外を散文で再記述しており、AC-03 の挙動契約を重複保持しています。`.harness/policies/no-upstream-restatement.md` に従い、変更対象と anchor cite のみにしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 271,
+              "message": "`ReviewYieldMetric` の docs が、実行数・検出率を集計して driver に提示するという AC-02 の出力契約を再記述しています。上流契約を prose で複製せず、AC-02 の anchor cite に置き換えるべきです。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 312,
+              "message": "`ReviewYieldValue` の docs が、記録された軸による grouping という AC-02 の挙動契約を「exactly one」として再記述しています。これは upstream-restatement policy の対象です。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 169,
+              "message": "`TelemetryReportSnapshot` の docs が、空コレクションを「matching rounds がなく rate を計算できない」と解釈する AC-02 の契約を再記述しています。挙動本文は spec に残し、entry docs は対象変更と AC-02/CO-02 の cite に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 413,
+              "message": "`TelemetryReportOutput` の docs が、対象を structured local review に限定し、空の metrics が rate 不在を意味するという IN-02/AC-02 の契約を再記述しています。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7e9983a8d95a96ab6662881097858be90d029f20983387a8e9873672f642ff3c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:22:39Z",
+          "findings": [
+            {
+              "category": "declaration-completeness",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 93,
+              "message": "`StructuredReviewRoundDto` は `findings_count: ReviewFindingCount` を serde DTO として公開しますが、`ReviewFindingCount` には数値 accessor、`Display`、serde trait のいずれも宣言されていません。内部値も非公開のため、infrastructure 側が「finding count の数値」を Serialize する契約を実装できず、AC-01 の telemetry record が構築不能になります。`ReviewFindingCount` に境界用 accessor または明示的な serialization contract を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4305db1c9b89e921d13b8e2df83ad2f7adfb92f8163fda1b98cbfeff3dc42e50",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:24:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:52e5fd4356d1ce51be322bb43a6922aa4783f82e94add613f37e9f0549fb0be4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:33:39Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 131,
+              "message": "`infrastructure::TelemetryEvent` needs a companion `action: modify` declaration. Its frozen-baseline `ReviewRound` variant is the event accepted by `TelemetryWriter::write` and parsed by telemetry reporting, but it lacks the required `scope` and `reasoning_effort` fields. Adding `StructuredReviewRoundDto` alone leaves IN-01/AC-01 disconnected from the persisted event surface, forcing an undeclared public API mutation or making the required axes unrecordable. Declare the enum's complete post-change shape, potentially embedding this DTO.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 223,
+              "message": "`usecase::ReviewExecutionCount.docs` restates AC-02's zero-match behavior and its rationale (`NonZeroU64 makes a zero-sample rate unrepresentable`) instead of identifying the type/shape and citing the upstream anchors. This creates a second prose owner for the behavior, contrary to `.harness/policies/no-upstream-restatement.md`; reduce it to the declared type choice plus IN-02/AC-02 references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:52e5fd4356d1ce51be322bb43a6922aa4783f82e94add613f37e9f0549fb0be4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:41:01Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 131,
+              "message": "`infrastructure::StructuredReviewRoundDto` has no declared connection to the persisted telemetry event surface. The frozen baseline’s public `TelemetryEvent::ReviewRound` lacks the required `scope` and `reasoning_effort` fields, while `TelemetryWriter` accepts that enum. IN-01/AC-01 therefore require a companion `action: modify` entry declaring `TelemetryEvent`’s complete post-change shape; otherwise implementation must make an undeclared public API mutation or cannot persist all required axes.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 223,
+              "message": "`usecase::ReviewExecutionCount.docs` restates AC-02’s zero-match behavior and rationale in prose (`NonZeroU64 makes a zero-sample rate unrepresentable`). Per `.harness/policies/no-upstream-restatement.md`, identify the type/shape and cite IN-02/AC-02 without reproducing their behavioral contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:52e5fd4356d1ce51be322bb43a6922aa4783f82e94add613f37e9f0549fb0be4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:00:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b6597e9ab50910324a2dcd570fb95ebb5bd441d168a2beb060cc763db630e35",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:04:11Z",
+          "findings": [
+            {
+              "category": "action incoherent with diff",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 205,
+              "message": "`infrastructure::TelemetryEvent` declares all seven variants as tuple payloads, but the frozen baseline defines them as named struct variants. This contradicts the entry’s promise that unchanged legacy wire fields remain baseline-identical, removes field names from every variant, and changes the public/serde wire shape far beyond the intended `ReviewRound` update; internally tagged serde also requires struct-style payloads here. Preserve unchanged variants with `payload.kind: \"struct\"` and named fields, and declare the intended named post-change fields for `ReviewRound`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3b6597e9ab50910324a2dcd570fb95ebb5bd441d168a2beb060cc763db630e35",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:15:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4744237b6c622a1a3e820b423bbe8c58531a9b4577ee62bdade42c7affb7e46f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:19:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4744237b6c622a1a3e820b423bbe8c58531a9b4577ee62bdade42c7affb7e46f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

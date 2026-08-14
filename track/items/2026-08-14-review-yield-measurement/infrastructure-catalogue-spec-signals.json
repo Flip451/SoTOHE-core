@@ -1,0 +1,21 @@
+{
+  "catalogue_declaration_hash": "c4e6f4b484abfad8fb09a1e88008640d1a6e120b3ea88bc00d7849c7895399bd",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "13e1059025bd544c6c25763d0b5352f7cedffc3ddeb1bc96e356482b83062adb",
+      "signal": "blue",
+      "type_name": "StructuredReviewRoundDto"
+    },
+    {
+      "entry_hash": "1e8cc2a635719cfd2b4dfde94b5ee00989d26d2c1e08d956003f3b0bfd202297",
+      "signal": "blue",
+      "type_name": "TelemetryEvent"
+    },
+    {
+      "entry_hash": "e49060b9a037d5a740a4e9f40b47fa4071f4d80051d3521872e8dda5960a5a90",
+      "signal": "blue",
+      "type_name": "TelemetryReportSnapshot"
+    }
+  ]
+}
