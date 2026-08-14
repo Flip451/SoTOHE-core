@@ -1,0 +1,223 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:09:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3d82df5a56852f6efa4f043317361d7bca356ab75962d71135433737904ba9c0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:11:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3d82df5a56852f6efa4f043317361d7bca356ab75962d71135433737904ba9c0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:33:33Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 92,
+              "message": "`open-set covering contract` omits the third permitted resolution, strict implementation with an acknowledged depth estimate. As written, it would report a type contract that legitimately chooses that option, contradicting the three-option policy in `adr.md`, `impl-plan.md`, and the workflow SSoT.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3347dfe5e85dedb1f072107d691b3dda9d160bd9959e66d809cfddb6aff3b6bf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:35:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4df6e52c317dbbab2be4023e40879986759c354dd4b41bef75e56f6366377ef7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:39:37Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 96,
+              "message": "`open-set covering contract` only exempts resolutions explicitly declared by the catalogue entry. This conflicts with the immediately preceding `upstream restatement` rule, which requires upstream behavior to be represented by an anchor cite rather than repeated, and with `impl-plan.md`, which accepts resolutions recorded anywhere in the upstream chain. Consequently, an entry citing an upstream delegation or strict-depth decision can be falsely reported unless it duplicates that decision. Treat an upstream-recorded resolution as sufficient.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4df6e52c317dbbab2be4023e40879986759c354dd4b41bef75e56f6366377ef7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:41:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1c05c935512cb691ba414d47cc52cc12fcde8db041bcf03507ef7b605bb764",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:43:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1c05c935512cb691ba414d47cc52cc12fcde8db041bcf03507ef7b605bb764",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:14:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a30de42c959680ccd5211f9df4e68059e0718f5bce805048a079ab4aa391ad3b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:17:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a30de42c959680ccd5211f9df4e68059e0718f5bce805048a079ab4aa391ad3b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:35:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcb7238d9387a24e161bae6ccd61c112a5ced4d3cbdd47455f4dcfdacae71e3a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:39:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dcb7238d9387a24e161bae6ccd61c112a5ced4d3cbdd47455f4dcfdacae71e3a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:52:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:58fccb4cc3a1f382cc8d676e54de22fd4927e23d4bfe9ac0e56bb0651e8d1942",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:55:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:58fccb4cc3a1f382cc8d676e54de22fd4927e23d4bfe9ac0e56bb0651e8d1942",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:14:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a1403bf08dd75cd155236989e2ce6431e1f04e1679f1c1e1324a724972c34e60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:18:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a1403bf08dd75cd155236989e2ce6431e1f04e1679f1c1e1324a724972c34e60",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:33:49Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-14-adr-open-set-depth-check/spec.json",
+              "line": 79,
+              "message": "GO-01 states that the change will prevent post-implementation review stagnation, but AC-01 and AC-02 only verify that review checks/briefing guidance exist; no acceptance criterion deterministically verifies this stated goal outcome.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c020fb0b8307a73e1adef8bbd464ddfebb8bb5608100b54bc273e8e0f80cfa61",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:39:54Z",
+          "findings": [
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-14-adr-open-set-depth-check/spec.json",
+              "line": 89,
+              "message": "The `related_conventions` entry for `prefer-type-safe-abstractions` is self-evidently off-topic for this document-only behavioral spec: the scope explicitly excludes Rust production code, types, and runtime checks, while this convention concerns implementation type abstractions.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d07d527eb776151a87c73f57bce291616fbbe280303d3acf54dd5ff28390430b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:44:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:256a8d8fcbad44ef05195a5fcb562e3385668b0409a34aca29d046c7645de6d0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:47:30Z",
+          "findings": [
+            {
+              "category": "broken cross-reference at narrative level",
+              "file": "track/items/2026-08-14-adr-open-set-depth-check/spec.json",
+              "line": 85,
+              "message": "`coding-principles.md#Rules` は Rust プロダクションコード向けの規約だが、本 spec は OUT-02 で Rust コード・型・実行時検査を明示的に除外し、受入条件も文書変更だけを対象としている。このため、契約全体に適用される規約としての関連性がなく、下流工程を誤誘導する narrative-level の不整合になっている。該当する規約がないならこの `related_conventions` エントリを削除すること。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:256a8d8fcbad44ef05195a5fcb562e3385668b0409a34aca29d046c7645de6d0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:52:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30f704a2293729f034578e5c9092c66656e377f7b418bd3814d0f3dbcd9abee1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:02:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c355b146340a3c2c63da93c8f21acd848490270458f3e5d15166f5b1d8e60a9a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:08:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c355b146340a3c2c63da93c8f21acd848490270458f3e5d15166f5b1d8e60a9a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

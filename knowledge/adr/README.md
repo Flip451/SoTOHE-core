@@ -195,6 +195,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加](2026-07-18-0340-adr2pr-baseline-diff-comment.md) | Proposed | 2026-07-18 |
 | [入力決定と pipeline 産決定の二箱分離](2026-07-19-0616-two-box-decision-separation.md) | Proposed | 2026-07-19 |
 | [Phase 0 承認後に修正が入った場合は承認前へ戻して再収束する](2026-07-25-0716-phase0-post-approval-reconvergence-lane.md) | Proposed | 2026-07-25 |
+| [ADR 起草とレビューに開集合検査を追加する](2026-08-13-1756-adr-open-set-depth-check.md) | Proposed | 2026-08-13 |
 
 ### ドキュメント運用
 
