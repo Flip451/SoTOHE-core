@@ -259,6 +259,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [reasoning effort に max 段を追加し、限定レーンを Luna Max へ移行する](2026-08-02-0151-codex-reasoning-effort-max.md) | Proposed | 2026-08-02 |
 | [capability routing を中華系プロバイダーへ拡張可能にする](2026-08-02-0151-multi-provider-capability-routing.md) | Proposed | 2026-08-02 |
 | [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
+| [grok を第三の provider binding として追加する](2026-08-14-1225-grok-provider-binding.md) | Proposed | 2026-08-14 |
 
 ### テスト・CI ツーリング
 

@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-14T14:07:13Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md",
+              "line": 80,
+              "message": "D3 は未宣言の権限について「`read-only` に倒す」としながら、同じ文で「宣言を欠く定義への dispatch は拒否する」と定めており、dispatch が受理すべきか拒否すべきかを決定できない。どちらか一方の fail-closed 方針に統一する必要がある。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b277bad7cf305801aa8d4c586187e7f2afcadcb1627c4d67cec0ba034067093",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:15:22Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md",
+              "line": 80,
+              "message": "D3 contains a direct unresolved contradiction: it says an undeclared `grok-sandbox` resolves to `read-only`, but also says dispatch of a definition lacking that declaration must be rejected. The ADR does not decide whether missing declarations are accepted with the default or fail-closed, so the permission boundary is not adjudicable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9b277bad7cf305801aa8d4c586187e7f2afcadcb1627c4d67cec0ba034067093",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:38:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0461d2e9071b7c135b2c06a827db55197f88fd094042f428fb9f22266715bece",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:44:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0461d2e9071b7c135b2c06a827db55197f88fd094042f428fb9f22266715bece",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:02:50Z",
+          "findings": [
+            {
+              "category": "broken narrative reference",
+              "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md",
+              "line": 132,
+              "message": "The relationship paragraph misidentifies D4 of `2026-07-12-0510-capability-exec-unified-dispatch.md` as the source of the “mapping undefined => fail-closed” rule. That ADR’s D4 is provider resolution; the fail-closed mapping rule is stated in its D3. This makes the ADR’s cross-decision narrative reference incorrect.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:14b3d24f810ecb504aed3c0486dac601b084e4f81a90fec92efe6ca2914e8af3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T15:08:37Z",
+          "findings": [
+            {
+              "category": "decision obscured by excess detail",
+              "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md",
+              "line": 125,
+              "message": "D9 embeds operational wiring detail that obscures the decision: the `${VAR}` expansion restriction and requirement to resolve the installed `sotp` binary outside hook JSON are implementation procedures. Removing this passage leaves the recorded decision—that `.grok/hooks/` is canonical and dispatch maps Grok envelopes to the existing contract—unchanged; delegate this wiring to the hook/dispatch contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "decision obscured by excess detail",
+              "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md",
+              "line": 129,
+              "message": "D9 also records an implementation-specific execution property (moving resolution order outside JSON and relying on idempotence under double application). Removing it leaves the D9 decision unchanged, so this operational detail should be delegated to the existing hooks-path/handler contract rather than retained in the ADR.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:00ddbc5299b5b145a731c674ff4260e4b8e9ad8d6524efe1a8093598386ec705",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T15:11:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ed6e18492f06f9ab1224c296a5eec332e0e57efab4582d3d9b12c514f0bd57ba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:14:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ed6e18492f06f9ab1224c296a5eec332e0e57efab4582d3d9b12c514f0bd57ba",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:21:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c5eaf4a03b21d481a0c0a443e0a1ef290e85076b23047f8e12e70319225189a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:24:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c5eaf4a03b21d481a0c0a443e0a1ef290e85076b23047f8e12e70319225189a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
