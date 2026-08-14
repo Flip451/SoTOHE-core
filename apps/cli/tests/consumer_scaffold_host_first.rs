@@ -4,13 +4,31 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::OnceLock;
 
 use tempfile::TempDir;
 
-static EXPORTED_SCAFFOLD: OnceLock<TempDir> = OnceLock::new();
+static EXPORTED_SCAFFOLD_PATH: OnceLock<PathBuf> = OnceLock::new();
+static EXPORTED_SCAFFOLD_PARENT: OnceLock<PathBuf> = OnceLock::new();
+static EXPORTED_SCAFFOLD_CLEANUP_REGISTERED: OnceLock<()> = OnceLock::new();
+
+extern "C" fn cleanup_exported_scaffold() {
+    if let Some(path) = EXPORTED_SCAFFOLD_PARENT.get()
+        && let Err(error) = fs::remove_dir_all(path)
+        && error.kind() != std::io::ErrorKind::NotFound
+    {
+        let mut stderr = std::io::stderr().lock();
+        let _ = writeln!(
+            stderr,
+            "cannot remove template-export test directory {} at process exit: {error}",
+            path.display()
+        );
+        std::process::abort();
+    }
+}
 
 fn workspace_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..").canonicalize().unwrap()
@@ -37,6 +55,15 @@ fn template_export_tempdir() -> TempDir {
     tempfile::tempdir_in(&parent).unwrap_or_else(|error| {
         panic!("cannot create template-export temporary directory in {}: {error}", parent.display())
     })
+}
+
+fn host_first_scaffold_parent(
+    cargo_target_tmpdir: Option<PathBuf>,
+    workspace_root: &Path,
+    process_id: u32,
+) -> PathBuf {
+    template_export_temp_parent(cargo_target_tmpdir, workspace_root)
+        .join(format!("consumer-scaffold-host-first-{process_id}"))
 }
 
 fn git_predicate(workspace_root: &Path, args: &[&str]) -> bool {
@@ -166,16 +193,51 @@ fn materialize_export_source(parent: &Path) -> PathBuf {
 }
 
 fn exported_scaffold() -> PathBuf {
-    EXPORTED_SCAFFOLD
+    let export_parent = EXPORTED_SCAFFOLD_PARENT
         .get_or_init(|| {
-            let export_parent = template_export_tempdir();
-            let output_dir = export_parent.path().join("scaffold");
-            let source_root = materialize_export_source(export_parent.path());
-            export_scaffold(&source_root, &output_dir);
-            export_parent
+            let workspace_root = workspace_root();
+            host_first_scaffold_parent(
+                option_env!("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+                &workspace_root,
+                std::process::id(),
+            )
         })
-        .path()
-        .join("scaffold")
+        .clone();
+    EXPORTED_SCAFFOLD_CLEANUP_REGISTERED.get_or_init(|| {
+        // Safety: the callback has the required C ABI, captures no state, and only
+        // removes the process-isolated directory recorded in the OnceLock.
+        let registration = unsafe { libc::atexit(cleanup_exported_scaffold) };
+        if registration != 0 {
+            panic!("cannot register template-export test directory cleanup");
+        }
+    });
+    EXPORTED_SCAFFOLD_PATH
+        .get_or_init(|| {
+            // This fixed, process-isolated directory is deliberately stored as a
+            // path rather than a `TempDir`: it remains under Cargo's cleanable
+            // target temp root while allowing all tests in this binary to share
+            // one expensive export. Remove leftovers from an interrupted prior
+            // run before recreating the sibling source/scaffold trees.
+            if export_parent.exists() {
+                fs::remove_dir_all(&export_parent).unwrap_or_else(|error| {
+                    panic!(
+                        "cannot remove stale template-export test directory {}: {error}",
+                        export_parent.display()
+                    )
+                });
+            }
+            fs::create_dir_all(&export_parent).unwrap_or_else(|error| {
+                panic!(
+                    "cannot create template-export test directory {}: {error}",
+                    export_parent.display()
+                )
+            });
+            let output_dir = export_parent.join("scaffold");
+            let source_root = materialize_export_source(&export_parent);
+            export_scaffold(&source_root, &output_dir);
+            output_dir
+        })
+        .clone()
 }
 
 fn export_scaffold(source_root: &Path, output_dir: &Path) {
@@ -223,6 +285,16 @@ fn test_template_export_temp_parent_falls_back_to_workspace_target_tmp() {
     assert_eq!(
         template_export_temp_parent(Some(PathBuf::new()), Path::new("/workspace")),
         PathBuf::from("/workspace/target/tmp")
+    );
+}
+
+#[test]
+fn test_host_first_scaffold_parent_is_process_isolated_under_target_tmp() {
+    let configured = PathBuf::from("/cargo/target/tmp");
+
+    assert_eq!(
+        host_first_scaffold_parent(Some(configured), Path::new("/workspace"), 4242),
+        PathBuf::from("/cargo/target/tmp/consumer-scaffold-host-first-4242")
     );
 }
 

@@ -140,9 +140,13 @@ fn validate_exclusion_pattern(pattern: &str, index: usize) -> Result<(), ScopeDi
 
 /// Counts an untracked file's whole length as additions.
 pub(super) fn untracked_paths(output: &[u8]) -> Result<Vec<FilePath>, ScopeDiffMeasureError> {
+    // Git reports an untracked directory, including a nested repository, as a
+    // single path ending in `/`. It cannot be a reviewable file, so skip this
+    // structural entry before path decoding; other records keep their normal
+    // validation and fail-closed filesystem handling.
     output
         .split(|byte| *byte == b'\0')
-        .filter(|raw_path| !raw_path.is_empty())
+        .filter(|raw_path| !raw_path.is_empty() && !raw_path.ends_with(b"/"))
         .map(file_path_bytes)
         .collect()
 }

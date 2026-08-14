@@ -143,6 +143,64 @@
           "hash": "rvw1:sha256:13f0ab6caea9968dae8d87d263b8d5696144cd3f348f74663250e2d097dd92e1",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:11:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d150ec1dd4156c3069312bd91b46ca9adc34d678a99340979d9ad24b6f79f76c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:45Z",
+          "findings": [
+            {
+              "category": "resource_cleanup",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 178,
+              "message": "`EXPORTED_SCAFFOLD_PATH` retains only a `PathBuf`, so normal process exit performs no directory cleanup. The sole `remove_dir_all` runs before creation and targets the current PID; a later test process generally uses a different PID and leaves this run's ~1.6 GB directory untouched. Thus the B2 disk-leak requirement is not satisfied.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d150ec1dd4156c3069312bd91b46ca9adc34d678a99340979d9ad24b6f79f76c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:21:22Z",
+          "findings": [
+            {
+              "category": "resource_cleanup",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 18,
+              "message": "The cleanup callback removes only the stored `.../scaffold` path. `materialize_export_source` creates the sibling `.../source` tree under the process directory, so every successful run still leaves that copied source tree and its parent behind. Store/remove `export_parent`, not only `output_dir`.",
+              "severity": "P1"
+            },
+            {
+              "category": "resource_cleanup",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 218,
+              "message": "Cleanup registration occurs only after fixture materialization and scaffold export complete. If copying or export panics—the failure path most likely to need cleanup—no handler is registered and the partial process directory leaks at test-binary exit.",
+              "severity": "P1"
+            },
+            {
+              "category": "error_handling",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 18,
+              "message": "The exit callback silently discards `remove_dir_all` failures. A test binary can therefore exit successfully while retaining the large fixture, with no diagnostic that the disk-hygiene guarantee failed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:95b76b5609f675bb4d56030ba56cda688e9d4de064327dfbd28e04818b6316a0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:24:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75cd5f40e36cdf0d2b41b04d7ee90f60d817df5217e4ca0b4caae2b384f25dd3",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -310,6 +368,35 @@
           "at": "2026-08-13T20:36:50Z",
           "findings": [],
           "hash": "rvw1:sha256:28b42223a8cf73f43c7e247eb3d47b27d801f931b1204122b6120a30d66f2ec3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:12:27Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 68,
+              "message": "T002 is marked done, but its plan description and S2 section still cover only D2/IN-02/CN-02/AC-03. The B2 correction described in the briefing (T002 owning CN-03 / the typed recording-failure propagation) is absent, while CN-03 remains assigned to T003. This leaves the intended T002 responsibility unrepresented in the executable plan.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:116780086a347f4cc43ed345905b348438a9bd15138f4b19fb1c66fe17714b31",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:13:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:116780086a347f4cc43ed345905b348438a9bd15138f4b19fb1c66fe17714b31",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:116780086a347f4cc43ed345905b348438a9bd15138f4b19fb1c66fe17714b31",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -491,6 +578,20 @@
           "at": "2026-08-14T00:45:28Z",
           "findings": [],
           "hash": "rvw1:sha256:df81e82adc511b2e84acf8e46287b8f85c359a55f8bdb357e455ae8cc15d15dc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:12:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d78b98a7a4efe0e868253a28d44ddb2627516b2d5557cd5e343f2c31aff74c4d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:17:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d78b98a7a4efe0e868253a28d44ddb2627516b2d5557cd5e343f2c31aff74c4d",
           "type": "final",
           "verdict": "zero_findings"
         }

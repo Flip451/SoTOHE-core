@@ -1095,18 +1095,16 @@ mod tests {
     }
 
     #[test]
-    fn test_an_embedded_git_repository_under_reviewable_prefix_fails_closed() {
+    fn test_an_ignored_embedded_git_repository_under_reviewable_prefix_is_skipped() {
         let repo = fixture_repo();
         let root = repo.path();
+        write(root, ".gitignore", "libs/domain/src/embedded-repository/\n");
         embedded_git_repo(root, "libs/domain/src/embedded-repository");
 
-        let error = measure_result_in(root)
-            .expect_err("an embedded repository in reviewable space must fail measurement");
-        assert!(
-            error.to_string().contains(
-                "untracked file libs/domain/src/embedded-repository/ is not a regular file"
-            ),
-            "the existing non-regular-file failure must be preserved: {error}"
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "an ignored nested repository directory entry must not be counted"
         );
     }
 
