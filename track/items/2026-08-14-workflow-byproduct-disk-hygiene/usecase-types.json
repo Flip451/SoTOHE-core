@@ -1,0 +1,71 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {
+    "ScopeDiffMeasurePort": {
+      "action": "reference",
+      "docs": "Baseline driven port for per-scope diff measurement. The synchronous boundary color is intentional: the existing task-admission workflow is synchronous, and GitScopeDiffMeasurer performs blocking Git process and filesystem operations within that call; an async signature would not make those operations non-blocking without a wider execution-model migration outside D1/D2. Its public method and Send + Sync bounds therefore remain unchanged while GitScopeDiffMeasurer changes only its internal D1/D2 behavior; referenced so the adapter impl edge remains resolvable (IN-01, IN-02, AC-01, AC-02, AC-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "measure_scope_diff",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::batch_plan::MeasuredScopeDiff>, ScopeDiffMeasureError>"
+        }
+      ],
+      "module_path": "batch_plan::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {}
+}

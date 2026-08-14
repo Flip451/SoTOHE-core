@@ -33,12 +33,12 @@ const MAX_BINARY_TREE_PATHSPEC_BYTES: usize = 64 * 1024;
 
 mod untracked;
 
-use untracked::{
-    IGNORED_NON_REVIEW_PATHS, drop_ignored_non_review_paths, file_path_bytes, retained_paths,
-    untracked_additions, untracked_paths,
-};
 #[cfg(test)]
 use untracked::{MAX_UNTRACKED_FILE_BYTES, count_file_lines};
+use untracked::{
+    ScopeDiffExclusions, file_path_bytes, load_scope_diff_exclusions, retained_paths,
+    untracked_additions, untracked_paths,
+};
 
 fn measure_failed(message: impl Into<String>) -> ScopeDiffMeasureError {
     ScopeDiffMeasureError::MeasureFailed { message: FreeText::new(message.into()) }
@@ -83,6 +83,7 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
                 scope_config_classification(&error)
             ))
         })?;
+        let exclusions = load_scope_diff_exclusions(&root)?;
 
         // Run from the discovery anchor, with paths pinned to the full tree.
         // Disable rename, textconv, and external-diff configuration so numstat
@@ -103,27 +104,13 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
             ],
         )?;
         // Enumerate ordinary and ignored files separately. The ignored pass is
-        // needed for in-scope source files. Git can still emit an embedded
-        // repository as a directory entry despite an exclude pathspec, so the
-        // Rust-side prefix filter below enforces the exclusions on both passes.
-        let visible_untracked = git_bytes(
-            &items_dir,
-            &["ls-files", "-z", "--others", "--exclude-standard", "--full-name", "--", ":/"],
-        )?;
-        let ignored_args = [
-            "ls-files",
-            "-z",
-            "--others",
-            "--ignored",
-            "--exclude-standard",
-            "--full-name",
-            "--",
-            ":/",
-        ]
-        .into_iter()
-        .chain(IGNORED_NON_REVIEW_PATHS)
-        .collect::<Vec<_>>();
-        let ignored_untracked = git_bytes(&items_dir, &ignored_args)?;
+        // needed for in-scope source files. Git evaluates the operator-owned
+        // exclusion pathspecs for both passes, so Git remains the sole matcher
+        // for pathspec semantics.
+        let visible_untracked =
+            git_bytes_owned(&items_dir, &visible_untracked_git_args(&exclusions))?;
+        let ignored_untracked =
+            git_bytes_owned(&items_dir, &ignored_untracked_git_args(&exclusions))?;
 
         let mut changed = binary_safe_numstat_additions(
             &root,
@@ -133,7 +120,6 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
         )?;
         let mut untracked = untracked_paths(&visible_untracked)?;
         untracked.extend(untracked_paths(&ignored_untracked)?);
-        let untracked = drop_ignored_non_review_paths(untracked)?;
         let untracked = retained_paths(&scope_config, untracked);
         changed.extend(untracked_additions(&root, &untracked)?);
 
@@ -243,6 +229,26 @@ fn resolve_base(
 
 fn git_bytes(command_dir: &Path, args: &[&str]) -> Result<Vec<u8>, ScopeDiffMeasureError> {
     git_bytes_with_limit(command_dir, args, MAX_GIT_OUTPUT_BYTES as usize)
+}
+
+fn git_bytes_owned(command_dir: &Path, args: &[String]) -> Result<Vec<u8>, ScopeDiffMeasureError> {
+    let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+    git_bytes(command_dir, &refs)
+}
+
+fn ignored_untracked_git_args(exclusions: &ScopeDiffExclusions) -> Vec<String> {
+    let mut args =
+        vec!["ls-files".to_owned(), "-z".to_owned(), "--others".to_owned(), "--ignored".to_owned()];
+    args.extend(["--exclude-standard", "--full-name", "--", ":/"].into_iter().map(str::to_owned));
+    args.extend(exclusions.git_pathspecs().iter().cloned());
+    args
+}
+
+fn visible_untracked_git_args(exclusions: &ScopeDiffExclusions) -> Vec<String> {
+    let mut args = vec!["ls-files".to_owned(), "-z".to_owned(), "--others".to_owned()];
+    args.extend(["--exclude-standard", "--full-name", "--", ":/"].into_iter().map(str::to_owned));
+    args.extend(exclusions.git_pathspecs().iter().cloned());
+    args
 }
 
 fn git_bytes_with_limit(
@@ -595,6 +601,10 @@ mod tests {
         std::fs::write(path, contents).unwrap();
     }
 
+    fn write_exclusions_config(root: &std::path::Path, contents: &str) {
+        write(root, ".harness/config/scope-diff-exclusions.json", contents);
+    }
+
     fn embedded_git_repo(root: &std::path::Path, rel: &str) {
         let embedded = root.join(rel);
         std::fs::create_dir_all(&embedded).unwrap();
@@ -622,6 +632,24 @@ mod tests {
             r#"{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"]}},
                 "review_operational": ["track/items/<track-id>/review.json"],
                 "other_track": [], "default_diff_ceiling_lines": 500}"#,
+        );
+        write(
+            root,
+            ".harness/config/scope-diff-exclusions.json",
+            r#"{"schema_version":1,"exclusions":[
+                "target/**", "target-*/**", "**/*.rs.bk",
+                ".claude/logs/**", ".claude/worktrees/**",
+                ".fastembed_cache/**", "**/.fastembed_cache/**",
+                ".semantic_index/**", "**/.semantic_index/**", ".semantic_index.*",
+                ".cache", "sotp-dry-index-*/**", ".env", ".env.*",
+                "**/*.pem", "**/*.key", "private/**", "config/secrets/**",
+                "tmp/**", ".cache/**", "libs/**/tmp/**", "apps/**/tmp/**",
+                ".harness/tools/**", "bin/sotp", ".cargo-install/**",
+                "repomix-output.txt", "repomix-output.xml", "repomix-output.*/**",
+                ".idea/**", ".vscode/**", ".locks/**",
+                "track/items/**/.commit_hash", "track/items/**/.commit_hash.tmp",
+                "track/items/*/*-graph*/**", "track/items/*/logs/**"
+            ]}"#,
         );
         write(root, "libs/domain/src/committed.rs", &"line\n".repeat(10));
         write(root, "libs/domain/src/staged.rs", &"line\n".repeat(5));
@@ -813,6 +841,72 @@ mod tests {
     }
 
     #[test]
+    fn test_operator_owned_exclusions_filter_visible_and_ignored_untracked_paths() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ".gitignore", "libs/domain/tmp/ignored.rs\n");
+        write(root, "libs/domain/tmp/visible.rs", &"line\n".repeat(7));
+        write(root, "libs/domain/tmp/ignored.rs", &"line\n".repeat(11));
+        write(root, "libs/domain/src/visible.pem", &"line\n".repeat(13));
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "shipped recursive and non-recursive policies must apply to visible and ignored paths"
+        );
+
+        write_exclusions_config(
+            root,
+            r#"{"schema_version":1,"exclusions":[
+                "libs/**/tmp/**", "libs/domain/src/operator-owned/**", "**/*.pem"
+            ]}"#,
+        );
+        write(root, "libs/domain/src/operator-owned/generated.rs", &"line\n".repeat(13));
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a new operator pattern must work without a source-code change"
+        );
+    }
+
+    #[test]
+    fn test_missing_scope_diff_exclusions_config_fails_closed() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        std::fs::remove_file(root.join(".harness/config/scope-diff-exclusions.json")).unwrap();
+
+        let error = measure_result_in(root).expect_err("the mandatory config must be present");
+        assert!(
+            error.to_string().contains(".harness/config/scope-diff-exclusions.json"),
+            "the failure identifies the missing required config: {error}"
+        );
+    }
+
+    #[test]
+    fn test_malformed_empty_and_unsafe_scope_diff_exclusions_configs_fail_closed() {
+        let repo = fixture_repo();
+        let root = repo.path();
+
+        for contents in [
+            "not json",
+            r#"{"schema_version":1,"exclusions":[]}"#,
+            r#"{"schema_version":1,"exclusions":[""]}"#,
+            r#"{"schema_version":1,"exclusions":["/root"]}"#,
+            r#"{"schema_version":1,"exclusions":[":(exclude)target/**"]}"#,
+            r#"{"schema_version":1,"exclusions":["libs/../target/**"]}"#,
+        ] {
+            write_exclusions_config(root, contents);
+            let error = measure_result_in(root)
+                .expect_err("malformed, empty, and invalid policy must fail closed");
+            assert!(
+                error.to_string().contains("scope-diff-exclusions.json"),
+                "the failure identifies the required config: {error}"
+            );
+        }
+    }
+
+    #[test]
     fn test_an_ignored_untracked_in_scope_file_is_counted_as_additions() {
         let repo = fixture_repo();
         let root = repo.path().to_path_buf();
@@ -828,10 +922,13 @@ mod tests {
 
     #[test]
     fn test_an_ignore_negated_visible_file_is_kept_for_scope_classification() {
+        // The negated file must not match the fixture's committed operator
+        // exclusions: overwriting that tracked config here would add its own
+        // diff lines to the `other` scope and obscure the assertion.
         let repo = fixture_repo();
         let root = repo.path().to_path_buf();
-        write(&root, ".gitignore", ".env*\n!.env.example\n");
-        write(&root, ".env.example", &"line\n".repeat(5));
+        write(&root, ".gitignore", "notes-*.md\n!notes-keep.md\n");
+        write(&root, "notes-keep.md", &"line\n".repeat(5));
 
         let measured = measure_in(&root);
         assert_eq!(
@@ -841,6 +938,127 @@ mod tests {
                 .map(|diff| diff.lines().value()),
             Some(7),
             "a visible ignore negation must not be filtered as a generated output"
+        );
+    }
+
+    #[test]
+    fn test_explicit_operator_exclusion_overrides_visible_ignore_negation() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ".gitignore", ".env*\n!.env.example\n");
+        write(root, ".env.example", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":[".env.example"]}"#);
+
+        let with_excluded_file = measure_in(root);
+        std::fs::remove_file(root.join(".env.example")).unwrap();
+        let without_file = measure_in(root);
+        assert_eq!(
+            with_excluded_file
+                .iter()
+                .find(|diff| diff.scope().to_string() == "other")
+                .map(|diff| diff.lines().value()),
+            without_file
+                .iter()
+                .find(|diff| diff.scope().to_string() == "other")
+                .map(|diff| diff.lines().value()),
+            "an explicit operator exclusion must win over a Git ignore negation"
+        );
+    }
+
+    #[test]
+    fn test_slashless_exclusion_is_root_anchored_like_git_pathspec() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, "Cargo.toml", &"line\n".repeat(5));
+        write(root, "libs/domain/src/Cargo.toml", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":["Cargo.toml"]}"#);
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3 + 5,
+            "a slashless top pathspec must not exclude a nested same-name file"
+        );
+    }
+
+    #[test]
+    fn test_literal_directory_exclusion_is_evaluated_by_git_for_visible_descendants() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, "libs/domain/src/operator-owned/generated.rs", &"line\n".repeat(5));
+        write_exclusions_config(
+            root,
+            r#"{"schema_version":1,"exclusions":["libs/domain/src/operator-owned"]}"#,
+        );
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a literal directory pathspec must exclude its visible descendants"
+        );
+    }
+
+    #[test]
+    fn test_posix_character_class_exclusion_is_evaluated_by_git() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, "libs/domain/src/Cargo.toml", &"line\n".repeat(5));
+        write_exclusions_config(
+            root,
+            r#"{"schema_version":1,"exclusions":["libs/domain/src/[[:upper:]]argo.toml"]}"#,
+        );
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "Git POSIX character classes must control the exclusion"
+        );
+    }
+
+    #[test]
+    fn test_an_ignore_negated_visible_file_inside_recursive_exclusion_is_dropped() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(&root, ".gitignore", "libs/domain/tmp/*\n!libs/domain/tmp/large-output\n");
+        write(&root, "libs/domain/tmp/large-output", &"line\n".repeat(5));
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            3,
+            "a visible ignore negation must not bypass a recursive operator exclusion"
+        );
+    }
+
+    #[test]
+    fn test_an_ignore_negated_visible_file_cannot_bypass_a_non_recursive_exclusion() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ".gitignore", "*.pem\n!libs/domain/src/review.pem\n");
+        write(root, "libs/domain/src/review.pem", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":["*.pem"]}"#);
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a visible ignore negation must not bypass a credential-file exclusion"
+        );
+    }
+
+    #[test]
+    fn test_an_ignore_negated_visible_descendant_cannot_bypass_a_slash_pattern() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(
+            root,
+            ".gitignore",
+            "libs/*\n!libs/domain/\n!libs/domain/src/\n!libs/domain/src/review.rs\n",
+        );
+        write(root, "libs/domain/src/review.rs", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":["libs/*"]}"#);
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a visible descendant must not bypass a slash-containing operator exclusion"
         );
     }
 
@@ -877,18 +1095,16 @@ mod tests {
     }
 
     #[test]
-    fn test_an_embedded_git_repository_under_reviewable_prefix_fails_closed() {
+    fn test_an_ignored_embedded_git_repository_under_reviewable_prefix_is_skipped() {
         let repo = fixture_repo();
         let root = repo.path();
+        write(root, ".gitignore", "libs/domain/src/embedded-repository/\n");
         embedded_git_repo(root, "libs/domain/src/embedded-repository");
 
-        let error = measure_result_in(root)
-            .expect_err("an embedded repository in reviewable space must fail measurement");
-        assert!(
-            error.to_string().contains(
-                "untracked file libs/domain/src/embedded-repository/ is not a regular file"
-            ),
-            "the existing non-regular-file failure must be preserved: {error}"
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "an ignored nested repository directory entry must not be counted"
         );
     }
 
