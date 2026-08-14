@@ -56,6 +56,19 @@ For a Full hearing, elicit the sections in this order:
 6. Reassess When triggers.
 7. Related references.
 
+### Open-set check (Full hearing, before finalizing each decision)
+
+A decision text contains **open-set semantics** when it commits to exact enumeration, complete tracking, or a universally quantified obligation — phrasings such as 「正確な列挙」「完全な追跡」「すべての X を Y する」 or their equivalents.
+Such a phrase silently expands into unbounded implementation depth (hand-rolled parsers, resource tracking, build-system imitation) and non-converging reviews.
+Before finalizing a decision whose text contains open-set semantics, ask the user to resolve it as one of three options and record the chosen resolution in the decision text or its Consequences:
+
+1. **Delegate to an existing authority** — the compiler, cargo, rustdoc, git, or a domain type already owns the enumeration; the decision defers to it.
+2. **Conservative over-approximation** — an admittedly coarse superset check suffices; exactness is explicitly waived.
+3. **Strict implementation with a depth estimate** — exactness is genuinely required; the user acknowledges an explicit estimate of the implementation depth before the decision is confirmed.
+
+Do not finalize an open-set decision without one of these resolutions.
+This check applies to the Full hearing; a decision without open-set phrasing needs no extra question.
+
 ### Write the ADR
 
 Create a new file only at `knowledge/adr/$(date -u +"%Y-%m-%d-%H%M")-<slug>.md`.

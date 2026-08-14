@@ -4,13 +4,13 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use domain::FreeText;
-use usecase::capability_exec::{ProviderName, ReasoningEffort};
+use usecase::capability_exec::{CODEX_PROVIDER_NAME, ProviderName, ReasoningEffort};
 use usecase::dry_write_driver::CapabilityName;
 
 use super::types::{AgentProfilesDto, ProviderMetadataDto, SchemaVersionEnvelope};
 use super::{
-    AgentProfilesError, CapabilityConfigDto, ExecutionModeDto, ModelNameDto, ProviderNameDto,
-    ReasoningEffortDto, ResolvedExecution, RoundType,
+    AgentProfilesError, CapabilityConfigDto, CapabilityProviderBindingDto, ExecutionModeDto,
+    ModelNameDto, ProviderNameDto, ReasoningEffortDto, ResolvedExecution, RoundType,
 };
 use crate::capability_exec::{
     bounded_read_utf8_file,
@@ -112,13 +112,17 @@ impl AgentProfiles {
         let config = self
             .resolve_capability(capability)
             .ok_or_else(|| AgentProfilesError::CapabilityNotFound(capability.clone()))?;
+        let default_provider = match config.provider_binding() {
+            CapabilityProviderBindingDto::Standard(provider) => provider.clone().into_domain(),
+            CapabilityProviderBindingDto::CodexCustom(_) => CODEX_PROVIDER_NAME.clone(),
+        };
         let provider = match round_type {
-            RoundType::Final => config.provider.clone().into_domain(),
+            RoundType::Final => default_provider,
             RoundType::Fast => config
                 .fast_provider
                 .clone()
-                .unwrap_or_else(|| config.provider.clone())
-                .into_domain(),
+                .map(ProviderNameDto::into_domain)
+                .unwrap_or(default_provider),
         };
 
         if capability.as_str() == "pr-reviewer" {
@@ -164,10 +168,10 @@ impl AgentProfiles {
 }
 
 impl CapabilityConfigDto {
-    /// The provider name.
+    /// The provider binding selected by the flat profile fields.
     #[must_use]
-    pub fn provider(&self) -> &ProviderNameDto {
-        &self.provider
+    pub fn provider_binding(&self) -> &CapabilityProviderBindingDto {
+        &self.provider_binding
     }
 
     /// The default model name, if set.

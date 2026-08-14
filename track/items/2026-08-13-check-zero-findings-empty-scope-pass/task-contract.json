@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-13-check-zero-findings-empty-scope-pass",
+  "entries": {
+    "T1": [
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      }
+    ],
+    "T2": []
+  }
+}

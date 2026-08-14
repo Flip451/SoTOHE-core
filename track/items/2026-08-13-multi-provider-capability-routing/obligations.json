@@ -1,0 +1,65 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProfilePort' of AgentProfilesCapabilityAdapter",
+      "declaration_hash": "298572cbb1d0b9b939da34d5015606e12ca5fae0f9c6e2f78f3922ab4e486cd5",
+      "id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProviderPort' of CodexCapabilityAdapter",
+      "declaration_hash": "edec83b4cf00bae8da651127e6ad59063e09e4cc10c0ef6ce17cca6d352336fd",
+      "id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "CodexCapabilityAdapter",
+        "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    }
+  ],
+  "track_id": "2026-08-13-multi-provider-capability-routing"
+}

@@ -1,0 +1,327 @@
+{
+  "entries": [
+    {
+      "claim_hash": "f3bb3886f9c5d64894e5ac5c8e65531aef64f94ed6aaca6629e5106fe193492b",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "開集合の意味論を含む決定を、ADR 起草時と実装計画時の二段階で確認できる文書上の検査として定義する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f3bb3886f9c5d64894e5ac5c8e65531aef64f94ed6aaca6629e5106fe193492b",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "開集合の意味論を含む決定を、ADR 起草時と実装計画時の二段階で確認できる文書上の検査として定義する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実装方針が「開集合をヒューリスティックで覆う」形になった時点で指摘する観点（手作りのパーサ・リソース管理・ビルドシステム模倣の検出）を briefing に加える。起草をすり抜けた開集合の二段目の網。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "904916bb0556fcac0c78d3366f5e294696f23aca99c28329e9d8b0f5afd79fd2",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "ADR 起草ヒアリングの Full モードと ADR レビュー prompt に、開集合の決定文面を確認する三択検査を追加する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "64acbc1fb7b70c630eb42f5f9c99280a5c3a16e4d8839913d38b662467d8f7c7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "impl-plan と types の reviewer briefing に、開集合をヒューリスティックで覆う実装方針を検出する観点を追加する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実装方針が「開集合をヒューリスティックで覆う」形になった時点で指摘する観点（手作りのパーサ・リソース管理・ビルドシステム模倣の検出）を briefing に加える。起草をすり抜けた開集合の二段目の網。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6b1805070d76ce99495981b992fb725793102b0a2c9753453adc573a4714988c",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "開集合を示す句のパターン検出を CI lint として機械化することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2255309a83c559a6ac2b4230252b2da54cac7c1a3996d413810940d4f2b4666",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "Rust のプロダクションコード、型、または実行時の検査を実装することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2255309a83c559a6ac2b4230252b2da54cac7c1a3996d413810940d4f2b4666",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "Rust のプロダクションコード、型、または実行時の検査を実装することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実装方針が「開集合をヒューリスティックで覆う」形になった時点で指摘する観点（手作りのパーサ・リソース管理・ビルドシステム模倣の検出）を briefing に加える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2d2ea1c8f046c900bfd8c11392953f3e2e5c488b7641774a1b93c085f550f014",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "ADR 起草時の確認を省略し、実装後のレビューだけで開集合を検出する運用は対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3f46622a99b82f85b873ed23105e326d739c0b64d68a83b0d25394dccd2a92ca",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "D1 の検査は ADR 起草ヒアリングの Full モードおよび ADR レビュー prompt に限定して配置する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2d1a48d3a140eca3277417dda34be8a479da41a2758294e392e251a659be341b",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "D2 の検査は impl-plan と types の reviewer briefing に限定して配置する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D2: impl-plan / types の reviewer briefing に同観点を追加する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2ceb996de7a12b9606a2381e3ffa977404c7f3e378cf94b47f904a307ae25944",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "開集合検査は既存の権威への委譲、保守的な過大近似、または厳密実装の深さ見積りを比較する意味論的な確認であり、単純な文言一致で代替しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える: 決定文面に「正確な列挙」「完全な追跡」「すべての X を Y する」型の句があれば、(a) 既存の権威（コンパイラ・cargo・rustdoc・git・domain 型）へ委譲可能か、(b) 保守的な過大近似で足りるか、(c) 厳密実装の深さ見積り、の三択を確認してから決定を確定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8f09a28dd96b165978222e47425d464ffa26fac5218e910cff97af2133475ed0",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "Full モードの ADR 起草ヒアリングと ADR 意味論レビュー prompt は、正確な列挙、完全な追跡、または「すべての X を Y する」型の決定文面について、既存の権威への委譲、保守的な過大近似、厳密実装の深さ見積りの三択確認を求める。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える: 決定文面に「正確な列挙」「完全な追跡」「すべての X を Y する」型の句があれば、(a) 既存の権威（コンパイラ・cargo・rustdoc・git・domain 型）へ委譲可能か、(b) 保守的な過大近似で足りるか、(c) 厳密実装の深さ見積り、の三択を確認してから決定を確定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0c3ba28c766b71ca79cd48fb133c9eee321d4d40fa84c29ea45472c312e36e59",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "impl-plan と types の reviewer briefing は、実装方針が開集合をヒューリスティックで覆おうとしている場合に、手作りのパーサ、リソース管理、またはビルドシステム模倣を指摘する観点を含む。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "実装方針が「開集合をヒューリスティックで覆う」形になった時点で指摘する観点（手作りのパーサ・リソース管理・ビルドシステム模倣の検出）を briefing に加える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cca686ce28a968f4844c8cd7260a8c1b973dda0751cd913fcdab7b90f4077a65",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "検査は自然言語の意味を人が判断する文書上の確認として提供され、句パターンを検出する決定論的な CI lint を導入しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "710a7733a336d7d1e303dbc2dcd1baad14b6c4f8ae3b91d9a7cfb05d6a091698",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-13-1756-adr-open-set-depth-check.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "起草ヒアリング（Full モード）と ADR レビュー prompt に次の検査を加える",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

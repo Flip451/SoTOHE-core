@@ -84,6 +84,19 @@ affected layer key.
   (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the field
   must reference upstream behaviour by anchor cite, not reproduce it. Cite
   `.harness/policies/no-upstream-restatement.md`.
+- **open-set covering contract**: an entry whose declared purpose (docs /
+  intent / method surface) commits the type to exactly enumerating or
+  completely tracking an open set — hand-rolled parsing of a language another
+  authority already parses, resource-lifecycle bookkeeping the platform
+  already owns, or imitation of a build system's dependency knowledge —
+  instead of (a) delegating to that existing authority (compiler, cargo,
+  rustdoc, git, a domain type), (b) declaring a conservative over-approximation,
+  or (c) acknowledging a strict implementation with a depth estimate. Cite the
+  entry key and name the authority being reimplemented or the exactness claim
+  that lacks grounds. An entry that explicitly declares one of these three
+  resolutions, or whose `spec_refs[]` anchor traces to an upstream chain that
+  records one for the entry's open-set surface, is not reportable under this
+  category; do not require duplicating the resolution in `docs` / `intent`.
 - **unsupported semantic placement**: a `ValueObject` placed in domain, usecase,
   or infrastructure whose `docs` or reviewable track record does not establish
   the semantic grounds for that placement: ubiquitous language, invariant

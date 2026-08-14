@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-13-multi-provider-capability-routing",
+  "entries": {
+    "T001": [
+      {
+        "layer": "usecase",
+        "entry_key": "CapabilityInputValidationError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CapabilityProfile"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CapabilityProviderBinding"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ModelProviderName"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "usecase",
+        "entry_key": "CapabilityProfilePort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "AgentProfilesCapabilityAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CapabilityConfigDto"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CapabilityProviderBindingDto"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "ModelProviderNameDto"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "usecase",
+        "entry_key": "CapabilityProviderPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexCapabilityAdapter"
+      }
+    ],
+    "T004": [],
+    "T005": [],
+    "T006": []
+  }
+}

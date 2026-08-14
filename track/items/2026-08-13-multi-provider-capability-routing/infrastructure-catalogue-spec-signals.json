@@ -1,0 +1,31 @@
+{
+  "catalogue_declaration_hash": "4193552b56ca694a8fc92bb1f6a8f3bc123cfa2f8b595ba5e7a575e75a563ce1",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "ea169719133c0a14a8f33fdb953128d8a4be8a9a7cf8b5e2e594f36fd0744adc",
+      "signal": "blue",
+      "type_name": "AgentProfilesCapabilityAdapter"
+    },
+    {
+      "entry_hash": "55c5eaf1a581d7feff48460a56701a14d80dfa1aac6f0c42a83281d5be8766d2",
+      "signal": "blue",
+      "type_name": "CapabilityConfigDto"
+    },
+    {
+      "entry_hash": "51d9c6bfc0c3bc65692bdfc37d14a7eb094c3182e590af1c8ad56035c2c604bb",
+      "signal": "blue",
+      "type_name": "CapabilityProviderBindingDto"
+    },
+    {
+      "entry_hash": "655c2bd2cdc2ffcb1aaeeab0d81675636f1b5b9e45e65ba8e3fd4262883d3994",
+      "signal": "blue",
+      "type_name": "CodexCapabilityAdapter"
+    },
+    {
+      "entry_hash": "a88c4b2898321f6126bb54f6cb94b9d22f680c602c503956c25b4e776bdf685c",
+      "signal": "blue",
+      "type_name": "ModelProviderNameDto"
+    }
+  ]
+}

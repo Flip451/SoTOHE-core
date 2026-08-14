@@ -181,6 +181,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [base merge 後の baseline 再取得と同期記録を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
 | [type-signals cache は clean な同一 HEAD commit でのみ再利用する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
 | [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
+| [check-zero-findings は空 scope を pass させる](2026-08-13-1736-check-zero-findings-empty-scope-pass.md) | Proposed | 2026-08-13 |
 
 ### ADR 運用
 
@@ -194,6 +195,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加](2026-07-18-0340-adr2pr-baseline-diff-comment.md) | Proposed | 2026-07-18 |
 | [入力決定と pipeline 産決定の二箱分離](2026-07-19-0616-two-box-decision-separation.md) | Proposed | 2026-07-19 |
 | [Phase 0 承認後に修正が入った場合は承認前へ戻して再収束する](2026-07-25-0716-phase0-post-approval-reconvergence-lane.md) | Proposed | 2026-07-25 |
+| [ADR 起草とレビューに開集合検査を追加する](2026-08-13-1756-adr-open-set-depth-check.md) | Proposed | 2026-08-13 |
 
 ### ドキュメント運用
 
@@ -255,6 +257,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
 | [Codex 正規入口の整備](2026-07-22-1149-codex-merge-done-adr-entrypoints.md) | Proposed | 2026-07-22 |
 | [reasoning effort に max 段を追加し、限定レーンを Luna Max へ移行する](2026-08-02-0151-codex-reasoning-effort-max.md) | Proposed | 2026-08-02 |
+| [capability routing を中華系プロバイダーへ拡張可能にする](2026-08-02-0151-multi-provider-capability-routing.md) | Proposed | 2026-08-02 |
 | [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
 
 ### テスト・CI ツーリング
