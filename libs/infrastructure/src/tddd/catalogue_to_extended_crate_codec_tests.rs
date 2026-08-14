@@ -179,18 +179,19 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
                 },
                 None,
             )),
-            vec![MethodDeclaration {
-                name: MethodName::new("get_value").unwrap(),
-                receiver: Some(SelfReceiver::SharedRef),
-                params: vec![],
+            vec![MethodDeclaration::new(
+                MethodName::new("get_value").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
                 // TypeRef::new accepts any non-empty string; the codec rejects it at syn parse time.
-                returns: TypeRef::new("42invalid").unwrap(),
-                is_async: false,
-                has_default_impl: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-            }],
+                TypeRef::new("42invalid").unwrap(),
+                false,
+                false,
+                vec![],
+                vec![],
+                vec![],
+                None,
+            )],
             vec![],
             vec![],
             ModulePath::root(),
@@ -314,6 +315,10 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     vec![],
                     TypeRef::new("Self").unwrap(),
                     false,
+                    false,
+                    vec![],
+                    vec![],
+                    vec![],
                     None,
                 ),
                 MethodDeclaration::new(
@@ -322,6 +327,10 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     vec![],
                     TypeRef::new("str").unwrap(),
                     false,
+                    false,
+                    vec![],
+                    vec![],
+                    vec![],
                     None,
                 ),
             ],
@@ -870,18 +879,21 @@ fn test_encode_enum_struct_variant_produces_named_struct_field_items() {
 #[test]
 fn test_encode_method_generic_param_type_emits_type_generic() {
     let mut doc = make_doc("domain");
-    let mut method = MethodDeclaration::new(
+    let method = MethodDeclaration::new(
         MethodName::new("set_value").unwrap(),
         Some(SelfReceiver::ExclusiveRef),
         vec![ParamDeclaration::new(ParamName::new("value").unwrap(), TypeRef::new("T").unwrap())],
         TypeRef::new("()").unwrap(),
         false,
+        false,
+        vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Into<String>").unwrap()],
+        }],
+        vec![],
+        vec![],
         None,
     );
-    method.generics = vec![MethodGenericParam {
-        name: ParamName::new("T").unwrap(),
-        bounds: vec![TypeRef::new("Into<String>").unwrap()],
-    }];
     doc.insert_type(
         TypeName::new("ValueHolder").unwrap(),
         TypeEntry::new(
@@ -1738,15 +1750,18 @@ fn test_encode_type_alias_with_two_generic_declarations_returns_error() {
 #[test]
 fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() {
     let mut doc = make_doc("usecase");
-    let mut method = MethodDeclaration::new(
+    let method = MethodDeclaration::new(
         MethodName::new("describe").unwrap(),
         Some(SelfReceiver::SharedRef),
         vec![],
         TypeRef::new("String").unwrap(),
         false,
+        true,
+        vec![],
+        vec![],
+        vec![],
         None,
     );
-    method.has_default_impl = true;
     doc.insert_trait(
         TraitName::new("Describable").unwrap(),
         TraitEntry::new(
@@ -1793,10 +1808,14 @@ fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false(
         vec![],
         TypeRef::new("()").unwrap(),
         false,
+        false,
+        vec![],
+        vec![],
+        vec![],
         None,
     );
-    // has_default_impl defaults to false via MethodDeclaration::new.
-    assert!(!method.has_default_impl);
+    // has_default_impl is explicitly false via MethodDeclaration::new.
+    assert!(!method.has_default_impl());
     doc.insert_trait(
         TraitName::new("RequiredOps").unwrap(),
         TraitEntry::new(
@@ -1846,9 +1865,13 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
         vec![],
         TypeRef::new("u32").unwrap(),
         false,
+        false,
+        vec![],
+        vec![],
+        vec![],
         None,
     );
-    assert!(!method.has_default_impl);
+    assert!(!method.has_default_impl());
     doc.insert_type(
         TypeName::new("Calculator").unwrap(),
         TypeEntry::new(

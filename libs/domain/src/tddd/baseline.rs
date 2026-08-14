@@ -410,7 +410,7 @@ impl TypeBaseline {
 mod tests {
     use super::*;
     use crate::schema::TypeKind;
-    use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+    use crate::tddd::catalogue_v2::identifiers::{DocString, MethodName, ParamName, TypeRef};
     use crate::tddd::catalogue_v2::roles::SelfReceiver;
     use crate::timestamp::Timestamp;
 
@@ -421,6 +421,10 @@ mod tests {
             vec![],
             TypeRef::new("()").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         )
     }
@@ -501,6 +505,10 @@ mod tests {
                 vec![],
                 TypeRef::new("()").unwrap(),
                 false,
+                false,
+                vec![],
+                vec![],
+                vec![],
                 None,
             )],
         );
@@ -516,6 +524,10 @@ mod tests {
                 )],
                 TypeRef::new("()").unwrap(),
                 false,
+                false,
+                vec![],
+                vec![],
+                vec![],
                 None,
             )],
         );
@@ -549,6 +561,10 @@ mod tests {
                 vec![],
                 TypeRef::new("()").unwrap(),
                 false,
+                false,
+                vec![],
+                vec![],
+                vec![],
                 None, // no docs
             )],
         );
@@ -561,7 +577,11 @@ mod tests {
                 vec![],
                 TypeRef::new("()").unwrap(),
                 false,
-                Some("Saves the entity.".to_string()), // docs differ
+                false,
+                vec![],
+                vec![],
+                vec![],
+                Some(DocString::new("Saves the entity.".to_string())), // docs differ
             )],
         );
         assert!(
@@ -586,6 +606,10 @@ mod tests {
                 )],
                 TypeRef::new("Option<User>").unwrap(),
                 false,
+                false,
+                vec![],
+                vec![],
+                vec![],
                 None,
             )],
         );
@@ -601,6 +625,10 @@ mod tests {
                 )],
                 TypeRef::new("Option<User>").unwrap(),
                 false,
+                false,
+                vec![],
+                vec![],
+                vec![],
                 None,
             )],
         );
@@ -646,6 +674,10 @@ mod tests {
             vec![],
             TypeRef::new("Option<Self>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         )]);
         let b = TraitBaselineEntry::new(vec![MethodDeclaration::new(
@@ -654,7 +686,11 @@ mod tests {
             vec![],
             TypeRef::new("Option<Self>").unwrap(),
             false,
-            Some("Returns the entity, if found.".to_string()),
+            false,
+            vec![],
+            vec![],
+            vec![],
+            Some(DocString::new("Returns the entity, if found.".to_string())),
         )]);
         assert!(
             a.structurally_equal(&b),
@@ -689,6 +725,10 @@ mod tests {
                     vec![],
                     TypeRef::new("TaskStatusKind").unwrap(),
                     false,
+                    false,
+                    vec![],
+                    vec![],
+                    vec![],
                     None,
                 )],
             ),

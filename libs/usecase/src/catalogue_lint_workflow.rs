@@ -730,6 +730,10 @@ mod tests {
                 .collect(),
             TypeRef::new(returns).unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         )
     }

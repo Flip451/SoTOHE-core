@@ -264,11 +264,11 @@ impl EncoderState {
         let mut ids = vec![];
         for method in methods {
             let method_id = self.alloc_id();
-            let is_async = method.is_async;
-            let docs = method.docs.clone();
-            let name = method.name.as_str().to_string();
-            let returns_str = method.returns.as_str().to_string();
-            let receiver_opt = method.receiver;
+            let is_async = method.is_async();
+            let docs = method.docs().map(|docs| docs.as_str().to_owned());
+            let name = method.name().as_str().to_string();
+            let returns_str = method.returns().as_str().to_string();
+            let receiver_opt = method.receiver();
 
             // Build inputs: receiver then params.
             let mut inputs: Vec<(String, Type)> = vec![];
@@ -297,7 +297,7 @@ impl EncoderState {
             //    types, references, generics-in-generics like `Option<T>`) and then call
             //    `rewrite_generic_types` to replace any inner bare generic occurrences.
             let method_generic_names: Vec<&str> =
-                method.generics.iter().map(|g| g.name.as_str()).collect();
+                method.generics().iter().map(|g| g.name.as_str()).collect();
             // Combine outer (impl-level) and method-level generic names. Outer names come
             // first so that method-level names can shadow them if needed (though shadowing
             // generic names is rare in practice).
@@ -308,7 +308,7 @@ impl EncoderState {
                 .collect();
 
             let param_pairs: Vec<(String, String)> = method
-                .params
+                .params()
                 .iter()
                 .map(|p| (p.name.as_str().to_string(), p.ty.as_str().to_string()))
                 .collect();
@@ -364,14 +364,14 @@ impl EncoderState {
             // NOT duplicated into `Function.generics`; they appear on the enclosing
             // `Impl.generics` / `Trait.generics`.
             let method_generics = self.build_where_form_generics(
-                &method.generics,
-                &method.where_predicates,
+                method.generics(),
+                method.where_predicates(),
                 &generic_names,
             )?;
 
             // Per-method has_body: inherent methods always get true via
             // `force_has_body`; trait methods read from `has_default_impl`.
-            let method_has_body = force_has_body || method.has_default_impl;
+            let method_has_body = force_has_body || method.has_default_impl();
             let fn_item = make_item(
                 method_id,
                 Some(name.clone()),

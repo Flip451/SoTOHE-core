@@ -2637,6 +2637,10 @@ mod tests {
             vec![],
             TypeRef::new(returns).unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         )
     }
@@ -2667,6 +2671,10 @@ mod tests {
             params,
             TypeRef::new(returns).unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         )
     }

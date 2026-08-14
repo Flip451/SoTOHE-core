@@ -127,6 +127,39 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-08-14T10:18:54Z",
+          "findings": [
+            {
+              "category": "contract-conformance",
+              "file": "libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 239,
+              "message": "`MethodDeclaration::new` does not match the declared catalogue contract: the contract requires the complete ten-argument constructor, but this implementation retains the legacy six-argument signature and moves the complete form to an undeclared `from_parts` API. This leaves the implementation/catalogue chain inconsistent and keeps the temporary second construction API in the public surface.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:851a97c2fdcff52ce25be141d54e1f91874e3d2af2a33fe71963cd2fcbcfa6c0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T10:49:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d66e7ee4389c75f48cae0e3bd6d6e2856173fe823397b7406ad641991054c75",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:56:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d66e7ee4389c75f48cae0e3bd6d6e2856173fe823397b7406ad641991054c75",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -577,6 +610,81 @@
           "hash": "rvw1:sha256:3f66e9ec8fae51396553b8e54de9a9d7848a75aebd4a7df8adcfc28f309fe1b9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:18:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d527c5da95dbdbc5b2dbd082cf887b36b1d89052074893fa3303a5acf169d7da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:23:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:012a8785fea41f00a7972d8744306db7bcc04754076ac1cba12dc57fb4a48f92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:02:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d527c5da95dbdbc5b2dbd082cf887b36b1d89052074893fa3303a5acf169d7da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:05:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d527c5da95dbdbc5b2dbd082cf887b36b1d89052074893fa3303a5acf169d7da",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-14T10:19:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:210971b1c132de7f8c005086f9176eb19c47d8d15f943f8a88e0f13374dc1cdf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:25:32Z",
+          "findings": [
+            {
+              "category": "compilation",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
+              "line": 209,
+              "message": "`MethodDeclaration::from_parts` does not exist in the current domain API, so this decode path and the three new test constructions cannot compile. The scoped tests also retain several six-argument calls to `MethodDeclaration::new`, whose current signature now requires ten arguments. Restore the intended constructor split or migrate every scoped call consistently.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:210971b1c132de7f8c005086f9176eb19c47d8d15f943f8a88e0f13374dc1cdf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T10:44:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a265882a6cb02e898681c8447afdb1d06a50a824d3a372277c39e2e67739346",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:49:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a265882a6cb02e898681c8447afdb1d06a50a824d3a372277c39e2e67739346",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:52:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a265882a6cb02e898681c8447afdb1d06a50a824d3a372277c39e2e67739346",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -773,6 +881,24 @@
           "at": "2026-08-14T07:09:11Z",
           "findings": [],
           "hash": "rvw1:sha256:f8a7f48baeaa265a1202b0558af19ca04582212da9aa9a22ba83b9f0c4d4cb92",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-14T10:50:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:510e0bdf1838d19e72b02b15cbfcd31285c6783d8154885470270522ab17d74f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:54:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:510e0bdf1838d19e72b02b15cbfcd31285c6783d8154885470270522ab17d74f",
           "type": "final",
           "verdict": "zero_findings"
         }

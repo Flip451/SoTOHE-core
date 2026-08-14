@@ -14,7 +14,8 @@
 //! No serde derives — per ADR `knowledge/adr/2026-04-14-1531-domain-serde-ripout.md`,
 //! the domain layer is serialization-free. The infrastructure codec (T003) handles JSON.
 
-use crate::tddd::catalogue_v2::identifiers::{MethodName, ParamName, TypeRef};
+use crate::plan_ref::SpecRef;
+use crate::tddd::catalogue_v2::identifiers::{DocString, MethodName, ParamName, TypeRef};
 use crate::tddd::catalogue_v2::roles::SelfReceiver;
 
 // ---------------------------------------------------------------------------
@@ -174,15 +175,15 @@ impl ParamDeclaration {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MethodDeclaration {
     /// The method name.
-    pub name: MethodName,
+    pub(crate) name: MethodName,
     /// The self-receiver form. `None` = associated function (no receiver).
-    pub receiver: Option<SelfReceiver>,
+    pub(crate) receiver: Option<SelfReceiver>,
     /// The method parameters (excludes the self receiver).
-    pub params: Vec<ParamDeclaration>,
+    pub(crate) params: Vec<ParamDeclaration>,
     /// The return type (generics-inclusive type reference string).
-    pub returns: TypeRef,
+    pub(crate) returns: TypeRef,
     /// Whether this method is `async`.
-    pub is_async: bool,
+    pub(crate) is_async: bool,
     /// Whether this trait method declaration carries a default implementation
     /// (rustdoc-flavor `provided_trait_methods`).
     ///
@@ -195,14 +196,14 @@ pub struct MethodDeclaration {
     /// meaningful and is always treated as `false` by the catalogue codec; the
     /// codec forces `Function.has_body = true` for inherent methods regardless.
     /// (ADR `2026-05-08-0248` D13)
-    pub has_default_impl: bool,
+    pub(crate) has_default_impl: bool,
     /// Generic type parameters on this method.
     ///
     /// Populated when the method is declared with APIT (`impl Into<String>`) or
     /// an explicit generic parameter. Default empty Vec for backward compatibility.
     /// The A-codec encodes these as `GenericParamDef::Type` entries in the function's
     /// `Generics`, mirroring the rustdoc C-side APIT desugaring.
-    pub generics: Vec<MethodGenericParam>,
+    pub(crate) generics: Vec<MethodGenericParam>,
     /// `where`-clause bound predicates on this method's generics.
     ///
     /// Used to express bounds whose LHS is an arbitrary type expression — patterns
@@ -217,14 +218,19 @@ pub struct MethodDeclaration {
     /// source).
     ///
     /// (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1, D2)
-    pub where_predicates: Vec<WherePredicateDecl>,
+    pub(crate) where_predicates: Vec<WherePredicateDecl>,
     /// Optional documentation string.
-    pub docs: Option<String>,
+    pub(crate) docs: Option<DocString>,
+    /// SoT Chain ② references assigned to this method.
+    ///
+    /// The containing entry retains the complete entry-level catalogue while this
+    /// collection records only the anchors owned by the method.
+    pub(crate) spec_refs: Vec<SpecRef>,
 }
 
 impl MethodDeclaration {
-    /// Creates a new `MethodDeclaration` with no generic parameters and
-    /// `has_default_impl: false` (default — required / abstract method).
+    /// Creates a `MethodDeclaration` from its complete contract representation.
+    #[allow(clippy::too_many_arguments)]
     #[must_use]
     pub fn new(
         name: MethodName,
@@ -232,7 +238,11 @@ impl MethodDeclaration {
         params: Vec<ParamDeclaration>,
         returns: TypeRef,
         is_async: bool,
-        docs: Option<String>,
+        has_default_impl: bool,
+        generics: Vec<MethodGenericParam>,
+        where_predicates: Vec<WherePredicateDecl>,
+        spec_refs: Vec<SpecRef>,
+        docs: Option<DocString>,
     ) -> Self {
         Self {
             name,
@@ -240,10 +250,11 @@ impl MethodDeclaration {
             params,
             returns,
             is_async,
-            has_default_impl: false,
-            generics: vec![],
-            where_predicates: vec![],
+            has_default_impl,
+            generics,
+            where_predicates,
             docs,
+            spec_refs,
         }
     }
 
@@ -264,7 +275,68 @@ impl MethodDeclaration {
             generics: vec![],
             where_predicates: vec![],
             docs: None,
+            spec_refs: vec![],
         }
+    }
+
+    /// Returns the method name.
+    #[must_use]
+    pub fn name(&self) -> &MethodName {
+        &self.name
+    }
+
+    /// Returns the method's self-receiver form.
+    #[must_use]
+    pub fn receiver(&self) -> Option<SelfReceiver> {
+        self.receiver
+    }
+
+    /// Returns the method parameters, excluding the self receiver.
+    #[must_use]
+    pub fn params(&self) -> &[ParamDeclaration] {
+        &self.params
+    }
+
+    /// Returns the method return type.
+    #[must_use]
+    pub fn returns(&self) -> &TypeRef {
+        &self.returns
+    }
+
+    /// Returns whether this method is asynchronous.
+    #[must_use]
+    pub fn is_async(&self) -> bool {
+        self.is_async
+    }
+
+    /// Returns whether this method has a default implementation.
+    #[must_use]
+    pub fn has_default_impl(&self) -> bool {
+        self.has_default_impl
+    }
+
+    /// Returns the method's generic parameters.
+    #[must_use]
+    pub fn generics(&self) -> &[MethodGenericParam] {
+        &self.generics
+    }
+
+    /// Returns the method's `where`-clause predicates.
+    #[must_use]
+    pub fn where_predicates(&self) -> &[WherePredicateDecl] {
+        &self.where_predicates
+    }
+
+    /// Returns the specification anchors owned by this method.
+    #[must_use]
+    pub fn spec_refs(&self) -> &[SpecRef] {
+        &self.spec_refs
+    }
+
+    /// Returns the optional method documentation.
+    #[must_use]
+    pub fn docs(&self) -> Option<&DocString> {
+        self.docs.as_ref()
     }
 
     /// Reconstructs a human-readable signature string from the structured fields
@@ -445,6 +517,10 @@ mod tests {
             vec![param.clone()],
             returns.clone(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         assert_eq!(decl.name, name);
@@ -472,8 +548,18 @@ mod tests {
     fn test_method_declaration_with_owned_receiver() {
         let name = MethodName::new("consume").unwrap();
         let returns = TypeRef::new("()").unwrap();
-        let decl =
-            MethodDeclaration::new(name, Some(SelfReceiver::Owned), vec![], returns, false, None);
+        let decl = MethodDeclaration::new(
+            name,
+            Some(SelfReceiver::Owned),
+            vec![],
+            returns,
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
         assert_eq!(decl.receiver, Some(SelfReceiver::Owned));
     }
 
@@ -491,6 +577,10 @@ mod tests {
             vec![param],
             returns,
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         assert_eq!(decl.receiver, Some(SelfReceiver::ExclusiveRef));
@@ -507,10 +597,14 @@ mod tests {
             vec![],
             returns,
             true,
-            Some("Execute the use case.".to_string()),
+            false,
+            vec![],
+            vec![],
+            vec![],
+            Some(DocString::new("Execute the use case.".to_string())),
         );
         assert!(decl.is_async);
-        assert_eq!(decl.docs, Some("Execute the use case.".to_string()));
+        assert_eq!(decl.docs().map(|docs| docs.as_str()), Some("Execute the use case."));
     }
 
     #[test]
@@ -529,6 +623,10 @@ mod tests {
             vec![p1, p2],
             returns,
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         assert_eq!(decl.params.len(), 2);
@@ -546,6 +644,10 @@ mod tests {
             vec![param.clone()],
             returns.clone(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         let b = MethodDeclaration::new(
@@ -554,6 +656,10 @@ mod tests {
             vec![param],
             returns,
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         assert_eq!(a, b);
@@ -577,21 +683,43 @@ mod tests {
     }
 
     #[test]
-    fn test_method_declaration_new_has_empty_generics_by_default() {
+    fn test_method_declaration_new_accepts_empty_generics() {
         let name = MethodName::new("save").unwrap();
         let returns = TypeRef::new("()").unwrap();
-        let decl = MethodDeclaration::new(name, None, vec![], returns, false, None);
+        let decl = MethodDeclaration::new(
+            name,
+            None,
+            vec![],
+            returns,
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
         assert!(decl.generics.is_empty());
     }
 
     #[test]
-    fn test_method_declaration_new_defaults_has_default_impl_to_false() {
+    fn test_method_declaration_new_preserves_false_has_default_impl() {
         let name = MethodName::new("op").unwrap();
         let returns = TypeRef::new("()").unwrap();
-        let decl = MethodDeclaration::new(name, None, vec![], returns, false, None);
+        let decl = MethodDeclaration::new(
+            name,
+            None,
+            vec![],
+            returns,
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
         assert!(
             !decl.has_default_impl,
-            "MethodDeclaration::new must default has_default_impl to false"
+            "MethodDeclaration::new must preserve the supplied has_default_impl value"
         );
     }
 
@@ -607,20 +735,71 @@ mod tests {
     }
 
     #[test]
+    fn test_method_declaration_new_preserves_metadata_through_accessors() {
+        let name = MethodName::new("save").unwrap();
+        let receiver = Some(SelfReceiver::SharedRef);
+        let params = vec![ParamDeclaration::new(
+            ParamName::new("value").unwrap(),
+            TypeRef::new("Value").unwrap(),
+        )];
+        let returns = TypeRef::new("Result<(), Error>").unwrap();
+        let generics = vec![MethodGenericParam {
+            name: ParamName::new("E").unwrap(),
+            bounds: vec![TypeRef::new("ErrorTrait").unwrap()],
+        }];
+        let where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("E").unwrap(),
+            rhs: vec![TypeRef::new("Send").unwrap()],
+            operator: BoundOp::Bound,
+        }];
+        let spec_ref = SpecRef::new(
+            "track/items/example/spec.json",
+            crate::plan_ref::SpecElementId::try_new("AC-01").unwrap(),
+        );
+        let docs = DocString::new("Persists a value.".to_owned());
+        let decl = MethodDeclaration::new(
+            name.clone(),
+            receiver,
+            params.clone(),
+            returns.clone(),
+            true,
+            true,
+            generics.clone(),
+            where_predicates.clone(),
+            vec![spec_ref.clone()],
+            Some(docs.clone()),
+        );
+
+        assert_eq!(decl.name(), &name);
+        assert_eq!(decl.receiver(), receiver);
+        assert_eq!(decl.params(), params.as_slice());
+        assert_eq!(decl.returns(), &returns);
+        assert!(decl.is_async());
+        assert!(decl.has_default_impl());
+        assert_eq!(decl.generics(), generics.as_slice());
+        assert_eq!(decl.where_predicates(), where_predicates.as_slice());
+        assert_eq!(decl.spec_refs(), &[spec_ref]);
+        assert_eq!(decl.docs(), Some(&docs));
+    }
+
+    #[test]
     fn test_method_declaration_can_set_has_default_impl_true_for_provided_trait_method() {
         // Per ADR 2026-05-08-0248 D13: traits with provided default impls must be
         // expressible at the catalogue level so the A-codec can emit has_body=true.
         let name = MethodName::new("describe").unwrap();
         let returns = TypeRef::new("String").unwrap();
-        let mut decl = MethodDeclaration::new(
+        let decl = MethodDeclaration::new(
             name,
             Some(SelfReceiver::SharedRef),
             vec![],
             returns,
             false,
+            true,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
-        decl.has_default_impl = true;
         assert!(decl.has_default_impl);
     }
 
@@ -634,6 +813,10 @@ mod tests {
             vec![],
             returns.clone(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         let mut provided_method = abstract_method.clone();
@@ -648,10 +831,30 @@ mod tests {
     fn test_method_declaration_none_receiver_is_not_equal_to_owned_receiver() {
         let name = MethodName::new("init").unwrap();
         let returns = TypeRef::new("Self").unwrap();
-        let associated =
-            MethodDeclaration::new(name.clone(), None, vec![], returns.clone(), false, None);
-        let owned =
-            MethodDeclaration::new(name, Some(SelfReceiver::Owned), vec![], returns, false, None);
+        let associated = MethodDeclaration::new(
+            name.clone(),
+            None,
+            vec![],
+            returns.clone(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
+        let owned = MethodDeclaration::new(
+            name,
+            Some(SelfReceiver::Owned),
+            vec![],
+            returns,
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
         assert_ne!(associated, owned);
     }
 
@@ -754,7 +957,18 @@ mod tests {
     fn test_method_declaration_new_defaults_where_predicates_to_empty() {
         let name = MethodName::new("save").unwrap();
         let returns = TypeRef::new("()").unwrap();
-        let decl = MethodDeclaration::new(name, None, vec![], returns, false, None);
+        let decl = MethodDeclaration::new(
+            name,
+            None,
+            vec![],
+            returns,
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
         assert!(decl.where_predicates.is_empty());
     }
 
@@ -808,6 +1022,10 @@ mod tests {
             vec![],
             returns.clone(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         let mut constrained = unconstrained.clone();

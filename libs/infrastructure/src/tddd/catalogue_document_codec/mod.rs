@@ -2816,9 +2816,52 @@ mod tests {
         let trait_entry = doc.traits().values().next().unwrap();
         assert_eq!(trait_entry.methods().len(), 1);
         assert!(
-            trait_entry.methods()[0].has_default_impl,
+            trait_entry.methods()[0].has_default_impl(),
             "has_default_impl=true must round-trip through decode"
         );
+    }
+
+    #[test]
+    fn test_method_level_spec_refs_round_trip_through_catalogue_codec() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "ApplicationService": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "spec_refs": [
+        { "file": "track/items/example/spec.json", "anchor": "AC-01" }
+      ],
+      "methods": [
+        {
+          "name": "save",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "spec_refs": [
+            { "file": "track/items/example/spec.json", "anchor": "AC-01" }
+          ]
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let method = &doc.traits().values().next().unwrap().methods()[0];
+        assert_eq!(method.spec_refs().len(), 1);
+        assert_eq!(method.spec_refs()[0].anchor.as_ref(), "AC-01");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let encoded_json = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();
+        let method_json = &encoded_json["traits"]["ApplicationService"]["methods"][0];
+        assert_eq!(method_json["spec_refs"][0]["anchor"], "AC-01");
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, decoded);
     }
 
     #[test]
@@ -2827,19 +2870,19 @@ mod tests {
             .unwrap();
         let trait_entry = doc.traits().values().next().unwrap();
         let required =
-            trait_entry.methods().iter().find(|m| m.name.as_str() == "required").unwrap();
-        assert!(!required.has_default_impl, "omitted has_default_impl must default to false");
+            trait_entry.methods().iter().find(|m| m.name().as_str() == "required").unwrap();
+        assert!(!required.has_default_impl(), "omitted has_default_impl must default to false");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
         assert_eq!(doc, doc2);
         let trait_entry = doc2.traits().values().next().unwrap();
         let required =
-            trait_entry.methods().iter().find(|m| m.name.as_str() == "required").unwrap();
+            trait_entry.methods().iter().find(|m| m.name().as_str() == "required").unwrap();
         let provided =
-            trait_entry.methods().iter().find(|m| m.name.as_str() == "provided").unwrap();
-        assert!(!required.has_default_impl);
-        assert!(provided.has_default_impl);
+            trait_entry.methods().iter().find(|m| m.name().as_str() == "provided").unwrap();
+        assert!(!required.has_default_impl());
+        assert!(provided.has_default_impl());
     }
 
     #[test]
@@ -3045,11 +3088,11 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let entry = doc.traits().values().next().unwrap();
         let method = &entry.methods()[0];
-        assert_eq!(method.where_predicates.len(), 1);
-        assert_eq!(method.where_predicates[0].lhs.as_str(), "T");
-        assert_eq!(method.where_predicates[0].rhs.len(), 2);
-        assert_eq!(method.where_predicates[0].rhs[0].as_str(), "Clone");
-        assert_eq!(method.where_predicates[0].rhs[1].as_str(), "Send");
+        assert_eq!(method.where_predicates().len(), 1);
+        assert_eq!(method.where_predicates()[0].lhs.as_str(), "T");
+        assert_eq!(method.where_predicates()[0].rhs.len(), 2);
+        assert_eq!(method.where_predicates()[0].rhs[0].as_str(), "Clone");
+        assert_eq!(method.where_predicates()[0].rhs[1].as_str(), "Send");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
@@ -3125,8 +3168,8 @@ mod tests {
         use domain::tddd::catalogue_v2::methods::BoundOp;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let method = &doc.traits().values().next().unwrap().methods()[0];
-        assert_eq!(method.where_predicates.len(), 1, "expected 1 where predicate");
-        let pred = &method.where_predicates[0];
+        assert_eq!(method.where_predicates().len(), 1, "expected 1 where predicate");
+        let pred = &method.where_predicates()[0];
         assert_eq!(pred.lhs.as_str(), "T", "legacy `type` field maps to `lhs`");
         assert_eq!(pred.rhs.len(), 2, "legacy `bounds` field maps to `rhs`");
         assert_eq!(pred.rhs[0].as_str(), "Clone");
@@ -3201,7 +3244,7 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let method = &doc.traits().values().next().unwrap().methods()[0];
         assert!(
-            method.where_predicates.is_empty(),
+            method.where_predicates().is_empty(),
             "omitted where_predicates must default to empty Vec"
         );
     }
@@ -3444,7 +3487,7 @@ mod tests {
         assert_eq!(doc.inherent_impls().len(), 1);
         assert_eq!(doc.inherent_impls()[0].type_name.as_str(), "Email");
         assert_eq!(doc.inherent_impls()[0].methods.len(), 1);
-        assert_eq!(doc.inherent_impls()[0].methods[0].name.as_str(), "as_str");
+        assert_eq!(doc.inherent_impls()[0].methods[0].name().as_str(), "as_str");
     }
 
     #[test]
@@ -3495,8 +3538,8 @@ mod tests {
         assert_eq!(doc.inherent_impls().len(), 2, "two impl blocks must be decoded as two entries");
         assert_eq!(doc.inherent_impls()[0].type_name.as_str(), "Email");
         assert_eq!(doc.inherent_impls()[1].type_name.as_str(), "Email");
-        assert_eq!(doc.inherent_impls()[0].methods[0].name.as_str(), "as_str");
-        assert_eq!(doc.inherent_impls()[1].methods[0].name.as_str(), "validate");
+        assert_eq!(doc.inherent_impls()[0].methods[0].name().as_str(), "as_str");
+        assert_eq!(doc.inherent_impls()[1].methods[0].name().as_str(), "validate");
     }
 
     #[test]

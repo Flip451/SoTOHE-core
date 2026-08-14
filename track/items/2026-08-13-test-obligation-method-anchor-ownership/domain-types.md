@@ -4,6 +4,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| MethodDeclaration | value_object | modify | — | 🟡 | 🔵 |
+| MethodDeclaration | value_object | modify | — | 🔵 | 🔵 |
 | TestObligation | value_object | reference | — | 🔵 | 🔵 |
 

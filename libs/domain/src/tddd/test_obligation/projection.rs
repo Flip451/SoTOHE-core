@@ -256,6 +256,10 @@ mod tests {
             vec![],
             TypeRef::new("Output").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![method]);
@@ -417,6 +421,10 @@ mod tests {
             vec![],
             TypeRef::new("Output").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
             None,
         );
         let port = TraitEntry::new(
