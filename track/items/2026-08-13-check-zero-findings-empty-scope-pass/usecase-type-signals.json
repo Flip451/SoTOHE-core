@@ -1,0 +1,21 @@
+{
+  "baseline_hash": "3e5d26f80470052ec86136540dce5051ef75126fad5f0c834020ee3c52639716",
+  "declaration_hash": "b6b6b9d0a9222476a436fb05848aee27a35cdfad96146f903aff200473ab698d",
+  "generated_at": "2026-08-13T20:38:36Z",
+  "head_commit": "1ecfadb99072155b7ed87fc7b771a2fe1a3e105e",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ReviewCheckZeroFindingsOutcome"
+    }
+  ]
+}

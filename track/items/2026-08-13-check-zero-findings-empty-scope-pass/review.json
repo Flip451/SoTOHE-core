@@ -1,0 +1,261 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:58:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aa90542057c62852b1ba0b26388f257d93d7fbfcb3f140f104ee46b4a50786b3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:00:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aa90542057c62852b1ba0b26388f257d93d7fbfcb3f140f104ee46b4a50786b3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-13T20:02:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad8d28593089390016dc3daa403f20bc802deacd21275c512c40415dc0a7e933",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:05:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad8d28593089390016dc3daa403f20bc802deacd21275c512c40415dc0a7e933",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-13T20:02:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ed0e1a03aa9290f964864e748e1b515e0e92264ee1da20341c0944d4e39d2ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:06:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ed0e1a03aa9290f964864e748e1b515e0e92264ee1da20341c0944d4e39d2ae",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:11:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:14:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:12:16Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/impl-plan.json",
+              "line": 6,
+              "message": "T1 description restates the behavior contract (“successful, explicitly empty-scope result” and retaining non-empty failure behavior) instead of limiting itself to target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/impl-plan.json",
+              "line": 27,
+              "message": "Section `empty-scope-outcome-and-delivery` restates the upstream behavior contract for `NotRequired(Empty)`, successful output, and non-empty failures in prose; replace it with target + operation + anchor cite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01eb69b4add772c6c0f5fc86fccc849acc50722e790bc73578cddcf924601fd5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:19:54Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/impl-plan.json",
+              "line": 35,
+              "message": "Section `restore-spec-design-pre-entry` restates the upstream restoration behavior (“restore the temporarily removed canonical pre-entry command”) instead of using only target + operation + anchor cite. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ca65c0e951ff36e6858eeada985e177cd7e770fea9af365b61537d8df8b154ed",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:25:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e886c1bd33532aa6da9f4e1759ec37cea920df322ea194d40040f1982a5b3638",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:31:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e886c1bd33532aa6da9f4e1759ec37cea920df322ea194d40040f1982a5b3638",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:02:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:efb9614bbf58d05e90296e4dacba4478853352f529ac40822ef13136c1fd246c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:04:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:efb9614bbf58d05e90296e4dacba4478853352f529ac40822ef13136c1fd246c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:34:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c1e1eb8ae58b6aa7845056fa15e2a74d62386c41b6e2b7c275d24d2806e735",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:37:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f4c1e1eb8ae58b6aa7845056fa15e2a74d62386c41b6e2b7c275d24d2806e735",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:10:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3f960d2090eec81e75d709465e76d93ebeef9081b5a198d4379ac6256461e97",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:13:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3f960d2090eec81e75d709465e76d93ebeef9081b5a198d4379ac6256461e97",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:25:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5cbca11952509de9869887a7d93d4bae32b117d0b222ed70f40f6c08e1cfcea",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:29:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5cbca11952509de9869887a7d93d4bae32b117d0b222ed70f40f6c08e1cfcea",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:32:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:84f3f96ba331ca512e0089ab9901a0c73286c6483147a68fbefe9369a047a022",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:37:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:84f3f96ba331ca512e0089ab9901a0c73286c6483147a68fbefe9369a047a022",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:48:58Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/usecase-types.json",
+              "line": 10,
+              "message": "`ReviewCheckZeroFindingsOutcome` docs restate the upstream empty-scope behavior and non-empty failure contract in prose. Per `.harness/policies/no-upstream-restatement.md`, replace this with a concise change description plus relevant spec anchor citations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1ad429f5199e9bd540a82db6c7d1a08994e5d17292bb6f31e60e8c31144310f4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:01:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7a614eb66642a5071c24388358fbc0cd916c225dd2e8c333db26460e0d36d8bd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:05:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7a614eb66642a5071c24388358fbc0cd916c225dd2e8c333db26460e0d36d8bd",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-13T20:02:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6abbd0f5e2aab5e76cfceb352c5f58f58675c0994d178abd90af690cf87f1252",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:04:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6abbd0f5e2aab5e76cfceb352c5f58f58675c0994d178abd90af690cf87f1252",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

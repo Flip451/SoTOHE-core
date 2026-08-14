@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-13-check-zero-findings-empty-scope-pass",
+  "task_estimates": [
+    {
+      "task_id": "T1",
+      "scope_estimates": [
+        {"scope": "usecase", "production_lines": 18, "test_lines": 45},
+        {"scope": "cli_driver", "production_lines": 10, "test_lines": 35},
+        {"scope": "cli_composition", "production_lines": 0, "test_lines": 45}
+      ]
+    },
+    {
+      "task_id": "T2",
+      "scope_estimates": [
+        {"scope": "harness-policy", "production_lines": 8, "test_lines": 0}
+      ]
+    }
+  ],
+  "batches": [
+    {"id": "B-01", "task_ids": ["T1", "T2"]}
+  ]
+}
