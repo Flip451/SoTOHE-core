@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Update the review-fix runner's diagnostic capture and focused infrastructure regressions. [D1; D2; IN-01; IN-03; OS-01; CN-02; CN-03; AC-01; AC-03]",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Apply the catalogued captured-stream outcome contract to the program runner and infrastructure adapter; update usecase and adapter regressions, including the ProgramRunnerPort contract obligation. [D1; IN-02; OS-02; OS-03; CN-01; CN-03; AC-02; AC-04]",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Adapt phase-command rendering and CLI/composition regressions to the captured-stream outcome. [D1; D2; IN-02; OS-02; CN-03; AC-02; AC-04]",
+      "status": "todo",
+      "commit_hash": null,
+      "depends_on": [
+        "T002"
+      ]
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01 → T001, T002, T003."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Review-fix diagnostic capture",
+        "description": [
+          "Update review-fix runner diagnostic capture and focused infrastructure regressions. [D1; IN-01; IN-03; CN-02; AC-01; AC-03]"
+        ],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Program-runner capture contract and adapter",
+        "description": [
+          "Update the program-runner outcome contract, infrastructure adapter, and related regressions. [IN-02; CN-01; CN-03; AC-02; AC-04]"
+        ],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Phase-command propagation",
+        "description": [
+          "Update downstream outcome rendering and regression coverage after the program-runner contract is available. [IN-02; OS-02; CN-03; AC-02; AC-04]"
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      }
+    ]
+  }
+}

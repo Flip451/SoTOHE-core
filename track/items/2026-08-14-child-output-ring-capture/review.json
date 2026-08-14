@@ -18,6 +18,357 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:57:53Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates the upstream behavior contract in prose (\"preserving the separately bounded, fail-closed verdict-envelope read\"). Keep only target + operation + anchor cite; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates upstream behavior contracts (tail retention through exit/timeout, removal of process termination, and preservation of safeguards). Keep only target + operation + anchor cite; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 18,
+              "message": "T003 restates AC-04 behavior in prose (invocation validation, repository-root execution, timeout, recursion protection, and first-failure behavior). Keep only target + operation + anchor cite; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 35,
+              "message": "Section S1 restates D2 validation-input behavior (\"preserving D2 validation-input handling\"). Use target + operation + anchor cite only; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 45,
+              "message": "Section S2 restates the upstream diagnostic-tail and process-execution protection contracts. Use target + operation + anchor cite only; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c5ff3d49740b29f1b5aa97be27c22adba2b20b8100982805f10574ef9dc0410e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:00:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:baff65993df60110ac8ad4214a6a5d096757a2ba9bf0dde98f11e7b7a048d142",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:07:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:baff65993df60110ac8ad4214a6a5d096757a2ba9bf0dde98f11e7b7a048d142",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:56:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddee21009689256ba970059c6ae4b53fdb6d53fd032cfdb039fc0016d1054812",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:59:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddee21009689256ba970059c6ae4b53fdb6d53fd032cfdb039fc0016d1054812",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-14T11:39:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:da43cbe4983bbfa04ec3de30d494a2884cae5386c18bdf9d04cb862f7b090b1b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:44:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:da43cbe4983bbfa04ec3de30d494a2884cae5386c18bdf9d04cb862f7b090b1b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:04:13Z",
+          "findings": [
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 17,
+              "message": "`PhaseCommandDriver` docs restate the upstream truncation behavior instead of only identifying the change and citing `IN-02`/`AC-02`; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 32,
+              "message": "`CodexReviewFixRunner` docs restate upstream diagnostic-capture and fail-closed behavior instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 89,
+              "message": "`ProcessProgramRunner` docs restate the upstream tail-retention and timeout contract instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 157,
+              "message": "`ProgramRunnerPort` docs restate the upstream capacity-exhaustion behavior instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 243,
+              "message": "`CapturedProgramOutput` docs restate the upstream truncation/failure semantics instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 284,
+              "message": "`CapturedStreamOutput` docs restate the upstream exhaustive states and representation rationale instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 359,
+              "message": "`ProgramExecutionRecord` docs restate the upstream failure-classification behavior instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 428,
+              "message": "`ProgramRunOutcome` docs restate the upstream outcome semantics instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8a5fd7ab698df4fa204fe0b7d795641c38c9b359b0e29f8a0d697993bf88fe1a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:09:12Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` is declared `action: modify`, but both public method signatures (`new` and `handle`) are identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` is declared `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` is declared `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` is declared `action: modify`, but its `run` method signature is identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` is declared `action: modify`, but its `classify` method signature and declared fields are identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc00b153a8694903ab04e96484b1c3c75c70c450b808c7ac44cb0518d2728796",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:12:50Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` remains `action: modify`, but both public method signatures (`new` and `handle`) are identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` remains `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` remains `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` remains `action: modify`, but its `run` method signature is identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` remains `action: modify`, but its `classify` method signature and declared fields are identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc00b153a8694903ab04e96484b1c3c75c70c450b808c7ac44cb0518d2728796",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:22:31Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` is `action: modify`, but its `new` and `handle` method signatures are unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` is `action: modify`, but its `new` method signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` is `action: modify`, but its `new` method signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` is `action: modify`, but its `run` method signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` is `action: modify`, but its declared fields and `classify` method signature are unchanged from the frozen baseline.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc00b153a8694903ab04e96484b1c3c75c70c450b808c7ac44cb0518d2728796",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:37:06Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` is declared `action: modify`, but its `new` and `handle` signatures are unchanged from the frozen baseline; the entry should not claim a method-level modification.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` is declared `action: modify`, but its `new` signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` is declared `action: modify`, but its `new` signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` is declared `action: modify`, but its `run` signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` is declared `action: modify`, but its fields and `classify` signature are unchanged from the frozen baseline.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:422a7308ac16764571c04ae0fa6ee4dd608715925c6ae52737300e85855ac8ef",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:41:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:422a7308ac16764571c04ae0fa6ee4dd608715925c6ae52737300e85855ac8ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:47:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:422a7308ac16764571c04ae0fa6ee4dd608715925c6ae52737300e85855ac8ef",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

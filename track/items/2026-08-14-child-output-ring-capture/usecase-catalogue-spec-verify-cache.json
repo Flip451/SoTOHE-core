@@ -1,0 +1,558 @@
+{
+  "entries": [
+    {
+      "claim_hash": "65c62c6d051bd395625ad8eadf5cfd49da958f02634b7c919da14bf5dfab54a0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedProgramOutput",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "65c62c6d051bd395625ad8eadf5cfd49da958f02634b7c919da14bf5dfab54a0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedProgramOutput",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7bac7919bdcc840142794c1ba455c6a437bcd352c957e64d1c1544bbc493bc49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "65c62c6d051bd395625ad8eadf5cfd49da958f02634b7c919da14bf5dfab54a0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedProgramOutput",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dcd676ae123d27215a2c6d904a75bfa2cceb6337d0d3364dc791f48844766f05",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "89147bde0beeb7e3adeb93df3f50c8d57b8e3b0875aadcfcb674794eeb1f2fe5",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedStreamOutput",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "89147bde0beeb7e3adeb93df3f50c8d57b8e3b0875aadcfcb674794eeb1f2fe5",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedStreamOutput",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7bac7919bdcc840142794c1ba455c6a437bcd352c957e64d1c1544bbc493bc49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "89147bde0beeb7e3adeb93df3f50c8d57b8e3b0875aadcfcb674794eeb1f2fe5",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapturedStreamOutput",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dcd676ae123d27215a2c6d904a75bfa2cceb6337d0d3364dc791f48844766f05",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e65c21185c8bfbe0c73e1e766c999bf8779349276f02e0fe4d4183262d031fcd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FailedProgramExecutionRecord",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "faf6bc03f807d70b869da2836d7ff4590237748ee91d77a8dd49ac3f0270f79b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e65c21185c8bfbe0c73e1e766c999bf8779349276f02e0fe4d4183262d031fcd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "FailedProgramExecutionRecord",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f4f48e107dc9c5d0de62500a77a824cb8efd45992b3a5b5a837c0e6b71dc426a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Phase-command and pre-review execution continue to reject invalid invocation configuration, use the repository-root working directory, enforce their timeout and recursion protections, and stop at the first command failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "stop at the first command failure",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "428796d2be1e8161db4524309acad7f2593ae45ce2fb0abe9b0aba5f30e014c0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramExecutionRecord",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "428796d2be1e8161db4524309acad7f2593ae45ce2fb0abe9b0aba5f30e014c0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramExecutionRecord",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "faf6bc03f807d70b869da2836d7ff4590237748ee91d77a8dd49ac3f0270f79b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "428796d2be1e8161db4524309acad7f2593ae45ce2fb0abe9b0aba5f30e014c0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramExecutionRecord",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f4f48e107dc9c5d0de62500a77a824cb8efd45992b3a5b5a837c0e6b71dc426a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Phase-command and pre-review execution continue to reject invalid invocation configuration, use the repository-root working directory, enforce their timeout and recursion protections, and stop at the first command failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Phase-command and pre-review execution continue to reject invalid invocation configuration, use the repository-root working directory, enforce their timeout and recursion protections, and stop at the first command failure.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3450e11279014665aa49caf0505e262f3370210d335c6794caf0c096aa351e43",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramRunOutcome",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3450e11279014665aa49caf0505e262f3370210d335c6794caf0c096aa351e43",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramRunOutcome",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7bac7919bdcc840142794c1ba455c6a437bcd352c957e64d1c1544bbc493bc49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3450e11279014665aa49caf0505e262f3370210d335c6794caf0c096aa351e43",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramRunOutcome",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dcd676ae123d27215a2c6d904a75bfa2cceb6337d0d3364dc791f48844766f05",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f5d02ab925561ca19b69eb23c57c32601ceea578fd3fb4a46c27ef30b823065b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SuccessfulProgramExecutionRecord",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "faf6bc03f807d70b869da2836d7ff4590237748ee91d77a8dd49ac3f0270f79b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f5d02ab925561ca19b69eb23c57c32601ceea578fd3fb4a46c27ef30b823065b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "SuccessfulProgramExecutionRecord",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f4f48e107dc9c5d0de62500a77a824cb8efd45992b3a5b5a837c0e6b71dc426a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Phase-command and pre-review execution continue to reject invalid invocation configuration, use the repository-root working directory, enforce their timeout and recursion protections, and stop at the first command failure."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"Phase-command and pre-review execution continue to reject invalid invocation configuration, use the repository-root working directory, enforce their timeout and recursion protections, and stop at the first command failure.\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b5c57ae98494b5a6a0d1f9c83cce73bf9ec0785bf6ea699ecbc1e34b8f01855e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramRunnerPort",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b5c57ae98494b5a6a0d1f9c83cce73bf9ec0785bf6ea699ecbc1e34b8f01855e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramRunnerPort",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7bac7919bdcc840142794c1ba455c6a437bcd352c957e64d1c1544bbc493bc49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b5c57ae98494b5a6a0d1f9c83cce73bf9ec0785bf6ea699ecbc1e34b8f01855e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramRunnerPort",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dcd676ae123d27215a2c6d904a75bfa2cceb6337d0d3364dc791f48844766f05",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a039f012bb5d20480011d763d3f20da3d849dee465d9ae5219ec701d6f402ae2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1003efd9b1798840e3d76fcdcbe90a7df2cb4dad37934190e5ace839136c3b73",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Preserve the separate bounded, fail-closed handling for child output whose contents are consumed as validation input, including verdict-envelope extraction."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Preserve the separate bounded, fail-closed handling for child output whose contents are consumed as validation input, including verdict-envelope extraction.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a039f012bb5d20480011d763d3f20da3d849dee465d9ae5219ec701d6f402ae2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ea132633e44070a88ad7b969f2303f9b5eee2c734ac709eec86489a706e7dd8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "The diagnostic-capture policy must remain separate from output used as a verification input, so that validation paths retain their bounded, fail-closed behavior."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The diagnostic-capture policy must remain separate from output used as a verification input, so that validation paths retain their bounded, fail-closed behavior.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a039f012bb5d20480011d763d3f20da3d849dee465d9ae5219ec701d6f402ae2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "486ca28f09aee99b8cfa2a2594b850714d12e28cedeb944b3c9aa71aa632bfcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A path that reads child output as validation input, including verdict-envelope extraction, retains its existing output bound and fails closed when that bound is exceeded."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A path that reads child output as validation input, including verdict-envelope extraction, retains its existing output bound and fails closed when that bound is exceeded.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6a1db3db33415c2b36890e1544c70b0a2885fa266549786e06dc5589bab93315",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProgramOutputStream",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

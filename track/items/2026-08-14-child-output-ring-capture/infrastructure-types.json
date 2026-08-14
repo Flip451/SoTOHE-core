@@ -1,0 +1,126 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ProcessProgramRunner",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProcessProgramRunner",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProcessProgramRunner",
+      "trait_ref": "usecase::program_runner::ProgramRunnerPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "CodexReviewFixRunner",
+      "trait_ref": "usecase::review_v2::run_review_fix::ReviewFixRunner"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CodexReviewFixRunner": {
+      "action": "reference",
+      "docs": "Baseline-identical infrastructure adapter carried to expose its unchanged port edge while IN-01, IN-03, CN-02, AC-01, and AC-03 change internal execution behavior.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            }
+          ],
+          "returns": "CodexReviewFixRunner"
+        }
+      ],
+      "module_path": "review_v2::review_fix_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    },
+    "ProcessProgramRunner": {
+      "action": "reference",
+      "docs": "Baseline-identical infrastructure adapter carried to expose its unchanged port edge while IN-02, CN-01, and AC-02 change internal execution behavior.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "program_runner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    }
+  }
+}

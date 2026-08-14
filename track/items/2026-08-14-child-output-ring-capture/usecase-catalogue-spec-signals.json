@@ -1,0 +1,51 @@
+{
+  "catalogue_declaration_hash": "d7ddf49df67f240e5e90b2333e4abbf2e8c1f97f8014194abf3d7a80487f5206",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "65c62c6d051bd395625ad8eadf5cfd49da958f02634b7c919da14bf5dfab54a0",
+      "signal": "blue",
+      "type_name": "CapturedProgramOutput"
+    },
+    {
+      "entry_hash": "89147bde0beeb7e3adeb93df3f50c8d57b8e3b0875aadcfcb674794eeb1f2fe5",
+      "signal": "blue",
+      "type_name": "CapturedStreamOutput"
+    },
+    {
+      "entry_hash": "e65c21185c8bfbe0c73e1e766c999bf8779349276f02e0fe4d4183262d031fcd",
+      "signal": "blue",
+      "type_name": "FailedProgramExecutionRecord"
+    },
+    {
+      "entry_hash": "428796d2be1e8161db4524309acad7f2593ae45ce2fb0abe9b0aba5f30e014c0",
+      "signal": "blue",
+      "type_name": "ProgramExecutionRecord"
+    },
+    {
+      "entry_hash": "3450e11279014665aa49caf0505e262f3370210d335c6794caf0c096aa351e43",
+      "signal": "blue",
+      "type_name": "ProgramRunOutcome"
+    },
+    {
+      "entry_hash": "f5d02ab925561ca19b69eb23c57c32601ceea578fd3fb4a46c27ef30b823065b",
+      "signal": "blue",
+      "type_name": "SuccessfulProgramExecutionRecord"
+    },
+    {
+      "entry_hash": "b5c57ae98494b5a6a0d1f9c83cce73bf9ec0785bf6ea699ecbc1e34b8f01855e",
+      "signal": "blue",
+      "type_name": "ProgramRunnerPort"
+    },
+    {
+      "entry_hash": "a039f012bb5d20480011d763d3f20da3d849dee465d9ae5219ec701d6f402ae2",
+      "signal": "blue",
+      "type_name": "ReviewFixRunner"
+    },
+    {
+      "entry_hash": "6a1db3db33415c2b36890e1544c70b0a2885fa266549786e06dc5589bab93315",
+      "signal": "blue",
+      "type_name": "ProgramOutputStream"
+    }
+  ]
+}
