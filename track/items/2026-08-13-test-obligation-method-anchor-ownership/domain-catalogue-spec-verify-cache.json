@@ -1,0 +1,510 @@
+{
+  "entries": [
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ecd4a322eccf5d9d13df289392393170c0fea5b2555b61818e98dccfdff700f0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "trait_method ごとの test-obligation が自 method の仕様 anchor だけを所有・検証できるようにし、複数 method の ApplicationService trait を method-relevant な fulfillment で test-obligation gate に通せるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "trait_method ごとの test-obligation が自 method の仕様 anchor だけを所有・検証できるようにし、複数 method の ApplicationService trait を method-relevant な fulfillment で test-obligation gate に通せるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c3582f72c5c4c22d2f4de67f3f0248899f873bdd91485339f670146357c88270",
+      "evidence_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "D1 の method-level spec_refs を active catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "D1 の method-level spec_refs を active catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1cbf339f3ebdf7164e9d769eba4268ece1691d0b5eb1645f0f9b37cad01608c8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9ccf91b78a331c4d73b570dace51140c4c9983d0eacfd5452e4ee33910105705",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "156d8b8003661e4a3a15989430c09fd0c4aa0b1fb733c95cde16e0ebf48d0a65",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "D1 のためにアクティブな catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "D1 のためにアクティブな catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a5a264a1b4d4fde9a0f44bf15077d8a87a74be2b2d9347981ea9a89d41f33fd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "089d11c73c1a5ae135d8d77db1502e7057196817fdc9d0946fd63338649a41d9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2b12874af00c94c3cc60b16623e552fb3b884aa876531df609984b33b1808138",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d7343c63610450a2a58dd1fe051c791281ba0ceddefd68207f44daa87d4e6290",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "アクティブな catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "アクティブな catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "61971870ffefb373af766d432f9abd5f06785f2e0d4e0b3437893a2a15bb5255",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "028b1dbfe902a3b1c1b76f91b2b1c34891afb3707040fbaa8520cd58b6c55a67",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b0dbdee240cf0961c4e7f30fd8583fb81771bc6b256a55fd1baf6b81a669c250",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "MethodDeclaration の lint-compliance remediation は、D1 の method-level spec_refs を active catalogue で宣言・評価できる状態にするため、既存宣言の name、receiver、params、returns、async/default-implementation status、generics、where predicates、docs という観測可能な method contract information を保持したまま、宣言された entry に適用される catalogue lint 規則へ適合させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存宣言の name、receiver、params、returns、async/default-implementation status、generics、where predicates、docs という観測可能な method contract information を保持したまま、宣言された entry に適用される catalogue lint 規則へ適合させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ecd4a322eccf5d9d13df289392393170c0fea5b2555b61818e98dccfdff700f0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "trait_method ごとの test-obligation が自 method の仕様 anchor だけを所有・検証できるようにし、複数 method の ApplicationService trait を method-relevant な fulfillment で test-obligation gate に通せるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "trait_method ごとの test-obligation が自 method の仕様 anchor だけを所有・検証できるようにし、複数 method の ApplicationService trait を method-relevant な fulfillment で test-obligation gate に通せるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1cbf339f3ebdf7164e9d769eba4268ece1691d0b5eb1645f0f9b37cad01608c8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "276c59ab8af01291181aa697bca0f2c332667e5104eff2c69be5b86572eed02d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "fulfillment 検証と verifier instruction を、各 trait_method 義務が所有する anchor に限定する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "fulfillment 検証と verifier instruction を、各 trait_method 義務が所有する anchor に限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7a5a264a1b4d4fde9a0f44bf15077d8a87a74be2b2d9347981ea9a89d41f33fd",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "2b12874af00c94c3cc60b16623e552fb3b884aa876531df609984b33b1808138",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e973a2869e033384001c38c49ebab0a1f1513fd85ac0974195e7adda0d61bbfa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "61971870ffefb373af766d432f9abd5f06785f2e0d4e0b3437893a2a15bb5255",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "028b1dbfe902a3b1c1b76f91b2b1c34891afb3707040fbaa8520cd58b6c55a67",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TestObligation",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0657a077f14f9790cca6399257bc76833ec40d2d6dad9b4bc5d3ddf46b11c612",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 1
+}

@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "9274ca19a0ef68cabc2d88c61b64fe94b8fe9e05901487bbb8fb1704c09cf3a6",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "signal": "blue",
+      "type_name": "MethodDeclaration"
+    },
+    {
+      "entry_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "signal": "blue",
+      "type_name": "TestObligation"
+    }
+  ]
+}

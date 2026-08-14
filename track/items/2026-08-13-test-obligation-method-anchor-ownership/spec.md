@@ -1,0 +1,50 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+version: "1.1"
+signals: { blue: 20, yellow: 0, red: 0 }
+---
+
+# trait_method obligations own method-scoped anchors
+
+## Goal
+
+- [GO-01] trait_method ごとの test-obligation が自 method の仕様 anchor だけを所有・検証できるようにし、複数 method の ApplicationService trait を method-relevant な fulfillment で test-obligation gate に通せるようにする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D2]
+- [GO-02] D1 の method-level spec_refs を active catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md#D1]
+
+## Scope
+
+### In Scope
+- [IN-01] trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T1, T2, T3, T4]
+- [IN-02] method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
+- [IN-03] fulfillment 検証と verifier instruction を、各 trait_method 義務が所有する anchor に限定する。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D2] [tasks: T5]
+- [IN-05] D1 のためにアクティブな catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md#D1] [tasks: T1]
+
+### Out of Scope
+- [OS-01] 既存 catalogue 全体へ method-level anchor 宣言と coverage 規則を遡及適用することは本 track の対象外とする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
+- [OS-02] cross-populated fulfillment を entry 単位の正規形として恒久化すること、または merged track にある歴史的な cross-populated binding record を書き換えることは本 track の対象外とする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4, T5]
+- [OS-03] trait_method 義務を廃止して型単位の粗い義務へ置き換えることは本 track の対象外とする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
+- [OS-04] D1 の coverage 検証を通さずに、fulfillment 検証から未担当の entry-level anchor を除外することは本 track の対象外とする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D2] [tasks: T5]
+- [OS-05] MethodDeclaration 以外の legacy catalogue entry を一律に remediation すること、または宣言済み entry への lint 適用を免除する一般方針を導入することは本 track の対象外とする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T1, T3]
+
+## Constraints
+- [CN-01] entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
+- [CN-02] 新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
+- [CN-03] fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D2] [tasks: T5]
+- [CN-05] MethodDeclaration の lint-compliance remediation は、D1 の method-level spec_refs を active catalogue で宣言・評価できる状態にするため、既存宣言の name、receiver、params、returns、async/default-implementation status、generics、where predicates、docs という観測可能な method contract information を保持したまま、宣言された entry に適用される catalogue lint 規則へ適合させる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md#D1] [tasks: T1, T2]
+
+## Acceptance Criteria
+- [ ] [AC-01] アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T1, T2, T3, T4]
+- [ ] [AC-02] アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
+- [ ] [AC-03] method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
+- [ ] [AC-04] D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D2] [tasks: T5]
+- [ ] [AC-06] アクティブな catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md#D1] [tasks: T1, T2]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/coding-principles.md#Rules
+- knowledge/conventions/prefer-type-safe-abstractions.md#Rule
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 20  🟡 0  🔴 0
+

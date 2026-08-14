@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-13-test-obligation-method-anchor-ownership",
+  "task_estimates": [
+    {
+      "task_id": "T1",
+      "scope_estimates": [
+        { "scope": "domain", "production_lines": 220, "test_lines": 160 }
+      ]
+    },
+    {
+      "task_id": "T2",
+      "scope_estimates": [
+        { "scope": "infrastructure", "production_lines": 160, "test_lines": 140 }
+      ]
+    },
+    {
+      "task_id": "T3",
+      "scope_estimates": [
+        { "scope": "domain", "production_lines": 260, "test_lines": 140 },
+        { "scope": "usecase", "production_lines": 120, "test_lines": 90 },
+        { "scope": "infrastructure", "production_lines": 80, "test_lines": 60 }
+      ]
+    },
+    {
+      "task_id": "T4",
+      "scope_estimates": [
+        { "scope": "domain", "production_lines": 100, "test_lines": 80 },
+        { "scope": "usecase", "production_lines": 160, "test_lines": 140 }
+      ]
+    },
+    {
+      "task_id": "T5",
+      "scope_estimates": [
+        { "scope": "usecase", "production_lines": 100, "test_lines": 80 },
+        { "scope": "infrastructure", "production_lines": 100, "test_lines": 80 }
+      ]
+    }
+  ],
+  "batches": [
+    {
+      "id": "B-01",
+      "task_ids": ["T1", "T2"]
+    },
+    {
+      "id": "B-02",
+      "task_ids": ["T3"]
+    },
+    {
+      "id": "B-03",
+      "task_ids": ["T4", "T5"]
+    }
+  ]
+}

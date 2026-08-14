@@ -1,0 +1,426 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "MethodDeclaration": {
+      "action": "modify",
+      "docs": "Modified MethodDeclaration surface with typed method-level spec_refs and lint-conformant accessors; see the cited specification anchors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "MethodName"
+            },
+            {
+              "name": "receiver",
+              "ty": "Option<SelfReceiver>"
+            },
+            {
+              "name": "params",
+              "ty": "Vec<ParamDeclaration>"
+            },
+            {
+              "name": "returns",
+              "ty": "TypeRef"
+            },
+            {
+              "name": "is_async",
+              "ty": "bool"
+            },
+            {
+              "name": "has_default_impl",
+              "ty": "bool"
+            },
+            {
+              "name": "generics",
+              "ty": "Vec<MethodGenericParam>"
+            },
+            {
+              "name": "where_predicates",
+              "ty": "Vec<WherePredicateDecl>"
+            },
+            {
+              "name": "spec_refs",
+              "ty": "Vec<SpecRef>"
+            },
+            {
+              "name": "docs",
+              "ty": "Option<DocString>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "associated_function",
+          "params": [
+            {
+              "name": "name",
+              "ty": "MethodName"
+            },
+            {
+              "name": "params",
+              "ty": "Vec<ParamDeclaration>"
+            },
+            {
+              "name": "returns",
+              "ty": "TypeRef"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&MethodName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "receiver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<SelfReceiver>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "params",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ParamDeclaration]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "returns",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TypeRef"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_async",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "has_default_impl",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "generics",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodGenericParam]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "where_predicates",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[WherePredicateDecl]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_refs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[SpecRef]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "docs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&DocString>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signature_string",
+          "params": [],
+          "receiver": "&self",
+          "returns": "String"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::methods",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "GO-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ]
+    },
+    "TestObligation": {
+      "action": "reference",
+      "docs": "Referenced existing TestObligation public surface for contract exposure; see the cited specification anchors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TestObligationId"
+            },
+            {
+              "name": "target_entry",
+              "ty": "CatalogueEntryRef"
+            },
+            {
+              "name": "target_role",
+              "ty": "TargetEntryRoleKind"
+            },
+            {
+              "name": "brief",
+              "ty": "TestObligationBrief"
+            },
+            {
+              "name": "declaration_hash",
+              "ty": "DeclarationHash"
+            },
+            {
+              "name": "spec_refs",
+              "ty": "Vec<TestObligationAnchorId>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_entry",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryRef"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_role",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TargetEntryRoleKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "brief",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationBrief"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_refs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationAnchorId]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "owns_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "tddd::test_obligation::obligations",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ]
+}

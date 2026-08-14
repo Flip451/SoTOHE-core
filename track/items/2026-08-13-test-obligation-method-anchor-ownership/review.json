@@ -126,6 +126,657 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:45:49Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 6,
+              "message": "Task T1 restates upstream behavior/design rationale in prose (“catalogue-defined, lint-compliant representation”, “record each method's owned spec-anchor share”, and compatibility behavior) instead of using only target + operation + anchor cite, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "Task T2 has target symbols and operations but no AC/IN/CN/spec-element anchor cite, so its implementation boundary is not executable under the impl-plan policy.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "Task T2 restates the AC-05 behavior contract (“re-ground ... without its recorded accepted deviations”) in prose instead of referencing the anchor only.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 18,
+              "message": "Task T3 has an operation and a general target but no AC/IN/CN/spec-element anchor cite, leaving the executor to infer the governing contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 18,
+              "message": "Task T3 restates the upstream validation behavior (“subset, full-coverage, single-method total-declaration, and no-retroactivity validation rules”) in prose rather than using anchor references.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 24,
+              "message": "Task T4 has an operation and general symbols but no AC/IN/CN/spec-element anchor cite, so its required boundary is not executable from the task text.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 35,
+              "message": "The `method-declaration` section descriptions restate the upstream representation, ownership, compatibility, and accepted-deviation behavior instead of using target + operation + anchor cites.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 44,
+              "message": "The `obligation-derivation` section description restates the upstream ownership and rejection contract instead of referencing its spec anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 52,
+              "message": "The `fulfillment-verification` section description restates the upstream fulfillment-scope behavior instead of referencing its spec anchors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3caa14f740bcc554dd52a881dc68d7acce0dfd778bd8e230b6478537f12698ea",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:48:30Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 29,
+              "message": "The `impl-plan.json` omits `plan.summary`, so GO-01 and GO-02 have no goal-to-task traceability. `task-coverage.json` intentionally cannot carry GO mappings; the impl-plan policy requires these mappings in `plan.summary`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6766d414535c37ec7c3200317f219dd1039f01f807320ec6a2d079fa3b7f7c31",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:49:58Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 6,
+              "message": "`IN-03` is mapped to T3, but T3 only implements `TraitMethodObligationDerivation` and structural validation. IN-03 requires fulfillment verification and rendered verifier instructions to be limited to owned anchors; that behavior belongs to T4. This is a load-bearing task-coverage mismatch.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 7,
+              "message": "`IN-04` is mapped to T4, but T4 only updates `FulfillmentVerification` and guidance. IN-04 requires re-grounding the discovered three-method ApplicationService trait and removing its Known Accepted Deviations, which the plan assigns to T2/AC-05. This leaves the in-scope requirement attributed to a task that does not describe delivering it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:44bdb399419d493ad7790474ad8df10f732d6739180e4b5819e1499531f82a35",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:51:03Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 6,
+              "message": "The plan omits the dependency edges needed to make the declared execution order reliable: T2 must follow T1 before migrating MethodDeclaration call sites, T3 must follow T1/T2 before deriving obligations from the new ownership fields, and T4 must follow T3 before fulfillment verification consumes the validated ownership boundary. All are in B-01/B-02 without `depends_on`, so batch execution can rely only on an unsafe heuristic and may schedule a consumer before its producer.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:312fdcb377c19e64b73f25493d4561674e11676ce5d35e95a92065fb1b190980",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:52:36Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 12,
+              "message": "`task-contract.json` attributes T3 to the non-existent usecase catalogue entry `TraitMethodObligationDerivation`; the active catalogue exposes `DeriveTestObligationsInteractor` instead. T3 therefore has no valid catalogue attribution.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 15,
+              "message": "`task-contract.json` attributes T4 to the non-existent usecase catalogue entry `FulfillmentVerification`; the active catalogue exposes `EvaluateTestObligationsInteractor` instead. T4 therefore has no valid catalogue attribution.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 4,
+              "message": "The active domain catalogue entry `TestObligation` has no task attribution in `task-contract.json`, leaving a catalogue entry orphaned from the implementation plan.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 4,
+              "message": "The active usecase catalogue entry `DeriveTestObligationsInteractor` has no task attribution in `task-contract.json`; T3's invalid `TraitMethodObligationDerivation` key does not cover it.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 4,
+              "message": "The active usecase catalogue entry `EvaluateTestObligationsInteractor` has no task attribution in `task-contract.json`; T4's invalid `FulfillmentVerification` key does not cover it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:def5e55b1263df89851de633a5b3baca3bf4f4d6cc85c23e22c8298c8440a53f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:54:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad9d06e2f02c2c455eef48e79f384ba47a5733814c2f3bd79c00cd7439e1c4da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:03:07Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 4,
+              "message": "IN-01 and AC-01 are mapped only to T1, which updates MethodDeclaration. Both elements also require trait_method obligations to own the method-level anchors; that behavior is implemented by T3's derivation work, but T3 is absent from both mappings and does not cite either anchor. Add T3 as a co-owner of IN-01 and AC-01.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "T2 bundles two independently verifiable units: MethodDeclaration codec/call-site migration (AC-06/CN-05/IN-05) and PhaseCommandService re-grounding plus accepted-deviation cleanup (AC-05/CN-04/IN-04). The latter has distinct targets and ownership constraints, yet the description names only a generic “originating ApplicationService trait,” and its usecase/harness work is absent from T2's scope estimates. Split these units before implementation and give the PhaseCommandService cleanup an explicit, sanctioned target/writer boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ad9d06e2f02c2c455eef48e79f384ba47a5733814c2f3bd79c00cd7439e1c4da",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:10:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:59d26ea3cdb351b94affb84cf553f10cffb2a00bb0bfa316e283d845f796b0d9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:13:24Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 33,
+              "message": "T5 names “this track's existing test-bindings.json records for PhaseCommandService,” but this track's catalogues, obligations, and bindings contain no PhaseCommandService records. The actual grounding/binding records are under `track/items/scope-conditional-pre-review-gates-2026-07-31/`, while the accepted-deviation record is in `.harness/custom/review-prompts/harness-policy.md`. Consequently T5 cannot deliver IN-04/AC-05/CN-04 within its declared target and ownership boundary; it needs explicit sanctioned targets/writers rather than the nonexistent current-track records.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:59d26ea3cdb351b94affb84cf553f10cffb2a00bb0bfa316e283d845f796b0d9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:50:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2de243e46b60f8af5a235ca36f7455e46a54fdc5ff4596ce8039f872e6ac8a29",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:56:19Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 42,
+              "message": "T5 depends only on T4, so the declared full-cycle proceeds directly from B-02 to B-03. The required type-design re-entry is mentioned only in prose; it is not an executable dependency or workflow step. At that point the current catalogue still lacks PhaseCommandService, task-contract.json has no attribution for it, and current-track obligations/bindings cannot contain its methods. End this plan after B-02 and re-enter type design and Phase 3 before declaring the recovery task, or otherwise represent an enforced re-entry gate.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "T5 bundles four independently verifiable units while still todo: validate fulfillment (AC-05), explain fulfillment (AC-07), enter fulfillment (AC-08), and removal of the live deviation after all three pass (AC-09). Split the three method fulfillments into separately verifiable tasks and make a final deviation-removal task depend on them.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "T5 restates OS-02 as “Do not modify the merged scope-conditional-pre-review-gates-2026-07-31 historical binding record” instead of citing that anchor. Keep the target and removal operations, and replace this repeated behavioral exclusion with an OS-02 citation as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 58,
+              "message": "All three plan sections restate upstream behavior in prose: method-declaration describes lint conformance and catalogue enablement, obligation-ownership repeats method-owned derivation/verification behavior, and post-reentry-recovery repeats the three fulfillments plus historical-record exclusion. Replace these descriptions with target + operation + the applicable anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2de243e46b60f8af5a235ca36f7455e46a54fdc5ff4596ce8039f872e6ac8a29",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:07:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4930d22fd84d7dbc9165d351c1ed5177bd5421037c749ecdbe5034f713f5d815",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:10:54Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 33,
+              "message": "T5 is not an executable implementation task: its target is “post-B-02 type-design and Phase 3 re-entry,” not a file or symbol, and its operation is an orchestrator phase transition rather than a concrete implementation change. Remove this placeholder from the implementation task list and perform the sanctioned re-entry outside the batch plan; author executable recovery tasks after the catalogue converges.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 7,
+              "message": "IN-04/06/07/08, AC-05/07/08/09, and CN-04/06/07/08 are mapped solely to T5, but T5 only requires catalogue re-entry; it does not add the three method-specific fulfillments or remove the live deviation. A future Phase 3 pass does not make these current mappings genuine. Attribute them to the executable recovery tasks created after re-entry.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "The current `plan` omits `summary`, so GO-01 and GO-02 have no task traceability. Restore their mappings in `impl-plan.json` `plan.summary`; do not add goals to task-coverage.json, whose schema intentionally excludes them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4930d22fd84d7dbc9165d351c1ed5177bd5421037c749ecdbe5034f713f5d815",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:23:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0fd43aa35e1d69ad4d59c9310c8d737828459606ea695b2a5eb2d8c355b89d6b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:28:29Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 34,
+              "message": "T5–T8 are the sole owners of the twelve recovery elements, but all four are marked `skipped`. Here `skipped` is a settled terminal state: the batch plan may omit these tasks, full-cycle does not implement them, and the merge guard treats them as resolved. Consequently no declared batch creates the PhaseCommandService bindings or removes the deviation, so the coverage is nominal. T5–T7 also declare only T4 as a dependency and never represent the required type-design/Phase 3 re-entry. Re-author the recovery tasks after that re-entry as executable unsettled tasks and include them in the batch plan.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0fd43aa35e1d69ad4d59c9310c8d737828459606ea695b2a5eb2d8c355b89d6b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:50:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08e926a788fa735778752d0d9c42ecccc8d812a7ba9c53846a0c5ffb96afc588",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:54:54Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 20,
+              "message": "OS-02 remains an enforced out-of-scope element in spec v1.1, but this map skips directly from OS-01 to OS-03 and no task cites OS-02. The prohibition on canonicalizing cross-populated fulfillment or rewriting historical binding records therefore has no task owner in this pass.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 63,
+              "message": "B-01 contains only T1, although T1 must implement the catalogue-declared breaking MethodDeclaration::new signature while T2, in B-02, owns migration of its existing call sites. Because full-cycle compiles, reviews, and commits each batch independently, B-01 cannot compile before T2 runs. The API change needs compatibility staging or caller migration in the same executable batch.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 17,
+              "message": "T2 explicitly owns MethodDeclaration construction call sites, including eleven invocations under libs/usecase, but its estimates declare only domain and infrastructure scopes. B-02 already consumes 480 of the 500-line usecase ceiling through T3 and T4, so omitting T2's required usecase migration makes the batch composition and ceiling rationale unsound.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:08e926a788fa735778752d0d9c42ecccc8d812a7ba9c53846a0c5ffb96afc588",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:05:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75d61b1b6b1b6d2e21228a3737ad2a89cd1eee52cd06dab1f68c3c8c59f99530",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T09:10:00Z",
+          "findings": [
+            {
+              "category": "implausible indivisibility justification",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 24,
+              "message": "T1's justification—“MethodDeclaration::new must adopt its catalogue-declared signature together with every affected construction site…”—only establishes that the final constructor cutover and its callers must land together; it does not make the entire 720-line domain task indivisible. T1 also bundles independently verifiable lint remediation/accessor work (IN-05, AC-06, CN-05) and method-level spec_refs plus codec support (IN-01, AC-01). These can be staged while retaining a temporary compatible constructor, followed by the atomic signature/caller cutover. Split these units instead of exempting all of T1 from the ceiling.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:75d61b1b6b1b6d2e21228a3737ad2a89cd1eee52cd06dab1f68c3c8c59f99530",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:16:03Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 7,
+              "message": "T3 is mapped to IN-05, AC-06, and CN-05, but its described operation is only the constructor cutover and its tests. It does not perform or validate MethodDeclaration lint remediation, accessors, or preservation of the method contract; those anchors belong to T1. This makes the coverage attribution implausible.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 17,
+              "message": "T2 is mapped to CN-01 and CN-02, but its operation is limited to codec support and compatibility integration. It does not enforce the method-anchor subset/coverage invariants or active-catalogue-only validation; those are implemented by T4's derivation and structural-validation task. The mappings therefore do not represent genuine delivery of these constraints.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:53ad472f1524b5ecb38682a2f84749af93d65082459b9c584577318136cb5cb6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:19:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a254aabe4639d4bbbefa21a8e124e99ffa44bb8b56dee2d0d34fe654b745b5ff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T09:23:32Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 5,
+              "message": "T1 and T2 are explicitly compatibility-staging tasks, while T3 performs the final MethodDeclaration constructor cutover. Nevertheless, all three are attributed to MethodDeclaration. Attribution denotes catalogue convergence at task completion; after B-01 marks T1/T2 done, the pre-review gate will require a Blue final-shape signal even though the catalogue-declared constructor is intentionally deferred to T3. Attribute convergence to T3 only, or redesign the stages so B-01 actually reaches the declared shape.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 43,
+              "message": "B-01 cannot independently deliver T1's AC-06 lint remediation. Making MethodDeclaration fields non-public requires migrating existing direct field reads and struct literals, including production code under `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/`, but T1 targets only `methods.rs`, T2 only `catalogue_document_codec/`, and T3 is deferred to B-02 and names only construction call sites. B-01 therefore either fails compilation or leaves AC-06 incomplete. Move all accessor-use migration into B-01 or defer the field-visibility cutover and AC-06 ownership to the batch containing that migration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a254aabe4639d4bbbefa21a8e124e99ffa44bb8b56dee2d0d34fe654b745b5ff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:30:19Z",
+          "findings": [
+            {
+              "category": "dependency or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "T2 is ordered before the domain API its codec work requires. MethodDeclaration currently has no method-level `spec_refs` storage or accessor, T2 targets only infrastructure, and T3—the next task touching `methods.rs`—runs in the following batch. Consequently T2 cannot implement and test codec round-tripping without inventing an unlisted domain change. Add the backward-compatible `spec_refs` API to T2's targets and estimates, or make it an explicit IN-01/AC-01 deliverable of T1 and map/trace T1 accordingly before T2 consumes it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e8f15d304cda2136e8e24943c3c9a9457e2f3d207c2ce29c26c5db806ada8402",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:32:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3f66e9ec8fae51396553b8e54de9a9d7848a75aebd4a7df8adcfc28f309fe1b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:45:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7f2586e56f0e9dd0557cf778da314423738c87f3e274e2792355090787d7b01",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:47:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7f2586e56f0e9dd0557cf778da314423738c87f3e274e2792355090787d7b01",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-14T04:05:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0566dccadf13e33b371efdc507b4ce043ba5764f4acc73a64792d74be2078385",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:08:24Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 41,
+              "message": "AC-04 contradicts CN-01 for shared anchors. CN-01 permits the same anchor to be assigned to multiple methods, but AC-04 says an obligation must not require an anchor assigned to another method. A shared anchor is both owned by the current obligation and assigned to another method, so the criterion gives conflicting expected behavior. Define the exclusion in terms of anchors not owned by the current obligation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0566dccadf13e33b371efdc507b4ce043ba5764f4acc73a64792d74be2078385",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T04:15:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd2394a22a58fa15c5b351d2f56eab396073683afe432f553a62b2ccfed6815a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:35:57Z",
+          "findings": [
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 143,
+              "message": "GO-02 is not anchored to the cited ADR D1. D1 defines adding method-level `spec_refs`, ownership, coverage validation, and active-catalogue applicability, but does not decide that pre-existing catalogue-lint violations must be remediated in this track or that they must not block progress. This goal expands the ADR decision space.",
+              "severity": "P1"
+            },
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 113,
+              "message": "CN-05 is too vague to provide a concrete downstream contract: “既存の method declaration の利用上の意味を維持” does not define which observable behavior or fields constitute the preserved meaning. Type/implementation planning would have to invent the compatibility boundary while performing the lint remediation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:489b795dd5536165faf1cac527f8ab7b35b44e7c40eb9dc8107973534dccfe5b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T04:48:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:14860eccf6fbdb43bde8c5f8e808edb6289cd90490f37e5763033aceddb36582",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:52:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:14860eccf6fbdb43bde8c5f8e808edb6289cd90490f37e5763033aceddb36582",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:31:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e40c2ad8d530e9428c040d7310dc5bde2415524d4aa872d41b335786a17c6e72",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:35:24Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 81,
+              "message": "AC-09 requires removing the live-harness Known Accepted Deviations allowance, but the in_scope set now contains only the three per-method re-grounding outcomes plus mechanism/lint work; none declares deviation-record removal. CN-08 reinforces the same hidden completion requirement. The acceptance criteria therefore require behavior outside the declared in_scope contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e40c2ad8d530e9428c040d7310dc5bde2415524d4aa872d41b335786a17c6e72",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:38:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b07b386e5e48952a1cc3d0f6ad6f66cbe4977bb1bc1e8548f9f3e88815e87154",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:40:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73cfce82e250eacbb04acf9c28943a1a9f0c3d90673e90baade3b7ac8801c37a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:43:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73cfce82e250eacbb04acf9c28943a1a9f0c3d90673e90baade3b7ac8801c37a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:14:46Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 10,
+              "message": "`domain::MethodDeclaration` docs restate upstream behavior and rationale (private-field preservation, method-level anchor ownership, boolean semantics, and rendering) instead of limiting the entry to the changed surface plus anchor cites. Replace the prose with a concise change declaration referencing the relevant spec anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 220,
+              "message": "`domain::TestObligation` docs restate the upstream ownership and behavioral contract (typed `spec_refs` as the ownership boundary and changed derivation/evaluation behavior). Keep only the declared surface/change and cite the relevant spec anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 10,
+              "message": "`usecase::DeriveTestObligationsInteractor` docs restate the upstream derivation, subset, and coverage behavior. The entry should identify the existing surface and reference the spec anchors without reproducing the behavioral contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 99,
+              "message": "`usecase::EvaluateTestObligationsInteractor` docs restate the upstream method-scoped fulfillment behavior. Reduce the text to the changed/observed surface with anchor cites rather than repeating the specification.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:826af6a9cbfaf9855c44d0d732fb3cdeee9bbc4ae911e69ac8eab52ae5ad0090",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:29:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bdcd3d3b007bb8dcdf691a988a8507235e4948a29df0418783e9463129164bfb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:35:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bdcd3d3b007bb8dcdf691a988a8507235e4948a29df0418783e9463129164bfb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:04:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8a7f48baeaa265a1202b0558af19ca04582212da9aa9a22ba83b9f0c4d4cb92",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:09:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8a7f48baeaa265a1202b0558af19ca04582212da9aa9a22ba83b9f0c4d4cb92",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

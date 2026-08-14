@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-13-test-obligation-method-anchor-ownership",
+  "entries": {
+    "T3": [
+      { "layer": "domain", "entry_key": "MethodDeclaration" }
+    ],
+    "T4": [
+      { "layer": "domain", "entry_key": "TestObligation" },
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" }
+    ],
+    "T5": [
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" }
+    ]
+  }
+}

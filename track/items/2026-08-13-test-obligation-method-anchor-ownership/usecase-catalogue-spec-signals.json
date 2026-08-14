@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "0e25bb400d2eba5e9e73c389fb9b792d5b5e336fc363615cbbccac5959f8a9c5",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "signal": "blue",
+      "type_name": "DeriveTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "5e82907568197cefae4e2195455149fc162e84637daf3689131f0728c851718b",
+      "signal": "blue",
+      "type_name": "EvaluateTestObligationsInteractor"
+    }
+  ]
+}
