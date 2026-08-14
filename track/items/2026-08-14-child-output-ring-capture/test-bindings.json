@@ -1,1 +1,208 @@
-{"track_id": "2026-08-14-child-output-ring-capture", "records": []}
+{
+  "track_id": "2026-08-14-child-output-ring-capture",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapturedProgramOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapturedProgramOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapturedProgramOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapturedStreamOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapturedStreamOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapturedStreamOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ProgramRunOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_with_truncated_output_returns_succeeded"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ProgramRunOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_terminates_timed_out_process"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_with_truncated_output_returns_succeeded"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ProgramRunOutcome",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_with_truncated_output_returns_succeeded"
+        }
+      ]
+    }
+  ]
+}

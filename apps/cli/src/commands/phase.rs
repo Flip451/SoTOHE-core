@@ -98,8 +98,9 @@ mod tests {
         PhaseValidateCommand,
     };
     use usecase::program_runner::{
-        CapturedProgramOutput, ClassifiedProgramExecutionRecord, ProgramExecutionRecord,
-        ProgramExitCode, ProgramRunOutcome, SuccessfulProgramExecutionRecord,
+        CapturedProgramOutput, CapturedStreamOutput, ClassifiedProgramExecutionRecord,
+        ProgramExecutionRecord, ProgramExitCode, ProgramRunOutcome,
+        SuccessfulProgramExecutionRecord,
     };
 
     use super::{
@@ -201,7 +202,10 @@ mod tests {
             command,
             outcome: ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(0),
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                output: CapturedProgramOutput {
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(Vec::new()),
+                },
             },
         };
         match record.classify() {
@@ -775,8 +779,8 @@ fi
             r#"{
                 "schema_version": 1,
                 "phases": [{
-                    "id": "output-limited",
-                    "writer": {"argv": ["yes"], "timeout_seconds": 1},
+                    "id": "truncated-output",
+                    "writer": {"argv": ["sh", "-c", "head -c 1048576 /dev/zero; printf 'stdout-tail-marker'"], "timeout_seconds": 1},
                     "pre_entry_commands": []
                 }]
             }"#,
@@ -785,18 +789,21 @@ fi
             run_in_dir(repository.path(), || {
                 execute_with_driver(
                     PhaseCommand::Enter(PhaseEnterArgs {
-                        phase_id: PhaseIdArg::from_str("output-limited").expect("valid phase id"),
+                        phase_id: PhaseIdArg::from_str("truncated-output").expect("valid phase id"),
                         host: None,
                     }),
                     &PhaseCompositionRoot.build(),
                 )
             })
         });
-        assert_eq!(exit, std::process::ExitCode::FAILURE);
-        assert_eq!(stdout.len(), 1_048_577, "1 MiB capture plus CLI newline");
-        assert!(stderr.contains(
-            "phase command blocked at sequence 0: [\"yes\"]; outcome: output limit exceeded on stdout"
-        ));
+        assert_eq!(exit, std::process::ExitCode::SUCCESS);
+        assert!(stderr.is_empty());
+        assert!(stdout.contains("[output truncated; showing retained tail]"));
+        assert!(stdout.contains("stdout-tail-marker"));
+        assert!(
+            stdout.contains("phase command sequence 0: [\"sh\",\"-c\"")
+                && stdout.contains("outcome: exited with 0")
+        );
 
         write_phase_config(
             &config_path,
@@ -883,8 +890,8 @@ fi
             r#"{
                 "schema_version": 1,
                 "phases": [{
-                    "id": "output-limited",
-                    "writer": {"argv": ["yes"], "timeout_seconds": 1},
+                    "id": "truncated-output",
+                    "writer": {"argv": ["sh", "-c", "head -c 1048576 /dev/zero; printf 'stdout-tail-marker'"], "timeout_seconds": 1},
                     "pre_entry_commands": []
                 }]
             }"#,
@@ -892,16 +899,19 @@ fi
         let (exit, stdout, stderr) = capture_cli_output(|| {
             run_in_dir(repository.path(), || {
                 execute(PhaseCommand::Enter(PhaseEnterArgs {
-                    phase_id: PhaseIdArg::from_str("output-limited").expect("valid phase id"),
+                    phase_id: PhaseIdArg::from_str("truncated-output").expect("valid phase id"),
                     host: None,
                 }))
             })
         });
-        assert_eq!(exit, std::process::ExitCode::FAILURE);
-        assert_eq!(stdout.len(), 1_048_577, "1 MiB capture plus CLI newline");
-        assert!(stderr.contains(
-            "phase command blocked at sequence 0: [\"yes\"]; outcome: output limit exceeded on stdout"
-        ));
+        assert_eq!(exit, std::process::ExitCode::SUCCESS);
+        assert!(stderr.is_empty());
+        assert!(stdout.contains("[output truncated; showing retained tail]"));
+        assert!(stdout.contains("stdout-tail-marker"));
+        assert!(
+            stdout.contains("phase command sequence 0: [\"sh\",\"-c\"")
+                && stdout.contains("outcome: exited with 0")
+        );
 
         write_phase_config(
             &config_path,

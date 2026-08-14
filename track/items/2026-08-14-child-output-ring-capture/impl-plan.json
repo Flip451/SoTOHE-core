@@ -39,6 +39,7 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "a700c6810f60a85c256919e37ef55924591bcb19",
       "description": "Update the review-fix runner's diagnostic capture and focused infrastructure regressions. [D1; D2; IN-01; IN-03; OS-01; CN-02; CN-03; AC-01; AC-03]",
       "id": "T001",
       "status": "done"
@@ -46,7 +47,7 @@
     {
       "description": "Apply the catalogued captured-stream outcome contract to the program runner and infrastructure adapter; update usecase and adapter regressions, including the ProgramRunnerPort contract obligation. [D1; IN-02; OS-02; OS-03; CN-01; CN-03; AC-02; AC-04]",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -54,7 +55,7 @@
       ],
       "description": "Adapt phase-command rendering and CLI/composition regressions to the captured-stream outcome. [D1; D2; IN-02; OS-02; CN-03; AC-02; AC-04]",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

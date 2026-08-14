@@ -4,8 +4,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapturedStreamOutput | enum | add | Complete, TruncatedTail | 🟡 | 🔵 |
-| ProgramRunOutcome | enum | modify | Exited, TimedOut | 🟡 | 🔵 |
+| CapturedStreamOutput | enum | add | Complete, TruncatedTail | 🔵 | 🔵 |
+| ProgramRunOutcome | enum | modify | Exited, TimedOut | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -18,7 +18,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapturedProgramOutput | dto | modify | — | 🟡 | 🔵 |
+| CapturedProgramOutput | dto | modify | — | 🔵 | 🔵 |
 | FailedProgramExecutionRecord | dto | reference | — | 🔵 | 🔵 |
 | ProgramExecutionRecord | dto | reference | — | 🔵 | 🔵 |
 | SuccessfulProgramExecutionRecord | dto | reference | — | 🔵 | 🔵 |

@@ -19,6 +19,60 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:233c9389949e8ccdf384c8b6d8504bac8fe618e6eb7004183d7188d80e60823d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:56:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:233c9389949e8ccdf384c8b6d8504bac8fe618e6eb7004183d7188d80e60823d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46c6c81716620be03755d3ab67e78cf11321f2ad9a975452128d6cafabb16b13",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:55:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46c6c81716620be03755d3ab67e78cf11321f2ad9a975452128d6cafabb16b13",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e55103b11cc55296bcbabf8373554c1fa5eaad3c2c2e402342c2feb82e2a4549",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:56:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e55103b11cc55296bcbabf8373554c1fa5eaad3c2c2e402342c2feb82e2a4549",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -89,6 +143,20 @@
           "at": "2026-08-14T14:08:26Z",
           "findings": [],
           "hash": "rvw1:sha256:6773ac3f773028055eaae3aa203cc9634b07581706b2fa79829cf07386932b88",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:50:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13377c878df622d459a1c51b1c89a9ce8facde98bf60c830fe8e465a78d03197",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:54:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13377c878df622d459a1c51b1c89a9ce8facde98bf60c830fe8e465a78d03197",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -169,6 +237,20 @@
           "hash": "rvw1:sha256:2845ec064ff5b3f26b13be97d3259857e783e9b932cd6739debd7542d0c0ee71",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:52:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf48d4c1bcfdc3490a8ea9e700846e818a63c04f9866598837e8581fd8947504",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:58:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf48d4c1bcfdc3490a8ea9e700846e818a63c04f9866598837e8581fd8947504",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -185,6 +267,64 @@
           "at": "2026-08-14T12:59:51Z",
           "findings": [],
           "hash": "rvw1:sha256:ddee21009689256ba970059c6ae4b53fdb6d53fd032cfdb039fc0016d1054812",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:50:59Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 44,
+              "message": "This binding associates `test_program_runner_terminates_timed_out_process` with `CapturedProgramOutput × CN-01`, but the test only matches `ProgramRunOutcome::TimedOut` and never inspects the `CapturedProgramOutput` value. Bind it only to the `ProgramRunOutcome` edge, or use a test that asserts the captured output contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 115,
+              "message": "This binding associates `test_program_runner_terminates_timed_out_process` with `CapturedStreamOutput × CN-01`, but the test does not inspect either captured stream or its truncation/tail behavior. Remove this test from the stream-output edge or replace it with a test asserting that stream’s contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4b88d031675fb82fc27af9a40b20422031afc40dbcac125c8d7a2a9780da6893",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T15:53:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a901be224772d98409aa250837c8282512a60acd95aeaed34ecba010d520cfa6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:58:57Z",
+          "findings": [
+            {
+              "category": "test-obligation coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 35,
+              "message": "The CapturedProgramOutput × CN-01 binding now contains only the stdout-overflow test, but its frozen passing verdict covered a different set that also included the timeout test. `bin/sotp test-obligation check` reports this edge as `TestChanged`, so the claimed resolved edge is currently stale. Restore the intended tests or have the host re-evaluate this exact set.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 101,
+              "message": "The CapturedStreamOutput × CN-01 binding likewise no longer matches its evaluated test set: the current record omits the timeout test present in the frozen verdict. The canonical check reports this edge as `TestChanged`; it must be restored or re-evaluated before the obligation gate can pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a901be224772d98409aa250837c8282512a60acd95aeaed34ecba010d520cfa6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T16:07:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a901be224772d98409aa250837c8282512a60acd95aeaed34ecba010d520cfa6",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -457,6 +597,24 @@
           "at": "2026-08-14T12:47:59Z",
           "findings": [],
           "hash": "rvw1:sha256:422a7308ac16764571c04ae0fa6ee4dd608715925c6ae52737300e85855ac8ef",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3036d886fdc09d1f70af60db928950a55860ac2b75987944a7f319d9bba10c06",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T16:00:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3036d886fdc09d1f70af60db928950a55860ac2b75987944a7f319d9bba10c06",
           "type": "final",
           "verdict": "zero_findings"
         }
