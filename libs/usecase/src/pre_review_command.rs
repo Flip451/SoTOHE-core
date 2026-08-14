@@ -396,8 +396,8 @@ mod tests {
         CommandArgument, CommandConfigLoadError, CommandConfigSchemaVersion, ConfiguredCommand,
     };
     use crate::program_runner::{
-        CapturedProgramOutput, ClassifiedProgramExecutionRecord, FailedProgramExecutionRecord,
-        ProgramExecutionRecord, ProgramExitCode, ProgramInvocation, ProgramOutputStream,
+        CapturedProgramOutput, CapturedStreamOutput, ClassifiedProgramExecutionRecord,
+        FailedProgramExecutionRecord, ProgramExecutionRecord, ProgramExitCode, ProgramInvocation,
         ProgramRunOutcome, ProgramRunnerError, ProgramRunnerPort,
     };
     use crate::review_v2::{
@@ -576,7 +576,10 @@ mod tests {
                 .push(arguments);
             Ok(ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(exit_code),
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                output: CapturedProgramOutput {
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(Vec::new()),
+                },
             })
         }
     }
@@ -738,22 +741,12 @@ mod tests {
     fn test_pre_review_command_dispatch_timeout_blocks_and_stops_before_later_command() {
         assert_dispatch_stops_after_bounded_failure(
             ProgramRunOutcome::TimedOut {
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                output: CapturedProgramOutput {
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(Vec::new()),
+                },
             },
             |record| matches!(record.as_ref().outcome, ProgramRunOutcome::TimedOut { .. }),
-        );
-    }
-
-    #[test]
-    fn test_pre_review_command_dispatch_output_limit_blocks_and_stops_before_later_command() {
-        assert_dispatch_stops_after_bounded_failure(
-            ProgramRunOutcome::OutputLimitExceeded {
-                stream: ProgramOutputStream::Stderr,
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
-            },
-            |record| {
-                matches!(record.as_ref().outcome, ProgramRunOutcome::OutputLimitExceeded { .. })
-            },
         );
     }
 
@@ -825,7 +818,10 @@ mod tests {
                 completed: Vec::new(),
                 failed: failed_record(ProgramRunOutcome::Exited {
                     exit_code: ProgramExitCode::new(1),
-                    output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                    output: CapturedProgramOutput {
+                        stdout: CapturedStreamOutput::Complete(Vec::new()),
+                        stderr: CapturedStreamOutput::Complete(Vec::new()),
+                    },
                 }),
             })
         }
@@ -1146,11 +1142,17 @@ mod tests {
             outcomes: Mutex::new(std::collections::VecDeque::from([
                 ProgramRunOutcome::Exited {
                     exit_code: ProgramExitCode::new(0),
-                    output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                    output: CapturedProgramOutput {
+                        stdout: CapturedStreamOutput::Complete(Vec::new()),
+                        stderr: CapturedStreamOutput::Complete(Vec::new()),
+                    },
                 },
                 ProgramRunOutcome::Exited {
                     exit_code: ProgramExitCode::new(1),
-                    output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                    output: CapturedProgramOutput {
+                        stdout: CapturedStreamOutput::Complete(Vec::new()),
+                        stderr: CapturedStreamOutput::Complete(Vec::new()),
+                    },
                 },
             ])),
             invocations: Mutex::new(Vec::new()),
@@ -1213,7 +1215,10 @@ mod tests {
         let review = Arc::new(CountingReview(AtomicUsize::new(0)));
         let success = || ProgramRunOutcome::Exited {
             exit_code: ProgramExitCode::new(0),
-            output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+            output: CapturedProgramOutput {
+                stdout: CapturedStreamOutput::Complete(Vec::new()),
+                stderr: CapturedStreamOutput::Complete(Vec::new()),
+            },
         };
         let runner = Arc::new(OutcomeRecordingRunner {
             outcomes: Mutex::new(std::collections::VecDeque::from([

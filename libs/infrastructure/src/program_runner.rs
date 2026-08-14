@@ -1,5 +1,6 @@
 //! Generic, bounded literal-argv process runner.
 
+use std::collections::VecDeque;
 use std::io::Read;
 use std::process::{Child, Command, Stdio};
 use std::sync::mpsc::{self, Receiver};
@@ -8,7 +9,7 @@ use std::time::{Duration, Instant};
 
 use domain::FreeText;
 use usecase::program_runner::{
-    CapturedProgramOutput, ProgramExitCode, ProgramInvocation, ProgramOutputStream,
+    CapturedProgramOutput, CapturedStreamOutput, ProgramExitCode, ProgramInvocation,
     ProgramRunOutcome, ProgramRunnerError, ProgramRunnerPort,
 };
 
@@ -63,24 +64,13 @@ impl ProgramRunnerPort for ProcessProgramRunner {
                 );
             }
         };
-        let (sender, receiver) = mpsc::channel();
-        let stdout_reader = match spawn_reader(
-            stdout,
-            invocation.stdout_limit.as_usize(),
-            ProgramOutputStream::Stdout,
-            sender.clone(),
-        ) {
+        let stdout_reader = match spawn_reader(stdout, invocation.stdout_limit.as_usize()) {
             Ok(reader) => reader,
             Err(error) => {
                 return cleanup_after_start_failure(&mut child, spawn_failed(&error), None);
             }
         };
-        let stderr_reader = match spawn_reader(
-            stderr,
-            invocation.stderr_limit.as_usize(),
-            ProgramOutputStream::Stderr,
-            sender,
-        ) {
+        let stderr_reader = match spawn_reader(stderr, invocation.stderr_limit.as_usize()) {
             Ok(reader) => reader,
             Err(error) => {
                 return cleanup_after_start_failure(
@@ -93,15 +83,12 @@ impl ProgramRunnerPort for ProcessProgramRunner {
 
         let deadline = Instant::now() + Duration::from_secs(invocation.timeout.as_secs());
         let mut timed_out = false;
-        let mut overflow = None;
         let mut cleanup_after_termination = false;
         let stdout = match receive_reader(
             &stdout_reader,
             deadline,
             &mut child,
             &mut timed_out,
-            &receiver,
-            &mut overflow,
             &mut cleanup_after_termination,
         ) {
             Ok(output) => output,
@@ -114,16 +101,11 @@ impl ProgramRunnerPort for ProcessProgramRunner {
                 );
             }
         };
-        if stdout.exceeded {
-            terminate_for_reader_overflow(&mut child, &mut cleanup_after_termination)?;
-        }
         let stderr = match receive_reader(
             &stderr_reader,
             deadline,
             &mut child,
             &mut timed_out,
-            &receiver,
-            &mut overflow,
             &mut cleanup_after_termination,
         ) {
             Ok(output) => output,
@@ -136,9 +118,6 @@ impl ProgramRunnerPort for ProcessProgramRunner {
                 );
             }
         };
-        if stderr.exceeded {
-            terminate_for_reader_overflow(&mut child, &mut cleanup_after_termination)?;
-        }
         join_reader(stdout_reader)?;
         join_reader(stderr_reader)?;
         // Both readers have completed, so no descendant can still keep one of
@@ -146,16 +125,10 @@ impl ProgramRunnerPort for ProcessProgramRunner {
         // enforcing the invocation deadline.
         let exit_status =
             wait_for_child(&mut child, deadline, &mut timed_out, &mut cleanup_after_termination)?;
-        let output = CapturedProgramOutput { stdout: stdout.bytes, stderr: stderr.bytes };
+        let output = CapturedProgramOutput { stdout: stdout.output, stderr: stderr.output };
 
         if timed_out {
             return Ok(ProgramRunOutcome::TimedOut { output });
-        }
-        if let Some(stream) = overflow
-            .or_else(|| stdout.exceeded.then_some(ProgramOutputStream::Stdout))
-            .or_else(|| stderr.exceeded.then_some(ProgramOutputStream::Stderr))
-        {
-            return Ok(ProgramRunOutcome::OutputLimitExceeded { stream, output });
         }
         // A successful leader can leave descendants in its process group even
         // after every output pipe closes. They must not outlive this runner.
@@ -168,8 +141,7 @@ impl ProgramRunnerPort for ProcessProgramRunner {
 }
 
 struct StreamRead {
-    bytes: Vec<u8>,
-    exceeded: bool,
+    output: CapturedStreamOutput,
 }
 
 struct PipeReader {
@@ -177,31 +149,26 @@ struct PipeReader {
     handle: thread::JoinHandle<()>,
 }
 
-fn spawn_reader<R>(
-    mut reader: R,
-    limit: usize,
-    stream: ProgramOutputStream,
-    sender: mpsc::Sender<ProgramOutputStream>,
-) -> Result<PipeReader, std::io::Error>
+fn spawn_reader<R>(mut reader: R, limit: usize) -> Result<PipeReader, std::io::Error>
 where
     R: Read + Send + 'static,
 {
     let (completion_sender, receiver) = mpsc::sync_channel(1);
     let handle =
         thread::Builder::new().name("program-output-reader".to_owned()).spawn(move || {
-            let mut bytes = Vec::new();
+            let mut capture = TailCapture::new(limit);
             let mut chunk = [0_u8; 8192];
             let result = loop {
                 match reader.read(&mut chunk) {
-                    Ok(0) => break Ok(StreamRead { bytes, exceeded: false }),
+                    Ok(0) => break Ok(StreamRead { output: capture.finish() }),
                     Ok(read) => {
-                        let remaining = limit.saturating_sub(bytes.len());
-                        if read > remaining {
-                            bytes.extend(chunk.iter().take(remaining).copied());
-                            let _ = sender.send(stream);
-                            break Ok(StreamRead { bytes, exceeded: true });
-                        }
-                        bytes.extend(chunk.iter().take(read).copied());
+                        let Some(bytes) = chunk.get(..read) else {
+                            break Err(std::io::Error::new(
+                                std::io::ErrorKind::InvalidData,
+                                "output reader returned more bytes than its buffer",
+                            ));
+                        };
+                        capture.push(bytes);
                     }
                     Err(error) => break Err(error),
                 }
@@ -209,6 +176,55 @@ where
             let _ = completion_sender.send(result);
         })?;
     Ok(PipeReader { receiver, handle })
+}
+
+struct TailCapture {
+    bytes: VecDeque<u8>,
+    capacity: usize,
+    truncated: bool,
+}
+
+impl TailCapture {
+    fn new(capacity: usize) -> Self {
+        Self { bytes: VecDeque::with_capacity(capacity), capacity, truncated: false }
+    }
+
+    fn push(&mut self, bytes: &[u8]) {
+        if bytes.is_empty() {
+            return;
+        }
+        if self.capacity == 0 {
+            self.truncated = true;
+            return;
+        }
+
+        let overflow = self.bytes.len().saturating_add(bytes.len()).saturating_sub(self.capacity);
+        if overflow == 0 {
+            self.bytes.extend(bytes.iter().copied());
+            return;
+        }
+
+        self.truncated = true;
+        if overflow >= self.bytes.len() {
+            let input_start = overflow.saturating_sub(self.bytes.len());
+            self.bytes.clear();
+            self.bytes.extend(bytes.get(input_start..).unwrap_or_default().iter().copied());
+        } else {
+            for _ in 0..overflow {
+                let _ = self.bytes.pop_front();
+            }
+            self.bytes.extend(bytes.iter().copied());
+        }
+    }
+
+    fn finish(self) -> CapturedStreamOutput {
+        let bytes = self.bytes.into_iter().collect();
+        if self.truncated {
+            CapturedStreamOutput::TruncatedTail(bytes)
+        } else {
+            CapturedStreamOutput::Complete(bytes)
+        }
+    }
 }
 
 fn terminate(child: &mut Child) -> Result<(), ProgramRunnerError> {
@@ -222,22 +238,11 @@ fn receive_reader(
     deadline: Instant,
     child: &mut Child,
     timed_out: &mut bool,
-    overflow_notifications: &Receiver<ProgramOutputStream>,
-    overflow: &mut Option<ProgramOutputStream>,
     cleanup_after_termination: &mut bool,
 ) -> Result<StreamRead, ProgramRunnerError> {
     let mut cleanup_deadline =
         cleanup_after_termination.then(|| Instant::now() + READER_CLEANUP_TIMEOUT);
     loop {
-        if let Some(stream) = overflow_notifications.try_iter().next() {
-            *overflow = Some(stream);
-            begin_cleanup_after_termination(
-                child,
-                cleanup_after_termination,
-                &mut cleanup_deadline,
-            )?;
-        }
-
         let remaining = if *cleanup_after_termination {
             cleanup_deadline
                 .and_then(|deadline| deadline.checked_duration_since(Instant::now()))
@@ -265,14 +270,6 @@ fn receive_reader(
             }
         }
     }
-}
-
-fn terminate_for_reader_overflow(
-    child: &mut Child,
-    cleanup_after_termination: &mut bool,
-) -> Result<(), ProgramRunnerError> {
-    let mut cleanup_deadline = None;
-    begin_cleanup_after_termination(child, cleanup_after_termination, &mut cleanup_deadline)
 }
 
 fn wait_for_child(
@@ -411,8 +408,11 @@ mod tests {
         match outcome {
             ProgramRunOutcome::Exited { exit_code, output } => {
                 assert_eq!(exit_code.as_i32(), 0);
-                assert_eq!(output.stdout, b"out; printf err >&2; exit 7");
-                assert!(output.stderr.is_empty());
+                assert_eq!(
+                    output.stdout,
+                    CapturedStreamOutput::Complete(b"out; printf err >&2; exit 7".to_vec())
+                );
+                assert_eq!(output.stderr, CapturedStreamOutput::Complete(Vec::new()));
             }
             other => panic!("expected normal exit, got {other:?}"),
         }
@@ -425,7 +425,11 @@ mod tests {
         match outcome {
             ProgramRunOutcome::Exited { exit_code, output } => {
                 assert_eq!(exit_code.as_i32(), 0);
-                assert_eq!(PathBuf::from(String::from_utf8(output.stdout).unwrap().trim()), root);
+                let stdout = match output.stdout {
+                    CapturedStreamOutput::Complete(bytes)
+                    | CapturedStreamOutput::TruncatedTail(bytes) => bytes,
+                };
+                assert_eq!(PathBuf::from(String::from_utf8(stdout).unwrap().trim()), root);
             }
             other => panic!("expected normal exit, got {other:?}"),
         }
@@ -440,24 +444,43 @@ mod tests {
     }
 
     #[test]
-    fn test_program_runner_terminates_process_on_independent_output_limit() {
-        let outcome = ProcessProgramRunner::new().run(invocation(&["yes"], 5)).unwrap();
-        assert!(matches!(
-            outcome,
-            ProgramRunOutcome::OutputLimitExceeded { stream: ProgramOutputStream::Stdout, .. }
-        ));
+    fn test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail() {
+        let outcome = ProcessProgramRunner::new()
+            .run(invocation(
+                &["sh", "-c", "head -c 1048576 /dev/zero; printf 'stdout-tail-marker'"],
+                5,
+            ))
+            .unwrap();
+
+        match outcome {
+            ProgramRunOutcome::Exited { exit_code, output } => {
+                assert_eq!(exit_code.as_i32(), 0);
+                match output.stdout {
+                    CapturedStreamOutput::TruncatedTail(bytes) => {
+                        assert!(bytes.ends_with(b"stdout-tail-marker"));
+                    }
+                    other => panic!("expected truncated stdout tail, got {other:?}"),
+                }
+            }
+            other => panic!("expected output overflow to remain a normal exit, got {other:?}"),
+        }
     }
 
     #[cfg(unix)]
     #[test]
-    fn test_program_runner_allows_exact_capture_bound_and_rejects_one_byte_more() {
+    fn test_program_runner_marks_only_discarded_output_as_truncated() {
         let at_limit = ProcessProgramRunner::new()
             .run(invocation(&["head", "-c", "1048576", "/dev/zero"], 5))
             .unwrap();
         match at_limit {
             ProgramRunOutcome::Exited { exit_code, output } => {
                 assert_eq!(exit_code.as_i32(), 0);
-                assert_eq!(output.stdout.len(), OutputCaptureLimitBytes::one_mebibyte().as_usize());
+                match output.stdout {
+                    CapturedStreamOutput::Complete(bytes) => {
+                        assert_eq!(bytes.len(), OutputCaptureLimitBytes::one_mebibyte().as_usize());
+                    }
+                    other => panic!("expected an exact capture to be complete, got {other:?}"),
+                }
             }
             other => panic!("expected exact capture bound to succeed, got {other:?}"),
         }
@@ -466,13 +489,18 @@ mod tests {
             .run(invocation(&["head", "-c", "1048577", "/dev/zero"], 5))
             .unwrap();
         match over_limit {
-            ProgramRunOutcome::OutputLimitExceeded {
-                stream: ProgramOutputStream::Stdout,
-                output,
-            } => {
-                assert_eq!(output.stdout.len(), OutputCaptureLimitBytes::one_mebibyte().as_usize())
+            ProgramRunOutcome::Exited { exit_code, output } => {
+                assert_eq!(exit_code.as_i32(), 0);
+                match output.stdout {
+                    CapturedStreamOutput::TruncatedTail(bytes) => {
+                        assert_eq!(bytes.len(), OutputCaptureLimitBytes::one_mebibyte().as_usize())
+                    }
+                    other => {
+                        panic!("expected a truncated tail after one extra byte, got {other:?}")
+                    }
+                }
             }
-            other => panic!("expected one byte over the capture bound to fail, got {other:?}"),
+            other => panic!("expected one byte over the capture bound to exit, got {other:?}"),
         }
     }
 
@@ -500,19 +528,30 @@ mod tests {
 
     #[cfg(unix)]
     #[test]
-    fn test_program_runner_terminates_descendant_after_stderr_limit_when_leader_exits() {
+    fn test_program_runner_continues_after_stderr_capture_limit_and_retains_tail() {
         let started = Instant::now();
         let outcome = ProcessProgramRunner::new()
-            .run(invocation(&["sh", "-c", "yes >&2 & exit 0"], 2))
+            .run(invocation(
+                &["sh", "-c", "head -c 1048576 /dev/zero >&2; printf 'stderr-tail-marker' >&2"],
+                2,
+            ))
             .unwrap();
 
-        assert!(matches!(
-            outcome,
-            ProgramRunOutcome::OutputLimitExceeded { stream: ProgramOutputStream::Stderr, .. }
-        ));
+        match outcome {
+            ProgramRunOutcome::Exited { exit_code, output } => {
+                assert_eq!(exit_code.as_i32(), 0);
+                match output.stderr {
+                    CapturedStreamOutput::TruncatedTail(bytes) => {
+                        assert!(bytes.ends_with(b"stderr-tail-marker"));
+                    }
+                    other => panic!("expected truncated stderr tail, got {other:?}"),
+                }
+            }
+            other => panic!("expected stderr overflow to remain a normal exit, got {other:?}"),
+        }
         assert!(
             started.elapsed() < Duration::from_secs(5),
-            "stderr overflow must terminate the descendant before the command deadline"
+            "stderr overflow must not make the finite command hit its deadline"
         );
     }
 

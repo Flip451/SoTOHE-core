@@ -184,7 +184,7 @@ impl CodexReviewFixRunner {
             &codex_home,
             &output_last_message_path,
         );
-        let (stdout, child_status, log_file) = spawn_and_collect_codex(
+        let (child_status, log_file) = spawn_and_collect_codex(
             &bin,
             &args,
             &safe_env,
@@ -211,7 +211,7 @@ impl CodexReviewFixRunner {
                 ));
             }
         };
-        let status = parse_sentinel(&last_message_content).or_else(|| parse_sentinel(&stdout));
+        let status = parse_sentinel(&last_message_content);
         let status = match status {
             Some(s) => s,
             None => {
@@ -379,6 +379,44 @@ exit 0
     }
 
     #[cfg(unix)]
+    fn write_fake_codex_runner_with_large_diagnostic_output(
+        dir: &std::path::Path,
+        stdout_marker: &str,
+        stderr_marker: &str,
+    ) -> PathBuf {
+        let script = dir.join("fake-codex-large-diagnostic-output.sh");
+        let script_content = format!(
+            r#"#!/bin/sh
+if [ "$1" = "--version" ]; then
+  echo "codex 0.125.0"
+  exit 0
+fi
+out=""
+while [ "$#" -gt 0 ]; do
+  if [ "$1" = "--output-last-message" ]; then
+    out="$2"
+    shift 2
+  else
+    shift
+  fi
+done
+cat >/dev/null
+printf 'early-stdout-diagnostic-marker\n'
+head -c 1048577 /dev/zero | tr '\000' x
+printf '{stdout_marker}\n'
+printf 'early-stderr-diagnostic-marker\n' >&2
+head -c 1048577 /dev/zero | tr '\000' x >&2
+printf '{stderr_marker}\n' >&2
+printf 'REVIEW_FIX_STATUS: failed\n' > "$out"
+exit 0
+"#
+        );
+        std::fs::write(&script, script_content).unwrap();
+        make_executable(&script);
+        script
+    }
+
+    #[cfg(unix)]
     fn write_fake_codex_runner_capturing_working_directory(dir: &std::path::Path) -> PathBuf {
         let script = dir.join("fake-codex-captures-working-directory.sh");
         let script_content = r#"#!/bin/sh
@@ -430,6 +468,41 @@ cat >/dev/null
 printf 'not a sentinel\n' > "$out"
 printf 'fake stdout without sentinel\n'
 exit {exit_code}
+"#
+        );
+        std::fs::write(&script, script_content).unwrap();
+        make_executable(&script);
+        script
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_runner_with_diagnostic_sentinel_tail(
+        dir: &std::path::Path,
+        marker: &str,
+    ) -> PathBuf {
+        let script = dir.join("fake-codex-diagnostic-sentinel-tail.sh");
+        let script_content = format!(
+            r#"#!/bin/sh
+if [ "$1" = "--version" ]; then
+  echo "codex 0.125.0"
+  exit 0
+fi
+out=""
+while [ "$#" -gt 0 ]; do
+  if [ "$1" = "--output-last-message" ]; then
+    out="$2"
+    shift 2
+  else
+    shift
+  fi
+done
+cat >/dev/null
+printf 'early diagnostic output\n'
+head -c 1048577 /dev/zero | tr '\000' x
+printf 'REVIEW_FIX_STATUS: completed\n'
+printf '{marker}\n' >&2
+printf 'not a sentinel\n' > "$out"
+exit 0
 "#
         );
         std::fs::write(&script, script_content).unwrap();
@@ -642,6 +715,41 @@ exit 0
 
     #[cfg(unix)]
     #[test]
+    fn test_run_fix_diagnostic_stdout_and_stderr_overflow_keeps_child_running_and_retains_tail() {
+        let dir = tempfile::tempdir().unwrap();
+        let stdout_marker = format!(
+            "large-diagnostic-stdout-tail-marker-{}",
+            dir.path().file_name().unwrap().to_string_lossy()
+        );
+        let stderr_marker = format!(
+            "large-diagnostic-stderr-tail-marker-{}",
+            dir.path().file_name().unwrap().to_string_lossy()
+        );
+        let fake = write_fake_codex_runner_with_large_diagnostic_output(
+            dir.path(),
+            &stdout_marker,
+            &stderr_marker,
+        );
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
+
+        let output = make_runner().with_bin(&fake).run_fix(command).unwrap();
+
+        assert_eq!(output.status, "failed");
+        assert_eq!(output.exit_code, 1);
+        let log_path = retained_session_log_containing(&stdout_marker)
+            .expect("diagnostic overflow must retain the completed child's session log");
+        let log = std::fs::read_to_string(&log_path).unwrap();
+        assert_eq!(log.matches("output truncated").count(), 2);
+        assert!(log.contains(&stdout_marker));
+        assert!(log.contains(&stderr_marker));
+        assert!(!log.contains("early-stdout-diagnostic-marker"));
+        assert!(!log.contains("early-stderr-diagnostic-marker"));
+        std::fs::remove_file(log_path).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn test_run_fix_spawns_fake_codex_from_resolver_proven_repository_root() {
         let process_cwd = std::env::current_dir().expect("process current directory");
         let fixture_parent = process_cwd.join("tmp");
@@ -784,6 +892,26 @@ exit 0
             Err(ReviewFixRunnerError::Unexpected(message))
                 if message.as_str().contains("exceeds")
         ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_fix_diagnostic_stdout_sentinel_does_not_bypass_validation() {
+        let dir = tempfile::tempdir().unwrap();
+        let marker = format!(
+            "diagnostic-sentinel-tail-marker-{}",
+            dir.path().file_name().unwrap().to_string_lossy()
+        );
+        let fake = write_fake_codex_runner_with_diagnostic_sentinel_tail(dir.path(), &marker);
+        let (_briefing_directory, briefing) = trusted_briefing_fixture();
+        let command = make_command_with_briefing_file(briefing);
+
+        let result = make_runner().with_bin(&fake).run_fix(command);
+
+        assert!(matches!(result, Err(ReviewFixRunnerError::SentinelNotFound(_))));
+        let log_path = retained_session_log_containing(&marker)
+            .expect("diagnostic stdout must not make a missing validation sentinel pass");
+        std::fs::remove_file(log_path).unwrap();
     }
 
     // ── make_command and make_runner are needed for unused-variable lint ──────

@@ -266,16 +266,21 @@ mod tests {
         ));
     }
 
+    #[cfg(unix)]
     #[test]
-    fn test_phase_composition_root_output_limited_writer_renders_auditable_outcome() {
+    fn test_phase_composition_root_truncated_stdout_writer_renders_tail_notice() {
         let repository = test_repository();
+        let emitter = repository.path().join("emit-stdout");
+        fs::write(&emitter, "#!/bin/sh\nhead -c 1048576 /dev/zero\nprintf 'stdout-tail-marker'\n")
+            .expect("stdout emitter is written");
+        crate::test_support::make_executable(&emitter);
         write_phase_config(
             repository.path(),
             r#"{
                 "schema_version": 1,
                 "phases": [{
-                    "id": "output-limited",
-                    "writer": {"argv": ["yes"], "timeout_seconds": 1},
+                    "id": "truncated-output",
+                    "writer": {"argv": ["./emit-stdout"], "timeout_seconds": 1},
                     "pre_entry_commands": []
                 }]
             }"#,
@@ -283,33 +288,38 @@ mod tests {
 
         let outcome = PhaseCompositionRoot.build().handle(PhaseCommandInput::Enter {
             repository_root: repository.path().to_path_buf(),
-            phase_id: PhaseIdArg::from_str("output-limited").expect("valid phase id"),
+            phase_id: PhaseIdArg::from_str("truncated-output").expect("valid phase id"),
             host: None,
         });
 
-        assert_eq!(outcome.exit_code, 1);
-        assert_eq!(
-            outcome.stdout.as_deref().expect("captured stdout reaches the configured limit").len(),
-            1_048_576
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.expect("truncated stdout outcome is rendered");
+        assert!(stdout.contains("[output truncated; showing retained tail]"));
+        assert!(stdout.contains("stdout-tail-marker"));
+        assert!(
+            stdout
+                .contains("phase command sequence 0: [\"./emit-stdout\"]; outcome: exited with 0")
         );
-        assert!(outcome.stderr.expect("output-limit outcome is rendered").contains(
-            "phase command blocked at sequence 0: [\"yes\"]; outcome: output limit exceeded on stdout"
-        ));
+        assert!(outcome.stderr.is_none());
     }
 
     #[cfg(unix)]
     #[test]
-    fn test_phase_composition_root_stderr_limited_writer_renders_auditable_outcome() {
+    fn test_phase_composition_root_truncated_stderr_writer_renders_tail_notice() {
         let repository = test_repository();
         let emitter = repository.path().join("emit-stderr");
-        fs::write(&emitter, "#!/bin/sh\nyes >&2\n").expect("stderr emitter is written");
+        fs::write(
+            &emitter,
+            "#!/bin/sh\nhead -c 1048576 /dev/zero >&2\nprintf 'stderr-tail-marker' >&2\n",
+        )
+        .expect("stderr emitter is written");
         crate::test_support::make_executable(&emitter);
         write_phase_config(
             repository.path(),
             r#"{
                 "schema_version": 1,
                 "phases": [{
-                    "id": "stderr-limited",
+                    "id": "truncated-stderr",
                     "writer": {"argv": ["./emit-stderr"], "timeout_seconds": 1},
                     "pre_entry_commands": []
                 }]
@@ -318,17 +328,18 @@ mod tests {
 
         let outcome = PhaseCompositionRoot.build().handle(PhaseCommandInput::Enter {
             repository_root: repository.path().to_path_buf(),
-            phase_id: PhaseIdArg::from_str("stderr-limited").expect("valid phase id"),
+            phase_id: PhaseIdArg::from_str("truncated-stderr").expect("valid phase id"),
             host: None,
         });
 
-        assert_eq!(outcome.exit_code, 1);
-        assert!(outcome.stdout.is_none());
-        let diagnostic = "phase command blocked at sequence 0: [\"./emit-stderr\"]; outcome: output limit exceeded on stderr";
-        let stderr = outcome.stderr.expect("stderr output-limit outcome is rendered");
-        let captured_stderr = stderr
-            .strip_suffix(&format!("\n{diagnostic}"))
-            .expect("captured stderr precedes the audit diagnostic");
-        assert_eq!(captured_stderr.len(), 1_048_576);
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.expect("completed command audit is rendered");
+        assert!(
+            stdout
+                .contains("phase command sequence 0: [\"./emit-stderr\"]; outcome: exited with 0")
+        );
+        let stderr = outcome.stderr.expect("truncated stderr outcome is rendered");
+        assert!(stderr.contains("[output truncated; showing retained tail]"));
+        assert!(stderr.contains("stderr-tail-marker"));
     }
 }

@@ -1,0 +1,21 @@
+{
+  "baseline_hash": "598543ebbc341a3ac319ca06998df8c6735fd86f8cbd92d626130abffa17bca7",
+  "declaration_hash": "fdaed0ca84b4c369996aaa0010d3ac21f4dfddbd283850966e4841eecac9ed0f",
+  "generated_at": "2026-08-14T16:24:48Z",
+  "head_commit": "0eb8410999b38b1c28e5742fd2e8c08d2c43bdea",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "CodexReviewFixRunner"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "ProcessProgramRunner"
+    }
+  ]
+}
