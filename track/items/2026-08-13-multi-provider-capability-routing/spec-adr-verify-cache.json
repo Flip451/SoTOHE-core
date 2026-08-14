@@ -1,0 +1,442 @@
+{
+  "entries": [
+    {
+      "claim_hash": "0dc062ea4c57317e7eb7b859008ff2456ffe53c32766e972c2bbe2e483346780",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "capability profile から Codex custom model provider を選択可能にし、capability 単位の provider routing を拡張する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "capability ごとの混在 routing（例: fast lane のみ外部プロバイダー）を可能にする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8a10074b0a3a1982ca8d99af3a21dbc3c1da7b010e2a3b664e123643b8f09c3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "外部 provider の選択肢、設定方法、互換性の限界を consumer が data-residency 判断とともに理解して採用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "DeepSeek / GLM / Qwen の Codex custom provider 設定例（`config.toml` 断片）と、Anthropic 互換経路の設定・注意点（per-subprocess env 注入の必要性、delegate-in-host は redirect されないこと、Qwen の system message gap）を consumer 向け文書として同梱する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8a10074b0a3a1982ca8d99af3a21dbc3c1da7b010e2a3b664e123643b8f09c3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-02",
+          "section": "goal",
+          "text_label": "外部 provider の選択肢、設定方法、互換性の限界を consumer が data-residency 判断とともに理解して採用できるようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "SoTOHE は選択肢と文書化されたリスクを提供し、採否は consumer の責任。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "df99a7fb1940dc73a77041760b1d8995c3f8680c92b296c3e84755ff89a74595",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "capability profile schema に optional な `model_provider` フィールドを追加し、指定時は `--config model_provider=\"<id>\"` を発行する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7b2caf929323c4a7545355b94b9b069d1f4e1740b565bb6f85c024c43093dc34",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "model_provider を利用する profile でも sotp の provider 名を codex に維持し、既存の typed-pipeline provider gate を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "sotp の provider 名は `codex` のまま維持されるため、typed pipeline の provider gate はそのまま機能する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d51c916d1c646bc4ffe93dd9f3e675c29e132c122529e2efb8771cfe9e19a374",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "DeepSeek、GLM、Qwen 向け Codex custom provider の config.toml 例と、Anthropic 互換経路の設定上の注意を consumer documentation として同梱する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "DeepSeek / GLM / Qwen の Codex custom provider 設定例（`config.toml` 断片）と、Anthropic 互換経路の設定・注意点（per-subprocess env 注入の必要性、delegate-in-host は redirect されないこと、Qwen の system message gap）を consumer 向け文書として同梱する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6122e6cd7bc6709fba407f90bde4699e8fe41b28eb163b49133e3d2114d1343c",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "外部 provider 利用時の data residency 判断を consumer の責任として文書化し、外部 provider を選ばない既定 profile を維持する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ソースコード・briefing・diff が外部（PRC ホスト含む）サーバーへ送信される判断は、permissions allowlist と同じ所有権構図とする: SoTOHE は選択肢と文書化されたリスクを提供し、採否は consumer の責任。CI による強制は行わず、既定 profile は外部プロバイダーを指さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bf734072ffaf1e733d9872a55911e44d395c93312132fcfc4624af41e6302863",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "sotp が custom provider の存在、endpoint、認証、または provider 固有の意味論を検証・解釈することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "sotp はその意味論を解釈しない（値の pass-through + 非空検証のみ）",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8b751ab3eb08ebad14e7db2ff1fba61adab0f8dd0a82c7028c24d280264e0383",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "sotp に各 provider の API client を直接実装することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "DeepSeek / GLM / Qwen の Codex custom provider 設定例（`config.toml` 断片）と、Anthropic 互換経路の設定・注意点（per-subprocess env 注入の必要性、delegate-in-host は redirect されないこと、Qwen の system message gap）を consumer 向け文書として同梱する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "85b3f53cf443b76720e921fbc539eb00f3d22391fdb37e4dd349b642fb85b464",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-03",
+          "section": "out_of_scope",
+          "text_label": "global な環境変数 redirect を provider routing の正規経路として採用することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Anthropic 互換経路の設定・注意点（per-subprocess env 注入の必要性、delegate-in-host は redirect されないこと、Qwen の system message gap）",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7c0f4acfcb70cf69c2f3a217ca1577542b52970a932f14e0b96fc2772719c82",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-04",
+          "section": "out_of_scope",
+          "text_label": "open weights の self-host provider 経路を実装または運用することは対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "DeepSeek / GLM / Qwen の Codex custom provider 設定例（`config.toml` 断片）と、Anthropic 互換経路の設定・注意点（per-subprocess env 注入の必要性、delegate-in-host は redirect されないこと、Qwen の system message gap）を consumer 向け文書として同梱する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7ee3b8db878f87dc93c1ef5a1efdfa29836b7fa3ab405bd38c31da494cd9b5b9",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "sotp はその意味論を解釈しない（値の pass-through + 非空検証のみ）",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "83adf66c2a3224974d807cb8070b21e0a480bdd64a64ed7cfa2d43e9d92c81a2",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "provider 固有の互換性、既知の制約、および typed-pipeline 準拠の未検証状態は consumer documentation で区別して伝える。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各プロバイダーの typed-pipeline 準拠（verdict envelope / structured output）は未検証である旨を明記し、検証済みになったものから文書上のステータスを更新する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc7f8c2fe803b2aa85b289d8ee8308299582962900788c81120ea6ecf9016231",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "data residency の採否は consumer-owned とし、template は外部 provider を既定化せず、CI enforcement を追加しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "採否は consumer の責任。CI による強制は行わず、既定 profile は外部プロバイダーを指さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9948f940562ab05141afc7ca723258a6126c8d9dfe9e8636e2fffee94af2874f",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "capability profile schema に optional な `model_provider` フィールドを追加し、指定時は `--config model_provider=\"<id>\"` を発行する。provider 名は Codex `config.toml` の `model_providers` 宣言と対応し、sotp はその意味論を解釈しない（値の pass-through + 非空検証のみ）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a9184b0f8b9272798d457cb242b519187afd2c950cebaab582170cd381386152",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "provider 名は Codex `config.toml` の `model_providers` 宣言と対応し、sotp はその意味論を解釈しない（値の pass-through + 非空検証のみ）。sotp の provider 名は `codex` のまま維持されるため、typed pipeline の provider gate はそのまま機能する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b0d1bb213b0aa6f6f7a20f485e725538befe7b8523aee4758bb2169c09e34b32",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "consumer-facing documentation は DeepSeek、GLM、Qwen の Codex custom provider 用 config.toml 例と、Anthropic 互換経路の per-subprocess 環境変数注入、delegate-in-host 非 redirect、Qwen の system-message gap を明記する。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "DeepSeek / GLM / Qwen の Codex custom provider 設定例（`config.toml` 断片）と、Anthropic 互換経路の設定・注意点（per-subprocess env 注入の必要性、delegate-in-host は redirect されないこと、Qwen の system message gap）を consumer 向け文書として同梱する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7e49b583170b6b207da60cb680bcf2dc5cd2c91535e4853af411c6368f28b9e7",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各外部 provider の typed-pipeline 準拠は、verdict envelope と structured output を含めて検証されるまで、文書上で未検証として扱われる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "各プロバイダーの typed-pipeline 準拠（verdict envelope / structured output）は未検証である旨を明記し、検証済みになったものから文書上のステータスを更新する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9ecc41422771a7b94cfb710e5b3893be1d1b41c6fbb5308cc533696f89bedd12",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "外部 provider への source code・briefing・diff 送信の可否は consumer が判断し、CI は data residency を強制せず、既定 profile は外部 provider を指さない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "07dc711b09833ff0d59497f8ffdb76d9e3954c1c792da371fe91a69bb569e5ba",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ソースコード・briefing・diff が外部（PRC ホスト含む）サーバーへ送信される判断は、permissions allowlist と同じ所有権構図とする: SoTOHE は選択肢と文書化されたリスクを提供し、採否は consumer の責任。CI による強制は行わず、既定 profile は外部プロバイダーを指さない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,411 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "docs": "Constructor surface for ModelProviderNameDto; transient unvalidated JSON text input, not a stored DTO slot; reachable error variant: CapabilityInputValidationError::EmptyModelProviderName (IN-01, AC-01, CN-01).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, usecase::capability_exec::CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::capability_exec::ModelProviderName"
+        }
+      ],
+      "type_name": "ModelProviderNameDto"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::capability_exec::CapabilityProviderBinding"
+        }
+      ],
+      "type_name": "CapabilityProviderBindingDto"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ModelProviderNameDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ModelProviderNameDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ModelProviderNameDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ModelProviderNameDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ModelProviderNameDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityConfigDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "modify",
+      "for_type": "AgentProfilesCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProfilePort"
+    },
+    {
+      "action": "modify",
+      "for_type": "CodexCapabilityAdapter",
+      "trait_ref": "usecase::capability_exec::CapabilityProviderPort"
+    },
+    {
+      "for_type": "CapabilityProviderBindingDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityProviderBindingDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityProviderBindingDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityProviderBindingDto",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AgentProfilesCapabilityAdapter": {
+      "action": "reference",
+      "docs": "Baseline-reference surface for AgentProfilesCapabilityAdapter: existing struct shape and constructor (IN-01, AC-01, AC-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "capability_exec::agent_profiles",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    },
+    "CapabilityConfigDto": {
+      "action": "modify",
+      "docs": "Changes the CapabilityConfigDto accessor surface from provider() to provider_binding() returning &CapabilityProviderBindingDto (IN-01, IN-02, AC-01, AC-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider_binding",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CapabilityProviderBindingDto"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModelNameDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ProviderNameDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&ModelNameDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "prompt_template_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&std::path::Path>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<ReasoningEffortDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<ReasoningEffortDto>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execution_mode",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ExecutionModeDto"
+        }
+      ],
+      "module_path": "agent_profiles::types",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    },
+    "CapabilityProviderBindingDto": {
+      "action": "add",
+      "docs": "Adds the CapabilityProviderBindingDto enum with Standard(ProviderNameDto) and CodexCustom(ModelProviderNameDto) variants (IN-01, IN-02, AC-01, AC-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Standard",
+            "payload": {
+              "fields": [
+                "ProviderNameDto"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CodexCustom",
+            "payload": {
+              "fields": [
+                "ModelProviderNameDto"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "agent_profiles::types",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    },
+    "CodexCapabilityAdapter": {
+      "action": "reference",
+      "docs": "Baseline-reference surface for CodexCapabilityAdapter: existing struct shape and constructor (IN-01, AC-01, AC-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            },
+            {
+              "name": "track_id",
+              "ty": "Option<domain::ids::TrackId>"
+            }
+          ],
+          "returns": "CodexCapabilityAdapter"
+        }
+      ],
+      "module_path": "capability_exec::codex",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    },
+    "ModelProviderNameDto": {
+      "action": "add",
+      "docs": "Adds the ModelProviderNameDto tuple DTO and conversion surface (IN-01, AC-01, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "agent_profiles::types",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    }
+  }
+}

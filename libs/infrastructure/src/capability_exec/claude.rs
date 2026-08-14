@@ -119,7 +119,10 @@ impl ClaudeCapabilityAdapter {
 
         let prompt = capability_prompt(request);
         let session =
-            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
+            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone())
+                .map_err(|error| {
+                    adapter_preflight_error(request, &self.provider, error.to_string())
+                })?;
         let resume_id = session.resumable_id(&request.request.resume);
         let args = build_claude_args_with_resume(
             request.request.capability.as_str(),
@@ -333,7 +336,9 @@ mod tests {
                 resume: usecase::capability_exec::CapabilityResumeRequest::Fresh,
             },
             profile: CapabilityProfile {
-                provider: ProviderName::try_new("claude")?,
+                provider: usecase::capability_exec::CapabilityProviderBinding::Standard(
+                    ProviderName::try_new("claude")?,
+                ),
                 model: ModelName::try_new("claude-opus")?,
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
@@ -573,7 +578,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("prior-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("claude")?,
                 request.profile.model.clone(),
                 request.profile.effort,
             ),
@@ -621,7 +626,7 @@ mod tests {
             capability: request.request.capability.clone(),
             target_artifacts: targets,
         };
-        let current_provider = request.profile.provider.clone();
+        let current_provider = ProviderName::try_new("claude")?;
         let recorded_provider = ProviderName::try_new("codex")?;
         assert_ne!(current_provider, recorded_provider);
         cache.save(
@@ -686,7 +691,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("stale-model-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("claude")?,
                 recorded_model,
                 request.profile.effort,
             ),
@@ -746,7 +751,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("prior-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("claude")?,
                 request.profile.model.clone(),
                 request.profile.effort,
             ),

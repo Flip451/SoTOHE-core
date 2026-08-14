@@ -74,6 +74,132 @@ track 作業には `/adr:add <slug>` で ADR を作り
 - 出力ツリー内 `bin/sotp` を git 管理するかどうか (ignore / track) は利用者側の判断領域であり、本テンプレートは強制しない
 - プレビルトバイナリ配布 (GitHub Releases) は現時点では実施していない (将来検討)
 
+## 外部プロバイダーを capability 単位で設定する
+
+外部プロバイダーを Codex の custom model provider として使う場合は、Codex の
+`config.toml`（通常は `~/.codex/config.toml`、または `$CODEX_HOME/config.toml`）に
+プロバイダーを定義し、`agent-profiles.json` の対象 capability に
+`model_provider` としてその定義名を指定する。SoTOHE 側の `provider` は `codex` のままにし、
+`model_provider` と `[model_providers.<id>]` の `<id>` を一致させる。API key は TOML に書かず、
+`env_key` で参照する環境変数名を指定する。現在の Codex が custom provider に送る wire API は
+Responses API のみであり、SoTOHE は Chat Completions への変換を行わない。
+
+```toml
+# $CODEX_HOME/config.toml
+
+# Qwen (DashScope): Responses API の接続先を使う実行可能な例。
+[model_providers.qwen]
+name = "Qwen (DashScope)"
+base_url = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+env_key = "DASHSCOPE_API_KEY"
+wire_api = "responses"
+
+# DeepSeek: Responses API の接続先を使う実行可能な例。
+[model_providers.deepseek]
+name = "DeepSeek"
+base_url = "https://api.deepseek.com"
+env_key = "DEEPSEEK_API_KEY"
+wire_api = "responses"
+
+# GLM (Z.ai) の公式 OpenAI 互換 endpoint は Chat Completions 経路であり、
+# 現在の Codex の Responses-only custom provider には直結できない。
+# 次のブロックは設定形状を示す参考（実行可能な設定ではない）。
+#
+# [model_providers.glm]
+# name = "GLM (Z.ai)"
+# base_url = "https://api.z.ai/api/coding/paas/v4"
+# env_key = "ZAI_API_KEY"
+# wire_api = "responses" # endpoint が Chat Completions のため使用不可
+```
+
+Responses API 対応 provider を使う generic `orchestrator-output` capability の設定は次のような
+JSON 断片になる。これはテンプレートに実在する `spec-designer` の完全な entry であり、モデル名は
+契約している provider のモデル ID に置き換える。`model_provider` の pass-through はこの generic
+dispatch 経路だけが行う。
+
+```json
+{
+  "capabilities": {
+    "spec-designer": {
+      "provider": "codex",
+      "model": "qwen3.7-plus",
+      "model_provider": "qwen",
+      "reasoning_effort": "high",
+      "execution_mode": "orchestrator-output"
+    }
+  }
+}
+```
+
+`reviewer` や `review-fix-lead` など `execution_mode = "typed-pipeline"` の capability は専用の
+固定出力経路を持ち、`model_provider` を generic dispatch のようには転送しない。そのため、
+typed-pipeline の provider gate は `codex` のままであり、外部 provider への routing を設定で
+有効化できない。DeepSeek、GLM (Z.ai)、Qwen (DashScope) の typed-pipeline capability としての
+verdict envelope / structured output 準拠も未検証である。この未検証状態は、接続経路が実際に
+選択されることを意味しない。provider ごとの status と更新条件は、次の表で管理する。
+
+### typed-pipeline の検証ステータス
+
+`typed-pipeline` の provider gate が `codex` のまま維持されることと、外部 provider が
+typed-pipeline の出力契約に準拠することは別の判定である。現時点では、次の provider は
+すべて **未検証** として扱う。
+
+| 外部 provider | typed-pipeline 準拠 | status の扱いと、別に扱う既知の制約 |
+|---|---|---|
+| DeepSeek | 未検証 | provider 固有の実行で `verdict envelope` と `structured output` の両方が受理されるまで未検証。 |
+| GLM (Z.ai) | 未検証 | Chat Completions / Responses の互換性とは別に、typed-pipeline 準拠は未検証。 |
+| Qwen (DashScope) | 未検証 | Anthropic 互換経路の system-message gap とは別に、typed-pipeline 準拠は未検証。 |
+
+ここで `検証済み` に更新できるのは、対象 provider を使った typed-pipeline の実行が実際に
+成功し、`verdict envelope` と `structured output` の両方を pipeline が受理した場合だけである。
+`config.toml` の接続確認、通常の会話応答、Anthropic 互換 subprocess の動作確認だけでは
+検証済みとはしない。検証結果が得られたら、この README の表の該当行を provider 単位で更新する。
+`agent-profiles.json` の `model_provider` 設定や `sotp` の provider gate は、この status を自動更新しない。
+
+GLM (Z.ai) を Codex の custom provider として直接使うことは、現行の公式 OpenAI 互換 endpoint
+（Chat Completions）と Codex の Responses-only 制約が一致しないため未対応である。
+`wire_api = "chat"` に変更しても現行 Codex は受け付けない。GLM を使う場合は、下の
+Anthropic 互換 subprocess 経路、または consumer が管理する Responses 変換 gateway を選ぶ。
+GLM の OpenAI 互換 endpoint と Anthropic 互換 endpoint、DashScope の地域別 endpoint は別物
+なので、経路を混同しない。
+
+### Anthropic 互換経路の注意
+
+Anthropic 互換 endpoint は Codex の `[model_providers.*]` ではなく、Claude 互換の
+subprocess を起動するときに使う。`ANTHROPIC_BASE_URL` と認証トークンは、次のように
+対象プロセスだけへ注入する。
+
+```bash
+env \
+  ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" \
+  ANTHROPIC_AUTH_TOKEN="$ZAI_API_KEY" \
+  claude
+```
+
+代表的な Anthropic 互換 endpoint は次のとおりである（利用地域の URL を優先する）。
+
+| provider | Anthropic 互換 `base_url` の例 |
+|---|---|
+| DeepSeek | `https://api.deepseek.com/anthropic` |
+| GLM (Z.ai) | `https://api.z.ai/api/anthropic` |
+| Qwen (DashScope) | `https://dashscope-intl.aliyuncs.com/apps/anthropic` |
+
+`ANTHROPIC_BASE_URL` をシェル全体へ `export` して一括 redirect しないこと。per-subprocess
+注入だけが対象 provider の経路を変更し、`delegate-in-host` の経路は redirect されない。
+また、Qwen の Anthropic 互換経路には、Claude Code の新しい会話フローが会話途中に送る
+system message を拒否する既知の gap がある。会話途中の system message を必要とする
+処理では、この経路を互換性があるものとして扱わない。
+
+endpoint とモデル ID は provider 側で更新されるため、利用前に [Codex の設定リファレンス](https://developers.openai.com/codex/config-reference)、[DeepSeek API ドキュメント](https://api-docs.deepseek.com/)、
+[Z.AI のツール連携ドキュメント](https://docs.z.ai/devpack/tool/others)、[DashScope の base URL 一覧](https://help.aliyun.com/en/model-studio/base-url)
+を確認する。
+
+### データ所在と採用判断
+
+外部 provider への routing が実際に有効な capability/経路（`model_provider` を転送する generic `orchestrator-output` など）を実行すると、その capability に渡されるソースコード、briefing、diff は、選択した外部 provider のサーバーへ送信される。`typed-pipeline` のように `model_provider` を generic dispatch のようには転送しない経路や、外部 provider を選択していない実行は、この説明の対象ではない。利用地域、保存期間、学習への利用、第三者アクセスなどを含む data residency の可否は consumer が判断する。permissions allowlist と同じく、SoTOHE は選択肢と判断材料を提供するが、provider の採否と運用上の責任は consumer にある。
+
+テンプレートの既定 profile は `model_provider` を指定せず、custom な外部 provider を指さない。CI は data residency を検査・強制せず、consumer のポリシーに基づく profile と provider 側設定の管理を妨げない。open weights の self-host provider 経路の実装・運用はこのテンプレートの対象外である。
+
 ## はじめ方
 
 ### 初回セットアップ

@@ -4,7 +4,8 @@ use std::sync::Arc;
 
 use domain::TrackId;
 use usecase::capability_exec::{
-    CapabilityDispatchRequest, CapabilityResumeRequest, ModelName, ProviderName, ReasoningEffort,
+    CapabilityDispatchRequest, CapabilityInputValidationError, CapabilityProviderBinding,
+    CapabilityResumeRequest, ModelName, ProviderName, ReasoningEffort,
 };
 use usecase::provider_session::{
     ProviderSessionCacheEntry, ProviderSessionCacheKey, ProviderSessionCachePort, ProviderSessionId,
@@ -16,16 +17,17 @@ pub(crate) fn cache_key(
     request: &CapabilityDispatchRequest,
     track_id: Option<&TrackId>,
 ) -> Option<ProviderSessionCacheKey> {
+    let capability = request.request.capability.clone();
     if let Some(track_id) = track_id {
         return Some(ProviderSessionCacheKey::TrackCapability {
             track_id: track_id.clone(),
-            capability: request.request.capability.clone(),
+            capability,
         });
     }
     match &request.request.resume {
         CapabilityResumeRequest::Resume(target_artifacts) => {
             Some(ProviderSessionCacheKey::WorkspaceCapability {
-                capability: request.request.capability.clone(),
+                capability,
                 target_artifacts: target_artifacts.clone(),
             })
         }
@@ -33,7 +35,7 @@ pub(crate) fn cache_key(
     }
 }
 
-/// Loads and saves a cache entry only when the selected provider and model still match.
+/// Loads and saves a cache entry only when the effective provider and model still match.
 pub(crate) struct CapabilitySession {
     cache: Arc<dyn ProviderSessionCachePort>,
     key: Option<ProviderSessionCacheKey>,
@@ -43,18 +45,24 @@ pub(crate) struct CapabilitySession {
 }
 
 impl CapabilitySession {
+    /// Creates a session cache binding for the requested provider profile.
+    ///
+    /// # Errors
+    ///
+    /// Returns the provider-name validation error if a custom model-provider
+    /// cannot be represented by the provider-session cache contract.
     pub(crate) fn new(
         request: &CapabilityDispatchRequest,
         track_id: Option<&TrackId>,
         cache: Arc<dyn ProviderSessionCachePort>,
-    ) -> Self {
-        Self {
+    ) -> Result<Self, CapabilityInputValidationError> {
+        Ok(Self {
             cache,
             key: cache_key(request, track_id),
-            provider: request.profile.provider.clone(),
+            provider: session_provider(&request.profile.provider)?,
             model: request.profile.model.clone(),
             effort: request.profile.effort,
-        }
+        })
     }
 
     /// Returns a cached ID only for an explicit resume request and matching profile.
@@ -89,6 +97,20 @@ impl CapabilitySession {
     }
 }
 
+fn session_provider(
+    binding: &CapabilityProviderBinding,
+) -> Result<ProviderName, CapabilityInputValidationError> {
+    match binding {
+        CapabilityProviderBinding::Standard(provider) => Ok(provider.clone()),
+        // The prefix keeps `CodexCustom("codex")` distinct from `Standard("codex")`:
+        // both bindings are valid, and a cached session from one backend must never
+        // be resumed under the other.
+        CapabilityProviderBinding::CodexCustom(model_provider) => {
+            ProviderName::try_new(format!("codex-custom:{}", model_provider.as_str()))
+        }
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::expect_used)]
 mod tests {
@@ -99,8 +121,9 @@ mod tests {
     use domain::TrackId;
     use usecase::capability_exec::{
         BriefingText, CapabilityDispatchRequest, CapabilityExecRequest, CapabilityFilePath,
-        CapabilityProfile, CapabilityResumeRequest, DisciplineText, ExecutionMode, ModelName,
-        ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet,
+        CapabilityProfile, CapabilityProviderBinding, CapabilityResumeRequest, DisciplineText,
+        ExecutionMode, ModelName, ModelProviderName, ProviderName, ReasoningEffort,
+        TargetArtifactPath, TargetArtifactSet,
     };
     use usecase::dry_write_driver::CapabilityName;
     use usecase::provider_session::{
@@ -149,7 +172,9 @@ mod tests {
                 resume,
             },
             profile: CapabilityProfile {
-                provider: ProviderName::try_new("codex").expect("valid provider"),
+                provider: CapabilityProviderBinding::Standard(
+                    ProviderName::try_new("codex").expect("valid provider"),
+                ),
                 model: ModelName::try_new("gpt-5").expect("valid model"),
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
@@ -193,20 +218,23 @@ mod tests {
                 &ProviderSessionCacheEntry::new(
                     ProviderSessionId::try_new("same-track-session".to_owned())
                         .expect("session id"),
-                    request.profile.provider.clone(),
+                    ProviderName::try_new("codex").expect("valid provider"),
                     request.profile.model.clone(),
                     request.profile.effort,
                 ),
             )
             .expect("seed matching cache entry");
 
-        let same_track = CapabilitySession::new(&request, Some(&track_a), cache.clone());
-        let other_track = CapabilitySession::new(&request, Some(&track_b), cache.clone());
+        let same_track = CapabilitySession::new(&request, Some(&track_a), cache.clone())
+            .expect("valid session profile");
+        let other_track = CapabilitySession::new(&request, Some(&track_b), cache.clone())
+            .expect("valid session profile");
         let mut other_capability_request = request.clone();
         other_capability_request.request.capability =
             CapabilityName::try_new("spec-designer").expect("valid capability");
         let other_capability =
-            CapabilitySession::new(&other_capability_request, Some(&track_a), cache.clone());
+            CapabilitySession::new(&other_capability_request, Some(&track_a), cache.clone())
+                .expect("valid session profile");
 
         assert_eq!(
             same_track.resumable_id(&request.request.resume),
@@ -236,7 +264,8 @@ mod tests {
         ));
 
         let cache = Arc::new(FakeCache::default());
-        let targetless_session = CapabilitySession::new(&targetless, None, cache.clone());
+        let targetless_session = CapabilitySession::new(&targetless, None, cache.clone())
+            .expect("valid session profile");
         targetless_session.save(Some("unrecorded-session".to_owned()));
         assert!(cache.entries.lock().expect("test cache lock").is_empty());
     }
@@ -245,9 +274,10 @@ mod tests {
     fn test_capability_session_mismatch_starts_fresh_and_success_persists_matching_profile() {
         let request = request(CapabilityResumeRequest::Resume(targets("track/items/a/spec.json")));
         let cache = Arc::new(FakeCache::default());
-        let session = CapabilitySession::new(&request, None, cache.clone());
+        let session =
+            CapabilitySession::new(&request, None, cache.clone()).expect("valid session profile");
         let key = cache_key(&request, None).expect("workspace key");
-        let current_provider = request.profile.provider.clone();
+        let current_provider = ProviderName::try_new("codex").expect("valid provider");
         let current_model = request.profile.model.clone();
         let recorded_provider = ProviderName::try_new("claude").expect("provider");
         let recorded_model = ModelName::try_new("gpt-5").expect("model");
@@ -270,6 +300,87 @@ mod tests {
         assert_eq!(
             cache.load(&key).expect("load cache").expect("saved entry").session_id().as_str(),
             "new-session"
+        );
+    }
+
+    #[test]
+    fn test_capability_session_standard_and_codex_custom_bindings_do_not_collide() {
+        let standard = request(CapabilityResumeRequest::Resume(targets("spec.json")));
+        let mut custom = standard.clone();
+        custom.profile.provider = CapabilityProviderBinding::CodexCustom(
+            ModelProviderName::try_new("codex").expect("valid model provider"),
+        );
+        let cache = Arc::new(FakeCache::default());
+        let standard_key = cache_key(&standard, None).expect("standard workspace key");
+        let custom_key = cache_key(&custom, None).expect("custom workspace key");
+
+        assert_eq!(standard_key, custom_key);
+
+        let standard_session =
+            CapabilitySession::new(&standard, None, cache.clone()).expect("valid standard profile");
+        standard_session.save(Some("standard-session".to_owned()));
+
+        let custom_session =
+            CapabilitySession::new(&custom, None, cache.clone()).expect("valid custom profile");
+        assert_eq!(custom_session.resumable_id(&custom.request.resume), None);
+
+        custom_session.save(Some("custom-session".to_owned()));
+        assert_eq!(standard_session.resumable_id(&standard.request.resume), None);
+    }
+
+    #[test]
+    fn test_capability_session_codex_custom_binding_uses_model_provider_cache_identity() {
+        let mut request = request(CapabilityResumeRequest::Resume(targets("spec.json")));
+        request.profile.provider = CapabilityProviderBinding::CodexCustom(
+            ModelProviderName::try_new("deepseek").expect("valid model provider"),
+        );
+        let cache = Arc::new(FakeCache::default());
+        let key = cache_key(&request, None).expect("workspace key");
+        cache
+            .save(
+                &key,
+                &ProviderSessionCacheEntry::new(
+                    ProviderSessionId::try_new("codex-session".to_owned())
+                        .expect("valid session id"),
+                    ProviderName::try_new("codex-custom:deepseek").expect("valid provider"),
+                    request.profile.model.clone(),
+                    request.profile.effort,
+                ),
+            )
+            .expect("seed cache entry");
+
+        let session =
+            CapabilitySession::new(&request, None, cache.clone()).expect("valid session profile");
+
+        assert_eq!(session.resumable_id(&request.request.resume), Some("codex-session".to_owned()));
+
+        request.profile.provider = CapabilityProviderBinding::CodexCustom(
+            ModelProviderName::try_new("qwen").expect("valid model provider"),
+        );
+        let changed_provider_session =
+            CapabilitySession::new(&request, None, cache).expect("valid session profile");
+
+        assert_eq!(
+            changed_provider_session.resumable_id(&request.request.resume),
+            None,
+            "changing the Codex custom provider must not reuse the prior session"
+        );
+    }
+
+    #[test]
+    fn test_standard_codex_and_custom_codex_bindings_do_not_share_session_identity() {
+        let standard = super::session_provider(&CapabilityProviderBinding::Standard(
+            ProviderName::try_new("codex").expect("valid provider"),
+        ))
+        .expect("standard identity");
+        let custom = super::session_provider(&CapabilityProviderBinding::CodexCustom(
+            ModelProviderName::try_new("codex").expect("valid model provider"),
+        ))
+        .expect("custom identity");
+
+        assert_ne!(
+            standard, custom,
+            "a session cached for Standard(codex) must never resume under CodexCustom(codex)"
         );
     }
 
