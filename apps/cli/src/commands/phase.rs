@@ -663,12 +663,20 @@ fi
                 .collect::<Vec<_>>()
         };
 
-        // spec-design declares no adr-scope review check: after the Phase 0
-        // ADR-baseline commit — the canonical entry moment — the adr scope is
-        // structurally empty and can hold no current final verdict.
         assert_eq!(
             commands_for("spec-design"),
-            vec![serde_json::json!(["bin/sotp", "signal", "check-adr-user", "--gate", "commit"])]
+            vec![
+                serde_json::json!(["bin/sotp", "signal", "check-adr-user", "--gate", "commit"]),
+                serde_json::json!([
+                    "bin/sotp",
+                    "review",
+                    "check-zero-findings",
+                    "--scope",
+                    "adr",
+                    "--round",
+                    "final"
+                ]),
+            ]
         );
         assert_eq!(
             commands_for("type-design"),

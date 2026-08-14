@@ -181,10 +181,19 @@ mod tests {
 
     fn template_export_temp_parent(
         cargo_target_tmpdir: Option<PathBuf>,
+        cargo_target_dir: Option<PathBuf>,
         workspace_root: &Path,
     ) -> PathBuf {
+        // Unit tests do not receive CARGO_TARGET_TMPDIR from Cargo. Fall back
+        // to the configured target tree first so an interrupted run leaves its
+        // leftovers where `cargo clean` of that tree can still collect them.
         cargo_target_tmpdir
             .filter(|path| !path.as_os_str().is_empty())
+            .or_else(|| {
+                cargo_target_dir
+                    .filter(|path| !path.as_os_str().is_empty())
+                    .map(|target_dir| target_dir.join("tmp"))
+            })
             .unwrap_or_else(|| workspace_root.join("target/tmp"))
     }
 
@@ -192,6 +201,7 @@ mod tests {
         let workspace_root = crate::test_support::repo_root_for_tests();
         let parent = template_export_temp_parent(
             std::env::var_os("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+            std::env::var_os("CARGO_TARGET_DIR").map(PathBuf::from),
             &workspace_root,
         );
         std::fs::create_dir_all(&parent).unwrap_or_else(|error| {
@@ -210,19 +220,47 @@ mod tests {
         let configured = PathBuf::from("/cargo/target/tmp");
 
         assert_eq!(
-            template_export_temp_parent(Some(configured.clone()), Path::new("/workspace")),
+            template_export_temp_parent(
+                Some(configured.clone()),
+                Some(PathBuf::from("/elsewhere/target")),
+                Path::new("/workspace")
+            ),
             configured
+        );
+    }
+
+    #[test]
+    fn test_template_export_temp_parent_derives_fallback_from_cargo_target_dir() {
+        assert_eq!(
+            template_export_temp_parent(
+                None,
+                Some(PathBuf::from("/external/target")),
+                Path::new("/workspace")
+            ),
+            PathBuf::from("/external/target/tmp")
+        );
+        assert_eq!(
+            template_export_temp_parent(
+                Some(PathBuf::new()),
+                Some(PathBuf::from("/external/target")),
+                Path::new("/workspace")
+            ),
+            PathBuf::from("/external/target/tmp")
         );
     }
 
     #[test]
     fn test_template_export_temp_parent_falls_back_to_workspace_target_tmp() {
         assert_eq!(
-            template_export_temp_parent(None, Path::new("/workspace")),
+            template_export_temp_parent(None, None, Path::new("/workspace")),
             PathBuf::from("/workspace/target/tmp")
         );
         assert_eq!(
-            template_export_temp_parent(Some(PathBuf::new()), Path::new("/workspace")),
+            template_export_temp_parent(Some(PathBuf::new()), None, Path::new("/workspace")),
+            PathBuf::from("/workspace/target/tmp")
+        );
+        assert_eq!(
+            template_export_temp_parent(None, Some(PathBuf::new()), Path::new("/workspace")),
             PathBuf::from("/workspace/target/tmp")
         );
     }
