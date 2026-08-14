@@ -5,13 +5,13 @@
 
 GO-01 → T001, T002, T003, T004, T005.
 
-## Tasks (0/5 resolved)
+## Tasks (2/5 resolved)
 
 ### S1 — Scope-diff configuration
 
 > Update the scope-diff config targets and adapter regressions. D1; IN-01; CN-01; AC-01; AC-02.
 
-- [ ] **T001**: Update `libs/infrastructure/src/scope_diff_measure.rs`, the scope-diff config under `.harness/config/`, and focused adapter regression tests. D1; IN-01; CN-01; AC-01; AC-02.
+- [x] **T001**: Update `libs/infrastructure/src/scope_diff_measure.rs`, the scope-diff config under `.harness/config/`, and focused adapter regression tests. D1; IN-01; CN-01; AC-01; AC-02.
 
 ### S2 — Untracked directory filtering
 
@@ -23,7 +23,7 @@ GO-01 → T001, T002, T003, T004, T005.
 
 > Update integration and in-process scaffold test targets. D3; IN-03; CN-03; AC-04.
 
-- [ ] **T003**: Update scaffold setup in `apps/cli/tests/` and the in-process export regression in `apps/cli-composition/src/template_export/mod.rs`. D3; IN-03; CN-03; AC-04.
+- [x] **T003**: Update scaffold setup in `apps/cli/tests/` and the in-process export regression in `apps/cli-composition/src/template_export/mod.rs`. D3; IN-03; CN-03; AC-04.
 
 ### S4 — Host-first scaffold lifecycle
 

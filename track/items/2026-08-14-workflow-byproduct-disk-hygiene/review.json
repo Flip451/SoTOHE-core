@@ -16,6 +16,20 @@
           "hash": "rvw1:sha256:6fcb586b1777790185c37a5045c84ed890191bbe0668081b7204cfc115a1cc67",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:53:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddf51b6ec68cc9750f45ceacadc48b2cae8fc633295fc2daca2fc18deca6afd6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:57:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddf51b6ec68cc9750f45ceacadc48b2cae8fc633295fc2daca2fc18deca6afd6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -32,6 +46,119 @@
           "at": "2026-08-13T18:53:36Z",
           "findings": [],
           "hash": "rvw1:sha256:12e3e53312dd437dab4e41dd1c59e4792eb0bc190c7a27c8bbf260d2404a7b9c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:34:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aadd582eb2cacfc7154a8500c1bbc019ffd258242ba84028f555d0c438cfa2b5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:42:20Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 31,
+              "message": "`CARGO_TARGET_TMPDIR` is supplied while Cargo builds integration tests, not as a guaranteed runtime variable ([Cargo documentation](https://doc.rust-lang.org/cargo/reference/environment-variables.html)). Reading it only through `std::env::var_os` therefore normally selects `<workspace>/target/tmp`; with a custom target directory, leaked fixtures fall outside Cargo's cleanable target and violate AC-04/CN-03. Embed the build-time value with `option_env!`/`env!` while retaining the non-Cargo fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 197,
+              "message": "The fixture is constructed only from paths already present in the boundary manifest. Any new real-workspace path lacking a classification is omitted before the production exporter sees it, masking the `UnclassifiedPath` failure that the former real-workspace export detected and allowing boundary drift to pass this integration suite. Snapshot the relevant workspace surface independently of the manifest, or explicitly fail after checking the original workspace for unclassified paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aadd582eb2cacfc7154a8500c1bbc019ffd258242ba84028f555d0c438cfa2b5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T20:47:46Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 31,
+              "message": "`CARGO_TARGET_TMPDIR` is supplied when Cargo compiles an integration test, not as a guaranteed runtime variable ([Cargo documentation](https://doc.rust-lang.org/cargo/reference/environment-variables.html)). Reading only `std::env::var_os` therefore normally takes the hard-coded `<workspace>/target/tmp` fallback; with a custom target directory, leaked fixtures fall outside Cargo's cleanable target and violate AC-04/CN-03. Use the compile-time value via `option_env!`/`env!`, retaining the undefined fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 197,
+              "message": "The source fixture is populated only by iterating paths already present in the boundary manifest. A newly added real-workspace path with no classification is therefore omitted before the production exporter sees it, masking the `UnclassifiedPath` failure that the former real-workspace export detected. Snapshot the relevant workspace surface independently of the manifest, or explicitly validate the original workspace for unclassified paths before export.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aadd582eb2cacfc7154a8500c1bbc019ffd258242ba84028f555d0c438cfa2b5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T20:59:13Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 100,
+              "message": "When `CARGO_TARGET_TMPDIR` belongs to a workspace-local custom target directory that is not covered by `.gitignore` (for example `CARGO_TARGET_DIR=build`), this traversal descends into that directory and eventually into the `source_root` it is currently creating. It then recursively copies its own destination until path/disk exhaustion—the failure mode this track is intended to prevent. Explicitly exclude the owned temporary parent/Cargo target tree from the snapshot walk.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5086ca98ba9b583a3ae8073a5ee27954f6605f47bf37cf31716cf31d28c9f928",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:03:57Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 84,
+              "message": "For any workspace-local `CARGO_TARGET_TMPDIR`, this returns the fixture's entire first workspace component rather than the Cargo target tree itself. A valid custom target nested under an included subtree (for example `<workspace>/.harness/target`) consequently excludes all of `.harness`, including the required boundary manifest, so export fails instead of satisfying AC-04; other locations can silently omit real export inputs. Exclude only the actual Cargo target/temp tree containing the fixture.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bcb22437986c7c268b95ea0e3f0565a31217f2acae89f508a6d5339c41ce181c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:08:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0334a20f711d0b43c736d931070bc160320f79533cfdaf04125f6a97ce43007",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T00:35:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13f0ab6caea9968dae8d87d263b8d5696144cd3f348f74663250e2d097dd92e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-13T20:34:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075caa0c440df72c3355a8d07d6c90aeed699cef932b2d600991326f3b55bf4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:38:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075caa0c440df72c3355a8d07d6c90aeed699cef932b2d600991326f3b55bf4b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -65,6 +192,20 @@
           "at": "2026-08-13T18:50:09Z",
           "findings": [],
           "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:34:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3011bb72aeaa113d1fb9bae85d82f93955da5475495243f7a4881ff494868a8f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:38:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3011bb72aeaa113d1fb9bae85d82f93955da5475495243f7a4881ff494868a8f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -155,6 +296,201 @@
           "at": "2026-08-13T18:59:56Z",
           "findings": [],
           "hash": "rvw1:sha256:e92dd906d938197a1aabd71401269b14d7114ad47730a45a615a579662149daf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:33:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28b42223a8cf73f43c7e247eb3d47b27d801f931b1204122b6120a30d66f2ec3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:36:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28b42223a8cf73f43c7e247eb3d47b27d801f931b1204122b6120a30d66f2ec3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-13T20:34:11Z",
+          "findings": [
+            {
+              "category": "logic/security",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 53,
+              "message": "非 `/ **` 形式の exclusion pattern は Rust 側 matcher に追加されません。visible untracked pass は exclusion pathspec を使わず、`drop_ignored_non_review_paths` に依存しているため、`.env`、`*.pem`、`bin/sotp` などの可視 untracked ファイルが除外されず、scope diff に計上されます。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:bc707a3c631972f76b800033b83631c16814330b09b34b7e6c2cd5d7cbb01be6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T20:39:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd9b338321bf7bfe5051f0685b12b3dbabfa5b164fd6a309ea75a5fce6f8036",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:44:30Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 192,
+              "message": "The full exclusion matcher is applied after the visible and ignored untracked lists are merged. Consequently, the shipped `.env.*` pattern removes an ignore-negated `.env.example` returned by the visible Git pass. This breaks the existing `test_an_ignore_negated_visible_file_is_kept_for_scope_classification` contract and silently understates reviewable scope changes. Preserve visible ignore-negated paths when applying the Rust-side fallback filter, or retain each path's enumeration origin.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd9b338321bf7bfe5051f0685b12b3dbabfa5b164fd6a309ea75a5fce6f8036",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:02:00Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 294,
+              "message": "`write_all` feeds the complete visible-path list before `collect_bounded_git_output` starts draining stdout/stderr or enforcing its deadline. `check-ignore --verbose` emits a record for every negation-matched path, so a sufficiently large set can fill stdout while the parent fills stdin, deadlocking measurement indefinitely. Feed stdin concurrently with bounded output collection under the same deadline.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:c3714d1af645dbe72eb2bb729c2bc9d3a105ae3cbceed9441da28b935204aed2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:10:30Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 195,
+              "message": "`preserved_paths.contains(path)` lets any `.gitignore` negation override the mandatory operator-owned exclusion config. For example, `tmp/*` plus `!tmp/large-output` makes that visible file survive even though the configured `tmp/**` exclusion matches it, allowing generated artifacts to consume the read budget or fail measurement. Preserve only the intended legacy exception without bypassing configured recursive exclusions, or model explicit exceptions in the operator config.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:49bf4fe4d1993c43e93a4e0d9a5f52347b5b16f2eb2595fd641d8fce034ff9f7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:19:11Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 207,
+              "message": "Ignore-negated visible paths still bypass every configured exclusion that does not end in `/**`. This includes shipped credential patterns such as `**/*.pem`, `**/*.key`, and `.env.*`, as well as operator-added exact/glob exclusions: a matching `!` rule in `.gitignore` puts the path in `preserved_paths`, and `matches_recursive` is false, so the mandatory exclusion policy is ignored. Preserve only the explicit `.env.example` compatibility case, or represent exceptions in the operator-owned configuration instead of granting all non-recursive patterns this override.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:cd87da9724d7360a7c9be197b9f7261eb25bae0525849fbffa9a99105f764107",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:23:55Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 178,
+              "message": "The Rust-side matcher does not implement the Git pathspec semantics promised by this config. With `literal_separator(true)`, a pattern such as `*.pem` does not match `libs/domain/review.pem`, while the same `:(top,exclude)*.pem` pattern passed to Git does match nested paths. Because visible untracked paths are filtered only by this GlobSet, operator exclusions—and shipped patterns such as `.env.*` when a nested path is visible—can be bypassed. Compile equivalent Git pathspec semantics or reject patterns whose semantics cannot be reproduced consistently.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:4943bd5cc9296f1a5b76ca1a2afbaf21dac43031bc73ace75201ba139f3475d2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:32:04Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 189,
+              "message": "For patterns containing `/`, `literal_separator(true)` does not preserve Git pathspec semantics: Git's `*` can cover descendant paths (for example, `:(top)libs/*` matches `libs/domain/src/lib.rs`), while this GlobSet matcher stops at `/`. Consequently, a visible untracked descendant can survive the Rust-side filter even though the same operator pattern excludes an ignored file, understating or inconsistently measuring the configured scope. Use Git-compatible matching semantics for slash-containing patterns.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:37cdb2a7eabdfe92d023d4fc4cff930f22f0fba3f2a53fe6411738ed2723924a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T00:12:55Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 182,
+              "message": "Slashless `:(top,exclude)` pathspecs are still translated incorrectly. They are top-anchored; for example, Git matches `:(top)Cargo.toml` only at the repository root, whereas `**/Cargo.toml` also matches nested files. Shipped patterns such as `.env.*` and operator-supplied literals can therefore suppress visible nested files that Git would retain, understating the scope diff. Do not add the recursive prefix.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 188,
+              "message": "The fallback still interprets operator patterns using GlobSet syntax rather than Git pathspec syntax. GlobSet expands constructs such as `{Cargo,clippy}.toml`, while Git treats those braces literally; the Rust-side visible-path filter would therefore exclude files that the configured Git pathspec does not match. Use Git-compatible matching or reject/escape syntax whose meanings differ.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 218,
+              "message": "The hardcoded `.env.example` preservation overrides explicit operator policy. With an exclusion such as `*` or `.env.example` and a Git-ignore negation making `.env.example` visible, `matches_recursive` is false and this branch retains the file despite `exclusions.matches` being true. Limit the compatibility exception to the specific legacy rule that requires it or encode it in operator-owned configuration.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:19dfbe68202c73a6057f03958868bd65d68346060696c8543d66084183562e5f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T00:22:37Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 174,
+              "message": "A literal Git pathspec that names a directory also matches all descendants (`:(top)libs` selects the entire `libs` tree), but the GlobSet only matches the literal `libs` entry. Consequently, visible untracked descendants survive `drop_ignored_non_review_paths` while ignored descendants are removed by Git, so an operator exclusion behaves inconsistently. Apply the Git pathspecs to the visible enumeration too, or reproduce directory-prefix semantics.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 176,
+              "message": "The fallback matcher still accepts Git pathspec syntax that GlobSet interprets differently. For example, Git supports POSIX character classes such as `[[:upper:]]argo.toml`, while GlobSet parses that expression as a different ordinary character class. A configured exclusion can therefore retain a Git-matching visible path or suppress a different path. Use Git-compatible matching or reject every unsupported divergent construct, including POSIX classes.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ab04b0e2929f99652e6396a2a976d53a137fc96b748298fcaf8f7ab3c414f677",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T00:31:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a81e6da5d87d9bc2925cdd68e0a640793ddf3aa12cf8135499bc89a74a53a852",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T00:45:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:df81e82adc511b2e84acf8e46287b8f85c359a55f8bdb357e455ae8cc15d15dc",
           "type": "final",
           "verdict": "zero_findings"
         }

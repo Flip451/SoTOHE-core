@@ -109,6 +109,54 @@ mod tests {
 
     use super::{TemplateCompositionRoot, machine_home_directory};
 
+    fn template_export_temp_parent(
+        cargo_target_tmpdir: Option<PathBuf>,
+        workspace_root: &Path,
+    ) -> PathBuf {
+        cargo_target_tmpdir
+            .filter(|path| !path.as_os_str().is_empty())
+            .unwrap_or_else(|| workspace_root.join("target/tmp"))
+    }
+
+    fn template_export_tempdir() -> TempDir {
+        let workspace_root = crate::test_support::repo_root_for_tests();
+        let parent = template_export_temp_parent(
+            std::env::var_os("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+            &workspace_root,
+        );
+        std::fs::create_dir_all(&parent).unwrap_or_else(|error| {
+            panic!("cannot create template-export temporary parent {}: {error}", parent.display())
+        });
+        TempDir::new_in(&parent).unwrap_or_else(|error| {
+            panic!(
+                "cannot create template-export temporary directory in {}: {error}",
+                parent.display()
+            )
+        })
+    }
+
+    #[test]
+    fn test_template_export_temp_parent_prefers_cargo_target_tmpdir() {
+        let configured = PathBuf::from("/cargo/target/tmp");
+
+        assert_eq!(
+            template_export_temp_parent(Some(configured.clone()), Path::new("/workspace")),
+            configured
+        );
+    }
+
+    #[test]
+    fn test_template_export_temp_parent_falls_back_to_workspace_target_tmp() {
+        assert_eq!(
+            template_export_temp_parent(None, Path::new("/workspace")),
+            PathBuf::from("/workspace/target/tmp")
+        );
+        assert_eq!(
+            template_export_temp_parent(Some(PathBuf::new()), Path::new("/workspace")),
+            PathBuf::from("/workspace/target/tmp")
+        );
+    }
+
     #[test]
     fn test_machine_home_directory_home_set_returns_home() {
         let _lock = crate::test_support::process_env_lock().lock().unwrap();
@@ -351,20 +399,22 @@ mod tests {
     /// binary with `--help` would not necessarily behave like `sotp --help`.
     #[test]
     fn export_transplants_running_binary_into_bin_sotp() {
-        let dir = TempDir::new().unwrap();
-        let root_dir = dir.path();
+        let dir = template_export_tempdir();
+        let parent_dir = dir.path();
+        let source_root = parent_dir.join("source");
         // Minimal workspace tree: an included subtree, an overlay-classified
         // file with an overlay counterpart, and an excluded directory.
-        write_file(root_dir, "workspace/libs/domain/src/lib.rs", "// domain\n");
-        write_file(root_dir, "workspace/Makefile.toml", "# real\n");
-        write_file(root_dir, "workspace/vendor/blob.bin", "excluded\n");
-        write_file(root_dir, "overlay/Makefile.toml", "# template\n");
+        write_file(&source_root, "libs/domain/src/lib.rs", "// domain\n");
+        write_file(&source_root, "Makefile.toml", "# real\n");
+        write_file(&source_root, "vendor/blob.bin", "excluded\n");
+        write_file(parent_dir, "overlay/Makefile.toml", "# template\n");
         write_file(
-            root_dir,
+            &source_root,
             "boundary.json",
             r#"{
   "schema_version": 1,
   "entries": [
+    { "pattern": "boundary.json", "classification": "include" },
     { "pattern": "libs/domain", "classification": "include" },
     { "pattern": "Makefile.toml", "classification": "overlay" },
     { "pattern": "vendor", "classification": "exclude" }
@@ -372,12 +422,12 @@ mod tests {
 }"#,
         );
 
-        let output_dir = root_dir.join("out");
+        let output_dir = parent_dir.join("scaffold");
         let composition_root = TemplateCompositionRoot::new();
         let input = TemplateInput::Export(TemplateExportInput {
-            workspace_root: root_dir.join("workspace"),
-            manifest_path: root_dir.join("boundary.json"),
-            overlay_dir: root_dir.join("overlay"),
+            workspace_root: source_root.clone(),
+            manifest_path: source_root.join("boundary.json"),
+            overlay_dir: parent_dir.join("overlay"),
             output_dir: output_dir.clone(),
         });
 

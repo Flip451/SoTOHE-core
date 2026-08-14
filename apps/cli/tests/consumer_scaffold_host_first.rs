@@ -5,7 +5,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::sync::OnceLock;
 
 use tempfile::TempDir;
@@ -16,31 +16,180 @@ fn workspace_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..").canonicalize().unwrap()
 }
 
+fn template_export_temp_parent(
+    cargo_target_tmpdir: Option<PathBuf>,
+    workspace_root: &Path,
+) -> PathBuf {
+    cargo_target_tmpdir
+        .filter(|path| !path.as_os_str().is_empty())
+        .unwrap_or_else(|| workspace_root.join("target/tmp"))
+}
+
+fn template_export_tempdir() -> TempDir {
+    let workspace_root = workspace_root();
+    let parent = template_export_temp_parent(
+        option_env!("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+        &workspace_root,
+    );
+    fs::create_dir_all(&parent).unwrap_or_else(|error| {
+        panic!("cannot create template-export temporary parent {}: {error}", parent.display())
+    });
+    tempfile::tempdir_in(&parent).unwrap_or_else(|error| {
+        panic!("cannot create template-export temporary directory in {}: {error}", parent.display())
+    })
+}
+
+fn git_predicate(workspace_root: &Path, args: &[&str]) -> bool {
+    let status = Command::new("git")
+        .args(args)
+        .current_dir(workspace_root)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .unwrap_or_else(|error| panic!("cannot run git {}: {error}", args.join(" ")));
+
+    match status.code() {
+        Some(0) => true,
+        Some(1) => false,
+        code => panic!("git {} failed with exit code {code:?}", args.join(" ")),
+    }
+}
+
+fn gitignored_untracked(workspace_root: &Path, relative_path: &Path) -> bool {
+    let relative_path = relative_path.to_str().unwrap_or_else(|| {
+        panic!("workspace path is not valid UTF-8: {}", relative_path.display())
+    });
+    if git_predicate(workspace_root, &["ls-files", "--error-unmatch", "--", relative_path]) {
+        return false;
+    }
+    git_predicate(workspace_root, &["check-ignore", "--quiet", "--", relative_path])
+}
+
+fn copy_file(source: &Path, destination: &Path) {
+    if let Some(parent) = destination.parent() {
+        fs::create_dir_all(parent).unwrap_or_else(|error| {
+            panic!("cannot create fixture directory {}: {error}", parent.display())
+        });
+    }
+    fs::copy(source, destination).unwrap_or_else(|error| {
+        panic!("cannot copy {} to {}: {error}", source.display(), destination.display())
+    });
+}
+
+fn workspace_cargo_target_root(
+    workspace_root: &Path,
+    cargo_target_tmpdir: &Path,
+) -> Option<PathBuf> {
+    let cargo_target_tmpdir = cargo_target_tmpdir.canonicalize().unwrap_or_else(|error| {
+        panic!(
+            "cannot canonicalize Cargo target temporary directory {}: {error}",
+            cargo_target_tmpdir.display()
+        )
+    });
+    let target_root = cargo_target_tmpdir.parent()?.to_path_buf();
+    if target_root == workspace_root || !target_root.starts_with(workspace_root) {
+        return None;
+    }
+    Some(target_root)
+}
+
+fn copy_workspace_input_tree(
+    workspace_root: &Path,
+    relative_source: &Path,
+    destination: &Path,
+    excluded_root: Option<&Path>,
+) {
+    let source = workspace_root.join(relative_source);
+    if excluded_root.is_some_and(|root| source == root || source.starts_with(root)) {
+        return;
+    }
+    let metadata = fs::symlink_metadata(&source)
+        .unwrap_or_else(|error| panic!("cannot inspect {}: {error}", source.display()));
+    if metadata.file_type().is_symlink() {
+        panic!("workspace fixture source must not contain symlink {}", source.display());
+    }
+
+    if metadata.is_dir() {
+        fs::create_dir_all(destination).unwrap_or_else(|error| {
+            panic!("cannot create fixture directory {}: {error}", destination.display())
+        });
+        let mut entries = fs::read_dir(&source)
+            .unwrap_or_else(|error| panic!("cannot read {}: {error}", source.display()))
+            .map(|entry| {
+                entry.unwrap_or_else(|error| panic!("cannot read {}: {error}", source.display()))
+            })
+            .collect::<Vec<_>>();
+        entries.sort_by_key(std::fs::DirEntry::file_name);
+        for entry in entries {
+            let child = relative_source.join(entry.file_name());
+            let child_source = workspace_root.join(&child);
+            if child == Path::new(".git")
+                || excluded_root
+                    .is_some_and(|root| child_source == root || child_source.starts_with(root))
+                || gitignored_untracked(workspace_root, &child)
+            {
+                continue;
+            }
+            copy_workspace_input_tree(
+                workspace_root,
+                &child,
+                &destination.join(entry.file_name()),
+                excluded_root,
+            );
+        }
+    } else if metadata.is_file() {
+        copy_file(&source, destination);
+    } else {
+        panic!("workspace fixture source is not a regular file or directory: {}", source.display());
+    }
+}
+
+fn materialize_export_source(parent: &Path) -> PathBuf {
+    let workspace_root = workspace_root();
+    let source_root = parent.join("source");
+    fs::create_dir_all(&source_root).unwrap_or_else(|error| {
+        panic!("cannot create template-export source fixture {}: {error}", source_root.display())
+    });
+
+    let cargo_target_tmpdir = template_export_temp_parent(
+        option_env!("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+        &workspace_root,
+    );
+    let excluded_root = workspace_cargo_target_root(&workspace_root, &cargo_target_tmpdir);
+    copy_workspace_input_tree(
+        &workspace_root,
+        Path::new(""),
+        &source_root,
+        excluded_root.as_deref(),
+    );
+    source_root
+}
+
 fn exported_scaffold() -> PathBuf {
     EXPORTED_SCAFFOLD
         .get_or_init(|| {
-            let export_parent = tempfile::tempdir().unwrap();
+            let export_parent = template_export_tempdir();
             let output_dir = export_parent.path().join("scaffold");
-            export_scaffold(&output_dir);
+            let source_root = materialize_export_source(export_parent.path());
+            export_scaffold(&source_root, &output_dir);
             export_parent
         })
         .path()
         .join("scaffold")
 }
 
-fn export_scaffold(output_dir: &Path) {
-    let root = workspace_root();
+fn export_scaffold(source_root: &Path, output_dir: &Path) {
     let output = Command::new(env!("CARGO_BIN_EXE_sotp"))
         .env("SOTP_TELEMETRY", "0")
         .args([
             "template",
             "export",
             "--workspace-root",
-            root.to_str().unwrap(),
+            source_root.to_str().unwrap(),
             "--manifest-path",
-            root.join(".harness/config/template-boundary.json").to_str().unwrap(),
+            source_root.join(".harness/config/template-boundary.json").to_str().unwrap(),
             "--overlay-dir",
-            root.join("overlay").to_str().unwrap(),
+            source_root.join("overlay").to_str().unwrap(),
             "--output-dir",
             output_dir.to_str().unwrap(),
         ])
@@ -52,6 +201,28 @@ fn export_scaffold(output_dir: &Path) {
         "template export failed\nstdout: {}\nstderr: {}",
         String::from_utf8_lossy(&output.stdout),
         String::from_utf8_lossy(&output.stderr),
+    );
+}
+
+#[test]
+fn test_template_export_temp_parent_prefers_cargo_target_tmpdir() {
+    let configured = PathBuf::from("/cargo/target/tmp");
+
+    assert_eq!(
+        template_export_temp_parent(Some(configured.clone()), Path::new("/workspace")),
+        configured
+    );
+}
+
+#[test]
+fn test_template_export_temp_parent_falls_back_to_workspace_target_tmp() {
+    assert_eq!(
+        template_export_temp_parent(None, Path::new("/workspace")),
+        PathBuf::from("/workspace/target/tmp")
+    );
+    assert_eq!(
+        template_export_temp_parent(Some(PathBuf::new()), Path::new("/workspace")),
+        PathBuf::from("/workspace/target/tmp")
     );
 }
 
@@ -306,12 +477,12 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
 fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() {
     use std::os::unix::fs::PermissionsExt;
 
-    let export_parent = tempfile::tempdir().unwrap();
+    let export_parent = template_export_tempdir();
     let real_git = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
         .map(|directory| directory.join("git"))
         .find(|candidate| candidate.is_file())
         .expect("Git must be available on PATH");
-    let enclosing_repository = export_parent.path().join("enclosing-repository");
+    let enclosing_repository = export_parent.path().to_path_buf();
     let global_git_config = export_parent.path().join("gitconfig");
     fs::write(&global_git_config, "[user]\n\tuseConfigOnly = true\n").unwrap();
     fs::create_dir_all(&enclosing_repository).unwrap();
@@ -339,8 +510,9 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         );
     }
 
+    let source_root = materialize_export_source(export_parent.path());
     let scaffold = enclosing_repository.join("scaffold");
-    export_scaffold(&scaffold);
+    export_scaffold(&source_root, &scaffold);
     fs::write(
         &global_git_config,
         "[user]\n\tuseConfigOnly = true\n[core]\n\thooksPath = .githooks\n",

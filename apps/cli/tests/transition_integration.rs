@@ -10,6 +10,11 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+const SHIPPED_SCOPE_DIFF_EXCLUSIONS: &str = include_str!(concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../../.harness/config/scope-diff-exclusions.json"
+));
+
 /// Runs the CLI from inside `root`, the way it is run in a checkout: the
 /// repository-scoped reads a transition makes resolve against the repository the
 /// process stands in.
@@ -205,6 +210,16 @@ fn write_fixture_review_scope(root: &Path) {
     std::fs::write(config_dir.join("review-scope.json"), config).unwrap();
 }
 
+/// Gives synthetic transition repositories the same mandatory scope-diff
+/// policy as the shipped workspace. The production loader remains fail-closed;
+/// these fixtures simply provide the required valid input.
+fn write_fixture_scope_diff_exclusions(root: &Path) {
+    let config_dir = root.join(".harness/config");
+    std::fs::create_dir_all(&config_dir).unwrap();
+    std::fs::write(config_dir.join("scope-diff-exclusions.json"), SHIPPED_SCOPE_DIFF_EXCLUSIONS)
+        .unwrap();
+}
+
 fn project_root_with_full_track(root: &Path, track_id: &str) -> PathBuf {
     let items_dir = root.join("track/items");
     write_fixture_metadata(&items_dir, track_id);
@@ -212,6 +227,7 @@ fn project_root_with_full_track(root: &Path, track_id: &str) -> PathBuf {
     write_fixture_batch_plan(&items_dir, track_id);
     write_fixture_arch_rules(root);
     write_fixture_review_scope(root);
+    write_fixture_scope_diff_exclusions(root);
     // Bootstrap a git repo on the track branch so `resolve_track_id_for_write`
     // can discover it from the items_dir project root.
     init_git_repo_on_track_branch(root, track_id);
@@ -698,6 +714,7 @@ fn transition_subcommand_write_guard_success_with_synthetic_track_branch() {
     write_fixture_batch_plan(&items_dir, track_id);
     write_fixture_arch_rules(root_dir.path());
     write_fixture_review_scope(root_dir.path());
+    write_fixture_scope_diff_exclusions(root_dir.path());
 
     let output = sotp_bin_in(root_dir.path())
         .args([
@@ -753,6 +770,7 @@ fn transition_subcommand_write_guard_rejects_mismatched_track_id() {
     write_fixture_metadata(&items_dir, sentinel_track);
     write_fixture_impl_plan(&items_dir, sentinel_track);
     write_fixture_arch_rules(root_dir.path());
+    write_fixture_scope_diff_exclusions(root_dir.path());
 
     let output = sotp_bin_in(root_dir.path())
         .args([

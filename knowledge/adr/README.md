@@ -271,6 +271,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
 | [ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化](2026-07-20-1608-disk-footprint-and-dry-feature-gating.md) | Proposed | 2026-07-20 |
 | [ワークフロー副産物によるディスク衛生の修繕 — scope diff の untracked ディレクトリ計測失敗と template export テストの /tmp scaffold リーク](2026-08-02-0643-workflow-byproduct-disk-hygiene.md) | Proposed | 2026-08-02 |
+| [template export 統合テストの source fixture 隔離配置](2026-08-14-0442-template-export-test-source-fixture-placement.md) | Proposed | 2026-08-14 |
 
 ### DRY / リファクタ
 
