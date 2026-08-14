@@ -45,11 +45,13 @@
       "status": "done"
     },
     {
+      "commit_hash": "0eb8410999b38b1c28e5742fd2e8c08d2c43bdea",
       "description": "Apply the catalogued captured-stream outcome contract to the program runner and infrastructure adapter; update usecase and adapter regressions, including the ProgramRunnerPort contract obligation. [D1; IN-02; OS-02; OS-03; CN-01; CN-03; AC-02; AC-04]",
       "id": "T002",
       "status": "done"
     },
     {
+      "commit_hash": "0eb8410999b38b1c28e5742fd2e8c08d2c43bdea",
       "depends_on": [
         "T002"
       ],
