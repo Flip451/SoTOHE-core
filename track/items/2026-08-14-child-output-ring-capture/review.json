@@ -77,6 +77,98 @@
           "hash": "rvw1:sha256:baff65993df60110ac8ad4214a6a5d096757a2ba9bf0dde98f11e7b7a048d142",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:05:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6773ac3f773028055eaae3aa203cc9634b07581706b2fa79829cf07386932b88",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:08:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6773ac3f773028055eaae3aa203cc9634b07581706b2fa79829cf07386932b88",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-14T14:05:39Z",
+          "findings": [
+            {
+              "category": "adapter correctness / fail-closed validation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs",
+              "line": 304,
+              "message": "`spawn_and_collect_codex` now uses the diagnostic tail collector for stdout, but `mod.rs` still uses returned stdout as fallback input to `parse_sentinel`. This removes the required 1 MiB fail-closed validation bound and can discard a valid sentinel outside the final 64 KiB. Keep stdout validation collection separate from diagnostic tail capture.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9238840aed02462acabd98bf568585d9ebd67abe9e1113b39b91eb41cc800b8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:15:13Z",
+          "findings": [
+            {
+              "category": "process lifecycle / fail-closed validation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs",
+              "line": 304,
+              "message": "The validation stdout collector still fails closed at 1 MiB, but the change removes the output-limit cancellation signal from `spawn_and_collect_codex`. When stdout exceeds the limit, the collector returns and drops the pipe without notifying the supervisor; a child that continues writing can block, so the runner waits until the one-hour timeout instead of terminating promptly as before. Preserve cancellation for validation-output overflow while allowing only the diagnostic tail collector to drain without cancellation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f718a071aaaa607c8c1797312ec96ff7a650b57545723c93323e598e2de32f90",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:22:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f501aee6923c0ce9f7b5d5bc66a9d2674a022a5a573fe1178a070a016d2c20fd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:30:44Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs",
+              "line": 309,
+              "message": "Review-fix stdout is still routed through the fail-closed collector, so a child emitting more than 1 MiB on diagnostic stdout is terminated instead of continuing with bounded tail retention. This violates IN-01/AC-01, which explicitly cover both stdout and stderr. The new “validation stdout” regression also locks in the incorrect behavior; validation should remain on the separately bounded output-last-message path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f501aee6923c0ce9f7b5d5bc66a9d2674a022a5a573fe1178a070a016d2c20fd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:40:39Z",
+          "findings": [
+            {
+              "category": "non-fail-closed validation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/mod.rs",
+              "line": 214,
+              "message": "The diagnostic stdout tail is still passed to `parse_sentinel` as a validation fallback. Because `spawn_and_collect_codex` now truncates stdout without reporting overflow, a stream exceeding the prior validation bound can discard its prefix and still be accepted as `completed` when its retained tail ends with that sentinel. This violates CN-02/AC-03 and OS-01. Remove this fallback or preserve a separate bounded, fail-closed validation result alongside the diagnostic tail.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cdc07a9be2878b07ca93fa7f43b33cab7fd80db0be5a4a3c84eb5415a977d286",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:48:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2845ec064ff5b3f26b13be97d3259857e783e9b932cd6739debd7542d0c0ee71",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

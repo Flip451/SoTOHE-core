@@ -5,13 +5,13 @@
 
 GO-01 → T001, T002, T003.
 
-## Tasks (0/3 resolved)
+## Tasks (1/3 resolved)
 
 ### S1 — Review-fix diagnostic capture
 
 > Update review-fix runner diagnostic capture and focused infrastructure regressions. [D1; IN-01; IN-03; CN-02; AC-01; AC-03]
 
-- [ ] **T001**: Update the review-fix runner's diagnostic capture and focused infrastructure regressions. [D1; D2; IN-01; IN-03; OS-01; CN-02; CN-03; AC-01; AC-03]
+- [x] **T001**: Update the review-fix runner's diagnostic capture and focused infrastructure regressions. [D1; D2; IN-01; IN-03; OS-01; CN-02; CN-03; AC-01; AC-03]
 
 ### S2 — Program-runner capture contract and adapter
 
