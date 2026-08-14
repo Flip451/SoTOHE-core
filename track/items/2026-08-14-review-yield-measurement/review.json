@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-14T04:55:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ff9a126339a5046851f7c131565ba548a68330bbdb58991b258730561433c221",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:58:15Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md",
+              "line": 19,
+              "message": "D1 の「review 実行ごと」は全 review 実行の完全追跡を約束していますが、既存 authority への委譲、保守的な過近似、または深度見積もりを伴う厳密実装のいずれを採るか記録していません。対象入口が際限なく広がる open-set commitment です。いずれかの解決を選ぶ必要があるため hearing-required です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ff9a126339a5046851f7c131565ba548a68330bbdb58991b258730561433c221",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:23:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b5cf384017c2447d57af4e4620b7b5d6f2183cb274232736b27db962297d13",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:25:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b5cf384017c2447d57af4e4620b7b5d6f2183cb274232736b27db962297d13",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
