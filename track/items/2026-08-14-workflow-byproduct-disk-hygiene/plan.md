@@ -5,7 +5,7 @@
 
 GO-01 → T001, T002, T003, T004, T005.
 
-## Tasks (4/5 resolved)
+## Tasks (5/5 resolved)
 
 ### S1 — Scope-diff configuration
 
@@ -17,7 +17,7 @@ GO-01 → T001, T002, T003, T004, T005.
 
 > Update the scope-diff adapter filtering target and regressions. D2; IN-02; CN-02; AC-03.
 
-- [x] **T002**: Update `libs/infrastructure/src/scope_diff_measure.rs` and focused adapter regression tests for untracked entry filtering. D2; IN-02; CN-02; AC-03.
+- [x] **T002**: Update `libs/infrastructure/src/scope_diff_measure.rs` and focused adapter regression tests for untracked entry filtering. D2; IN-02; CN-02; AC-03. (`f16505f927b2733f5afc166c23e4eb70671681b7`)
 
 ### S3 — Scaffold placement
 
@@ -29,10 +29,10 @@ GO-01 → T001, T002, T003, T004, T005.
 
 > Update the host-first scaffold test target and regression coverage. D4; IN-04; AC-05.
 
-- [x] **T004**: Update `apps/cli/tests/consumer_scaffold_host_first.rs` and its focused regression coverage. D4; IN-04; AC-05.
+- [x] **T004**: Update `apps/cli/tests/consumer_scaffold_host_first.rs` and its focused regression coverage. D4; IN-04; AC-05. (`f16505f927b2733f5afc166c23e4eb70671681b7`)
 
 ### S5 — Template-export transplant
 
 > Update template-export transplant regression targets. D5; IN-05; OS-01; CN-04; AC-06; AC-07.
 
-- [ ] **T005**: Update template-export transplant regressions in `apps/cli/tests/` and `apps/cli-composition/src/template_export/mod.rs`. D5; IN-05; OS-01; CN-04; AC-06; AC-07.
+- [x] **T005**: Update template-export transplant regressions in `apps/cli/tests/` and `apps/cli-composition/src/template_export/mod.rs`. D5; IN-05; OS-01; CN-04; AC-06; AC-07.

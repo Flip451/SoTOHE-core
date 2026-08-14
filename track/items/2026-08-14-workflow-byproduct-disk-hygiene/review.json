@@ -201,6 +201,35 @@
           "hash": "rvw1:sha256:75cd5f40e36cdf0d2b41b04d7ee90f60d817df5217e4ca0b4caae2b384f25dd3",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:50:37Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 318,
+              "message": "この回帰テストは `TemplateDriver` を直接構築して `handle` を呼ぶため、本番 CLI の clap 引数変換、`TemplateCompositionRoot` の wiring、実際の `sotp template export` 起動を検証しなくなっています。CLI または composition の接続が壊れてもテストが通るため、少なくとも export の CLI dispatch を検証する別の薄い統合テストを残してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dabc7492f33379c866c360758f5a984a1e1e272e26706f3c868afe0f605f2e32",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:56:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:659708107927f6699905486da2364db223d26016254209cdc02b337f985f65c6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:01:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:659708107927f6699905486da2364db223d26016254209cdc02b337f985f65c6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -217,6 +246,20 @@
           "at": "2026-08-13T20:38:30Z",
           "findings": [],
           "hash": "rvw1:sha256:075caa0c440df72c3355a8d07d6c90aeed699cef932b2d600991326f3b55bf4b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:50:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6dd7256d892950df654b9973d64a78a2d84dff120e5e88fd778f4431a8b7485e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:54:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6dd7256d892950df654b9973d64a78a2d84dff120e5e88fd778f4431a8b7485e",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -397,6 +440,13 @@
           "at": "2026-08-14T01:15:36Z",
           "findings": [],
           "hash": "rvw1:sha256:116780086a347f4cc43ed345905b348438a9bd15138f4b19fb1c66fe17714b31",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:55:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc19fa051063d852a1a6a930d2cb0671ff759da9c6cc1f50fb1e353e03ebefcf",
           "type": "final",
           "verdict": "zero_findings"
         }

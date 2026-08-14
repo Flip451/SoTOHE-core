@@ -7,9 +7,16 @@ use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
+use cli_driver::template_export::{TemplateDriver, TemplateExportInput, TemplateInput};
+use domain::FreeText;
+use infrastructure::template_export::{FsTemplateBoundaryManifestAdapter, FsTemplateExportAdapter};
 use tempfile::TempDir;
+use usecase::template_export::{
+    SelfBinaryTransplantError, SelfBinaryTransplantPort, TemplateBoundaryManifestPort,
+    TemplateExportInteractor, TemplateExportPort, TemplateExportService,
+};
 
 static EXPORTED_SCAFFOLD_PATH: OnceLock<PathBuf> = OnceLock::new();
 static EXPORTED_SCAFFOLD_PARENT: OnceLock<PathBuf> = OnceLock::new();
@@ -57,6 +64,12 @@ fn template_export_tempdir() -> TempDir {
     })
 }
 
+fn machine_home_directory() -> Option<PathBuf> {
+    ["SOTP_MACHINE_HOME", "HOME", "USERPROFILE"].into_iter().find_map(|variable| {
+        std::env::var_os(variable).filter(|value| !value.is_empty()).map(PathBuf::from)
+    })
+}
+
 fn host_first_scaffold_parent(
     cargo_target_tmpdir: Option<PathBuf>,
     workspace_root: &Path,
@@ -101,6 +114,67 @@ fn copy_file(source: &Path, destination: &Path) {
     fs::copy(source, destination).unwrap_or_else(|error| {
         panic!("cannot copy {} to {}: {error}", source.display(), destination.display())
     });
+}
+
+/// Test-only transplant adapter. The production export command keeps its
+/// copy-based adapter; this fixture uses a hard link so creating the exported
+/// scaffold does not duplicate the CLI binary.
+#[derive(Debug)]
+struct HardLinkSelfBinaryTransplantAdapter {
+    source: PathBuf,
+}
+
+impl HardLinkSelfBinaryTransplantAdapter {
+    fn new(source: PathBuf) -> Self {
+        Self { source }
+    }
+}
+
+fn hard_link_or_copy(source: &Path, destination: &Path) -> Result<(), std::io::Error> {
+    match fs::hard_link(source, destination) {
+        Ok(()) => Ok(()),
+        // The test source and target normally share Cargo's filesystem. A
+        // target directory mounted elsewhere still gets a usable fixture.
+        Err(error) if error.kind() == std::io::ErrorKind::CrossesDevices => {
+            fs::copy(source, destination).map(|_| ())
+        }
+        Err(error) => Err(error),
+    }
+}
+
+impl SelfBinaryTransplantPort for HardLinkSelfBinaryTransplantAdapter {
+    fn transplant(&self, destination: &Path) -> Result<(), SelfBinaryTransplantError> {
+        if let Some(parent) = destination.parent()
+            && !parent.as_os_str().is_empty()
+        {
+            fs::create_dir_all(parent).map_err(|error| {
+                SelfBinaryTransplantError::DestinationWriteFailure {
+                    path: destination.to_path_buf(),
+                    reason: FreeText::new(error.to_string()),
+                }
+            })?;
+        }
+
+        hard_link_or_copy(&self.source, destination).map_err(|error| {
+            SelfBinaryTransplantError::DestinationWriteFailure {
+                path: destination.to_path_buf(),
+                reason: FreeText::new(error.to_string()),
+            }
+        })
+    }
+}
+
+fn test_template_export_driver() -> TemplateDriver {
+    let manifest_port: Arc<dyn TemplateBoundaryManifestPort> =
+        Arc::new(FsTemplateBoundaryManifestAdapter::new());
+    let export_port: Arc<dyn TemplateExportPort> =
+        Arc::new(FsTemplateExportAdapter::new(machine_home_directory()));
+    let transplant_port: Arc<dyn SelfBinaryTransplantPort> = Arc::new(
+        HardLinkSelfBinaryTransplantAdapter::new(PathBuf::from(env!("CARGO_BIN_EXE_sotp"))),
+    );
+    let service: Arc<dyn TemplateExportService> =
+        Arc::new(TemplateExportInteractor::new(manifest_port, export_port, transplant_port));
+    TemplateDriver::new(service)
 }
 
 fn workspace_cargo_target_root(
@@ -241,29 +315,64 @@ fn exported_scaffold() -> PathBuf {
 }
 
 fn export_scaffold(source_root: &Path, output_dir: &Path) {
+    let outcome =
+        test_template_export_driver().handle(TemplateInput::Export(TemplateExportInput {
+            workspace_root: source_root.to_path_buf(),
+            manifest_path: source_root.join(".harness/config/template-boundary.json"),
+            overlay_dir: source_root.join("overlay"),
+            output_dir: output_dir.to_path_buf(),
+        }));
+
+    assert!(outcome.exit_code == 0, "template export failed: {outcome:?}",);
+
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt as _;
+
+        let source = fs::metadata(env!("CARGO_BIN_EXE_sotp")).unwrap();
+        let transplanted = fs::metadata(output_dir.join("bin/sotp")).unwrap();
+        if source.dev() == transplanted.dev() {
+            assert_eq!(source.ino(), transplanted.ino());
+        }
+    }
+}
+
+#[test]
+fn test_template_export_cli_dispatch_missing_manifest_returns_failure() {
+    let temp_dir = template_export_tempdir();
+    let workspace_root = temp_dir.path().join("workspace");
+    let manifest_path = workspace_root.join("boundary.json");
+    let overlay_dir = workspace_root.join("overlay");
+    let output_dir = temp_dir.path().join("scaffold");
+    fs::create_dir_all(&workspace_root).unwrap();
+
+    // Stop at manifest loading so this subprocess smoke test covers the real
+    // CLI/composition dispatch without invoking production's copy-based binary
+    // transplant; the in-process path above owns the hard-link transplant check.
     let output = Command::new(env!("CARGO_BIN_EXE_sotp"))
         .env("SOTP_TELEMETRY", "0")
-        .args([
-            "template",
-            "export",
-            "--workspace-root",
-            source_root.to_str().unwrap(),
-            "--manifest-path",
-            source_root.join(".harness/config/template-boundary.json").to_str().unwrap(),
-            "--overlay-dir",
-            source_root.join("overlay").to_str().unwrap(),
-            "--output-dir",
-            output_dir.to_str().unwrap(),
-        ])
+        .args(["template", "export", "--workspace-root"])
+        .arg(&workspace_root)
+        .arg("--manifest-path")
+        .arg(&manifest_path)
+        .arg("--overlay-dir")
+        .arg(&overlay_dir)
+        .arg("--output-dir")
+        .arg(&output_dir)
         .output()
         .unwrap();
 
     assert!(
-        output.status.success(),
-        "template export failed\nstdout: {}\nstderr: {}",
+        !output.status.success(),
+        "sotp template export must surface the missing manifest\nstdout: {}\nstderr: {}",
         String::from_utf8_lossy(&output.stdout),
         String::from_utf8_lossy(&output.stderr),
     );
+    assert!(
+        String::from_utf8_lossy(&output.stderr).contains("template boundary manifest not found"),
+        "the CLI must dispatch through the composition-root manifest adapter"
+    );
+    assert!(!output_dir.exists(), "manifest failure must stop before creating an export");
 }
 
 #[test]
@@ -547,7 +656,7 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
 
 #[test]
 fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() {
-    use std::os::unix::fs::PermissionsExt;
+    use std::os::unix::fs::{MetadataExt, PermissionsExt};
 
     let export_parent = template_export_tempdir();
     let real_git = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
@@ -606,7 +715,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let cargo_shim = shim_dir.join("cargo");
     fs::write(
         &cargo_shim,
-        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make install-sotp') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; cp \"$RUNNABLE_SOTP\" bin/sotp; chmod +x bin/sotp ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; if [ \"${FAIL_BOOTSTRAP:-0}\" = 1 ]; then echo 'simulated bootstrap failure' >&2; exit 72; fi; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
+        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make install-sotp') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; ln \"$RUNNABLE_SOTP\" bin/sotp 2>/dev/null || cp \"$RUNNABLE_SOTP\" bin/sotp; chmod +x bin/sotp ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; if [ \"${FAIL_BOOTSTRAP:-0}\" = 1 ]; then echo 'simulated bootstrap failure' >&2; exit 72; fi; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
     )
     .unwrap();
     fs::set_permissions(&cargo_shim, fs::Permissions::from_mode(0o755)).unwrap();
@@ -772,6 +881,18 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     assert!(
         installed_sotp.is_file(),
         "a missing transplanted CLI must be restored before the convention index is generated"
+    );
+    let source_metadata = fs::metadata(&sotp_shim).unwrap();
+    let installed_metadata = fs::metadata(&installed_sotp).unwrap();
+    assert_eq!(
+        source_metadata.dev(),
+        installed_metadata.dev(),
+        "test transplant must remain on the source filesystem",
+    );
+    assert_eq!(
+        source_metadata.ino(),
+        installed_metadata.ino(),
+        "test install-sotp shim must use a hard link",
     );
     let branch_output = isolated_git_command(&real_git, &global_git_config)
         .args(["branch", "--show-current"])
