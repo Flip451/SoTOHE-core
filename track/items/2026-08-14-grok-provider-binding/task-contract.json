@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-14-grok-provider-binding",
+  "entries": {
+    "T001": [
+      {"layer": "infrastructure", "entry_key": "GrokOutputEnvelope"},
+      {"layer": "infrastructure", "entry_key": "GrokEnvelopeError"}
+    ],
+    "T009": [
+      {"layer": "infrastructure", "entry_key": "GrokSandbox"},
+      {"layer": "infrastructure", "entry_key": "GrokSandboxProfileName"},
+      {"layer": "infrastructure", "entry_key": "GrokSandboxProfileNameError"}
+    ],
+    "T008": [],
+    "T002": [
+      {"layer": "infrastructure", "entry_key": "GrokCapabilityDefinition"}
+    ],
+    "T003": [
+      {"layer": "usecase", "entry_key": "CapabilityProviderPort"},
+      {"layer": "infrastructure", "entry_key": "GrokCapabilityAdapter"}
+    ],
+    "T004": [
+      {"layer": "usecase", "entry_key": "Reviewer"},
+      {"layer": "infrastructure", "entry_key": "GrokReviewer"}
+    ],
+    "T005": [
+      {"layer": "usecase", "entry_key": "DryCheckAgentPort"},
+      {"layer": "infrastructure", "entry_key": "GrokDryChecker"}
+    ],
+    "T010": [
+      {"layer": "usecase", "entry_key": "ReviewFixRunner"},
+      {"layer": "infrastructure", "entry_key": "CodexDryFixLocalRunner"},
+      {"layer": "infrastructure", "entry_key": "ReviewFixRunnerAdapter"}
+    ],
+    "T006": [
+      {"layer": "cli_driver", "entry_key": "CapabilityDriver"},
+      {"layer": "cli_composition", "entry_key": "CapabilityCompositionRoot"}
+    ],
+    "T011": [
+      {"layer": "cli_driver", "entry_key": "ReviewDriver"},
+      {"layer": "cli_composition", "entry_key": "ReviewCompositionRoot"}
+    ],
+    "T012": [
+      {"layer": "cli_driver", "entry_key": "ReviewFixDriver"},
+      {"layer": "cli_composition", "entry_key": "ReviewCompositionRoot"}
+    ],
+    "T007": [],
+    "T013": [
+      {"layer": "usecase", "entry_key": "HookDispatchService"},
+      {"layer": "cli_driver", "entry_key": "HookInput"},
+      {"layer": "cli_driver", "entry_key": "HookDriver"},
+      {"layer": "cli_driver", "entry_key": "CommandOutcome"}
+    ]
+  }
+}

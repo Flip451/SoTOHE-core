@@ -1,0 +1,61 @@
+{
+  "catalogue_declaration_hash": "0c40dfcc1beb0689cf83ab8e0e4651e3391d1cb0e0ad98bd9a57cbb8e72cdd3d",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "b95e45a50695a22a48f87b42df38fc007b0c5268d242945dcf4634ee4bf14c15",
+      "signal": "blue",
+      "type_name": "CodexDryFixLocalRunner"
+    },
+    {
+      "entry_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "signal": "blue",
+      "type_name": "GrokCapabilityAdapter"
+    },
+    {
+      "entry_hash": "6c6e9d43b8eef14b7dbe993423d7a396ae8e51d6bd8cbde37e32f8b1ac8612f4",
+      "signal": "blue",
+      "type_name": "GrokCapabilityDefinition"
+    },
+    {
+      "entry_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "signal": "blue",
+      "type_name": "GrokDryChecker"
+    },
+    {
+      "entry_hash": "324dde796649328c07586db56c5728e1aac690240793c8917ef28ee3ea074594",
+      "signal": "blue",
+      "type_name": "GrokEnvelopeError"
+    },
+    {
+      "entry_hash": "87922037eaffa6531448d4a327fef8f4eb0330f39daa5702521d6594a0caca1e",
+      "signal": "blue",
+      "type_name": "GrokOutputEnvelope"
+    },
+    {
+      "entry_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "signal": "blue",
+      "type_name": "GrokReviewer"
+    },
+    {
+      "entry_hash": "39183ef07ba66283db2f510264514ea57150c5f8450f9979031575c9952040e1",
+      "signal": "blue",
+      "type_name": "GrokSandbox"
+    },
+    {
+      "entry_hash": "c6fb8d1ed30167eb76e1c51e436f4928d0d35b59ceb66a3c10fb175f57a74a3c",
+      "signal": "blue",
+      "type_name": "GrokSandboxProfileName"
+    },
+    {
+      "entry_hash": "8f383b45a21e1a2f89487876f1e2bcd2bbbba219eaa9c9a6f256c5e16c940180",
+      "signal": "blue",
+      "type_name": "GrokSandboxProfileNameError"
+    },
+    {
+      "entry_hash": "2de252f14d6a6f7e47539b10e2a08bae251b27e50c3f23710699be3f17e115f2",
+      "signal": "blue",
+      "type_name": "ReviewFixRunnerAdapter"
+    }
+  ]
+}

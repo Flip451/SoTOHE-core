@@ -1,0 +1,21 @@
+{
+  "baseline_hash": "4128c9717bde1b3021f52a78063451391fa0935952c3bde2d5bbe290368d55d8",
+  "declaration_hash": "e593b431c47a87fbe013c370140564646406bc9bafceffb5f3691d5ac092c21c",
+  "generated_at": "2026-08-14T18:22:48Z",
+  "head_commit": "aae53d50f42a122f73a338af6cfe386d5793a99d",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "type_name": "CapabilityCompositionRoot"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "type_name": "ReviewCompositionRoot"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProviderPort' of GrokCapabilityAdapter",
+      "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404",
+      "id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GrokCapabilityAdapter",
+        "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::Reviewer' of GrokReviewer",
+      "declaration_hash": "69aca5ba145f6545016cf3ff605289b312080a04d7219a90efe746a0817d5f7b",
+      "id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GrokReviewer",
+        "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::dry_check::DryCheckAgentPort' of GrokDryChecker",
+      "declaration_hash": "0875f1213a473686c228519bd2134691c31ee1f0be736682aed4846d36b6ab73",
+      "id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "trait_impl:usecase::dry_check::DryCheckAgentPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GrokDryChecker",
+        "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    }
+  ],
+  "track_id": "2026-08-14-grok-provider-binding"
+}

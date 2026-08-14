@@ -113,6 +113,421 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-14T17:39:50Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 15,
+              "message": "T002 description restates the admission behavior contract (“including declared `grok-sandbox`, model, and effort admission checks”) instead of limiting the task text to target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 24,
+              "message": "T003 description restates multiple upstream execution guarantees (“isolated Grok subprocess,” explicit settings, resume fallback, and structured-output-only extraction); these should be represented by anchors rather than prose.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 35,
+              "message": "T004 description restates the execution-routing contract (“reusing the profile-resolved isolated launch contract without routing through capability exec”) rather than only naming the target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 45,
+              "message": "T005 description restates shared launch and resume behavior instead of limiting the task text to target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 55,
+              "message": "T006 description restates the architecture constraint “without adding a capability-name dispatch table”; the anchor is sufficient and the prose should not repeat the upstream contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 65,
+              "message": "T007 description restates behavior requirements (“rejecting unmappable input while preserving the Claude surface”) instead of only naming the target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 71,
+              "message": "T008 description restates the acceptance behavior of retaining the shipped default provider selection; this should be expressed through the AC-06 anchor only.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 82,
+              "message": "The `provider-foundation` section description restates ordering and admission behavior (“before any provider execution path”) rather than using only section scope and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 96,
+              "message": "The `provider-execution-paths` section description restates execution isolation and composition behavior (“isolated capability-exec and typed-pipeline paths” and exposing existing paths) rather than only naming the planned work and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 110,
+              "message": "The `grok-host-guards` section description restates the hook-policy and envelope-mapping behavior instead of limiting the section description to target, operation, and anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-14-grok-provider-binding/batch-plan.json",
+              "line": 68,
+              "message": "T004 and T005 are unnecessarily deferred to B4. Both are ready after T002, have distinct typed-pipeline behavior targets, and together with T003 fit the infrastructure ceiling exactly: 250 + 130 + 120 = 500 production lines. They can be placed in B3 after T003, leaving only dependent T006 for B4.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ed458e7dfeed9d796f0d349238287788ee8866462289253ce4f7e46a92cb4314",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T17:44:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30db24fb029de67c78c1a5ec0e155bb55383cf9c80c4d80cd16eea0fc72a39a9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T17:51:32Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 12,
+              "message": "T002 names discovery and validation work but no target file or exact symbol. `task-contract.json` points to `GrokCapabilityDefinition`, yet the task description itself leaves the implementation boundary to the executor. Name the concrete module/symbol while retaining the anchor citations.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 32,
+              "message": "T004 says only “Grok reviewer typed-pipeline adapter”; it does not name the `GrokReviewer` symbol or its module/file. The executor must infer the target from another artifact.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 42,
+              "message": "T005 names two feature paths but no target files or symbols. Its contract attribution spans `GrokDryChecker`, `CodexDryFixLocalRunner`, and `ReviewFixRunnerAdapter`, so the description does not establish an executable write boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 52,
+              "message": "T006 names architectural layers and three paths, but no target file or symbol. The five attributed driver/composition entries do not repair the missing target in the task description itself.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 63,
+              "message": "T007 identifies `.grok/hooks/` for the declarations, but “Grok hook adapter” does not identify the target file or symbol for the separately estimated usecase and CLI-driver work. The adapter boundary remains unspecified.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 69,
+              "message": "T008 names kinds of examples but no concrete profile or shared-adapter file. Because it has no task-contract entries to narrow the boundary, an executor must invent which files are owned by this task.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-grok-provider-binding/task-coverage.json",
+              "line": 25,
+              "message": "AC-01 through AC-08 are mapped only to T001–T008 descriptions that say Implement/Wire/Add and never include a test or other validation operation. Test-line estimates do not make these mappings executable, so every acceptance criterion currently lacks a validation-bearing task. Add target-specific validation operations to at least one mapped task per AC.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 6,
+              "message": "T001 combines independently verifiable envelope extraction (`GrokOutputEnvelope`/`GrokEnvelopeError`, AC-01) with sandbox admission types (`GrokSandbox`, `GrokSandboxProfileName`, and its error, AC-03/AC-04). Split these behavior units before implementation and redistribute their contract attributions and estimates.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 42,
+              "message": "T005 combines the independently testable Grok DRY-check path (`GrokDryChecker`, AC-03) and review-fix path (`CodexDryFixLocalRunner`/`ReviewFixRunnerAdapter`, AC-03/AC-05). These can converge and be validated separately, so they should be separate pre-implementation tasks.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 52,
+              "message": "T006 bundles capability execution (AC-02/AC-03/AC-08), reviewer dispatch (AC-03), and review-fix dispatch (AC-03/AC-05) across distinct driver/composition entries. Each path is independently verifiable; split them into separate tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 63,
+              "message": "T007 bundles two independently verifiable units: `.grok/hooks/` declarations and the Grok-envelope/tool-name adapter. AC-07 separately exposes declaration presence and translation/rejection behavior, so split the configuration and adapter work before implementation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:30db24fb029de67c78c1a5ec0e155bb55383cf9c80c4d80cd16eea0fc72a39a9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T17:58:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:031b7079eec522a00d771c8877eeac7ce0fb241c76edf0e019767f2626642048",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T18:02:33Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-grok-provider-binding/impl-plan.json",
+              "line": 52,
+              "message": "T010 targets `libs/infrastructure/src/dry_check/dry_fix_local.rs`, but `CodexDryFixLocalRunner` is defined in `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs`; the named file does not exist and cannot coexist with the current directory module. Correct the target path so the task is executable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:031b7079eec522a00d771c8877eeac7ce0fb241c76edf0e019767f2626642048",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T18:04:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e6101921dfeaab06827bcfdd224dde2ffb2faa66dcbea1e3eefb257edf2511dc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T18:05:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e6101921dfeaab06827bcfdd224dde2ffb2faa66dcbea1e3eefb257edf2511dc",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-14T17:37:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ada4da0c2b236d5f7391bd209c85a2b2e5f0c31084cfc7566c7cf66441d386f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T17:39:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ada4da0c2b236d5f7391bd209c85a2b2e5f0c31084cfc7566c7cf66441d386f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:37:39Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-14-grok-provider-binding/spec.json",
+              "line": 35,
+              "message": "AC-03 unconditionally says every profile-defined Grok capability is dispatchable, but AC-04/CN-01 require rejection when its adapter definition is missing. This contradiction leaves the admissibility condition ambiguous.",
+              "severity": "P1"
+            },
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-14-grok-provider-binding/spec.json",
+              "line": 135,
+              "message": "GO-01 includes typed-pipeline support and the model/effort/resume-based deterministic dispatch contract, but its ADR refs only cite D1 and D7; those clauses are decided by D5 and D8 (and isolation/fail-closed details by D2/D3). The goal is therefore not fully anchored to the cited decision anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-14-grok-provider-binding/spec.json",
+              "line": 135,
+              "message": "GO-01 states that Grok is enabled as a subscription-authenticated provider, but no acceptance criterion deterministically verifies the CLI sign-in authentication path or absence of an API-key/custom-provider route. AC-06 only verifies the sample profile and default selection.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55bf494b061842fa409623947e4ba756f8c2e5478239c32a206301679bc28e68",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T15:40:56Z",
+          "findings": [
+            {
+              "category": "missing AC coverage for a stated goal",
+              "file": "track/items/2026-08-14-grok-provider-binding/spec.json",
+              "line": 135,
+              "message": "GO-01 promises a subscription-authenticated Grok CLI provider, but AC-01–AC-07 never deterministically establish that dispatch uses the CLI sign-in path without requiring an API key. An API-key-backed implementation could satisfy every stated AC despite violating GO-01 and OS-01, so this part of the goal lacks acceptance coverage.",
+              "severity": "P1"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-14-grok-provider-binding/spec.json",
+              "line": 35,
+              "message": "AC-03 unconditionally says a profile-defined Grok capability is dispatchable, while AC-04 and CN-01 require rejection when that capability lacks a shared adapter definition or valid grok-sandbox declaration. A capability can be present in the profile while lacking either prerequisite, so the criteria prescribe contradictory outcomes for the same input.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55bf494b061842fa409623947e4ba756f8c2e5478239c32a206301679bc28e68",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T15:56:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c6f07d05a33caf4bf6c680b2d797f2c7dcd632317420b24f3bf8d990039efb5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T16:00:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8c6f07d05a33caf4bf6c680b2d797f2c7dcd632317420b24f3bf8d990039efb5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-14T16:36:17Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/cli_composition-types.json",
+              "line": 17,
+              "message": "The `docs` fields for `CapabilityCompositionRoot` and `ReviewCompositionRoot` restate upstream dispatch/review behavior instead of only citing the spec anchors; this violates `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/cli_driver-types.json",
+              "line": 10,
+              "message": "The `docs` fields for `CapabilityDriver`, `HookDriver`, and `ReviewDriver`/`ReviewFixDriver` restate provider wiring, envelope translation, rejection, and service-boundary behavior already defined upstream; they should reference the anchors without reproducing the contracts, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/usecase-types.json",
+              "line": 9,
+              "message": "The `docs` fields for `CapabilityProviderPort`, `DryCheckAgentPort`, `HookDispatchService`, `ReviewFixRunner`, and `Reviewer` restate upstream provider-routing and pipeline behavior rather than serving as anchor-only references, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+              "line": 346,
+              "message": "The `docs` fields for `CodexDryFixLocalRunner`, `GrokCapabilityAdapter`, `GrokCapabilityDefinition`, `GrokDryChecker`, `GrokEnvelopeError`, `GrokOutputEnvelope`, `GrokReviewer`, `GrokSandbox`, `GrokSandboxProfileName`, `GrokSandboxProfileNameError`, and `ReviewFixRunnerAdapter` reproduce upstream execution, fail-closed, sandbox, envelope, and resume contracts instead of merely citing spec anchors, violating `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8aed570ecfb7565c5b7abb0d42f6ebe28daff17a94556276bfa6a9dee555aaa1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T16:56:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cbdf175937cc904d6b4619ac1f5baf47b1e07a28d3e1f139c50d688f1a6d85be",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T17:06:21Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+              "line": 740,
+              "message": "`infrastructure::GrokSandbox` exposes `ProjectProfile(GrokSandboxProfileName)`, but the profile-name constructor's only declared error is `Empty`. This leaves `ProjectProfile(\"off\")` constructible even though CN-01 explicitly forbids Grok's unrestricted `off` sandbox, allowing callers such as `GrokReviewer::new` or `GrokDryChecker::new` to carry an unsafe state. Add a reserved/unsupported-name rejection so `off` cannot enter `ProjectProfile`.",
+              "severity": "P0"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-grok-provider-binding/cli_composition-types.json",
+              "line": 16,
+              "message": "`cli_composition::CapabilityCompositionRoot` is marked `modify`, but its frozen-baseline shape and all declared signatures (`new`, `discover`, and `capability_driver`) are identical. The track changes wiring only, so this must be a `reference` entry rather than declaring an API mutation.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-grok-provider-binding/cli_composition-types.json",
+              "line": 100,
+              "message": "`cli_composition::ReviewCompositionRoot` is marked `modify`, although the frozen baseline already has the same unit shape and identical `new`, `review_driver`, and `review_fix_driver` signatures. Since only wiring changes, declare it as `reference`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-grok-provider-binding/cli_driver-types.json",
+              "line": 157,
+              "message": "`cli_driver::HookDriver` is marked `modify`, but its frozen-baseline shape and both declared signatures (`new` and `handle`) are unchanged. The body-only translation change does not alter the type contract; use `reference`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+              "line": 345,
+              "message": "`infrastructure::CodexDryFixLocalRunner` is marked `modify`, while its unit shape and `new`/`dry_run_fix_local` signatures exactly match the frozen baseline. Provider-routing body changes do not constitute a catalogue API modification; use `reference`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+              "line": 332,
+              "message": "`infrastructure::ReviewFixRunnerAdapter` and its `ReviewFixRunner` impl are marked `modify`, but the frozen baseline already contains the same unit type, trait implementation, and identical `run_fix` signature. The provider-arm body change should leave both declarations as `reference`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cbdf175937cc904d6b4619ac1f5baf47b1e07a28d3e1f139c50d688f1a6d85be",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T17:28:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:feca07f4773e9fc1ef49dced1a5c8b08869152f4f5f3bc7098c80a9bdc3ce981",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T17:31:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:feca07f4773e9fc1ef49dced1a5c8b08869152f4f5f3bc7098c80a9bdc3ce981",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

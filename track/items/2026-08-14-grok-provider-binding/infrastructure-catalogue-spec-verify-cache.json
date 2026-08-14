@@ -1,0 +1,1326 @@
+{
+  "entries": [
+    {
+      "claim_hash": "b95e45a50695a22a48f87b42df38fc007b0c5268d242945dcf4634ee4bf14c15",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexDryFixLocalRunner",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b95e45a50695a22a48f87b42df38fc007b0c5268d242945dcf4634ee4bf14c15",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexDryFixLocalRunner",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94889cf74e0b26e71637c1c82eba3e92c4e013b4f61743229d0fd6cf3896d552",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b95e45a50695a22a48f87b42df38fc007b0c5268d242945dcf4634ee4bf14c15",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexDryFixLocalRunner",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bdf2da9dfd7acd8d615cb657194029070d713df7176e782734d35bbd6e148b1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "typed-pipeline retains its dedicated execution paths with the same Grok launch contract",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b95e45a50695a22a48f87b42df38fc007b0c5268d242945dcf4634ee4bf14c15",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexDryFixLocalRunner",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "18fc87a458d86bba647c32db4f295315b0b22ba4a7270e2e85c14da1c56325ee",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions. A resumed execution remains an independent subprocess and explicitly receives model, effort, and permission settings; failed, expired, provider-mismatched, or model-mismatched resume falls back to a new session without rejecting the dispatch for that reason alone."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "229c1ddb3eab1407f071225c06584fed5d7e69b4135b8995252fd2b76cc08be9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b15df19059b673d69daaccec188176d0f20b11f2712a4e5a5bfaafc5c43fa281",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94889cf74e0b26e71637c1c82eba3e92c4e013b4f61743229d0fd6cf3896d552",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8293608393c163ecedf9ff8a2cb5984cd6e88d3d9823b31409bc054f2c0bcc87",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Grok is executed as the Grok CLI provider adapter, not as a Codex custom-provider implementation."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok is executed as the Grok CLI provider adapter, not as a Codex custom-provider implementation.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9aee48d97cdd5f415b1125118c4fcaaa2b57d3675b89b3181dca3e4cce67207e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field. A missing value fails closed and reports the envelope's failure reason; the envelope text field is not a return channel."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c8e40b1f569d2085ab03cef82d25183905491fac76e92a24581739250174f2a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1dc831e4e85d7f62abeb9b2992652d8787bd243a01d738a6a2627979d676c1a6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Grok is eligible as both an orchestrator host and a provider. When the host and provider are both Grok, dispatch still starts an independent Grok subprocess rather than delegating in-host."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok is eligible as both an orchestrator host and a provider. When the host and provider are both Grok, dispatch still starts an independent Grok subprocess rather than delegating in-host.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bdf2da9dfd7acd8d615cb657194029070d713df7176e782734d35bbd6e148b1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fed7c207e84c732d7a0b621dfa831ea4f1f3aa8f672a3db83c24ec3aed6dfa75",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Compatible capability definitions are discovered from the shared .agents/ surface. Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary; Grok-only project files are limited to surfaces the shared definition cannot provide."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Compatible capability definitions are discovered from the shared .agents/ surface. Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary; Grok-only project files are limited to surfaces the shared definition cannot provide.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf0ecb8f0fa4981c0a94d2718b3dacb4768985cd2bbd83a859b5290b56538635",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "18fc87a458d86bba647c32db4f295315b0b22ba4a7270e2e85c14da1c56325ee",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions. A resumed execution remains an independent subprocess and explicitly receives model, effort, and permission settings; failed, expired, provider-mismatched, or model-mismatched resume falls back to a new session without rejecting the dispatch for that reason alone."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6c6e9d43b8eef14b7dbe993423d7a396ae8e51d6bd8cbde37e32f8b1ac8612f4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityDefinition",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"a shared adapter definition exists, and that definition declares a valid grok-sandbox\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6c6e9d43b8eef14b7dbe993423d7a396ae8e51d6bd8cbde37e32f8b1ac8612f4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityDefinition",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6c6e9d43b8eef14b7dbe993423d7a396ae8e51d6bd8cbde37e32f8b1ac8612f4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityDefinition",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fed7c207e84c732d7a0b621dfa831ea4f1f3aa8f672a3db83c24ec3aed6dfa75",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Compatible capability definitions are discovered from the shared .agents/ surface. Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary; Grok-only project files are limited to surfaces the shared definition cannot provide."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6c6e9d43b8eef14b7dbe993423d7a396ae8e51d6bd8cbde37e32f8b1ac8612f4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityDefinition",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "229c1ddb3eab1407f071225c06584fed5d7e69b4135b8995252fd2b76cc08be9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b15df19059b673d69daaccec188176d0f20b11f2712a4e5a5bfaafc5c43fa281",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94889cf74e0b26e71637c1c82eba3e92c4e013b4f61743229d0fd6cf3896d552",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9aee48d97cdd5f415b1125118c4fcaaa2b57d3675b89b3181dca3e4cce67207e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field. A missing value fails closed and reports the envelope's failure reason; the envelope text field is not a return channel."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c8e40b1f569d2085ab03cef82d25183905491fac76e92a24581739250174f2a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bdf2da9dfd7acd8d615cb657194029070d713df7176e782734d35bbd6e148b1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "942f442e937e6c417be8669995df91f7eb3e92830b2537a596e530016d663742",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokDryChecker",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "18fc87a458d86bba647c32db4f295315b0b22ba4a7270e2e85c14da1c56325ee",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions. A resumed execution remains an independent subprocess and explicitly receives model, effort, and permission settings; failed, expired, provider-mismatched, or model-mismatched resume falls back to a new session without rejecting the dispatch for that reason alone."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "324dde796649328c07586db56c5728e1aac690240793c8917ef28ee3ea074594",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokEnvelopeError",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "229c1ddb3eab1407f071225c06584fed5d7e69b4135b8995252fd2b76cc08be9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "324dde796649328c07586db56c5728e1aac690240793c8917ef28ee3ea074594",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokEnvelopeError",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9aee48d97cdd5f415b1125118c4fcaaa2b57d3675b89b3181dca3e4cce67207e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field. A missing value fails closed and reports the envelope's failure reason; the envelope text field is not a return channel."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A missing value fails closed and reports the envelope's failure reason",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "324dde796649328c07586db56c5728e1aac690240793c8917ef28ee3ea074594",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokEnvelopeError",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "87922037eaffa6531448d4a327fef8f4eb0330f39daa5702521d6594a0caca1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokOutputEnvelope",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "229c1ddb3eab1407f071225c06584fed5d7e69b4135b8995252fd2b76cc08be9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "87922037eaffa6531448d4a327fef8f4eb0330f39daa5702521d6594a0caca1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokOutputEnvelope",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8293608393c163ecedf9ff8a2cb5984cd6e88d3d9823b31409bc054f2c0bcc87",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Grok is executed as the Grok CLI provider adapter, not as a Codex custom-provider implementation."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok is executed as the Grok CLI provider adapter, not as a Codex custom-provider implementation.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "87922037eaffa6531448d4a327fef8f4eb0330f39daa5702521d6594a0caca1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokOutputEnvelope",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9aee48d97cdd5f415b1125118c4fcaaa2b57d3675b89b3181dca3e4cce67207e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field. A missing value fails closed and reports the envelope's failure reason; the envelope text field is not a return channel."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field. A missing value fails closed and reports the envelope's failure reason; the envelope text field is not a return channel.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "229c1ddb3eab1407f071225c06584fed5d7e69b4135b8995252fd2b76cc08be9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b15df19059b673d69daaccec188176d0f20b11f2712a4e5a5bfaafc5c43fa281",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94889cf74e0b26e71637c1c82eba3e92c4e013b4f61743229d0fd6cf3896d552",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9aee48d97cdd5f415b1125118c4fcaaa2b57d3675b89b3181dca3e4cce67207e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field. A missing value fails closed and reports the envelope's failure reason; the envelope text field is not a return channel."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c8e40b1f569d2085ab03cef82d25183905491fac76e92a24581739250174f2a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bdf2da9dfd7acd8d615cb657194029070d713df7176e782734d35bbd6e148b1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "abe7c7fd11b736a9be242c92bc4209ea109cd5929c0551bcc5135edf44495c74",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokReviewer",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "18fc87a458d86bba647c32db4f295315b0b22ba4a7270e2e85c14da1c56325ee",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions. A resumed execution remains an independent subprocess and explicitly receives model, effort, and permission settings; failed, expired, provider-mismatched, or model-mismatched resume falls back to a new session without rejecting the dispatch for that reason alone."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "39183ef07ba66283db2f510264514ea57150c5f8450f9979031575c9952040e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandbox",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "that definition declares a valid grok-sandbox",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "39183ef07ba66283db2f510264514ea57150c5f8450f9979031575c9952040e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandbox",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"rejects an unsupported sandbox\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "39183ef07ba66283db2f510264514ea57150c5f8450f9979031575c9952040e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandbox",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fed7c207e84c732d7a0b621dfa831ea4f1f3aa8f672a3db83c24ec3aed6dfa75",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Compatible capability definitions are discovered from the shared .agents/ surface. Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary; Grok-only project files are limited to surfaces the shared definition cannot provide."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "39183ef07ba66283db2f510264514ea57150c5f8450f9979031575c9952040e1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandbox",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6fb8d1ed30167eb76e1c51e436f4928d0d35b59ceb66a3c10fb175f57a74a3c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandboxProfileName",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "a valid grok-sandbox",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6fb8d1ed30167eb76e1c51e436f4928d0d35b59ceb66a3c10fb175f57a74a3c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandboxProfileName",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "\"lacks a valid grok-sandbox declaration\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6fb8d1ed30167eb76e1c51e436f4928d0d35b59ceb66a3c10fb175f57a74a3c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandboxProfileName",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fed7c207e84c732d7a0b621dfa831ea4f1f3aa8f672a3db83c24ec3aed6dfa75",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Compatible capability definitions are discovered from the shared .agents/ surface. Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary; Grok-only project files are limited to surfaces the shared definition cannot provide."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8f383b45a21e1a2f89487876f1e2bcd2bbbba219eaa9c9a6f256c5e16c940180",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandboxProfileNameError",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2de252f14d6a6f7e47539b10e2a08bae251b27e50c3f23710699be3f17e115f2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixRunnerAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2de252f14d6a6f7e47539b10e2a08bae251b27e50c3f23710699be3f17e115f2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixRunnerAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "94889cf74e0b26e71637c1c82eba3e92c4e013b4f61743229d0fd6cf3896d552",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2de252f14d6a6f7e47539b10e2a08bae251b27e50c3f23710699be3f17e115f2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixRunnerAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "4bdf2da9dfd7acd8d615cb657194029070d713df7176e782734d35bbd6e148b1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2de252f14d6a6f7e47539b10e2a08bae251b27e50c3f23710699be3f17e115f2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewFixRunnerAdapter",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "18fc87a458d86bba647c32db4f295315b0b22ba4a7270e2e85c14da1c56325ee",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions. A resumed execution remains an independent subprocess and explicitly receives model, effort, and permission settings; failed, expired, provider-mismatched, or model-mismatched resume falls back to a new session without rejecting the dispatch for that reason alone."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}
