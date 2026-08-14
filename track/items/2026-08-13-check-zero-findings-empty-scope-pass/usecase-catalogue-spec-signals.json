@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "b6b6b9d0a9222476a436fb05848aee27a35cdfad96146f903aff200473ab698d",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "8ff9150f095fac694e8c77e27814d8be75fb78797c17edcdce4f8bf3cb302da3",
+      "signal": "blue",
+      "type_name": "ReviewCheckZeroFindingsOutcome"
+    }
+  ]
+}

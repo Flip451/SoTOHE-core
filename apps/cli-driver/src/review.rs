@@ -14,10 +14,7 @@ use usecase::review_v2::run_review_fix::{
     ReviewFixRunnerError, RunReviewFixError, RunReviewFixOutput, RunReviewFixRequest,
     RunReviewFixService,
 };
-use usecase::review_v2::{
-    ReviewCheckZeroFindingsEvaluationError, ReviewCheckZeroFindingsOutcome,
-    ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsValidationError,
-};
+use usecase::review_v2::{ReviewCheckZeroFindingsQuery, ReviewCheckZeroFindingsValidationError};
 use usecase::review_v2::{
     ReviewCheckZeroFindingsService, ReviewResultsService, ReviewScopeSelectionRequest,
     ReviewScopeSelectionValidationError, ReviewService,
@@ -31,43 +28,15 @@ use review_results_renderer::render_review_results;
 #[path = "review_local_output_renderer.rs"]
 mod review_local_output_renderer;
 use review_local_output_renderer::review_run_local_output_to_outcome;
+#[path = "review_check_zero_findings_renderer.rs"]
+mod review_check_zero_findings_renderer;
+use review_check_zero_findings_renderer::check_zero_findings_result_to_command_outcome;
 
 /// First stdout line for a review-fix subagent dispatch.
 pub const SUBAGENT_DISPATCH_SENTINEL: &str = "SUBAGENT_DISPATCH_REQUIRED";
 
 /// Exit code for a review-fix subagent dispatch.
 pub const SUBAGENT_DISPATCH_EXIT_CODE: u8 = 64;
-
-/// Converts the check-zero-findings evaluation into the command's fail-closed
-/// exit-code contract.
-fn check_zero_findings_outcome_to_command_outcome(
-    outcome: ReviewCheckZeroFindingsOutcome,
-) -> CommandOutcome {
-    match outcome {
-        ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings => CommandOutcome::success(Some(
-            "current final review verdict is zero_findings".to_owned(),
-        )),
-        ReviewCheckZeroFindingsOutcome::MissingFinalVerdict => CommandOutcome::failure(Some(
-            "no final review verdict exists for this scope".to_owned(),
-        )),
-        ReviewCheckZeroFindingsOutcome::StaleFinalVerdict => {
-            CommandOutcome::failure(Some("final review verdict is stale for this scope".to_owned()))
-        }
-        ReviewCheckZeroFindingsOutcome::FindingsRemain => {
-            CommandOutcome::failure(Some("final review verdict has findings remaining".to_owned()))
-        }
-    }
-}
-
-/// Maps both a completed check and an evaluation error to the command boundary.
-fn check_zero_findings_result_to_command_outcome(
-    result: Result<ReviewCheckZeroFindingsOutcome, ReviewCheckZeroFindingsEvaluationError>,
-) -> CommandOutcome {
-    match result {
-        Ok(outcome) => check_zero_findings_outcome_to_command_outcome(outcome),
-        Err(error) => CommandOutcome::failure(Some(error.to_string())),
-    }
-}
 
 // ---------------------------------------------------------------------------
 // Input type
@@ -730,11 +699,14 @@ mod tests {
         RunReviewOutput, SubagentDispatchInstruction, SubagentName,
     };
 
+    use super::review_check_zero_findings_renderer::{
+        check_zero_findings_outcome_to_command_outcome,
+        check_zero_findings_result_to_command_outcome,
+    };
     use super::{
         ReviewCheckRoundSelect, ReviewCheckZeroFindingsInput, ReviewDriver, ReviewFixDriver,
         ReviewFixInput, ReviewInput, ReviewResultsInput, SUBAGENT_DISPATCH_EXIT_CODE,
-        SUBAGENT_DISPATCH_SENTINEL, check_zero_findings_outcome_to_command_outcome,
-        check_zero_findings_result_to_command_outcome, review_run_local_output_to_outcome,
+        SUBAGENT_DISPATCH_SENTINEL, review_run_local_output_to_outcome,
         subagent_dispatch_to_outcome,
     };
     struct UnusedReviewService {
@@ -1534,6 +1506,20 @@ mod tests {
         );
 
         assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stderr.is_none());
+    }
+
+    #[test]
+    fn test_review_check_zero_findings_empty_scope_returns_success_with_explicit_message() {
+        let outcome = check_zero_findings_outcome_to_command_outcome(
+            ReviewCheckZeroFindingsOutcome::EmptyScope,
+        );
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some("review scope is empty; no final review verdict is required")
+        );
         assert!(outcome.stderr.is_none());
     }
 
