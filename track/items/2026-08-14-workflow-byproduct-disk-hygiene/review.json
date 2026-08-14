@@ -1,0 +1,798 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:17:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6fcb586b1777790185c37a5045c84ed890191bbe0668081b7204cfc115a1cc67",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:21:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6fcb586b1777790185c37a5045c84ed890191bbe0668081b7204cfc115a1cc67",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:53:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddf51b6ec68cc9750f45ceacadc48b2cae8fc633295fc2daca2fc18deca6afd6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:57:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddf51b6ec68cc9750f45ceacadc48b2cae8fc633295fc2daca2fc18deca6afd6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T03:20:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8fd90c231f331467d67b3b2f51c3f821cae6c5cdee4b815780e99f200615503",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:50:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12e3e53312dd437dab4e41dd1c59e4792eb0bc190c7a27c8bbf260d2404a7b9c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:53:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:12e3e53312dd437dab4e41dd1c59e4792eb0bc190c7a27c8bbf260d2404a7b9c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:34:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aadd582eb2cacfc7154a8500c1bbc019ffd258242ba84028f555d0c438cfa2b5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:42:20Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 31,
+              "message": "`CARGO_TARGET_TMPDIR` is supplied while Cargo builds integration tests, not as a guaranteed runtime variable ([Cargo documentation](https://doc.rust-lang.org/cargo/reference/environment-variables.html)). Reading it only through `std::env::var_os` therefore normally selects `<workspace>/target/tmp`; with a custom target directory, leaked fixtures fall outside Cargo's cleanable target and violate AC-04/CN-03. Embed the build-time value with `option_env!`/`env!` while retaining the non-Cargo fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 197,
+              "message": "The fixture is constructed only from paths already present in the boundary manifest. Any new real-workspace path lacking a classification is omitted before the production exporter sees it, masking the `UnclassifiedPath` failure that the former real-workspace export detected and allowing boundary drift to pass this integration suite. Snapshot the relevant workspace surface independently of the manifest, or explicitly fail after checking the original workspace for unclassified paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aadd582eb2cacfc7154a8500c1bbc019ffd258242ba84028f555d0c438cfa2b5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T20:47:46Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 31,
+              "message": "`CARGO_TARGET_TMPDIR` is supplied when Cargo compiles an integration test, not as a guaranteed runtime variable ([Cargo documentation](https://doc.rust-lang.org/cargo/reference/environment-variables.html)). Reading only `std::env::var_os` therefore normally takes the hard-coded `<workspace>/target/tmp` fallback; with a custom target directory, leaked fixtures fall outside Cargo's cleanable target and violate AC-04/CN-03. Use the compile-time value via `option_env!`/`env!`, retaining the undefined fallback.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 197,
+              "message": "The source fixture is populated only by iterating paths already present in the boundary manifest. A newly added real-workspace path with no classification is therefore omitted before the production exporter sees it, masking the `UnclassifiedPath` failure that the former real-workspace export detected. Snapshot the relevant workspace surface independently of the manifest, or explicitly validate the original workspace for unclassified paths before export.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aadd582eb2cacfc7154a8500c1bbc019ffd258242ba84028f555d0c438cfa2b5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T20:59:13Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 100,
+              "message": "When `CARGO_TARGET_TMPDIR` belongs to a workspace-local custom target directory that is not covered by `.gitignore` (for example `CARGO_TARGET_DIR=build`), this traversal descends into that directory and eventually into the `source_root` it is currently creating. It then recursively copies its own destination until path/disk exhaustion—the failure mode this track is intended to prevent. Explicitly exclude the owned temporary parent/Cargo target tree from the snapshot walk.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5086ca98ba9b583a3ae8073a5ee27954f6605f47bf37cf31716cf31d28c9f928",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:03:57Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 84,
+              "message": "For any workspace-local `CARGO_TARGET_TMPDIR`, this returns the fixture's entire first workspace component rather than the Cargo target tree itself. A valid custom target nested under an included subtree (for example `<workspace>/.harness/target`) consequently excludes all of `.harness`, including the required boundary manifest, so export fails instead of satisfying AC-04; other locations can silently omit real export inputs. Exclude only the actual Cargo target/temp tree containing the fixture.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bcb22437986c7c268b95ea0e3f0565a31217f2acae89f508a6d5339c41ce181c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:08:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0334a20f711d0b43c736d931070bc160320f79533cfdaf04125f6a97ce43007",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T00:35:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13f0ab6caea9968dae8d87d263b8d5696144cd3f348f74663250e2d097dd92e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:11:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d150ec1dd4156c3069312bd91b46ca9adc34d678a99340979d9ad24b6f79f76c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:45Z",
+          "findings": [
+            {
+              "category": "resource_cleanup",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 178,
+              "message": "`EXPORTED_SCAFFOLD_PATH` retains only a `PathBuf`, so normal process exit performs no directory cleanup. The sole `remove_dir_all` runs before creation and targets the current PID; a later test process generally uses a different PID and leaves this run's ~1.6 GB directory untouched. Thus the B2 disk-leak requirement is not satisfied.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d150ec1dd4156c3069312bd91b46ca9adc34d678a99340979d9ad24b6f79f76c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:21:22Z",
+          "findings": [
+            {
+              "category": "resource_cleanup",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 18,
+              "message": "The cleanup callback removes only the stored `.../scaffold` path. `materialize_export_source` creates the sibling `.../source` tree under the process directory, so every successful run still leaves that copied source tree and its parent behind. Store/remove `export_parent`, not only `output_dir`.",
+              "severity": "P1"
+            },
+            {
+              "category": "resource_cleanup",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 218,
+              "message": "Cleanup registration occurs only after fixture materialization and scaffold export complete. If copying or export panics—the failure path most likely to need cleanup—no handler is registered and the partial process directory leaks at test-binary exit.",
+              "severity": "P1"
+            },
+            {
+              "category": "error_handling",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 18,
+              "message": "The exit callback silently discards `remove_dir_all` failures. A test binary can therefore exit successfully while retaining the large fixture, with no diagnostic that the disk-hygiene guarantee failed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:95b76b5609f675bb4d56030ba56cda688e9d4de064327dfbd28e04818b6316a0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:24:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75cd5f40e36cdf0d2b41b04d7ee90f60d817df5217e4ca0b4caae2b384f25dd3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:50:37Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 318,
+              "message": "この回帰テストは `TemplateDriver` を直接構築して `handle` を呼ぶため、本番 CLI の clap 引数変換、`TemplateCompositionRoot` の wiring、実際の `sotp template export` 起動を検証しなくなっています。CLI または composition の接続が壊れてもテストが通るため、少なくとも export の CLI dispatch を検証する別の薄い統合テストを残してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dabc7492f33379c866c360758f5a984a1e1e272e26706f3c868afe0f605f2e32",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:56:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:659708107927f6699905486da2364db223d26016254209cdc02b337f985f65c6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:01:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:659708107927f6699905486da2364db223d26016254209cdc02b337f985f65c6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:36:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80d4f5af8dd1df3d429c8f5c26f8bbca94d63ac5e25784352241b58bd623630f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:40:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80d4f5af8dd1df3d429c8f5c26f8bbca94d63ac5e25784352241b58bd623630f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-13T20:34:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075caa0c440df72c3355a8d07d6c90aeed699cef932b2d600991326f3b55bf4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:38:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:075caa0c440df72c3355a8d07d6c90aeed699cef932b2d600991326f3b55bf4b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:50:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6dd7256d892950df654b9973d64a78a2d84dff120e5e88fd778f4431a8b7485e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:54:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6dd7256d892950df654b9973d64a78a2d84dff120e5e88fd778f4431a8b7485e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:36:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:427b3d393befebd74370a548cf69a2ab1c81fee57a8ee061c0f058b1a9373a44",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:40:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:427b3d393befebd74370a548cf69a2ab1c81fee57a8ee061c0f058b1a9373a44",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:41:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:46:05Z",
+          "findings": [
+            {
+              "category": "branch-wide consistency",
+              "file": ".harness/config/phase-commands.json",
+              "line": 17,
+              "message": "意図した ADR review check の削除と、shipped matrix を固定するテストが同期されていません。`apps/cli/src/commands/phase.rs` の `test_shipped_phase_commands_declare_direct_upstream_convergence_matrix` はこの JSON を `include_str!` で直接読み、`spec-design` に削除済みの第2コマンドが存在すると assert するため、CI の CLI テストが確実に失敗します。operator-owned override を許容する形へ当該 assertion も更新または条件化してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:50:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:34:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3011bb72aeaa113d1fb9bae85d82f93955da5475495243f7a4881ff494868a8f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:38:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3011bb72aeaa113d1fb9bae85d82f93955da5475495243f7a4881ff494868a8f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:28:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b8f65a76f36ef43e84a1d049321dc71d25f5a37926141c6337893494f99f6aa2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:34:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b8f65a76f36ef43e84a1d049321dc71d25f5a37926141c6337893494f99f6aa2",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:39:03Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates upstream behavior contracts instead of limiting the task text to target + operation + anchors; in particular, the clauses about mandatory configuration validation, pathspec application, nested-repository handling, and preserving the port duplicate IN/CN/AC content. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates upstream behavior contracts instead of limiting the task text to target + operation + anchors; the scaffold location, static lifetime removal, hard-link semantics, byte identity, and production-copy clauses duplicate IN/OS/CN/AC content. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 26,
+              "message": "Section S1 repeats the upstream design rationale and behavior contract in prose (validated operator configuration, port preservation, and nested-repository handling) rather than using only target + operation + anchors. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 36,
+              "message": "Section S2 repeats the upstream behavior contract in prose (cargo-cleanable scaffolds, lifetime retention, hard-link optimization, and production-export preservation) rather than using only target + operation + anchors. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a15655576b4eb0d86b98703ff5d12912c5b45062d1ea043d27ae54eee4bb2615",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:45:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6d6960247e0d5c930a3e1f1d64911bc6e02ee97258f47547cfb8aa08658df18e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:50:06Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 6,
+              "message": "T001 is a pre-implementation split candidate: it combines the independently verifiable config-loading/fail-closed unit (IN-01, CN-01, AC-01, AC-02) with trailing-directory filtering (IN-02, CN-02, AC-03). Split these into separately committable tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 12,
+              "message": "T002 bundles three independently verifiable behavior units: target-scoped scaffold placement and fallback (IN-03, CN-03, AC-04), removal of process-lifetime TempDir retention (IN-04, AC-05), and test-only hard-link transplantation with production-copy preservation (IN-05, CN-04, AC-06, AC-07). Split them into separate tasks before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/task-coverage.json",
+              "line": 24,
+              "message": "AC-04's mapping to T002 is not load-bearing for its in-process-test requirement. T002 concretely targets `apps/cli/tests/`, and batch-plan estimates only the `cli` scope, while the current in-process scaffold export test is `export_transplants_running_binary_into_bin_sotp` in `apps/cli-composition/src/template_export/mod.rs`. Add an explicit target/task and corresponding scope estimate for that in-process path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6d6960247e0d5c930a3e1f1d64911bc6e02ee97258f47547cfb8aa08658df18e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:56:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e92dd906d938197a1aabd71401269b14d7114ad47730a45a615a579662149daf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:59:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e92dd906d938197a1aabd71401269b14d7114ad47730a45a615a579662149daf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:33:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28b42223a8cf73f43c7e247eb3d47b27d801f931b1204122b6120a30d66f2ec3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:36:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:28b42223a8cf73f43c7e247eb3d47b27d801f931b1204122b6120a30d66f2ec3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:12:27Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/impl-plan.json",
+              "line": 68,
+              "message": "T002 is marked done, but its plan description and S2 section still cover only D2/IN-02/CN-02/AC-03. The B2 correction described in the briefing (T002 owning CN-03 / the typed recording-failure propagation) is absent, while CN-03 remains assigned to T003. This leaves the intended T002 responsibility unrepresented in the executable plan.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:116780086a347f4cc43ed345905b348438a9bd15138f4b19fb1c66fe17714b31",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T01:13:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:116780086a347f4cc43ed345905b348438a9bd15138f4b19fb1c66fe17714b31",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:116780086a347f4cc43ed345905b348438a9bd15138f4b19fb1c66fe17714b31",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:55:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cc19fa051063d852a1a6a930d2cb0671ff759da9c6cc1f50fb1e353e03ebefcf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:10:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5df7d8adad47374b58921c26be1588d5d8428aae21cc2952f7e0fab3c568e67",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:13:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5df7d8adad47374b58921c26be1588d5d8428aae21cc2952f7e0fab3c568e67",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-13T20:34:11Z",
+          "findings": [
+            {
+              "category": "logic/security",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 53,
+              "message": "非 `/ **` 形式の exclusion pattern は Rust 側 matcher に追加されません。visible untracked pass は exclusion pathspec を使わず、`drop_ignored_non_review_paths` に依存しているため、`.env`、`*.pem`、`bin/sotp` などの可視 untracked ファイルが除外されず、scope diff に計上されます。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:bc707a3c631972f76b800033b83631c16814330b09b34b7e6c2cd5d7cbb01be6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T20:39:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6bd9b338321bf7bfe5051f0685b12b3dbabfa5b164fd6a309ea75a5fce6f8036",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T20:44:30Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 192,
+              "message": "The full exclusion matcher is applied after the visible and ignored untracked lists are merged. Consequently, the shipped `.env.*` pattern removes an ignore-negated `.env.example` returned by the visible Git pass. This breaks the existing `test_an_ignore_negated_visible_file_is_kept_for_scope_classification` contract and silently understates reviewable scope changes. Preserve visible ignore-negated paths when applying the Rust-side fallback filter, or retain each path's enumeration origin.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:6bd9b338321bf7bfe5051f0685b12b3dbabfa5b164fd6a309ea75a5fce6f8036",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:02:00Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure.rs",
+              "line": 294,
+              "message": "`write_all` feeds the complete visible-path list before `collect_bounded_git_output` starts draining stdout/stderr or enforcing its deadline. `check-ignore --verbose` emits a record for every negation-matched path, so a sufficiently large set can fill stdout while the parent fills stdin, deadlocking measurement indefinitely. Feed stdin concurrently with bounded output collection under the same deadline.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:c3714d1af645dbe72eb2bb729c2bc9d3a105ae3cbceed9441da28b935204aed2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:10:30Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 195,
+              "message": "`preserved_paths.contains(path)` lets any `.gitignore` negation override the mandatory operator-owned exclusion config. For example, `tmp/*` plus `!tmp/large-output` makes that visible file survive even though the configured `tmp/**` exclusion matches it, allowing generated artifacts to consume the read budget or fail measurement. Preserve only the intended legacy exception without bypassing configured recursive exclusions, or model explicit exceptions in the operator config.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:49bf4fe4d1993c43e93a4e0d9a5f52347b5b16f2eb2595fd641d8fce034ff9f7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:19:11Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 207,
+              "message": "Ignore-negated visible paths still bypass every configured exclusion that does not end in `/**`. This includes shipped credential patterns such as `**/*.pem`, `**/*.key`, and `.env.*`, as well as operator-added exact/glob exclusions: a matching `!` rule in `.gitignore` puts the path in `preserved_paths`, and `matches_recursive` is false, so the mandatory exclusion policy is ignored. Preserve only the explicit `.env.example` compatibility case, or represent exceptions in the operator-owned configuration instead of granting all non-recursive patterns this override.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:cd87da9724d7360a7c9be197b9f7261eb25bae0525849fbffa9a99105f764107",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:23:55Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 178,
+              "message": "The Rust-side matcher does not implement the Git pathspec semantics promised by this config. With `literal_separator(true)`, a pattern such as `*.pem` does not match `libs/domain/review.pem`, while the same `:(top,exclude)*.pem` pattern passed to Git does match nested paths. Because visible untracked paths are filtered only by this GlobSet, operator exclusions—and shipped patterns such as `.env.*` when a nested path is visible—can be bypassed. Compile equivalent Git pathspec semantics or reject patterns whose semantics cannot be reproduced consistently.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:4943bd5cc9296f1a5b76ca1a2afbaf21dac43031bc73ace75201ba139f3475d2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:32:04Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 189,
+              "message": "For patterns containing `/`, `literal_separator(true)` does not preserve Git pathspec semantics: Git's `*` can cover descendant paths (for example, `:(top)libs/*` matches `libs/domain/src/lib.rs`), while this GlobSet matcher stops at `/`. Consequently, a visible untracked descendant can survive the Rust-side filter even though the same operator pattern excludes an ignored file, understating or inconsistently measuring the configured scope. Use Git-compatible matching semantics for slash-containing patterns.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:37cdb2a7eabdfe92d023d4fc4cff930f22f0fba3f2a53fe6411738ed2723924a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T00:12:55Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 182,
+              "message": "Slashless `:(top,exclude)` pathspecs are still translated incorrectly. They are top-anchored; for example, Git matches `:(top)Cargo.toml` only at the repository root, whereas `**/Cargo.toml` also matches nested files. Shipped patterns such as `.env.*` and operator-supplied literals can therefore suppress visible nested files that Git would retain, understating the scope diff. Do not add the recursive prefix.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 188,
+              "message": "The fallback still interprets operator patterns using GlobSet syntax rather than Git pathspec syntax. GlobSet expands constructs such as `{Cargo,clippy}.toml`, while Git treats those braces literally; the Rust-side visible-path filter would therefore exclude files that the configured Git pathspec does not match. Use Git-compatible matching or reject/escape syntax whose meanings differ.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 218,
+              "message": "The hardcoded `.env.example` preservation overrides explicit operator policy. With an exclusion such as `*` or `.env.example` and a Git-ignore negation making `.env.example` visible, `matches_recursive` is false and this branch retains the file despite `exclusions.matches` being true. Limit the compatibility exception to the specific legacy rule that requires it or encode it in operator-owned configuration.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:19dfbe68202c73a6057f03958868bd65d68346060696c8543d66084183562e5f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T00:22:37Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 174,
+              "message": "A literal Git pathspec that names a directory also matches all descendants (`:(top)libs` selects the entire `libs` tree), but the GlobSet only matches the literal `libs` entry. Consequently, visible untracked descendants survive `drop_ignored_non_review_paths` while ignored descendants are removed by Git, so an operator exclusion behaves inconsistently. Apply the Git pathspecs to the visible enumeration too, or reproduce directory-prefix semantics.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/scope_diff_measure/untracked.rs",
+              "line": 176,
+              "message": "The fallback matcher still accepts Git pathspec syntax that GlobSet interprets differently. For example, Git supports POSIX character classes such as `[[:upper:]]argo.toml`, while GlobSet parses that expression as a different ordinary character class. A configured exclusion can therefore retain a Git-matching visible path or suppress a different path. Use Git-compatible matching or reject every unsupported divergent construct, including POSIX classes.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ab04b0e2929f99652e6396a2a976d53a137fc96b748298fcaf8f7ab3c414f677",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T00:31:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a81e6da5d87d9bc2925cdd68e0a640793ddf3aa12cf8135499bc89a74a53a852",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T00:45:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:df81e82adc511b2e84acf8e46287b8f85c359a55f8bdb357e455ae8cc15d15dc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:12:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d78b98a7a4efe0e868253a28d44ddb2627516b2d5557cd5e343f2c31aff74c4d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:17:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d78b98a7a4efe0e868253a28d44ddb2627516b2d5557cd5e343f2c31aff74c4d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:38:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b998039e04d3f6fbf8634fb1af1da26a19cd416cbaa875b014ce0d8b39d276cb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:40:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b998039e04d3f6fbf8634fb1af1da26a19cd416cbaa875b014ce0d8b39d276cb",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:46:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3109b97664c98d07d418837970acb4e32091fba5133f80c848b8f154ae7c1dd9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:49:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3109b97664c98d07d418837970acb4e32091fba5133f80c848b8f154ae7c1dd9",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-13T18:02:37Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+              "line": 15,
+              "message": "`usecase::ScopeDiffMeasurePort::measure_scope_diff` is declared synchronous (`is_async: false`) despite performing external Git/filesystem I/O, while the entry docs do not acknowledge or justify this sync choice. Record the boundary-color decision explicitly or expose an async-compatible contract before implementation locks in the adapter shape.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:86a2953d3124cdbffe88d7adc78a6b889d7dc48ab05b67aa2fc79d2c196bff6e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:12:53Z",
+          "findings": [
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+              "line": 15,
+              "message": "`usecase::ScopeDiffMeasurePort::measure_scope_diff` is declared synchronous (`is_async: false`) despite its contract performing external Git/filesystem I/O, and the entry docs do not acknowledge or justify that synchronous boundary choice. This can force adapter rework if the port must support non-blocking I/O.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e448c3a11f7aa7630573ed88688aa6f8dfd230deb90f1112c7adf7500b06ef9c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:29:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e448c3a11f7aa7630573ed88688aa6f8dfd230deb90f1112c7adf7500b06ef9c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:33:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e448c3a11f7aa7630573ed88688aa6f8dfd230deb90f1112c7adf7500b06ef9c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

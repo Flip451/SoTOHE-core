@@ -123,6 +123,18 @@ specific `task_id` or `section.id`, or quote the offending text.
   implementation starts**, naming the units and the anchor each would cover.
   This is the one forward-looking category: it exists so ceiling pressure is
   answered by task-boundary splits, not post-hoc justifications.
+- **open-set covering task**: a task whose described operation covers an open
+  set heuristically — writing a hand-rolled parser for a language an existing
+  authority already parses, reimplementing resource-lifecycle tracking the
+  platform already owns, or imitating a build system's dependency knowledge —
+  where neither the task description nor the upstream chain records the
+  resolution that grounds it: delegation to that existing authority (compiler,
+  cargo, rustdoc, git, a domain type), a declared conservative
+  over-approximation, or an acknowledged strict-implementation depth estimate.
+  This is the second net for open-set semantics that slipped past ADR
+  drafting; cite the task_id and name the authority being reimplemented or the
+  missing resolution. A task that explicitly declares its coverage as a
+  conservative approximation is not reportable under this category.
 - **out_of_scope leak into a task**: a task that implements behaviour the spec
   explicitly excludes via `scope.out_of_scope[]`.
 - **observations.md mandate without trigger**: an `AC-NN` worded as "must be

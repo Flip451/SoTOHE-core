@@ -16,9 +16,9 @@ use std::sync::Arc;
 
 pub use values::{
     BriefingText, CAPABILITY_EXEC_DISCIPLINE_PATH, CLAUDE_PROVIDER_NAME, CODEX_PROVIDER_NAME,
-    CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError, DisciplineText,
-    ExecutionMode, ModelName, ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet,
-    TimeoutSeconds,
+    CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
+    CapabilityProviderBinding, DisciplineText, ExecutionMode, ModelName, ModelProviderName,
+    ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
 };
 
 use crate::conventions_resolve::{
@@ -54,8 +54,8 @@ pub enum CapabilityResumeRequest {
 /// Typed routing data resolved from the capability profile.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapabilityProfile {
-    /// Provider selected by the profile.
-    pub provider: ProviderName,
+    /// Provider binding selected by the profile.
+    pub provider: CapabilityProviderBinding,
     /// Single model selected by the profile.
     pub model: ModelName,
     /// Explicit reasoning effort selected by the profile.
@@ -253,12 +253,24 @@ impl CapabilityExecService for CapabilityExecInteractor {
         let provider = self
             .providers
             .iter()
-            .find(|adapter| adapter.provider() == &profile.provider)
+            .find(|adapter| match &profile.provider {
+                CapabilityProviderBinding::Standard(provider) => adapter.provider() == provider,
+                CapabilityProviderBinding::CodexCustom(_) => {
+                    adapter.provider() == &*CODEX_PROVIDER_NAME
+                }
+            })
             .ok_or_else(|| CapabilityExecError::UnsupportedProvider {
-                provider: profile.provider.clone(),
+                provider: adapter_provider_name(&profile.provider),
             })?;
 
         provider.dispatch(&CapabilityDispatchRequest { request, profile, briefing, discipline })
+    }
+}
+
+fn adapter_provider_name(binding: &CapabilityProviderBinding) -> ProviderName {
+    match binding {
+        CapabilityProviderBinding::Standard(provider) => provider.clone(),
+        CapabilityProviderBinding::CodexCustom(_) => CODEX_PROVIDER_NAME.clone(),
     }
 }
 
@@ -351,8 +363,9 @@ mod tests {
         BriefingText, CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
         CapabilityExecInteractor, CapabilityExecRequest, CapabilityExecService,
         CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
-        CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilityResumeRequest,
-        CapabilitySourcePort, ConventionResolveError, DisciplineText, ExecutionMode, ModelName,
+        CapabilityProfile, CapabilityProfilePort, CapabilityProviderBinding,
+        CapabilityProviderPort, CapabilityResumeRequest, CapabilitySourcePort,
+        ConventionResolveError, DisciplineText, ExecutionMode, ModelName, ModelProviderName,
         ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
     };
     use crate::conventions_resolve::{
@@ -519,7 +532,7 @@ mod tests {
 
     fn profile(mode: ExecutionMode) -> Result<CapabilityProfile, CapabilityInputValidationError> {
         Ok(CapabilityProfile {
-            provider: ProviderName::try_new("codex")?,
+            provider: CapabilityProviderBinding::Standard(ProviderName::try_new("codex")?),
             model: ModelName::try_new("gpt-5")?,
             effort: ReasoningEffort::High,
             execution_mode: mode,
@@ -540,6 +553,42 @@ mod tests {
             ProviderName::try_new("codex"),
             Ok(provider) if provider.as_str() == "codex" && provider.to_string() == "codex"
         ));
+    }
+
+    #[test]
+    fn test_model_provider_name_whitespace_rejected() {
+        assert!(matches!(
+            ModelProviderName::try_new(" \t\n "),
+            Err(CapabilityInputValidationError::EmptyModelProviderName)
+        ));
+    }
+
+    #[test]
+    fn test_model_provider_name_valid_value_preserved() {
+        assert!(matches!(
+            ModelProviderName::try_new("deepseek"),
+            Ok(provider) if provider.as_str() == "deepseek" && provider.to_string() == "deepseek"
+        ));
+    }
+
+    #[test]
+    fn test_capability_provider_binding_standard_retains_provider()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("claude")?;
+        let binding = CapabilityProviderBinding::Standard(provider.clone());
+
+        assert_eq!(binding, CapabilityProviderBinding::Standard(provider));
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_provider_binding_codex_custom_retains_model_provider()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let model_provider = ModelProviderName::try_new("qwen")?;
+        let binding = CapabilityProviderBinding::CodexCustom(model_provider.clone());
+
+        assert_eq!(binding, CapabilityProviderBinding::CodexCustom(model_provider));
+        Ok(())
     }
 
     #[test]
@@ -761,16 +810,51 @@ mod tests {
     #[test]
     fn test_capability_profile_valid_values_retained() -> Result<(), Box<dyn std::error::Error>> {
         let profile = CapabilityProfile {
-            provider: ProviderName::try_new("codex")?,
+            provider: CapabilityProviderBinding::Standard(ProviderName::try_new("codex")?),
             model: ModelName::try_new("gpt-5")?,
             effort: ReasoningEffort::High,
             execution_mode: ExecutionMode::OrchestratorOutput,
         };
 
-        assert_eq!(profile.provider.as_str(), "codex");
+        assert!(matches!(
+            profile.provider,
+            CapabilityProviderBinding::Standard(ref provider) if provider.as_str() == "codex"
+        ));
         assert_eq!(profile.model.as_str(), "gpt-5");
         assert_eq!(profile.effort, ReasoningEffort::High);
         assert_eq!(profile.execution_mode, ExecutionMode::OrchestratorOutput);
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_exec_codex_custom_binding_selects_codex_adapter()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let dispatches = Arc::new(Mutex::new(Vec::new()));
+        let interactor = dispatching_interactor(
+            CapabilityProfile {
+                provider: CapabilityProviderBinding::CodexCustom(ModelProviderName::try_new(
+                    "deepseek",
+                )?),
+                model: ModelName::try_new("gpt-5")?,
+                effort: ReasoningEffort::High,
+                execution_mode: ExecutionMode::OrchestratorOutput,
+            },
+            resolver(&recorder(), &[])?,
+            recording_provider(&dispatches)?,
+        )?;
+
+        let outcome = interactor.execute(request()?)?;
+
+        assert!(matches!(
+            outcome,
+            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 0 }
+                if provider.as_str() == "codex"
+        ));
+        let recorded = dispatches.lock().expect("test dispatch recorder lock");
+        assert!(matches!(
+            &recorded[0].profile.provider,
+            CapabilityProviderBinding::CodexCustom(provider) if provider.as_str() == "deepseek"
+        ));
         Ok(())
     }
 
@@ -901,7 +985,10 @@ mod tests {
         assert_eq!(recorded.len(), 1);
         assert_eq!(recorded[0].request.capability.as_str(), "implementer");
         assert_eq!(recorded[0].request.host.as_ref().map(ProviderName::as_str), Some("codex"));
-        assert_eq!(recorded[0].profile.provider.as_str(), "codex");
+        assert!(matches!(
+            &recorded[0].profile.provider,
+            CapabilityProviderBinding::Standard(provider) if provider.as_str() == "codex"
+        ));
         assert_eq!(recorded[0].profile.model.as_str(), "gpt-5");
         assert_eq!(recorded[0].briefing.as_str(), "perform the task");
         assert_eq!(
@@ -922,7 +1009,7 @@ mod tests {
         let interactor = CapabilityExecInteractor::new(
             Arc::new(StaticProfilePort {
                 profile: CapabilityProfile {
-                    provider: provider.clone(),
+                    provider: CapabilityProviderBinding::Standard(provider.clone()),
                     model: ModelName::try_new("claude-opus")?,
                     effort: ReasoningEffort::High,
                     execution_mode: ExecutionMode::OrchestratorOutput,
@@ -956,7 +1043,10 @@ mod tests {
         let recorded = dispatches.lock().expect("test dispatch recorder lock");
         assert_eq!(recorded.len(), 1);
         assert_eq!(recorded[0].request.host, None);
-        assert_eq!(recorded[0].profile.provider.as_str(), "claude");
+        assert!(matches!(
+            &recorded[0].profile.provider,
+            CapabilityProviderBinding::Standard(provider) if provider.as_str() == "claude"
+        ));
         assert_eq!(recorded[0].profile.model.as_str(), "claude-opus");
         Ok(())
     }
@@ -969,7 +1059,7 @@ mod tests {
         let interactor = CapabilityExecInteractor::new(
             Arc::new(StaticProfilePort {
                 profile: CapabilityProfile {
-                    provider: provider.clone(),
+                    provider: CapabilityProviderBinding::Standard(provider.clone()),
                     model: ModelName::try_new("claude-opus")?,
                     effort: ReasoningEffort::High,
                     execution_mode: ExecutionMode::OrchestratorOutput,
@@ -997,7 +1087,10 @@ mod tests {
         let recorded = dispatches.lock().expect("test dispatch recorder lock");
         assert_eq!(recorded.len(), 1);
         assert_eq!(recorded[0].request.host.as_ref().map(ProviderName::as_str), Some("codex"));
-        assert_eq!(recorded[0].profile.provider.as_str(), "claude");
+        assert!(matches!(
+            &recorded[0].profile.provider,
+            CapabilityProviderBinding::Standard(provider) if provider.as_str() == "claude"
+        ));
         Ok(())
     }
 
@@ -1082,7 +1175,9 @@ mod tests {
         let interactor = CapabilityExecInteractor::new(
             Arc::new(StaticProfilePort {
                 profile: CapabilityProfile {
-                    provider: ProviderName::try_new("unsupported-provider")?,
+                    provider: CapabilityProviderBinding::Standard(ProviderName::try_new(
+                        "unsupported-provider",
+                    )?),
                     model: ModelName::try_new("model-x")?,
                     effort: ReasoningEffort::High,
                     execution_mode: ExecutionMode::OrchestratorOutput,
@@ -1295,7 +1390,9 @@ mod tests {
         // choosing the execution subject is the step that fails here.
         let interactor = dispatching_interactor(
             CapabilityProfile {
-                provider: ProviderName::try_new("unsupported-provider")?,
+                provider: CapabilityProviderBinding::Standard(ProviderName::try_new(
+                    "unsupported-provider",
+                )?),
                 model: ModelName::try_new("model-x")?,
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
@@ -1497,7 +1594,7 @@ mod tests {
         let provider = ProviderName::try_new("claude")?;
         let interactor = dispatching_interactor(
             CapabilityProfile {
-                provider: provider.clone(),
+                provider: CapabilityProviderBinding::Standard(provider.clone()),
                 model: ModelName::try_new("claude-opus")?,
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
@@ -1602,7 +1699,7 @@ mod tests {
         let provider = ProviderName::try_new("claude")?;
         dispatching_interactor(
             CapabilityProfile {
-                provider: provider.clone(),
+                provider: CapabilityProviderBinding::Standard(provider.clone()),
                 model: ModelName::try_new("claude-opus")?,
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,

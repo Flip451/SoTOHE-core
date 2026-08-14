@@ -44,7 +44,9 @@ mod tests {
                 resume,
             },
             profile: CapabilityProfile {
-                provider: ProviderName::try_new("codex").expect("valid provider"),
+                provider: usecase::capability_exec::CapabilityProviderBinding::Standard(
+                    ProviderName::try_new("codex").expect("valid provider"),
+                ),
                 model: ModelName::try_new("gpt-5").expect("valid model"),
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,

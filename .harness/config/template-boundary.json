@@ -33,6 +33,7 @@
     { "pattern": ".harness/config/pre-review-gates.json", "classification": "include" },
     { "pattern": ".harness/config/review-scope.json", "classification": "include" },
     { "pattern": ".harness/config/samples", "classification": "include" },
+    { "pattern": ".harness/config/scope-diff-exclusions.json", "classification": "include" },
     { "pattern": ".harness/config/signal-gates.json", "classification": "include" },
     { "pattern": ".harness/config/sotp-version.json", "classification": "include" },
     { "pattern": ".harness/config/template-boundary.json", "classification": "include" },

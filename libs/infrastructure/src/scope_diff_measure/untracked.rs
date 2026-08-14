@@ -1,9 +1,10 @@
 use std::collections::HashSet;
+use std::fs;
 use std::io::{BufReader, Read};
 use std::path::Path;
 
 use domain::review_v2::{FilePath, ReviewScopeConfig};
-use globset::{GlobBuilder, GlobSet, GlobSetBuilder};
+use serde::Deserialize;
 use usecase::batch_plan::ScopeDiffMeasureError;
 
 use super::measure_failed;
@@ -12,87 +13,142 @@ use crate::track::symlink_guard::reject_symlinks_below;
 
 pub(super) const MAX_UNTRACKED_FILE_BYTES: u64 = 16 * 1024 * 1024;
 const GIT_EXCLUDE_PATHSPEC_PREFIX: &str = ":(top,exclude)";
-/// Generated build, cache, and credential outputs excluded before collection.
-pub(super) const IGNORED_NON_REVIEW_PATHS: [&str; 33] = [
-    ":(top,exclude)target/**",
-    ":(top,exclude)target-*/**",
-    ":(top,exclude)**/*.rs.bk",
-    ":(top,exclude).claude/logs/**",
-    ":(top,exclude).claude/worktrees/**",
-    ":(top,exclude).fastembed_cache/**",
-    ":(top,exclude)**/.fastembed_cache/**",
-    ":(top,exclude).semantic_index/**",
-    ":(top,exclude)**/.semantic_index/**",
-    ":(top,exclude).semantic_index.*",
-    // Git reports an ignored nested repository as the directory itself; exclude
-    // that exact path as well as its descendants before regular-file inspection.
-    ":(top,exclude).cache",
-    ":(top,exclude)sotp-dry-index-*/**",
-    ":(top,exclude).env",
-    ":(top,exclude).env.*",
-    ":(top,exclude)**/*.pem",
-    ":(top,exclude)**/*.key",
-    ":(top,exclude)private/**",
-    ":(top,exclude)config/secrets/**",
-    ":(top,exclude)tmp/**",
-    ":(top,exclude).cache/**",
-    ":(top,exclude).harness/tools/**",
-    ":(top,exclude)bin/sotp",
-    ":(top,exclude).cargo-install/**",
-    ":(top,exclude)repomix-output.txt",
-    ":(top,exclude)repomix-output.xml",
-    ":(top,exclude)repomix-output.*/**",
-    ":(top,exclude).idea/**",
-    ":(top,exclude).vscode/**",
-    ":(top,exclude).locks/**",
-    ":(top,exclude)track/items/**/.commit_hash",
-    ":(top,exclude)track/items/**/.commit_hash.tmp",
-    ":(top,exclude)track/items/*/*-graph*/**",
-    ":(top,exclude)track/items/*/logs/**",
-];
+const SCOPE_DIFF_EXCLUSIONS_CONFIG: &str = ".harness/config/scope-diff-exclusions.json";
+const MAX_SCOPE_DIFF_EXCLUSIONS_BYTES: u64 = 64 * 1024;
+const SUPPORTED_SCOPE_DIFF_EXCLUSIONS_SCHEMA_VERSION: u32 = 1;
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ScopeDiffExclusionsConfig {
+    schema_version: u32,
+    exclusions: Vec<String>,
+}
+
+/// Operator-selected paths excluded from both untracked enumerations.
+#[derive(Debug)]
+pub(super) struct ScopeDiffExclusions {
+    git_pathspecs: Vec<String>,
+}
+
+impl ScopeDiffExclusions {
+    fn from_patterns(patterns: Vec<String>) -> Result<Self, ScopeDiffMeasureError> {
+        if patterns.is_empty() {
+            return Err(measure_failed(format!(
+                "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: no exclusion patterns configured"
+            )));
+        }
+
+        let mut git_pathspecs = Vec::with_capacity(patterns.len());
+        for (index, pattern) in patterns.iter().enumerate() {
+            validate_exclusion_pattern(pattern, index)?;
+            git_pathspecs.push(format!("{GIT_EXCLUDE_PATHSPEC_PREFIX}{pattern}"));
+        }
+
+        Ok(Self { git_pathspecs })
+    }
+
+    pub(super) fn git_pathspecs(&self) -> &[String] {
+        &self.git_pathspecs
+    }
+}
+
+/// Loads the mandatory operator-owned measurement exclusions from the repository.
+pub(super) fn load_scope_diff_exclusions(
+    repository_root: &Path,
+) -> Result<ScopeDiffExclusions, ScopeDiffMeasureError> {
+    let source = read_scope_diff_exclusions(repository_root)?;
+    let config: ScopeDiffExclusionsConfig = serde_json::from_str(&source).map_err(|_| {
+        measure_failed(format!("load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: not valid JSON"))
+    })?;
+    if config.schema_version != SUPPORTED_SCOPE_DIFF_EXCLUSIONS_SCHEMA_VERSION {
+        return Err(measure_failed(format!(
+            "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: unsupported schema version"
+        )));
+    }
+    ScopeDiffExclusions::from_patterns(config.exclusions)
+}
+
+fn read_scope_diff_exclusions(repository_root: &Path) -> Result<String, ScopeDiffMeasureError> {
+    let root = repository_root.canonicalize().map_err(|error| {
+        measure_failed(format!(
+            "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: repository root is unreadable ({})",
+            io_classification(&error)
+        ))
+    })?;
+    let path = root.join(SCOPE_DIFF_EXCLUSIONS_CONFIG);
+    match reject_symlinks_below(&path, &root).map_err(|error| {
+        measure_failed(format!(
+            "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: {}",
+            io_classification(&error)
+        ))
+    })? {
+        true => {}
+        false => {
+            return Err(measure_failed(format!("load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: not found")));
+        }
+    }
+
+    let metadata = fs::symlink_metadata(&path).map_err(|error| {
+        measure_failed(format!(
+            "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: {}",
+            io_classification(&error)
+        ))
+    })?;
+    if !metadata.file_type().is_file() || metadata.len() > MAX_SCOPE_DIFF_EXCLUSIONS_BYTES {
+        return Err(measure_failed(format!(
+            "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: not a bounded regular file"
+        )));
+    }
+
+    let mut source = String::new();
+    fs::File::open(&path)
+        .map_err(|error| {
+            measure_failed(format!(
+                "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: {}",
+                io_classification(&error)
+            ))
+        })?
+        .take(MAX_SCOPE_DIFF_EXCLUSIONS_BYTES.saturating_add(1))
+        .read_to_string(&mut source)
+        .map_err(|error| {
+            measure_failed(format!(
+                "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: {}",
+                io_classification(&error)
+            ))
+        })?;
+    if source.len() as u64 > MAX_SCOPE_DIFF_EXCLUSIONS_BYTES {
+        return Err(measure_failed(format!(
+            "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: file exceeds its size limit"
+        )));
+    }
+    Ok(source)
+}
+
+fn validate_exclusion_pattern(pattern: &str, index: usize) -> Result<(), ScopeDiffMeasureError> {
+    if pattern.trim().is_empty()
+        || pattern.contains('\0')
+        || pattern.starts_with('/')
+        || pattern.starts_with(':')
+        || pattern.split('/').any(|component| component == "..")
+    {
+        return Err(measure_failed(format!(
+            "load {SCOPE_DIFF_EXCLUSIONS_CONFIG}: invalid exclusion pattern at index {index}"
+        )));
+    }
+    Ok(())
+}
 
 /// Counts an untracked file's whole length as additions.
 pub(super) fn untracked_paths(output: &[u8]) -> Result<Vec<FilePath>, ScopeDiffMeasureError> {
+    // Git reports an untracked directory, including a nested repository, as a
+    // single path ending in `/`. It cannot be a reviewable file, so skip this
+    // structural entry before path decoding; other records keep their normal
+    // validation and fail-closed filesystem handling.
     output
         .split(|byte| *byte == b'\0')
-        .filter(|raw_path| !raw_path.is_empty())
+        .filter(|raw_path| !raw_path.is_empty() && !raw_path.ends_with(b"/"))
         .map(file_path_bytes)
         .collect()
-}
-
-/// Builds matchers for the directory prefixes represented by the exclusion
-/// pathspecs. Keeping the prefixes derived from [`IGNORED_NON_REVIEW_PATHS`]
-/// prevents the Git pathspec list and the Rust-side safety filter from drifting.
-fn ignored_non_review_path_set() -> Result<GlobSet, ScopeDiffMeasureError> {
-    let mut builder = GlobSetBuilder::new();
-    for prefix in IGNORED_NON_REVIEW_PATHS.iter().filter_map(|pathspec| {
-        pathspec
-            .strip_prefix(GIT_EXCLUDE_PATHSPEC_PREFIX)
-            .and_then(|pathspec| pathspec.strip_suffix("/**"))
-    }) {
-        for pattern in [prefix.to_owned(), format!("{prefix}/**")] {
-            let glob =
-                GlobBuilder::new(&pattern).literal_separator(true).build().map_err(|error| {
-                    measure_failed(format!("invalid ignored path pattern: {error}"))
-                })?;
-            builder.add(glob);
-        }
-    }
-    builder.build().map_err(|error| measure_failed(format!("build ignored path matcher: {error}")))
-}
-
-/// Removes entries that Git emitted despite a non-review exclusion pathspec.
-/// Trailing separators are ignored for matching because Git uses them to mark
-/// an embedded repository as a directory; they remain intact for reviewable
-/// paths so [`count_file_lines`] can fail closed on the non-regular entry.
-pub(super) fn drop_ignored_non_review_paths(
-    paths: Vec<FilePath>,
-) -> Result<Vec<FilePath>, ScopeDiffMeasureError> {
-    let ignored_paths = ignored_non_review_path_set()?;
-    Ok(paths
-        .into_iter()
-        .filter(|path| !ignored_paths.is_match(path.as_str().trim_end_matches('/')))
-        .collect())
 }
 
 /// Keeps paths that [`ReviewScopeConfig::classify`] will include in a scope.

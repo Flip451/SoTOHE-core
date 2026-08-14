@@ -21,6 +21,9 @@ pub enum CapabilityInputValidationError {
     /// The supplied model name was empty.
     #[error("model name must not be empty")]
     EmptyModelName,
+    /// The supplied custom model-provider name was empty.
+    #[error("model provider name must not be empty")]
+    EmptyModelProviderName,
     /// The supplied file path was empty.
     #[error("file path must not be empty")]
     EmptyFilePath,
@@ -68,6 +71,47 @@ impl std::fmt::Display for ProviderName {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         formatter.write_str(self.as_str())
     }
+}
+
+/// Validated technical identifier for a Codex custom model provider.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelProviderName(String);
+
+impl ModelProviderName {
+    /// Validates and wraps a custom model-provider identifier.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`CapabilityInputValidationError::EmptyModelProviderName`] when
+    /// `value` is empty or whitespace-only.
+    pub fn try_new(value: impl Into<String>) -> Result<Self, CapabilityInputValidationError> {
+        let value = value.into();
+        if value.trim().is_empty() {
+            return Err(CapabilityInputValidationError::EmptyModelProviderName);
+        }
+        Ok(Self(value))
+    }
+
+    /// Returns the validated custom model-provider identifier.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl std::fmt::Display for ModelProviderName {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str(self.as_str())
+    }
+}
+
+/// Provider binding selected by a capability profile.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CapabilityProviderBinding {
+    /// Use a standard provider adapter directly.
+    Standard(ProviderName),
+    /// Use the Codex adapter with a Codex custom model-provider identifier.
+    CodexCustom(ModelProviderName),
 }
 
 /// Validated technical model identifier for capability dispatch.

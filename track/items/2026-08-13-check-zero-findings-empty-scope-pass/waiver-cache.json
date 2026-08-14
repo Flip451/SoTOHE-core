@@ -1,0 +1,29 @@
+{
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        "entry_key": "ReviewCheckZeroFindingsOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "85136fe7a19f75a708efcdc0dd13f66ca761965ca6c95a5a742620729c2237a1",
+        "declaration_hash": "16e438adee6b67153e62df07286be892346d0be106629ed6200660dffa26ac3f",
+        "waived_reason_hash": "aad7228db50e4605f2265858e521b3347e4ada5b5194a0453fd4742fa2992983"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCheckZeroFindingsOutcome",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "commit が guarded 経路だけを通り、commit gate が review approval を要求する既存の保証を前提とし",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
+  "track_id": "2026-08-13-check-zero-findings-empty-scope-pass"
+}

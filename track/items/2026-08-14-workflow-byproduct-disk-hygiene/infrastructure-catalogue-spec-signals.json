@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "5e75ddfa7e043aa5a5e45abdcde69401daf488244c1dbd32028fa4bc7f7087bc",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "d260bda21b90994af31189f28a654a094937619a13d7dc2fc697aa8955a6870e",
+      "signal": "blue",
+      "type_name": "GitScopeDiffMeasurer"
+    }
+  ]
+}

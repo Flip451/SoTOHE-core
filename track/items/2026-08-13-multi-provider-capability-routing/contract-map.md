@@ -1,0 +1,192 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_capability_exec["usecase::capability_exec"]
+    direction TB
+  subgraph T46_usecase_usecase_CapabilityInputValidationError["capability_exec::values::CapabilityInputValidationError"]
+    direction TB
+    T46_usecase_usecase_CapabilityInputValidationError__self[CapabilityInputValidationError]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyProviderName[EmptyProviderName]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyModelName[EmptyModelName]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyModelProviderName[EmptyModelProviderName]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyFilePath[EmptyFilePath]
+    T46_usecase_usecase_CapabilityInputValidationError_InvalidFilePath[InvalidFilePath]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyTargetArtifactSet[EmptyTargetArtifactSet]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyContent[EmptyContent]
+    T46_usecase_usecase_CapabilityInputValidationError_ZeroTimeoutSeconds[ZeroTimeoutSeconds]
+  end
+  subgraph T33_usecase_usecase_CapabilityProfile["capability_exec::CapabilityProfile"]
+    direction TB
+    T33_usecase_usecase_CapabilityProfile__self[CapabilityProfile]
+  end
+  subgraph T41_usecase_usecase_CapabilityProviderBinding["capability_exec::values::CapabilityProviderBinding"]
+    direction TB
+    T41_usecase_usecase_CapabilityProviderBinding__self[CapabilityProviderBinding]
+    T41_usecase_usecase_CapabilityProviderBinding_Standard[Standard]
+    T41_usecase_usecase_CapabilityProviderBinding_CodexCustom[CodexCustom]
+  end
+  subgraph T33_usecase_usecase_ModelProviderName["capability_exec::values::ModelProviderName"]
+    direction TB
+    T33_usecase_usecase_ModelProviderName__self[ModelProviderName]
+    T33_usecase_usecase_ModelProviderName_try_new([try_new])
+    T33_usecase_usecase_ModelProviderName_as_str([as_str])
+  end
+  subgraph R37_usecase_usecase_CapabilityProfilePort["capability_exec::CapabilityProfilePort"]
+    direction TB
+    R37_usecase_usecase_CapabilityProfilePort__self[CapabilityProfilePort]
+    R37_usecase_usecase_CapabilityProfilePort_resolve([resolve])
+  end
+  subgraph R38_usecase_usecase_CapabilityProviderPort["capability_exec::CapabilityProviderPort"]
+    direction TB
+    R38_usecase_usecase_CapabilityProviderPort__self[CapabilityProviderPort]
+    R38_usecase_usecase_CapabilityProviderPort_provider([provider])
+    R38_usecase_usecase_CapabilityProviderPort_dispatch([dispatch])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_agent_profiles["infrastructure::agent_profiles"]
+    direction TB
+  subgraph T49_infrastructure_infrastructure_CapabilityConfigDto["agent_profiles::types::CapabilityConfigDto"]
+    direction TB
+    T49_infrastructure_infrastructure_CapabilityConfigDto__self[CapabilityConfigDto]
+    T49_infrastructure_infrastructure_CapabilityConfigDto_provider_binding([provider_binding])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_model([model])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_provider([fast_provider])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_model([fast_model])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_prompt_template_path([prompt_template_path])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_effort([effort])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_effort([fast_effort])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_execution_mode([execution_mode])
+  end
+  subgraph T58_infrastructure_infrastructure_CapabilityProviderBindingDto["agent_profiles::types::CapabilityProviderBindingDto"]
+    direction TB
+    T58_infrastructure_infrastructure_CapabilityProviderBindingDto__self[CapabilityProviderBindingDto]
+    T58_infrastructure_infrastructure_CapabilityProviderBindingDto_Standard[Standard]
+    T58_infrastructure_infrastructure_CapabilityProviderBindingDto_CodexCustom[CodexCustom]
+    T58_infrastructure_infrastructure_CapabilityProviderBindingDto_into_domain([into_domain])
+  end
+  subgraph T50_infrastructure_infrastructure_ModelProviderNameDto["agent_profiles::types::ModelProviderNameDto"]
+    direction TB
+    T50_infrastructure_infrastructure_ModelProviderNameDto__self[ModelProviderNameDto]
+    T50_infrastructure_infrastructure_ModelProviderNameDto_try_new([try_new])
+    T50_infrastructure_infrastructure_ModelProviderNameDto_into_domain([into_domain])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_capability_exec["infrastructure::capability_exec"]
+    direction TB
+  subgraph T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter["capability_exec::agent_profiles::AgentProfilesCapabilityAdapter"]
+    direction TB
+    T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self[AgentProfilesCapabilityAdapter]
+    T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter_new([new])
+  end
+  subgraph T52_infrastructure_infrastructure_CodexCapabilityAdapter["capability_exec::codex::CodexCapabilityAdapter"]
+    direction TB
+    T52_infrastructure_infrastructure_CodexCapabilityAdapter__self[CodexCapabilityAdapter]
+    T52_infrastructure_infrastructure_CodexCapabilityAdapter_new([new])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+end
+T33_usecase_usecase_CapabilityProfile__self --o|provider| T41_usecase_usecase_CapabilityProviderBinding__self
+T41_usecase_usecase_CapabilityProviderBinding_CodexCustom --o T33_usecase_usecase_ModelProviderName__self
+T33_usecase_usecase_ModelProviderName_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T33_usecase_usecase_ModelProviderName_try_new --> T33_usecase_usecase_ModelProviderName__self
+R37_usecase_usecase_CapabilityProfilePort_resolve --> T33_usecase_usecase_CapabilityProfile__self
+T49_infrastructure_infrastructure_CapabilityConfigDto_provider_binding --> T58_infrastructure_infrastructure_CapabilityProviderBindingDto__self
+T58_infrastructure_infrastructure_CapabilityProviderBindingDto_CodexCustom --o T50_infrastructure_infrastructure_ModelProviderNameDto__self
+T58_infrastructure_infrastructure_CapabilityProviderBindingDto_into_domain --> T41_usecase_usecase_CapabilityProviderBinding__self
+T50_infrastructure_infrastructure_ModelProviderNameDto_try_new --> T50_infrastructure_infrastructure_ModelProviderNameDto__self
+T50_infrastructure_infrastructure_ModelProviderNameDto_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T50_infrastructure_infrastructure_ModelProviderNameDto_into_domain --> T33_usecase_usecase_ModelProviderName__self
+T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter_new --> T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self
+T52_infrastructure_infrastructure_CodexCapabilityAdapter_new --> T52_infrastructure_infrastructure_CodexCapabilityAdapter__self
+T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self -.impl.-> R37_usecase_usecase_CapabilityProfilePort__self
+T52_infrastructure_infrastructure_CodexCapabilityAdapter__self -.impl.-> R38_usecase_usecase_CapabilityProviderPort__self
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyProviderName variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyModelName variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyModelProviderName variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyFilePath variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_InvalidFilePath variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyTargetArtifactSet variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyContent variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_ZeroTimeoutSeconds variant_node
+class T46_usecase_usecase_CapabilityInputValidationError__self error_type
+class T33_usecase_usecase_CapabilityProfile__self dto
+class T41_usecase_usecase_CapabilityProviderBinding_Standard variant_node
+class T41_usecase_usecase_CapabilityProviderBinding_CodexCustom variant_node
+class T41_usecase_usecase_CapabilityProviderBinding__self value_object
+class T33_usecase_usecase_ModelProviderName_try_new method_node
+class T33_usecase_usecase_ModelProviderName_as_str method_node
+class T33_usecase_usecase_ModelProviderName__self value_object
+class R37_usecase_usecase_CapabilityProfilePort_resolve method_node
+class R37_usecase_usecase_CapabilityProfilePort__self secondary_port
+class R38_usecase_usecase_CapabilityProviderPort_provider method_node
+class R38_usecase_usecase_CapabilityProviderPort_dispatch method_node
+class R38_usecase_usecase_CapabilityProviderPort__self secondary_port
+class T49_infrastructure_infrastructure_CapabilityConfigDto_provider_binding method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_model method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_provider method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_model method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_prompt_template_path method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_effort method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_effort method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_execution_mode method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto__self dto
+class T58_infrastructure_infrastructure_CapabilityProviderBindingDto_Standard variant_node
+class T58_infrastructure_infrastructure_CapabilityProviderBindingDto_CodexCustom variant_node
+class T58_infrastructure_infrastructure_CapabilityProviderBindingDto_into_domain method_node
+class T58_infrastructure_infrastructure_CapabilityProviderBindingDto__self dto
+class T50_infrastructure_infrastructure_ModelProviderNameDto_try_new method_node
+class T50_infrastructure_infrastructure_ModelProviderNameDto_into_domain method_node
+class T50_infrastructure_infrastructure_ModelProviderNameDto__self dto
+class T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter_new method_node
+class T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self secondary_adapter
+class T52_infrastructure_infrastructure_CodexCapabilityAdapter_new method_node
+class T52_infrastructure_infrastructure_CodexCapabilityAdapter__self secondary_adapter
+```

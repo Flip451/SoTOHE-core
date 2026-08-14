@@ -1,0 +1,417 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "docs": "Constructor surface for ModelProviderName; transient unvalidated text input, not a stored state slot; reachable error variant: CapabilityInputValidationError::EmptyModelProviderName (IN-01, AC-01, CN-01).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "docs": "Read-only &str projection surface for ModelProviderName (IN-01, AC-01, CN-01).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ModelProviderName"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ModelProviderName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ModelProviderName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ModelProviderName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ModelProviderName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ModelProviderName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityProfile",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityProviderBinding",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityProviderBinding",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityProviderBinding",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityProviderBinding",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "CapabilityProfilePort": {
+      "action": "reference",
+      "docs": "Baseline-identical secondary port for resolving a typed capability profile.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&CapabilityName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityProfile, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "CapabilityProviderPort": {
+      "action": "reference",
+      "docs": "Baseline-identical secondary port implemented by provider-native dispatch adapters.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "params": [
+            {
+              "name": "request",
+              "ty": "&CapabilityDispatchRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityDispatchOutcome, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CapabilityInputValidationError": {
+      "action": "modify",
+      "docs": "Adds the EmptyModelProviderName variant to CapabilityInputValidationError (IN-01, AC-01, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyProviderName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyModelName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyModelProviderName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyTargetArtifactSet",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyContent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ZeroTimeoutSeconds",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec::values",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    },
+    "CapabilityProfile": {
+      "action": "modify",
+      "docs": "Changes the provider field type from ProviderName to CapabilityProviderBinding (IN-01, IN-02, AC-01, AC-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "provider",
+              "ty": "CapabilityProviderBinding"
+            },
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "ReasoningEffort"
+            },
+            {
+              "name": "execution_mode",
+              "ty": "ExecutionMode"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    },
+    "CapabilityProviderBinding": {
+      "action": "add",
+      "docs": "Adds the CapabilityProviderBinding enum with Standard(ProviderName) and CodexCustom(ModelProviderName) variants (IN-01, IN-02, AC-01, AC-02, CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Standard",
+            "payload": {
+              "fields": [
+                "ProviderName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CodexCustom",
+            "payload": {
+              "fields": [
+                "ModelProviderName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec::values",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    },
+    "ModelProviderName": {
+      "action": "add",
+      "docs": "Usecase-layer validated technical identifier for a Codex custom model provider; it is application routing vocabulary, not a domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec::values",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-multi-provider-capability-routing/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "ReviewCheckZeroFindingsOutcome": {
+      "action": "modify",
+      "docs": "Adds `EmptyScope` to the check-zero-findings application-boundary outcome DTO (IN-01, AC-01, AC-02, AC-03, CN-01, CN-02, CN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CurrentFinalZeroFindings",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyScope",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "MissingFinalVerdict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "StaleFinalVerdict",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FindingsRemain",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::check_zero_findings",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-13-check-zero-findings-empty-scope-pass/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ReviewCheckZeroFindingsOutcome",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ]
+}

@@ -1,0 +1,465 @@
+{
+  "entries": [
+    {
+      "claim_hash": "da8fff33f056929f31cae8a2afe257800b6096b1f6cde8f2e562428af436c56f",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Eliminate the workflow failures and disk-pressure recurrence caused by untracked nested repositories and template-export test scaffolds, while preserving the production template-export contract."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "帰結として、**計測除外の新変種はコード変更なしに config 編集で対応可能**になり、「変種が見つかるたびに実装 track を切る」という再発パターン自体が消える。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "da8fff33f056929f31cae8a2afe257800b6096b1f6cde8f2e562428af436c56f",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Eliminate the workflow failures and disk-pressure recurrence caused by untracked nested repositories and template-export test scaffolds, while preserving the production template-export contract."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "scaffold を書き出すテスト（integration / in-process の両方）は、`tempfile::tempdir()` による `/tmp` 直下ではなく、cargo が統合テスト向けに提供する `CARGO_TARGET_TMPDIR`（`target/tmp/`）配下に一時ディレクトリを作る。取り残しが発生しても `cargo clean` および `sotp maintenance` の清掃対象に含まれ、共有領域 `/tmp` を汚さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ce90898a8d6c9b180ab26d0ca632b77fd347362f73a15016807e623a6d43b325",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Replace the hardcoded scope-diff exclusion set with an operator-owned configuration under `.harness/config/`; load it for untracked-path enumeration as top-level git exclusion pathspecs. The shipped configuration includes the current exclusions plus `.cache/**`, `tmp/**`, `libs/**/tmp/**`, and `apps/**/tmp/**`."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ソースにハードコードされた除外配列（`IGNORED_NON_REVIEW_PATHS`、現行 32 エントリ）を廃止し、`.harness/config/` 配下の計測除外 config（ファイル名は実装時に確定）へ移す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "90ec10c853d50fceb499177cdfbfa74407453642d9578846a68364ee699faf80",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Exclude trailing-`/` directory entries reported by `git ls-files --others` from the untracked measurement set, while retaining existing fail-closed handling for other non-regular filesystem entries."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`untracked_paths` の解析で、git が末尾 `/` で報告するエントリ（ネストした git リポジトリ）を untracked 集合から除外する。… fail-closed 原則（symlink 等の非通常ファイルをエラーとする既存挙動）は維持したまま、このケースのみを既知の非対象として静かにスキップする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "12903a48c38b305371a927456139dbfe90cab6dc1c03048f998100e248db0a44",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Place template-export test scaffolds under `CARGO_TARGET_TMPDIR` when it is available, with a defined fallback for test invocation paths where that environment variable is absent."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "scaffold を書き出すテスト（integration / in-process の両方）は、`tempfile::tempdir()` による `/tmp` 直下ではなく、cargo が統合テスト向けに提供する `CARGO_TARGET_TMPDIR`（`target/tmp/`）配下に一時ディレクトリを作る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fdf3a05f8c85382def4392a69240b39c29dc9310e8509d57429354890dbfffc7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "Remove the process-lifetime `static OnceLock<TempDir>` sharing pattern from `consumer_scaffold_host_first.rs` so its scaffold lifecycle no longer bypasses cleanup."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`consumer_scaffold_host_first.rs` の `static EXPORTED_SCAFFOLD: OnceLock<TempDir>` は Drop が実行されない構造的リークであるため廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f2b48e5d20cd30863bebe5208af9aa28f643daf294e6a0ebc39147fbe6f29d73",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Use a same-filesystem hard link for the test-path transplant of `bin/sotp`, retaining byte-identity verification for the transplanted binary."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テストが transplant する `bin/sotp` は、フルコピーではなく同一ファイルシステム内のハードリンクとして作成する。byte-identical 検証（既存テストの assert）はハードリンクでも成立する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fc1f41adfbaad69b49769588d3d7bd9ce28c295be61afd036c6f0db56c56d815",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "Changing the production template-export behavior, output artifacts, or its binary-copy transplant mechanism."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本番経路（実 `sotp` からの export）の複製方式は本決定の対象外とし、現行のコピーを維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "561bc7cebee83724dabeedc1a280650dc765aa84532da2a525e138e801601876",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "Treating periodic `/tmp` cleanup as the permanent remediation for the scaffold leak."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "取り残しが発生しても `cargo clean` および `sotp maintenance` の清掃対象に含まれ、共有領域 `/tmp` を汚さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b64bc594fe40bbf3b011194fe03d6c20b4566a3bf7ae6ccce1a0a7ce183f8de9",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The scope-diff exclusion configuration is mandatory and fail-closed: absent, invalid, or empty configuration is a hard error rather than an implicit fallback to a partial or hardcoded policy."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "config の fail-closed 検証（不在・不正・空は hard error — 既存の必須 config 群と同じ規律）",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "690413fa7c289fc779ebc77cbf5f5b7199eb3716ea445d430dda42469005028f",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "The directory-entry exception is structural and non-configurable; it must not relax fail-closed behavior for symlinks or other non-regular files."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D2 は mechanism 側の構造規則であり config 化しない（「ネスト repo は計測対象になり得ない」は選好ではなく事実であるため）。… fail-closed 原則（symlink 等の非通常ファイルをエラーとする既存挙動）は維持したまま、このケースのみを既知の非対象として静かにスキップする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d67d079f1f74582e31b9f11d4ece8105a55fc6c4255535b034952f76ad79395f",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "Test scaffold placement must keep retained artifacts within a cargo-cleanable or `sotp maintenance`-cleanable location instead of the shared `/tmp` area."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "取り残しが発生しても `cargo clean` および `sotp maintenance` の清掃対象に含まれ、共有領域 `/tmp` を汚さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c0e31369b220adf57ee18212ac46c74d86332a1f51bcb9568b51d6c69391797a",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "The hard-link optimization is limited to the test transplant path and must preserve the existing byte-identical assertion; production export continues to copy its binary."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テストが transplant する `bin/sotp` は、フルコピーではなく同一ファイルシステム内のハードリンクとして作成する。… byte-identical 検証（既存テストの assert）はハードリンクでも成立する。本番経路（実 `sotp` からの export）の複製方式は本決定の対象外とし、現行のコピーを維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8e928124849e74c9875d433fa81fb0225c59248dc2ee8090727c874aecc8ab16",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "With a valid shipped scope-diff configuration, untracked enumeration excludes the configured patterns, including `.cache/**`, `tmp/**`, `libs/**/tmp/**`, and `apps/**/tmp/**`, without relying on a hardcoded exclusion array."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ソースにハードコードされた除外配列（`IGNORED_NON_REVIEW_PATHS`、現行 32 エントリ）を廃止し、`.harness/config/` 配下の計測除外 config（ファイル名は実装時に確定）へ移す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "396036bc651cfe27070f03cde54c384541ea331871897da7f128b8667e400549",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "A missing, malformed, or empty scope-diff configuration causes measurement to fail with a hard error; it never silently proceeds with an incomplete exclusion policy."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "config の fail-closed 検証（不在・不正・空は hard error — 既存の必須 config 群と同じ規律）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8dcb24bdca09e92ad28c780cf14c839df5cd01efb5e742af5399599d21a78b1a",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "When untracked enumeration reports a trailing-`/` nested-repository entry, scope-diff measurement completes without attempting to count that directory; an encountered symlink or other unsupported non-regular file still fails closed."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "ネストした git リポジトリを untracked 集合から除外する。ネストした git リポジトリがレビュー対象ソースであることはあり得ないため、fail-closed 原則（symlink 等の非通常ファイルをエラーとする既存挙動）は維持したまま、このケースのみを既知の非対象として静かにスキップする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1a803033e00d16cb4aa61a3a49cf3c1160a24d0c740ed63621d499f8bab49f58",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Template-export integration and in-process tests create scaffolds beneath `CARGO_TARGET_TMPDIR` when cargo supplies it, and remain runnable through an invocation path where the variable is not defined."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "scaffold を書き出すテスト（integration / in-process の両方）は、`tempfile::tempdir()` による `/tmp` 直下ではなく、cargo が統合テスト向けに提供する `CARGO_TARGET_TMPDIR`（`target/tmp/`）配下に一時ディレクトリを作る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ece0e3b8d92225414b470730975421ad37269cb93233d1ca8662977494dbfd72",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "The host-first consumer scaffold tests no longer retain a `TempDir` in static process-lifetime storage, and their scaffold lifecycle permits cleanup after test use."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`consumer_scaffold_host_first.rs` の `static EXPORTED_SCAFFOLD: OnceLock<TempDir>` は Drop が実行されない構造的リークであるため廃止する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3c7de22a8daaa69a041cd0533466158d1a884f381164be1e2db77a17adf7177b",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "The test-path binary transplant uses a same-filesystem hard link and the resulting target remains byte-identical to its source."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "テストが transplant する `bin/sotp` は、フルコピーではなく同一ファイルシステム内のハードリンクとして作成する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1200f546c8832e894fb1052eec764a5fa54eb02ad509e0433649502a7152401d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "Production template export continues to copy its binary and produces the same production export behavior and artifacts as before this track."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "8e5d937ff043fec22d0fcb4953faaaec687d3db957c542e39aef3c63ed8be7a6",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0643-workflow-byproduct-disk-hygiene.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本番経路（実 `sotp` からの export）の複製方式は本決定の対象外とし、現行のコピーを維持する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

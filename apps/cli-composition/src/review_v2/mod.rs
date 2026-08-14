@@ -1151,7 +1151,7 @@ exit 0
     }
 
     #[test]
-    fn test_check_zero_findings_interactor_empty_scope_returns_missing_final_verdict() {
+    fn test_check_zero_findings_interactor_empty_scope_returns_empty_scope_success() {
         use usecase::review_v2::{
             ReviewCheckZeroFindingsInteractor, ReviewCheckZeroFindingsOutcome,
             ReviewCheckZeroFindingsService as _,
@@ -1174,8 +1174,25 @@ exit 0
 
         assert_eq!(
             interactor.check_zero_findings(&query).unwrap(),
-            ReviewCheckZeroFindingsOutcome::MissingFinalVerdict
+            ReviewCheckZeroFindingsOutcome::EmptyScope
         );
+
+        let empty_scope_input = ReviewCheckZeroFindingsInput::try_new(
+            repo.items_dir.clone(),
+            repo.track_id.clone(),
+            "empty_scope".to_owned(),
+            ReviewCheckRoundSelect::Final,
+        )
+        .expect("valid empty-scope fixture input");
+        let command_outcome = ReviewCompositionRoot::new()
+            .review_driver()
+            .handle(ReviewInput::CheckZeroFindings(empty_scope_input));
+
+        assert_eq!(command_outcome.exit_code, 0, "{command_outcome:?}");
+        assert!(command_outcome.stdout.as_deref().is_some_and(|message| {
+            message.contains("empty") && message.contains("no final review verdict is required")
+        }));
+        assert!(command_outcome.stderr.is_none());
     }
 
     #[cfg(unix)]
