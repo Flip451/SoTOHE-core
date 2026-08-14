@@ -157,6 +157,57 @@
           "hash": "rvw1:sha256:8d66e7ee4389c75f48cae0e3bd6d6e2856173fe823397b7406ad641991054c75",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:48:46Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 4067,
+              "message": "The lint test can pass even if `evaluate_catalogue_lint` silently skips `MethodDeclaration` (or returns no violations): all selected rules are expected to produce zero violations, and the test only asserts `violations.is_empty()`. Add a sentinel case or otherwise assert that the entry was actually evaluated so GO-02/IN-05/AC-06 are genuinely covered.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eadf2552b123eec6ee72403fdd1c801c08611c62f379a8c9d13c597100e2a12b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T11:55:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77a1e4bcc3d9cc5ad55eff98a3370d8b7332d538fb3f9e7f87e1d73c9ed80bd6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:01:28Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 4016,
+              "message": "The test's hard-coded `rules` vector does not represent all catalogue-lint rules currently applicable to a `ValueObject`. It omits `TraitImplRequired`, `NoRoleInMethodSignature`, `KindLayerConstraint`, `MethodReferenceSignature`, and `ForbiddenMethodReceiver`; notably, the fixture declares no `PartialEq`/`Eq` trait implementations, yet still passes because `TraitImplRequired` is absent. Consequently this test can remain green while the declared `MethodDeclaration` fails an active rule, so it does not substantiate the GO-02/IN-05 conformance bindings. Exercise the complete applicable rule set and mirror the active trait implementations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:77a1e4bcc3d9cc5ad55eff98a3370d8b7332d538fb3f9e7f87e1d73c9ed80bd6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:24:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7e03a1448580b14666cd34cf8351bd9e5d62eb1022abc76f8d1d2ae5648af911",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:28:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7e03a1448580b14666cd34cf8351bd9e5d62eb1022abc76f8d1d2ae5648af911",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -638,6 +689,34 @@
           "hash": "rvw1:sha256:d527c5da95dbdbc5b2dbd082cf887b36b1d89052074893fa3303a5acf169d7da",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:47:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:084311311177dbe06a8d60079b33a98cb6bb4523c20b88fa0edeb0363c900ac3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:53:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:084311311177dbe06a8d60079b33a98cb6bb4523c20b88fa0edeb0363c900ac3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:24:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5e0130575fd48de736e4d25e18df350eb3c1db6bf454dc11d93079bdb0e92ba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:28:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5e0130575fd48de736e4d25e18df350eb3c1db6bf454dc11d93079bdb0e92ba",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -685,6 +764,20 @@
           "hash": "rvw1:sha256:6a265882a6cb02e898681c8447afdb1d06a50a824d3a372277c39e2e67739346",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:24:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f423065b0935070226552ec2e7530f5ddc630e7e28cb25a261f778b923ac04e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:28:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f423065b0935070226552ec2e7530f5ddc630e7e28cb25a261f778b923ac04e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -701,6 +794,187 @@
           "at": "2026-08-14T05:47:36Z",
           "findings": [],
           "hash": "rvw1:sha256:e7f2586e56f0e9dd0557cf778da314423738c87f3e274e2792355090787d7b01",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:48:42Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 5,
+              "message": "The bindings for GO-01, IN-01, and AC-01 cite only constructor/accessor tests that show two MethodDeclaration values retain different spec_refs. They do not exercise catalogue obligation extraction, method-scoped ownership, or fulfillment/verifier behavior, so they cannot establish the broader ownership and gate promises of these anchors. Bind an integration test covering actual trait_method obligation ownership and method-relevant fulfillment, or narrow/waive these bindings.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 117,
+              "message": "AC-03 is bound only to an empty-spec_refs accessor assertion. That demonstrates the field is empty, but not the anchor's additional compatibility promise that an existing catalogue remains valid without new method-level declarations. The binding should include an existing-catalogue compatibility test or be converted to a justified waiver.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:22356382aa7e7619b5a73ae49395ffa9b34cbc744267bb011a9b0917f4bea282",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:09:18Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 5,
+              "message": "GO-01's waiver is not justified: the ownership and fulfillment promise is cross-entry, but it is still testable by an integration test bound to MethodDeclaration. The reason incorrectly limits evidence to constructor/accessor tests and defers the behavior to later tasks. Add a catalogue/obligation-pipeline binding or narrow the anchor.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 33,
+              "message": "IN-01's waiver incorrectly treats cross-entry ownership as inherently unverifiable. A catalogue-level test can verify that distinct trait_method obligations receive their declared method-specific anchors, so this should be bound to such evidence rather than waived.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 44,
+              "message": "IN-02's waiver is not supported: subset and full-coverage rejection are explicitly structural validation behavior and can be tested with a multi-method catalogue fixture. The absence of a constructor-local validation path does not establish that no bound test can verify the promise.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 72,
+              "message": "AC-01's waiver improperly defers the active-catalogue multi-method ownership behavior to later tasks. Since AC-03 is already bound to an infrastructure integration test, the same kind of catalogue-level test can verify AC-01; this is not an inherently unverifiable promise.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 83,
+              "message": "AC-02's waiver is not justified. Unknown-anchor and incomplete-coverage rejection are observable structural-validation outcomes and should be covered by tests using invalid multi-method catalogue declarations; saying MethodDeclaration itself lacks the validation path is insufficient.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 128,
+              "message": "CN-01's waiver incorrectly classifies the required completeness, subset, and coverage invariants as untestable merely because they span entries. A catalogue-level test can directly verify those invariants and should be bound to this anchor.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 139,
+              "message": "CN-02's waiver is too broad: active-only and non-retroactive behavior is a catalogue lifecycle rule, but it remains observable and testable with active and legacy catalogue fixtures. The binding record already demonstrates that tests outside the constructor module may be bound to this entry.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b6227113cf134ba20efceb713bfbc2aa7826af05f0d320e27bfd89e415a36806",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:24:43Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 39,
+              "message": "AC-02 remains incorrectly waived. Unknown-anchor and incomplete-coverage rejection are observable catalogue-level behavior, and an integration test can be bound to MethodDeclaration even though the constructor lacks the validation path. The reason does not establish that no test could verify the promise.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 84,
+              "message": "CN-01 remains incorrectly waived. Completeness, subset, and cross-method coverage are explicitly testable structural invariants; the fact that they span entries does not make them unverifiable. Bind a catalogue-level invariant test or reassign the edge to the task implementing that validation.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 95,
+              "message": "CN-02 remains incorrectly waived. Active-only and non-retroactive behavior can be verified with active and legacy catalogue fixtures. Its lifecycle scope explains where the test belongs, but not why no test bound to this entry could verify the promise.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a9271453c298b1453e5ce5d14f75740881ca097eaef54de85fec7a4c947748fb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:26:40Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 39,
+              "message": "The AC-03 binding is incomplete. The cited codec test proves that omitted method-level spec_refs decode as empty and remain round-trippable, but it does not verify the anchor's behavioral promise that the resulting trait_method obligation owns no anchors. Bind an obligation-derivation test when that behavior is implemented, or leave AC-03 unbound with the corresponding task attribution.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c4fe381164b9d474cf6a304375c455282a687a9949870542c0620d868909b90",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:27:31Z",
+          "findings": [
+            {
+              "category": "traceability",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 3,
+              "message": "The current record set silently drops AC-02, AC-03, CN-01, and CN-02 in addition to the four edges explicitly reassigned to T4. The briefing only authorizes removal of GO-01, IN-01, IN-02, and AC-01 and explicitly says AC-03 plus the remaining waivers should remain represented. Preserve those bindings/waivers or document and attribute their reassignment; otherwise the entry's owed edges are not traceable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:994661c4996f6ee01cdf12f82fc24704a154f35c50699d511871bd9a77b12c19",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:34:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6c4fe381164b9d474cf6a304375c455282a687a9949870542c0620d868909b90",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:39:12Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 17,
+              "message": "The GO-02, IN-05, and AC-06 bindings cite a test that loads the active lint rules but manually constructs a separate `MethodDeclaration` fixture. It never reads or compares the actual active catalogue entry, so the three promises can regress while this evidence remains green. Bind these edges to a test that lints the real declared entry or proves the fixture cannot drift from it.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 51,
+              "message": "AC-03 is only bound to a codec compatibility test. That test proves omitted method-level `spec_refs` remain decodable and round-trippable, but it never derives a `trait_method` obligation or verifies that an unassigned method owns no anchors, which is also required by AC-03. Add ownership evidence after T4 or leave this edge unresolved in the todo lane.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 85,
+              "message": "The CN-05 test only verifies that `MethodDeclaration::new` and its accessors preserve supplied values. It does not exercise the lint-compliance remediation or compare the active catalogue declaration's method signatures and metadata, so the catalogue can drop or alter the contract information named by CN-05 without failing this test. Bind CN-05 to evidence covering the remediated declaration itself.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c4fe381164b9d474cf6a304375c455282a687a9949870542c0620d868909b90",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:41:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b79495ba41beb8ff4b41cdb7697b63bcaa240057107da0d2bd003ce833693fc3",
           "type": "final",
           "verdict": "zero_findings"
         }

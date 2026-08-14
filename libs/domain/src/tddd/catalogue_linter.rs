@@ -3929,6 +3929,429 @@ mod tests {
         assert!(violations[0].message().contains("public"));
     }
 
+    const ACTIVE_CATALOGUE_LINT_CONFIG: &str =
+        include_str!("../../../../.harness/catalogue-lint/config.json");
+
+    fn config_field<'a>(value: &'a serde_json::Value, field: &str) -> &'a serde_json::Value {
+        value.get(field).unwrap_or_else(|| {
+            panic!("active catalogue-lint config entry is missing `{field}`: {value:?}")
+        })
+    }
+
+    fn config_array<'a>(value: &'a serde_json::Value, field: &str) -> &'a [serde_json::Value] {
+        config_field(value, field).as_array().unwrap_or_else(|| {
+            panic!("active catalogue-lint config field `{field}` must be an array: {value:?}")
+        })
+    }
+
+    fn config_string<'a>(value: &'a serde_json::Value, context: &str) -> &'a str {
+        value.as_str().unwrap_or_else(|| {
+            panic!("active catalogue-lint config `{context}` must be a string: {value:?}")
+        })
+    }
+
+    fn configured_non_empty<T, F>(
+        values: &[serde_json::Value],
+        context: &str,
+        parse: F,
+    ) -> NonEmptyVec<T>
+    where
+        F: Fn(&serde_json::Value) -> T,
+    {
+        let mut parsed = values.iter().map(parse);
+        let first = parsed.next().unwrap_or_else(|| {
+            panic!("active catalogue-lint config `{context}` must not be empty")
+        });
+        NonEmptyVec::new(first, parsed.collect())
+    }
+
+    fn configured_role(value: &serde_json::Value, context: &str) -> RoleKind {
+        let name = config_string(value, context);
+        RoleKind::all()
+            .iter()
+            .copied()
+            .find(|role| role.variant_name() == name)
+            .unwrap_or_else(|| panic!("active catalogue-lint config has unknown role `{name}`"))
+    }
+
+    fn configured_roles(values: &[serde_json::Value], context: &str) -> Vec<RoleKind> {
+        values.iter().map(|value| configured_role(value, context)).collect()
+    }
+
+    fn configured_role_payload_field(value: &serde_json::Value) -> RolePayloadField {
+        match config_string(value, "target_field") {
+            "invariants" => RolePayloadField::Invariants,
+            "identity" => RolePayloadField::Identity,
+            "exclusive_members" => RolePayloadField::ExclusiveMembers,
+            "shared_value_objects" => RolePayloadField::SharedValueObjects,
+            "emits" => RolePayloadField::Emits,
+            "handles" => RolePayloadField::Handles,
+            "reacts_to" => RolePayloadField::ReactsTo,
+            "aggregate" => RolePayloadField::Aggregate,
+            field => panic!("active catalogue-lint config has unknown target field `{field}`"),
+        }
+    }
+
+    fn configured_type_refs(values: &[serde_json::Value], context: &str) -> NonEmptyVec<TypeRef> {
+        configured_non_empty(values, context, |value| {
+            let text = config_string(value, context);
+            TypeRef::new(text).unwrap_or_else(|error| {
+                panic!("active catalogue-lint config has invalid {context} `{text}`: {error:?}")
+            })
+        })
+    }
+
+    fn configured_layers(values: &[serde_json::Value], context: &str) -> NonEmptyVec<LayerId> {
+        configured_non_empty(values, context, |value| layer(config_string(value, context)))
+    }
+
+    fn configured_primitives(
+        values: &[serde_json::Value],
+        context: &str,
+    ) -> NonEmptyVec<PrimitiveName> {
+        configured_non_empty(values, context, |value| {
+            let text = config_string(value, context);
+            PrimitiveName::new(text).unwrap_or_else(|error| {
+                panic!("active catalogue-lint config has invalid {context} `{text}`: {error:?}")
+            })
+        })
+    }
+
+    fn configured_positions(
+        values: &[serde_json::Value],
+        context: &str,
+    ) -> NonEmptyVec<PrimitiveOccurrencePosition> {
+        configured_non_empty(values, context, |value| match config_string(value, context) {
+            "named_field" => PrimitiveOccurrencePosition::NamedField,
+            "variant_field" => PrimitiveOccurrencePosition::VariantField,
+            "param" => PrimitiveOccurrencePosition::Param,
+            "return" => PrimitiveOccurrencePosition::Return,
+            "bound" => PrimitiveOccurrencePosition::Bound,
+            "type_alias_target" => PrimitiveOccurrencePosition::TypeAliasTarget,
+            "result_err" => PrimitiveOccurrencePosition::ResultErr,
+            position => {
+                panic!("active catalogue-lint config has unknown primitive position `{position}`")
+            }
+        })
+    }
+
+    fn configured_rule_kind(kind: &serde_json::Value) -> CatalogueLinterRuleKind {
+        let (name, payload) = match kind {
+            serde_json::Value::String(name) if name == "NoPublicField" => {
+                return CatalogueLinterRuleKind::NoPublicField;
+            }
+            serde_json::Value::Object(fields) if fields.len() == 1 => {
+                fields.iter().next().unwrap_or_else(|| {
+                    panic!("a single-entry lint rule object must contain its rule kind")
+                })
+            }
+            serde_json::Value::String(name) => {
+                panic!("unsupported active ValueObject catalogue-lint rule `{name}`")
+            }
+            other => panic!("active catalogue-lint rule kind has invalid shape: {other:?}"),
+        };
+
+        match name.as_str() {
+            "MethodReferenceSignature" => CatalogueLinterRuleKind::MethodReferenceSignature {
+                target_field: configured_role_payload_field(config_field(payload, "target_field")),
+            },
+            "TraitImplRequired" => CatalogueLinterRuleKind::TraitImplRequired {
+                required_traits: configured_type_refs(
+                    config_array(payload, "required_traits"),
+                    "required_traits",
+                ),
+            },
+            "NoRoleInMethodSignature" => CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: configured_non_empty(
+                    config_array(payload, "forbidden_roles"),
+                    "forbidden_roles",
+                    |value| configured_role(value, "forbidden_roles"),
+                ),
+            },
+            "KindLayerConstraint" => CatalogueLinterRuleKind::KindLayerConstraint {
+                permitted_layers: configured_layers(
+                    config_array(payload, "permitted_layers"),
+                    "permitted_layers",
+                ),
+            },
+            "ForbiddenMethodReceiver" => CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                forbidden_receiver: config_string(
+                    config_field(payload, "forbidden_receiver"),
+                    "forbidden_receiver",
+                )
+                .parse()
+                .unwrap_or_else(|error| {
+                    panic!("active catalogue-lint config has invalid receiver: {error:?}")
+                }),
+            },
+            "ForbidPrimitiveInTypes" => CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                primitives: configured_primitives(
+                    config_array(payload, "primitives"),
+                    "primitives",
+                ),
+                layers: configured_layers(config_array(payload, "layers"), "layers"),
+                positions: configured_positions(config_array(payload, "positions"), "positions"),
+            },
+            other => panic!(
+                "unsupported active ValueObject catalogue-lint rule `{other}`; add its test translation"
+            ),
+        }
+    }
+
+    fn configured_value_object_rules() -> Vec<CatalogueLinterRule> {
+        let config: serde_json::Value = serde_json::from_str(ACTIVE_CATALOGUE_LINT_CONFIG)
+            .unwrap_or_else(|error| {
+                panic!("active catalogue-lint config must be valid JSON: {error:?}")
+            });
+        let mut rules = Vec::new();
+        for spec in config_array(&config, "rules") {
+            let target_roles = config_array(spec, "target_roles");
+            let applies_to_value_object = target_roles.is_empty()
+                || target_roles.iter().any(|role| {
+                    config_string(role, "target_roles") == RoleKind::ValueObject.variant_name()
+                });
+            if !applies_to_value_object {
+                continue;
+            }
+
+            let target = RuleTarget::new(configured_roles(target_roles, "target_roles"));
+            let kind = configured_rule_kind(config_field(spec, "kind"));
+            rules.push(CatalogueLinterRule::new(target, kind).unwrap_or_else(|error| {
+                panic!("active ValueObject catalogue-lint rule must be valid: {error:?}")
+            }));
+        }
+        assert!(
+            !rules.is_empty(),
+            "active catalogue-lint config must declare at least one ValueObject rule"
+        );
+        rules
+    }
+
+    #[test]
+    fn test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules() {
+        // Mirror the active domain catalogue declaration: MethodDeclaration is
+        // a modified ValueObject with a stripped plain shape, so the linter
+        // must inspect the declaration rather than silently skipping it.
+        let mut domain_doc = make_doc("domain");
+        let methods = vec![
+            method_with_params(
+                "new",
+                None,
+                vec![
+                    ("name", "MethodName"),
+                    ("receiver", "Option<SelfReceiver>"),
+                    ("params", "Vec<ParamDeclaration>"),
+                    ("returns", "TypeRef"),
+                    ("is_async", "bool"),
+                    ("has_default_impl", "bool"),
+                    ("generics", "Vec<MethodGenericParam>"),
+                    ("where_predicates", "Vec<WherePredicateDecl>"),
+                    ("spec_refs", "Vec<SpecRef>"),
+                    ("docs", "Option<DocString>"),
+                ],
+                "Self",
+            ),
+            method_with_params(
+                "associated_function",
+                None,
+                vec![
+                    ("name", "MethodName"),
+                    ("params", "Vec<ParamDeclaration>"),
+                    ("returns", "TypeRef"),
+                ],
+                "Self",
+            ),
+            method_shared_ref_no_params("name", "&MethodName"),
+            method_shared_ref_no_params("receiver", "Option<SelfReceiver>"),
+            method_shared_ref_no_params("params", "&[ParamDeclaration]"),
+            method_shared_ref_no_params("returns", "&TypeRef"),
+            method_shared_ref_no_params("is_async", "bool"),
+            method_shared_ref_no_params("has_default_impl", "bool"),
+            method_shared_ref_no_params("generics", "&[MethodGenericParam]"),
+            method_shared_ref_no_params("where_predicates", "&[WherePredicateDecl]"),
+            method_shared_ref_no_params("spec_refs", "&[SpecRef]"),
+            method_shared_ref_no_params("docs", "Option<&DocString>"),
+            method_shared_ref_no_params("signature_string", "String"),
+        ];
+        domain_doc.insert_type(
+            TypeName::new("MethodDeclaration").unwrap(),
+            TypeEntry::new(
+                ItemAction::Modify,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: true },
+                    None,
+                )),
+                methods,
+                vec![],
+                vec![],
+                ModulePath::root(),
+                Some(crate::tddd::catalogue_v2::identifiers::DocString::new(
+                    "Modified MethodDeclaration surface.".to_owned(),
+                )),
+                vec![],
+                vec![],
+            ),
+        );
+        for (trait_ref, for_type) in [
+            ("core::fmt::Debug", "MethodDeclaration"),
+            ("core::clone::Clone", "MethodDeclaration"),
+            ("core::cmp::PartialEq", "MethodDeclaration"),
+            ("core::cmp::Eq", "MethodDeclaration"),
+        ] {
+            domain_doc.push_trait_impl(TraitImplDeclV2::new(
+                TypeRef::new(trait_ref).unwrap(),
+                TypeRef::new(for_type).unwrap(),
+            ));
+        }
+
+        let method_entry =
+            match domain_doc.types().get(&TypeName::new("MethodDeclaration").unwrap()) {
+                Some(entry) => entry,
+                None => panic!("active catalogue fixture must contain MethodDeclaration"),
+            };
+        assert_eq!(method_entry.action(), ItemAction::Modify);
+        assert_eq!(method_entry.methods().len(), 13);
+
+        let mut all_catalogues = BTreeMap::new();
+        for layer_name in
+            ["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"]
+        {
+            let catalogue =
+                if layer_name == "domain" { domain_doc.clone() } else { make_doc(layer_name) };
+            all_catalogues.insert(catalogue.layer().clone(), catalogue);
+        }
+
+        let rules = configured_value_object_rules();
+        let target_layer = layer("domain");
+        let violations =
+            evaluate_catalogue_lint(&rules, &all_catalogues, &target_layer, &StubPrimitiveScanner)
+                .unwrap();
+
+        assert!(
+            violations.is_empty(),
+            "active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}"
+        );
+
+        // A zero-violation result alone would also pass if the linter skipped
+        // MethodDeclaration entirely.  Run the same rules against a deliberately
+        // invalid entry and require each selected rule to report its sentinel.
+        let mut sentinel_doc = make_doc("domain");
+        sentinel_doc.insert_type(
+            TypeName::new("MethodDeclaration").unwrap(),
+            TypeEntry::new(
+                ItemAction::Modify,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain {
+                        fields: vec![field_decl("probe", "String")],
+                        has_stripped_fields: false,
+                    },
+                    None,
+                )),
+                vec![method_shared_ref_no_params("probe", "()")],
+                vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Into<Result<(), String>>").unwrap()],
+                }],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        for (trait_ref, for_type) in [
+            ("core::fmt::Debug", "MethodDeclaration"),
+            ("core::clone::Clone", "MethodDeclaration"),
+            ("core::cmp::PartialEq", "MethodDeclaration"),
+            ("core::cmp::Eq", "MethodDeclaration"),
+        ] {
+            sentinel_doc.push_trait_impl(TraitImplDeclV2::new(
+                TypeRef::new(trait_ref).unwrap(),
+                TypeRef::new(for_type).unwrap(),
+            ));
+        }
+
+        let mut sentinel_all_catalogues = BTreeMap::new();
+        for layer_name in
+            ["domain", "usecase", "infrastructure", "cli_driver", "cli", "cli_composition"]
+        {
+            let catalogue =
+                if layer_name == "domain" { sentinel_doc.clone() } else { make_doc(layer_name) };
+            sentinel_all_catalogues.insert(catalogue.layer().clone(), catalogue);
+        }
+
+        let sentinel_violations = evaluate_catalogue_lint(
+            &rules,
+            &sentinel_all_catalogues,
+            &target_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+        assert_eq!(
+            sentinel_violations.len(),
+            2,
+            "the sentinel must exercise NoPublicField and the named-field primitive position: {sentinel_violations:?}"
+        );
+        assert_eq!(
+            sentinel_violations
+                .iter()
+                .filter(|violation| violation.rule_kind() == "NoPublicField")
+                .count(),
+            1,
+            "the NoPublicField rule must inspect MethodDeclaration"
+        );
+        assert_eq!(
+            sentinel_violations
+                .iter()
+                .filter(|violation| violation.rule_kind() == "ForbidPrimitiveInTypes")
+                .count(),
+            1,
+            "the named-field primitive lint rule must inspect MethodDeclaration"
+        );
+        assert!(
+            sentinel_violations
+                .iter()
+                .all(|violation| violation.entry_name() == "MethodDeclaration")
+        );
+
+        let result_err_sentinel_violations = evaluate_catalogue_lint(
+            &rules,
+            &sentinel_all_catalogues,
+            &target_layer,
+            &BoundResultErrScanner,
+        )
+        .unwrap();
+        assert_eq!(
+            result_err_sentinel_violations.len(),
+            2,
+            "the sentinel must exercise NoPublicField and the ResultErr primitive position: \
+             {result_err_sentinel_violations:?}"
+        );
+        assert_eq!(
+            result_err_sentinel_violations
+                .iter()
+                .filter(|violation| violation.rule_kind() == "NoPublicField")
+                .count(),
+            1,
+            "the NoPublicField rule must inspect MethodDeclaration with the ResultErr scanner"
+        );
+        assert_eq!(
+            result_err_sentinel_violations
+                .iter()
+                .filter(|violation| violation.rule_kind() == "ForbidPrimitiveInTypes")
+                .count(),
+            1,
+            "the ResultErr primitive lint rule must inspect MethodDeclaration"
+        );
+        assert!(
+            result_err_sentinel_violations
+                .iter()
+                .all(|violation| violation.entry_name() == "MethodDeclaration")
+        );
+    }
+
     // ===========================================================================
     // T016: Rule 12 — ForbiddenMethodReceiver
     // ===========================================================================

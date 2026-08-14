@@ -2865,6 +2865,49 @@ mod tests {
     }
 
     #[test]
+    fn test_existing_catalogue_without_method_level_spec_refs_remains_compatible() {
+        // Existing catalogues predate method-level grounding. Their omitted
+        // method `spec_refs` must decode as empty and remain round-trippable.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "LegacyPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Value"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits().get(&TraitName::new("LegacyPort").unwrap()).unwrap();
+        assert!(entry.spec_refs().is_empty());
+        assert_eq!(entry.methods().len(), 1);
+        assert!(entry.methods()[0].spec_refs().is_empty());
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let encoded_json = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();
+        assert!(
+            encoded_json["traits"]["LegacyPort"]["methods"][0].get("spec_refs").is_none(),
+            "empty method-level spec_refs should remain omitted for compatibility"
+        );
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, decoded);
+    }
+
+    #[test]
     fn test_encode_decode_round_trip_preserves_has_default_impl() {
         let doc = CatalogueDocumentCodec::decode(mixed_trait_with_default_impl_json(), "usecase")
             .unwrap();

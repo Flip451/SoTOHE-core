@@ -33,11 +33,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "79af41935c3b7f5ff1812eb6490625792ca7da3c",
       "description": "Targets: libs/domain/src/tddd/catalogue_v2/methods.rs. Operation: implement and test lint remediation, accessors, the backward-compatible method-level spec_refs storage/accessor API, and compatibility staging. Anchors: GO-01, GO-02, IN-01, IN-05, AC-01, AC-06, CN-05, OS-05.",
       "id": "T1",
       "status": "done"
     },
     {
+      "commit_hash": "79af41935c3b7f5ff1812eb6490625792ca7da3c",
       "depends_on": [
         "T1"
       ],
@@ -51,7 +53,7 @@
       ],
       "description": "Targets: libs/domain/src/tddd/catalogue_v2/methods.rs and MethodDeclaration construction call sites. Operation: migrate and test the constructor cutover. Anchors: GO-01, GO-02, IN-01, AC-01, OS-05.",
       "id": "T3",
-      "status": "todo"
+      "status": "in_progress"
     },
     {
       "depends_on": [

@@ -1,4 +1,160 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "GO-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "7832dd1acaf6b20685546ab28b16143bc0b980e04580cada69645626c0e6cb9a",
+        "bound_tests_set_hash": "779179d10c664a5ac8f9e5f0074ec1b342c12be55dc89cfc3145fc8c3d91e0c6",
+        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:GO-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "1a9ccc1be429517f0795c316a8ba3c60851953593dcc952f6b6e72b6417bdd18",
+        "bound_tests_set_hash": "779179d10c664a5ac8f9e5f0074ec1b342c12be55dc89cfc3145fc8c3d91e0c6",
+        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_existing_catalogue_without_method_level_spec_refs_remains_compatible"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "dc31ead9d9f8b872e221b92f9f1bd09b2f22376c00225f2f5241df91feac9fc0",
+        "bound_tests_set_hash": "533cf89d27b85e0947ae930338020983405a2ea2788d57ed086c3699c7ff365e",
+        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(entry.methods()[0].spec_refs().is_empty());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-06",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "33047b21fa31a7260f4882f76bf0ace8afd0c74c1a1ed6526a4258d821a2f701",
+        "bound_tests_set_hash": "779179d10c664a5ac8f9e5f0074ec1b342c12be55dc89cfc3145fc8c3d91e0c6",
+        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:AC-06",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-05",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "d62a0bbc73bf1ad0416064b340595598ec8177433bac9dbd41052d299e6c1dab",
+        "bound_tests_set_hash": "93b8b0bda7e4a6ede3e5bf316441897bccc0cc798511341a25b67b9a917aca15",
+        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:CN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(decl.name(), &name);\n        assert_eq!(decl.receiver(), receiver);\n        assert_eq!(decl.params(), params.as_slice());\n        assert_eq!(decl.returns(), &returns);\n        assert!(decl.is_async());\n        assert!(decl.has_default_impl());\n        assert_eq!(decl.generics(), generics.as_slice());\n        assert_eq!(decl.where_predicates(), where_predicates.as_slice());\n        assert_eq!(decl.spec_refs(), &[spec_ref]);\n        assert_eq!(decl.docs(), Some(&docs));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ],
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership"
 }

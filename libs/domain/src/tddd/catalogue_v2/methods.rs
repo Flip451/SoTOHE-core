@@ -783,6 +783,65 @@ mod tests {
     }
 
     #[test]
+    fn test_method_declaration_new_preserves_distinct_method_spec_refs() {
+        let load_ref = SpecRef::new(
+            "track/items/example/spec.json",
+            crate::plan_ref::SpecElementId::try_new("GO-01").unwrap(),
+        );
+        let save_ref = SpecRef::new(
+            "track/items/example/spec.json",
+            crate::plan_ref::SpecElementId::try_new("AC-01").unwrap(),
+        );
+
+        let load = MethodDeclaration::new(
+            MethodName::new("load").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Result<Value, Error>").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![load_ref.clone()],
+            None,
+        );
+        let save = MethodDeclaration::new(
+            MethodName::new("save").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("Result<(), Error>").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![save_ref.clone()],
+            None,
+        );
+
+        assert_eq!(load.spec_refs(), &[load_ref]);
+        assert_eq!(save.spec_refs(), &[save_ref]);
+        assert_ne!(load.spec_refs(), save.spec_refs());
+    }
+
+    #[test]
+    fn test_method_declaration_new_with_empty_spec_refs_owns_no_anchors() {
+        let declaration = MethodDeclaration::new(
+            MethodName::new("legacy").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
+
+        assert!(declaration.spec_refs().is_empty());
+    }
+
+    #[test]
     fn test_method_declaration_can_set_has_default_impl_true_for_provided_trait_method() {
         // Per ADR 2026-05-08-0248 D13: traits with provided default impls must be
         // expressible at the catalogue level so the A-codec can emit has_body=true.
