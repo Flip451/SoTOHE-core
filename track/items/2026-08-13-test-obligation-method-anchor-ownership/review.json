@@ -1,0 +1,131 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:44:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c2cc53c33edddfa76c2ffe29202a97000cb6dd34918f07349391941da03df42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:49:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c2cc53c33edddfa76c2ffe29202a97000cb6dd34918f07349391941da03df42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:55:41Z",
+          "findings": [
+            {
+              "category": "inconsistent_decisions",
+              "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md",
+              "line": 36,
+              "message": "D1/D2 leaves a silent verification bypass: when a multi-method entry keeps entry-level `spec_refs` but a method omits optional method-level `spec_refs`, those anchors are not copied to any method obligation, while D2 limits fulfillment evaluation to obligation-owned anchors. The ADR therefore permits a grounded trait-level promise to receive no fulfillment verification without stating how it is resolved.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7d698821ce37f35c389dac14fcfce60d2724b257210bdea2b9971b05c8129bf5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:04:56Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md",
+              "line": 40,
+              "message": "D1 is internally contradictory: it states that a trait_method obligation owns only the method's `spec_refs` (line 40), but then says single-method traits retain existing behavior (line 42), although the prior ADR defines method-level refs as optional and entry-level refs as the fallback. Clarify whether the method-only ownership rule applies to single-method traits; otherwise the scope of anchor ownership is undecidable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:63dc410521381297f354f1b4a1ba22f1480aa75db64ebb62bcba11a4f032ffa7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:11:27Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions",
+              "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md",
+              "line": 42,
+              "message": "D1 permits a single-method trait to declare a partial `method-level spec_refs` set without requiring coverage or falling back to the entry-level refs. Those omitted entry-level anchors then have no owning obligation, contradicting D2's claim that every entry-level anchor is independently verified and allowing fulfillment to silently bypass them. Require single-method coverage or define fallback for partial declarations.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:8bfde04d55db857e50db9f742c6740d5d1ff2cfa59bc926ccf782bee9d20fccc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:23:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e901c9c4f5177939c3fa6b2e81276bc846c105efacfd36f95d3cd9152c8290e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:27:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e901c9c4f5177939c3fa6b2e81276bc846c105efacfd36f95d3cd9152c8290e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:32:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:49f874b13dbe64fffc31f47d40650d9b8b065615e5318421d280e228fa791a40",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:36:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:49f874b13dbe64fffc31f47d40650d9b8b065615e5318421d280e228fa791a40",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:20:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02dc2613c6792e777169c505b2805be340c0134a4527f8579c39161b64f5836f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:25:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02dc2613c6792e777169c505b2805be340c0134a4527f8579c39161b64f5836f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:55:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:491ca33f79aac7d0b73f42dab2a750039ecb914d00b660b5dcfceb42e8a75b42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:56:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:491ca33f79aac7d0b73f42dab2a750039ecb914d00b660b5dcfceb42e8a75b42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:59:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:491ca33f79aac7d0b73f42dab2a750039ecb914d00b660b5dcfceb42e8a75b42",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

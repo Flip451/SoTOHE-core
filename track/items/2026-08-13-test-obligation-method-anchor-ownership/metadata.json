@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-13-test-obligation-method-anchor-ownership",
+  "title": "trait_method 義務の anchor 所有権を method 単位にする",
+  "branch": "track/2026-08-13-test-obligation-method-anchor-ownership",
+  "created_at": "2026-08-13T17:41:19Z",
+  "updated_at": "2026-08-13T17:41:19Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

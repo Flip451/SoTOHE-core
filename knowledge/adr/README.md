@@ -143,6 +143,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型配置是正における CLI 契約の維持](2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md) | Proposed | 2026-07-25 |
 | [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
 | [role × 層マトリクスを機構で強制し ValueObject の層勾配を是正する](2026-07-25-0538-role-layer-matrix-enforcement.md) | Proposed | 2026-07-25 |
+| [trait_method 義務の anchor 所有権を method 単位にする（テスト義務ゲート ADR の refinement）](2026-08-13-1720-test-obligation-method-anchor-ownership.md) | Proposed | 2026-08-13 |
 
 ### トラック・ワークフロー
 
