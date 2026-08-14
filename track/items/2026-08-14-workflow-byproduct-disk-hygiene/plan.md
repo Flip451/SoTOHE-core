@@ -35,4 +35,4 @@ GO-01 → T001, T002, T003, T004, T005.
 
 > Update template-export transplant regression targets. D5; IN-05; OS-01; CN-04; AC-06; AC-07.
 
-- [x] **T005**: Update template-export transplant regressions in `apps/cli/tests/` and `apps/cli-composition/src/template_export/mod.rs`. D5; IN-05; OS-01; CN-04; AC-06; AC-07.
+- [x] **T005**: Update template-export transplant regressions in `apps/cli/tests/` and `apps/cli-composition/src/template_export/mod.rs`. D5; IN-05; OS-01; CN-04; AC-06; AC-07. (`e4088bdc2547364b0c62bce5433da4b5c7e70e85`)
