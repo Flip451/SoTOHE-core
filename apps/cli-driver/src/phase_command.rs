@@ -10,11 +10,13 @@ use usecase::phase_command::{
     PhaseExplainQuery, PhaseValidateCommand,
 };
 use usecase::program_runner::{
-    CapturedProgramOutput, ProgramExecutionRecord, ProgramOutputStream, ProgramRunOutcome,
+    CapturedProgramOutput, CapturedStreamOutput, ProgramExecutionRecord, ProgramRunOutcome,
 };
 
 use crate::capability::ProviderNameArg;
 use crate::render::CommandOutcome;
+
+const TRUNCATED_TAIL_NOTICE: &str = "[output truncated; showing retained tail]";
 
 /// CLI transport wrapper for a usecase-owned phase declaration identifier.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -189,16 +191,25 @@ fn render_completed_record_audit(record: &ProgramExecutionRecord) -> String {
 
 fn render_record(record: &ProgramExecutionRecord) -> (Option<String>, Option<String>) {
     match &record.outcome {
-        ProgramRunOutcome::Exited { output, .. }
-        | ProgramRunOutcome::TimedOut { output }
-        | ProgramRunOutcome::OutputLimitExceeded { output, .. } => render_output(output),
+        ProgramRunOutcome::Exited { output, .. } | ProgramRunOutcome::TimedOut { output } => {
+            render_output(output)
+        }
     }
 }
 
 fn render_output(output: &CapturedProgramOutput) -> (Option<String>, Option<String>) {
-    let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
-    let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
+    let stdout = render_stream(&output.stdout);
+    let stderr = render_stream(&output.stderr);
     ((!stdout.is_empty()).then_some(stdout), (!stderr.is_empty()).then_some(stderr))
+}
+
+fn render_stream(stream: &CapturedStreamOutput) -> String {
+    match stream {
+        CapturedStreamOutput::Complete(bytes) => String::from_utf8_lossy(bytes).into_owned(),
+        CapturedStreamOutput::TruncatedTail(bytes) => {
+            format!("{TRUNCATED_TAIL_NOTICE}\n{}", String::from_utf8_lossy(bytes))
+        }
+    }
 }
 
 fn exit_code_for(outcome: &ProgramRunOutcome) -> u8 {
@@ -206,7 +217,7 @@ fn exit_code_for(outcome: &ProgramRunOutcome) -> u8 {
         ProgramRunOutcome::Exited { exit_code, .. } => {
             u8::try_from(exit_code.as_i32()).ok().filter(|code| *code != 0).unwrap_or(1)
         }
-        ProgramRunOutcome::TimedOut { .. } | ProgramRunOutcome::OutputLimitExceeded { .. } => 1,
+        ProgramRunOutcome::TimedOut { .. } => 1,
     }
 }
 
@@ -216,10 +227,6 @@ fn render_outcome_name(outcome: &ProgramRunOutcome) -> String {
             format!("exited with {}", exit_code.as_i32())
         }
         ProgramRunOutcome::TimedOut { .. } => "timed out".to_owned(),
-        ProgramRunOutcome::OutputLimitExceeded { stream, .. } => match stream {
-            ProgramOutputStream::Stdout => "output limit exceeded on stdout".to_owned(),
-            ProgramOutputStream::Stderr => "output limit exceeded on stderr".to_owned(),
-        },
     }
 }
 
@@ -260,15 +267,16 @@ mod tests {
         PhaseCommandService, PhaseEnterCommand, PhaseExplainQuery, PhaseValidateCommand,
     };
     use usecase::program_runner::{
-        CapturedProgramOutput, ClassifiedProgramExecutionRecord, FailedProgramExecutionRecord,
-        ProgramExecutionRecord, ProgramExitCode, ProgramOutputStream, ProgramRunOutcome,
+        CapturedProgramOutput, CapturedStreamOutput, ClassifiedProgramExecutionRecord,
+        FailedProgramExecutionRecord, ProgramExecutionRecord, ProgramExitCode, ProgramRunOutcome,
         SuccessfulProgramExecutionRecord,
     };
 
     use crate::capability::ProviderNameArg;
 
     use super::{
-        PhaseCommandDriver, PhaseCommandInput, PhaseIdArg, render_argv, render_enter_outcome,
+        PhaseCommandDriver, PhaseCommandInput, PhaseIdArg, TRUNCATED_TAIL_NOTICE, render_argv,
+        render_enter_outcome,
     };
 
     #[derive(Default)]
@@ -402,6 +410,22 @@ mod tests {
         stdout: &[u8],
         stderr: &[u8],
     ) -> ProgramExecutionRecord {
+        raw_record_with_streams(
+            sequence,
+            arguments,
+            exit_code,
+            CapturedStreamOutput::Complete(stdout.to_vec()),
+            CapturedStreamOutput::Complete(stderr.to_vec()),
+        )
+    }
+
+    fn raw_record_with_streams(
+        sequence: usize,
+        arguments: &[&str],
+        exit_code: i32,
+        stdout: CapturedStreamOutput,
+        stderr: CapturedStreamOutput,
+    ) -> ProgramExecutionRecord {
         let command = command_with_timeout(arguments, 1);
         ProgramExecutionRecord {
             sequence_index: CommandSequenceIndex::new(sequence),
@@ -409,7 +433,7 @@ mod tests {
             command,
             outcome: ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(exit_code),
-                output: CapturedProgramOutput { stdout: stdout.to_vec(), stderr: stderr.to_vec() },
+                output: CapturedProgramOutput { stdout, stderr },
             },
         }
     }
@@ -422,6 +446,20 @@ mod tests {
         stderr: &[u8],
     ) -> SuccessfulProgramExecutionRecord {
         match raw_record(sequence, arguments, exit_code, stdout, stderr).classify() {
+            ClassifiedProgramExecutionRecord::Succeeded(record) => record,
+            ClassifiedProgramExecutionRecord::Failed(record) => {
+                panic!("expected success, got {record:?}")
+            }
+        }
+    }
+
+    fn successful_record_with_streams(
+        sequence: usize,
+        arguments: &[&str],
+        stdout: CapturedStreamOutput,
+        stderr: CapturedStreamOutput,
+    ) -> SuccessfulProgramExecutionRecord {
+        match raw_record_with_streams(sequence, arguments, 0, stdout, stderr).classify() {
             ClassifiedProgramExecutionRecord::Succeeded(record) => record,
             ClassifiedProgramExecutionRecord::Failed(record) => {
                 panic!("expected success, got {record:?}")
@@ -595,6 +633,26 @@ mod tests {
     }
 
     #[test]
+    fn test_phase_driver_enter_completed_renders_truncated_tail_with_explicit_notice() {
+        let outcome = render_enter_outcome(PhaseCommandEnterOutcome::Completed {
+            pre_entry_records: vec![successful_record_with_streams(
+                0,
+                &["pre"],
+                CapturedStreamOutput::TruncatedTail(b"stdout tail".to_vec()),
+                CapturedStreamOutput::TruncatedTail(b"stderr tail".to_vec()),
+            )],
+            writer_record: successful_record(1, &["writer"], 0, b"", b""),
+        });
+
+        let stdout = outcome.stdout.expect("truncated stdout is rendered");
+        assert!(stdout.contains(&format!("{TRUNCATED_TAIL_NOTICE}\nstdout tail")));
+        assert!(stdout.contains("phase command sequence 0: [\"pre\"]; outcome: exited with 0"));
+
+        let stderr = outcome.stderr.expect("truncated stderr is rendered");
+        assert!(stderr.contains(&format!("{TRUNCATED_TAIL_NOTICE}\nstderr tail")));
+    }
+
+    #[test]
     fn test_phase_enter_completed_host_bearing_writer_renders_actual_argv() {
         let command = command_with_timeout(&["bin/sotp", "capability", "exec"], 1);
         let invoked_argv = match command.argv().with_appended_arguments([
@@ -610,7 +668,10 @@ mod tests {
             command,
             outcome: ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(0),
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                output: CapturedProgramOutput {
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(Vec::new()),
+                },
             },
         })
         .classify()
@@ -665,8 +726,8 @@ mod tests {
             failed: failed_record(ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(7),
                 output: CapturedProgramOutput {
-                    stdout: Vec::new(),
-                    stderr: b"failed output".to_vec(),
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(b"failed output".to_vec()),
                 },
             }),
         });
@@ -687,25 +748,14 @@ mod tests {
         let timeout = render_enter_outcome(PhaseCommandEnterOutcome::Blocked {
             completed: Vec::new(),
             failed: failed_record(ProgramRunOutcome::TimedOut {
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
-            }),
-        });
-        let output_limit = render_enter_outcome(PhaseCommandEnterOutcome::Blocked {
-            completed: Vec::new(),
-            failed: failed_record(ProgramRunOutcome::OutputLimitExceeded {
-                stream: ProgramOutputStream::Stdout,
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                output: CapturedProgramOutput {
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(Vec::new()),
+                },
             }),
         });
 
         assert_eq!(timeout.exit_code, 1);
         assert!(timeout.stderr.expect("timeout diagnostic").contains("outcome: timed out"));
-        assert_eq!(output_limit.exit_code, 1);
-        assert!(
-            output_limit
-                .stderr
-                .expect("output-limit diagnostic")
-                .contains("outcome: output limit exceeded on stdout")
-        );
     }
 }

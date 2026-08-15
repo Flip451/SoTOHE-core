@@ -182,6 +182,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [type-signals cache は clean な同一 HEAD commit でのみ再利用する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
 | [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
 | [check-zero-findings は空 scope を pass させる](2026-08-13-1736-check-zero-findings-empty-scope-pass.md) | Proposed | 2026-08-13 |
+| [子プロセスの診断出力は末尾リングで保持し、出力量で kill しない](2026-08-14-1048-child-output-ring-capture.md) | Proposed | 2026-08-14 |
 
 ### ADR 運用
 

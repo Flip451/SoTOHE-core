@@ -356,7 +356,7 @@ mod tests {
         OutputCaptureLimitBytes, UnvalidatedTimeoutSeconds,
     };
     use crate::program_runner::{
-        CapturedProgramOutput, ProgramExitCode, ProgramInvocation, ProgramOutputStream,
+        CapturedProgramOutput, CapturedStreamOutput, ProgramExitCode, ProgramInvocation,
         ProgramRunOutcome, ProgramRunnerError, ProgramRunnerPort,
     };
 
@@ -1012,7 +1012,10 @@ mod tests {
             self.invocations.lock().unwrap().push(invocation);
             Ok(ProgramRunOutcome::Exited {
                 exit_code: ProgramExitCode::new(exit_code),
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                output: CapturedProgramOutput {
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(Vec::new()),
+                },
             })
         }
     }
@@ -1047,30 +1050,10 @@ mod tests {
         ) -> Result<ProgramRunOutcome, ProgramRunnerError> {
             self.invocations.lock().unwrap().push(invocation);
             Ok(ProgramRunOutcome::TimedOut {
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
-            })
-        }
-    }
-
-    struct OutputLimitedRunner {
-        invocations: Mutex<Vec<ProgramInvocation>>,
-    }
-
-    impl OutputLimitedRunner {
-        fn invocations(&self) -> Vec<ProgramInvocation> {
-            self.invocations.lock().unwrap().clone()
-        }
-    }
-
-    impl ProgramRunnerPort for OutputLimitedRunner {
-        fn run(
-            &self,
-            invocation: ProgramInvocation,
-        ) -> Result<ProgramRunOutcome, ProgramRunnerError> {
-            self.invocations.lock().unwrap().push(invocation);
-            Ok(ProgramRunOutcome::OutputLimitExceeded {
-                stream: ProgramOutputStream::Stderr,
-                output: CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() },
+                output: CapturedProgramOutput {
+                    stdout: CapturedStreamOutput::Complete(Vec::new()),
+                    stderr: CapturedStreamOutput::Complete(Vec::new()),
+                },
             })
         }
     }
@@ -1513,43 +1496,6 @@ mod tests {
             panic!("expected one writer invocation");
         };
         assert_eq!(writer.timeout.as_secs(), 3_600);
-    }
-
-    #[test]
-    fn test_phase_command_enter_returns_output_limited_pre_entry_as_blocked_outcome() {
-        let declaration = PhaseCommandDeclaration::new(
-            CommandDeclarationId::try_new("phase-one".to_owned()).unwrap(),
-            command_argv(&["writer"]),
-            vec![command_argv(&["limited-pre-entry"]), command_argv(&["later-pre-entry"])],
-        );
-        let config =
-            PhaseCommandConfig::try_new(CommandConfigSchemaVersion::new(1), vec![declaration])
-                .unwrap();
-        let runner = Arc::new(OutputLimitedRunner { invocations: Mutex::new(Vec::new()) });
-        let service = PhaseCommandInteractor::new(Arc::new(StaticLoader(config)), runner.clone());
-
-        match service.enter(enter_command(None)).unwrap() {
-            PhaseCommandEnterOutcome::Blocked { completed, failed } => {
-                assert!(completed.is_empty());
-                assert_eq!(failed.as_ref().sequence_index.as_usize(), 0);
-                assert_eq!(
-                    failed.as_ref().command.argv().arguments().first().map(CommandArgument::as_str),
-                    Some("limited-pre-entry")
-                );
-                assert!(matches!(
-                    failed.as_ref().outcome,
-                    ProgramRunOutcome::OutputLimitExceeded {
-                        stream: ProgramOutputStream::Stderr,
-                        ..
-                    }
-                ));
-            }
-            PhaseCommandEnterOutcome::Completed { .. } => panic!("expected blocked enter outcome"),
-        }
-        assert_eq!(
-            runner.invocations().iter().map(argv_values).collect::<Vec<_>>(),
-            vec![vec!["limited-pre-entry"]]
-        );
     }
 
     #[test]

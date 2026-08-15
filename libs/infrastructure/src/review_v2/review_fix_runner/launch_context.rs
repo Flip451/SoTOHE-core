@@ -2,10 +2,11 @@
 //!
 //! This is the sole review-fix boundary that accepts a resolver-proven root
 //! and a caller-supplied briefing path. It defends against path escape,
-//! symlink traversal, output exhaustion, and runtime-directory substitution.
+//! symlink traversal, bounded output handling, and runtime-directory substitution.
 //! It cannot defend against a provider that intentionally ignores its prompt
 //! or writes arbitrary content inside the already trusted runtime directory.
 
+use std::collections::VecDeque;
 use std::ffi::{OsStr, OsString};
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -22,7 +23,10 @@ use super::session_log::{
 use super::spawn::{RuntimeFile, create_runtime_file, read_runtime_file_bounded};
 
 const MAX_RETAINED_CHILD_OUTPUT_BYTES: usize = 64 * 1024;
-/// A child that exceeds this amount is terminated rather than drained forever.
+/// Maximum output retained when a child stream is used as validation input.
+///
+/// Diagnostic review-fix streams use the separate tail collector below and do
+/// not apply this fail-closed limit.
 pub(super) const MAX_CHILD_TOTAL_OUTPUT_BYTES: usize = 1024 * 1024;
 pub(super) const VERSION_PROBE_TIMEOUT: Duration = Duration::from_secs(30);
 pub(super) const FIXER_RUNTIME_TIMEOUT: Duration = Duration::from_secs(60 * 60);
@@ -31,6 +35,7 @@ const TRUNCATION_MARKER: &[u8] = b"\n[review-fix child output truncated]\n";
 const RETAINED_CHILD_OUTPUT_SUFFIX_BYTES: usize = 16 * 1024;
 const RETAINED_CHILD_OUTPUT_PREFIX_BYTES: usize =
     MAX_RETAINED_CHILD_OUTPUT_BYTES - TRUNCATION_MARKER.len() - RETAINED_CHILD_OUTPUT_SUFFIX_BYTES;
+const TAIL_RING_CONTENT_BYTES: usize = MAX_RETAINED_CHILD_OUTPUT_BYTES - TRUNCATION_MARKER.len();
 const COLLECTOR_DRAIN_TIMEOUT: Duration = Duration::from_secs(1);
 
 pub(crate) struct TrustedLaunchContext {
@@ -88,9 +93,9 @@ impl TrustedLaunchContext {
             .map_err(|error| unexpected(format!("failed to start codex --version: {error}")))?;
         let process_id = child.id();
         let stdout = child.stdout.take();
-        let stdout_collector = spawn_child_output_collector(stdout, false, "stdout", None);
+        let stdout_collector = spawn_child_output_collector(stdout, false, "stdout");
         let stderr = child.stderr.take();
-        let stderr_collector = spawn_child_output_collector(stderr, false, "stderr", None);
+        let stderr_collector = spawn_child_output_collector(stderr, false, "stderr");
         let status =
             wait_for_child_with_timeout(&mut child, VERSION_PROBE_TIMEOUT, "codex --version");
         let stdout = receive_child_output_collector(
@@ -185,41 +190,47 @@ fn terminate_child_process_group(
     (kill_result, wait_result)
 }
 
-/// Drains one child stream in fixed-size chunks while retaining a bounded log.
+/// Drains one child stream with the fail-closed bound used for validation input.
 #[cfg(test)]
 pub(super) fn collect_child_output_bounded<R: Read>(
     pipe: Option<R>,
     echo_to_stderr: bool,
     stream_name: &str,
 ) -> Result<String, String> {
-    collect_child_output_with_limit_signal(pipe, echo_to_stderr, stream_name, None)
+    collect_child_output_fail_closed(pipe, echo_to_stderr, stream_name)
 }
 
-/// Starts a pipe collector whose result can be received with a drain deadline.
+/// Starts a pipe collector for output that is consumed as validation input.
 pub(super) fn spawn_child_output_collector<R: Read + Send + 'static>(
     pipe: Option<R>,
     echo_to_stderr: bool,
     stream_name: &'static str,
-    output_limit_signal: Option<mpsc::Sender<String>>,
 ) -> mpsc::Receiver<Result<String, String>> {
     let (sender, receiver) = mpsc::sync_channel(1);
     thread::spawn(move || {
-        let _ = sender.send(collect_child_output_with_limit_signal(
-            pipe,
-            echo_to_stderr,
-            stream_name,
-            output_limit_signal,
-        ));
+        let _ = sender.send(collect_child_output_fail_closed(pipe, echo_to_stderr, stream_name));
     });
     receiver
 }
 
-/// Drains one child stream, notifying the supervisor before rejecting excess output.
-pub(super) fn collect_child_output_with_limit_signal<R: Read>(
+/// Starts a pipe collector for review-fix diagnostic output.
+pub(super) fn spawn_child_output_tail_collector<R: Read + Send + 'static>(
+    pipe: Option<R>,
+    echo_to_stderr: bool,
+    stream_name: &'static str,
+) -> mpsc::Receiver<Result<String, String>> {
+    let (sender, receiver) = mpsc::sync_channel(1);
+    thread::spawn(move || {
+        let _ = sender.send(collect_child_output_tail_impl(pipe, echo_to_stderr, stream_name));
+    });
+    receiver
+}
+
+/// Drains one child stream, rejecting excess output because it is validation input.
+fn collect_child_output_fail_closed<R: Read>(
     mut pipe: Option<R>,
     echo_to_stderr: bool,
     stream_name: &str,
-    output_limit_signal: Option<mpsc::Sender<String>>,
 ) -> Result<String, String> {
     let mut collected = Vec::with_capacity(MAX_CHILD_TOTAL_OUTPUT_BYTES);
     let mut buffer = [0_u8; CHILD_OUTPUT_CHUNK_BYTES];
@@ -241,14 +252,10 @@ pub(super) fn collect_child_output_with_limit_signal<R: Read>(
         }
         total_read = total_read.saturating_add(read);
         if total_read > MAX_CHILD_TOTAL_OUTPUT_BYTES {
-            let message = format!(
+            return Err(format!(
                 "codex fixer {stream_name} exceeded the {}-byte output limit",
                 MAX_CHILD_TOTAL_OUTPUT_BYTES
-            );
-            if let Some(sender) = &output_limit_signal {
-                let _ = sender.send(message.clone());
-            }
-            return Err(message);
+            ));
         }
         let chunk = buffer.get(..read).ok_or_else(|| {
             format!(
@@ -270,10 +277,61 @@ pub(super) fn collect_child_output_with_limit_signal<R: Read>(
     if echo_to_stderr {
         flush_redacted(&mut echo_pending, &credentials, |text| eprint!("{text}"));
     }
-    // Redact the complete bounded stream before choosing retained prefix and
-    // suffix bytes. Otherwise a credential spanning the truncation point can
-    // leave an unredactable fragment in a persistent session log.
+    // Redact the complete validation-bounded stream before choosing retained
+    // prefix and suffix bytes. Otherwise a credential spanning the truncation
+    // point can leave an unredactable fragment in a persistent session log.
     Ok(redact_and_retain_child_output(&collected, &credentials))
+}
+
+/// Drains one diagnostic child stream while retaining only its recent tail.
+///
+/// The collector always drains the pipe to EOF. Reaching the retention
+/// capacity records truncation in the returned diagnostic, but never signals
+/// the supervisor to terminate the child.
+#[cfg(test)]
+pub(super) fn collect_child_output_tail<R: Read>(
+    pipe: Option<R>,
+    echo_to_stderr: bool,
+    stream_name: &str,
+) -> Result<String, String> {
+    collect_child_output_tail_impl(pipe, echo_to_stderr, stream_name)
+}
+
+fn collect_child_output_tail_impl<R: Read>(
+    mut pipe: Option<R>,
+    echo_to_stderr: bool,
+    stream_name: &str,
+) -> Result<String, String> {
+    let mut retained = TailRing::new(TAIL_RING_CONTENT_BYTES);
+    let mut buffer = [0_u8; CHILD_OUTPUT_CHUNK_BYTES];
+    let redaction_overlap =
+        credential_redaction_overlap_bytes().saturating_add(CHILD_OUTPUT_CHUNK_BYTES);
+    let credentials = credential_values();
+    let mut pending = Vec::with_capacity(redaction_overlap);
+    let mut capture = |text: &str| {
+        retained.push_bytes(text.as_bytes());
+        if echo_to_stderr {
+            eprint!("{text}");
+        }
+    };
+
+    while let Some(reader) = pipe.as_mut() {
+        let read = reader
+            .read(&mut buffer)
+            .map_err(|error| format!("failed to read codex fixer {stream_name}: {error}"))?;
+        if read == 0 {
+            break;
+        }
+        let chunk = buffer.get(..read).ok_or_else(|| {
+            format!(
+                "codex fixer {stream_name} reader returned {read} bytes for a {}-byte buffer",
+                buffer.len()
+            )
+        })?;
+        redact_and_emit_prefix(&mut pending, chunk, redaction_overlap, &credentials, &mut capture);
+    }
+    flush_redacted(&mut pending, &credentials, &mut capture);
+    Ok(retained.finish())
 }
 
 fn redact_and_retain_child_output(output: &[u8], credentials: &[(&str, String)]) -> String {
@@ -296,6 +354,55 @@ fn retain_bounded_child_output(output: &[u8]) -> String {
     retained.extend_from_slice(TRUNCATION_MARKER);
     retained.extend_from_slice(suffix);
     String::from_utf8_lossy(&retained).into_owned()
+}
+
+struct TailRing {
+    bytes: VecDeque<u8>,
+    capacity: usize,
+    truncated: bool,
+}
+
+impl TailRing {
+    fn new(capacity: usize) -> Self {
+        Self { bytes: VecDeque::with_capacity(capacity), capacity, truncated: false }
+    }
+
+    fn push_bytes(&mut self, bytes: &[u8]) {
+        if bytes.is_empty() {
+            return;
+        }
+        if self.capacity == 0 {
+            self.truncated = true;
+            return;
+        }
+        if bytes.len() >= self.capacity {
+            self.bytes.clear();
+            let start = bytes.len().saturating_sub(self.capacity);
+            if let Some(tail) = bytes.get(start..) {
+                self.bytes.extend(tail.iter().copied());
+            }
+            self.truncated = true;
+            return;
+        }
+        let overflow = self.bytes.len().saturating_add(bytes.len()).saturating_sub(self.capacity);
+        for _ in 0..overflow {
+            let _ = self.bytes.pop_front();
+        }
+        if overflow > 0 {
+            self.truncated = true;
+        }
+        self.bytes.extend(bytes.iter().copied());
+    }
+
+    fn finish(self) -> String {
+        let marker_bytes = if self.truncated { TRUNCATION_MARKER.len() } else { 0 };
+        let mut output = Vec::with_capacity(self.bytes.len() + marker_bytes);
+        if self.truncated {
+            output.extend_from_slice(TRUNCATION_MARKER);
+        }
+        output.extend(self.bytes);
+        String::from_utf8_lossy(&output).into_owned()
+    }
 }
 
 fn redact_and_emit_prefix(
@@ -433,10 +540,10 @@ mod tests {
     use std::time::{Duration, Instant};
 
     use super::{
-        MAX_CHILD_TOTAL_OUTPUT_BYTES, MAX_RETAINED_CHILD_OUTPUT_BYTES, TrustedLaunchContext,
-        collect_child_output_bounded, collect_child_output_with_limit_signal, flush_redacted,
-        redact_and_emit_prefix, redact_and_retain_child_output,
-        wait_for_child_with_timeout_or_cancellation,
+        MAX_CHILD_TOTAL_OUTPUT_BYTES, MAX_RETAINED_CHILD_OUTPUT_BYTES,
+        RETAINED_CHILD_OUTPUT_PREFIX_BYTES, TrustedLaunchContext, collect_child_output_bounded,
+        collect_child_output_tail, flush_redacted, redact_and_emit_prefix,
+        redact_and_retain_child_output, wait_for_child_with_timeout_or_cancellation,
     };
 
     #[test]
@@ -467,7 +574,7 @@ mod tests {
     #[test]
     fn test_retained_output_redacts_credential_crossing_truncation_boundary() {
         let secret = "sk-crosses-retained-output-boundary";
-        let prefix_len = super::RETAINED_CHILD_OUTPUT_PREFIX_BYTES.saturating_sub(secret.len() / 2);
+        let prefix_len = RETAINED_CHILD_OUTPUT_PREFIX_BYTES.saturating_sub(secret.len() / 2);
         let mut output = vec![b'x'; prefix_len];
         output.extend_from_slice(secret.as_bytes());
         output.extend(std::iter::repeat_n(b'y', MAX_RETAINED_CHILD_OUTPUT_BYTES));
@@ -489,19 +596,18 @@ mod tests {
     }
 
     #[test]
-    fn test_collect_child_output_limit_notifies_supervisor() {
-        let input = vec![b'x'; MAX_CHILD_TOTAL_OUTPUT_BYTES + 1];
-        let (sender, receiver) = mpsc::channel();
+    fn test_collect_child_output_tail_drains_past_validation_limit() {
+        let mut input = b"early diagnostic output\n".to_vec();
+        input.extend(std::iter::repeat_n(b'x', MAX_CHILD_TOTAL_OUTPUT_BYTES + 1));
+        input.extend_from_slice(b"latest diagnostic output\n");
 
-        let result = collect_child_output_with_limit_signal(
-            Some(Cursor::new(input)),
-            false,
-            "stdout",
-            Some(sender),
-        );
+        let output = collect_child_output_tail(Some(Cursor::new(input)), false, "stdout")
+            .expect("diagnostic output must continue past the validation limit");
 
-        let error = result.expect_err("total child output above the limit must be rejected");
-        assert_eq!(receiver.recv().expect("output-limit notification"), error);
+        assert!(output.len() <= MAX_RETAINED_CHILD_OUTPUT_BYTES);
+        assert!(output.starts_with("\n[review-fix child output truncated]\n"));
+        assert!(output.contains("latest diagnostic output"));
+        assert!(!output.contains("early diagnostic output"));
     }
 
     #[cfg(unix)]
