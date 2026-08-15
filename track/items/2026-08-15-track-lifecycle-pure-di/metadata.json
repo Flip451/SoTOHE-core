@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "2026-08-15-track-lifecycle-pure-di",
+  "title": "track lifecycle コマンド群の composition root 純 DI 化",
+  "branch": "track/2026-08-15-track-lifecycle-pure-di",
+  "created_at": "2026-08-15T13:18:46Z",
+  "updated_at": "2026-08-15T13:18:46Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
