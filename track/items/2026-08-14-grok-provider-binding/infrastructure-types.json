@@ -318,11 +318,11 @@
     },
     {
       "for_type": "GrokReviewer",
-      "trait_ref": "usecase::review_v2::Reviewer"
+      "trait_ref": "usecase::review_v2::ports::Reviewer"
     },
     {
       "for_type": "GrokDryChecker",
-      "trait_ref": "usecase::dry_check::DryCheckAgentPort"
+      "trait_ref": "usecase::dry_check::ports::DryCheckAgentPort"
     },
     {
       "for_type": "GrokDryChecker",

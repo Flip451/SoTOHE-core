@@ -2268,6 +2268,947 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_implements_reviewer_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_is_dedicated_path_not_capability_exec"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_accepts_briefing_content_and_structured_output_schema"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_launch_uses_structured_result_schema_and_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_resume_failure_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_fast_review_uses_the_same_typed_pipeline"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_successful_review_uses_only_structured_result_not_envelope_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_failed_resume_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_provider_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_model_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_missing_structured_output_fails_with_envelope_reason"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "1ab6d5d2790dfb0dc832501ce8bc0f4d00b97f4dc1e29d83228ed111bb5b27e6",
+        "bound_tests_set_hash": "bd0457f84e5859e061846d73445a54fca9a08ec554b2e9f640227b8559cb1501",
+        "declaration_hash": "54ea00e04fe39968ed7ae0c8296199df328ed2e52e31bf5241a803f7924fb866"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "reviewer.review(&ReviewTarget::new(vec![]))?;\n\nlet invocations = runner.invocations.lock().expect(\"process recorder lock\");\nassert_eq!(invocations.len(), 1);\nlet (binary, args, _) = invocations.first().expect(\"typed-pipeline launch is recorded\");\nassert_eq!(binary, \"grok\");\nassert!(\n    !args.iter().any(|arg| arg == \"capability\" || arg == \"exec\" || arg == \"agent\"),\n    \"typed-pipeline reviewer must launch grok directly, not through capability exec\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_implements_reviewer_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_is_dedicated_path_not_capability_exec"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_accepts_briefing_content_and_structured_output_schema"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_launch_uses_structured_result_schema_and_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_resume_failure_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_fast_review_uses_the_same_typed_pipeline"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_successful_review_uses_only_structured_result_not_envelope_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_failed_resume_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_provider_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_model_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_missing_structured_output_fails_with_envelope_reason"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "309da9e0db87093d52bcc6560990a9fb025a6703f62340072fcc9d72a67aa77a",
+        "bound_tests_set_hash": "bd0457f84e5859e061846d73445a54fca9a08ec554b2e9f640227b8559cb1501",
+        "declaration_hash": "54ea00e04fe39968ed7ae0c8296199df328ed2e52e31bf5241a803f7924fb866"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "reviewer.review(&ReviewTarget::new(vec![]))?;\n\n        let invocations = runner.invocations.lock().expect(\"process recorder lock\");\n        assert_eq!(invocations.len(), 1);\n        let (binary, args, _) = invocations.first().expect(\"typed-pipeline launch is recorded\");\n        assert_eq!(binary, \"grok\");\n        assert!(\n            !args.iter().any(|arg| arg == \"capability\" || arg == \"exec\" || arg == \"agent\"),\n            \"typed-pipeline reviewer must launch grok directly, not through capability exec\"\n        );\n\nlet (verdict, _) = reviewer.fast_review(&ReviewTarget::new(vec![]))?;\n\n        assert!(matches!(verdict, FastVerdict::ZeroFindings));\n        let invocations = runner.invocations.lock().expect(\"process recorder lock\");\n        assert_eq!(invocations.len(), 1);\n        let (binary, args, timeout) = invocations.first().expect(\"fast launch is recorded\");\n        assert_eq!(binary, \"grok\");\n        assert_eq!(*timeout, Some(Duration::from_secs(10)));\n        assert!(args.windows(2).any(|pair| pair == [\"--model\", \"grok-review-model\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--reasoning-effort\", \"high\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--output-format\", \"json\"]));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_implements_reviewer_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_is_dedicated_path_not_capability_exec"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_accepts_briefing_content_and_structured_output_schema"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_launch_uses_structured_result_schema_and_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_resume_failure_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_fast_review_uses_the_same_typed_pipeline"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_successful_review_uses_only_structured_result_not_envelope_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_failed_resume_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_provider_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_model_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_missing_structured_output_fails_with_envelope_reason"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "fb55a6378ece84ec1cb2fbe2de745fa23f669c12d59cd8161895765ba049e461",
+        "bound_tests_set_hash": "bd0457f84e5859e061846d73445a54fca9a08ec554b2e9f640227b8559cb1501",
+        "declaration_hash": "54ea00e04fe39968ed7ae0c8296199df328ed2e52e31bf5241a803f7924fb866"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_explicit_grok_settings(first, Some(\"prior-session\"));\n        assert_explicit_grok_settings(second, None);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_implements_dry_check_agent_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_typed_pipeline_uses_dedicated_path_not_capability_exec"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fast_tier_launches_isolated_typed_pipeline_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_final_tier_launches_with_final_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_reentry_restates_explicit_settings_on_each_launch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fresh_and_resumed_launches_restate_permission_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_extracts_only_structured_result"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_expired_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_unavailable_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_model_mismatch_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_incompatible_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_provider_mismatched_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_structured_result_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_result_field_returns_illegal_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_nonzero_provider_exit_returns_agent_abort"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "1ab6d5d2790dfb0dc832501ce8bc0f4d00b97f4dc1e29d83228ed111bb5b27e6",
+        "bound_tests_set_hash": "c76aeed64d5de5a16a40a1d6f017b713481700daf37dcb8410907e8afd2ae2d4",
+        "declaration_hash": "b34cd28e8c17b79cd7f940190eb9edbc785e8a1f9b9f3cc771b34846cf7abc6c"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "trait_impl:usecase::dry_check::ports::DryCheckAgentPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(\n            !invocations[0]\n                .args\n                .iter()\n                .any(|arg| arg == \"capability\" || arg == \"exec\" || arg == \"agent\"),\n            \"typed-pipeline dry-check must launch grok directly, not through capability exec\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_implements_dry_check_agent_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_typed_pipeline_uses_dedicated_path_not_capability_exec"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fast_tier_launches_isolated_typed_pipeline_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_final_tier_launches_with_final_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_reentry_restates_explicit_settings_on_each_launch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fresh_and_resumed_launches_restate_permission_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_extracts_only_structured_result"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_expired_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_unavailable_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_model_mismatch_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_incompatible_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_provider_mismatched_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_structured_result_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_result_field_returns_illegal_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_nonzero_provider_exit_returns_agent_abort"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "309da9e0db87093d52bcc6560990a9fb025a6703f62340072fcc9d72a67aa77a",
+        "bound_tests_set_hash": "c76aeed64d5de5a16a40a1d6f017b713481700daf37dcb8410907e8afd2ae2d4",
+        "declaration_hash": "b34cd28e8c17b79cd7f940190eb9edbc785e8a1f9b9f3cc771b34846cf7abc6c"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "trait_impl:usecase::dry_check::ports::DryCheckAgentPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(invocations[0].binary, \"grok\");\n        assert!(\n            !invocations[0]\n                .args\n                .iter()\n                .any(|arg| arg == \"capability\" || arg == \"exec\" || arg == \"agent\"),\n            \"typed-pipeline dry-check must launch grok directly, not through capability exec\"\n        );\n        assert_settings(&invocations[0].args, \"grok-fast\", \"medium\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_implements_dry_check_agent_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_typed_pipeline_uses_dedicated_path_not_capability_exec"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fast_tier_launches_isolated_typed_pipeline_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_final_tier_launches_with_final_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_reentry_restates_explicit_settings_on_each_launch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fresh_and_resumed_launches_restate_permission_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_extracts_only_structured_result"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_expired_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_unavailable_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_model_mismatch_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_incompatible_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_provider_mismatched_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_structured_result_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_result_field_returns_illegal_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_nonzero_provider_exit_returns_agent_abort"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "fb55a6378ece84ec1cb2fbe2de745fa23f669c12d59cd8161895765ba049e461",
+        "bound_tests_set_hash": "c76aeed64d5de5a16a40a1d6f017b713481700daf37dcb8410907e8afd2ae2d4",
+        "declaration_hash": "b34cd28e8c17b79cd7f940190eb9edbc785e8a1f9b9f3cc771b34846cf7abc6c"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "trait_impl:usecase::dry_check::ports::DryCheckAgentPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(invocations[1].args.windows(2).any(|pair| pair == [\"--resume\", \"grok-session\"]));\nfor invocation in invocations.iter() {\n    assert_eq!(invocation.binary, \"grok\");\n    assert_settings(&invocation.args, \"grok-fast\", \"medium\");\n}\n\nassert!(\n    invocation.args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace\"]),\n    \"permission settings (--sandbox) must be passed on fresh and resumed Grok launches\"\n);\n\nassert!(invocations[1].args.windows(2).any(|pair| pair == [\"--resume\", \"prior-session\"]));\nassert!(!invocations[2].args.iter().any(|arg| arg == \"--resume\"));\nassert!(invocations[3].args.windows(2).any(|pair| pair == [\"--resume\", \"fresh-session\"]));\n\nassert!(\n    !invocations[0].args.iter().any(|arg| arg == \"--resume\"),\n    \"provider-mismatched resume must fall back to a fresh isolated subprocess\"\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_successful_review_uses_only_structured_result_not_envelope_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_missing_structured_output_fails_with_envelope_reason"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "266a0bbb8f4177d73d0c9eadeff6ef7a0863d4689da523ec84df527b49df6030",
+        "bound_tests_set_hash": "13a77afea554244b905f96773b2cb76a3b7c105491ebc35e6e575e1eb2ea7d3d",
+        "declaration_hash": "76a5b23faf55880a7977d9a2b6d0f753b7c1e1c309a4b7aee9b2b7f8d6c5653b"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(verdict, Verdict::ZeroFindings));\n\nlet error = reviewer\n    .review(&ReviewTarget::new(vec![]))\n    .expect_err(\"failed Grok envelope must fail closed\");\n\nassert!(error.to_string().contains(\"provider declined structured output\"));\nassert!(!error.to_string().contains(\"ignore\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_launch_uses_structured_result_schema_and_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_fast_review_uses_the_same_typed_pipeline"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "180a78bdc01b1dedce67a205f86883676a7ddf6dfbb43afde9a3de6682be31e4",
+        "bound_tests_set_hash": "0f8cf7221fcb2d26c89d6f9064d2f0874e992a6c9cb5fbb6fed9dfacf835768a",
+        "declaration_hash": "76a5b23faf55880a7977d9a2b6d0f753b7c1e1c309a4b7aee9b2b7f8d6c5653b"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(binary, \"grok\");\n        assert!(args.windows(2).any(|pair| pair == [\"--model\", \"grok-review-model\"]));\n        assert!(args.windows(2).any(|pair| pair == [\"--reasoning-effort\", \"high\"]));\n        assert!(!args.iter().any(|arg| arg == \"agent\"));\n        assert!(!args.iter().any(|arg| arg == \"--leader\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_resume_failure_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_failed_resume_retries_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_provider_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_model_mismatched_resume_starts_fresh_with_all_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_effort_mismatched_resume_starts_fresh_with_all_settings"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "e0887bcf448cbb54a35c672d03dd1c1f05db82f221a6c131aaa6fe9d9819462c",
+        "bound_tests_set_hash": "a5a1cbc2e434972be85f9576b94f2b06a129fd54b0bdcaa20a2ce86b4e83a0ca",
+        "declaration_hash": "76a5b23faf55880a7977d9a2b6d0f753b7c1e1c309a4b7aee9b2b7f8d6c5653b"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_explicit_grok_settings(first, Some(\"prior-session\"));\n        assert_explicit_grok_settings(second, None);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_accepts_briefing_content_and_structured_output_schema"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_successful_review_uses_only_structured_result_not_envelope_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_missing_structured_output_fails_with_envelope_reason"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "d11ce21a85298662f0baab64cf9386d4d1a828f171e5d436ec34ba9cbb5ffa99",
+        "bound_tests_set_hash": "e25ab2dcaa2f1198a2aaf5e862303e57243d01f57f4237bf0802ff3d7150286f",
+        "declaration_hash": "76a5b23faf55880a7977d9a2b6d0f753b7c1e1c309a4b7aee9b2b7f8d6c5653b"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(\n            args.windows(2).any(|pair| pair == [\"-p\", \"Review this code.\"]),\n            \"Grok reviewer must accept the briefing content as its prompt\"\n        );\n        assert!(\n            args.windows(2).any(|pair| pair == [\"--json-schema\", GROK_STRUCTURED_OUTPUT_SCHEMA])\n        );\n\n        assert!(matches!(verdict, Verdict::ZeroFindings));\n\n        assert!(error.to_string().contains(\"provider declined structured output\"));\n        assert!(!error.to_string().contains(\"ignore\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_typed_pipeline_launch_uses_structured_result_schema_and_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::grok_reviewer::tests",
+          "test_name": "test_grok_reviewer_fast_review_uses_the_same_typed_pipeline"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "0fdadc0364e4cf882e76844253c995b34e5a03ceb1bb42d80f1de454a4100bdf",
+        "bound_tests_set_hash": "0f8cf7221fcb2d26c89d6f9064d2f0874e992a6c9cb5fbb6fed9dfacf835768a",
+        "declaration_hash": "76a5b23faf55880a7977d9a2b6d0f753b7c1e1c309a4b7aee9b2b7f8d6c5653b"
+      },
+      "obligation_id": {
+        "entry_key": "GrokReviewer",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(invocations.len(), 1);\nassert_eq!(binary, \"grok\");\nassert!(args.windows(2).any(|pair| pair == [\"--model\", \"grok-review-model\"]));\nassert!(args.windows(2).any(|pair| pair == [\"--reasoning-effort\", \"high\"]));\nassert!(!args.iter().any(|arg| arg == \"agent\"));\nassert!(!args.iter().any(|arg| arg == \"--leader\"));\nassert_explicit_grok_settings(args, None);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_extracts_only_structured_result"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_structured_result_reports_envelope_failure_reason"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "266a0bbb8f4177d73d0c9eadeff6ef7a0863d4689da523ec84df527b49df6030",
+        "bound_tests_set_hash": "8b90622a1b55b6c0fb4540b39cf7a3975ebaaec93bf8711261c8b80435138451",
+        "declaration_hash": "0f48919ab5ee90dc531ca6372186614fac368f4725b7ea9a9dce64df9bba7f11"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "successful judgment must come only from structured_output.result, got {other:?} / missing structured output must fail closed / detail.contains(\"Grok declined structured output\") / !error.to_string().contains(\"ignore-me\")",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fast_tier_launches_isolated_typed_pipeline_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_final_tier_launches_with_final_model_and_effort"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "180a78bdc01b1dedce67a205f86883676a7ddf6dfbb43afde9a3de6682be31e4",
+        "bound_tests_set_hash": "fdfd13f4bfb697bb0092b64041825e501f93faf896ffd04f569569ea0e8c24ab",
+        "declaration_hash": "0f48919ab5ee90dc531ca6372186614fac368f4725b7ea9a9dce64df9bba7f11"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(invocations.len(), 1);\n        let invocation = &invocations[0];\n        assert_eq!(invocation.binary, \"grok\");\n        assert!(invocation.path_prefix.is_none());\n        assert!(invocation.output_last_message.is_none());\n        assert!(!invocation.args.iter().any(|arg| arg == \"--resume\"));\n        assert_settings(&invocation.args, \"grok-fast\", \"medium\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_incompatible_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_expired_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_unavailable_resume_retries_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_provider_mismatched_resume_starts_fresh_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_model_mismatch_starts_fresh_with_explicit_settings"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "e0887bcf448cbb54a35c672d03dd1c1f05db82f221a6c131aaa6fe9d9819462c",
+        "bound_tests_set_hash": "33f93863c8a80d43d1a6f9e590b932bc86d9f8d8f4ba7da51f388f3611cd8d1b",
+        "declaration_hash": "0f48919ab5ee90dc531ca6372186614fac368f4725b7ea9a9dce64df9bba7f11"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "voluntary:AC-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_settings(&invocations[1].args, \"grok-fast\", \"medium\");\n        assert_settings(&invocations[2].args, \"grok-fast\", \"medium\");\n        assert_settings(&invocations[3].args, \"grok-fast\", \"medium\");\n        assert!(invocation.path_prefix.is_none());\n        assert!(invocation.output_last_message.is_none());\n        assert!(!invocations[2].args.iter().any(|arg| arg == \"--resume\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_extracts_only_structured_result"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_missing_structured_result_reports_envelope_failure_reason"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "d11ce21a85298662f0baab64cf9386d4d1a828f171e5d436ec34ba9cbb5ffa99",
+        "bound_tests_set_hash": "8b90622a1b55b6c0fb4540b39cf7a3975ebaaec93bf8711261c8b80435138451",
+        "declaration_hash": "0f48919ab5ee90dc531ca6372186614fac368f4725b7ea9a9dce64df9bba7f11"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "successful judgment must come only from structured_output.result, got {other:?}",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_fast_tier_launches_isolated_typed_pipeline_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::dry_check::grok_dry_checker::tests",
+          "test_name": "test_grok_dry_checker_final_tier_launches_with_final_model_and_effort"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokDryChecker"
+      },
+      "key": {
+        "anchor_text_hash": "0fdadc0364e4cf882e76844253c995b34e5a03ceb1bb42d80f1de454a4100bdf",
+        "bound_tests_set_hash": "fdfd13f4bfb697bb0092b64041825e501f93faf896ffd04f569569ea0e8c24ab",
+        "declaration_hash": "0f48919ab5ee90dc531ca6372186614fac368f4725b7ea9a9dce64df9bba7f11"
+      },
+      "obligation_id": {
+        "entry_key": "GrokDryChecker",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(invocation.binary, \"grok\");\n        assert!(invocation.path_prefix.is_none());\n        assert!(invocation.output_last_message.is_none());\n        assert!(!invocation.args.iter().any(|arg| arg == \"--resume\"));\n        assert_settings(&invocation.args, \"grok-fast\", \"medium\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ],
   "track_id": "2026-08-14-grok-provider-binding"

@@ -398,10 +398,10 @@ impl CapabilityProviderPort for GrokCapabilityAdapter {
 }
 
 /// Schema for generic orchestrator-output capabilities: a required free-form result text.
-const GROK_STRUCTURED_OUTPUT_SCHEMA: &str =
+pub(crate) const GROK_STRUCTURED_OUTPUT_SCHEMA: &str =
     r#"{"type":"object","properties":{"result":{"type":"string"}},"required":["result"]}"#;
 
-fn build_grok_args(
+pub(crate) fn build_grok_args(
     model: &str,
     effort: ReasoningEffort,
     sandbox: &GrokSandbox,

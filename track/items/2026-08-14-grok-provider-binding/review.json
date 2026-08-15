@@ -136,6 +136,35 @@
           "hash": "rvw1:sha256:744ad55464693ce0f7e3078bb297ccd48772131d2ea3655d5fd4b8c13f76c68f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:50:40Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 390,
+              "message": "The new Grok path makes `ReviewCompositionRoot::review_run_local_ungated` execute application flow: it calls `run_grok_review_str`, which invokes `ReviewCycle::review`/`fast_review` and returns the review result. Composition must only construct and hand off the object graph; this provider-specific invoke path belongs behind the driving/use-case boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a985ba4b70de38156ba147453d41d8b93f768772fe7e628ee0ef16ebbb5260a9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T12:55:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a985ba4b70de38156ba147453d41d8b93f768772fe7e628ee0ef16ebbb5260a9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T13:00:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a985ba4b70de38156ba147453d41d8b93f768772fe7e628ee0ef16ebbb5260a9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -152,6 +181,20 @@
           "at": "2026-08-14T19:22:53Z",
           "findings": [],
           "hash": "rvw1:sha256:2fa1e8d5007a18284a54b3d0a1eff57c1d57a5d9fe2febfb59948bf4d0ac4d84",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:49:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2349c98ed639315519385c67227fd9952faa62716166406c8d0fad5d23a7f104",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:59:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2349c98ed639315519385c67227fd9952faa62716166406c8d0fad5d23a7f104",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -482,6 +525,20 @@
           "hash": "rvw1:sha256:819e2395e07771861f516744f17d645f10643797c8ce4b102d0a43050bb313cb",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:37:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9de6564056a85f7aba1ec0cb7745af9488909349ec881685d718a6bfda178655",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:58:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9de6564056a85f7aba1ec0cb7745af9488909349ec881685d718a6bfda178655",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -674,6 +731,57 @@
           "hash": "rvw1:sha256:50e447b58251c330ab7be2656b0b72b73cb147dfe4bb8344481924fdfab6a522",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:49:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9a3df06e10a0492d9588e7dadc654bcbda240168e9411b793d6c52f2e8abcbe0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T13:03:41Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/review_v2/grok_reviewer.rs",
+              "line": 148,
+              "message": "A Grok subprocess timeout can never become `ReviewerError::Timeout`: `ProviderProcessRunner` reports it as `CapabilityExecError::DispatchFailed`, but this blanket conversion changes every runner failure into `Unexpected`, while the later classifier is always passed `timed_out = false`. The composition layer consequently does not recognize this as a subprocess failure, so normal failure recording/telemetry is skipped. Preserve the timeout distinction and add a focused timeout test.",
+              "severity": "P1"
+            },
+            {
+              "category": "session-resume",
+              "file": "libs/infrastructure/src/review_v2/grok_reviewer.rs",
+              "line": 185,
+              "message": "An effort-mismatched cached reviewer session is still resumed. `run_review` accepts the ID returned by `ReviewerSession::resumable_id`, whose compatibility check considers provider and model but not the cached `ReasoningEffort`; a valid response then prevents the fresh fallback required by the briefing. Reject cache entries whose effort differs from the current reviewer effort and cover this case explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9a3df06e10a0492d9588e7dadc654bcbda240168e9411b793d6c52f2e8abcbe0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T13:15:55Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/review_v2/grok_reviewer.rs",
+              "line": 233,
+              "message": "Malformed Grok stdout is mapped to `ReviewerError::Unexpected` after the subprocess has already run. The shared review workflow does not recognize the resulting `cannot decode Grok output envelope...` message as a subprocess failure, so it follows the pre-subprocess error path and skips `SubprocessFailed` telemetry/diagnostics. Map envelope decoding failures to `IllegalVerdict`, and classify non-zero exits before decoding, so provider-output failures remain on the typed subprocess-failure path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2d3b71e3a7020d130e9942135572a3178508f50cf2a0cc326fad759749410c81",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T13:20:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:52ee051f0ce404e42d4a79f6ed100e74fb28bac6034790fd5a06e8c13efb7c42",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -805,6 +913,42 @@
           "at": "2026-08-15T09:12:42Z",
           "findings": [],
           "hash": "rvw1:sha256:4453cf117187fe1e88011555f5cfc420b749c328cba8c0b5c8a8ec002d833c7c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:37:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9ef25a8bf22c134977a8e5c3a7cc268f5355cee5010d84eee2cbdaecba930393",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T13:00:41Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-14-grok-provider-binding/test-bindings.json",
+              "line": 547,
+              "message": "The GrokReviewer fulfillment uses the stale obligation ID `trait_impl:usecase::review_v2::Reviewer`; current derivation yields `trait_impl:usecase::review_v2::ports::Reviewer`. The obligation check rejects this as unexpected and leaves the derived obligation missing. Regenerate the obligations/bindings skeleton and bind the generated ID.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-14-grok-provider-binding/test-bindings.json",
+              "line": 612,
+              "message": "The GrokDryChecker fulfillment uses the stale obligation ID `trait_impl:usecase::dry_check::DryCheckAgentPort`; current derivation yields `trait_impl:usecase::dry_check::ports::DryCheckAgentPort`. The obligation check therefore rejects this record and leaves the derived contract-conformance obligation unfulfilled. Regenerate the obligations/bindings skeleton and bind the generated ID.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9ef25a8bf22c134977a8e5c3a7cc268f5355cee5010d84eee2cbdaecba930393",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T13:13:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e2fd0238398779302b6bb772cc5aa9a29952c673dc834aca8a4d431089af37b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -985,6 +1129,20 @@
           "at": "2026-08-14T17:31:08Z",
           "findings": [],
           "hash": "rvw1:sha256:feca07f4773e9fc1ef49dced1a5c8b08869152f4f5f3bc7098c80a9bdc3ce981",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:53:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6824ce58e3587053f882e5b0b48c7fa2e11896ed76092fe136afe0d0ce380e52",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T12:59:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6824ce58e3587053f882e5b0b48c7fa2e11896ed76092fe136afe0d0ce380e52",
           "type": "final",
           "verdict": "zero_findings"
         }

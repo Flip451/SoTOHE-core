@@ -7,6 +7,7 @@
 //! - [`GitDryCheckDiffGetter`]: git-based diff-source returning hunk ranges.
 //! - [`FsDryCheckCommitHashStore`]: filesystem reader for the `.commit_hash` file.
 //! - [`CodexDryChecker`]: Codex-backed agent adapter implementing `DryCheckAgentPort`.
+//! - [`GrokDryChecker`]: Grok-backed typed-pipeline adapter implementing `DryCheckAgentPort`.
 //!
 //! Also provides the `.harness/config/dry-check.json` loader:
 //!
@@ -33,6 +34,7 @@ pub mod dry_driver_shared;
 pub mod dry_fix_local;
 #[cfg(feature = "semantic-dup")]
 pub mod dry_write_driver;
+mod grok_dry_checker;
 pub mod noop_approval;
 pub mod recording_agent;
 mod store;
@@ -48,6 +50,7 @@ pub use coverage::FsDryCheckCoverageAdapter;
 pub use diff_base_resolver::FsDiffBaseResolverAdapter;
 pub use diff_getter::GitDryCheckDiffGetter;
 pub use dry_fix_local::DryDriverAdapter;
+pub use grok_dry_checker::GrokDryChecker;
 pub use noop_approval::NoOpDryApprovalService;
 pub use recording_agent::RecordingDryAgent;
 pub use store::FsDryCheckStore;

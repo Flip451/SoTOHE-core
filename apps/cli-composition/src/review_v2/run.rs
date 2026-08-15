@@ -1,4 +1,4 @@
-//! Review cycle execution helpers (Codex and Claude).
+//! Review cycle execution helpers (Codex, Claude, and Grok).
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -11,7 +11,7 @@ use domain::review_v2::{
     Verdict,
 };
 use infrastructure::review_v2::{
-    ClaudeReviewer, CodexReviewer, FsReviewStore, GitDiffGetter, SystemReviewHasher,
+    ClaudeReviewer, CodexReviewer, FsReviewStore, GitDiffGetter, GrokReviewer, SystemReviewHasher,
 };
 use usecase::review_v2::error::{ReviewCycleError, ReviewerError};
 use usecase::review_v2::{DiffGetter, ReviewCycle, ReviewHasher, Reviewer};
@@ -315,6 +315,24 @@ pub(crate) fn run_claude_review_str(
     group_str: &str,
     round_type_str: &str, // "fast" | "final"
     reviewer: ClaudeReviewer,
+) -> Result<CodexReviewOutcome, String> {
+    run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer)
+}
+
+/// Runs the full Grok review cycle from string inputs.
+///
+/// Mirrors [`run_codex_review_str`] with [`GrokReviewer`] in place of
+/// [`CodexReviewer`]. The reviewer remains a dedicated typed-pipeline adapter;
+/// this helper only supplies it to the shared review-cycle machinery.
+///
+/// # Errors
+/// Returns a human-readable error string on failure at any step.
+pub(crate) fn run_grok_review_str(
+    track_id_str: &str,
+    items_dir: &Path,
+    group_str: &str,
+    round_type_str: &str, // "fast" | "final"
+    reviewer: GrokReviewer,
 ) -> Result<CodexReviewOutcome, String> {
     run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer)
 }

@@ -38,7 +38,7 @@ use helpers::{
     outcome_to_run_review_output, resolve_track_id_or_branch, resolve_track_id_or_branch_write,
     validate_all_paths,
 };
-use run::{run_claude_review_str, run_codex_review_str};
+use run::{run_claude_review_str, run_codex_review_str, run_grok_review_str};
 use scope::validate_scope_for_track_str;
 use session_context::reviewer_session_context;
 use shared::{build_scope_query_interactor_no_diff_str, build_scope_query_interactor_str};
@@ -48,7 +48,8 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use infrastructure::agent_profiles::ResolvedExecution;
-use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer};
+use infrastructure::grok_common::GrokSandbox;
+use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer, GrokReviewer};
 use usecase::{capability_exec::ReasoningEffort, dry_write_driver::CapabilityName};
 
 use crate::{CommandOutcome, error::CompositionError};
@@ -241,8 +242,8 @@ impl ReviewCompositionRoot {
     ///
     /// Resolves the `reviewer` capability from `agent-profiles.json` at the repo
     /// root, applies an optional model override, and dispatches to the appropriate
-    /// reviewer implementation (codex or claude). Delegates all domain type
-    /// handling to `run_codex_review_str` / `run_claude_review_str` (CN-02).
+    /// reviewer implementation (codex, claude, or grok). Delegates all domain
+    /// type handling to the provider-specific string adapters (CN-02).
     ///
     /// Ungated execution body: callers outside the gated service graph must go
     /// through [`Self::review_run_local`] or the [`cli_driver::review::ReviewDriver`]
@@ -365,10 +366,40 @@ impl ReviewCompositionRoot {
                 );
                 (result, "claude".to_owned(), model)
             }
+            "grok" => {
+                let session = reviewer_session_context(
+                    &track_id,
+                    &group,
+                    &input.round_type,
+                    &model,
+                    base_prompt,
+                    &input.items_dir,
+                )?;
+                let reviewer = GrokReviewer::new(
+                    session.track_id,
+                    session.scope,
+                    session.round_type,
+                    session.diff_base,
+                    session.model,
+                    effort,
+                    GrokSandbox::Workspace,
+                    timeout,
+                    session.prompt,
+                    session.cache,
+                );
+                let result = run_grok_review_str(
+                    &track_id,
+                    &input.items_dir,
+                    &group,
+                    &input.round_type,
+                    reviewer,
+                );
+                (result, "grok".to_owned(), model)
+            }
             other => {
                 return Err(CompositionError::WiringFailed(format!(
                     "[ERROR] unsupported reviewer provider '{other}' \
-                     (supported: 'codex', 'claude')"
+                     (supported: 'codex', 'claude', 'grok')"
                 )));
             }
         };
@@ -860,11 +891,59 @@ exit 0
     }
 
     #[cfg(unix)]
+    fn write_recording_grok_reviewer_bin(
+        bin_dir: &std::path::Path,
+        arguments_log: &std::path::Path,
+        fail_resume: bool,
+    ) {
+        fs::create_dir_all(bin_dir).unwrap();
+        let grok = bin_dir.join("grok");
+        let resume_failure =
+            if fail_resume { r#"case "$*" in *--resume*) exit 7 ;; esac"# } else { "" };
+        // The text field deliberately reports a conflicting finding. The typed
+        // Grok reviewer must use only structured_output.result for the verdict.
+        let envelope = r#"{"sessionId":"grok-review-session","text":"{\"verdict\":\"findings_remain\",\"findings\":[{\"message\":\"text-only finding\"}]}","structured_output":{"result":"{\"verdict\":\"zero_findings\",\"findings\":[]}"}}"#;
+        let script = format!(
+            r#"#!/bin/sh
+printf '%s\n' '--- grok invocation ---' >> '{log}'
+printf '%s\n' "$*" >> '{log}'
+{resume_failure}
+printf '%s\n' '{envelope}'
+exit 0
+"#,
+            log = arguments_log.display(),
+            resume_failure = resume_failure,
+            envelope = envelope,
+        );
+        fs::write(&grok, script).unwrap();
+        make_executable(&grok);
+    }
+
+    #[cfg(unix)]
     fn seed_reviewer_session(
         repo: &ReviewEntrypointRepo,
         scope: ScopeName,
         round_type: RoundType,
         model: &str,
+    ) {
+        seed_reviewer_session_for_provider(
+            repo,
+            scope,
+            round_type,
+            "codex",
+            model,
+            ReasoningEffort::High,
+        );
+    }
+
+    #[cfg(unix)]
+    fn seed_reviewer_session_for_provider(
+        repo: &ReviewEntrypointRepo,
+        scope: ScopeName,
+        round_type: RoundType,
+        provider: &str,
+        model: &str,
+        effort: ReasoningEffort,
     ) {
         let cache = FsProviderSessionCacheAdapter::new(
             repo._dir.path().to_path_buf(),
@@ -881,11 +960,36 @@ exit 0
         };
         let entry = ProviderSessionCacheEntry::new(
             ProviderSessionId::try_new("prior-session".to_owned()).unwrap(),
-            ProviderName::try_new("codex".to_owned()).unwrap(),
+            ProviderName::try_new(provider.to_owned()).unwrap(),
             ModelName::try_new(model.to_owned()).unwrap(),
-            ReasoningEffort::High,
+            effort,
         );
         cache.save(&key, &entry).unwrap();
+    }
+
+    #[cfg(unix)]
+    fn assert_grok_invocation(arguments: &str, model: &str, effort: &str, resume_id: Option<&str>) {
+        assert!(arguments.contains("-p Review Grok."), "Grok prompt missing: {arguments}");
+        assert!(arguments.contains(&format!("--model {model}")), "Grok model missing: {arguments}");
+        assert!(
+            arguments.contains(&format!("--reasoning-effort {effort}")),
+            "Grok reasoning effort missing: {arguments}"
+        );
+        assert!(arguments.contains("--sandbox workspace"), "Grok sandbox missing: {arguments}");
+        assert!(
+            arguments.contains("--output-format json"),
+            "Grok output format missing: {arguments}"
+        );
+        assert!(arguments.contains("--json-schema"), "Grok schema flag missing: {arguments}");
+        assert!(arguments.contains(r#""result""#), "Grok result schema missing: {arguments}");
+        assert!(!arguments.split_whitespace().any(|arg| arg == "agent" || arg == "--leader"));
+        match resume_id {
+            Some(id) => assert!(
+                arguments.contains(&format!("--resume {id}")),
+                "resume missing: {arguments}"
+            ),
+            None => assert!(!arguments.contains("--resume "), "unexpected resume: {arguments}"),
+        }
     }
 
     #[cfg(unix)]
@@ -1577,6 +1681,210 @@ exit 0
         assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
         assert_review_telemetry(&repo.track_dir, "claude", "review-fast", "claude", "fast");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_run_local_grok_profile_dispatches_typed_pipeline_and_records_structured_verdict()
+    {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-grok-2026");
+        write_agent_profiles(repo._dir.path(), "grok");
+        let bin_dir = repo.track_dir.join("fake-bin-local-grok");
+        let arguments_log = repo.track_dir.join("grok-arguments.log");
+        write_recording_grok_reviewer_bin(&bin_dir, &arguments_log, false);
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_local_ungated(crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review Grok.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(
+            !outcome.summary.as_deref().unwrap_or("").contains("text-only finding"),
+            "Grok envelope text must not become the review verdict"
+        );
+        assert!(repo.track_dir.join("review.json").exists());
+        let verdict = fs::read_to_string(repo.track_dir.join("review.json")).unwrap();
+        assert!(verdict.contains("zero_findings"), "verdict was not recorded: {verdict}");
+        assert!(!verdict.contains("text-only finding"));
+
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        assert_grok_invocation(&arguments, "review-fast", "low", None);
+        assert_review_telemetry(&repo.track_dir, "grok", "review-fast", "grok", "fast");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_run_local_grok_matching_resume_restates_settings_and_uses_session_id() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-grok-resume-2026");
+        write_agent_profiles(repo._dir.path(), "grok");
+        let bin_dir = repo.track_dir.join("fake-bin-local-grok-resume");
+        let arguments_log = repo.track_dir.join("grok-resume-arguments.log");
+        write_recording_grok_reviewer_bin(&bin_dir, &arguments_log, false);
+        seed_reviewer_session_for_provider(
+            &repo,
+            ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+            RoundType::Fast,
+            "grok",
+            "review-fast",
+            ReasoningEffort::Low,
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_local_ungated(crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review Grok.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        let attempts: Vec<&str> = arguments
+            .split("--- grok invocation ---")
+            .filter(|attempt| !attempt.trim().is_empty())
+            .collect();
+        assert_eq!(attempts.len(), 1, "matching resume should launch once: {arguments}");
+        assert_grok_invocation(
+            attempts.first().expect("matching resume attempt is recorded"),
+            "review-fast",
+            "low",
+            Some("prior-session"),
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_run_local_grok_unavailable_resume_falls_back_to_fresh_session() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-grok-fallback-2026");
+        write_agent_profiles(repo._dir.path(), "grok");
+        let bin_dir = repo.track_dir.join("fake-bin-local-grok-fallback");
+        let arguments_log = repo.track_dir.join("grok-fallback-arguments.log");
+        write_recording_grok_reviewer_bin(&bin_dir, &arguments_log, true);
+        seed_reviewer_session_for_provider(
+            &repo,
+            ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+            RoundType::Fast,
+            "grok",
+            "review-fast",
+            ReasoningEffort::Low,
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_local_ungated(crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review Grok.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        let attempts: Vec<&str> = arguments
+            .split("--- grok invocation ---")
+            .filter(|attempt| !attempt.trim().is_empty())
+            .collect();
+        assert_eq!(attempts.len(), 2, "failed resume should retry fresh: {arguments}");
+        assert_grok_invocation(
+            attempts.first().expect("failed resume attempt is recorded"),
+            "review-fast",
+            "low",
+            Some("prior-session"),
+        );
+        assert_grok_invocation(
+            attempts.get(1).expect("fresh retry attempt is recorded"),
+            "review-fast",
+            "low",
+            None,
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_run_local_grok_incompatible_resume_starts_fresh_session() {
+        let _lock = cwd_lock().lock().unwrap();
+        let _cwd_guard = CwdGuard::save_current();
+
+        for (case, provider, model) in [
+            ("provider-mismatch", "codex", "review-fast"),
+            ("model-mismatch", "grok", "previous-review-model"),
+        ] {
+            let repo = setup_review_entrypoint_repo(&format!("review-run-local-grok-{case}-2026"));
+            write_agent_profiles(repo._dir.path(), "grok");
+            let bin_dir = repo.track_dir.join("fake-bin-local-grok-incompatible");
+            let arguments_log = repo.track_dir.join("grok-incompatible-arguments.log");
+            write_recording_grok_reviewer_bin(&bin_dir, &arguments_log, false);
+            seed_reviewer_session_for_provider(
+                &repo,
+                ScopeName::Main(MainScopeName::new("cli_composition").unwrap()),
+                RoundType::Fast,
+                provider,
+                model,
+                ReasoningEffort::Low,
+            );
+            let _path_guard = prepend_path(&bin_dir);
+            std::env::set_current_dir(repo._dir.path()).unwrap();
+
+            let outcome = ReviewCompositionRoot::new()
+                .review_run_local_ungated(crate::review_v2::ReviewRunLocalInput {
+                    model: None,
+                    timeout_seconds: 10,
+                    briefing_file: None,
+                    prompt: Some("Review Grok.".to_owned()),
+                    track_id: Some(repo.track_id.clone()),
+                    round_type: "fast".to_owned(),
+                    group: "cli_composition".to_owned(),
+                    items_dir: repo.items_dir.clone(),
+                })
+                .unwrap();
+
+            assert_eq!(outcome.exit_code, 0, "{case}");
+            let arguments = fs::read_to_string(arguments_log).unwrap();
+            let attempts: Vec<&str> = arguments
+                .split("--- grok invocation ---")
+                .filter(|attempt| !attempt.trim().is_empty())
+                .collect();
+            assert_eq!(attempts.len(), 1, "{case} should start fresh: {arguments}");
+            assert_grok_invocation(
+                attempts.first().expect("incompatible resume starts fresh"),
+                "review-fast",
+                "low",
+                None,
+            );
+        }
     }
 
     #[cfg(unix)]

@@ -1,8 +1,8 @@
 {
   "baseline_hash": "1db98d07f55de7d5c620ae7123f843d04d964cd7c3be044e33c7dd186d48c599",
-  "declaration_hash": "0c40dfcc1beb0689cf83ab8e0e4651e3391d1cb0e0ad98bd9a57cbb8e72cdd3d",
-  "generated_at": "2026-08-15T09:28:15Z",
-  "head_commit": "2fbff3c69589300130f7da3cf2a7ba572abd1e80",
+  "declaration_hash": "e0068a427948614f5922cded6405c7b811cbc9c3ac9ea746df499d49b8bc06af",
+  "generated_at": "2026-08-15T13:23:34Z",
+  "head_commit": "a044a3f9f7ef93b94d36722a24b649d896565609",
   "schema_version": 4,
   "signals": [
     {
@@ -28,13 +28,13 @@
       "type_name": "GrokCapabilityDefinition"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
+      "found_items": [
         "Debug",
-        "usecase::dry_check::DryCheckAgentPort"
+        "usecase::dry_check::ports::DryCheckAgentPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "GrokDryChecker"
     },
     {
@@ -65,12 +65,12 @@
       "type_name": "GrokOutputEnvelope"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
-        "usecase::review_v2::Reviewer"
+      "found_items": [
+        "usecase::review_v2::ports::Reviewer"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "GrokReviewer"
     },
     {

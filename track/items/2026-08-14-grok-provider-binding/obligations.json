@@ -73,11 +73,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::Reviewer' of GrokReviewer",
-      "declaration_hash": "69aca5ba145f6545016cf3ff605289b312080a04d7219a90efe746a0817d5f7b",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::ports::Reviewer' of GrokReviewer",
+      "declaration_hash": "54ea00e04fe39968ed7ae0c8296199df328ed2e52e31bf5241a803f7924fb866",
       "id": {
         "entry_key": "GrokReviewer",
-        "item_identifier": "trait_impl:usecase::review_v2::Reviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -105,11 +105,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::dry_check::DryCheckAgentPort' of GrokDryChecker",
-      "declaration_hash": "0875f1213a473686c228519bd2134691c31ee1f0be736682aed4846d36b6ab73",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::dry_check::ports::DryCheckAgentPort' of GrokDryChecker",
+      "declaration_hash": "b34cd28e8c17b79cd7f940190eb9edbc785e8a1f9b9f3cc771b34846cf7abc6c",
       "id": {
         "entry_key": "GrokDryChecker",
-        "item_identifier": "trait_impl:usecase::dry_check::DryCheckAgentPort",
+        "item_identifier": "trait_impl:usecase::dry_check::ports::DryCheckAgentPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [

@@ -86,6 +86,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "a044a3f9f7ef93b94d36722a24b649d896565609",
       "depends_on": [
         "T001",
         "T002"
@@ -101,7 +102,7 @@
       ],
       "description": "Implement `GrokReviewer` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/review_v2/grok_reviewer.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
       "id": "T004",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -110,7 +111,7 @@
       ],
       "description": "Implement `GrokDryChecker` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/dry_check/grok_dry_checker.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -122,6 +123,7 @@
       "status": "todo"
     },
     {
+      "commit_hash": "a044a3f9f7ef93b94d36722a24b649d896565609",
       "depends_on": [
         "T003"
       ],
@@ -135,7 +137,7 @@
       ],
       "description": "Wire `ReviewDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with reviewer-dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05]",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
