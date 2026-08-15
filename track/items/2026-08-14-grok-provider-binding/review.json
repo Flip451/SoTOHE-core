@@ -114,6 +114,79 @@
         }
       ]
     },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-14T19:14:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2fa1e8d5007a18284a54b3d0a1eff57c1d57a5d9fe2febfb59948bf4d0ac4d84",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T19:22:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2fa1e8d5007a18284a54b3d0a1eff57c1d57a5d9fe2febfb59948bf4d0ac4d84",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-14T19:15:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f54270a0c30c24f7a6990e35146320d938be665a9f95df4ec57976d3adcbf433",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T19:24:15Z",
+          "findings": [
+            {
+              "category": "capability_routing_mismatch",
+              "file": ".harness/config/samples/agent-profiles.grok-heavy.json",
+              "line": 29,
+              "message": "The shipped Grok-heavy profile routes `spec-designer` and nearly every other capability to Grok, but only `impl-planner` declares the mandatory `grok-sandbox`; several typed-pipeline capabilities have no corresponding shared `.agents/skills/<capability>/SKILL.md` at all. Under the ADR/spec fail-closed contract, adopting this sample therefore rejects those dispatches. Add the required shared definitions/declarations or keep unsupported capabilities on an existing provider.",
+              "severity": "P1"
+            },
+            {
+              "category": "review_scope_wiring_inconsistency",
+              "file": ".harness/config/template-boundary.json",
+              "line": 22,
+              "message": "Adding `.grok` to the shipped template boundary without adding `.grok/**` to the `harness-policy` patterns leaves the new host-hook surface outside review. `bin/sotp review files --scope harness-policy` consequently omits both `.grok/hooks/sotp.json` and `.grok/hooks/sotp-hook.sh`, even though this briefing explicitly requires their validation. Add the new surface to `.harness/config/review-scope.json`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f54270a0c30c24f7a6990e35146320d938be665a9f95df4ec57976d3adcbf433",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T20:08:15Z",
+          "findings": [
+            {
+              "category": "hook_wiring_inconsistency",
+              "file": ".grok/hooks/sotp.json",
+              "line": 8,
+              "message": "`skill-compliance` cannot deliver its intended advisory on Grok. The handler emits `hookSpecificOutput.additionalContext` on stdout, but Grok treats `UserPromptSubmit` as observe-only and ignores both stdout and the exit status, so the skill guidance never reaches the agent. Use a Grok-supported context-injection/enforcement mechanism or revise the claimed hook parity. See the [official Grok hooks contract](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-pager/docs/user-guide/10-hooks.md).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2bc0b0c04cbd5ed8d9cb1336e7170965f43a1627bf1f3b53bc85c5c33ffaddd2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T20:09:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2bc0b0c04cbd5ed8d9cb1336e7170965f43a1627bf1f3b53bc85c5c33ffaddd2",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -328,6 +401,38 @@
           "hash": "rvw1:sha256:e6101921dfeaab06827bcfdd224dde2ffb2faa66dcbea1e3eefb257edf2511dc",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T19:14:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03b7810485e1a18999c16cbc590f763f0553007996055f9dafdf96c3394d74ee",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T19:23:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:03b7810485e1a18999c16cbc590f763f0553007996055f9dafdf96c3394d74ee",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-14T19:15:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9ae7fc85bbc2bdb218262e16cb19c7e2a326f87ec6cd15bf5ec07489d575e50",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T19:22:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d9ae7fc85bbc2bdb218262e16cb19c7e2a326f87ec6cd15bf5ec07489d575e50",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -344,6 +449,57 @@
           "at": "2026-08-14T17:39:52Z",
           "findings": [],
           "hash": "rvw1:sha256:3ada4da0c2b236d5f7391bd209c85a2b2e5f0c31084cfc7566c7cf66441d386f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T19:15:40Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": ".grok/hooks/sotp.json",
+              "line": 8,
+              "message": "The `UserPromptSubmit` hook invokes `skill-compliance` without fail-open handling. When `bin/sotp` is absent (normal in a fresh checkout), `sotp-hook.sh` exits 2, causing every Grok prompt submission to be rejected instead of treating this advisory check as unavailable. Add `|| exit 0` for this hook, while keeping the enforcement hooks fail-closed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:97e0515ca5cefecdcc1778919e490f66345828b8fe12a5f58671f1c2d0e0294e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T19:17:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:410b9fe0f52d40212c36a617d73552eb74e3359b0b41ac11582acf4488942703",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T19:24:33Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": ".grok/hooks/sotp-hook.sh",
+              "line": 11,
+              "message": "The launcher `exec`s the selected CLI without normalizing launch or crash failures. Grok treats exit codes other than 2 as fail-open; for example, an invalid `SOTP_CLI_BINARY` makes this line exit 127, allowing the terminal operation without the hooks-path or git-operation guard. Convert every unsuccessful PreToolUse dispatch into exit 2; the surrounding `UserPromptSubmit` command can remain explicitly fail-open. See the [Grok hook exit-code contract](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-pager/docs/user-guide/10-hooks.md#exit-codes).",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": ".grok/hooks/sotp.json",
+              "line": 8,
+              "message": "This registration cannot deliver skill-compliance guidance. Grok treats `UserPromptSubmit` as observe-only and ignores its stdout, while `sotp hook dispatch skill-compliance` communicates through stdout `additionalContext`. The handler therefore runs but its guidance never reaches the model, leaving the D9/AC-07 behavior ineffective. Use a Grok-supported context-injection surface or revise the contract. See the [Grok hooks compatibility notes](https://github.com/xai-org/grok-build/blob/main/crates/codegen/xai-grok-pager/docs/user-guide/10-hooks.md#passive-hooks).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:410b9fe0f52d40212c36a617d73552eb74e3359b0b41ac11582acf4488942703",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T20:04:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:693ed799c040370071b5a2b3039b263707c36743954c4f1d1098488d9288b711",
           "type": "final",
           "verdict": "zero_findings"
         }

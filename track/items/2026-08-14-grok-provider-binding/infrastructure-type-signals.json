@@ -1,8 +1,8 @@
 {
   "baseline_hash": "1db98d07f55de7d5c620ae7123f843d04d964cd7c3be044e33c7dd186d48c599",
   "declaration_hash": "0c40dfcc1beb0689cf83ab8e0e4651e3391d1cb0e0ad98bd9a57cbb8e72cdd3d",
-  "generated_at": "2026-08-14T18:22:44Z",
-  "head_commit": "aae53d50f42a122f73a338af6cfe386d5793a99d",
+  "generated_at": "2026-08-15T05:05:53Z",
+  "head_commit": "70a990333f137e82c0a9f998250942a9ea77254d",
   "schema_version": 4,
   "signals": [
     {
@@ -38,9 +38,7 @@
       "type_name": "GrokDryChecker"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Debug",
         "Display",
@@ -48,20 +46,22 @@
         "Error",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "GrokEnvelopeError"
     },
     {
-      "found_type": false,
-      "kind_tag": "enum",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
       "type_name": "GrokOutputEnvelope"
     },
     {

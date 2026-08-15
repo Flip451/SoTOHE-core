@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GrokOutputEnvelope | enum | add | Succeeded, Failed | 🟡 | 🔵 |
+| GrokOutputEnvelope | enum | add | Succeeded, Failed | 🔵 | 🔵 |
 | GrokSandbox | enum | add | ReadOnly, Workspace, Strict, ProjectProfile | 🟡 | 🔵 |
 
 ## Value Objects
@@ -17,7 +17,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GrokEnvelopeError | error_type | add | ProviderFailure | 🟡 | 🔵 |
+| GrokEnvelopeError | error_type | add | ProviderFailure | 🔵 | 🔵 |
 | GrokSandboxProfileNameError | error_type | add | Empty, Reserved | 🟡 | 🔵 |
 
 ## DTOs

@@ -75,6 +75,7 @@
         ".claude/agents/**",
         ".claude/skills/**",
         ".agents/**",
+        ".grok/**",
         ".harness/**",
         ".codex/**",
         ".claude/settings*.json",

@@ -1,124 +1,159 @@
 {
-  "schema_version": 2,
-  "tasks": [
-    {
-      "id": "T001",
-      "description": "Add `GrokOutputEnvelope` and `GrokEnvelopeError` with focused envelope-extraction tests in `libs/infrastructure/src/grok_common.rs`. [IN-01; OS-02; AC-01]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T009",
-      "description": "Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-01; AC-04]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T008",
-      "description": "Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; CN-01; AC-06]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T002",
-      "description": "Add `GrokCapabilityDefinition` discovery and admission validation with shared-adapter fixture tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-02; IN-04; IN-05; OS-04; OS-05; CN-01; CN-02; AC-02; AC-03; AC-04]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T009"]
-    },
-    {
-      "id": "T003",
-      "description": "Implement `GrokCapabilityAdapter` with subprocess, structured-envelope, and resume fallback tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-01; IN-02; IN-03; IN-04; IN-05; OS-01; OS-02; OS-03; OS-04; OS-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T001", "T002"]
-    },
-    {
-      "id": "T004",
-      "description": "Implement `GrokReviewer` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/review_v2/grok_reviewer.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T001", "T002"]
-    },
-    {
-      "id": "T005",
-      "description": "Implement `GrokDryChecker` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/dry_check/grok_dry_checker.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T001", "T002"]
-    },
-    {
-      "id": "T010",
-      "description": "Update `CodexDryFixLocalRunner` in `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs` and `ReviewFixRunnerAdapter` in `libs/infrastructure/src/review_v2/review_fix_adapter.rs` with Grok launch-path tests. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T001", "T002"]
-    },
-    {
-      "id": "T006",
-      "description": "Wire `CapabilityDriver` in `apps/cli-driver/src/capability.rs` and `CapabilityCompositionRoot` in `apps/cli-composition/src/capability.rs`, with capability-dispatch integration tests. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T003"]
-    },
-    {
-      "id": "T011",
-      "description": "Wire `ReviewDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with reviewer-dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T004"]
-    },
-    {
-      "id": "T012",
-      "description": "Wire `ReviewFixDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_fix_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with review-fix dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T005", "T010"]
-    },
-    {
-      "id": "T007",
-      "description": "Add Grok host-guard declarations under `.grok/hooks/` and validate their configured handler names. [IN-07; OS-06; CN-03; AC-07]",
-      "status": "todo",
-      "commit_hash": null
-    },
-    {
-      "id": "T013",
-      "description": "Update `HookInput`, `HookDriver`, and `CommandOutcome` in `apps/cli-driver/src/hook.rs` with Grok envelope and tool-name translation tests. [IN-07; OS-06; CN-03; AC-07]",
-      "status": "todo",
-      "commit_hash": null,
-      "depends_on": ["T007"]
-    }
-  ],
   "plan": {
     "sections": [
       {
+        "description": [
+          "Coordinate foundation and admission tasks. [IN-01; IN-02; IN-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-06]"
+        ],
         "id": "provider-foundation",
-        "title": "Provider foundation and admission",
-        "description": ["Coordinate foundation and admission tasks. [IN-01; IN-02; IN-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-06]"],
-        "task_ids": ["T001", "T009", "T008", "T002"]
+        "task_ids": [
+          "T001",
+          "T009",
+          "T008",
+          "T002"
+        ],
+        "title": "Provider foundation and admission"
       },
       {
+        "description": [
+          "Coordinate provider execution tasks. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; OS-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]"
+        ],
         "id": "provider-execution-paths",
-        "title": "Provider execution paths",
-        "description": ["Coordinate provider execution tasks. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; OS-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]"],
-        "task_ids": ["T003", "T004", "T005", "T010"]
+        "task_ids": [
+          "T003",
+          "T004",
+          "T005",
+          "T010"
+        ],
+        "title": "Provider execution paths"
       },
       {
+        "description": [
+          "Coordinate driver and composition wiring tasks. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]"
+        ],
         "id": "provider-composition",
-        "title": "Provider composition wiring",
-        "description": ["Coordinate driver and composition wiring tasks. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]"],
-        "task_ids": ["T006", "T011", "T012"]
+        "task_ids": [
+          "T006",
+          "T011",
+          "T012"
+        ],
+        "title": "Provider composition wiring"
       },
       {
+        "description": [
+          "Coordinate Grok host guard tasks. [IN-07; OS-06; CN-03; AC-07]"
+        ],
         "id": "grok-host-guards",
-        "title": "Grok host guards",
-        "description": ["Coordinate Grok host guard tasks. [IN-07; OS-06; CN-03; AC-07]"],
-        "task_ids": ["T007", "T013"]
+        "task_ids": [
+          "T007",
+          "T013"
+        ],
+        "title": "Grok host guards"
       }
     ],
     "summary": [
       "GO-01 -> T001, T009, T008, T002, T003, T004, T005, T010, T006, T011, T012.",
       "Grok host hook coverage is delivered by T007 and T013."
     ]
-  }
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "description": "Add `GrokOutputEnvelope` and `GrokEnvelopeError` with focused envelope-extraction tests in `libs/infrastructure/src/grok_common.rs`. [IN-01; OS-02; AC-01]",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "description": "Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-01; AC-04]",
+      "id": "T009",
+      "status": "todo"
+    },
+    {
+      "description": "Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; CN-01; AC-06]",
+      "id": "T008",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T009"
+      ],
+      "description": "Add `GrokCapabilityDefinition` discovery and admission validation with shared-adapter fixture tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-02; IN-04; IN-05; OS-04; OS-05; CN-01; CN-02; AC-02; AC-03; AC-04]",
+      "id": "T002",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "description": "Implement `GrokCapabilityAdapter` with subprocess, structured-envelope, and resume fallback tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-01; IN-02; IN-03; IN-04; IN-05; OS-01; OS-02; OS-03; OS-04; OS-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]",
+      "id": "T003",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "description": "Implement `GrokReviewer` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/review_v2/grok_reviewer.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
+      "id": "T004",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "description": "Implement `GrokDryChecker` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/dry_check/grok_dry_checker.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
+      "id": "T005",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T001",
+        "T002"
+      ],
+      "description": "Update `CodexDryFixLocalRunner` in `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs` and `ReviewFixRunnerAdapter` in `libs/infrastructure/src/review_v2/review_fix_adapter.rs` with Grok launch-path tests. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
+      "id": "T010",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T003"
+      ],
+      "description": "Wire `CapabilityDriver` in `apps/cli-driver/src/capability.rs` and `CapabilityCompositionRoot` in `apps/cli-composition/src/capability.rs`, with capability-dispatch integration tests. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]",
+      "id": "T006",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T004"
+      ],
+      "description": "Wire `ReviewDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with reviewer-dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05]",
+      "id": "T011",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T005",
+        "T010"
+      ],
+      "description": "Wire `ReviewFixDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_fix_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with review-fix dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05]",
+      "id": "T012",
+      "status": "todo"
+    },
+    {
+      "description": "Add Grok host-guard declarations under `.grok/hooks/` and validate their configured handler names. [IN-07; OS-06; CN-03; AC-07]",
+      "id": "T007",
+      "status": "done"
+    },
+    {
+      "depends_on": [
+        "T007"
+      ],
+      "description": "Update `HookInput`, `HookDriver`, and `CommandOutcome` in `apps/cli-driver/src/hook.rs` with Grok envelope and tool-name translation tests. [IN-07; OS-06; CN-03; AC-07]",
+      "id": "T013",
+      "status": "done"
+    }
+  ]
 }

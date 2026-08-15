@@ -1,4 +1,159 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokEnvelopeError"
+      },
+      "key": {
+        "anchor_text_hash": "266a0bbb8f4177d73d0c9eadeff6ef7a0863d4689da523ec84df527b49df6030",
+        "bound_tests_set_hash": "06f7be7f8cb3ab4c348397d5847672101f9df06184982c32dcaf1690634e7dca",
+        "declaration_hash": "c9c347198231bacc2480d7a478aa63bb060b961a93332d91a9701d9a5e0761a5"
+      },
+      "obligation_id": {
+        "entry_key": "GrokEnvelopeError",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n    envelope.into_structured_output(),\n    Err(GrokEnvelopeError::ProviderFailure {\n        failure_reason: CapabilityFailureDetail::new(\"provider timed out\"),\n    }),\n); ... assert_eq!(\n    envelope.into_structured_output(),\n    Err(GrokEnvelopeError::ProviderFailure {\n        failure_reason: CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT),\n    }),\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokEnvelopeError"
+      },
+      "key": {
+        "anchor_text_hash": "d11ce21a85298662f0baab64cf9386d4d1a828f171e5d436ec34ba9cbb5ffa99",
+        "bound_tests_set_hash": "06f7be7f8cb3ab4c348397d5847672101f9df06184982c32dcaf1690634e7dca",
+        "declaration_hash": "c9c347198231bacc2480d7a478aa63bb060b961a93332d91a9701d9a5e0761a5"
+      },
+      "obligation_id": {
+        "entry_key": "GrokEnvelopeError",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            envelope.into_structured_output(),\n            Err(GrokEnvelopeError::ProviderFailure {\n                failure_reason: CapabilityFailureDetail::new(\"provider timed out\"),\n            }),\n        );\n\nassert_eq!(\n            envelope.into_structured_output(),\n            Err(GrokEnvelopeError::ProviderFailure {\n                failure_reason: CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT),\n            }),\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_success_structured_output_returns_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokOutputEnvelope"
+      },
+      "key": {
+        "anchor_text_hash": "266a0bbb8f4177d73d0c9eadeff6ef7a0863d4689da523ec84df527b49df6030",
+        "bound_tests_set_hash": "4b124f0c4063ab01e8cdceb0564226d15018edd9448bf89b65849ba9e52c93d9",
+        "declaration_hash": "afd44a6bc8cefdf852cddd768f3aed6bdb22395bc3f797562d569e332e3c9a34"
+      },
+      "obligation_id": {
+        "entry_key": "GrokOutputEnvelope",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            envelope.into_structured_output()?,\n            serde_json::json!({\"verdict\": \"zero_findings\", \"findings\": []}),\n        );\n\n        assert_eq!(\n            envelope.into_structured_output(),\n            Err(GrokEnvelopeError::ProviderFailure {\n                failure_reason: CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT),\n            }),\n        );\n\n        assert_eq!(\n            envelope.into_structured_output(),\n            Err(GrokEnvelopeError::ProviderFailure {\n                failure_reason: CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT),\n            }),\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_success_structured_output_returns_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokOutputEnvelope"
+      },
+      "key": {
+        "anchor_text_hash": "d11ce21a85298662f0baab64cf9386d4d1a828f171e5d436ec34ba9cbb5ffa99",
+        "bound_tests_set_hash": "4b124f0c4063ab01e8cdceb0564226d15018edd9448bf89b65849ba9e52c93d9",
+        "declaration_hash": "afd44a6bc8cefdf852cddd768f3aed6bdb22395bc3f797562d569e332e3c9a34"
+      },
+      "obligation_id": {
+        "entry_key": "GrokOutputEnvelope",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            envelope.into_structured_output()?,\n            serde_json::json!({\"verdict\": \"zero_findings\", \"findings\": []}),\n        );\n...\nassert_eq!(\n            envelope.into_structured_output(),\n            Err(GrokEnvelopeError::ProviderFailure {\n                failure_reason: CapabilityFailureDetail::new(\"provider timed out\"),\n            }),\n        );\n...\nassert_eq!(\n            envelope.into_structured_output(),\n            Err(GrokEnvelopeError::ProviderFailure {\n                failure_reason: CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT),\n            }),\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ],
   "track_id": "2026-08-14-grok-provider-binding"
 }

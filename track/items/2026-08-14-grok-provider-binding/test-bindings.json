@@ -1,1 +1,125 @@
-{"track_id":"2026-08-14-grok-provider-binding","records":[]}
+{
+  "track_id": "2026-08-14-grok-provider-binding",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokEnvelopeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokEnvelopeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "GrokEnvelopeError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "GrokEnvelopeError exposes only ProviderFailure with a CapabilityFailureDetail from a missing or failed structured-output field. It has no variant or constructor for missing profile capabilities, missing adapters, undeclared grok-sandbox, unrestricted sandbox, or unresolved model/effort, so CN-01 is not an entry-local promise of this type."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokOutputEnvelope",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_success_structured_output_returns_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "GrokOutputEnvelope",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "reason": "GrokOutputEnvelope is a DTO with Succeeded/Failed variants over structured_output and failure_reason only. It has no provider-identity or authentication field, so AC-08's CLI-adapter-versus-custom-provider promise is not an entry-local obligation of this type."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokOutputEnvelope",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_success_structured_output_returns_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_missing_structured_output_returns_provider_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
+        }
+      ]
+    }
+  ]
+}
