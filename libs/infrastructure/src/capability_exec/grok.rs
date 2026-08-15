@@ -11,7 +11,8 @@ use serde::Deserialize;
 use serde::de::{self, Visitor};
 use usecase::capability_exec::{
     CapabilityDispatchOutcome, CapabilityDispatchRequest, CapabilityExecError,
-    CapabilityProviderPort, GROK_PROVIDER_NAME, ModelName, ProviderName, ReasoningEffort,
+    CapabilityFailureDetail, CapabilityProviderPort, GROK_PROVIDER_NAME, ModelName, ProviderName,
+    ReasoningEffort,
 };
 use usecase::provider_session::ProviderSessionCachePort;
 
@@ -48,6 +49,20 @@ impl GrokCapabilityDefinition {
     #[must_use]
     pub fn model(&self) -> Option<&ModelName> {
         self.model.as_ref()
+    }
+
+    /// Discovers and admits the shared Grok adapter definition for `capability`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an opaque diagnostic when discovery or admission fails closed.
+    pub fn resolve(
+        repo_root: &std::path::Path,
+        capability: &str,
+        profile_model: &ModelName,
+    ) -> Result<Self, CapabilityFailureDetail> {
+        resolve_grok_capability_definition(repo_root, capability, profile_model)
+            .map_err(CapabilityFailureDetail::new)
     }
 
     /// Returns the optional Grok sandbox declaration.

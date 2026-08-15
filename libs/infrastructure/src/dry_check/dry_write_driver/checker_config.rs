@@ -47,7 +47,7 @@ pub(super) fn build_usecase_dry_check_config(
     ))
 }
 
-/// Resolve `(fast_model, final_model, fast_reasoning_effort,
+/// Resolve `(provider, fast_model, final_model, fast_reasoning_effort,
 /// final_reasoning_effort)` for the `dry-checker` capability. Explicit
 /// `--model` overrides both model fields. Both rounds resolve through the
 /// fail-closed profile API so the process never falls back to provider effort
@@ -56,7 +56,7 @@ pub(super) fn resolve_dry_checker_config(
     root: &Path,
     capability_name: &str,
     explicit_model: Option<String>,
-) -> Result<(String, String, String, String), String> {
+) -> Result<(String, String, String, String, String), String> {
     use crate::agent_profiles::RoundType;
     use usecase::capability_exec::ReasoningEffort;
     use usecase::dry_write_driver::CapabilityName;
@@ -68,14 +68,33 @@ pub(super) fn resolve_dry_checker_config(
             .resolve_execution(&capability, round_type)
             .map_err(|error| format!("[ERROR] failed to resolve '{capability_name}': {error}"))?;
         match resolved {
-            ResolvedExecution::ProviderCli { model, effort, .. } => Ok((model, effort)),
+            ResolvedExecution::ProviderCli { provider, model, effort } => {
+                Ok((provider, model, effort))
+            }
             ResolvedExecution::HostedService { .. } => {
                 Err(format!("[ERROR] '{capability_name}' must resolve to a provider CLI execution"))
             }
         }
     };
-    let (fast_profile_model, fast_effort) = resolve_cli(RoundType::Fast)?;
-    let (final_profile_model, final_effort) = resolve_cli(RoundType::Final)?;
+    let (fast_provider, fast_profile_model, fast_effort) = resolve_cli(RoundType::Fast)?;
+    let (final_provider, final_profile_model, final_effort) = resolve_cli(RoundType::Final)?;
+    if fast_provider.as_str() != final_provider.as_str() {
+        return Err(format!(
+            "[ERROR] '{capability_name}' fast provider '{}' does not match final provider '{}'",
+            fast_provider.as_str(),
+            final_provider.as_str()
+        ));
+    }
+    if final_provider.as_str() == "grok"
+        && let Some(model) = explicit_model.as_ref()
+        && (model != fast_profile_model.as_str() || model != final_profile_model.as_str())
+    {
+        return Err(format!(
+            "[ERROR] Grok dry-checker model override '{model}' does not match profile models '{}/{}'",
+            fast_profile_model.as_str(),
+            final_profile_model.as_str()
+        ));
+    }
     let (fast_model, final_model) = explicit_model.map_or_else(
         || (fast_profile_model.as_str().to_owned(), final_profile_model.as_str().to_owned()),
         |model| (model.clone(), model),
@@ -89,7 +108,13 @@ pub(super) fn resolve_dry_checker_config(
     };
     let fast_reasoning_effort = effort_text(fast_effort).to_owned();
     let final_reasoning_effort = effort_text(final_effort).to_owned();
-    Ok((fast_model, final_model, fast_reasoning_effort, final_reasoning_effort))
+    Ok((
+        final_provider.as_str().to_owned(),
+        fast_model,
+        final_model,
+        fast_reasoning_effort,
+        final_reasoning_effort,
+    ))
 }
 
 fn load_agent_profiles_under_root(root: &Path) -> Result<AgentProfiles, String> {
@@ -179,9 +204,10 @@ mod tests {
         )
         .unwrap();
 
-        let (fast_model, final_model, fast_effort, final_effort) =
+        let (provider, fast_model, final_model, fast_effort, final_effort) =
             resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap();
 
+        assert_eq!(provider, "codex");
         assert_eq!(fast_model, "fast-model-v1");
         assert_eq!(final_model, "final-model-v1");
         assert_eq!(fast_effort, "low");
@@ -216,12 +242,13 @@ mod tests {
         )
         .unwrap();
 
-        let (fast_model, final_model, fast_effort, final_effort) = resolve_dry_checker_config(
-            dir.path(),
-            "dry-checker",
-            Some("explicit-model-v1".to_owned()),
-        )
-        .unwrap();
+        let (_provider, fast_model, final_model, fast_effort, final_effort) =
+            resolve_dry_checker_config(
+                dir.path(),
+                "dry-checker",
+                Some("explicit-model-v1".to_owned()),
+            )
+            .unwrap();
 
         assert_eq!(fast_model, "explicit-model-v1");
         assert_eq!(final_model, "explicit-model-v1");
@@ -255,7 +282,7 @@ mod tests {
         )
         .unwrap();
 
-        let (fast_model, final_model, fast_effort, final_effort) =
+        let (_provider, fast_model, final_model, fast_effort, final_effort) =
             resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap();
 
         assert_eq!(fast_model, "only-final-model-v1");
@@ -334,5 +361,79 @@ mod tests {
             let err = resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap_err();
             assert!(err.contains(expected_value), "got: {err}");
         }
+    }
+
+    #[test]
+    fn test_resolve_dry_checker_config_returns_grok_provider() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
+        std::fs::write(
+            dir.path().join(".harness/config/agent-profiles.json"),
+            r#"{
+  "schema_version": 1,
+  "providers": {
+    "grok": {
+      "label": "Grok",
+      "supported_reasoning_efforts": ["low", "high"]
+    }
+  },
+  "capabilities": {
+    "dry-checker": {
+      "provider": "grok",
+      "model": "grok-final",
+      "fast_model": "grok-fast",
+      "fast_reasoning_effort": "low",
+      "final_reasoning_effort": "high",
+      "execution_mode": "typed-pipeline"
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let (provider, fast_model, final_model, fast_effort, final_effort) =
+            resolve_dry_checker_config(dir.path(), "dry-checker", None).unwrap();
+
+        assert_eq!(provider, "grok");
+        assert_eq!(fast_model, "grok-fast");
+        assert_eq!(final_model, "grok-final");
+        assert_eq!(fast_effort, "low");
+        assert_eq!(final_effort, "high");
+    }
+
+    #[test]
+    fn test_resolve_dry_checker_config_rejects_grok_model_override_mismatch() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".harness/config")).unwrap();
+        std::fs::write(
+            dir.path().join(".harness/config/agent-profiles.json"),
+            r#"{
+  "schema_version": 1,
+  "providers": {
+    "grok": {
+      "label": "Grok",
+      "supported_reasoning_efforts": ["low", "high"]
+    }
+  },
+  "capabilities": {
+    "dry-checker": {
+      "provider": "grok",
+      "model": "grok-final",
+      "fast_model": "grok-fast",
+      "fast_reasoning_effort": "low",
+      "final_reasoning_effort": "high",
+      "execution_mode": "typed-pipeline"
+    }
+  }
+}"#,
+        )
+        .unwrap();
+
+        let err =
+            resolve_dry_checker_config(dir.path(), "dry-checker", Some("gpt-fast".to_owned()))
+                .unwrap_err();
+
+        assert!(err.contains("does not match profile models"), "got: {err}");
+        assert!(err.contains("gpt-fast"), "got: {err}");
     }
 }

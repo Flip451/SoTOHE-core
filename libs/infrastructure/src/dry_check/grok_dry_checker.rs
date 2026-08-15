@@ -48,6 +48,34 @@ struct GrokDryCheckSession {
     provider: ProviderName,
     model: ModelName,
     effort: ReasoningEffort,
+    pair: GrokDryCheckPairIdentity,
+}
+
+#[derive(Clone, PartialEq, Eq)]
+struct GrokDryCheckPairIdentity {
+    changed_path: PathBuf,
+    changed_start: u32,
+    changed_end: u32,
+    changed_content: String,
+    candidate_path: PathBuf,
+    candidate_start: u32,
+    candidate_end: u32,
+    candidate_content: String,
+}
+
+impl GrokDryCheckPairIdentity {
+    fn from_fragments(changed: &CodeFragment, candidate: &CodeFragment) -> Self {
+        Self {
+            changed_path: changed.source_path.clone(),
+            changed_start: changed.start_line(),
+            changed_end: changed.end_line(),
+            changed_content: changed.content().to_owned(),
+            candidate_path: candidate.source_path.clone(),
+            candidate_start: candidate.start_line(),
+            candidate_end: candidate.end_line(),
+            candidate_content: candidate.content().to_owned(),
+        }
+    }
 }
 
 impl std::fmt::Debug for GrokDryChecker {
@@ -69,8 +97,10 @@ impl std::fmt::Debug for GrokDryChecker {
 }
 
 impl GrokDryChecker {
-    /// Constructs a Grok dry-check adapter using the current repository and its
-    /// capability runtime directory for provider subprocess execution.
+    /// Constructs a Grok dry-check adapter rooted at `repo_root`.
+    ///
+    /// The capability runtime directory is derived from that trusted root so
+    /// the subprocess never inherits a process-CWD repository.
     #[must_use]
     pub fn new(
         fast_model: ModelName,
@@ -79,8 +109,8 @@ impl GrokDryChecker {
         final_reasoning_effort: ReasoningEffort,
         capability_name: CapabilityName,
         sandbox: GrokSandbox,
+        repo_root: PathBuf,
     ) -> GrokDryChecker {
-        let repo_root = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         let runtime_dir = repo_root.join("tmp/capability-runtime");
         Self {
             fast_model,
@@ -122,6 +152,7 @@ impl GrokDryChecker {
         &self,
         model: &ModelName,
         effort: ReasoningEffort,
+        pair: &GrokDryCheckPairIdentity,
     ) -> Result<Option<String>, DryCheckAgentError> {
         let mut session = self.session.lock().map_err(|_| {
             DryCheckAgentError::Unexpected("dry-check session state is poisoned".to_owned())
@@ -132,8 +163,10 @@ impl GrokDryChecker {
         if active.provider.as_str() == self.provider.as_str()
             && active.model.as_str() == model.as_str()
             && active.effort == effort
+            && active.pair == *pair
         {
-            return Ok(Some(active.session_id.as_str().to_owned()));
+            let reserved = session.take();
+            return Ok(reserved.map(|session| session.session_id.as_str().to_owned()));
         }
         *session = None;
         Ok(None)
@@ -152,6 +185,7 @@ impl GrokDryChecker {
         session_id: Option<String>,
         model: &ModelName,
         effort: ReasoningEffort,
+        pair: GrokDryCheckPairIdentity,
     ) -> Result<(), DryCheckAgentError> {
         let session_id = session_id.and_then(|value| ProviderSessionId::try_new(value).ok());
         let mut session = self.session.lock().map_err(|_| {
@@ -162,6 +196,7 @@ impl GrokDryChecker {
             provider: self.provider.clone(),
             model: model.clone(),
             effort,
+            pair,
         });
         Ok(())
     }
@@ -177,8 +212,22 @@ impl GrokDryChecker {
     ) {
         let session_id =
             ProviderSessionId::try_new(session_id.to_owned()).expect("session is valid");
-        *self.session.lock().expect("session lock") =
-            Some(GrokDryCheckSession { session_id, provider, model, effort });
+        *self.session.lock().expect("session lock") = Some(GrokDryCheckSession {
+            session_id,
+            provider,
+            model,
+            effort,
+            pair: GrokDryCheckPairIdentity {
+                changed_path: PathBuf::new(),
+                changed_start: 0,
+                changed_end: 0,
+                changed_content: String::new(),
+                candidate_path: PathBuf::new(),
+                candidate_start: 0,
+                candidate_end: 0,
+                candidate_content: String::new(),
+            },
+        });
     }
 
     fn build_prompt(&self, changed: &CodeFragment, candidate: &CodeFragment) -> String {
@@ -238,10 +287,17 @@ impl DryCheckAgentPort for GrokDryChecker {
     ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
         let (model, effort) = self.model_and_effort(tier);
         let prompt = self.build_prompt(changed_fragment, candidate_fragment);
-        let resume_id = self.resumable_session_id(model, effort)?;
+        let pair = GrokDryCheckPairIdentity::from_fragments(changed_fragment, candidate_fragment);
+        let resume_id = self.resumable_session_id(model, effort, &pair)?;
         let output = match resume_id.as_deref() {
             Some(resume_id) => match self.run_process(model, effort, Some(resume_id), &prompt) {
-                Ok(output) if !resume_attempt_needs_fresh_session(&output) => output,
+                Ok(output)
+                    if !resume_attempt_needs_fresh_session(&output)
+                        && parse_grok_judgment(&output, changed_fragment, candidate_fragment)
+                            .is_ok() =>
+                {
+                    output
+                }
                 Ok(_) | Err(_) => {
                     self.clear_session()?;
                     self.run_process(model, effort, None, &prompt).map_err(map_process_error)?
@@ -251,7 +307,7 @@ impl DryCheckAgentPort for GrokDryChecker {
         };
         let judgment = parse_grok_judgment(&output, changed_fragment, candidate_fragment)?;
         if output.exit_code == 0 {
-            self.save_session(output.session_id.clone(), model, effort)?;
+            self.save_session(output.session_id.clone(), model, effort, pair)?;
         }
         Ok(judgment)
     }
@@ -395,6 +451,7 @@ mod tests {
             ReasoningEffort::High,
             capability("dry-checker"),
             GrokSandbox::Workspace,
+            PathBuf::from("."),
         )
         .with_process_runner(PathBuf::from("."), PathBuf::from("tmp/runtime"), runner)
     }
@@ -522,6 +579,39 @@ mod tests {
                 "permission settings (--sandbox) must be passed on fresh and resumed Grok launches"
             );
         }
+        Ok(())
+    }
+
+    #[test]
+    fn test_grok_dry_checker_different_pair_starts_fresh_session()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let runner = Arc::new(RecordingProcessRunner {
+            responses: Mutex::new(VecDeque::from([
+                Ok(successful_output()),
+                Ok(successful_output()),
+            ])),
+            ..Default::default()
+        });
+        let checker = checker(runner.clone());
+        let (changed, candidate) = fragments();
+        let other_candidate = CodeFragment::new(
+            "src/other.rs".into(),
+            "fn other() { let value = 2; }".to_owned(),
+            3,
+            3,
+        )
+        .expect("other fragment is valid");
+
+        checker.judge(&changed, &candidate, DryCheckJudgeTier::Fast)?;
+        checker.judge(&changed, &other_candidate, DryCheckJudgeTier::Fast)?;
+
+        let invocations = runner.invocations.lock().expect("invocation lock");
+        assert_eq!(invocations.len(), 2);
+        assert!(!invocations[0].args.iter().any(|arg| arg == "--resume"));
+        assert!(
+            !invocations[1].args.iter().any(|arg| arg == "--resume"),
+            "a different fragment pair must not resume the previous pair's Grok session"
+        );
         Ok(())
     }
 
@@ -691,6 +781,39 @@ mod tests {
         assert!(!invocations[2].args.iter().any(|arg| arg == "--resume"));
         assert_settings(&invocations[1].args, "grok-fast", "medium");
         assert_settings(&invocations[2].args, "grok-fast", "medium");
+        Ok(())
+    }
+
+    #[test]
+    fn test_grok_dry_checker_unusable_resumed_payload_retries_fresh()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let runner = Arc::new(RecordingProcessRunner {
+            responses: Mutex::new(VecDeque::from([
+                Ok(successful_output_with_session("prior-session")),
+                Ok(ProviderProcessOutput {
+                    exit_code: 0,
+                    session_id: Some("stale-session".to_owned()),
+                    final_message: Some(
+                        br#"{"structured_output":{"text":"not-a-result"}}"#.to_vec(),
+                    ),
+                }),
+                Ok(successful_output_with_session("fresh-session")),
+            ])),
+            ..Default::default()
+        });
+        let checker = checker(runner.clone());
+        let (changed, candidate) = fragments();
+
+        checker.judge(&changed, &candidate, DryCheckJudgeTier::Fast)?;
+        checker.judge(&changed, &candidate, DryCheckJudgeTier::Fast)?;
+
+        let invocations = runner.invocations.lock().expect("invocation lock");
+        assert_eq!(invocations.len(), 3);
+        assert!(invocations[1].args.windows(2).any(|pair| pair == ["--resume", "prior-session"]));
+        assert!(
+            !invocations[2].args.iter().any(|arg| arg == "--resume"),
+            "an unusable resumed envelope must retry as a fresh isolated subprocess"
+        );
         Ok(())
     }
 

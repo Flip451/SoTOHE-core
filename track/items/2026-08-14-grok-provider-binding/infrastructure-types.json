@@ -44,6 +44,26 @@
           "params": [],
           "receiver": "&self",
           "returns": "Option<&GrokSandbox>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "capability",
+              "ty": "&str"
+            },
+            {
+              "name": "profile_model",
+              "ty": "&usecase::capability_exec::ModelName"
+            }
+          ],
+          "returns": "Result<Self, usecase::capability_exec::CapabilityFailureDetail>"
         }
       ],
       "type_name": "GrokCapabilityDefinition"
@@ -173,6 +193,10 @@
             {
               "name": "sandbox",
               "ty": "GrokSandbox"
+            },
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "GrokDryChecker"

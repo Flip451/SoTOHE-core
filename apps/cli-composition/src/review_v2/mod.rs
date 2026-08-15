@@ -48,7 +48,6 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use infrastructure::agent_profiles::ResolvedExecution;
-use infrastructure::grok_common::GrokSandbox;
 use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer, GrokReviewer};
 use usecase::{capability_exec::ReasoningEffort, dry_write_driver::CapabilityName};
 
@@ -375,6 +374,27 @@ impl ReviewCompositionRoot {
                     base_prompt,
                     &input.items_dir,
                 )?;
+                if model != profile_model.as_str() {
+                    return Err(CompositionError::WiringFailed(format!(
+                        "Grok reviewer model override '{model}' does not match profile model '{}'",
+                        profile_model.as_str()
+                    )));
+                }
+                let repo_root = shared::repo_root_from_items_dir(&input.items_dir)
+                    .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+                let definition =
+                    infrastructure::capability_exec::grok::GrokCapabilityDefinition::resolve(
+                        &repo_root,
+                        "reviewer",
+                        &profile_model,
+                    )
+                    .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+                let sandbox = definition.sandbox().cloned().ok_or_else(|| {
+                    CompositionError::WiringFailed(
+                        "Grok reviewer definition did not resolve a grok-sandbox permission"
+                            .to_owned(),
+                    )
+                })?;
                 let reviewer = GrokReviewer::new(
                     session.track_id,
                     session.scope,
@@ -382,7 +402,7 @@ impl ReviewCompositionRoot {
                     session.diff_base,
                     session.model,
                     effort,
-                    GrokSandbox::Workspace,
+                    sandbox,
                     timeout,
                     session.prompt,
                     session.cache,
@@ -730,6 +750,19 @@ mod tests {
 "#
         );
         fs::write(config_dir.join("agent-profiles.json"), content).unwrap();
+        if provider == "grok" {
+            for capability in ["reviewer", "review-fix-lead", "dry-checker"] {
+                let skill_dir = root.join(".agents/skills").join(capability);
+                fs::create_dir_all(&skill_dir).unwrap();
+                fs::write(
+                    skill_dir.join("SKILL.md"),
+                    format!(
+                        "---\nname: {capability}\ndescription: Test Grok adapter.\ngrok-sandbox: workspace\n---\n"
+                    ),
+                )
+                .unwrap();
+            }
+        }
     }
 
     /// A dedicated reviewer fixture with distinct profile efforts proves that

@@ -208,6 +208,79 @@
           "hash": "rvw1:sha256:8450ace3c2a9b0c8839460ef510326ac42376ae98d01ea7a24777586b9928215",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:14:07Z",
+          "findings": [
+            {
+              "category": "wiring",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 377,
+              "message": "`review_run_local_ungated` resolves the Grok adapter definition from the process CWD instead of the repository identified by `input.items_dir`. When the command is invoked from another directory with an absolute target `items_dir`—a supported path already handled by profile/session resolution—this looks for `.agents/skills/reviewer/SKILL.md` in the wrong repository and rejects the Grok review before launch. Derive the repository root from `input.items_dir`.",
+              "severity": "P1"
+            },
+            {
+              "category": "wiring",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 386,
+              "message": "The Grok admission check receives `session.model`, which already contains the optional CLI override, rather than the profile-resolved model. If the adapter definition omits its optional `model` field, a differing `--model` therefore passes admission and is launched even though the Grok contract makes the profile projection authoritative. Reject a mismatched Grok override and validate the definition against `profile_model`, as the review-fix Grok path does.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ba67ceed9dee367ab7ee9833d7a227c63ed2b2c72ffc631ee7e51762404e6316",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:19:55Z",
+          "findings": [
+            {
+              "category": "wiring",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 383,
+              "message": "Repository resolution is still incorrect for the supported `items_dir = \"track/items\"` invocation from a repository subdirectory. `resolve_project_root` returns `.` in that case, so `GrokCapabilityDefinition::resolve` searches `<current-subdirectory>/.agents/skills/reviewer/SKILL.md` instead of the discovered Git root and rejects Grok while the existing profile/session paths succeed. Resolve through `shared::repo_root_from_items_dir` (or equivalent Git-root discovery) before loading the definition.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ed1aff9f999361cf11c6b462c2202678385c5dfdbaf78d8f0b7bab126375e2e6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:26:08Z",
+          "findings": [
+            {
+              "category": "invoke_leak",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 410,
+              "message": "`ReviewCompositionRoot::review_run_local_ungated` now executes the Grok application flow by calling `run_grok_review_str(...)`. The cli_composition policy permits this layer to construct and return a fully wired primary adapter, but not to invoke the reviewer and return its application result. Move the Grok execution behind the cli_driver primary-adapter boundary and keep this method limited to injecting `GrokReviewer`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:816fdf25b4f43e022651b80d27321bd7c6b763b3149350dd899074cad280c2e7",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:27:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:816fdf25b4f43e022651b80d27321bd7c6b763b3149350dd899074cad280c2e7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:39:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f764ad79de477d393e0afc4ff6cfcd02bb9282ed9cc8d78dfd6291d1baceeadf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:41:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f764ad79de477d393e0afc4ff6cfcd02bb9282ed9cc8d78dfd6291d1baceeadf",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1039,6 +1112,160 @@
           "hash": "rvw1:sha256:ee9bf8f87efb0c861c1b81077f855bac7c7d342c20b14cd7870a34fb0f6a83d4",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:16:06Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 400,
+              "message": "Grok dry-check runs are recorded as Codex telemetry. The new Grok factory arm feeds the same recorder into `RecordingDryTierTelemetryAdapter`, but `record()` hard-codes `\"codex\"` for both `ReviewRound.provider` and `ExternalSubprocess.command` (also at lines 410, 420, and 430). This corrupts provider-level telemetry for every Grok run; carry the resolved provider into the telemetry adapter and emit it instead.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 286,
+              "message": "The new public Grok branch in `DryCheckServiceFactoryAdapter::build` has no factory-level happy-path or error-path coverage. Existing tests construct `GrokDryChecker` directly, so they do not verify profile routing, shared-definition/sandbox admission, effort conversion, or unsupported-provider behavior through this adapter. Add focused tests for successful Grok construction and fail-closed configuration cases.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5125a0512d261f026e38a08032517b09e3754029f266b75107a111c4c0ed9fef",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:20:24Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 598,
+              "message": "This test is named as factory-path coverage, but it only calls `resolve_grok_capability_definition`; it never invokes the public `DryCheckServiceFactoryAdapter::build` Grok arm. Consequently the newly added composition remains untested: profile-to-Grok routing, `GrokDryChecker` construction, provider propagation into telemetry, and factory error mapping could regress while this test passes. Add focused happy/error tests that exercise the factory through `DryCheckServiceFactoryPort`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5dd7877562141e26b1f31e1f1e5640a50296ae3233a16972b32f22d6c2393fac",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:23:42Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 286,
+              "message": "The public factory's new Grok arm still has no happy-path or error-path test through `DryCheckServiceFactoryPort::build`. The added test at line 598 only exercises `resolve_grok_capability_definition`, while the added config test only returns tuple values; neither verifies that the factory selects `GrokDryChecker`, maps missing definitions/unsupported providers correctly, or propagates `grok` into telemetry. Add focused factory-level coverage with injectable embedding/index dependencies.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0524c04d6bf3eb421f924768c8dfcfafb410ee5631fb2b27d6904d8938076f51",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:28:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0524c04d6bf3eb421f924768c8dfcfafb410ee5631fb2b27d6904d8938076f51",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:36:26Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 302,
+              "message": "The new Grok factory path constructs `GrokDryChecker` without passing `cmd.repo_root`; its constructor derives `repo_root` and `tmp/capability-runtime` from the process current directory. When the command targets a repository different from the process CWD, Grok subprocesses run against the wrong repository/runtime despite profile resolution and shared-definition admission using `cmd.repo_root`, so dry-check judgments can be made in the wrong trust boundary. Add a constructor accepting the resolved repository root and use it here.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:f76197b9f4ecbef4db8aac607cf0dc22a11ff6fcdc2c0336c0317a2030ccffb7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:39:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:300a210eb242e6b9078296417bedda30da10d5b633ad15db612d754ee2c630bb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:46:55Z",
+          "findings": [
+            {
+              "category": "session_isolation",
+              "file": "libs/infrastructure/src/dry_check/grok_dry_checker.rs",
+              "line": 134,
+              "message": "Session compatibility considers only provider, model, and effort, so later judgments for different fragment pairs reuse the previous pair's Grok session. `DryCheckInteractor` sends many pairs through this shared checker in parallel, which can also make multiple workers resume the same session ID concurrently. This carries unrelated pair context into new judgments and can produce incorrect or failed dry-check results. Key/reserve sessions by pair identity, or start a fresh session when the pair changes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:300a210eb242e6b9078296417bedda30da10d5b633ad15db612d754ee2c630bb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:50:16Z",
+          "findings": [
+            {
+              "category": "session-isolation",
+              "file": "libs/infrastructure/src/dry_check/grok_dry_checker.rs",
+              "line": 122,
+              "message": "`pair_key` is an unescaped delimiter-concatenated string containing attacker-controlled paths and fragment contents. Distinct fragment pairs can therefore produce the same key (for example, content containing `|`/`:` or paths containing the separators), causing a later Grok request to resume the wrong fragment pair's session and reuse its context. Use a collision-resistant canonical encoding/hash or store the tuple fields structurally.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:36938e0392c886f814f225707331a86440deb5185f5c159612206d9c51a8295c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:51:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad45c8f73597684d05f54bc4d5767201306bf5a409ebf31db21993a20bfdbfe1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:54:54Z",
+          "findings": [
+            {
+              "category": "configuration_admission",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/checker_config.rs",
+              "line": 88,
+              "message": "The explicit `--model` override is applied before provider dispatch, so a Grok profile can launch models other than the profile-authoritative models. The factory then admits the shared definition against this already-overridden final model; when `SKILL.md` omits its optional model field, admission cannot detect the deviation. Reject differing overrides for Grok or retain the profile models separately for admission.",
+              "severity": "P1"
+            },
+            {
+              "category": "session_resume",
+              "file": "libs/infrastructure/src/dry_check/grok_dry_checker.rs",
+              "line": 294,
+              "message": "A resumed attempt is adopted as soon as it returns any successful Grok envelope; the dry-check `result` is validated only afterward. If a stale resumed session returns a success envelope with a missing or malformed judgment, `parse_grok_judgment` fails the entire dry check instead of retrying with the required fresh session. Validate the complete judgment before adopting a resumed attempt and retry fresh for unusable resumed payloads.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ad45c8f73597684d05f54bc4d5767201306bf5a409ebf31db21993a20bfdbfe1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:59:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5cef01f2e790a733967c64af45cdebef06e5bc8ffbf905e74162738c527dcb07",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T17:08:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5cef01f2e790a733967c64af45cdebef06e5bc8ffbf905e74162738c527dcb07",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1400,6 +1627,34 @@
           "at": "2026-08-15T12:59:15Z",
           "findings": [],
           "hash": "rvw1:sha256:6824ce58e3587053f882e5b0b48c7fa2e11896ed76092fe136afe0d0ce380e52",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:11:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6e4cc7988bdc48d3f3fefdd3892350be6b7409b1fa63b7202a2cbe5d66808721",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:36:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:015c31c84cea78659d076c1a5253642ed25bdb348609750fb21bf3cc0b56a1b6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:40:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2de2099bd23c10ee7ebf7b59276954f266964913b57853e1b9e6acba2ca42e5b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T16:43:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2de2099bd23c10ee7ebf7b59276954f266964913b57853e1b9e6acba2ca42e5b",
           "type": "final",
           "verdict": "zero_findings"
         }
