@@ -49,11 +49,13 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "27d63c5a",
       "description": "Finalize libs/usecase/src/telemetry/review_yield.rs (ReviewYieldMetric, ReviewYieldValue) and libs/usecase/src/telemetry.rs (TelemetryReportOutput, TelemetryReportPort), including focused regressions and reconciliation of test-obligation binding records for its attributed catalogue entries. IN-01; IN-02; AC-01; AC-02; CO-01; CO-02.",
       "id": "T001",
       "status": "done"
     },
     {
+      "commit_hash": "27d63c5a",
       "depends_on": [
         "T001"
       ],
@@ -62,6 +64,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "27d63c5a",
       "depends_on": [
         "T002"
       ],
@@ -70,6 +73,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "27d63c5a",
       "depends_on": [
         "T002"
       ],
