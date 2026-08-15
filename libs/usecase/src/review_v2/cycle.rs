@@ -7,7 +7,7 @@ use domain::review_v2::{
     derive_review_approval_verdict,
 };
 
-use super::error::ReviewCycleError;
+use super::error::{DiffGetError, ReviewCycleError};
 use super::ports::{DiffGetter, ReviewHasher, Reviewer};
 
 /// Review cycle orchestrator.
@@ -67,8 +67,10 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
         let (verdict, log_info) = self.reviewer.review(&target_before)?;
 
         // Check for file changes during review
-        let target_after = self.get_scope_target(scope)?;
-        let hash_after = self.hasher.calc(&target_after)?;
+        let target_after =
+            self.get_scope_target(scope).map_err(ReviewCycleError::PostReviewDiff)?;
+        let hash_after =
+            self.hasher.calc(&target_after).map_err(ReviewCycleError::PostReviewHash)?;
         if hash_before != hash_after {
             return Err(ReviewCycleError::FileChangedDuringReview);
         }
@@ -99,8 +101,10 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
 
         let (verdict, log_info) = self.reviewer.fast_review(&target_before)?;
 
-        let target_after = self.get_scope_target(scope)?;
-        let hash_after = self.hasher.calc(&target_after)?;
+        let target_after =
+            self.get_scope_target(scope).map_err(ReviewCycleError::PostReviewDiff)?;
+        let hash_after =
+            self.hasher.calc(&target_after).map_err(ReviewCycleError::PostReviewHash)?;
         if hash_before != hash_after {
             return Err(ReviewCycleError::FileChangedDuringReview);
         }
@@ -197,7 +201,7 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
     }
 
     /// Helper: gets the classified files for a single scope from the current diff.
-    fn get_scope_target(&self, scope: &ScopeName) -> Result<ReviewTarget, ReviewCycleError> {
+    fn get_scope_target(&self, scope: &ScopeName) -> Result<ReviewTarget, DiffGetError> {
         let files = self.diff_getter.list_diff_files(&self.base)?;
         let classified = self.scope_config.classify(&files);
         let scope_files: Vec<FilePath> = classified.get(scope).cloned().unwrap_or_default();

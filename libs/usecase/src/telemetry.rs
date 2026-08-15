@@ -18,10 +18,15 @@ use crate::git_workflow::GitPrimitivePort;
 
 pub mod command_trace;
 pub mod report;
+pub mod review_yield;
 
 pub use report::{
     TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryPhaseDuration, TelemetryReportError,
     TelemetryReportOutput,
+};
+pub use review_yield::{
+    ReviewDetectionRateBasisPoints, ReviewExecutionCount, ReviewFindingCount, ReviewYieldMetric,
+    ReviewYieldValue, ReviewYieldValueError,
 };
 
 /// Secondary port for aggregating telemetry JSONL data for a track.
@@ -656,6 +661,7 @@ mod tests {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod aggregate_interactor_tests {
+    use std::num::NonZeroU64;
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex};
 
@@ -671,8 +677,13 @@ mod aggregate_interactor_tests {
         TelemetryReportOutput, TelemetryReportPort, TelemetryReportService,
         command_trace::TelemetrySkippedLineCount,
     };
+    use crate::capability_exec::{ModelName, ProviderName, ReasoningEffort};
     use crate::telemetry::command_trace::{
         CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric, SotpCommandIdentity,
+    };
+    use crate::telemetry::review_yield::{
+        ReviewDetectionRateBasisPoints, ReviewExecutionCount, ReviewFindingCount,
+        ReviewYieldMetric, ReviewYieldValue, ReviewYieldValueError,
     };
 
     /// Minimal [`GitPrimitivePort`] stub: only `resolve_repo_root` is meaningful;
@@ -889,6 +900,7 @@ mod aggregate_interactor_tests {
             hook_blocks: Vec::<TelemetryHookBlockEntry>::new(),
             skipped_lines: TelemetrySkippedLineCount::from(0),
             command_metrics: Vec::new(),
+            review_yield_metrics: Vec::new(),
         }
     }
 
@@ -953,6 +965,7 @@ mod aggregate_interactor_tests {
             hook_blocks: Vec::new(),
             skipped_lines: TelemetrySkippedLineCount::from(2),
             command_metrics: vec![metric],
+            review_yield_metrics: Vec::new(),
         };
         let git = Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) });
         let report = Arc::new(StubReport { result: Mutex::new(Some(Ok(output))) });
@@ -982,6 +995,75 @@ mod aggregate_interactor_tests {
             output.command_metrics.first().map(|metric| metric.failure_rate().value()),
             Some(2_500)
         );
+        Ok(())
+    }
+
+    #[test]
+    fn test_review_yield_value_objects_preserve_valid_counts_and_rate()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let findings = ReviewFindingCount::new(2);
+        let executions = ReviewExecutionCount::new(
+            NonZeroU64::new(3).expect("the test execution count must be non-zero"),
+        );
+        let detection_rate = ReviewDetectionRateBasisPoints::try_new(6_666)?;
+
+        assert_eq!(findings.value(), 2);
+        assert_eq!(executions.to_string(), "3");
+        assert_eq!(detection_rate.to_string(), "6666");
+        Ok(())
+    }
+
+    #[test]
+    fn test_review_yield_value_covers_each_recorded_axis() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let values = [
+            ReviewYieldValue::Scope(domain::review_v2::ScopeName::parse("architecture")?),
+            ReviewYieldValue::RoundType(domain::review_v2::RoundType::Final),
+            ReviewYieldValue::Provider(ProviderName::try_new("codex".to_owned())?),
+            ReviewYieldValue::Model(ModelName::try_new("gpt-5".to_owned())?),
+            ReviewYieldValue::ReasoningEffort(ReasoningEffort::High),
+        ];
+
+        assert_eq!(values.len(), 5);
+        Ok(())
+    }
+
+    #[test]
+    fn test_review_yield_detection_rate_rejects_out_of_range_value() {
+        let result = ReviewDetectionRateBasisPoints::try_new(10_001);
+
+        assert!(matches!(result, Err(ReviewYieldValueError::DetectionRateOutOfRange)));
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let metric = ReviewYieldMetric {
+            value: ReviewYieldValue::Provider(ProviderName::try_new("codex".to_owned())?),
+            execution_count: ReviewExecutionCount::new(
+                NonZeroU64::new(3).expect("the test execution count must be non-zero"),
+            ),
+            detection_rate: ReviewDetectionRateBasisPoints::try_new(3_333)?,
+        };
+        let output = TelemetryReportOutput {
+            phase_durations: Vec::new(),
+            errors: Vec::new(),
+            hook_blocks: Vec::new(),
+            skipped_lines: TelemetrySkippedLineCount::from(0),
+            command_metrics: Vec::new(),
+            review_yield_metrics: vec![metric.clone()],
+        };
+        let report = Arc::new(StubReport { result: Mutex::new(Some(Ok(output))) });
+        let factory = Arc::new(StubFactory {
+            built_dir: Mutex::new(None),
+            port: Arc::new(RecordingArchivedPort::default()),
+        });
+        let interactor =
+            facade(Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) }), report, factory);
+
+        let output = interactor.report("t", Path::new("track/items"))?;
+
+        assert_eq!(output.review_yield_metrics, vec![metric]);
         Ok(())
     }
 
@@ -1096,6 +1178,7 @@ mod aggregate_interactor_tests {
                 hook_blocks: Vec::new(),
                 skipped_lines: TelemetrySkippedLineCount::from(0),
                 command_metrics: vec![metric],
+                review_yield_metrics: Vec::new(),
             }))),
         });
         let archived = Arc::new(RecordingArchivedPort::default());

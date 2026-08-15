@@ -123,20 +123,10 @@ pub(crate) enum CodexReviewOutcome {
     /// / `DryCheckAgentError::IllegalOutput`). For all other failures (timeout, abort,
     /// file-changed race, record-write error) it is `false`.
     ///
-    /// `findings_count` carries the actual count from the subprocess when the verdict was
-    /// successfully parsed before failure (e.g. persistence failure after a good verdict).
-    /// It is `0` for failures where no verdict was obtained.
-    ///
     /// Distinct from `Err(String)` returned by `run_codex_review_str` /
     /// `run_claude_review_str`, which represents pre-subprocess failures (diff/hash
     /// computation, scope lookup, composition build) that never launched the subprocess.
-    SubprocessFailed {
-        error: String,
-        round_type: String,
-        verdict_parse_failed: bool,
-        findings_count: u32,
-        subprocess_started_at: Instant,
-    },
+    SubprocessFailed { error: String, verdict_parse_failed: bool, subprocess_started_at: Instant },
 }
 
 /// Shared setup logic for both `build_review_v2` and `build_review_v2_with_reviewer`.

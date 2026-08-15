@@ -1,0 +1,350 @@
+{
+  "entries": [
+    {
+      "claim_hash": "3bb8073e08a16d9ecd02237d93655a7c7e3f32b05d3907b5e092313ace69b95a",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Provide reproducible, read-only measurement of findings from each structured local review round, including the reviewer assignment actually used."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録する軸は、検査文脈（scope、round type）と、その実行を担ったレビュアー割り当ての実値（provider、model、reasoning effort）、および findings 件数とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bb8073e08a16d9ecd02237d93655a7c7e3f32b05d3907b5e092313ace69b95a",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Provide reproducible, read-only measurement of findings from each structured local review round, including the reviewer assignment actually used."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D1 の telemetry 記録は既存の structured-review-round authority に委譲し、計測対象と記録点を `sotp review local` が実行する各構造化 review round のみに限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44d8f3d856f3244878d193002c4ec78ba37f0d233e82d2f3f54310692f542d26",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録する軸は、検査文脈（scope、round type）と、その実行を担ったレビュアー割り当ての実値（provider、model、reasoning effort）、および findings 件数とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "44d8f3d856f3244878d193002c4ec78ba37f0d233e82d2f3f54310692f542d26",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "計測対象と記録点を `sotp review local` が実行する各構造化 review round のみに限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "45e115fe25f1fe0b646d7789fb40501a849f6a98a27424afbc6db96e6e3f6368",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Provide a read-only aggregation surface that reports execution counts and detection rates grouped or filtered by any recorded measurement axis."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "集計コマンドは読み取り専用とし、上記の任意の軸で実行回数と検出率を集計できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5b8595724c7f24b55c3d4651eadadc7ee7b0f1df67065bc74538866d3d5b4297",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-01",
+          "section": "out_of_scope",
+          "text_label": "Measure PR review cycles, DRY-gate judgments, test-obligation-fulfillment judges, or binary pre-review gates."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review local` 以外の入口である PR review cycle、DRY gate の裁定、test-obligation fulfillment の judge、および binary pre-review gate は本 ADR の計測対象外とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6a21d18658f9fdb03eb563ab9b5d200d559c94baaa219e595b16c31ee354ae13",
+      "claim_origin": {
+        "data": {
+          "element_id": "OUT-02",
+          "section": "out_of_scope",
+          "text_label": "Reduce, reinforce, or otherwise alter existing inspection volume or review behavior."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本 ADR は検査を一つも変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3923e30baa6d844204fc86c4d4f49391e8c6d84328697f4475547c8f2f46f54f",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "Persist resolved reviewer-assignment values rather than a reference to configuration that produced them."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "設定から解決された実値を記録し、設定ファイルの参照では代替しない",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "39edb999ea7e64b173f56998fb0e1727d7ff4e0b0799718493f618e5feb1eab9",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "The aggregation surface must not mutate telemetry, review results, configuration, or inspection behavior."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "集計コマンドは読み取り専用とし、",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "39edb999ea7e64b173f56998fb0e1727d7ff4e0b0799718493f618e5feb1eab9",
+      "claim_origin": {
+        "data": {
+          "element_id": "CO-02",
+          "section": "constraint",
+          "text_label": "The aggregation surface must not mutate telemetry, review results, configuration, or inspection behavior."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本 ADR は検査を一つも変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1adf3f06c76c92ca4f572d7e445e3038dbba5842033359dc2314eafff5c8df3d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "記録する軸は、検査文脈（scope、round type）と、その実行を担ったレビュアー割り当ての実値（provider、model、reasoning effort）、および findings 件数とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1adf3f06c76c92ca4f572d7e445e3038dbba5842033359dc2314eafff5c8df3d",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D1 の telemetry 記録は既存の structured-review-round authority に委譲し、計測対象と記録点を `sotp review local` が実行する各構造化 review round のみに限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "82be00871ac7b85c56edc2d073fa7aaf7f717f99e71ffb68d18cc533ba9341d1",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The aggregation surface can report execution counts and detection rates for any selected recorded axis without changing stored telemetry or review execution; the detection rate is the proportion of matching recorded rounds with one or more findings, and it reports no rate when no recorded rounds match."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "集計コマンドは読み取り専用とし、上記の任意の軸で実行回数と検出率を集計できるようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae2ff6c754d5ee26fb109896250d7bf62b129d9afe9bd4f50e4b4549c96c5104",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "The feature neither adds nor removes review, gate, or inspection work, and produces no measurement records for the excluded review and gate entry points."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "本 ADR は検査を一つも変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae2ff6c754d5ee26fb109896250d7bf62b129d9afe9bd4f50e4b4549c96c5104",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "The feature neither adds nor removes review, gate, or inspection work, and produces no measurement records for the excluded review and gate entry points."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a24e889e3e3e174cf2dc60c5be16d6ce1897f32098fd310770b6167fcd2e3485",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`sotp review local` 以外の入口である PR review cycle、DRY gate の裁定、test-obligation fulfillment の judge、および binary pre-review gate は本 ADR の計測対象外とする。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

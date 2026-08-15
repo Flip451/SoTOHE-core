@@ -36,9 +36,11 @@ use domain::review_v2::{
 };
 use domain::{CommitHash, TrackId};
 use std::sync::Arc;
-use usecase::capability_exec::{ModelName, ReasoningEffort};
+use usecase::capability_exec::{CLAUDE_PROVIDER_NAME, ModelName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
-use usecase::review_v2::{ReviewerError, ports::Reviewer};
+use usecase::review_v2::{
+    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ports::Reviewer,
+};
 use usecase::review_workflow::{
     REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict,
     classify_review_verdict, normalize_final_message, parse_review_final_message,
@@ -90,6 +92,8 @@ pub struct ClaudeReviewer {
     scope_label: String,
     /// Scope-bound cache identity and resolved execution profile.
     session: ReviewerSession,
+    /// Validated assignment owned by this reviewer adapter.
+    assignment: ResolvedReviewerAssignment,
     /// Test-only: override the Claude binary path (avoids unsafe env var mutation).
     #[cfg(any(test, feature = "test-helpers"))]
     bin_override: Option<OsString>,
@@ -115,6 +119,13 @@ impl ClaudeReviewer {
         base_prompt: ReviewerPrompt,
         session_cache: Arc<dyn ProviderSessionCachePort>,
     ) -> Self {
+        let assignment = ResolvedReviewerAssignment::new(
+            track_id.clone(),
+            scope.clone(),
+            CLAUDE_PROVIDER_NAME.clone(),
+            model.clone(),
+            effort,
+        );
         Self {
             session: ReviewerSession::new(
                 track_id,
@@ -130,6 +141,7 @@ impl ClaudeReviewer {
             timeout,
             base_prompt: base_prompt.as_str().to_owned(),
             scope_label: scope.to_string(),
+            assignment,
             #[cfg(any(test, feature = "test-helpers"))]
             bin_override: None,
         }
@@ -217,6 +229,12 @@ impl ClaudeReviewer {
             return run(None);
         }
         attempted
+    }
+}
+
+impl ResolvedReviewer for ClaudeReviewer {
+    fn resolved_assignment(&self) -> &ResolvedReviewerAssignment {
+        &self.assignment
     }
 }
 
@@ -787,6 +805,35 @@ mod tests {
             ReviewerPrompt::try_new(prompt.to_owned()).unwrap(),
             cache,
         )
+    }
+
+    #[test]
+    fn test_claude_reviewer_resolved_assignment_returns_adapter_values() {
+        let mut reviewer: ClaudeReviewer = test_reviewer(Duration::from_secs(10), "Review.");
+        let assignment_before =
+            <ClaudeReviewer as usecase::review_v2::ResolvedReviewer>::resolved_assignment(
+                &reviewer,
+            )
+            .clone();
+
+        // `model` and `scope_label` are mutable invocation configuration. The
+        // constructor stores a separate resolved assignment snapshot, so a
+        // later configuration change must not alter values persisted to telemetry.
+        reviewer.model = ModelName::try_new("profile-mutated-model").unwrap();
+        reviewer.scope_label = "profile-mutated-scope".to_owned();
+        let assignment =
+            <ClaudeReviewer as usecase::review_v2::ResolvedReviewer>::resolved_assignment(
+                &reviewer,
+            );
+
+        assert_eq!(reviewer.model.as_str(), "profile-mutated-model");
+        assert_eq!(reviewer.scope_label, "profile-mutated-scope");
+        assert_eq!(assignment, &assignment_before);
+        assert_eq!(assignment.track_id().as_ref(), "test-track");
+        assert_eq!(assignment.scope(), &ScopeName::Other);
+        assert_eq!(assignment.provider().as_str(), "claude");
+        assert_eq!(assignment.model().as_str(), "claude-opus-4-7");
+        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);
     }
 
     fn session_entry(provider: &str) -> usecase::provider_session::ProviderSessionCacheEntry {
