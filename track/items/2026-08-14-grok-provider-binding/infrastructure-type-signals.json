@@ -1,17 +1,17 @@
 {
   "baseline_hash": "1db98d07f55de7d5c620ae7123f843d04d964cd7c3be044e33c7dd186d48c599",
   "declaration_hash": "0c40dfcc1beb0689cf83ab8e0e4651e3391d1cb0e0ad98bd9a57cbb8e72cdd3d",
-  "generated_at": "2026-08-15T06:44:58Z",
-  "head_commit": "d3995a59f24e6932cf95e27563a5acb3fef12565",
+  "generated_at": "2026-08-15T09:28:15Z",
+  "head_commit": "2fbff3c69589300130f7da3cf2a7ba572abd1e80",
   "schema_version": 4,
   "signals": [
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
+      "found_items": [
         "usecase::capability_exec::CapabilityProviderPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "GrokCapabilityAdapter"
     },
     {

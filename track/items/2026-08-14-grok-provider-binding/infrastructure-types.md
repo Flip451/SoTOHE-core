@@ -31,7 +31,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | CodexDryFixLocalRunner | secondary_adapter | reference | impl Default | 🔵 | 🔵 |
-| GrokCapabilityAdapter | secondary_adapter | add | impl CapabilityProviderPort | 🟡 | 🔵 |
+| GrokCapabilityAdapter | secondary_adapter | add | impl CapabilityProviderPort | 🔵 | 🔵 |
 | GrokDryChecker | secondary_adapter | add | impl DryCheckAgentPort, impl Debug | 🟡 | 🔵 |
 | GrokReviewer | secondary_adapter | add | impl Reviewer | 🟡 | 🔵 |
 | ReviewFixRunnerAdapter | secondary_adapter | reference | impl ReviewFixRunner | 🔵 | 🔵 |

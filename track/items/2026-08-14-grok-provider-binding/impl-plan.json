@@ -77,6 +77,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "2fbff3c69589300130f7da3cf2a7ba572abd1e80",
       "depends_on": [
         "T009"
       ],
@@ -91,7 +92,7 @@
       ],
       "description": "Implement `GrokCapabilityAdapter` with subprocess, structured-envelope, and resume fallback tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-01; IN-02; IN-03; IN-04; IN-05; OS-01; OS-02; OS-03; OS-04; OS-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]",
       "id": "T003",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -126,7 +127,7 @@
       ],
       "description": "Wire `CapabilityDriver` in `apps/cli-driver/src/capability.rs` and `CapabilityCompositionRoot` in `apps/cli-composition/src/capability.rs`, with capability-dispatch integration tests. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

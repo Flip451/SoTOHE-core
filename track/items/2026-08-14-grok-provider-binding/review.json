@@ -114,6 +114,31 @@
         }
       ]
     },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-15T08:16:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:582e8538444899ea42fa3aa4c74c5eba0e5fa0939b450206a27695628fb96114",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:24:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:582e8538444899ea42fa3aa4c74c5eba0e5fa0939b450206a27695628fb96114",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T09:01:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:744ad55464693ce0f7e3078bb297ccd48772131d2ea3655d5fd4b8c13f76c68f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "cli_driver": {
       "rounds": [
         {
@@ -443,6 +468,20 @@
           "hash": "rvw1:sha256:f8703545785c40577aaa5dbdba4e069f5dc2a7e99f09478019469ba2b5387ba6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:16:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:819e2395e07771861f516744f17d645f10643797c8ce4b102d0a43050bb313cb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:23:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:819e2395e07771861f516744f17d645f10643797c8ce4b102d0a43050bb313cb",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -517,6 +556,122 @@
           "at": "2026-08-15T06:36:10Z",
           "findings": [],
           "hash": "rvw1:sha256:67d423c8ee8ef9608525bd390b1ebd1ed6a8a0911cfd8a3bfb13c928efc433d5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:16:43Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/capability_exec/process/output_collector.rs",
+              "line": 128,
+              "message": "Grok structured output is collected under the 64 KiB `MAX_PROVIDER_SESSION_EVENT_BYTES` limit; oversized JSON lines are discarded before `extract_grok_final_message` runs. Since `structured_output` can legitimately exceed 64 KiB, valid provider results then appear to have no envelope and dispatch fails. Use a result-sized bound/path (such as `MAX_PROVIDER_FINAL_MESSAGE_BYTES`) while retaining bounded draining.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2bb9e5ea7e3e776648787bb92ae704b14cb1ae1ad6671e4a6145ec0b79fb0a03",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T08:20:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c65153edeb5e8d6a845c787a878f28716ae632f3fbda798efc7b8f6108f227dc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:30:25Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/capability_exec/grok.rs",
+              "line": 416,
+              "message": "`build_grok_args` requests JSON framing but never passes `--json-schema`, which is required for Grok to populate `structured_output`. A real successful dispatch therefore yields no usable structured result, and `structured_output_from_process` rejects it or emits `null`. Supply an appropriate schema on both fresh and resumed invocations and add argument-level coverage.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:c65153edeb5e8d6a845c787a878f28716ae632f3fbda798efc7b8f6108f227dc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T08:38:57Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/capability_exec/grok.rs",
+              "line": 401,
+              "message": "`GROK_STRUCTURED_OUTPUT_SCHEMA` constrains every generic `orchestrator-output` capability to an arbitrary JSON object, although this dispatch path returns free-form final text/Markdown (for example, `impl-planner` requires a headed report). The prompt defines no object shape, `{}` is valid under this schema, and the adapter serializes the generated object instead of preserving the provider-neutral final-message contract used by Codex and Claude. Use a schema with a required text result and emit that text, then cover a real free-form capability output.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:44db2184f11cd51b63ccfcd4df780db05098c27e2e8f0d7905f62d3310be0387",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T08:43:16Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/capability_exec/grok.rs",
+              "line": 401,
+              "message": "`GROK_STRUCTURED_OUTPUT_SCHEMA` constrains every generic `orchestrator-output` capability to an arbitrary JSON object, although this dispatch path returns free-form final text/Markdown. The prompt defines no object shape, `{}` is schema-valid, and the adapter serializes the generated object instead of preserving the provider-neutral final-message contract used by Codex and Claude. Use a schema with a required text result and emit that text, then cover a real free-form capability output.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:44db2184f11cd51b63ccfcd4df780db05098c27e2e8f0d7905f62d3310be0387",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T08:46:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c1c774f8caa257d1abcd9650dba8b8280a6de4d33122c870e7b50111bbafaadb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:52:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5cbc2b3ee81358da16be0e3e058754a36a05d4d84a073444ae7141430f69decd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:55:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:63a2e87f2011e71553594489d420b3da0895dfc9250b52d88acfab53925126ed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:57:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:210d0d8806d5d7e79fc25ad7e89d69c480a2e6fe9c5f5d35bfdd223f69721120",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T09:11:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2713c6fb502c0bf2d70ddcebaaa3d0d8dce857e493855bb7c9ad6d4013102fd9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T09:22:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c4f115e0ce68db3d9511b9cb9993154543952232207ff193d4070c3a0ef12ed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T09:28:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50e447b58251c330ab7be2656b0b72b73cb147dfe4bb8344481924fdfab6a522",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -629,6 +784,27 @@
           "at": "2026-08-15T06:31:07Z",
           "findings": [],
           "hash": "rvw1:sha256:7f853b956614c5d64c9961659ca30aa869c2f35d1d7047d0f2055257cfcc94d8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:16:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20c19cae0a5bb34532418527b36ca53f2638ffa9544298705034e6d6f462b334",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:25:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20c19cae0a5bb34532418527b36ca53f2638ffa9544298705034e6d6f462b334",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T09:12:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4453cf117187fe1e88011555f5cfc420b749c328cba8c0b5c8a8ec002d833c7c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -809,6 +985,24 @@
           "at": "2026-08-14T17:31:08Z",
           "findings": [],
           "hash": "rvw1:sha256:feca07f4773e9fc1ef49dced1a5c8b08869152f4f5f3bc7098c80a9bdc3ce981",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-15T08:16:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4843f3e23be9eb90e55adef575984eb0ce8fb195cd3c16eeea4d14b849ef1162",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:24:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4843f3e23be9eb90e55adef575984eb0ce8fb195cd3c16eeea4d14b849ef1162",
           "type": "final",
           "verdict": "zero_findings"
         }

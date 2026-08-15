@@ -630,6 +630,1644 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "266a0bbb8f4177d73d0c9eadeff6ef7a0863d4689da523ec84df527b49df6030",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(stdout, b\"from-structured-output\"); ... let error = adapter\n            .dispatch_with_stdout(&request(CapabilityResumeRequest::Fresh)?, &mut stdout)\n            .expect_err(\"missing structured output must fail closed\");\n\n        assert!(error.to_string().contains(\"structured output is missing\"));\n        assert!(stdout.is_empty()); ... let error = adapter\n            .dispatch_with_stdout(&request(CapabilityResumeRequest::Fresh)?, &mut stdout)\n            .expect_err(\"provider failure envelope must fail dispatch\");\n\n        assert!(error.to_string().contains(\"provider declined structured output\"));\n        assert!(!error.to_string().contains(\"ignore-me\"));\n        assert!(stdout.is_empty());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "180a78bdc01b1dedce67a205f86883676a7ddf6dfbb43afde9a3de6682be31e4",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(invocations.len(), 1); ... assert!(args.windows(2).any(|pair| pair == [\"--model\", \"grok-4\"])); ... assert!(args.windows(2).any(|pair| pair == [\"--reasoning-effort\", \"high\"])); ... assert!(!args.iter().any(|arg| arg == \"agent\" || arg == \"--leader\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "1ab6d5d2790dfb0dc832501ce8bc0f4d00b97f4dc1e29d83228ed111bb5b27e6",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let capability = \"reviewer-fixture\"; ... let outcome = CapabilityProviderPort::dispatch(&adapter, &dispatch_request)?; ... assert!(matches!( outcome, CapabilityDispatchOutcome::Executed { ref provider, exit_code: 0 } if provider.as_str() == \"grok\" ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "\"expect_err(\\\"missing shared adapter must stop dispatch before spawning Grok\\\")\"; \"expect_err(\\\"diagnostic read-only fallback must not authorize dispatch\\\")\"; \"expect_err(\\\"reserved sandbox must stop dispatch before spawning Grok\\\")\"; \"expect_err(\\\"invalid model projection must stop dispatch before spawning Grok\\\")\"; \"expect_err(\\\"mismatched model projection must stop dispatch before spawning Grok\\\")\"; \"expect!(matches!(error, CapabilityExecError::EffortMissing(capability)\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "e0887bcf448cbb54a35c672d03dd1c1f05db82f221a6c131aaa6fe9d9819462c",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "for args in [first_args, second_args] {\n            assert!(args.windows(2).any(|pair| pair == [\"--model\", \"grok-4\"]));\n            assert!(args.windows(2).any(|pair| pair == [\"--reasoning-effort\", \"high\"]));\n            assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace\"]));\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "d2c9d7fba850ee3082e21fb6d1c42cea7dbb0fcb2f7adb137b1a3b096f5cf45a",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(binary, \"grok\");\n        assert!(!args.iter().any(|arg| arg == \"agent\" || arg == \"--leader\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "d11ce21a85298662f0baab64cf9386d4d1a828f171e5d436ec34ba9cbb5ffa99",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--json-schema\", GROK_STRUCTURED_OUTPUT_SCHEMA]));\n\nprompt.contains(\"briefing\")\n\nassert_eq!(stdout, b\"from-structured-output\");\n\nassert!(error.to_string().contains(\"structured output is missing\"));\n\nassert!(error.to_string().contains(\"provider declined structured output\"));\nassert!(!error.to_string().contains(\"ignore-me\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "0fdadc0364e4cf882e76844253c995b34e5a03ceb1bb42d80f1de454a4100bdf",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(args.windows(2).any(|pair| pair == [\"--model\", \"grok-4\"])); assert!(args.windows(2).any(|pair| pair == [\"--reasoning-effort\", \"high\"])); assert!(!args.iter().any(|arg| arg == \"agent\" || arg == \"--leader\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "23caae1807f9336dfdfa1b3c1b04f727abf848273aae2dbbb1466bc5f475b1b2",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(!output.contains(\"delegate-in-host\"));\n        assert!(args.contains(\"--model\\ngrok-test-model\\n\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "309da9e0db87093d52bcc6560990a9fb025a6703f62340072fcc9d72a67aa77a",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let outcome = CapabilityProviderPort::dispatch(&adapter, &dispatch_request)?;\n\nassert!(matches!(\n    outcome,\n    CapabilityDispatchOutcome::Executed { ref provider, exit_code: 0 }\n        if provider.as_str() == \"grok\"\n));\n...\nassert_eq!(binary, \"grok\");\n...\nassert_explicit_grok_settings(args, \"strict\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "c4e781c53a8fae017feece4267c755e56d7bc60a45cc7cce4615c000b724866d",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let outcome = CapabilityProviderPort::dispatch(&adapter, &dispatch_request)?; ... let shared_definition =\n            directory.path().join(\".agents/skills\").join(capability).join(\"SKILL.md\");\n        assert!(shared_definition.is_file());\n        assert!(!directory.path().join(\".grok\").exists()); ... assert_explicit_grok_settings(args, \"strict\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "ab58ea62b4b2b336f696922f97800c6ccf706a0b97ea78cb978257c95614fa7e",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(error, CapabilityExecError::ProfileResolution { ref capability, .. } if capability.as_str() == \"absent-profile-capability\")); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty());\nassert!(matches!(error, CapabilityExecError::AdapterPreflight { .. })); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty());\nassert_eq!(resolve_grok_sandbox_for_diagnosis(&definition), GrokSandbox::ReadOnly); ... .expect_err(\"diagnostic read-only fallback must not authorize dispatch\");\nfor sandbox in [\"off\", \"workspace-write\"] { ... .expect_err(\"reserved sandbox must stop dispatch before spawning Grok\"); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty()); }\n.expect_err(\"invalid model projection must stop dispatch before spawning Grok\");\n.expect_err(\"mismatched model projection must stop dispatch before spawning Grok\");\n.expect_err(\"an unresolved profile effort must reject dispatch\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_subprocess_launch_with_explicit_model_and_effort"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_accepts_briefing_file_in_prompt"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_structured_envelope_success_extracts_structured_output"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_failure_starts_new_session"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_provider_dispatch_uses_profile_capability_name_shared_definition_and_valid_sandbox"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_missing_shared_definition_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_undeclared_sandbox_fails_closed_after_read_only_diagnosis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_reserved_sandbox_values_fail_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_invalid_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_dispatch_mismatched_declared_model_fails_closed_before_process"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_missing_structured_output_reports_envelope_failure_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_resume_unavailable_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_failed_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_provider_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_model_mismatched_resume_starts_fresh_session_with_explicit_settings"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_unresolved_effort_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_adapter_absent_profile_capability_is_rejected"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::capability::tests",
+          "test_name": "test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "fb55a6378ece84ec1cb2fbe2de745fa23f669c12d59cd8161895765ba049e461",
+        "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
+        "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityAdapter",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert!(first_args.windows(2).any(|pair| pair == [\"--resume\", \"expired-session\"]));\n        assert!(!second_args.iter().any(|arg| arg == \"--resume\"));\n        for args in [first_args, second_args] {\n            assert!(args.windows(2).any(|pair| pair == [\"--model\", \"grok-4\"]));\n            assert!(args.windows(2).any(|pair| pair == [\"--reasoning-effort\", \"high\"]));\n            assert!(args.windows(2).any(|pair| pair == [\"--sandbox\", \"workspace\"]));\n        }\n        assert_eq!(stdout, b\"ok\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ],
   "track_id": "2026-08-14-grok-provider-binding"
