@@ -59,6 +59,7 @@
   "schema_version": 2,
   "tasks": [
     {
+      "commit_hash": "28d1b47425930cc287dbb64e83a08ad2d4c1c49f",
       "description": "Add `GrokOutputEnvelope` and `GrokEnvelopeError` with focused envelope-extraction tests in `libs/infrastructure/src/grok_common.rs`. [IN-01; OS-02; AC-01]",
       "id": "T001",
       "status": "done"
@@ -66,9 +67,10 @@
     {
       "description": "Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-01; AC-04]",
       "id": "T009",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "28d1b47425930cc287dbb64e83a08ad2d4c1c49f",
       "description": "Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; CN-01; AC-06]",
       "id": "T008",
       "status": "done"
@@ -143,11 +145,13 @@
       "status": "todo"
     },
     {
+      "commit_hash": "28d1b47425930cc287dbb64e83a08ad2d4c1c49f",
       "description": "Add Grok host-guard declarations under `.grok/hooks/` and validate their configured handler names. [IN-07; OS-06; CN-03; AC-07]",
       "id": "T007",
       "status": "done"
     },
     {
+      "commit_hash": "28d1b47425930cc287dbb64e83a08ad2d4c1c49f",
       "depends_on": [
         "T007"
       ],

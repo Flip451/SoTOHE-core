@@ -153,6 +153,299 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_read_only_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_workspace_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_strict_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandbox"
+      },
+      "key": {
+        "anchor_text_hash": "1ab6d5d2790dfb0dc832501ce8bc0f4d00b97f4dc1e29d83228ed111bb5b27e6",
+        "bound_tests_set_hash": "b537b65bafa5cc622a0c5cedef79d6d07399dda25dab1e8bb926d3bedc82104a",
+        "declaration_hash": "4a6f049dc0b23f0cfacbb586cec193b2a429a4afdddaf9f1e0f8e64f96f6525d"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandbox",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(serde_json::from_str::<GrokSandbox>(r#\"\"read-only\"\"#)?, GrokSandbox::ReadOnly,);\nassert_eq!(serde_json::from_str::<GrokSandbox>(r#\"\"workspace\"\"#)?, GrokSandbox::Workspace,);\nassert_eq!(serde_json::from_str::<GrokSandbox>(r#\"\"strict\"\"#)?, GrokSandbox::Strict,);\nlet sandbox = serde_json::from_str::<GrokSandbox>(r#\"\"repository-profile\"\"#)?;\nassert_eq!(sandbox, GrokSandbox::ProjectProfile(GrokSandboxProfileName::try_new(\"repository-profile\".to_owned(),)?),);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_off_value_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_codex_workspace_write_value_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandbox"
+      },
+      "key": {
+        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "bound_tests_set_hash": "a0e5940dbf2e22b70e8a8724250a5942ee8a9a5310cf76dc5153a2d81741873f",
+        "declaration_hash": "4a6f049dc0b23f0cfacbb586cec193b2a429a4afdddaf9f1e0f8e64f96f6525d"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandbox",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(serde_json::from_str::<GrokSandbox>(r#\"\"off\"\"#).is_err());\nassert!(serde_json::from_str::<GrokSandbox>(r#\"\"workspace-write\"\"#).is_err());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_read_only_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_workspace_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_strict_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandbox"
+      },
+      "key": {
+        "anchor_text_hash": "c4e781c53a8fae017feece4267c755e56d7bc60a45cc7cce4615c000b724866d",
+        "bound_tests_set_hash": "b537b65bafa5cc622a0c5cedef79d6d07399dda25dab1e8bb926d3bedc82104a",
+        "declaration_hash": "4a6f049dc0b23f0cfacbb586cec193b2a429a4afdddaf9f1e0f8e64f96f6525d"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandbox",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(serde_json::from_str::<GrokSandbox>(r#\"\"read-only\"\"#)?, GrokSandbox::ReadOnly,);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_off_value_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandbox"
+      },
+      "key": {
+        "anchor_text_hash": "ab58ea62b4b2b336f696922f97800c6ccf706a0b97ea78cb978257c95614fa7e",
+        "bound_tests_set_hash": "cea54896229f1f11ea657072cbdf13de301ff1e83eda6cc52bef266e80c22f73",
+        "declaration_hash": "4a6f049dc0b23f0cfacbb586cec193b2a429a4afdddaf9f1e0f8e64f96f6525d"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandbox",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(serde_json::from_str::<GrokSandbox>(r#\"\"off\"\"#).is_err());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandboxProfileName"
+      },
+      "key": {
+        "anchor_text_hash": "1ab6d5d2790dfb0dc832501ce8bc0f4d00b97f4dc1e29d83228ed111bb5b27e6",
+        "bound_tests_set_hash": "14b096706c1b886b330bc52e1d5c21ae0687774f14c55ff43ad34e965aaedd8f",
+        "declaration_hash": "7444832d8dedd02e6a7ef981df6ae0e43a6ebf3e49aa6754a0f67597dd4f5133"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandboxProfileName",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            sandbox,\n            GrokSandbox::ProjectProfile(GrokSandboxProfileName::try_new(\n                \"repository-profile\".to_owned(),\n            )?),\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_empty_value_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_off_value_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandboxProfileName"
+      },
+      "key": {
+        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "bound_tests_set_hash": "887dbd2faa97a86775bb6e94a88a66082e0d7d6798998a4ff3523da623484fa4",
+        "declaration_hash": "7444832d8dedd02e6a7ef981df6ae0e43a6ebf3e49aa6754a0f67597dd4f5133"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandboxProfileName",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            GrokSandboxProfileName::try_new(String::new()),\n            Err(GrokSandboxProfileNameError::Empty),\n        );\n    }\n{\n        assert_eq!(\n            GrokSandboxProfileName::try_new(\"off\".to_owned()),\n            Err(GrokSandboxProfileNameError::Reserved),\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandboxProfileName"
+      },
+      "key": {
+        "anchor_text_hash": "c4e781c53a8fae017feece4267c755e56d7bc60a45cc7cce4615c000b724866d",
+        "bound_tests_set_hash": "14b096706c1b886b330bc52e1d5c21ae0687774f14c55ff43ad34e965aaedd8f",
+        "declaration_hash": "7444832d8dedd02e6a7ef981df6ae0e43a6ebf3e49aa6754a0f67597dd4f5133"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandboxProfileName",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let sandbox = serde_json::from_str::<GrokSandbox>(r#\"\"repository-profile\"\"#)?;\n\n        assert_eq!(\n            sandbox,\n            GrokSandbox::ProjectProfile(GrokSandboxProfileName::try_new(\n                \"repository-profile\".to_owned(),\n            )?),\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_empty_value_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_off_value_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandboxProfileNameError"
+      },
+      "key": {
+        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "bound_tests_set_hash": "887dbd2faa97a86775bb6e94a88a66082e0d7d6798998a4ff3523da623484fa4",
+        "declaration_hash": "8626bf69022c9c0d5782c453cea15bf235d3b0ce7229e96fa2383a06be834784"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandboxProfileNameError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            GrokSandboxProfileName::try_new(String::new()),\n            Err(GrokSandboxProfileNameError::Empty),\n        );\n\nassert_eq!(\n            GrokSandboxProfileName::try_new(\"off\".to_owned()),\n            Err(GrokSandboxProfileNameError::Reserved),\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ],
   "track_id": "2026-08-14-grok-provider-binding"

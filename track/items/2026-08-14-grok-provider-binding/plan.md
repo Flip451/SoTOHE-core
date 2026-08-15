@@ -6,15 +6,15 @@
 GO-01 -> T001, T009, T008, T002, T003, T004, T005, T010, T006, T011, T012.
 Grok host hook coverage is delivered by T007 and T013.
 
-## Tasks (4/13 resolved)
+## Tasks (5/13 resolved)
 
 ### provider-foundation — Provider foundation and admission
 
 > Coordinate foundation and admission tasks. [IN-01; IN-02; IN-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-06]
 
-- [x] **T001**: Add `GrokOutputEnvelope` and `GrokEnvelopeError` with focused envelope-extraction tests in `libs/infrastructure/src/grok_common.rs`. [IN-01; OS-02; AC-01]
-- [ ] **T009**: Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-01; AC-04]
-- [x] **T008**: Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; CN-01; AC-06]
+- [x] **T001**: Add `GrokOutputEnvelope` and `GrokEnvelopeError` with focused envelope-extraction tests in `libs/infrastructure/src/grok_common.rs`. [IN-01; OS-02; AC-01] (`28d1b47425930cc287dbb64e83a08ad2d4c1c49f`)
+- [x] **T009**: Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-01; AC-04]
+- [x] **T008**: Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; CN-01; AC-06] (`28d1b47425930cc287dbb64e83a08ad2d4c1c49f`)
 - [ ] **T002**: Add `GrokCapabilityDefinition` discovery and admission validation with shared-adapter fixture tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-02; IN-04; IN-05; OS-04; OS-05; CN-01; CN-02; AC-02; AC-03; AC-04]
 
 ### provider-execution-paths — Provider execution paths
@@ -38,5 +38,5 @@ Grok host hook coverage is delivered by T007 and T013.
 
 > Coordinate Grok host guard tasks. [IN-07; OS-06; CN-03; AC-07]
 
-- [x] **T007**: Add Grok host-guard declarations under `.grok/hooks/` and validate their configured handler names. [IN-07; OS-06; CN-03; AC-07]
-- [x] **T013**: Update `HookInput`, `HookDriver`, and `CommandOutcome` in `apps/cli-driver/src/hook.rs` with Grok envelope and tool-name translation tests. [IN-07; OS-06; CN-03; AC-07]
+- [x] **T007**: Add Grok host-guard declarations under `.grok/hooks/` and validate their configured handler names. [IN-07; OS-06; CN-03; AC-07] (`28d1b47425930cc287dbb64e83a08ad2d4c1c49f`)
+- [x] **T013**: Update `HookInput`, `HookDriver`, and `CommandOutcome` in `apps/cli-driver/src/hook.rs` with Grok envelope and tool-name translation tests. [IN-07; OS-06; CN-03; AC-07] (`28d1b47425930cc287dbb64e83a08ad2d4c1c49f`)

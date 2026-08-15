@@ -120,6 +120,187 @@
           "test_name": "test_grok_output_envelope_text_without_structured_output_is_rejected"
         }
       ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandbox",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_read_only_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_workspace_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_strict_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandbox",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_off_value_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_codex_workspace_write_value_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandbox",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_read_only_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_workspace_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_strict_value_deserializes"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandbox",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_off_value_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandboxProfileName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandboxProfileName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_empty_value_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_off_value_is_rejected"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandboxProfileName",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_project_profile_value_deserializes"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "GrokSandboxProfileNameError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_empty_value_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::grok_common::tests",
+          "test_name": "test_grok_sandbox_profile_name_off_value_is_rejected"
+        }
+      ]
     }
   ]
 }

@@ -5,20 +5,20 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | GrokOutputEnvelope | enum | add | Succeeded, Failed | 🔵 | 🔵 |
-| GrokSandbox | enum | add | ReadOnly, Workspace, Strict, ProjectProfile | 🟡 | 🔵 |
+| GrokSandbox | enum | add | ReadOnly, Workspace, Strict, ProjectProfile | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GrokSandboxProfileName | value_object | add | — | 🟡 | 🔵 |
+| GrokSandboxProfileName | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | GrokEnvelopeError | error_type | add | ProviderFailure | 🔵 | 🔵 |
-| GrokSandboxProfileNameError | error_type | add | Empty, Reserved | 🟡 | 🔵 |
+| GrokSandboxProfileNameError | error_type | add | Empty, Reserved | 🔵 | 🔵 |
 
 ## DTOs
 

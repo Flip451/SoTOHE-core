@@ -415,6 +415,20 @@
           "hash": "rvw1:sha256:03b7810485e1a18999c16cbc590f763f0553007996055f9dafdf96c3394d74ee",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:33:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71c1b15689e37b0f1e202431c13528bea9f7f4b291c9a4487cee4ca613702bcf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:36:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:71c1b15689e37b0f1e202431c13528bea9f7f4b291c9a4487cee4ca613702bcf",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -431,6 +445,50 @@
           "at": "2026-08-14T19:22:46Z",
           "findings": [],
           "hash": "rvw1:sha256:d9ae7fc85bbc2bdb218262e16cb19c7e2a326f87ec6cd15bf5ec07489d575e50",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:33:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a08103d914f2258340734cbf645633f937656db51410f0f8aae449d3f902000f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:38:32Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/grok_common.rs",
+              "line": 51,
+              "message": "`devbox` is a Grok built-in sandbox profile with near-unrestricted filesystem writes, but it is absent from this reserved-value list. Consequently, deserializing `\"devbox\"` falls through to `ProjectProfile` and admits a high-privilege mode outside the intended `read-only`/`workspace`/`strict` allowlist. Reject `devbox` (and other non-admitted built-ins) and add constructor/deserialization regression tests.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:a08103d914f2258340734cbf645633f937656db51410f0f8aae449d3f902000f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T05:42:50Z",
+          "findings": [
+            {
+              "category": "validation",
+              "file": "libs/infrastructure/src/grok_common.rs",
+              "line": 51,
+              "message": "The project-profile validator claims to reject built-in names but still accepts `read-only`, `workspace`, and `strict`. Public callers can therefore construct ambiguous states such as `GrokSandbox::ProjectProfile(GrokSandboxProfileName::try_new(\"workspace\")?)`, while deserialization represents the same value as the dedicated `Workspace` variant. Reserve all Grok built-in names in `GrokSandboxProfileName`; the outer deserializer can continue admitting the three safe modes through their dedicated variants.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c0105c8939fc72389fe77dbf2d4b8b89a9194cc14baac3c0cf953d11be82679",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T05:44:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ace9975013e27567591d6839c4ed73d48ce843db0dbe96208530e3180000ce6a",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -500,6 +558,20 @@
           "at": "2026-08-14T20:04:40Z",
           "findings": [],
           "hash": "rvw1:sha256:693ed799c040370071b5a2b3039b263707c36743954c4f1d1098488d9288b711",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:32:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f7aa7b0716329eea0e00e9652e34e3f121075de77029a8096de07609dcd54f89",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:38:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f7aa7b0716329eea0e00e9652e34e3f121075de77029a8096de07609dcd54f89",
           "type": "final",
           "verdict": "zero_findings"
         }
