@@ -12,6 +12,7 @@ pub mod persistence;
 pub mod results;
 pub mod review_fix_adapter;
 pub(crate) mod review_fix_briefing;
+mod review_fix_grok;
 pub mod review_fix_runner;
 pub mod scope_config_loader;
 mod session;

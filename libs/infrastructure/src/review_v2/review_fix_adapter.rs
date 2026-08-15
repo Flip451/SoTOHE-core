@@ -97,14 +97,31 @@ impl ReviewFixRunner for ReviewFixRunnerAdapter {
                 "review-fix-lead must resolve to a provider CLI execution",
             )));
         };
+        let profile_model = ModelName::try_new(model.as_str().to_owned())
+            .map_err(|error| ReviewFixRunnerError::Unexpected(diagnostic(error.to_string())))?;
         let model = match command.model().cloned() {
             Some(model) => model,
-            None => ModelName::try_new(model.as_str().to_owned())
-                .map_err(|error| ReviewFixRunnerError::Unexpected(diagnostic(error.to_string())))?,
+            None => profile_model.clone(),
         };
         match provider.as_str() {
             "codex" => CodexReviewFixRunner::new(model, effort)
                 .run_fix_with_briefing(command, briefing_content),
+            "grok" => {
+                if command.model().is_some_and(|override_model| override_model != &profile_model) {
+                    return Err(ReviewFixRunnerError::Unexpected(diagnostic(format!(
+                        "Grok review-fix model override '{}' does not match profile model '{}'",
+                        model.as_str(),
+                        profile_model.as_str()
+                    ))));
+                }
+                super::review_fix_grok::run_review_fix_grok(
+                    &profile_model,
+                    effort,
+                    &command,
+                    &briefing_content,
+                    &repository_root,
+                )
+            }
             "claude" => Err(ReviewFixRunnerError::SubagentDispatchRequired(Box::new(
                 SubagentDispatchInstruction {
                     agent: SubagentName::try_new("review-fix-lead".to_owned()).map_err(
@@ -124,7 +141,7 @@ impl ReviewFixRunner for ReviewFixRunnerAdapter {
                 },
             ))),
             other => Err(ReviewFixRunnerError::Unexpected(diagnostic(format!(
-                "unsupported review-fix-lead provider '{other}' (supported: 'codex', 'claude')"
+                "unsupported review-fix-lead provider '{other}' (supported: 'codex', 'claude', 'grok')"
             )))),
         }
     }
@@ -599,5 +616,177 @@ mod tests {
             .expect("resolved branch must invoke the runner");
 
         assert_eq!(output.status, "completed");
+    }
+
+    fn write_grok_review_fix_skill(root: &Path, sandbox: &str) {
+        let skill_dir = root.join(".agents/skills/review-fix-lead");
+        fs::create_dir_all(&skill_dir).expect("skill directory");
+        fs::write(
+            skill_dir.join("SKILL.md"),
+            format!(
+                "---\nname: review-fix-lead\ndescription: Test review-fix adapter.\ngrok-sandbox: {sandbox}\n---\n"
+            ),
+        )
+        .expect("skill file");
+    }
+
+    fn grok_adapter_fixture() -> tempfile::TempDir {
+        let directory = tempfile::tempdir().expect("temporary repository");
+        git_success(directory.path(), &["init", "-b", "main"]);
+        fs::create_dir_all(directory.path().join(".harness/config")).expect("config directory");
+        fs::write(
+            directory.path().join(".harness/config/agent-profiles.json"),
+            r#"{"schema_version":1,"providers":{"grok":{"label":"Grok","supported_reasoning_efforts":["low","medium","high","xhigh","max"]}},"capabilities":{"review-fix-lead":{"provider":"grok","model":"grok-fix-model","fast_provider":"grok","fast_model":"grok-fix-fast","reasoning_effort":"high","fast_reasoning_effort":"low","execution_mode":"typed-pipeline"}}}"#,
+        )
+        .expect("agent profiles");
+        write_grok_review_fix_skill(directory.path(), "workspace");
+        fs::write(directory.path().join("briefing.md"), "# Briefing\n").expect("briefing");
+        directory
+    }
+
+    fn grok_command(repository_root: &Path) -> RunReviewFixCommand {
+        RunReviewFixCommand::new_resolved(
+            usecase::review_v2::ReviewScopeName::try_new("cli".to_owned()).expect("valid scope"),
+            PathBuf::from("briefing.md"),
+            ReviewFixResolution::new(
+                ReviewTrackId::try_new("review-fix-grok-2026".to_owned()).expect("valid track ID"),
+                repository_root.to_path_buf(),
+            ),
+            ReviewRoundType::Fast,
+            None,
+        )
+    }
+
+    #[cfg(unix)]
+    fn write_fake_grok(bin_dir: &Path, body: &str) {
+        use std::os::unix::fs::PermissionsExt;
+        fs::create_dir_all(bin_dir).expect("fake bin");
+        let grok = bin_dir.join("grok");
+        fs::write(&grok, format!("#!/bin/sh\n{body}")).expect("fake grok");
+        let mut permissions = fs::metadata(&grok).expect("metadata").permissions();
+        permissions.set_mode(0o755);
+        fs::set_permissions(&grok, permissions).expect("chmod");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_runner_adapter_grok_uses_isolated_typed_pipeline() {
+        let _lock = cwd_lock().lock().expect("test mutex");
+        let directory = grok_adapter_fixture();
+        let args_log = directory.path().join("grok-args.log");
+        let bin_dir = directory.path().join("fake-bin");
+        write_fake_grok(
+            &bin_dir,
+            &format!(
+                "printf '%s\\n' \"$@\" > '{}'\nprintf '%s\\n' '{{\"sessionId\":\"grok-fix-session\",\"structured_output\":{{\"result\":\"REVIEW_FIX_STATUS: completed\"}},\"text\":\"REVIEW_FIX_STATUS: failed\"}}'\nexit 0\n",
+                args_log.display()
+            ),
+        );
+        let mut path_entries = vec![bin_dir];
+        if let Some(existing) = std::env::var_os("PATH") {
+            path_entries.extend(std::env::split_paths(&existing));
+        }
+        let path = std::env::join_paths(path_entries).expect("path");
+        let original = std::env::current_dir().expect("cwd");
+        std::env::set_current_dir(directory.path()).expect("cd");
+        let result = temp_env::with_vars([("PATH", Some(path.as_os_str()))], || {
+            ReviewFixRunnerAdapter.run_fix(grok_command(directory.path()))
+        });
+        std::env::set_current_dir(original).expect("restore cwd");
+        let output = result.expect("grok review-fix must complete");
+        assert_eq!(output.status, "completed");
+        assert_eq!(output.exit_code, 0);
+        let args = fs::read_to_string(args_log).expect("args");
+        assert!(args.contains("--model"));
+        assert!(args.contains("grok-fix-fast") || args.contains("grok-fix-model"));
+        assert!(args.contains("--sandbox"));
+        assert!(args.contains("workspace"));
+        assert!(args.contains("--json-schema"));
+        assert!(!args.split_whitespace().any(|arg| arg == "agent" || arg == "--leader"));
+        assert!(!args.contains("--resume"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_runner_adapter_grok_missing_structured_output_fails_closed() {
+        let directory = grok_adapter_fixture();
+        let bin_dir = directory.path().join("fake-bin");
+        write_fake_grok(
+            &bin_dir,
+            "printf '%s\\n' '{\"failure_reason\":\"Grok declined structured output\",\"text\":\"ignore\"}'\nexit 0\n",
+        );
+        let mut path_entries = vec![bin_dir];
+        if let Some(existing) = std::env::var_os("PATH") {
+            path_entries.extend(std::env::split_paths(&existing));
+        }
+        let path = std::env::join_paths(path_entries).expect("path");
+        let result = temp_env::with_vars([("PATH", Some(path.as_os_str()))], || {
+            ReviewFixRunnerAdapter.run_fix(grok_command(directory.path()))
+        });
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => panic!("missing structured output must fail closed"),
+        };
+        assert!(
+            error.to_string().contains("Grok declined structured output")
+                || error.to_string().contains("structured")
+        );
+        assert!(!error.to_string().contains("ignore"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_runner_adapter_grok_nonzero_exit_with_result_fails_closed() {
+        let directory = grok_adapter_fixture();
+        let bin_dir = directory.path().join("fake-bin");
+        write_fake_grok(
+            &bin_dir,
+            "printf '%s\\n' '{\"structured_output\":{\"result\":\"REVIEW_FIX_STATUS: completed\"}}'\nexit 7\n",
+        );
+        let mut path_entries = vec![bin_dir];
+        if let Some(existing) = std::env::var_os("PATH") {
+            path_entries.extend(std::env::split_paths(&existing));
+        }
+        let path = std::env::join_paths(path_entries).expect("path");
+        let result = temp_env::with_vars([("PATH", Some(path.as_os_str()))], || {
+            ReviewFixRunnerAdapter.run_fix(grok_command(directory.path()))
+        });
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => panic!("nonzero Grok exit must fail closed"),
+        };
+        assert!(error.to_string().contains("exited unsuccessfully"));
+        assert!(!error.to_string().contains("REVIEW_FIX_STATUS: completed"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_runner_adapter_grok_missing_sandbox_declaration_fails_closed() {
+        let directory = grok_adapter_fixture();
+        fs::remove_file(directory.path().join(".agents/skills/review-fix-lead/SKILL.md"))
+            .expect("remove skill");
+        let bin_dir = directory.path().join("fake-bin");
+        write_fake_grok(
+            &bin_dir,
+            "printf '%s\\n' '{\"structured_output\":{\"result\":\"REVIEW_FIX_STATUS: completed\"}}'\nexit 0\n",
+        );
+        let mut path_entries = vec![bin_dir];
+        if let Some(existing) = std::env::var_os("PATH") {
+            path_entries.extend(std::env::split_paths(&existing));
+        }
+        let path = std::env::join_paths(path_entries).expect("path");
+        let result = temp_env::with_vars([("PATH", Some(path.as_os_str()))], || {
+            ReviewFixRunnerAdapter.run_fix(grok_command(directory.path()))
+        });
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => panic!("missing grok-sandbox must fail closed"),
+        };
+        assert!(
+            error.to_string().contains("grok-sandbox")
+                || error.to_string().contains("capability definition")
+                || error.to_string().contains("cannot canonicalize"),
+            "got: {error}"
+        );
     }
 }

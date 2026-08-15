@@ -855,6 +855,25 @@ exit 0
     }
 
     #[cfg(unix)]
+    fn write_fake_grok_fix_bin(bin_dir: &std::path::Path, arguments_log: &std::path::Path) {
+        fs::create_dir_all(bin_dir).unwrap();
+        let grok = bin_dir.join("grok");
+        fs::write(
+            &grok,
+            format!(
+                r#"#!/bin/sh
+printf '%s\n' "$@" >> '{log}'
+printf '%s\n' '{{"sessionId":"grok-fix-session","structured_output":{{"result":"REVIEW_FIX_STATUS: completed"}},"text":"REVIEW_FIX_STATUS: failed"}}'
+exit 0
+"#,
+                log = arguments_log.display(),
+            ),
+        )
+        .unwrap();
+        make_executable(&grok);
+    }
+
+    #[cfg(unix)]
     fn write_fake_codex_reviewer_bin(bin_dir: &std::path::Path) {
         write_fake_codex_bin_with_body(
             bin_dir,
@@ -1965,6 +1984,57 @@ exit 0
         );
         assert_eq!(output.stderr, None);
         assert_eq!(output.exit_code, 0);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_review_fix_driver_grok_profile_dispatches_typed_pipeline() {
+        let _lock = cwd_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        GitRunner::at(dir.path()).assert_success(&["init", "-b", "main"]);
+        activate_review_fix_track(dir.path());
+        write_agent_profiles(dir.path(), "grok");
+        let skill_dir = dir.path().join(".agents/skills/review-fix-lead");
+        fs::create_dir_all(&skill_dir).unwrap();
+        fs::write(
+            skill_dir.join("SKILL.md"),
+            "---\nname: review-fix-lead\ndescription: Test review-fix adapter.\ngrok-sandbox: workspace\n---\n",
+        )
+        .unwrap();
+        fs::write(dir.path().join("briefing.md"), "# Briefing\n").unwrap();
+        let bin_dir = dir.path().join("bin-test");
+        let arguments_log = dir.path().join("grok-arguments.log");
+        write_fake_grok_fix_bin(&bin_dir, &arguments_log);
+        let _path_guard = prepend_path(&bin_dir);
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(dir.path()).unwrap();
+
+        let output = crate::review_v2::ReviewCompositionRoot::new().review_fix_driver().handle(
+            cli_driver::review::ReviewFixInput::new(
+                "cli_composition".to_owned(),
+                PathBuf::from("briefing.md"),
+                Some("review-fix-codex-rustify-2026-05-31".to_owned()),
+                PathBuf::from("track/items"),
+                "fast".to_owned(),
+                None,
+            ),
+        );
+
+        assert_eq!(output.exit_code, 0, "grok review-fix: {output:?}");
+        assert_eq!(output.stdout.as_deref(), Some("REVIEW_FIX_STATUS: completed"));
+        let arguments = fs::read_to_string(arguments_log).unwrap();
+        assert!(arguments.contains("--model"));
+        assert!(
+            arguments.contains("gpt-fast"),
+            "review-fix-lead fast model must be used, not reviewer: {arguments}"
+        );
+        assert!(!arguments.contains("review-fast"));
+        assert!(!arguments.contains("review-final"));
+        assert!(arguments.contains("--reasoning-effort"));
+        assert!(arguments.contains("--sandbox"));
+        assert!(arguments.contains("workspace"));
+        assert!(arguments.contains("--json-schema"));
+        assert!(!arguments.split_whitespace().any(|arg| arg == "agent" || arg == "--leader"));
     }
 
     #[cfg(unix)]

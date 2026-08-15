@@ -165,6 +165,49 @@
           "hash": "rvw1:sha256:a985ba4b70de38156ba147453d41d8b93f768772fe7e628ee0ef16ebbb5260a9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:32:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9525b546b992f10617054b7f416807f8a6fd6924a1eb21c416c46882f959f5b8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:50:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9525b546b992f10617054b7f416807f8a6fd6924a1eb21c416c46882f959f5b8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T15:07:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:759e3bdc532cc6ed9efe0f0b8d1abc28a4fda695e8798eef7f73c64117187a75",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T15:48:36Z",
+          "findings": [
+            {
+              "category": "test coverage",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 1996,
+              "message": "The integration test does not prove that provider/model resolution comes from `review-fix-lead`: `write_agent_profiles(..., \"grok\")` assigns Grok to both `reviewer` and `review-fix-lead`, and the assertions only check that `--model` exists. A regression that resolves the `reviewer` capability and launches `review-fast` would still pass, despite T012 requiring the review-fix profile (`gpt-fast`). Configure the reviewer capability differently or assert the exact `--model gpt-fast` value.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b54cf3e2e83053fd6196f01ddd7575bc9960f9b29833ef1327c08ffc65c38d2e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T15:49:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8450ace3c2a9b0c8839460ef510326ac42376ae98d01ea7a24777586b9928215",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -539,6 +582,20 @@
           "hash": "rvw1:sha256:9de6564056a85f7aba1ec0cb7745af9488909349ec881685d718a6bfda178655",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:32:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02bb0f59dd2f9935df5f3962d81e4205fadc99671894c423c334be877a3157db",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:49:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02bb0f59dd2f9935df5f3962d81e4205fadc99671894c423c334be877a3157db",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -780,6 +837,199 @@
           "at": "2026-08-15T13:20:20Z",
           "findings": [],
           "hash": "rvw1:sha256:52ee051f0ce404e42d4a79f6ed100e74fb28bac6034790fd5a06e8c13efb7c42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:33:14Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/grok.rs",
+              "line": 48,
+              "message": "The fresh-launch branch accepts `structured_output.result` without checking `output.exit_ok`. A Grok process that exits non-zero but emits a forged or partial success envelope can therefore produce `DRY_FIX_STATUS: completed` with exit code 0. Fresh launches must fail closed on non-zero process exit, as resume attempts already do.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 65,
+              "message": "The fresh-launch branch accepts `structured_output.result` without checking `output.exit_ok`. A Grok process that exits non-zero but emits a forged or partial success envelope can therefore produce `REVIEW_FIX_STATUS: completed` with exit code 0. Fresh launches must fail closed on non-zero process exit, as resume attempts already do.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:2e6c552a71ce74504409a50e306e08f8460cc50382f9344f0f29511731cfac14",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T14:43:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6c5658fc0fb8eba12d79c1d042037a5d9faa1a3cb895bc96c1237046edb9ab8c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:56:06Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/grok.rs",
+              "line": 87,
+              "message": "The dry-fix launcher bypasses Grok capability admission and always supplies `GrokSandbox::Workspace`. Selecting Grok therefore grants write access even when the shared `dry-fix-lead` adapter is missing, omits `grok-sandbox`, or declares a narrower permission. Resolve and admit the shared adapter definition before spawning, then use its declared sandbox.",
+              "severity": "P0"
+            },
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 107,
+              "message": "The review-fix launcher likewise hard-codes `GrokSandbox::Workspace` without resolving or admitting the `review-fix-lead` shared adapter. This bypasses the fail-closed permission boundary and can grant workspace writes despite an absent or read-only `grok-sandbox` declaration.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_adapter.rs",
+              "line": 110,
+              "message": "The Grok arm passes only raw reviewer briefing content. Unlike the Codex path, it omits the constructed fixer prompt containing `$review-fix-lead`, track, scope, round type, reviewer invocation, and required terminal statuses. An isolated Grok process can consequently perform a review instead of the fix loop or omit the sentinel entirely. Build and pass the same contextual fixer prompt used by the existing runner.",
+              "severity": "P1"
+            },
+            {
+              "category": "session_isolation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 53,
+              "message": "Review-fix sessions are keyed only by track and capability. After one scope stores a session, another scope using the same model and effort resumes that context even though changing scope or round is a concern switch that requires a fresh session. Include the assignment identity in the resume key or otherwise prevent cross-scope/round reuse.",
+              "severity": "P1"
+            },
+            {
+              "category": "resume_fallback",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/grok.rs",
+              "line": 42,
+              "message": "A resumed dry-fix attempt is accepted whenever it exits successfully and has any string `result`; the `DRY_FIX_STATUS` sentinel is validated only afterward, and the session is saved before that validation. A stale resumed session returning a schema-valid but invalid capability result therefore fails instead of falling back fresh and remains cached. Validate the complete capability result before adopting or saving a resumed attempt.",
+              "severity": "P1"
+            },
+            {
+              "category": "resume_fallback",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 58,
+              "message": "A resumed review-fix attempt is accepted before validating its `REVIEW_FIX_STATUS` sentinel. A schema-valid but unusable result is saved and then rejected without the required fresh-session fallback. Sentinel validation must be part of resume-attempt acceptance and precede cache persistence.",
+              "severity": "P1"
+            },
+            {
+              "category": "timeout",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 39,
+              "message": "The Grok review-fix process is killed after 600 seconds, while a legitimate review-fix invocation can spend up to 3600 seconds in one reviewer subprocess and the existing fixer runtime budget is also 3600 seconds. Any valid round lasting over ten minutes is therefore aborted. Use a timeout consistent with the review-fix execution contract or make it configurable.",
+              "severity": "P1"
+            },
+            {
+              "category": "configuration",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 109,
+              "message": "The effective model is selected from `input.model` before provider dispatch, so a dry-fix `--model` override is forwarded to Grok instead of the capability-profile model. Grok's contract makes the profile model authoritative; use the resolved profile model for this arm or reject an override.",
+              "severity": "P1"
+            },
+            {
+              "category": "configuration",
+              "file": "libs/infrastructure/src/review_v2/review_fix_adapter.rs",
+              "line": 98,
+              "message": "The review-fix adapter similarly applies `command.model()` overrides before entering the Grok arm. This allows Grok to launch a model different from the profile projection, contrary to the profile-authoritative launch contract. Preserve legacy override behavior only for providers that support it, and use or validate the profile model for Grok.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c5658fc0fb8eba12d79c1d042037a5d9faa1a3cb895bc96c1237046edb9ab8c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T14:59:55Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/grok.rs",
+              "line": 87,
+              "message": "The dry-fix launcher bypasses Grok capability admission and always supplies `GrokSandbox::Workspace`. Selecting Grok therefore grants write access even when the shared `dry-fix-lead` adapter is missing, omits `grok-sandbox`, or declares a narrower permission. Resolve and admit the shared adapter definition before spawning, then use its declared sandbox.",
+              "severity": "P0"
+            },
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 107,
+              "message": "The review-fix launcher likewise hard-codes `GrokSandbox::Workspace` without resolving or admitting the `review-fix-lead` shared adapter. This bypasses the fail-closed permission boundary and can grant workspace writes despite an absent or read-only `grok-sandbox` declaration.",
+              "severity": "P0"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_adapter.rs",
+              "line": 112,
+              "message": "The Grok arm passes only raw reviewer briefing content. Unlike the Codex path, it omits the constructed fixer prompt containing `$review-fix-lead`, track, scope, round type, reviewer invocation, and required terminal statuses. An isolated Grok process can consequently perform a review instead of the fix loop or omit the sentinel entirely. Build and pass the same contextual fixer prompt used by the existing runner.",
+              "severity": "P1"
+            },
+            {
+              "category": "session_isolation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 53,
+              "message": "Review-fix sessions are keyed only by track and capability. After one scope stores a session, another scope using the same model and effort resumes that context even though changing scope or round is a concern switch that requires a fresh session. Include the assignment identity in the resume key or otherwise prevent cross-scope/round reuse.",
+              "severity": "P1"
+            },
+            {
+              "category": "resume_fallback",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/grok.rs",
+              "line": 42,
+              "message": "A resumed dry-fix attempt is accepted whenever it exits successfully and has any string `result`; the `DRY_FIX_STATUS` sentinel is validated only afterward, and the session is saved before that validation. A resumed session returning a schema-valid but invalid capability result therefore fails instead of falling back fresh and remains cached. Validate the complete capability result before adopting or saving a resumed attempt.",
+              "severity": "P1"
+            },
+            {
+              "category": "resume_fallback",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 58,
+              "message": "A resumed review-fix attempt is accepted before validating its `REVIEW_FIX_STATUS` sentinel. A schema-valid but unusable result is saved and then rejected without the required fresh-session fallback. Sentinel validation must be part of resume-attempt acceptance and precede cache persistence.",
+              "severity": "P1"
+            },
+            {
+              "category": "timeout",
+              "file": "libs/infrastructure/src/review_v2/review_fix_grok.rs",
+              "line": 39,
+              "message": "The Grok review-fix process is killed after 600 seconds, while one legitimate reviewer subprocess may run for 3600 seconds and the existing review-fix runtime budget is also 3600 seconds. Valid rounds lasting over ten minutes are therefore aborted. Use a timeout consistent with the review-fix execution contract or make it configurable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c5658fc0fb8eba12d79c1d042037a5d9faa1a3cb895bc96c1237046edb9ab8c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T15:15:14Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/dry_check/dry_fix_local/mod.rs",
+              "line": 120,
+              "message": "The Grok dry-fix arm forwards the optional CLI model override rather than the profile-resolved model. This violates AC-02/IN-02 and means `--model other` can launch an unauthorized model when the shared definition omits `model`, or falsely reject a valid definition declaring the profile model. Preserve `profile_model` for Grok execution or reject a differing override.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_adapter.rs",
+              "line": 109,
+              "message": "The Grok review-fix arm likewise passes the optional fixer model override as though it were the profile projection. A differing override bypasses the profile-model authority when the adapter definition omits `model`, and causes incorrect admission failure when it declares the actual profile model. Use the profile-resolved model for Grok or reject conflicting overrides.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:801582ff3f24ac8292817eab1a1f3fc7d9fc8dee87057a1b6b815c192621c8fd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T15:18:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:401b3cc4ff53ab43da482d2a92efda3f9664a46b2cf7b624fdb572d769a92f56",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T15:43:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee9bf8f87efb0c861c1b81077f855bac7c7d342c20b14cd7870a34fb0f6a83d4",
           "type": "final",
           "verdict": "zero_findings"
         }
