@@ -290,6 +290,87 @@ fn test_review_file_changed_during_review_returns_error() {
     assert!(matches!(result, Err(ReviewCycleError::FileChangedDuringReview)));
 }
 
+#[test]
+fn test_review_post_review_diff_failure_returns_distinct_error() {
+    struct FailsAfterFirstDiff {
+        calls: RefCell<usize>,
+    }
+
+    impl DiffGetter for FailsAfterFirstDiff {
+        fn list_diff_files(&self, _base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError> {
+            let mut calls = self.calls.borrow_mut();
+            *calls += 1;
+            if *calls == 1 {
+                return Ok(vec![FilePath::new("libs/domain/src/lib.rs").unwrap()]);
+            }
+            Err(DiffGetError::Failed("post-review diff failure".to_owned()))
+        }
+    }
+
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        FailsAfterFirstDiff { calls: RefCell::new(0) },
+        MockHasher,
+    );
+
+    // `review` performs the second diff lookup only after the reviewer returns;
+    // the post-review lookup must retain its distinct error variant.
+    let result = cycle.review(&domain_scope());
+    assert!(matches!(
+        result,
+        Err(ReviewCycleError::PostReviewDiff(DiffGetError::Failed(message)))
+            if message == "post-review diff failure"
+    ));
+}
+
+#[test]
+fn test_review_post_review_hash_failure_returns_distinct_error() {
+    struct StableDiffGetter;
+
+    impl DiffGetter for StableDiffGetter {
+        fn list_diff_files(&self, _base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError> {
+            Ok(vec![FilePath::new("libs/domain/src/lib.rs").unwrap()])
+        }
+    }
+
+    struct FailsAfterFirstHash {
+        calls: RefCell<usize>,
+    }
+
+    impl ReviewHasher for FailsAfterFirstHash {
+        fn calc(
+            &self,
+            _target: &domain::review_v2::ReviewTarget,
+        ) -> Result<ReviewHash, ReviewHasherError> {
+            let mut calls = self.calls.borrow_mut();
+            *calls += 1;
+            if *calls == 1 {
+                return Ok(ReviewHash::computed(format!("rvw1:sha256:{:064x}", 1)).unwrap());
+            }
+            Err(ReviewHasherError::Failed("post-review hash failure".to_owned()))
+        }
+    }
+
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        StableDiffGetter,
+        FailsAfterFirstHash { calls: RefCell::new(0) },
+    );
+
+    // The first hash permits the reviewer call; the second hash is the
+    // post-review check and must not be reported as the pre-review hash error.
+    let result = cycle.review(&domain_scope());
+    assert!(matches!(
+        result,
+        Err(ReviewCycleError::PostReviewHash(ReviewHasherError::Failed(message)))
+            if message == "post-review hash failure"
+    ));
+}
+
 // ── fast_review() tests ───────────────────────────────────────────────
 
 #[test]
@@ -318,6 +399,87 @@ fn test_fast_review_skipped_on_empty() {
 
     let result = cycle.fast_review(&domain_scope()).unwrap();
     assert!(matches!(result, ReviewOutcome::Skipped));
+}
+
+#[test]
+fn test_fast_review_post_review_diff_failure_returns_distinct_error() {
+    struct FailsAfterFirstDiff {
+        calls: RefCell<usize>,
+    }
+
+    impl DiffGetter for FailsAfterFirstDiff {
+        fn list_diff_files(&self, _base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError> {
+            let mut calls = self.calls.borrow_mut();
+            *calls += 1;
+            if *calls == 1 {
+                return Ok(vec![FilePath::new("libs/domain/src/lib.rs").unwrap()]);
+            }
+            Err(DiffGetError::Failed("post-review diff failure".to_owned()))
+        }
+    }
+
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        FailsAfterFirstDiff { calls: RefCell::new(0) },
+        MockHasher,
+    );
+
+    // `fast_review` performs the second diff lookup only after the reviewer
+    // returns; the post-review lookup must retain its distinct error variant.
+    let result = cycle.fast_review(&domain_scope());
+    assert!(matches!(
+        result,
+        Err(ReviewCycleError::PostReviewDiff(DiffGetError::Failed(message)))
+            if message == "post-review diff failure"
+    ));
+}
+
+#[test]
+fn test_fast_review_post_review_hash_failure_returns_distinct_error() {
+    struct StableDiffGetter;
+
+    impl DiffGetter for StableDiffGetter {
+        fn list_diff_files(&self, _base: &CommitHash) -> Result<Vec<FilePath>, DiffGetError> {
+            Ok(vec![FilePath::new("libs/domain/src/lib.rs").unwrap()])
+        }
+    }
+
+    struct FailsAfterFirstHash {
+        calls: RefCell<usize>,
+    }
+
+    impl ReviewHasher for FailsAfterFirstHash {
+        fn calc(
+            &self,
+            _target: &domain::review_v2::ReviewTarget,
+        ) -> Result<ReviewHash, ReviewHasherError> {
+            let mut calls = self.calls.borrow_mut();
+            *calls += 1;
+            if *calls == 1 {
+                return Ok(ReviewHash::computed(format!("rvw1:sha256:{:064x}", 1)).unwrap());
+            }
+            Err(ReviewHasherError::Failed("post-review hash failure".to_owned()))
+        }
+    }
+
+    let cycle = ReviewCycle::new(
+        base_commit(),
+        basic_config(),
+        MockReviewer::zero_findings(),
+        StableDiffGetter,
+        FailsAfterFirstHash { calls: RefCell::new(0) },
+    );
+
+    // The first hash permits the reviewer call; the second hash is the
+    // post-review check and must not be reported as the pre-review hash error.
+    let result = cycle.fast_review(&domain_scope());
+    assert!(matches!(
+        result,
+        Err(ReviewCycleError::PostReviewHash(ReviewHasherError::Failed(message)))
+            if message == "post-review hash failure"
+    ));
 }
 
 // ── get_review_targets() tests ────────────────────────────────────────

@@ -1,14 +1,39 @@
 {
   "baseline_hash": "1365829f6203c24bb43342294ab9b66d89b60b88164858a9d564a0de700d46d2",
-  "declaration_hash": "c4e6f4b484abfad8fb09a1e88008640d1a6e120b3ea88bc00d7849c7895399bd",
-  "generated_at": "2026-08-14T08:21:43Z",
-  "head_commit": "2be2a5dcfd1e34f340f1966fff32e616aeb397c7",
+  "declaration_hash": "f864e70e2cc5219c3caa67a52d6c806d70232d11ab664ec697acdf1a56fff5d7",
+  "generated_at": "2026-08-15T05:54:49Z",
+  "head_commit": "069be6fd65609d78d9b6d7eed65503bf99b871f8",
   "schema_version": 4,
   "signals": [
     {
-      "found_type": false,
-      "kind_tag": "dto",
-      "missing_items": [
+      "found_items": [
+        "usecase::review_v2::ports::ResolvedReviewer"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "ClaudeReviewer"
+    },
+    {
+      "found_items": [
+        "usecase::review_v2::ports::ResolvedReviewer"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "CodexReviewer"
+    },
+    {
+      "found_items": [
+        "usecase::review_v2::ports::Reviewer"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "ReviewYieldRecordingReviewer"
+    },
+    {
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize",
@@ -16,20 +41,28 @@
         "PartialEq",
         "Serialize"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
       "type_name": "StructuredReviewRoundDto"
     },
     {
       "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TelemetryEvent"
     },
     {
       "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TelemetryReportSnapshot"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "TelemetryWriter"
     }
   ]
 }

@@ -1,7 +1,247 @@
 {
   "entries": [
     {
-      "claim_hash": "13e1059025bd544c6c25763d0b5352f7cedffc3ddeb1bc96e356482b83062adb",
+      "claim_hash": "0ea64c4afe9ee45835d6b62cd2313ac36cd0f790b19ca6d0c41d48f27b399979",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ClaudeReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "44d8f3d856f3244878d193002c4ec78ba37f0d233e82d2f3f54310692f542d26",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0ea64c4afe9ee45835d6b62cd2313ac36cd0f790b19ca6d0c41d48f27b399979",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ClaudeReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1adf3f06c76c92ca4f572d7e445e3038dbba5842033359dc2314eafff5c8df3d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0ea64c4afe9ee45835d6b62cd2313ac36cd0f790b19ca6d0c41d48f27b399979",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ClaudeReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3923e30baa6d844204fc86c4d4f49391e8c6d84328697f4475547c8f2f46f54f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "Persist resolved reviewer-assignment values rather than a reference to configuration that produced them."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Persist resolved reviewer-assignment values rather than a reference to configuration that produced them.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1141dab48d602f58713e21dd4fb3ef95a8e6e700331443a9b9b3535ef303c0ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "44d8f3d856f3244878d193002c4ec78ba37f0d233e82d2f3f54310692f542d26",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1141dab48d602f58713e21dd4fb3ef95a8e6e700331443a9b9b3535ef303c0ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1adf3f06c76c92ca4f572d7e445e3038dbba5842033359dc2314eafff5c8df3d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1141dab48d602f58713e21dd4fb3ef95a8e6e700331443a9b9b3535ef303c0ea",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3923e30baa6d844204fc86c4d4f49391e8c6d84328697f4475547c8f2f46f54f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "Persist resolved reviewer-assignment values rather than a reference to configuration that produced them."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Persist resolved reviewer-assignment values rather than a reference to configuration that produced them.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d7e546bf2498f6b0a23bf9fb7ac5a3cad5fcf65dbc00b2e201ede89c8c9aa28",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldRecordingReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "44d8f3d856f3244878d193002c4ec78ba37f0d233e82d2f3f54310692f542d26",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d7e546bf2498f6b0a23bf9fb7ac5a3cad5fcf65dbc00b2e201ede89c8c9aa28",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldRecordingReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1adf3f06c76c92ca4f572d7e445e3038dbba5842033359dc2314eafff5c8df3d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "After each structured `sotp review local` round, its telemetry contains the round scope and type, the resolved provider, model, and reasoning effort, and the number of findings produced.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d7e546bf2498f6b0a23bf9fb7ac5a3cad5fcf65dbc00b2e201ede89c8c9aa28",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldRecordingReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ae2ff6c754d5ee26fb109896250d7bf62b129d9afe9bd4f50e4b4549c96c5104",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "The feature neither adds nor removes review, gate, or inspection work, and produces no measurement records for the excluded review and gate entry points."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The feature neither adds nor removes review, gate, or inspection work, and produces no measurement records for the excluded review and gate entry points.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5d7e546bf2498f6b0a23bf9fb7ac5a3cad5fcf65dbc00b2e201ede89c8c9aa28",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ReviewYieldRecordingReviewer",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3923e30baa6d844204fc86c4d4f49391e8c6d84328697f4475547c8f2f46f54f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CO-01",
+          "section": "constraint",
+          "text_label": "Persist resolved reviewer-assignment values rather than a reference to configuration that produced them."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Persist resolved reviewer-assignment values rather than a reference to configuration that produced them.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "49019e8b91aaa9117b7f3fbadaf3ef6d576acdc451e67fa6f902e919998529b6",
       "claim_origin": {
         "data": {
           "entry_key": "StructuredReviewRoundDto",
@@ -25,7 +265,7 @@
       }
     },
     {
-      "claim_hash": "13e1059025bd544c6c25763d0b5352f7cedffc3ddeb1bc96e356482b83062adb",
+      "claim_hash": "49019e8b91aaa9117b7f3fbadaf3ef6d576acdc451e67fa6f902e919998529b6",
       "claim_origin": {
         "data": {
           "entry_key": "StructuredReviewRoundDto",
@@ -49,31 +289,7 @@
       }
     },
     {
-      "claim_hash": "13e1059025bd544c6c25763d0b5352f7cedffc3ddeb1bc96e356482b83062adb",
-      "claim_origin": {
-        "data": {
-          "entry_key": "StructuredReviewRoundDto",
-          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
-          "section_key": "types"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "ae2ff6c754d5ee26fb109896250d7bf62b129d9afe9bd4f50e4b4549c96c5104",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "The feature neither adds nor removes review, gate, or inspection work, and produces no measurement records for the excluded review and gate entry points."
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "The feature neither adds nor removes review, gate, or inspection work, and produces no measurement records for the excluded review and gate entry points.",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "13e1059025bd544c6c25763d0b5352f7cedffc3ddeb1bc96e356482b83062adb",
+      "claim_hash": "49019e8b91aaa9117b7f3fbadaf3ef6d576acdc451e67fa6f902e919998529b6",
       "claim_origin": {
         "data": {
           "entry_key": "StructuredReviewRoundDto",
@@ -213,6 +429,30 @@
       },
       "verdict": {
         "citation": "The aggregation surface must not mutate telemetry, review results, configuration, or inspection behavior.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "03b40b3d0a2b2b5ba69d3798ec3123d60d1b9089e0696f09a3acb929f2ec754d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TelemetryWriter",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "44d8f3d856f3244878d193002c4ec78ba37f0d233e82d2f3f54310692f542d26",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Record telemetry for every structured review round executed by `sotp review local`, including its scope, round type, actual reviewer provider, model, reasoning effort, and finding count.",
         "kind": "pass"
       }
     }

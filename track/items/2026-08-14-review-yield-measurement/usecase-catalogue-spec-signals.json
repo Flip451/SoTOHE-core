@@ -1,7 +1,17 @@
 {
-  "catalogue_declaration_hash": "bc4282fa640e29f501a176450fa1b0c21adef65f361efe1eb24597bd9c9d66e2",
+  "catalogue_declaration_hash": "5305d7edc85c1f198463f09395606d63ca192adba3e77e187989f84ec7a7cd20",
   "schema_version": 1,
   "signals": [
+    {
+      "entry_hash": "9a56c1aad30c6c9088796c956ac0462c608c5fb787737ae3aca1cd4fe473dd5d",
+      "signal": "blue",
+      "type_name": "ResolvedReviewerAssignment"
+    },
+    {
+      "entry_hash": "63560509d2e25ee282a6679262b649fe7cf0ac2c2dd83e16d50a25ebdc1f23ff",
+      "signal": "blue",
+      "type_name": "ReviewCycleError"
+    },
     {
       "entry_hash": "1ed5b4f21ab3149560184f18a30cdc44fee841e794df9ea0f89db6adf526404e",
       "signal": "blue",
@@ -36,6 +46,16 @@
       "entry_hash": "b191ec58c2d24cc5983c6fef96330ea5f144fe7a0cbc869860f561c15f6ed9e0",
       "signal": "blue",
       "type_name": "TelemetryReportOutput"
+    },
+    {
+      "entry_hash": "cec46e5539526e59df5707cfdf660f94bc093d3ad9f5c2d7aae2029b7807f8fd",
+      "signal": "blue",
+      "type_name": "ResolvedReviewer"
+    },
+    {
+      "entry_hash": "443bd12bd1142eed280e581d85719d9518a28a8a1d729486327292f9bd84c0e3",
+      "signal": "blue",
+      "type_name": "Reviewer"
     }
   ]
 }

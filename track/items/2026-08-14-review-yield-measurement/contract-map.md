@@ -37,6 +37,42 @@ subgraph domain["domain"]
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
+    direction TB
+  subgraph T42_usecase_usecase_ResolvedReviewerAssignment["review_v2::ports::ResolvedReviewerAssignment"]
+    direction TB
+    T42_usecase_usecase_ResolvedReviewerAssignment__self[ResolvedReviewerAssignment]
+    T42_usecase_usecase_ResolvedReviewerAssignment_new([new])
+    T42_usecase_usecase_ResolvedReviewerAssignment_track_id([track_id])
+    T42_usecase_usecase_ResolvedReviewerAssignment_scope([scope])
+    T42_usecase_usecase_ResolvedReviewerAssignment_provider([provider])
+    T42_usecase_usecase_ResolvedReviewerAssignment_model([model])
+    T42_usecase_usecase_ResolvedReviewerAssignment_reasoning_effort([reasoning_effort])
+  end
+  subgraph T32_usecase_usecase_ReviewCycleError["review_v2::error::ReviewCycleError"]
+    direction TB
+    T32_usecase_usecase_ReviewCycleError__self[ReviewCycleError]
+    T32_usecase_usecase_ReviewCycleError_UnknownScope[UnknownScope]
+    T32_usecase_usecase_ReviewCycleError_FileChangedDuringReview[FileChangedDuringReview]
+    T32_usecase_usecase_ReviewCycleError_Diff[Diff]
+    T32_usecase_usecase_ReviewCycleError_PostReviewDiff[PostReviewDiff]
+    T32_usecase_usecase_ReviewCycleError_Hash[Hash]
+    T32_usecase_usecase_ReviewCycleError_PostReviewHash[PostReviewHash]
+    T32_usecase_usecase_ReviewCycleError_Reviewer[Reviewer]
+    T32_usecase_usecase_ReviewCycleError_Reader[Reader]
+  end
+  subgraph R32_usecase_usecase_ResolvedReviewer["review_v2::ports::ResolvedReviewer"]
+    direction TB
+    R32_usecase_usecase_ResolvedReviewer__self[ResolvedReviewer]
+    R32_usecase_usecase_ResolvedReviewer_resolved_assignment([resolved_assignment])
+  end
+  subgraph R24_usecase_usecase_Reviewer["review_v2::ports::Reviewer"]
+    direction TB
+    R24_usecase_usecase_Reviewer__self[Reviewer]
+    R24_usecase_usecase_Reviewer_review([review])
+    R24_usecase_usecase_Reviewer_fast_review([fast_review])
+  end
+  end
   subgraph usecase_usecase_module_telemetry["usecase::telemetry"]
     direction TB
   subgraph T46_usecase_usecase_ReviewDetectionRateBasisPoints["telemetry::review_yield::ReviewDetectionRateBasisPoints"]
@@ -81,6 +117,28 @@ subgraph usecase["usecase"]
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_review_v2["infrastructure::review_v2"]
+    direction TB
+  subgraph T44_infrastructure_infrastructure_ClaudeReviewer["review_v2::claude_reviewer::ClaudeReviewer"]
+    direction TB
+    T44_infrastructure_infrastructure_ClaudeReviewer__self[ClaudeReviewer]
+    T44_infrastructure_infrastructure_ClaudeReviewer_new([new])
+    T44_infrastructure_infrastructure_ClaudeReviewer_with_scope_label([with_scope_label])
+  end
+  subgraph T43_infrastructure_infrastructure_CodexReviewer["review_v2::codex_reviewer::CodexReviewer"]
+    direction TB
+    T43_infrastructure_infrastructure_CodexReviewer__self[CodexReviewer]
+    T43_infrastructure_infrastructure_CodexReviewer_new([new])
+    T43_infrastructure_infrastructure_CodexReviewer_with_scope_label([with_scope_label])
+  end
+  subgraph T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer["review_v2::review_yield::ReviewYieldRecordingReviewer"]
+    direction TB
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self[ReviewYieldRecordingReviewer]
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new([new])
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new_for_subprocess_timing([new_for_subprocess_timing])
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_subprocess_started_at_reader([subprocess_started_at_reader])
+  end
+  end
   subgraph infrastructure_infrastructure_module_telemetry["infrastructure::telemetry"]
     direction TB
   subgraph T54_infrastructure_infrastructure_StructuredReviewRoundDto["telemetry::review_yield::StructuredReviewRoundDto"]
@@ -109,6 +167,13 @@ subgraph infrastructure["infrastructure"]
     direction TB
     T53_infrastructure_infrastructure_TelemetryReportSnapshot__self[TelemetryReportSnapshot]
   end
+  subgraph T45_infrastructure_infrastructure_TelemetryWriter["telemetry::writer::TelemetryWriter"]
+    direction TB
+    T45_infrastructure_infrastructure_TelemetryWriter__self[TelemetryWriter]
+    T45_infrastructure_infrastructure_TelemetryWriter_new([new])
+    T45_infrastructure_infrastructure_TelemetryWriter_track_id([track_id])
+    T45_infrastructure_infrastructure_TelemetryWriter_write([write])
+  end
   end
 end
 subgraph cli_driver["cli_driver"]
@@ -120,6 +185,8 @@ end
 subgraph cli["cli"]
   direction TB
 end
+T42_usecase_usecase_ResolvedReviewerAssignment_new --> T42_usecase_usecase_ResolvedReviewerAssignment__self
+R32_usecase_usecase_ResolvedReviewer_resolved_assignment --> T42_usecase_usecase_ResolvedReviewerAssignment__self
 T46_usecase_usecase_ReviewDetectionRateBasisPoints_try_new --> T37_usecase_usecase_ReviewYieldValueError__self
 T46_usecase_usecase_ReviewDetectionRateBasisPoints_try_new --> T46_usecase_usecase_ReviewDetectionRateBasisPoints__self
 T36_usecase_usecase_ReviewExecutionCount_new --> T36_usecase_usecase_ReviewExecutionCount__self
@@ -128,11 +195,46 @@ T33_usecase_usecase_ReviewYieldMetric__self --o|value| T32_usecase_usecase_Revie
 T33_usecase_usecase_ReviewYieldMetric__self --o|execution_count| T36_usecase_usecase_ReviewExecutionCount__self
 T33_usecase_usecase_ReviewYieldMetric__self --o|detection_rate| T46_usecase_usecase_ReviewDetectionRateBasisPoints__self
 T37_usecase_usecase_TelemetryReportOutput__self --o|review_yield_metrics| T33_usecase_usecase_ReviewYieldMetric__self
+T44_infrastructure_infrastructure_ClaudeReviewer_new --> T44_infrastructure_infrastructure_ClaudeReviewer__self
+T44_infrastructure_infrastructure_ClaudeReviewer_with_scope_label --> T44_infrastructure_infrastructure_ClaudeReviewer__self
+T43_infrastructure_infrastructure_CodexReviewer_new --> T43_infrastructure_infrastructure_CodexReviewer__self
+T43_infrastructure_infrastructure_CodexReviewer_with_scope_label --> T43_infrastructure_infrastructure_CodexReviewer__self
+T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new --> T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self
+T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new_for_subprocess_timing --> T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self
+T54_infrastructure_infrastructure_StructuredReviewRoundDto_new --o T42_usecase_usecase_ResolvedReviewerAssignment__self
 T54_infrastructure_infrastructure_StructuredReviewRoundDto_new --o T34_usecase_usecase_ReviewFindingCount__self
 T54_infrastructure_infrastructure_StructuredReviewRoundDto_new --> T54_infrastructure_infrastructure_StructuredReviewRoundDto__self
 T54_infrastructure_infrastructure_StructuredReviewRoundDto_findings_count --> T34_usecase_usecase_ReviewFindingCount__self
 T44_infrastructure_infrastructure_TelemetryEvent_ReviewRound --o|round| T54_infrastructure_infrastructure_StructuredReviewRoundDto__self
 T53_infrastructure_infrastructure_TelemetryReportSnapshot__self --o|review_yield_metrics| T33_usecase_usecase_ReviewYieldMetric__self
+T45_infrastructure_infrastructure_TelemetryWriter_new --> T45_infrastructure_infrastructure_TelemetryWriter__self
+T45_infrastructure_infrastructure_TelemetryWriter_write --o T44_infrastructure_infrastructure_TelemetryEvent__self
+T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self -.impl.-> R24_usecase_usecase_Reviewer__self
+T44_infrastructure_infrastructure_ClaudeReviewer__self -.impl.-> R24_usecase_usecase_Reviewer__self
+T44_infrastructure_infrastructure_ClaudeReviewer__self -.impl.-> R32_usecase_usecase_ResolvedReviewer__self
+T43_infrastructure_infrastructure_CodexReviewer__self -.impl.-> R24_usecase_usecase_Reviewer__self
+T43_infrastructure_infrastructure_CodexReviewer__self -.impl.-> R32_usecase_usecase_ResolvedReviewer__self
+class T42_usecase_usecase_ResolvedReviewerAssignment_new method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_track_id method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_scope method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_provider method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_model method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_reasoning_effort method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment__self value_object
+class T32_usecase_usecase_ReviewCycleError_UnknownScope variant_node
+class T32_usecase_usecase_ReviewCycleError_FileChangedDuringReview variant_node
+class T32_usecase_usecase_ReviewCycleError_Diff variant_node
+class T32_usecase_usecase_ReviewCycleError_PostReviewDiff variant_node
+class T32_usecase_usecase_ReviewCycleError_Hash variant_node
+class T32_usecase_usecase_ReviewCycleError_PostReviewHash variant_node
+class T32_usecase_usecase_ReviewCycleError_Reviewer variant_node
+class T32_usecase_usecase_ReviewCycleError_Reader variant_node
+class T32_usecase_usecase_ReviewCycleError__self error_type
+class R32_usecase_usecase_ResolvedReviewer_resolved_assignment method_node
+class R32_usecase_usecase_ResolvedReviewer__self secondary_port
+class R24_usecase_usecase_Reviewer_review method_node
+class R24_usecase_usecase_Reviewer_fast_review method_node
+class R24_usecase_usecase_Reviewer__self secondary_port
 class T46_usecase_usecase_ReviewDetectionRateBasisPoints_try_new method_node
 class T46_usecase_usecase_ReviewDetectionRateBasisPoints__self value_object
 class T36_usecase_usecase_ReviewExecutionCount_new method_node
@@ -150,6 +252,16 @@ class T32_usecase_usecase_ReviewYieldValue__self value_object
 class T37_usecase_usecase_ReviewYieldValueError_DetectionRateOutOfRange variant_node
 class T37_usecase_usecase_ReviewYieldValueError__self error_type
 class T37_usecase_usecase_TelemetryReportOutput__self dto
+class T44_infrastructure_infrastructure_ClaudeReviewer_new method_node
+class T44_infrastructure_infrastructure_ClaudeReviewer_with_scope_label method_node
+class T44_infrastructure_infrastructure_ClaudeReviewer__self secondary_adapter
+class T43_infrastructure_infrastructure_CodexReviewer_new method_node
+class T43_infrastructure_infrastructure_CodexReviewer_with_scope_label method_node
+class T43_infrastructure_infrastructure_CodexReviewer__self secondary_adapter
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new method_node
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new_for_subprocess_timing method_node
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_subprocess_started_at_reader method_node
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self secondary_adapter
 class T54_infrastructure_infrastructure_StructuredReviewRoundDto_new method_node
 class T54_infrastructure_infrastructure_StructuredReviewRoundDto_scope method_node
 class T54_infrastructure_infrastructure_StructuredReviewRoundDto_round_type method_node
@@ -167,4 +279,8 @@ class T44_infrastructure_infrastructure_TelemetryEvent_AdvisoryHookFired variant
 class T44_infrastructure_infrastructure_TelemetryEvent_NonZeroExit variant_node
 class T44_infrastructure_infrastructure_TelemetryEvent__self dto
 class T53_infrastructure_infrastructure_TelemetryReportSnapshot__self dto
+class T45_infrastructure_infrastructure_TelemetryWriter_new method_node
+class T45_infrastructure_infrastructure_TelemetryWriter_track_id method_node
+class T45_infrastructure_infrastructure_TelemetryWriter_write method_node
+class T45_infrastructure_infrastructure_TelemetryWriter__self secondary_adapter
 ```

@@ -1,5 +1,11 @@
 {
-  "catalogue_declaration_hash": "73195bcbc1efed6e699d825b92988bc24e2ab755f33ea8d9ce7ec2240de382a2",
+  "catalogue_declaration_hash": "13a53a23f5dd1caac982abdb30e7f0c3be628a9d4cba8f71100391b9f63a676b",
   "schema_version": 1,
-  "signals": []
+  "signals": [
+    {
+      "entry_hash": "6513c08781959305af5a29bd378c8574c60b4766f1c53c5c7dbb01c113ae646f",
+      "signal": "blue",
+      "type_name": "cli_composition::telemetry_wiring::emit_review_round"
+    }
+  ]
 }

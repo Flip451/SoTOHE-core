@@ -10,24 +10,12 @@
           "name": "new",
           "params": [
             {
-              "name": "scope",
-              "ty": "domain::review_v2::ScopeName"
+              "name": "assignment",
+              "ty": "&usecase::review_v2::ports::ResolvedReviewerAssignment"
             },
             {
               "name": "round_type",
               "ty": "domain::review_v2::RoundType"
-            },
-            {
-              "name": "provider",
-              "ty": "usecase::capability_exec::ProviderName"
-            },
-            {
-              "name": "model",
-              "ty": "usecase::capability_exec::ModelName"
-            },
-            {
-              "name": "reasoning_effort",
-              "ty": "usecase::capability_exec::ReasoningEffort"
             },
             {
               "name": "findings_count",
@@ -86,6 +74,59 @@
         }
       ],
       "type_name": "StructuredReviewRoundDto"
+    },
+    {
+      "impl_generics": [
+        {
+          "bounds": [
+            "usecase::review_v2::ports::ResolvedReviewer"
+          ],
+          "name": "R"
+        }
+      ],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "inner",
+              "ty": "R"
+            },
+            {
+              "name": "config",
+              "ty": "TelemetryConfig"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_for_subprocess_timing",
+          "params": [
+            {
+              "name": "inner",
+              "ty": "R"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "subprocess_started_at_reader",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Box<dyn Fn() -> Option<std::time::Instant> + Send + Sync + 'static>"
+        }
+      ],
+      "type_name": "ReviewYieldRecordingReviewer"
     }
   ],
   "layer": "infrastructure",
@@ -144,13 +185,278 @@
       "action": "reference",
       "for_type": "TelemetryEvent",
       "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "ReviewYieldRecordingReviewer",
+      "impl_generics": [
+        {
+          "bounds": [
+            "usecase::review_v2::ports::ResolvedReviewer"
+          ],
+          "name": "R"
+        }
+      ],
+      "trait_ref": "usecase::review_v2::ports::Reviewer"
+    },
+    {
+      "action": "reference",
+      "for_type": "ClaudeReviewer",
+      "trait_ref": "usecase::review_v2::ports::Reviewer"
+    },
+    {
+      "for_type": "ClaudeReviewer",
+      "trait_ref": "usecase::review_v2::ports::ResolvedReviewer"
+    },
+    {
+      "action": "reference",
+      "for_type": "CodexReviewer",
+      "trait_ref": "usecase::review_v2::ports::Reviewer"
+    },
+    {
+      "for_type": "CodexReviewer",
+      "trait_ref": "usecase::review_v2::ports::ResolvedReviewer"
+    },
+    {
+      "action": "reference",
+      "for_type": "TelemetryWriter",
+      "trait_ref": "core::fmt::Debug"
     }
   ],
   "traits": {},
   "types": {
+    "ClaudeReviewer": {
+      "action": "modify",
+      "docs": "Baseline Claude secondary adapter carried to expose its ResolvedReviewer implementation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "round_type",
+              "ty": "domain::review_v2::RoundType"
+            },
+            {
+              "name": "diff_base",
+              "ty": "Option<domain::ids::CommitHash>"
+            },
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            },
+            {
+              "name": "timeout",
+              "ty": "std::time::Duration"
+            },
+            {
+              "name": "base_prompt",
+              "ty": "usecase::provider_session::ReviewerPrompt"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "generics": [
+            {
+              "bounds": [
+                "Into<String>"
+              ],
+              "name": "S"
+            }
+          ],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_scope_label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "S"
+            }
+          ],
+          "receiver": "self",
+          "returns": "Self"
+        }
+      ],
+      "module_path": "review_v2::claude_reviewer",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "CodexReviewer": {
+      "action": "modify",
+      "docs": "Baseline Codex secondary adapter carried to expose its ResolvedReviewer implementation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "round_type",
+              "ty": "domain::review_v2::RoundType"
+            },
+            {
+              "name": "diff_base",
+              "ty": "Option<domain::ids::CommitHash>"
+            },
+            {
+              "name": "model",
+              "ty": "usecase::capability_exec::ModelName"
+            },
+            {
+              "name": "effort",
+              "ty": "usecase::capability_exec::ReasoningEffort"
+            },
+            {
+              "name": "timeout",
+              "ty": "std::time::Duration"
+            },
+            {
+              "name": "base_prompt",
+              "ty": "usecase::provider_session::ReviewerPrompt"
+            },
+            {
+              "name": "session_cache",
+              "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            }
+          ],
+          "returns": "CodexReviewer"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_scope_label",
+          "params": [
+            {
+              "name": "label",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": "self",
+          "returns": "CodexReviewer"
+        }
+      ],
+      "module_path": "review_v2::codex_reviewer",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "ReviewYieldRecordingReviewer": {
+      "action": "add",
+      "docs": "Infrastructure Reviewer decorator (IN-01, AC-01, AC-03, CO-01).",
+      "generics": [
+        {
+          "bounds": [],
+          "name": "R"
+        }
+      ],
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::review_yield",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
     "StructuredReviewRoundDto": {
       "action": "add",
-      "docs": "Private-field serde DTO for structured review telemetry (IN-01, AC-01, AC-03, CO-01).",
+      "docs": "Private-field serde DTO for structured review telemetry (IN-01, AC-01, CO-01).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -172,10 +478,6 @@
         },
         {
           "anchor": "AC-01",
-          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
-        },
-        {
-          "anchor": "AC-03",
           "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
         },
         {
@@ -474,6 +776,72 @@
         },
         {
           "anchor": "CO-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "TelemetryWriter": {
+      "action": "modify",
+      "docs": "Infrastructure telemetry sink modified to retain and expose the validated TrackId used to resolve its output path.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "config",
+              "ty": "TelemetryConfig"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::ids::TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "write",
+          "params": [
+            {
+              "name": "event",
+              "ty": "TelemetryEvent"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TelemetryWriteError>"
+        }
+      ],
+      "module_path": "telemetry::writer",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
           "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
         }
       ]

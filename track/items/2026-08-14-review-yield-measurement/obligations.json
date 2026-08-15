@@ -1,4 +1,125 @@
 {
-  "obligations": [],
+  "obligations": [
+    {
+      "brief": "Author a contract test covering 'trait_method:resolved_assignment' of ResolvedReviewer",
+      "declaration_hash": "1e9ce700868d1fdb26827e45b83b0b1b171565a47d3ff569c75798f1f74aa826",
+      "id": {
+        "entry_key": "ResolvedReviewer",
+        "item_identifier": "trait_method:resolved_assignment",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "ResolvedReviewer",
+        "file_path": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::ports::Reviewer' of ReviewYieldRecordingReviewer",
+      "declaration_hash": "3b281f8e70891709a5b74220662d77175b5cea765e53dbac527a11dc8c519af1",
+      "id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::ports::ResolvedReviewer' of ClaudeReviewer",
+      "declaration_hash": "e222fc5e0db45a0cb65961b15666742d0417495e4e2a2b24c6690e5c128e7ddd",
+      "id": {
+        "entry_key": "ClaudeReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "ClaudeReviewer",
+        "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::review_v2::ports::ResolvedReviewer' of CodexReviewer",
+      "declaration_hash": "9c8da944dca3fbd5cab0468a2e2624fd73c869fb5240c07fc5e73c88d58385b9",
+      "id": {
+        "entry_key": "CodexReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "CodexReviewer",
+        "file_path": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    }
+  ],
   "track_id": "2026-08-14-review-yield-measurement"
 }

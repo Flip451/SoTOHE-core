@@ -36,6 +36,7 @@ use super::TelemetryEvent;
 use super::TelemetryWriteError;
 use crate::telemetry::config::TelemetryConfig;
 use crate::track::symlink_guard::reject_symlinks_below;
+use domain::TrackId;
 
 /// Maximum byte length of a single JSONL event line (including the trailing
 /// newline) per CN-05 / IN-02.
@@ -67,6 +68,8 @@ const TRUNCATED_FIELD_CAP: usize = 256;
 ///
 /// See the module-level doc for the rationale behind `Mutex<Option<File>>`.
 pub struct TelemetryWriter {
+    /// Validated track identity used to resolve this sink.
+    track_id: TrackId,
     /// Whether telemetry is enabled (from `TelemetryConfig::is_enabled`).
     enabled: bool,
     /// Resolved path to `telemetry.jsonl`.
@@ -104,13 +107,13 @@ impl TelemetryWriter {
     ///
     /// No file I/O is performed at construction time (AC-06).
     #[must_use]
-    pub fn new(config: TelemetryConfig, track_id: String, items_dir: PathBuf) -> Self {
+    pub fn new(config: TelemetryConfig, track_id: TrackId, items_dir: PathBuf) -> Self {
         let (output_path, guard_root) = match config.output_dir_override() {
             Some(override_dir) => (override_dir.join("telemetry.jsonl"), None),
             None => {
                 // Sanitize track_id: collect only Normal components to prevent
                 // path-traversal via `..` or absolute prefixes in the string.
-                let safe_track_id = safe_path_component(&track_id);
+                let safe_track_id = safe_path_component(track_id.as_ref());
                 (
                     items_dir.join(safe_track_id).join("logs").join("telemetry.jsonl"),
                     Some(items_dir),
@@ -118,7 +121,19 @@ impl TelemetryWriter {
             }
         };
 
-        Self { enabled: config.is_enabled(), output_path, guard_root, file: Mutex::new(None) }
+        Self {
+            track_id,
+            enabled: config.is_enabled(),
+            output_path,
+            guard_root,
+            file: Mutex::new(None),
+        }
+    }
+
+    /// Returns the validated track identity bound to this sink.
+    #[must_use]
+    pub fn track_id(&self) -> &TrackId {
+        &self.track_id
     }
 
     /// Writes a single telemetry event as a JSONL line.
@@ -405,7 +420,11 @@ mod tests {
     /// (via SOTP_TELEMETRY_DIR override pointing to `tmp.path()`).
     fn writer_in_tempdir(tmp: &TempDir) -> TelemetryWriter {
         let config = enabled_config_with_dir(tmp.path());
-        TelemetryWriter::new(config, "test-track-2026".to_string(), tmp.path().to_path_buf())
+        TelemetryWriter::new(
+            config,
+            domain::TrackId::try_new("test-track-2026").unwrap(),
+            tmp.path().to_path_buf(),
+        )
     }
 
     fn sample_hook_block_event() -> TelemetryEvent {
@@ -425,8 +444,11 @@ mod tests {
     fn test_write_with_disabled_config_does_not_open_file() {
         let tmp = TempDir::new().unwrap();
         let config = disabled_config();
-        let writer =
-            TelemetryWriter::new(config, "test-track-2026".to_string(), tmp.path().to_path_buf());
+        let writer = TelemetryWriter::new(
+            config,
+            domain::TrackId::try_new("test-track-2026").unwrap(),
+            tmp.path().to_path_buf(),
+        );
 
         let result = writer.write(sample_hook_block_event());
         assert!(result.is_ok(), "disabled writer must return Ok: {result:?}");
@@ -446,7 +468,26 @@ mod tests {
         let writer = writer_in_tempdir(&tmp);
         let output_path = tmp.path().join("telemetry.jsonl");
 
-        let event = sample_hook_block_event();
+        assert_eq!(writer.track_id().as_ref(), "test-track-2026");
+        let assignment = usecase::review_v2::ResolvedReviewerAssignment::new(
+            domain::TrackId::try_new("test-track-2026").unwrap(),
+            domain::review_v2::ScopeName::parse("application").unwrap(),
+            usecase::capability_exec::ProviderName::try_new("codex").unwrap(),
+            usecase::capability_exec::ModelName::try_new("gpt-5.4-mini").unwrap(),
+            usecase::capability_exec::ReasoningEffort::High,
+        );
+        let round = crate::telemetry::StructuredReviewRoundDto::new(
+            &assignment,
+            domain::review_v2::RoundType::Fast,
+            usecase::telemetry::review_yield::ReviewFindingCount::new(3),
+        );
+        let event = TelemetryEvent::ReviewRound {
+            schema_version: 1,
+            track_id: "test-track-2026".to_string(),
+            round,
+            duration_ms: 125,
+            timestamp: "2026-08-15T00:00:00Z".to_string(),
+        };
         writer.write(event).unwrap();
 
         assert!(output_path.exists(), "telemetry.jsonl must be created after first write");
@@ -455,6 +496,19 @@ mod tests {
         assert!(!content.is_empty(), "telemetry.jsonl must not be empty after write");
         // Must end with newline (JSONL convention).
         assert!(content.ends_with('\n'), "line must end with newline");
+
+        // ReviewRound persists its typed `round` DTO inside the JSONL record;
+        // reading that record back makes every AC-01 axis observable after the write.
+        let persisted_record: serde_json::Value =
+            serde_json::from_str(content.lines().next().unwrap()).unwrap();
+        assert_eq!(persisted_record.get("event_type").expect("event type"), "ReviewRound");
+        let round = persisted_record.get("round").expect("round");
+        assert_eq!(round.get("scope").expect("round scope"), "application");
+        assert_eq!(round.get("round_type").expect("round type"), "fast");
+        assert_eq!(round.get("provider").expect("round provider"), "codex");
+        assert_eq!(round.get("model").expect("round model"), "gpt-5.4-mini");
+        assert_eq!(round.get("reasoning_effort").expect("round reasoning effort"), "high");
+        assert_eq!(round.get("findings_count").expect("round findings count"), 3);
     }
 
     #[test]
@@ -490,7 +544,7 @@ mod tests {
 
         let writer = TelemetryWriter::new(
             enabled_default_config(),
-            "test-track-2026".to_string(),
+            domain::TrackId::try_new("test-track-2026").unwrap(),
             items_dir,
         );
         let result = writer.write(sample_hook_block_event());
@@ -674,7 +728,7 @@ mod tests {
 
         let writer = TelemetryWriter::new(
             cfg.unwrap(),
-            "test-track-2026".to_string(),
+            domain::TrackId::try_new("test-track-2026").unwrap(),
             tmp.path().to_path_buf(),
         );
 

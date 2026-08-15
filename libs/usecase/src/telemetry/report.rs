@@ -1,6 +1,7 @@
 //! Report-side telemetry DTOs and secondary port.
 
 use super::command_trace::{CommandExecutionMetric, TelemetrySkippedLineCount};
+use super::review_yield::ReviewYieldMetric;
 
 /// Report record for a single telemetry phase duration.
 #[derive(Debug, Clone)]
@@ -48,6 +49,8 @@ pub struct TelemetryReportOutput {
     pub skipped_lines: TelemetrySkippedLineCount,
     /// Per-command execution metrics.
     pub command_metrics: Vec<CommandExecutionMetric>,
+    /// Structured-review yield metrics grouped by a recorded dimension.
+    pub review_yield_metrics: Vec<ReviewYieldMetric>,
 }
 
 /// Error type for [`super::TelemetryReportPort`].

@@ -1,14 +1,36 @@
 {
   "baseline_hash": "5e93a76a483c33b0975a43bd78ecbd4d6bfee290025ad608810a2aa1e2be23f8",
-  "declaration_hash": "bc4282fa640e29f501a176450fa1b0c21adef65f361efe1eb24597bd9c9d66e2",
-  "generated_at": "2026-08-14T08:21:40Z",
-  "head_commit": "2be2a5dcfd1e34f340f1966fff32e616aeb397c7",
+  "declaration_hash": "5305d7edc85c1f198463f09395606d63ca192adba3e77e187989f84ec7a7cd20",
+  "generated_at": "2026-08-15T05:54:43Z",
+  "head_commit": "069be6fd65609d78d9b6d7eed65503bf99b871f8",
   "schema_version": 4,
   "signals": [
     {
-      "found_type": false,
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ResolvedReviewer"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "value_object",
-      "missing_items": [
+      "signal": "blue",
+      "type_name": "ResolvedReviewerAssignment"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "ReviewCycleError"
+    },
+    {
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -16,13 +38,13 @@
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
       "type_name": "ReviewDetectionRateBasisPoints"
     },
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -30,62 +52,70 @@
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
       "type_name": "ReviewExecutionCount"
     },
     {
-      "found_type": false,
-      "kind_tag": "value_object",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
       "type_name": "ReviewFindingCount"
     },
     {
-      "found_type": false,
-      "kind_tag": "dto",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
       "type_name": "ReviewYieldMetric"
     },
     {
-      "found_type": false,
-      "kind_tag": "enum",
-      "missing_items": [
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
       "type_name": "ReviewYieldValue"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "ReviewYieldValueError"
     },
     {
       "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TelemetryReportOutput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "Reviewer"
     }
   ]
 }

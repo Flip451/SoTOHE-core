@@ -1,1 +1,727 @@
-{"track_id": "2026-08-14-review-yield-measurement", "records": []}
+{
+  "track_id": "2026-08-14-review-yield-measurement",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewDetectionRateBasisPoints",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewDetectionRateBasisPoints",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewExecutionCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewExecutionCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewFindingCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewFindingCount",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldMetric",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldMetric",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldValue",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_covers_each_recorded_axis"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldValue",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_covers_each_recorded_axis"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldValueError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldValueError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewCycleError",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::tests",
+          "test_name": "test_review_file_changed_during_review_returns_error"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_zero_findings_after_file_change_emits_review_telemetry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryReportOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryReportOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryReportOutput",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "CO-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "test_telemetry_report_output_aggregation_preserves_all_observed_state"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "StructuredReviewRoundDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_serialization_writes_wire_fields"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_deserialization_restores_typed_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "StructuredReviewRoundDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_serialization_writes_wire_fields"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_deserialization_restores_typed_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "StructuredReviewRoundDto",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "CO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_serialization_writes_wire_fields"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_deserialization_restores_typed_values"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryEvent",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::tests",
+          "test_name": "test_review_round_serde_round_trip_persists_structured_assignment"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryEvent",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::tests",
+          "test_name": "test_review_round_serde_round_trip_persists_structured_assignment"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_for_each_axis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_to_usecase_output"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_for_each_axis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_to_usecase_output"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "CO-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_telemetry_report_snapshot_aggregation_preserves_all_observed_state"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ResolvedReviewer",
+        "item_identifier": "trait_method:resolved_assignment",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_codex_happy_path_writes_verdict_and_telemetry"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_claude_happy_path_writes_verdict_and_telemetry"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolvedReviewerAssignment",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolvedReviewerAssignment",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolvedReviewerAssignment",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "CO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "CO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TelemetryWriter",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::writer::tests",
+          "test_name": "test_write_enabled_creates_telemetry_jsonl_and_appends_event"
+        }
+      ]
+    }
+  ]
+}

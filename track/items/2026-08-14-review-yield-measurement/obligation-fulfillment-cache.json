@@ -1,4 +1,1441 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewDetectionRateBasisPoints"
+      },
+      "key": {
+        "anchor_text_hash": "6f756bbdf3404c8462f210f4fcc6f6432493772275cb7148ecaeba70be2656c4",
+        "bound_tests_set_hash": "58b7a23d79e19a7de41579e5cb3b5b18d0a83955751299b70d196224280787b0",
+        "declaration_hash": "3f0132a3bfdd6d61f4f4d5941280f353fd1aeb296c333470d4d10da9111ca9b6"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewDetectionRateBasisPoints",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let detection_rate = ReviewDetectionRateBasisPoints::try_new(6_666)?;\n\nassert_eq!(detection_rate.to_string(), \"6666\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewDetectionRateBasisPoints"
+      },
+      "key": {
+        "anchor_text_hash": "46dd360bb4a52090ed8591af78e08fc47566c8ec3a45742891ba8651dd132087",
+        "bound_tests_set_hash": "58b7a23d79e19a7de41579e5cb3b5b18d0a83955751299b70d196224280787b0",
+        "declaration_hash": "3f0132a3bfdd6d61f4f4d5941280f353fd1aeb296c333470d4d10da9111ca9b6"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewDetectionRateBasisPoints",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let detection_rate = ReviewDetectionRateBasisPoints::try_new(6_666)?;\n\n        assert_eq!(detection_rate.to_string(), \"6666\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewExecutionCount"
+      },
+      "key": {
+        "anchor_text_hash": "6f756bbdf3404c8462f210f4fcc6f6432493772275cb7148ecaeba70be2656c4",
+        "bound_tests_set_hash": "a793b4642f92fa0f37f74f5c83f11976a305328934e3771a3efd5e7eee503650",
+        "declaration_hash": "d90ade4d7c0ceb35d806f73260c737f6fec223b9ff5b498a1abc2f51dd39820c"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewExecutionCount",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.review_yield_metrics, vec![metric]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewExecutionCount"
+      },
+      "key": {
+        "anchor_text_hash": "46dd360bb4a52090ed8591af78e08fc47566c8ec3a45742891ba8651dd132087",
+        "bound_tests_set_hash": "a793b4642f92fa0f37f74f5c83f11976a305328934e3771a3efd5e7eee503650",
+        "declaration_hash": "d90ade4d7c0ceb35d806f73260c737f6fec223b9ff5b498a1abc2f51dd39820c"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewExecutionCount",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.review_yield_metrics, vec![metric]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewFindingCount"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "06c35990037c54fb47a782a9e523fbdbe2b51e6e38f865b4de131eb16701be6f",
+        "declaration_hash": "879982908d2bfc1a4240eadd258ed793bc0440983bb672e22a8fcee6591f8a4b"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewFindingCount",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(findings.value(), 2);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_objects_preserve_valid_counts_and_rate"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewFindingCount"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "06c35990037c54fb47a782a9e523fbdbe2b51e6e38f865b4de131eb16701be6f",
+        "declaration_hash": "879982908d2bfc1a4240eadd258ed793bc0440983bb672e22a8fcee6591f8a4b"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewFindingCount",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let findings = ReviewFindingCount::new(2);\n\n        assert_eq!(findings.value(), 2);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldMetric"
+      },
+      "key": {
+        "anchor_text_hash": "6f756bbdf3404c8462f210f4fcc6f6432493772275cb7148ecaeba70be2656c4",
+        "bound_tests_set_hash": "8e8fa6edc066c2a141917cb6674f2f73e3252a69b9f797e2a62f2415aa15ffbd",
+        "declaration_hash": "48eda8a432b482bb97127a5652b20d1d49cc8d8fffa5f3bfb704f940c25da98a"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldMetric",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.review_yield_metrics, vec![metric]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldMetric"
+      },
+      "key": {
+        "anchor_text_hash": "46dd360bb4a52090ed8591af78e08fc47566c8ec3a45742891ba8651dd132087",
+        "bound_tests_set_hash": "8e8fa6edc066c2a141917cb6674f2f73e3252a69b9f797e2a62f2415aa15ffbd",
+        "declaration_hash": "48eda8a432b482bb97127a5652b20d1d49cc8d8fffa5f3bfb704f940c25da98a"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldMetric",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.review_yield_metrics, vec![metric]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_covers_each_recorded_axis"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldValue"
+      },
+      "key": {
+        "anchor_text_hash": "6f756bbdf3404c8462f210f4fcc6f6432493772275cb7148ecaeba70be2656c4",
+        "bound_tests_set_hash": "267652e816124e07795797b61eb3a9f312a8517e88c5740a3793ac9523eccf0b",
+        "declaration_hash": "ddce26558ff2d95e7c0109493eb2cc021def8b1303e95ea5db2be51bad2a3b16"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldValue",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let values = [\n            ReviewYieldValue::Scope(domain::review_v2::ScopeName::parse(\"architecture\")?),\n            ReviewYieldValue::RoundType(domain::review_v2::RoundType::Final),\n            ReviewYieldValue::Provider(ProviderName::try_new(\"codex\".to_owned())?),\n            ReviewYieldValue::Model(ModelName::try_new(\"gpt-5\".to_owned())?),\n            ReviewYieldValue::ReasoningEffort(ReasoningEffort::High),\n        ];\n\n        assert_eq!(values.len(), 5);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_value_covers_each_recorded_axis"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldValue"
+      },
+      "key": {
+        "anchor_text_hash": "46dd360bb4a52090ed8591af78e08fc47566c8ec3a45742891ba8651dd132087",
+        "bound_tests_set_hash": "267652e816124e07795797b61eb3a9f312a8517e88c5740a3793ac9523eccf0b",
+        "declaration_hash": "ddce26558ff2d95e7c0109493eb2cc021def8b1303e95ea5db2be51bad2a3b16"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldValue",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let values = [\n            ReviewYieldValue::Scope(domain::review_v2::ScopeName::parse(\"architecture\")?),\n            ReviewYieldValue::RoundType(domain::review_v2::RoundType::Final),\n            ReviewYieldValue::Provider(ProviderName::try_new(\"codex\".to_owned())?),\n            ReviewYieldValue::Model(ModelName::try_new(\"gpt-5\".to_owned())?),\n            ReviewYieldValue::ReasoningEffort(ReasoningEffort::High),\n        ];",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldValueError"
+      },
+      "key": {
+        "anchor_text_hash": "6f756bbdf3404c8462f210f4fcc6f6432493772275cb7148ecaeba70be2656c4",
+        "bound_tests_set_hash": "ed0f4489e9e97a3940083aebbfe2a4a31cdaa98b533608f0538a149880a5668b",
+        "declaration_hash": "80085620537b5b9c68dafa96cf8ea4a011169fe4dbe1987e6b0f53841c3245e6"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldValueError",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let result = ReviewDetectionRateBasisPoints::try_new(10_001);\n\n        assert!(matches!(result, Err(ReviewYieldValueError::DetectionRateOutOfRange)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_review_yield_detection_rate_rejects_out_of_range_value"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldValueError"
+      },
+      "key": {
+        "anchor_text_hash": "46dd360bb4a52090ed8591af78e08fc47566c8ec3a45742891ba8651dd132087",
+        "bound_tests_set_hash": "ed0f4489e9e97a3940083aebbfe2a4a31cdaa98b533608f0538a149880a5668b",
+        "declaration_hash": "80085620537b5b9c68dafa96cf8ea4a011169fe4dbe1987e6b0f53841c3245e6"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldValueError",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(result, Err(ReviewYieldValueError::DetectionRateOutOfRange)));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::review_v2::tests",
+          "test_name": "test_review_file_changed_during_review_returns_error"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_zero_findings_after_file_change_emits_review_telemetry"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewCycleError"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "e98ace26eca1b9b4b5d5faf33111cfb4cddaa250a9dbd979f97ac9c6e4c3aea6",
+        "declaration_hash": "4de46b509aa5ee7f6ea71a9b3de759f9f79ded49e7bd3ff620158acd03c21d6e"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewCycleError",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_review_telemetry(\n            &repo.track_dir,\n            \"codex\",\n            \"review-fast\",\n            \"codex\",\n            \"fast\",\n            \"cli_composition\",\n            \"low\",\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryReportOutput"
+      },
+      "key": {
+        "anchor_text_hash": "6f756bbdf3404c8462f210f4fcc6f6432493772275cb7148ecaeba70be2656c4",
+        "bound_tests_set_hash": "8e8fa6edc066c2a141917cb6674f2f73e3252a69b9f797e2a62f2415aa15ffbd",
+        "declaration_hash": "16606a67c064278776c31c7f329cb9fa6161ac11272a80da8c93db341f1ca5aa"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportOutput",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.review_yield_metrics, vec![metric]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::telemetry::aggregate_interactor_tests",
+          "test_name": "test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryReportOutput"
+      },
+      "key": {
+        "anchor_text_hash": "46dd360bb4a52090ed8591af78e08fc47566c8ec3a45742891ba8651dd132087",
+        "bound_tests_set_hash": "8e8fa6edc066c2a141917cb6674f2f73e3252a69b9f797e2a62f2415aa15ffbd",
+        "declaration_hash": "16606a67c064278776c31c7f329cb9fa6161ac11272a80da8c93db341f1ca5aa"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportOutput",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.review_yield_metrics, vec![metric]);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "test_telemetry_report_output_aggregation_preserves_all_observed_state"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryReportOutput"
+      },
+      "key": {
+        "anchor_text_hash": "e31637043110e2006194aa7634e667ccb8012a970f00a12dc90265b31ff8e9cd",
+        "bound_tests_set_hash": "32c2dd86a48d33e8d0235fdb969c75dade8aeed8536bffb18e3513583d3496c4",
+        "declaration_hash": "16606a67c064278776c31c7f329cb9fa6161ac11272a80da8c93db341f1ca5aa"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportOutput",
+        "item_identifier": "voluntary:CO-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(telemetry_after, telemetry_before, \"aggregation must not mutate telemetry\");\n        assert_eq!(\n            review_results_after, review_results_before,\n            \"aggregation must not mutate review results\"\n        );\n        assert_eq!(\n            configuration_after, configuration_before,\n            \"aggregation must not mutate configuration\"\n        );\n        assert_eq!(\n            inspection_rounds_after, inspection_rounds_before,\n            \"aggregation must not alter inspection behavior by adding or removing review rounds\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_serialization_writes_wire_fields"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_deserialization_restores_typed_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "StructuredReviewRoundDto"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "a9526ef497eba5008c3e321a73de9fe90f0a16a5f8718aeed6a9a13746d4c148",
+        "declaration_hash": "2ca3ecc7199ad9e3ea0426cc3aedf69b5d18a63d16726d0d9b13949f3fa77128"
+      },
+      "obligation_id": {
+        "entry_key": "StructuredReviewRoundDto",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(json.get(\"scope\").unwrap(), \"application\");\n        assert_eq!(json.get(\"round_type\").unwrap(), \"fast\");\n        assert_eq!(json.get(\"provider\").unwrap(), \"codex\");\n        assert_eq!(json.get(\"model\").unwrap(), \"gpt-5.4-mini\");\n        assert_eq!(json.get(\"reasoning_effort\").unwrap(), \"high\");\n        assert_eq!(json.get(\"findings_count\").unwrap(), 3);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_serialization_writes_wire_fields"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_deserialization_restores_typed_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "StructuredReviewRoundDto"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "a9526ef497eba5008c3e321a73de9fe90f0a16a5f8718aeed6a9a13746d4c148",
+        "declaration_hash": "2ca3ecc7199ad9e3ea0426cc3aedf69b5d18a63d16726d0d9b13949f3fa77128"
+      },
+      "obligation_id": {
+        "entry_key": "StructuredReviewRoundDto",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(json.get(\"scope\").unwrap(), \"application\");\n        assert_eq!(json.get(\"round_type\").unwrap(), \"fast\");\n        assert_eq!(json.get(\"provider\").unwrap(), \"codex\");\n        assert_eq!(json.get(\"model\").unwrap(), \"gpt-5.4-mini\");\n        assert_eq!(json.get(\"reasoning_effort\").unwrap(), \"high\");\n        assert_eq!(json.get(\"findings_count\").unwrap(), 3);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_serialization_writes_wire_fields"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::review_yield::tests",
+          "test_name": "test_structured_review_round_deserialization_restores_typed_values"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "StructuredReviewRoundDto"
+      },
+      "key": {
+        "anchor_text_hash": "6cedfc1394dbc4034dd31189b5dfea741040cf48569f5235a01d2530d531876e",
+        "bound_tests_set_hash": "079be842c3277cbc53130c34f0404139fce4c09ef242dd2fbe4de6e8a7cae9cd",
+        "declaration_hash": "2ca3ecc7199ad9e3ea0426cc3aedf69b5d18a63d16726d0d9b13949f3fa77128"
+      },
+      "obligation_id": {
+        "entry_key": "StructuredReviewRoundDto",
+        "item_identifier": "voluntary:CO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").unwrap(), \"cli_composition\");\n        assert_eq!(round.get(\"round_type\").unwrap(), \"fast\");\n        assert_eq!(round.get(\"provider\").unwrap(), \"claude\");\n        assert_eq!(round.get(\"model\").unwrap(), \"review-fast\");\n        assert_eq!(round.get(\"reasoning_effort\").unwrap(), \"low\");\n        assert_eq!(round.get(\"findings_count\").unwrap(), 0);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::tests",
+          "test_name": "test_review_round_serde_round_trip_persists_structured_assignment"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryEvent"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "b45eeb65f41b8ecaacfd92e3dd94f28e80007d44089416e05c6928fb66f475f8",
+        "declaration_hash": "7eac15bd9b054fb18d8ef3354a1f39ae6506dc80153bdd16f04dbb3e7f757187"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryEvent",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").unwrap(), \"application\");\n        assert_eq!(round.get(\"round_type\").unwrap(), \"final\");\n        assert_eq!(round.get(\"provider\").unwrap(), \"codex\");\n        assert_eq!(round.get(\"model\").unwrap(), \"gpt-5.4-mini\");\n        assert_eq!(round.get(\"reasoning_effort\").unwrap(), \"high\");\n        assert_eq!(round.get(\"findings_count\").unwrap(), 2);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::tests",
+          "test_name": "test_review_round_serde_round_trip_persists_structured_assignment"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryEvent"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "7828b0e93ca1f40b541fe65485de084568589b4df94f98f251b1084667059483",
+        "declaration_hash": "7eac15bd9b054fb18d8ef3354a1f39ae6506dc80153bdd16f04dbb3e7f757187"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryEvent",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").unwrap(), \"application\");\n        assert_eq!(round.get(\"round_type\").unwrap(), \"final\");\n        assert_eq!(round.get(\"provider\").unwrap(), \"codex\");\n        assert_eq!(round.get(\"model\").unwrap(), \"gpt-5.4-mini\");\n        assert_eq!(round.get(\"reasoning_effort\").unwrap(), \"high\");\n        assert_eq!(round.get(\"findings_count\").unwrap(), 2);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_for_each_axis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_to_usecase_output"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryReportSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "6f756bbdf3404c8462f210f4fcc6f6432493772275cb7148ecaeba70be2656c4",
+        "bound_tests_set_hash": "f993e9a5415825a193fa4e5e53791eacd1212c0af8e8569d37061e0504ff4d2f",
+        "declaration_hash": "46591e55c45b0049aecc86bf796c236c790c74f1f637dfe2600b4e1f5ecef1ad"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_review_yield_metric(\n            &output.review_yield_metrics,\n            ReviewYieldValue::Scope(domain::review_v2::ScopeName::parse(\"architecture\").unwrap()),\n            \"3\",\n            \"6666\",\n        );\n        assert_review_yield_metric(\n            &output.review_yield_metrics,\n            ReviewYieldValue::RoundType(domain::review_v2::RoundType::Fast),\n            \"2\",\n            \"5000\",\n        );\n        assert_review_yield_metric(\n            &output.review_yield_metrics,\n            ReviewYieldValue::Provider(\n                usecase::capability_exec::ProviderName::try_new(\"codex\").unwrap(),\n            ),\n            \"2\",\n            \"5000\",\n        );\n        assert_review_yield_metric(\n            &output.review_yield_metrics,\n            ReviewYieldValue::Model(usecase::capability_exec::ModelName::try_new(\"gpt-5\").unwrap()),\n            \"2\",\n            \"5000\",\n        );\n        assert_review_yield_metric(\n            &output.review_yield_metrics,\n            ReviewYieldValue::ReasoningEffort(usecase::capability_exec::ReasoningEffort::High),\n            \"2\",\n            \"5000\",\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_for_each_axis"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report_adapter::tests",
+          "test_name": "test_aggregate_projects_review_yield_metrics_to_usecase_output"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryReportSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "46dd360bb4a52090ed8591af78e08fc47566c8ec3a45742891ba8651dd132087",
+        "bound_tests_set_hash": "f993e9a5415825a193fa4e5e53791eacd1212c0af8e8569d37061e0504ff4d2f",
+        "declaration_hash": "46591e55c45b0049aecc86bf796c236c790c74f1f637dfe2600b4e1f5ecef1ad"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(output.review_yield_metrics.len(), 9);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::report::tests",
+          "test_name": "test_telemetry_report_snapshot_aggregation_preserves_all_observed_state"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-02",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryReportSnapshot"
+      },
+      "key": {
+        "anchor_text_hash": "e31637043110e2006194aa7634e667ccb8012a970f00a12dc90265b31ff8e9cd",
+        "bound_tests_set_hash": "327ae324b5248aaeba9a8d3bd2ea1e76a0e9ad37147b697d585d7051fee24ee5",
+        "declaration_hash": "46591e55c45b0049aecc86bf796c236c790c74f1f637dfe2600b4e1f5ecef1ad"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryReportSnapshot",
+        "item_identifier": "voluntary:CO-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(telemetry_after, telemetry_before, \"aggregation must not mutate telemetry\"); assert_eq!(review_results_after, review_results_before, \"aggregation must not mutate review results\"); assert_eq!(configuration_after, configuration_before, \"aggregation must not mutate configuration\"); assert_eq!(inspection_rounds_after, inspection_rounds_before, \"aggregation must not alter inspection behavior by adding or removing review rounds\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ResolvedReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "519f4cfdd0949aa7fd30aefbeb24eb74539ae7de7f75489d14f6882bd0eb070c",
+        "declaration_hash": "1e9ce700868d1fdb26827e45b83b0b1b171565a47d3ff569c75798f1f74aa826"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedReviewer",
+        "item_identifier": "trait_method:resolved_assignment",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment.track_id().as_ref(), \"test-track\");\n        assert_eq!(assignment.scope(), &ScopeName::Other);\n        assert_eq!(assignment.provider().as_str(), \"codex\");\n        assert_eq!(assignment.model().as_str(), \"gpt-5.4\");\n        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ResolvedReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "519f4cfdd0949aa7fd30aefbeb24eb74539ae7de7f75489d14f6882bd0eb070c",
+        "declaration_hash": "1e9ce700868d1fdb26827e45b83b0b1b171565a47d3ff569c75798f1f74aa826"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedReviewer",
+        "item_identifier": "trait_method:resolved_assignment",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").expect(\"round scope\"), \"infrastructure\");\n        assert_eq!(round.get(\"round_type\").expect(\"round type\"), \"final\");\n        assert_eq!(round.get(\"provider\").expect(\"round provider\"), \"codex\");\n        assert_eq!(round.get(\"model\").expect(\"round model\"), \"gpt-5.4\");\n        assert_eq!(round.get(\"reasoning_effort\").expect(\"round reasoning effort\"), \"high\");\n        assert_eq!(round.get(\"findings_count\").expect(\"round findings count\"), 0);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ResolvedReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "6cedfc1394dbc4034dd31189b5dfea741040cf48569f5235a01d2530d531876e",
+        "bound_tests_set_hash": "519f4cfdd0949aa7fd30aefbeb24eb74539ae7de7f75489d14f6882bd0eb070c",
+        "declaration_hash": "1e9ce700868d1fdb26827e45b83b0b1b171565a47d3ff569c75798f1f74aa826"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedReviewer",
+        "item_identifier": "trait_method:resolved_assignment",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "// `model` and `scope_label` are mutable invocation configuration. The\n        // constructor stores a separate resolved assignment snapshot, so a\n        // later configuration change must not alter values persisted to telemetry.\n        reviewer.model = ModelName::try_new(\"profile-mutated-model\").unwrap();\n        reviewer.scope_label = \"profile-mutated-scope\".to_owned();\n        let assignment =\n            <ClaudeReviewer as usecase::review_v2::ResolvedReviewer>::resolved_assignment(\n                &reviewer,\n            );\n\n        assert_eq!(reviewer.model.as_str(), \"profile-mutated-model\");\n        assert_eq!(reviewer.scope_label, \"profile-mutated-scope\");\n        assert_eq!(assignment, &assignment_before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_codex_happy_path_writes_verdict_and_telemetry"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_claude_happy_path_writes_verdict_and_telemetry"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldRecordingReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "3bda5f194afe75570642670d70e0febe25d25b96e24d64d0fcfd4c186f5d080b",
+        "bound_tests_set_hash": "cfa4ac47a476b003826270e4748647c63deec57b88df823141b1ede08151a60e",
+        "declaration_hash": "3b281f8e70891709a5b74220662d77175b5cea765e53dbac527a11dc8c519af1"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::Reviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(review_rounds, 0, \"excluded codex review emitted a ReviewRound: {telemetry}\"); ... assert_eq!(review_rounds, 0, \"excluded claude review emitted a ReviewRound: {telemetry}\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ClaudeReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "2b361126bbd75f239df36b814a14d1785a0ad80bd279a40c489f1d0083d2a6d7",
+        "declaration_hash": "e222fc5e0db45a0cb65961b15666742d0417495e4e2a2b24c6690e5c128e7ddd"
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment.track_id().as_ref(), \"test-track\");\n        assert_eq!(assignment.scope(), &ScopeName::Other);\n        assert_eq!(assignment.provider().as_str(), \"claude\");\n        assert_eq!(assignment.model().as_str(), \"claude-opus-4-7\");\n        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ClaudeReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "2b361126bbd75f239df36b814a14d1785a0ad80bd279a40c489f1d0083d2a6d7",
+        "declaration_hash": "e222fc5e0db45a0cb65961b15666742d0417495e4e2a2b24c6690e5c128e7ddd"
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment.scope(), &ScopeName::Other);\n        assert_eq!(assignment.provider().as_str(), \"claude\");\n        assert_eq!(assignment.model().as_str(), \"claude-opus-4-7\");\n        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ClaudeReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "6cedfc1394dbc4034dd31189b5dfea741040cf48569f5235a01d2530d531876e",
+        "bound_tests_set_hash": "2b361126bbd75f239df36b814a14d1785a0ad80bd279a40c489f1d0083d2a6d7",
+        "declaration_hash": "e222fc5e0db45a0cb65961b15666742d0417495e4e2a2b24c6690e5c128e7ddd"
+      },
+      "obligation_id": {
+        "entry_key": "ClaudeReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment, &assignment_before);\n        assert_eq!(assignment.track_id().as_ref(), \"test-track\");\n        assert_eq!(assignment.scope(), &ScopeName::Other);\n        assert_eq!(assignment.provider().as_str(), \"claude\");\n        assert_eq!(assignment.model().as_str(), \"claude-opus-4-7\");\n        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "CodexReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "98ceb691f973ccaf074bda2f64e27f0f4fed6fe4c6863c28f088df48094092ef",
+        "declaration_hash": "9c8da944dca3fbd5cab0468a2e2624fd73c869fb5240c07fc5e73c88d58385b9"
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment.track_id().as_ref(), \"test-track\");\n        assert_eq!(assignment.scope(), &ScopeName::Other);\n        assert_eq!(assignment.provider().as_str(), \"codex\");\n        assert_eq!(assignment.model().as_str(), \"gpt-5.4\");\n        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "CodexReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "98ceb691f973ccaf074bda2f64e27f0f4fed6fe4c6863c28f088df48094092ef",
+        "declaration_hash": "9c8da944dca3fbd5cab0468a2e2624fd73c869fb5240c07fc5e73c88d58385b9"
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment.scope(), &ScopeName::Other);\n        assert_eq!(assignment.provider().as_str(), \"codex\");\n        assert_eq!(assignment.model().as_str(), \"gpt-5.4\");\n        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "CodexReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "6cedfc1394dbc4034dd31189b5dfea741040cf48569f5235a01d2530d531876e",
+        "bound_tests_set_hash": "98ceb691f973ccaf074bda2f64e27f0f4fed6fe4c6863c28f088df48094092ef",
+        "declaration_hash": "9c8da944dca3fbd5cab0468a2e2624fd73c869fb5240c07fc5e73c88d58385b9"
+      },
+      "obligation_id": {
+        "entry_key": "CodexReviewer",
+        "item_identifier": "trait_impl:usecase::review_v2::ports::ResolvedReviewer",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment, &assignment_before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ResolvedReviewerAssignment"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "3143618054aade666723fd73419f64a57251e748654b88673265692460640d8c",
+        "declaration_hash": "5748591a3c3d6e012e3790d7bf363f7afcc3bf9b203fba3a22765dd4f4f5bbce"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedReviewerAssignment",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").expect(\"round scope\"), \"infrastructure\");\n        assert_eq!(round.get(\"round_type\").expect(\"round type\"), \"final\");\n        assert_eq!(round.get(\"provider\").expect(\"round provider\"), \"codex\");\n        assert_eq!(round.get(\"model\").expect(\"round model\"), \"gpt-5.4\");\n        assert_eq!(round.get(\"reasoning_effort\").expect(\"round reasoning effort\"), \"high\");\n        assert_eq!(round.get(\"findings_count\").expect(\"round findings count\"), 0);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ResolvedReviewerAssignment"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "3143618054aade666723fd73419f64a57251e748654b88673265692460640d8c",
+        "declaration_hash": "5748591a3c3d6e012e3790d7bf363f7afcc3bf9b203fba3a22765dd4f4f5bbce"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedReviewerAssignment",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").expect(\"round scope\"), \"infrastructure\");\n        assert_eq!(round.get(\"round_type\").expect(\"round type\"), \"final\");\n        assert_eq!(round.get(\"provider\").expect(\"round provider\"), \"codex\");\n        assert_eq!(round.get(\"model\").expect(\"round model\"), \"gpt-5.4\");\n        assert_eq!(round.get(\"reasoning_effort\").expect(\"round reasoning effort\"), \"high\");\n        assert_eq!(round.get(\"findings_count\").expect(\"round findings count\"), 0);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::claude_reviewer::tests",
+          "test_name": "test_claude_reviewer_resolved_assignment_returns_adapter_values"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::codex_reviewer::tests",
+          "test_name": "test_codex_reviewer_resolved_assignment_returns_adapter_values"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ResolvedReviewerAssignment"
+      },
+      "key": {
+        "anchor_text_hash": "6cedfc1394dbc4034dd31189b5dfea741040cf48569f5235a01d2530d531876e",
+        "bound_tests_set_hash": "87b94edf937781ba26c29570e720f0aa787d66b4951e5cfcd2f6651817322a08",
+        "declaration_hash": "5748591a3c3d6e012e3790d7bf363f7afcc3bf9b203fba3a22765dd4f4f5bbce"
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedReviewerAssignment",
+        "item_identifier": "voluntary:CO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(assignment, &assignment_before);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldRecordingReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "b3794bbd9c03d469aebd6f100eb15ada7a4e74123f09efc5d0e920683598263e",
+        "declaration_hash": "7c7f3b5fd53bcc19f216b108511d5da275e5ecf0af7bd4f7519200f03ada2b68"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").expect(\"round scope\"), \"infrastructure\");\n        assert_eq!(round.get(\"round_type\").expect(\"round type\"), \"final\");\n        assert_eq!(round.get(\"provider\").expect(\"round provider\"), \"codex\");\n        assert_eq!(round.get(\"model\").expect(\"round model\"), \"gpt-5.4\");\n        assert_eq!(round.get(\"reasoning_effort\").expect(\"round reasoning effort\"), \"high\");\n        assert_eq!(round.get(\"findings_count\").expect(\"round findings count\"), 0);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_derives_fast_round_and_count_from_verdict"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldRecordingReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "88432f0fe93a5d6c4eef5c3200d5ba9f9fcb2c980457945df114fa22194c39b4",
+        "bound_tests_set_hash": "b3794bbd9c03d469aebd6f100eb15ada7a4e74123f09efc5d0e920683598263e",
+        "declaration_hash": "7c7f3b5fd53bcc19f216b108511d5da275e5ecf0af7bd4f7519200f03ada2b68"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(round.get(\"scope\").expect(\"round scope\"), \"infrastructure\");\n        assert_eq!(round.get(\"round_type\").expect(\"round type\"), \"final\");\n        assert_eq!(round.get(\"provider\").expect(\"round provider\"), \"codex\");\n        assert_eq!(round.get(\"model\").expect(\"round model\"), \"gpt-5.4\");\n        assert_eq!(round.get(\"reasoning_effort\").expect(\"round reasoning effort\"), \"high\");\n        assert_eq!(round.get(\"findings_count\").expect(\"round findings count\"), 0);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::review_v2::review_yield::tests",
+          "test_name": "test_review_yield_recording_reviewer_records_zero_findings_final_verdict"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CO-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "ReviewYieldRecordingReviewer"
+      },
+      "key": {
+        "anchor_text_hash": "6cedfc1394dbc4034dd31189b5dfea741040cf48569f5235a01d2530d531876e",
+        "bound_tests_set_hash": "1ff697facb706e8112882b6672f2f4d638aa6157d641071120ee3dc3f0250912",
+        "declaration_hash": "7c7f3b5fd53bcc19f216b108511d5da275e5ecf0af7bd4f7519200f03ada2b68"
+      },
+      "obligation_id": {
+        "entry_key": "ReviewYieldRecordingReviewer",
+        "item_identifier": "voluntary:CO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(line.get(\"track_id\").expect(\"track id\"), \"review-yield-test\");\n        let round = line.get(\"round\").expect(\"round\");\n        assert_eq!(round.get(\"scope\").expect(\"round scope\"), \"infrastructure\");\n        assert_eq!(round.get(\"provider\").expect(\"round provider\"), \"codex\");\n        assert_eq!(round.get(\"model\").expect(\"round model\"), \"gpt-5.4\");\n        assert_eq!(round.get(\"reasoning_effort\").expect(\"round reasoning effort\"), \"high\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::telemetry::writer::tests",
+          "test_name": "test_write_enabled_creates_telemetry_jsonl_and_appends_event"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        "entry_key": "TelemetryWriter"
+      },
+      "key": {
+        "anchor_text_hash": "e6a5ea45e006a81c36ab2a30eaa6d98436bc76e356709b3d1c61e5823e483440",
+        "bound_tests_set_hash": "2ae7bda201fc0b90fcb3c86aa91f917c74c35601c55f58b0f0919a6528cd3376",
+        "declaration_hash": "bc4c34900ec0c4950676edaaae322efa3e553a167d5dd614748108a1ea55a8f4"
+      },
+      "obligation_id": {
+        "entry_key": "TelemetryWriter",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(persisted_record.get(\"event_type\").expect(\"event type\"), \"ReviewRound\");\n        let round = persisted_record.get(\"round\").expect(\"round\");\n        assert_eq!(round.get(\"scope\").expect(\"round scope\"), \"application\");\n        assert_eq!(round.get(\"round_type\").expect(\"round type\"), \"fast\");\n        assert_eq!(round.get(\"provider\").expect(\"round provider\"), \"codex\");\n        assert_eq!(round.get(\"model\").expect(\"round model\"), \"gpt-5.4-mini\");\n        assert_eq!(round.get(\"reasoning_effort\").expect(\"round reasoning effort\"), \"high\");\n        assert_eq!(round.get(\"findings_count\").expect(\"round findings count\"), 3);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ],
   "track_id": "2026-08-14-review-yield-measurement"
 }

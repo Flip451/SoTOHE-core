@@ -54,7 +54,8 @@ pub(super) fn resolve_dry_write_telemetry_writer(
         return None;
     }
 
-    Some(TelemetryWriter::new(config, track_id.to_owned(), items_dir.to_path_buf()))
+    let track_id = domain::TrackId::try_new(track_id).ok()?;
+    Some(TelemetryWriter::new(config, track_id, items_dir.to_path_buf()))
 }
 
 // ── DryRoundTelemetry ─────────────────────────────────────────────────────────
@@ -209,30 +210,22 @@ fn now_timestamp() -> String {
     chrono::Utc::now().to_rfc3339()
 }
 
-/// Emit a `ReviewRound` telemetry event for a dry-check tier.
+/// Keep the dry-check round hook as a no-op.
+///
+/// Dry-check rounds are excluded from structured review-yield telemetry. The
+/// caller still emits the existing `ExternalSubprocess` diagnostic event for
+/// the tier below, so this preserves the dry-check telemetry path without
+/// constructing a structured local-review record.
 pub(super) fn emit_dry_tier_review_round(
-    writer: &TelemetryWriter,
-    track_id: &str,
-    provider: &str,
-    model: &str,
-    round_type: &str,
-    telemetry: &DryRoundTelemetry,
-    fallback_start: Instant,
+    _writer: &TelemetryWriter,
+    _track_id: &str,
+    _provider: &str,
+    _model: &str,
+    _round_type: &str,
+    _telemetry: &DryRoundTelemetry,
+    _fallback_start: Instant,
 ) {
-    let duration_ms =
-        dry_duration_ms(telemetry.duration_ms, telemetry.round_started_at, fallback_start);
-    let event = TelemetryEvent::ReviewRound {
-        schema_version: 1,
-        track_id: track_id.to_string(),
-        provider: provider.to_string(),
-        model: model.to_string(),
-        round_type: round_type.to_string(),
-        duration_ms,
-        findings_count: telemetry.findings_count,
-        timestamp: now_timestamp(),
-    };
-    // Fire-and-forget: suppress errors per CN-01.
-    let _ = writer.write(event);
+    let _ = (_telemetry.findings_count, _telemetry.round_started_at);
 }
 
 /// Emit an `ExternalSubprocess` telemetry event for a dry-check tier.
@@ -264,6 +257,7 @@ pub(super) fn emit_dry_tier_external_subprocess(
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use crate::dry_check::recording_agent::DryAgentRunRecorder;
+    use usecase::dry_write_driver::DryTierTelemetryPort;
 
     use super::*;
 
@@ -350,5 +344,60 @@ mod tests {
         let fast_t = fast.unwrap();
         assert_eq!(fast_t.findings_count, 3);
         assert!(final_.is_none());
+    }
+
+    #[test]
+    fn test_recording_dry_tier_telemetry_emits_external_subprocess_without_review_round() {
+        let output_dir = tempfile::tempdir().unwrap();
+        let output_dir_string = output_dir.path().to_string_lossy().into_owned();
+        let config = {
+            let mut config = None;
+            temp_env::with_vars(
+                [
+                    ("SOTP_TELEMETRY", Some("1")),
+                    ("SOTP_TELEMETRY_DIR", Some(output_dir_string.as_str())),
+                ],
+                || {
+                    config = Some(TelemetryConfig::from_env());
+                },
+            );
+            config.unwrap()
+        };
+        let writer = TelemetryWriter::new(
+            config,
+            domain::TrackId::try_new("test-track").unwrap(),
+            output_dir.path().to_path_buf(),
+        );
+        let adapter = super::super::RecordingDryTierTelemetryAdapter::new(
+            make_tiered_recorder_fast_only(1),
+            "fast-model".to_owned(),
+            "final-model".to_owned(),
+            "test-track".to_owned(),
+            Some(writer),
+        );
+        let result: Result<Vec<DryCheckFinding>, DryCheckCycleError> = Ok(Vec::new());
+
+        adapter.record(&result);
+
+        let content = std::fs::read_to_string(output_dir.path().join("telemetry.jsonl")).unwrap();
+        let events: Vec<serde_json::Value> =
+            content.lines().map(serde_json::from_str).collect::<Result<_, _>>().unwrap();
+        assert_eq!(
+            events
+                .iter()
+                .filter(|event| event.get("event_type")
+                    == Some(&serde_json::json!("ExternalSubprocess")))
+                .count(),
+            1,
+            "a real dry tier must retain ExternalSubprocess telemetry"
+        );
+        assert_eq!(
+            events
+                .iter()
+                .filter(|event| event.get("event_type") == Some(&serde_json::json!("ReviewRound")))
+                .count(),
+            0,
+            "dry tiers must not emit structured ReviewRound telemetry"
+        );
     }
 }

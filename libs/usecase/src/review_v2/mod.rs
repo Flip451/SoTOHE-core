@@ -30,7 +30,7 @@ pub use check_zero_findings::{
 };
 pub use cycle::ReviewCycle;
 pub use error::{DiffGetError, ReviewCycleError, ReviewHasherError, ReviewerError};
-pub use ports::{DiffGetter, ReviewHasher, Reviewer};
+pub use ports::{DiffGetter, ResolvedReviewer, ResolvedReviewerAssignment, ReviewHasher, Reviewer};
 pub use review_aux::{
     NonEmptyReviewerFindingsOutput, ReviewAuxError, ReviewClassifyInteractor,
     ReviewClassifyService, ReviewFilesInteractor, ReviewFilesService,
