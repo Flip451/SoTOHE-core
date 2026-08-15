@@ -24,7 +24,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| GrokCapabilityDefinition | dto | add | — | 🟡 | 🔵 |
+| GrokCapabilityDefinition | dto | add | — | 🔵 | 🔵 |
 
 ## Secondary Adapters
 

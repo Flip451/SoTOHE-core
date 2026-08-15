@@ -429,6 +429,20 @@
           "hash": "rvw1:sha256:71c1b15689e37b0f1e202431c13528bea9f7f4b291c9a4487cee4ca613702bcf",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T06:22:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8703545785c40577aaa5dbdba4e069f5dc2a7e99f09478019469ba2b5387ba6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T06:30:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8703545785c40577aaa5dbdba4e069f5dc2a7e99f09478019469ba2b5387ba6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -489,6 +503,20 @@
           "at": "2026-08-15T05:44:29Z",
           "findings": [],
           "hash": "rvw1:sha256:ace9975013e27567591d6839c4ed73d48ce843db0dbe96208530e3180000ce6a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T06:30:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67d423c8ee8ef9608525bd390b1ebd1ed6a8a0911cfd8a3bfb13c928efc433d5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T06:36:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67d423c8ee8ef9608525bd390b1ebd1ed6a8a0911cfd8a3bfb13c928efc433d5",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -572,6 +600,35 @@
           "at": "2026-08-15T05:38:09Z",
           "findings": [],
           "hash": "rvw1:sha256:f7aa7b0716329eea0e00e9652e34e3f121075de77029a8096de07609dcd54f89",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T06:22:10Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-14-grok-provider-binding/test-bindings.json",
+              "line": 328,
+              "message": "AC-04 requires rejection of a missing shared adapter, but its binding omits the existing `test_grok_capability_definition_missing_shared_adapter_is_rejected` test. Add that test to the AC-04 record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c0290f8fbede45fb931af70fa03c814e8724a36733d8119b0367f5556e8528c6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T06:23:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7f853b956614c5d64c9961659ca30aa869c2f35d1d7047d0f2055257cfcc94d8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T06:31:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7f853b956614c5d64c9961659ca30aa869c2f35d1d7047d0f2055257cfcc94d8",
           "type": "final",
           "verdict": "zero_findings"
         }

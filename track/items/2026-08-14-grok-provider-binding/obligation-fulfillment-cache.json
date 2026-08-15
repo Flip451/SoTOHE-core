@@ -446,6 +446,190 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_valid_shared_adapter_with_optional_model_is_admitted"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityDefinition"
+      },
+      "key": {
+        "anchor_text_hash": "1ab6d5d2790dfb0dc832501ce8bc0f4d00b97f4dc1e29d83228ed111bb5b27e6",
+        "bound_tests_set_hash": "78bda98e84c097cc7c30461321142956a325a1357a86edeeec3cd06fed81148c",
+        "declaration_hash": "aef5a7e102780efd9da94c55a026ff0efcc79f439158028050e0c793049bdf20"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityDefinition",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(definition.model().map(|value| value.as_str()), model);\n            assert_eq!(definition.sandbox(), Some(&GrokSandbox::Workspace));\n            assert!(admit_grok_capability_definition(definition, &profile_model).is_ok());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_missing_shared_adapter_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_missing_grok_sandbox_is_diagnostic_only"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_off_sandbox_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_workspace_write_sandbox_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_empty_or_invalid_model_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_declared_model_matching_profile_projection_is_admitted"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_declared_model_mismatching_profile_projection_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityDefinition"
+      },
+      "key": {
+        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "bound_tests_set_hash": "ecca508494e0ed2a26ee4dd7e8de14321675df3e75c6b959ca2eccebb40501d6",
+        "declaration_hash": "aef5a7e102780efd9da94c55a026ff0efcc79f439158028050e0c793049bdf20"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityDefinition",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"missing shared adapter is rejected\"; \"diagnostic fallback must not admit dispatch\"; \"unrestricted sandbox is rejected\"; \"Codex sandbox vocabulary is rejected\"; \"empty or invalid model declaration is rejected during parsing\"; \"declared model must match the profile projection\"",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_valid_shared_adapter_with_optional_model_is_admitted"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-05",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityDefinition"
+      },
+      "key": {
+        "anchor_text_hash": "c4e781c53a8fae017feece4267c755e56d7bc60a45cc7cce4615c000b724866d",
+        "bound_tests_set_hash": "78bda98e84c097cc7c30461321142956a325a1357a86edeeec3cd06fed81148c",
+        "declaration_hash": "aef5a7e102780efd9da94c55a026ff0efcc79f439158028050e0c793049bdf20"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityDefinition",
+        "item_identifier": "voluntary:IN-05",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(definition.sandbox(), Some(&GrokSandbox::Workspace));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_missing_shared_adapter_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_missing_grok_sandbox_is_diagnostic_only"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_off_sandbox_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_workspace_write_sandbox_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_empty_or_invalid_model_is_rejected"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_declared_model_matching_profile_projection_is_admitted"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::capability_exec::grok::tests",
+          "test_name": "test_grok_capability_definition_declared_model_mismatching_profile_projection_is_rejected"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokCapabilityDefinition"
+      },
+      "key": {
+        "anchor_text_hash": "ab58ea62b4b2b336f696922f97800c6ccf706a0b97ea78cb978257c95614fa7e",
+        "bound_tests_set_hash": "ecca508494e0ed2a26ee4dd7e8de14321675df3e75c6b959ca2eccebb40501d6",
+        "declaration_hash": "aef5a7e102780efd9da94c55a026ff0efcc79f439158028050e0c793049bdf20"
+      },
+      "obligation_id": {
+        "entry_key": "GrokCapabilityDefinition",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(definition.sandbox(), None); resolve_grok_sandbox_for_diagnosis(&definition), GrokSandbox::ReadOnly); ... expect_err(\"diagnostic fallback must not admit dispatch\"); ... expect_err(\"unrestricted sandbox is rejected\"); ... expect_err(\"empty or invalid model declaration is rejected during parsing\"); ... expect_err(\"declared model must match the profile projection\")",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ],
   "track_id": "2026-08-14-grok-provider-binding"
