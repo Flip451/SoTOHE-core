@@ -529,6 +529,7 @@ fn reviewer_unexpected_after_spawn(message: &str) -> bool {
         || message.starts_with("failed to read output-last-message ")
         || message.starts_with("verdict construction:")
         || message.starts_with("failed to serialize reviewer final payload:")
+        || message.starts_with("Grok provider failed:")
 }
 
 #[cfg(test)]
@@ -979,6 +980,15 @@ mod tests {
     #[test]
     fn test_reviewer_unexpected_after_spawn_classifies_child_poll_failure() {
         let error = ReviewerError::Unexpected("failed to poll reviewer child: io".to_owned());
+
+        assert!(reviewer_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_reviewer_unexpected_after_spawn_classifies_grok_provider_failure() {
+        let error = ReviewerError::Unexpected(
+            "Grok provider failed: provider declined structured output".to_owned(),
+        );
 
         assert!(reviewer_error_is_subprocess_failure(&error));
     }
