@@ -88,6 +88,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "ce56ca5490c31ac24d6d986b424f1c2031fe7dd6",
       "depends_on": [
         "T5"
       ],
@@ -101,7 +102,7 @@
       ],
       "description": "Targets: the explain-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test explain's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-10, AC-11.",
       "id": "T7",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
