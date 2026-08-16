@@ -178,17 +178,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_hash": "239f609388cb1f0c2911e7135404153aae529fd549a8444fe29429afa7e33a34",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model.",
+        "citation": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox.",
         "kind": "pass"
       }
     },
@@ -370,17 +370,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_hash": "d16b7fc3ff21a25dcd4e33db383aafe77ade8062b7775bd48d227dcad27e892e",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+          "text_label": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection.",
+        "citation": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent.",
         "kind": "pass"
       }
     },
@@ -442,17 +442,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_hash": "239f609388cb1f0c2911e7135404153aae529fd549a8444fe29429afa7e33a34",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model.",
+        "citation": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox.",
         "kind": "pass"
       }
     },
@@ -490,17 +490,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_hash": "d16b7fc3ff21a25dcd4e33db383aafe77ade8062b7775bd48d227dcad27e892e",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+          "text_label": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection.",
+        "citation": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent.",
         "kind": "pass"
       }
     },
@@ -754,17 +754,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_hash": "d16b7fc3ff21a25dcd4e33db383aafe77ade8062b7775bd48d227dcad27e892e",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+          "text_label": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection.",
+        "citation": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent.",
         "kind": "pass"
       }
     },
@@ -1066,17 +1066,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_hash": "239f609388cb1f0c2911e7135404153aae529fd549a8444fe29429afa7e33a34",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"rejects an unsupported sandbox\"",
+        "citation": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox.",
         "kind": "pass"
       }
     },
@@ -1114,17 +1114,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "e0c3eed6c27eb4e92c74e2db9107bc9ceaa39f792dfbad72b702f44e401398b8",
+      "evidence_hash": "d16b7fc3ff21a25dcd4e33db383aafe77ade8062b7775bd48d227dcad27e892e",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+          "text_label": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch.",
+        "citation": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent.",
         "kind": "pass"
       }
     },
@@ -1162,17 +1162,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_hash": "239f609388cb1f0c2911e7135404153aae529fd549a8444fe29429afa7e33a34",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "\"lacks a valid grok-sandbox declaration\"",
+        "citation": "rejects an unsupported or unrestricted Grok sandbox",
         "kind": "pass"
       }
     },
@@ -1210,17 +1210,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "387cac0aeb1fccf000f77a001e09b6cef50b40b2c6f4001e2275c46998697d53",
+      "evidence_hash": "239f609388cb1f0c2911e7135404153aae529fd549a8444fe29429afa7e33a34",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model.",
+        "citation": "rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration",
         "kind": "pass"
       }
     },

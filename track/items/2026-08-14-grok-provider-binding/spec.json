@@ -51,14 +51,10 @@
         {
           "anchor": "D6",
           "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
-        },
-        {
-          "anchor": "D8",
-          "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
         }
       ],
       "id": "AC-04",
-      "text": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+      "text": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
     },
     {
       "adr_refs": [
@@ -99,15 +95,21 @@
       ],
       "id": "AC-08",
       "text": "Grok is executed as the Grok CLI provider adapter, not as a Codex custom-provider implementation."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D8",
+          "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        }
+      ],
+      "id": "AC-09",
+      "text": "Dispatch rejects a Grok capability when its model or reasoning effort cannot be resolved, or when a declared adapter model does not exactly match the profile projection."
     }
   ],
   "constraints": [
     {
       "adr_refs": [
-        {
-          "anchor": "D3",
-          "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
-        },
         {
           "anchor": "D5",
           "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
@@ -115,14 +117,30 @@
         {
           "anchor": "D6",
           "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
-        },
+        }
+      ],
+      "id": "CN-01",
+      "text": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent."
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        }
+      ],
+      "id": "CN-04",
+      "text": "Dispatch fails closed when grok-sandbox is undeclared for an execution request or its value is unsupported or unrestricted. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+    },
+    {
+      "adr_refs": [
         {
           "anchor": "D8",
           "file": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
         }
       ],
-      "id": "CN-01",
-      "text": "Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+      "id": "CN-05",
+      "text": "Dispatch fails closed when model or effort cannot be resolved, or when a declared adapter model does not exactly match the profile projection."
     },
     {
       "adr_refs": [
@@ -349,7 +367,7 @@
     ]
   },
   "signals": {
-    "blue": 25,
+    "blue": 28,
     "red": 0,
     "yellow": 0
   },

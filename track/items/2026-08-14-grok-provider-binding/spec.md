@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 25, yellow: 0, red: 0 }
+signals: { blue: 28, yellow: 0, red: 0 }
 ---
 
 # Grok provider binding
@@ -30,7 +30,9 @@ signals: { blue: 25, yellow: 0, red: 0 }
 - [OS-06] Changing the shipped default profile to use Grok, or replacing the Claude host configuration surface, is out of scope. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D7, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D9] [tasks: T007, T008, T013]
 
 ## Constraints
-- [CN-01] Dispatch fails closed when the profile capability is absent, its required adapter definition is absent, grok-sandbox is undeclared for an execution request, the sandbox value is unrestricted, model or effort cannot be resolved, or a declared adapter model does not exactly match the profile projection. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D3, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D5, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D6, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D8] [tasks: T009, T008, T002, T003]
+- [CN-01] Dispatch fails closed when the profile capability is absent or its required adapter definition is absent. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D5, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D6] [tasks: T002, T003]
+- [CN-04] Dispatch fails closed when grok-sandbox is undeclared for an execution request or its value is unsupported or unrestricted. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D3] [tasks: T009, T002, T003]
+- [CN-05] Dispatch fails closed when model or effort cannot be resolved, or when a declared adapter model does not exactly match the profile projection. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D8] [tasks: T002, T003, T004, T005, T010, T006, T011, T012]
 - [CN-02] Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions. A resumed execution remains an independent subprocess and explicitly receives model, effort, and permission settings; failed, expired, provider-mismatched, or model-mismatched resume falls back to a new session without rejecting the dispatch for that reason alone. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D8] [tasks: T002, T003, T004, T005, T010, T006, T011, T012]
 - [CN-03] Grok host hooks reuse the existing policy handlers; .grok/hooks/ is the canonical Grok-specific declaration surface and .claude/settings.json remains the Claude-specific surface. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D9] [tasks: T007, T013]
 
@@ -38,11 +40,12 @@ signals: { blue: 25, yellow: 0, red: 0 }
 - [ ] [AC-01] A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D1] [tasks: T001, T003, T004, T005, T010]
 - [ ] [AC-02] Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D2, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D4] [tasks: T002, T003, T004, T005, T010, T006, T011, T012]
 - [ ] [AC-03] A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D5, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D3, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D6] [tasks: T002, T003, T004, T005, T010, T006, T011, T012]
-- [ ] [AC-04] Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported sandbox, unresolved model or effort, or incompatible declared model. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D3, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D6, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D8] [tasks: T009, T002, T003]
+- [ ] [AC-04] Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D3, knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D6] [tasks: T009, T002, T003]
 - [ ] [AC-05] A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D8] [tasks: T003, T004, T005, T010, T006, T011, T012]
 - [ ] [AC-06] The shipped profile continues to select no Grok provider by default, while a Grok sample profile and shared-adapter permission declaration example are present for consumers who opt in. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D7] [tasks: T008]
 - [ ] [AC-07] When Grok is the host, .grok/hooks/ declares the host guards and Grok hook envelopes and tool names are mapped to the existing handler contract. An input that cannot be mapped is rejected, and the Claude configuration surface remains unchanged. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D9] [tasks: T007, T013]
 - [ ] [AC-08] Grok is executed as the Grok CLI provider adapter, not as a Codex custom-provider implementation. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D1] [tasks: T003, T006]
+- [ ] [AC-09] Dispatch rejects a Grok capability when its model or reasoning effort cannot be resolved, or when a declared adapter model does not exactly match the profile projection. [adr: knowledge/adr/2026-08-14-1225-grok-provider-binding.md#D8] [tasks: T002, T003, T004, T005, T010, T006, T011, T012]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
@@ -51,5 +54,5 @@ signals: { blue: 25, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 25  🟡 0  🔴 0
+🔵 28  🟡 0  🔴 0
 

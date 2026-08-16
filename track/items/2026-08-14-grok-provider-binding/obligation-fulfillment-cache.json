@@ -221,7 +221,7 @@
         "entry_key": "GrokSandbox"
       },
       "key": {
-        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "anchor_text_hash": "5ca9b398c7d12548ab22b15e3b175168fef005c65ff170dab4bdf71dcbb1cfcc",
         "bound_tests_set_hash": "a0e5940dbf2e22b70e8a8724250a5942ee8a9a5310cf76dc5153a2d81741873f",
         "declaration_hash": "4a6f049dc0b23f0cfacbb586cec193b2a429a4afdddaf9f1e0f8e64f96f6525d"
       },
@@ -287,37 +287,6 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::grok_common::tests",
-          "test_name": "test_grok_sandbox_off_value_is_rejected"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "CN-01",
-          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
-        },
-        "entry_key": "GrokSandbox"
-      },
-      "key": {
-        "anchor_text_hash": "ab58ea62b4b2b336f696922f97800c6ccf706a0b97ea78cb978257c95614fa7e",
-        "bound_tests_set_hash": "cea54896229f1f11ea657072cbdf13de301ff1e83eda6cc52bef266e80c22f73",
-        "declaration_hash": "4a6f049dc0b23f0cfacbb586cec193b2a429a4afdddaf9f1e0f8e64f96f6525d"
-      },
-      "obligation_id": {
-        "entry_key": "GrokSandbox",
-        "item_identifier": "voluntary:CN-01",
-        "obligation_kind": "logic"
-      },
-      "verdict": {
-        "citation": "assert!(serde_json::from_str::<GrokSandbox>(r#\"\"off\"\"#).is_err());",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::grok_common::tests",
           "test_name": "test_grok_sandbox_project_profile_value_deserializes"
         }
       ],
@@ -365,7 +334,7 @@
         "entry_key": "GrokSandboxProfileName"
       },
       "key": {
-        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "anchor_text_hash": "5ca9b398c7d12548ab22b15e3b175168fef005c65ff170dab4bdf71dcbb1cfcc",
         "bound_tests_set_hash": "887dbd2faa97a86775bb6e94a88a66082e0d7d6798998a4ff3523da623484fa4",
         "declaration_hash": "7444832d8dedd02e6a7ef981df6ae0e43a6ebf3e49aa6754a0f67597dd4f5133"
       },
@@ -375,7 +344,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(\n            GrokSandboxProfileName::try_new(String::new()),\n            Err(GrokSandboxProfileNameError::Empty),\n        );\n    }\n{\n        assert_eq!(\n            GrokSandboxProfileName::try_new(\"off\".to_owned()),\n            Err(GrokSandboxProfileNameError::Reserved),\n        );",
+        "citation": "GrokSandboxProfileName::try_new(\"off\".to_owned()),\n            Err(GrokSandboxProfileNameError::Reserved),",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -432,7 +401,7 @@
         "entry_key": "GrokSandboxProfileNameError"
       },
       "key": {
-        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "anchor_text_hash": "5ca9b398c7d12548ab22b15e3b175168fef005c65ff170dab4bdf71dcbb1cfcc",
         "bound_tests_set_hash": "887dbd2faa97a86775bb6e94a88a66082e0d7d6798998a4ff3523da623484fa4",
         "declaration_hash": "8626bf69022c9c0d5782c453cea15bf235d3b0ce7229e96fa2383a06be834784"
       },
@@ -499,21 +468,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::capability_exec::grok::tests",
           "test_name": "test_grok_capability_definition_workspace_write_sandbox_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_empty_or_invalid_model_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_matching_profile_projection_is_admitted"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_mismatching_profile_projection_is_rejected"
         }
       ],
       "edge_id": {
@@ -524,8 +478,8 @@
         "entry_key": "GrokCapabilityDefinition"
       },
       "key": {
-        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
-        "bound_tests_set_hash": "ecca508494e0ed2a26ee4dd7e8de14321675df3e75c6b959ca2eccebb40501d6",
+        "anchor_text_hash": "5ca9b398c7d12548ab22b15e3b175168fef005c65ff170dab4bdf71dcbb1cfcc",
+        "bound_tests_set_hash": "39a22eb067622c3721fee4d122c65165ff242c46cf3105faec20bf416c318325",
         "declaration_hash": "aef5a7e102780efd9da94c55a026ff0efcc79f439158028050e0c793049bdf20"
       },
       "obligation_id": {
@@ -534,7 +488,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "\"missing shared adapter is rejected\"; \"diagnostic fallback must not admit dispatch\"; \"unrestricted sandbox is rejected\"; \"Codex sandbox vocabulary is rejected\"; \"empty or invalid model declaration is rejected during parsing\"; \"declared model must match the profile projection\"",
+        "citation": "\"missing shared adapter is rejected\"; \"diagnostic fallback must not admit dispatch\"; \"unrestricted sandbox is rejected\"; \"Codex sandbox vocabulary is rejected\"",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -591,21 +545,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::capability_exec::grok::tests",
           "test_name": "test_grok_capability_definition_workspace_write_sandbox_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_empty_or_invalid_model_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_matching_profile_projection_is_admitted"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_mismatching_profile_projection_is_rejected"
         }
       ],
       "edge_id": {
@@ -616,8 +555,8 @@
         "entry_key": "GrokCapabilityDefinition"
       },
       "key": {
-        "anchor_text_hash": "ab58ea62b4b2b336f696922f97800c6ccf706a0b97ea78cb978257c95614fa7e",
-        "bound_tests_set_hash": "ecca508494e0ed2a26ee4dd7e8de14321675df3e75c6b959ca2eccebb40501d6",
+        "anchor_text_hash": "a7b35973e8bdccf001b34012cac03a4004b84a33a4cf6a84d856ae8c692e1f92",
+        "bound_tests_set_hash": "39a22eb067622c3721fee4d122c65165ff242c46cf3105faec20bf416c318325",
         "declaration_hash": "aef5a7e102780efd9da94c55a026ff0efcc79f439158028050e0c793049bdf20"
       },
       "obligation_id": {
@@ -626,7 +565,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(definition.sandbox(), None); resolve_grok_sandbox_for_diagnosis(&definition), GrokSandbox::ReadOnly); ... expect_err(\"diagnostic fallback must not admit dispatch\"); ... expect_err(\"unrestricted sandbox is rejected\"); ... expect_err(\"empty or invalid model declaration is rejected during parsing\"); ... expect_err(\"declared model must match the profile projection\")",
+        "citation": "let definition = discover_grok_capability_definition(directory.path(), \"implementer\")?;\n\n        assert_eq!(definition.sandbox(), None);\n        assert_eq!(resolve_grok_sandbox_for_diagnosis(&definition), GrokSandbox::ReadOnly);\n        let error = admit_grok_capability_definition(definition, &profile_model)\n            .expect_err(\"diagnostic fallback must not admit dispatch\");",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -1120,7 +1059,7 @@
         "entry_key": "GrokCapabilityAdapter"
       },
       "key": {
-        "anchor_text_hash": "6b632fd19972a519f0ddb96cae7a8de1c26f668cde1e689754fe71a5f277c7ed",
+        "anchor_text_hash": "5ca9b398c7d12548ab22b15e3b175168fef005c65ff170dab4bdf71dcbb1cfcc",
         "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
         "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
       },
@@ -1130,7 +1069,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "\"expect_err(\\\"missing shared adapter must stop dispatch before spawning Grok\\\")\"; \"expect_err(\\\"diagnostic read-only fallback must not authorize dispatch\\\")\"; \"expect_err(\\\"reserved sandbox must stop dispatch before spawning Grok\\\")\"; \"expect_err(\\\"invalid model projection must stop dispatch before spawning Grok\\\")\"; \"expect_err(\\\"mismatched model projection must stop dispatch before spawning Grok\\\")\"; \"expect!(matches!(error, CapabilityExecError::EffortMissing(capability)\"",
+        "citation": "assert!(matches!(error, CapabilityExecError::AdapterPreflight { .. }));\nassert!(error.to_string().contains(\"grok-sandbox\"));\nassert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -2128,7 +2067,7 @@
         "entry_key": "GrokCapabilityAdapter"
       },
       "key": {
-        "anchor_text_hash": "ab58ea62b4b2b336f696922f97800c6ccf706a0b97ea78cb978257c95614fa7e",
+        "anchor_text_hash": "a7b35973e8bdccf001b34012cac03a4004b84a33a4cf6a84d856ae8c692e1f92",
         "bound_tests_set_hash": "abbc013cccdc2ff87ee1909b1c278bf1739c681e56a50eeffda97b2d1ee1d2e9",
         "declaration_hash": "a677768bb4f33890bf9949f56b3532422ef0555c0c54aa030cf3672cebcaa404"
       },
@@ -2138,7 +2077,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert!(matches!(error, CapabilityExecError::ProfileResolution { ref capability, .. } if capability.as_str() == \"absent-profile-capability\")); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty());\nassert!(matches!(error, CapabilityExecError::AdapterPreflight { .. })); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty());\nassert_eq!(resolve_grok_sandbox_for_diagnosis(&definition), GrokSandbox::ReadOnly); ... .expect_err(\"diagnostic read-only fallback must not authorize dispatch\");\nfor sandbox in [\"off\", \"workspace-write\"] { ... .expect_err(\"reserved sandbox must stop dispatch before spawning Grok\"); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty()); }\n.expect_err(\"invalid model projection must stop dispatch before spawning Grok\");\n.expect_err(\"mismatched model projection must stop dispatch before spawning Grok\");\n.expect_err(\"an unresolved profile effort must reject dispatch\");",
+        "citation": "expect_err(\"a capability absent from the profile must reject dispatch\"); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty());\n\nexpect_err(\"missing shared adapter must stop dispatch before spawning Grok\"); ... assert!(runner.invocations.lock().expect(\"process recorder lock\").is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"

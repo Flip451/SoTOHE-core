@@ -54,7 +54,7 @@
           "element_id": "CN-01"
         }
       },
-      "reason": "GrokEnvelopeError exposes only ProviderFailure with a CapabilityFailureDetail from a missing or failed structured-output field. It has no variant or constructor for missing profile capabilities, missing adapters, undeclared grok-sandbox, unrestricted sandbox, or unresolved model/effort, so CN-01 is not an entry-local promise of this type."
+      "reason": "GrokEnvelopeError exposes only ProviderFailure with a CapabilityFailureDetail from a missing or failed structured-output field. It has no variant or constructor for a missing profile capability or missing required adapter, so CN-01 is not an entry-local promise of this type."
     },
     {
       "kind": "voluntary_binding",
@@ -154,6 +154,17 @@
       ]
     },
     {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "GrokSandbox",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "reason": "After the spec split, CN-01 only requires fail-closed dispatch when the profile capability or required adapter definition is absent. GrokSandbox is a value type for the --sandbox vocabulary; it has no constructor or variant for a missing profile capability or missing adapter. That promise lives on GrokCapabilityDefinition."
+    },
+    {
       "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "GrokSandbox",
@@ -204,23 +215,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::grok_common::tests",
           "test_name": "test_grok_sandbox_project_profile_value_deserializes"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "GrokSandbox",
-        "anchor_id": {
-          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json",
-          "element_id": "CN-01"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::grok_common::tests",
-          "test_name": "test_grok_sandbox_off_value_is_rejected"
         }
       ]
     },
@@ -348,21 +342,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::capability_exec::grok::tests",
           "test_name": "test_grok_capability_definition_workspace_write_sandbox_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_empty_or_invalid_model_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_matching_profile_projection_is_admitted"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_mismatching_profile_projection_is_rejected"
         }
       ]
     },
@@ -412,21 +391,6 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::capability_exec::grok::tests",
           "test_name": "test_grok_capability_definition_workspace_write_sandbox_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_empty_or_invalid_model_is_rejected"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_matching_profile_projection_is_admitted"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::capability_exec::grok::tests",
-          "test_name": "test_grok_capability_definition_declared_model_mismatching_profile_projection_is_rejected"
         }
       ]
     },

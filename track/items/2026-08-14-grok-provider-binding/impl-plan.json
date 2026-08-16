@@ -3,7 +3,7 @@
     "sections": [
       {
         "description": [
-          "Coordinate foundation and admission tasks. [IN-01; IN-02; IN-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-06]"
+          "Coordinate foundation and admission tasks. [IN-01; IN-02; IN-05; CN-01; CN-02; CN-04; CN-05; AC-01; AC-02; AC-03; AC-04; AC-06; AC-09]"
         ],
         "id": "provider-foundation",
         "task_ids": [
@@ -16,7 +16,7 @@
       },
       {
         "description": [
-          "Coordinate provider execution tasks. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; OS-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]"
+          "Coordinate provider execution tasks. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; OS-04; CN-01; CN-02; CN-04; CN-05; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08; AC-09]"
         ],
         "id": "provider-execution-paths",
         "task_ids": [
@@ -29,7 +29,7 @@
       },
       {
         "description": [
-          "Coordinate driver and composition wiring tasks. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]"
+          "Coordinate driver and composition wiring tasks. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-08; AC-09]"
         ],
         "id": "provider-composition",
         "task_ids": [
@@ -66,13 +66,13 @@
     },
     {
       "commit_hash": "d3995a59f24e6932cf95e27563a5acb3fef12565",
-      "description": "Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-01; AC-04]",
+      "description": "Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-04; AC-04]",
       "id": "T009",
       "status": "done"
     },
     {
       "commit_hash": "28d1b47425930cc287dbb64e83a08ad2d4c1c49f",
-      "description": "Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; CN-01; AC-06]",
+      "description": "Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; AC-06]",
       "id": "T008",
       "status": "done"
     },
@@ -81,7 +81,7 @@
       "depends_on": [
         "T009"
       ],
-      "description": "Add `GrokCapabilityDefinition` discovery and admission validation with shared-adapter fixture tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-02; IN-04; IN-05; OS-04; OS-05; CN-01; CN-02; AC-02; AC-03; AC-04]",
+      "description": "Add `GrokCapabilityDefinition` discovery and admission validation with shared-adapter fixture tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-02; IN-04; IN-05; OS-04; OS-05; CN-01; CN-02; CN-04; CN-05; AC-02; AC-03; AC-04; AC-09]",
       "id": "T002",
       "status": "done"
     },
@@ -91,7 +91,7 @@
         "T001",
         "T002"
       ],
-      "description": "Implement `GrokCapabilityAdapter` with subprocess, structured-envelope, and resume fallback tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-01; IN-02; IN-03; IN-04; IN-05; OS-01; OS-02; OS-03; OS-04; OS-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]",
+      "description": "Implement `GrokCapabilityAdapter` with subprocess, structured-envelope, and resume fallback tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-01; IN-02; IN-03; IN-04; IN-05; OS-01; OS-02; OS-03; OS-04; OS-05; CN-01; CN-02; CN-04; CN-05; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08; AC-09]",
       "id": "T003",
       "status": "done"
     },
@@ -101,7 +101,7 @@
         "T001",
         "T002"
       ],
-      "description": "Implement `GrokReviewer` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/review_v2/grok_reviewer.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
+      "description": "Implement `GrokReviewer` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/review_v2/grok_reviewer.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; CN-05; AC-01; AC-02; AC-03; AC-05; AC-09]",
       "id": "T004",
       "status": "done"
     },
@@ -111,7 +111,7 @@
         "T001",
         "T002"
       ],
-      "description": "Implement `GrokDryChecker` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/dry_check/grok_dry_checker.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
+      "description": "Implement `GrokDryChecker` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/dry_check/grok_dry_checker.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; CN-05; AC-01; AC-02; AC-03; AC-05; AC-09]",
       "id": "T005",
       "status": "done"
     },
@@ -121,7 +121,7 @@
         "T001",
         "T002"
       ],
-      "description": "Update `CodexDryFixLocalRunner` in `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs` and `ReviewFixRunnerAdapter` in `libs/infrastructure/src/review_v2/review_fix_adapter.rs` with Grok launch-path tests. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05]",
+      "description": "Update `CodexDryFixLocalRunner` in `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs` and `ReviewFixRunnerAdapter` in `libs/infrastructure/src/review_v2/review_fix_adapter.rs` with Grok launch-path tests. [IN-01; IN-02; IN-04; OS-04; CN-02; CN-05; AC-01; AC-02; AC-03; AC-05; AC-09]",
       "id": "T010",
       "status": "done"
     },
@@ -130,7 +130,7 @@
       "depends_on": [
         "T003"
       ],
-      "description": "Wire `CapabilityDriver` in `apps/cli-driver/src/capability.rs` and `CapabilityCompositionRoot` in `apps/cli-composition/src/capability.rs`, with capability-dispatch integration tests. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]",
+      "description": "Wire `CapabilityDriver` in `apps/cli-driver/src/capability.rs` and `CapabilityCompositionRoot` in `apps/cli-composition/src/capability.rs`, with capability-dispatch integration tests. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-08; AC-09]",
       "id": "T006",
       "status": "done"
     },
@@ -139,7 +139,7 @@
       "depends_on": [
         "T004"
       ],
-      "description": "Wire `ReviewDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with reviewer-dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05]",
+      "description": "Wire `ReviewDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with reviewer-dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-09]",
       "id": "T011",
       "status": "done"
     },
@@ -149,7 +149,7 @@
         "T005",
         "T010"
       ],
-      "description": "Wire `ReviewFixDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_fix_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with review-fix dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05]",
+      "description": "Wire `ReviewFixDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_fix_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with review-fix dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-09]",
       "id": "T012",
       "status": "done"
     },

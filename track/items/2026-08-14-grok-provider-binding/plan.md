@@ -10,29 +10,29 @@ Grok host hook coverage is delivered by T007 and T013.
 
 ### provider-foundation — Provider foundation and admission
 
-> Coordinate foundation and admission tasks. [IN-01; IN-02; IN-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-06]
+> Coordinate foundation and admission tasks. [IN-01; IN-02; IN-05; CN-01; CN-02; CN-04; CN-05; AC-01; AC-02; AC-03; AC-04; AC-06; AC-09]
 
 - [x] **T001**: Add `GrokOutputEnvelope` and `GrokEnvelopeError` with focused envelope-extraction tests in `libs/infrastructure/src/grok_common.rs`. [IN-01; OS-02; AC-01] (`28d1b47425930cc287dbb64e83a08ad2d4c1c49f`)
-- [x] **T009**: Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-01; AC-04] (`d3995a59f24e6932cf95e27563a5acb3fef12565`)
-- [x] **T008**: Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; CN-01; AC-06] (`28d1b47425930cc287dbb64e83a08ad2d4c1c49f`)
-- [x] **T002**: Add `GrokCapabilityDefinition` discovery and admission validation with shared-adapter fixture tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-02; IN-04; IN-05; OS-04; OS-05; CN-01; CN-02; AC-02; AC-03; AC-04] (`2fbff3c69589300130f7da3cf2a7ba572abd1e80`)
+- [x] **T009**: Add `GrokSandbox`, `GrokSandboxProfileName`, and `GrokSandboxProfileNameError` admission validation with invalid-value tests in `libs/infrastructure/src/grok_common.rs`. [IN-05; OS-05; CN-04; AC-04] (`d3995a59f24e6932cf95e27563a5acb3fef12565`)
+- [x] **T008**: Add `.harness/config/samples/agent-profiles.grok-heavy.json` and a `grok-sandbox` declaration example in `.agents/skills/impl-planner/SKILL.md`, then validate the sample profile and unchanged default selection. [IN-05; IN-06; OS-01; OS-05; OS-06; AC-06] (`28d1b47425930cc287dbb64e83a08ad2d4c1c49f`)
+- [x] **T002**: Add `GrokCapabilityDefinition` discovery and admission validation with shared-adapter fixture tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-02; IN-04; IN-05; OS-04; OS-05; CN-01; CN-02; CN-04; CN-05; AC-02; AC-03; AC-04; AC-09] (`2fbff3c69589300130f7da3cf2a7ba572abd1e80`)
 
 ### provider-execution-paths — Provider execution paths
 
-> Coordinate provider execution tasks. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; OS-04; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08]
+> Coordinate provider execution tasks. [IN-01; IN-02; IN-03; IN-04; OS-01; OS-02; OS-03; OS-04; CN-01; CN-02; CN-04; CN-05; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08; AC-09]
 
-- [x] **T003**: Implement `GrokCapabilityAdapter` with subprocess, structured-envelope, and resume fallback tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-01; IN-02; IN-03; IN-04; IN-05; OS-01; OS-02; OS-03; OS-04; OS-05; CN-01; CN-02; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08] (`a044a3f9f7ef93b94d36722a24b649d896565609`)
-- [x] **T004**: Implement `GrokReviewer` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/review_v2/grok_reviewer.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05] (`f86f8341721f1c780d93e1f98d0c04ef9f57f3c7`)
-- [x] **T005**: Implement `GrokDryChecker` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/dry_check/grok_dry_checker.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05] (`f86f8341721f1c780d93e1f98d0c04ef9f57f3c7`)
-- [x] **T010**: Update `CodexDryFixLocalRunner` in `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs` and `ReviewFixRunnerAdapter` in `libs/infrastructure/src/review_v2/review_fix_adapter.rs` with Grok launch-path tests. [IN-01; IN-02; IN-04; OS-04; CN-02; AC-01; AC-02; AC-03; AC-05] (`21eda68ac3d60e60fab2dbee0753c7c078820ee7`)
+- [x] **T003**: Implement `GrokCapabilityAdapter` with subprocess, structured-envelope, and resume fallback tests in `libs/infrastructure/src/capability_exec/grok.rs`. [IN-01; IN-02; IN-03; IN-04; IN-05; OS-01; OS-02; OS-03; OS-04; OS-05; CN-01; CN-02; CN-04; CN-05; AC-01; AC-02; AC-03; AC-04; AC-05; AC-08; AC-09] (`a044a3f9f7ef93b94d36722a24b649d896565609`)
+- [x] **T004**: Implement `GrokReviewer` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/review_v2/grok_reviewer.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; CN-05; AC-01; AC-02; AC-03; AC-05; AC-09] (`f86f8341721f1c780d93e1f98d0c04ef9f57f3c7`)
+- [x] **T005**: Implement `GrokDryChecker` with typed-pipeline launch and resume-setting tests in `libs/infrastructure/src/dry_check/grok_dry_checker.rs`. [IN-01; IN-02; IN-04; OS-04; CN-02; CN-05; AC-01; AC-02; AC-03; AC-05; AC-09] (`f86f8341721f1c780d93e1f98d0c04ef9f57f3c7`)
+- [x] **T010**: Update `CodexDryFixLocalRunner` in `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs` and `ReviewFixRunnerAdapter` in `libs/infrastructure/src/review_v2/review_fix_adapter.rs` with Grok launch-path tests. [IN-01; IN-02; IN-04; OS-04; CN-02; CN-05; AC-01; AC-02; AC-03; AC-05; AC-09] (`21eda68ac3d60e60fab2dbee0753c7c078820ee7`)
 
 ### provider-composition — Provider composition wiring
 
-> Coordinate driver and composition wiring tasks. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08]
+> Coordinate driver and composition wiring tasks. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-08; AC-09]
 
-- [x] **T006**: Wire `CapabilityDriver` in `apps/cli-driver/src/capability.rs` and `CapabilityCompositionRoot` in `apps/cli-composition/src/capability.rs`, with capability-dispatch integration tests. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; AC-02; AC-03; AC-05; AC-08] (`a044a3f9f7ef93b94d36722a24b649d896565609`)
-- [x] **T011**: Wire `ReviewDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with reviewer-dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05] (`f86f8341721f1c780d93e1f98d0c04ef9f57f3c7`)
-- [x] **T012**: Wire `ReviewFixDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_fix_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with review-fix dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; AC-02; AC-03; AC-05] (`21eda68ac3d60e60fab2dbee0753c7c078820ee7`)
+- [x] **T006**: Wire `CapabilityDriver` in `apps/cli-driver/src/capability.rs` and `CapabilityCompositionRoot` in `apps/cli-composition/src/capability.rs`, with capability-dispatch integration tests. [IN-02; IN-03; IN-04; OS-01; OS-03; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-08; AC-09] (`a044a3f9f7ef93b94d36722a24b649d896565609`)
+- [x] **T011**: Wire `ReviewDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with reviewer-dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-09] (`f86f8341721f1c780d93e1f98d0c04ef9f57f3c7`)
+- [x] **T012**: Wire `ReviewFixDriver` in `apps/cli-driver/src/review.rs` and `ReviewCompositionRoot::review_fix_driver` in `apps/cli-composition/src/review_v2/shim.rs`, with review-fix dispatch integration tests. [IN-02; IN-04; OS-04; CN-02; CN-05; AC-02; AC-03; AC-05; AC-09] (`21eda68ac3d60e60fab2dbee0753c7c078820ee7`)
 
 ### grok-host-guards — Grok host guards
 
