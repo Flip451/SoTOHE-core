@@ -106,6 +106,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1696565bbb5f5cd9ace924ff288cbe5d8701031a",
       "depends_on": [
         "T5"
       ],
@@ -114,6 +115,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1696565bbb5f5cd9ace924ff288cbe5d8701031a",
       "depends_on": [
         "T6",
         "T7",
