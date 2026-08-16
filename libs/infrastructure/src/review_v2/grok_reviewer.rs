@@ -49,11 +49,13 @@ pub struct GrokReviewer {
 }
 
 impl GrokReviewer {
-    /// Constructs a new `GrokReviewer`.
+    /// Constructs a new `GrokReviewer` rooted at `repo_root`.
     ///
     /// `diff_base` scopes session reuse to the current review cycle. The model,
     /// effort, and Grok sandbox are resolved by the caller and remain explicit
-    /// launch settings for both fresh and resumed rounds.
+    /// launch settings for both fresh and resumed rounds. The trusted
+    /// repository root must come from the same discovery path used for
+    /// definition admission so the subprocess never inherits process CWD.
     #[allow(clippy::too_many_arguments)] // signature is the catalogue-declared contract
     pub fn new(
         track_id: TrackId,
@@ -66,8 +68,8 @@ impl GrokReviewer {
         timeout: Duration,
         base_prompt: ReviewerPrompt,
         session_cache: Arc<dyn ProviderSessionCachePort>,
+        repo_root: PathBuf,
     ) -> GrokReviewer {
-        let repo_root = default_repo_root();
         let runtime_dir = repo_root.join(REVIEW_RUNTIME_DIR);
         Self {
             session: ReviewerSession::new(
@@ -308,13 +310,6 @@ fn convert_findings_to_domain(
         .collect()
 }
 
-fn default_repo_root() -> PathBuf {
-    crate::git_cli::SystemGitRepo::discover()
-        .map(|repository| repository.root().to_path_buf())
-        .or_else(|_| std::env::current_dir())
-        .unwrap_or_else(|_| PathBuf::from("."))
-}
-
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
@@ -447,6 +442,7 @@ mod tests {
             Duration::from_secs(10),
             ReviewerPrompt::try_new("Review this code.".to_owned()).expect("prompt is valid"),
             cache,
+            PathBuf::from("/test/repository"),
         )
         .with_process_runner(
             PathBuf::from("/test/repository"),

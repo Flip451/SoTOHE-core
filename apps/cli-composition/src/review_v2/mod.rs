@@ -406,6 +406,7 @@ impl ReviewCompositionRoot {
                     timeout,
                     session.prompt,
                     session.cache,
+                    repo_root,
                 );
                 let result = run_grok_review_str(
                     &track_id,

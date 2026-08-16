@@ -156,6 +156,10 @@
             {
               "name": "session_cache",
               "ty": "std::sync::Arc<dyn usecase::provider_session::ProviderSessionCachePort>"
+            },
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "GrokReviewer"
