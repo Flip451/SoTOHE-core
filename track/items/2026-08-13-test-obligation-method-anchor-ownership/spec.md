@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
-version: "1.1"
-signals: { blue: 20, yellow: 0, red: 0 }
+version: "1.2"
+signals: { blue: 28, yellow: 0, red: 0 }
 ---
 
 # trait_method obligations own method-scoped anchors
@@ -18,6 +18,10 @@ signals: { blue: 20, yellow: 0, red: 0 }
 - [IN-02] method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
 - [IN-03] fulfillment 検証と verifier instruction を、各 trait_method 義務が所有する anchor に限定する。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D2] [tasks: T5]
 - [IN-05] D1 のためにアクティブな catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md#D1] [tasks: T1]
+- [IN-09] PhaseCommandService の validate を、validate 自身が担当する spec anchor へ method-scoped に再 grounding し、validate の fulfillment を validate 自身の test で実証できる binding に戻す。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T6]
+- [IN-10] PhaseCommandService の explain を、explain 自身が担当する spec anchor へ method-scoped に再 grounding し、explain の fulfillment を explain 自身の test で実証できる binding に戻す。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T7]
+- [IN-11] PhaseCommandService の enter を、enter 自身が担当する spec anchor へ method-scoped に再 grounding し、enter の fulfillment を enter 自身の test で実証できる binding に戻す。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T8]
+- [IN-12] `.harness/custom/review-prompts/harness-policy.md` から、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項だけを撤去し、他の deviation 記述や他 track の記録は変更しない。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T9]
 
 ### Out of Scope
 - [OS-01] 既存 catalogue 全体へ method-level anchor 宣言と coverage 規則を遡及適用することは本 track の対象外とする。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
@@ -37,6 +41,10 @@ signals: { blue: 20, yellow: 0, red: 0 }
 - [ ] [AC-02] アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
 - [ ] [AC-03] method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1] [tasks: T4]
 - [ ] [AC-04] D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D2] [tasks: T5]
+- [ ] [AC-10] PhaseCommandService の validate は validate 自身が担当する spec anchor に method-scoped に再 grounding され、validate の trait_method 義務の fulfillment は explain または enter の test を cross-populate せずに検証できる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T6]
+- [ ] [AC-11] PhaseCommandService の explain は explain 自身が担当する spec anchor に method-scoped に再 grounding され、explain の trait_method 義務の fulfillment は validate または enter の test を cross-populate せずに検証できる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T7]
+- [ ] [AC-12] PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T8]
+- [ ] [AC-13] `.harness/custom/review-prompts/harness-policy.md` に、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項が残らない。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T9]
 - [ ] [AC-06] アクティブな catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md#D1] [tasks: T1, T2]
 
 ## Related Conventions (Required Reading)
@@ -46,5 +54,5 @@ signals: { blue: 20, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 20  🟡 0  🔴 0
+🔵 28  🟡 0  🔴 0
 

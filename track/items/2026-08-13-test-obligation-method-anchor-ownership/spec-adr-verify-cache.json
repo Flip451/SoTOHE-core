@@ -208,6 +208,98 @@
       }
     },
     {
+      "claim_hash": "b9b6f20e79f2192a8278339bc75077c83174d13fd1af6c2574c8478971330c84",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "PhaseCommandService の validate を、validate 自身が担当する spec anchor へ method-scoped に再 grounding し、validate の fulfillment を validate 自身の test で実証できる binding に戻す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "3 method の ApplicationService で、各 method を担当 anchor へ再 grounding し、cross-populated fulfillment を method-scoped に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f42bc9ed853148aaa5d20fe4663ec6894acf03fd6baf0ab4a845830b3b80a816",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "PhaseCommandService の explain を、explain 自身が担当する spec anchor へ method-scoped に再 grounding し、explain の fulfillment を explain 自身の test で実証できる binding に戻す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "3 method の ApplicationService で、各 method を担当 anchor へ再 grounding し、cross-populated fulfillment を method-scoped に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f6d839051b658a5752e38dc57fc5f49e2361268a7bf677e16460a9f94ec71eaf",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-11",
+          "section": "in_scope",
+          "text_label": "PhaseCommandService の enter を、enter 自身が担当する spec anchor へ method-scoped に再 grounding し、enter の fulfillment を enter 自身の test で実証できる binding に戻す。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "3 method の ApplicationService で、各 method を担当 anchor へ再 grounding し、cross-populated fulfillment を method-scoped に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ef8305a4bed0de3676ad9f5b3919a2d627b6febff2970ea8d47603f4030c9048",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-12",
+          "section": "in_scope",
+          "text_label": "`.harness/custom/review-prompts/harness-policy.md` から、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項だけを撤去し、他の deviation 記述や他 track の記録は変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "暫定受容の逸脱記録（Known Accepted Deviations）を撤去する。機構変更だけでなく、ここまでを本 refinement の完了条件とする。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "a96af3aac6a272eacba507f995154a062e7b86c393600d3071bf03192b713936",
       "claim_origin": {
         "data": {
@@ -526,6 +618,98 @@
       },
       "verdict": {
         "citation": "D1 の割り当て検証を通過した後、fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "070435dc0abef1f2e8df908ad02860ee13e2dcd1ec167bf0052f422ccf4260e1",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "PhaseCommandService の validate は validate 自身が担当する spec anchor に method-scoped に再 grounding され、validate の trait_method 義務の fulfillment は explain または enter の test を cross-populate せずに検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "3 method の ApplicationService で、各 method を担当 anchor へ再 grounding し、cross-populated fulfillment を method-scoped に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "24cc17490008f9004b9720943fc71474dbfcc27c9de94c18e9f2fd1f968dc5a5",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "PhaseCommandService の explain は explain 自身が担当する spec anchor に method-scoped に再 grounding され、explain の trait_method 義務の fulfillment は validate または enter の test を cross-populate せずに検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "3 method の ApplicationService で、各 method を担当 anchor へ再 grounding し、cross-populated fulfillment を method-scoped に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c280620b5aeb228c7a8ca22b663d87f432f6db5e82c2628d82e863c45b250e44",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "3 method の ApplicationService で、各 method を担当 anchor へ再 grounding し、cross-populated fulfillment を method-scoped に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "63ba2855e2789b3d1921c5cb197e41764d5891d42e5c04c0a4ec6ff8becb4a38",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-13",
+          "section": "acceptance_criteria",
+          "text_label": "`.harness/custom/review-prompts/harness-policy.md` に、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項が残らない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "暫定受容の逸脱記録（Known Accepted Deviations）を撤去する。機構変更だけでなく、ここまでを本 refinement の完了条件とする。",
         "kind": "pass"
       }
     },

@@ -43,6 +43,46 @@
     {
       "adr_refs": [
         {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-10",
+      "text": "PhaseCommandService の validate は validate 自身が担当する spec anchor に method-scoped に再 grounding され、validate の trait_method 義務の fulfillment は explain または enter の test を cross-populate せずに検証できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-11",
+      "text": "PhaseCommandService の explain は explain 自身が担当する spec anchor に method-scoped に再 grounding され、explain の trait_method 義務の fulfillment は validate または enter の test を cross-populate せずに検証できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-12",
+      "text": "PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-13",
+      "text": "`.harness/custom/review-prompts/harness-policy.md` に、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項が残らない。"
+    },
+    {
+      "adr_refs": [
+        {
           "anchor": "D1",
           "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
         },
@@ -187,6 +227,46 @@
         ],
         "id": "IN-05",
         "text": "D1 のためにアクティブな catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-09",
+        "text": "PhaseCommandService の validate を、validate 自身が担当する spec anchor へ method-scoped に再 grounding し、validate の fulfillment を validate 自身の test で実証できる binding に戻す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-10",
+        "text": "PhaseCommandService の explain を、explain 自身が担当する spec anchor へ method-scoped に再 grounding し、explain の fulfillment を explain 自身の test で実証できる binding に戻す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-11",
+        "text": "PhaseCommandService の enter を、enter 自身が担当する spec anchor へ method-scoped に再 grounding し、enter の fulfillment を enter 自身の test で実証できる binding に戻す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-12",
+        "text": "`.harness/custom/review-prompts/harness-policy.md` から、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項だけを撤去し、他の deviation 記述や他 track の記録は変更しない。"
       }
     ],
     "out_of_scope": [
@@ -243,10 +323,10 @@
     ]
   },
   "signals": {
-    "blue": 20,
+    "blue": 28,
     "red": 0,
     "yellow": 0
   },
   "title": "trait_method obligations own method-scoped anchors",
-  "version": "1.1"
+  "version": "1.2"
 }

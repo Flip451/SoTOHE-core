@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "0e25bb400d2eba5e9e73c389fb9b792d5b5e336fc363615cbbccac5959f8a9c5",
+  "catalogue_declaration_hash": "ebadf0e37884861028afa7b9bf3bbc891e2d47e1dd7de6431a1ee8421da39c0a",
   "schema_version": 1,
   "signals": [
     {
@@ -11,6 +11,11 @@
       "entry_hash": "5e82907568197cefae4e2195455149fc162e84637daf3689131f0728c851718b",
       "signal": "blue",
       "type_name": "EvaluateTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "signal": "blue",
+      "type_name": "PhaseCommandService"
     }
   ]
 }

@@ -15,7 +15,118 @@
       "trait_ref": "EvaluateTestObligationsApplicationService"
     }
   ],
-  "traits": {},
+  "traits": {
+    "PhaseCommandService": {
+      "action": "reference",
+      "docs": "Synchronous application service for validating, explaining, and entering configured phases.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "validate",
+          "params": [
+            {
+              "name": "command",
+              "ty": "PhaseValidateCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), CommandConfigLoadError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-09",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            },
+            {
+              "anchor": "AC-10",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "explain",
+          "params": [
+            {
+              "name": "query",
+              "ty": "PhaseExplainQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PhaseCommandExplanation, PhaseCommandExplainError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-10",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            },
+            {
+              "anchor": "AC-11",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            }
+          ]
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "enter",
+          "params": [
+            {
+              "name": "command",
+              "ty": "PhaseEnterCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<PhaseCommandEnterOutcome, PhaseCommandEnterError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-11",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            },
+            {
+              "anchor": "AC-12",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            }
+          ]
+        }
+      ],
+      "module_path": "phase_command",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
   "types": {
     "DeriveTestObligationsInteractor": {
       "action": "reference",

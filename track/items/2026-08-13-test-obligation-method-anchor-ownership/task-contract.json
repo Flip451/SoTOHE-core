@@ -9,6 +9,15 @@
     ],
     "T5": [
       { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" }
+    ],
+    "T6": [
+      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+    ],
+    "T7": [
+      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+    ],
+    "T8": [
+      { "layer": "usecase", "entry_key": "PhaseCommandService" }
     ]
   }
 }

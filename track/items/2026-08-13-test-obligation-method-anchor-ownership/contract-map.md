@@ -69,6 +69,16 @@ subgraph domain["domain"]
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_phase_command["usecase::phase_command"]
+    direction TB
+  subgraph R35_usecase_usecase_PhaseCommandService["phase_command::PhaseCommandService"]
+    direction TB
+    R35_usecase_usecase_PhaseCommandService__self[PhaseCommandService]
+    R35_usecase_usecase_PhaseCommandService_validate([validate])
+    R35_usecase_usecase_PhaseCommandService_explain([explain])
+    R35_usecase_usecase_PhaseCommandService_enter([enter])
+  end
+  end
   subgraph usecase_usecase_module_test_obligation["usecase::test_obligation"]
     direction TB
   subgraph T47_usecase_usecase_DeriveTestObligationsInteractor["test_obligation::derive::DeriveTestObligationsInteractor"]
@@ -123,6 +133,10 @@ class T28_domain_domain_TestObligation_declaration_hash method_node
 class T28_domain_domain_TestObligation_spec_refs method_node
 class T28_domain_domain_TestObligation_owns_edge method_node
 class T28_domain_domain_TestObligation__self value_object
+class R35_usecase_usecase_PhaseCommandService_validate method_node
+class R35_usecase_usecase_PhaseCommandService_explain method_node
+class R35_usecase_usecase_PhaseCommandService_enter method_node
+class R35_usecase_usecase_PhaseCommandService__self app_service
 class T47_usecase_usecase_DeriveTestObligationsInteractor_new method_node
 class T47_usecase_usecase_DeriveTestObligationsInteractor__self interactor
 class T49_usecase_usecase_EvaluateTestObligationsInteractor_new method_node

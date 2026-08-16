@@ -35,6 +35,30 @@
         { "scope": "usecase", "production_lines": 100, "test_lines": 80 },
         { "scope": "infrastructure", "production_lines": 100, "test_lines": 80 }
       ]
+    },
+    {
+      "task_id": "T6",
+      "scope_estimates": [
+        { "scope": "usecase", "production_lines": 35, "test_lines": 40 }
+      ]
+    },
+    {
+      "task_id": "T7",
+      "scope_estimates": [
+        { "scope": "usecase", "production_lines": 35, "test_lines": 40 }
+      ]
+    },
+    {
+      "task_id": "T8",
+      "scope_estimates": [
+        { "scope": "usecase", "production_lines": 30, "test_lines": 40 }
+      ]
+    },
+    {
+      "task_id": "T9",
+      "scope_estimates": [
+        { "scope": "other", "production_lines": 10, "test_lines": 0 }
+      ]
     }
   ],
   "batches": [
@@ -48,7 +72,23 @@
     },
     {
       "id": "B-03",
-      "task_ids": ["T4", "T5"]
+      "task_ids": ["T4"]
+    },
+    {
+      "id": "B-04",
+      "task_ids": ["T5"]
+    },
+    {
+      "id": "B-05",
+      "task_ids": ["T6"]
+    },
+    {
+      "id": "B-06",
+      "task_ids": ["T7"]
+    },
+    {
+      "id": "B-07",
+      "task_ids": ["T8", "T9"]
     }
   ]
 }

@@ -717,6 +717,64 @@
           "hash": "rvw1:sha256:e5e0130575fd48de736e4d25e18df350eb3c1db6bf454dc11d93079bdb0e92ba",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T07:32:11Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "GO-01 traceability stops at T5, but T6 is the sole task covering IN-09..IN-11 and AC-10..AC-12—the D3 recovery that makes the concrete multi-method `PhaseCommandService` satisfy GO-01. Add T6 to the GO-01 summary mapping.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 88,
+              "message": "T6 bundles four independently verifiable behavior units while still `todo`: validate grounding (IN-09/AC-10), explain grounding (IN-10/AC-11), enter grounding (IN-11/AC-12), and deviation-clause removal (IN-12/AC-13). Split the three method recoveries into independently testable tasks and make the policy cleanup depend on their completion.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 60,
+              "message": "B-04 unnecessarily serializes T5 after T4. T5 becomes ready after T4 within B-03, their targets do not overlap, and their combined usecase estimate is 480 lines (T4: 300; T5: 180), under the 500-line ceiling; domain and infrastructure each have only one contributor. Place T5 after T4 in B-03 and use the following batch for the remaining T6 work.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a5d8f415efcbca8ace930aa627f47212158afc2061130be5b9aab03fbf6e77",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T08:02:57Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 83,
+              "message": "B-05 groups T6, T7, and T8 despite concrete overlapping ownership: all three modify method-specific grounding/evidence for the same `PhaseCommandService`, whose implementation is in the single `libs/usecase/src/phase_command.rs` file, and all three are attributed to that same catalogue entry. Concurrent ownership is unsafe; place these tasks in separate ordered batches or establish genuinely non-overlapping write targets.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 86,
+              "message": "B-06 unnecessarily serializes T9. After T6, T7, and T8 appear earlier in B-05, T9 is ready; its `harness-policy.md` target does not overlap their PhaseCommandService target, and the batch totals remain within the ceilings (usecase 220 lines, other 10 lines). Place T9 after its predecessors in the same final recovery batch, or after the last recovery task if their overlapping ownership is split across batches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1f1e0c63420f3a1b0b418c7f1584f39eaffb52a6fb47635a08e71834e901c797",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T08:08:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aead5508ec7e3b90fd8860b91d632bc0f4adf5ff7b9f0377838dcb632981adff",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1089,6 +1147,72 @@
           "hash": "rvw1:sha256:73cfce82e250eacbb04acf9c28943a1a9f0c3d90673e90baade3b7ac8801c37a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:10:11Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 51,
+              "message": "AC-10 は deviation を名前で限定せず、指定 Track ID の conditional Known Accepted Deviations が一件も残らないことを要求しています。しかし `harness-policy.md` には同じ Track ID に対する unit-variant、composition、port placement など無関係な allowance も複数あります。この AC を満たすにはそれらまで削除する必要があり、CN-09 の「recovery は PhaseCommandService の validate/explain/enter に限定する」という制約と矛盾して D3 の範囲を越えます。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a1ebae6046255b45741c1aaaa0cddde8d7366b231af2fc89cf41726d3a10aa5b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:13:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2be83ed67d8eb3fce229764e7117988a184e61c04ccc1c98f0e6a20b6cbd8cf9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:45:41Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 80,
+              "message": "AC-13 は `harness-policy.md` から PhaseCommandService の conditional deviation 条項を撤去する挙動を要求していますが、現在の in_scope は IN-09〜IN-11 の各 method の re-grounding だけで、policy 条項の撤去を含む項目がありません。そのため、この acceptance criterion は declared in_scope の外にあります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dfd15d309837259ec618a89c4b61db8fd4512cdcbda198349161a4f5e460e9e5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:49:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2be83ed67d8eb3fce229764e7117988a184e61c04ccc1c98f0e6a20b6cbd8cf9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T07:10:33Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 81,
+              "message": "AC-13 requires deleting the track-specific PhaseCommandService deviation from `harness-policy.md`, but the declared in-scope set (IN-09–IN-11) covers only re-grounding and fulfillment bindings for validate/explain/enter; it never places the policy-record removal in scope. The acceptance criterion therefore requires behavior outside the declared scope.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0730361036c68834055d950c2819e5bb348fa28c69c6e596dd580dd878417dce",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:21:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0cfd07df5356a09f284abb127880d1a08a5a130de2ea1ddd3a3ef675f821a3a3",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1155,6 +1279,28 @@
           "at": "2026-08-14T07:09:11Z",
           "findings": [],
           "hash": "rvw1:sha256:f8a7f48baeaa265a1202b0558af19ca04582212da9aa9a22ba83b9f0c4d4cb92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:39:06Z",
+          "findings": [
+            {
+              "category": "spec_refs off-topic",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 36,
+              "message": "`usecase::PhaseCommandService` copies the complete entry-level set (`IN-09`, `CN-09`, `AC-10`) onto each of `validate`, `explain`, and `enter`. Every cited element describes all three methods plus removal of a harness-policy deviation, so no individual method obligation/test can establish the whole cited contract. This recreates entry-level cross-population instead of D1's method-scoped ownership. Introduce method-specific upstream anchors if necessary and cite only each method's own promises while preserving total entry coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9a003c74bf2657b6db6d2fb11daad04ef9ca834eb3d378c902847a0c8f9922f1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:11:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd6870077e2fd5560ac1a599d5e51cbafa83859488fceacf397dd6b28d8608a5",
           "type": "final",
           "verdict": "zero_findings"
         }

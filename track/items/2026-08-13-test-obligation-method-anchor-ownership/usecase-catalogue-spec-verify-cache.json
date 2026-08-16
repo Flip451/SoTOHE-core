@@ -287,6 +287,150 @@
         "citation": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。",
         "kind": "pass"
       }
+    },
+    {
+      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandService",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b9b6f20e79f2192a8278339bc75077c83174d13fd1af6c2574c8478971330c84",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-09",
+          "section": "in_scope",
+          "text_label": "PhaseCommandService の validate を、validate 自身が担当する spec anchor へ method-scoped に再 grounding し、validate の fulfillment を validate 自身の test で実証できる binding に戻す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "PhaseCommandService の validate を、validate 自身が担当する spec anchor へ method-scoped に再 grounding し、validate の fulfillment を validate 自身の test で実証できる binding に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandService",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f42bc9ed853148aaa5d20fe4663ec6894acf03fd6baf0ab4a845830b3b80a816",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-10",
+          "section": "in_scope",
+          "text_label": "PhaseCommandService の explain を、explain 自身が担当する spec anchor へ method-scoped に再 grounding し、explain の fulfillment を explain 自身の test で実証できる binding に戻す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "PhaseCommandService の explain を、explain 自身が担当する spec anchor へ method-scoped に再 grounding し、explain の fulfillment を explain 自身の test で実証できる binding に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandService",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f6d839051b658a5752e38dc57fc5f49e2361268a7bf677e16460a9f94ec71eaf",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-11",
+          "section": "in_scope",
+          "text_label": "PhaseCommandService の enter を、enter 自身が担当する spec anchor へ method-scoped に再 grounding し、enter の fulfillment を enter 自身の test で実証できる binding に戻す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "PhaseCommandService の enter を、enter 自身が担当する spec anchor へ method-scoped に再 grounding し、enter の fulfillment を enter 自身の test で実証できる binding に戻す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandService",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "070435dc0abef1f2e8df908ad02860ee13e2dcd1ec167bf0052f422ccf4260e1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-10",
+          "section": "acceptance_criteria",
+          "text_label": "PhaseCommandService の validate は validate 自身が担当する spec anchor に method-scoped に再 grounding され、validate の trait_method 義務の fulfillment は explain または enter の test を cross-populate せずに検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "PhaseCommandService の validate は validate 自身が担当する spec anchor に method-scoped に再 grounding され、validate の trait_method 義務の fulfillment は explain または enter の test を cross-populate せずに検証できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandService",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "24cc17490008f9004b9720943fc71474dbfcc27c9de94c18e9f2fd1f968dc5a5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-11",
+          "section": "acceptance_criteria",
+          "text_label": "PhaseCommandService の explain は explain 自身が担当する spec anchor に method-scoped に再 grounding され、explain の trait_method 義務の fulfillment は validate または enter の test を cross-populate せずに検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "PhaseCommandService の explain は explain 自身が担当する spec anchor に method-scoped に再 grounding され、explain の trait_method 義務の fulfillment は validate または enter の test を cross-populate せずに検証できる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandService",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c280620b5aeb228c7a8ca22b663d87f432f6db5e82c2628d82e863c45b250e44",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-12",
+          "section": "acceptance_criteria",
+          "text_label": "PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。",
+        "kind": "pass"
+      }
     }
   ],
   "layer": "usecase",
