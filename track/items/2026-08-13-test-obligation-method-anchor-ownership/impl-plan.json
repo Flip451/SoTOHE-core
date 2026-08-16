@@ -70,6 +70,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "ab81694a58e888cdaad845767d4c01168f697df2",
       "depends_on": [
         "T3"
       ],
@@ -83,7 +84,7 @@
       ],
       "description": "Targets: libs/usecase/src/test_obligation/evaluate/ and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test fulfillment verification and instruction rendering. Anchors: GO-01, IN-03, AC-04, CN-03, OS-02, OS-04.",
       "id": "T5",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

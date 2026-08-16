@@ -49,7 +49,7 @@
         "citation": "assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n    assert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -97,10 +97,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n            result,\n            Err(\n                domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(\n                    _\n                )\n            )\n        ));",
+        "citation": "assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n    assert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -148,10 +148,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));\n\nassert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\nassert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![\n            method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]),\n            method_with_spec_refs(\"save\", vec![]),\n        ],\n        vec![spec_ref(\"IN-01\")],\n    );\n...\nassert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -199,10 +199,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));\n\nassert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\nassert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "citation": "interactor.execute(&command(vec![path])).unwrap();\n\nassert_eq!(\n    load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n    vec![\"IN-01\"]\n);\nassert_eq!(\n    save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n    vec![\"IN-01\", \"AC-01\"]\n);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -238,10 +238,15 @@
         "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
@@ -262,7 +267,7 @@
       },
       "key": {
         "anchor_text_hash": "7832dd1acaf6b20685546ab28b16143bc0b980e04580cada69645626c0e6cb9a",
-        "bound_tests_set_hash": "9c1d34317ea91393978f628fe38d322ca8f9adf824110522c5b8ee48e481810c",
+        "bound_tests_set_hash": "2c086cfabe546ab2858251a9d60a4878a117bca59532e9ddf649211f7dc1705d",
         "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
@@ -271,10 +276,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(decl.spec_refs(), &[spec_ref]);",
+        "citation": "assert!(type_names.iter().any(|ty| ty.contains(\"SpecRef\"))); ... assert_eq!(decl.spec_refs(), &[spec_ref]);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -307,10 +312,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());\n\n        assert!(declaration.spec_refs().is_empty());",
+        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());\n...\nassert!(declaration.spec_refs().is_empty());",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -348,13 +353,18 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]) ... vec![spec_ref(\"IN-01\")] ... Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_));\n\nmethod_with_spec_refs(\"load\", vec![spec_ref(\"IN-01\")]) ... vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")] ... Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_));\n\nlet cases: Vec<Vec<SpecRef>> = vec![vec![], vec![spec_ref(\"IN-01\")]]; ... vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")] ... Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))",
+        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
@@ -375,7 +385,7 @@
       },
       "key": {
         "anchor_text_hash": "1a9ccc1be429517f0795c316a8ba3c60851953593dcc952f6b6e72b6417bdd18",
-        "bound_tests_set_hash": "9c1d34317ea91393978f628fe38d322ca8f9adf824110522c5b8ee48e481810c",
+        "bound_tests_set_hash": "2c086cfabe546ab2858251a9d60a4878a117bca59532e9ddf649211f7dc1705d",
         "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
@@ -384,10 +394,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(decl.spec_refs(), &[spec_ref]);\n        assert_eq!(decl.docs(), Some(&docs));",
+        "citation": "assert_eq!(shape[\"has_stripped_fields\"], true);\nassert_eq!(shape[\"fields\"].as_array().map(Vec::len), Some(0));\nassert!(type_names.iter().any(|ty| ty.contains(\"MethodName\")));\nassert!(type_names.iter().any(|ty| ty.contains(\"SpecRef\")));\nassert!(type_names.iter().any(|ty| ty.contains(\"DocString\")));\nassert!(type_names.iter().all(|ty| {\n    !ty.split(['<', '>', ',', ' '])\n        .any(|part| matches!(part, \"String\" | \"PathBuf\" | \"i32\" | \"u32\" | \"usize\"))\n}));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -423,7 +433,7 @@
         "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -461,10 +471,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
+        "citation": "let result = interactor.execute(&command(vec![path]));\n\nassert!(matches!(\n    result,\n    Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -500,7 +510,7 @@
         "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());\n\n        assert!(declaration.spec_refs().is_empty());",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -528,10 +538,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(shape[\"has_stripped_fields\"], true);\n        assert_eq!(shape[\"fields\"].as_array().map(Vec::len), Some(0));\n...\n        assert!(type_names.iter().all(|ty| {\n            !ty.split(['<', '>', ',', ' '])\n                .any(|part| matches!(part, \"String\" | \"PathBuf\" | \"i32\" | \"u32\" | \"usize\"))\n        }));",
+        "citation": "assert_eq!(shape[\"has_stripped_fields\"], true);\n        assert_eq!(shape[\"fields\"].as_array().map(Vec::len), Some(0));\n\n        assert!(type_names.iter().all(|ty| {\n            !ty.split(['<', '>', ',', ' '])\n                .any(|part| matches!(part, \"String\" | \"PathBuf\" | \"i32\" | \"u32\" | \"usize\"))\n        }));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -577,7 +587,7 @@
         "citation": "assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n    assert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -608,10 +618,15 @@
         "citation": "interactor.execute(&command(vec![valid_path])).unwrap();",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
@@ -632,7 +647,7 @@
       },
       "key": {
         "anchor_text_hash": "d62a0bbc73bf1ad0416064b340595598ec8177433bac9dbd41052d299e6c1dab",
-        "bound_tests_set_hash": "9c1d34317ea91393978f628fe38d322ca8f9adf824110522c5b8ee48e481810c",
+        "bound_tests_set_hash": "2c086cfabe546ab2858251a9d60a4878a117bca59532e9ddf649211f7dc1705d",
         "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
@@ -644,7 +659,7 @@
         "citation": "assert_eq!(decl.name(), &name);\n        assert_eq!(decl.receiver(), receiver);\n        assert_eq!(decl.params(), params.as_slice());\n        assert_eq!(decl.returns(), &returns);\n        assert!(decl.is_async());\n        assert!(decl.has_default_impl());\n        assert_eq!(decl.generics(), generics.as_slice());\n        assert_eq!(decl.where_predicates(), where_predicates.as_slice());\n        assert_eq!(decl.spec_refs(), &[spec_ref]);\n        assert_eq!(decl.docs(), Some(&docs));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     }
   ],
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership"

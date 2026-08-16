@@ -60,7 +60,7 @@ use domain::tddd::test_obligation::vocab::{
     FulfillmentFailCategory, TargetEntryRoleKind, TestObligationKind,
 };
 use domain::{
-    ContentHash, EvidenceCitation, SpecDocument, SpecDocumentLoadError, SpecElementId,
+    ContentHash, EvidenceCitation, SpecDocument, SpecDocumentLoadError, SpecElementId, SpecRef,
     SpecRequirement, SpecScope, TrackId,
 };
 
@@ -681,6 +681,130 @@ fn spec_doc_with_in_scope_and_acceptance_criteria() -> SpecDocument {
         None,
     )
     .unwrap()
+}
+
+const METHOD_ANCHOR_SPEC_FILE: &str =
+    "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json";
+
+fn method_owned_anchor(element_id: &str) -> TestObligationAnchorId {
+    TestObligationAnchorId::try_new(METHOD_ANCHOR_SPEC_FILE.to_owned(), element_id.to_owned())
+        .unwrap()
+}
+
+fn method_owned_spec_ref(element_id: &str) -> SpecRef {
+    SpecRef::new(METHOD_ANCHOR_SPEC_FILE, SpecElementId::try_new(element_id).unwrap())
+}
+
+fn method_anchor_ownership_spec() -> SpecDocument {
+    let requirement = |id: &str, text: &str| {
+        SpecRequirement::new(SpecElementId::try_new(id).unwrap(), text, vec![], vec![], vec![])
+            .unwrap()
+    };
+    SpecDocument::new(
+        "Method anchor ownership test spec",
+        "1.0",
+        vec![],
+        SpecScope::new(
+            vec![
+                requirement("IN-01", "validate requirement"),
+                requirement("IN-02", "explain requirement"),
+                requirement("GO-01", "shared requirement"),
+                requirement("IN-03", "sibling requirement"),
+            ],
+            vec![],
+        ),
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        None,
+    )
+    .unwrap()
+}
+
+fn method_anchor_ownership_catalogue() -> CatalogueDocument {
+    let method = |name: &str, anchors: &[&str]| {
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            anchors.iter().map(|anchor| method_owned_spec_ref(anchor)).collect(),
+            None,
+        )
+    };
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("usecase").unwrap(),
+        LayerId::try_new("usecase").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("ApplicationService").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::ApplicationService,
+            vec![method("validate", &["IN-01", "GO-01"]), method("explain", &["IN-02", "GO-01"])],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![
+                method_owned_spec_ref("IN-01"),
+                method_owned_spec_ref("IN-02"),
+                method_owned_spec_ref("GO-01"),
+            ],
+            vec![],
+        ),
+    );
+    catalogue
+}
+
+fn method_anchor_obligation(method: &str, anchors: &[&str]) -> TestObligation {
+    let entry_key = CatalogueEntryKey::try_new("ApplicationService".to_owned()).unwrap();
+    TestObligation::new(
+        TestObligationId::new(
+            entry_key.clone(),
+            TestObligationKind::Contract,
+            TestObligationItemIdentifier::try_new(format!("trait_method:{method}")).unwrap(),
+        ),
+        CatalogueEntryRef::new(
+            "domain-types.json".to_owned(),
+            CatalogueSectionKey::Traits,
+            entry_key,
+        ),
+        TargetEntryRoleKind::ContractRole(ContractRole::ApplicationService),
+        TestObligationBrief::try_new(format!("cover trait method {method}")).unwrap(),
+        DeclarationHash::new(ContentHash::from_bytes([7u8; 32])),
+        anchors.iter().map(|anchor| method_owned_anchor(anchor)).collect(),
+    )
+}
+
+fn fulfillment_binding_for(obligation: &TestObligation) -> TestBindingsDocument {
+    TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::Fulfillment {
+            obligation_id: obligation.id().clone(),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        }],
+    )
+}
+
+fn planned_fulfillment_edges(plan: &[PlannedAction]) -> Vec<(String, String)> {
+    plan.iter()
+        .filter_map(|action| match action {
+            PlannedAction::Fulfillment(task) => {
+                Some((task.edge_id.anchor_id().element_id().to_owned(), task.anchor_text.clone()))
+            }
+            PlannedAction::Immediate(_) | PlannedAction::Waiver(_) => None,
+        })
+        .collect()
 }
 
 fn empty_spec_doc() -> SpecDocument {
@@ -2095,6 +2219,83 @@ fn test_plan_voluntary_bindings_for_struct_and_enum_catalogue_entries_uses_llm_l
 
     assert_eq!(plan.len(), bindings.records().len());
     assert!(plan.iter().all(|action| matches!(action, PlannedAction::Fulfillment(_))));
+}
+
+#[test]
+fn test_plan_fulfillment_trait_method_anchors_limits_each_obligation_to_owned_and_shared() {
+    let validate = method_anchor_obligation("validate", &["IN-01", "GO-01"]);
+    let explain = method_anchor_obligation("explain", &["IN-02", "GO-01"]);
+    let obligations = ObligationsDocument::new(track(), vec![validate.clone(), explain.clone()]);
+    let catalogues = vec![LoadedCatalogueDocument::new(
+        Path::new("domain-types.json"),
+        method_anchor_ownership_catalogue(),
+    )];
+    let spec = method_anchor_ownership_spec();
+    let h = harness(None, None, fulfilled(), fulfillment_fail(), WaiverVerdict::Pending);
+
+    let validate_plan = h
+        .interactor
+        .plan_binding_records(
+            &fulfillment_binding_for(&validate),
+            &obligations,
+            &catalogues,
+            &spec,
+            None,
+            None,
+        )
+        .unwrap();
+    let explain_plan = h
+        .interactor
+        .plan_binding_records(
+            &fulfillment_binding_for(&explain),
+            &obligations,
+            &catalogues,
+            &spec,
+            None,
+            None,
+        )
+        .unwrap();
+
+    assert_eq!(
+        planned_fulfillment_edges(&validate_plan),
+        vec![
+            ("IN-01".to_owned(), "validate requirement".to_owned()),
+            ("GO-01".to_owned(), "shared requirement".to_owned()),
+        ]
+    );
+    assert_eq!(
+        planned_fulfillment_edges(&explain_plan),
+        vec![
+            ("IN-02".to_owned(), "explain requirement".to_owned()),
+            ("GO-01".to_owned(), "shared requirement".to_owned()),
+        ]
+    );
+}
+
+#[test]
+fn test_plan_fulfillment_trait_method_with_empty_spec_refs_emits_no_actions() {
+    let empty = method_anchor_obligation("empty", &[]);
+    let obligations = ObligationsDocument::new(track(), vec![empty.clone()]);
+    let catalogues = vec![LoadedCatalogueDocument::new(
+        Path::new("domain-types.json"),
+        method_anchor_ownership_catalogue(),
+    )];
+    let spec = method_anchor_ownership_spec();
+    let h = harness(None, None, fulfilled(), fulfillment_fail(), WaiverVerdict::Pending);
+
+    let plan = h
+        .interactor
+        .plan_binding_records(
+            &fulfillment_binding_for(&empty),
+            &obligations,
+            &catalogues,
+            &spec,
+            None,
+            None,
+        )
+        .unwrap();
+
+    assert!(plan.is_empty());
 }
 
 #[test]

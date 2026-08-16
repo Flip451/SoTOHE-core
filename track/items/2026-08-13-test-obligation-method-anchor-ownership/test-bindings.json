@@ -71,6 +71,11 @@
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
           "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
         },
         {
@@ -139,6 +144,11 @@
         }
       },
       "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
@@ -298,6 +308,11 @@
         }
       },
       "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        },
         {
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",

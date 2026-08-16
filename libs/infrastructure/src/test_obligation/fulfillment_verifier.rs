@@ -44,21 +44,26 @@ const CAPABILITY: &str = "obligation-fulfillment-verifier";
 const FULFILLMENT_PROMPT_PREAMBLE: &str = "\
 You are an obligation-fulfillment verifier. Decide whether the provided test source \
 actually verifies the behaviour that the cited anchor promises for the given catalogue \
-entry. Judge only the anchor's promise as it relates to THIS entry's declaration \
-(edge-local): do not fail the tests for behaviour that belongs to other entries.
+entry. The pair contains one cited anchor, and that cited anchor is the only promise this \
+obligation must fulfil. Judge only this cited (owned) anchor as it relates to THIS entry's \
+declaration (edge-local): do not fail the tests for behaviour that belongs to other entries. \
+Do not fail because the bound tests omit anchors owned exclusively by another method. If this \
+cited anchor is shared with another method, it is still in scope for this pair and must be \
+judged.
 
 Reply with exactly one JSON object and nothing else:
 {\"kind\": \"pass\" | \"fail\" | \"pending\", \"citation\": string | null, \"reason\": string | null, \"category\": \"contradiction\" | \"substitution\" | \"central_unverified\" | null}
 
 - \"pass\": the bound tests fulfil the obligation. \"citation\" MUST quote verbatim the \
 part of the test source that fulfils it. A pass without a citation is invalid.
-If the tests fully verify the promise as restricted to this entry, return pass even when the \
-anchor promises more for other entries.
+If the tests fully verify this cited promise as restricted to this entry, return pass even when \
+the anchor promises more for other entries or other methods own additional anchors.
 - \"fail\": set \"reason\" and \"category\": \"contradiction\" (a test asserts the opposite of \
 the promise), \"substitution\" (the tests cite the anchor but verify content unrelated to the \
 entry-relevant promise part), or \"central_unverified\" (no contradiction or irrelevance, but \
-the central, entry-relevant part of the anchor's promise is left unverified; do NOT demand \
-from this edge promise parts belonging to other entries' responsibilities).
+the central, entry-relevant part of the cited anchor's promise is left unverified; do NOT demand \
+from this edge promise parts belonging to other entries' responsibilities or anchors owned \
+exclusively by another method).
 - \"pending\": you cannot confirm fulfilment from the material provided.";
 
 /// Returns the SHA-256 content hash of this verifier's judging prompt preamble.
@@ -514,6 +519,15 @@ mod tests {
         assert!(prompt.contains("provided test source actually verifies the behaviour"));
         assert!(prompt.contains("cited anchor promises for the given catalogue entry"));
         assert!(prompt.contains("obligation-fulfillment verifier"));
+        assert!(
+            prompt.contains("that cited anchor is the only promise this obligation must fulfil")
+        );
+        assert!(prompt.contains(
+            "Do not fail because the bound tests omit anchors owned exclusively by another method"
+        ));
+        assert!(prompt.contains(
+            "If this cited anchor is shared with another method, it is still in scope for this pair and must be judged"
+        ));
         assert!(!prompt.contains("implementer-authored waiver reason"));
     }
 
@@ -534,10 +548,16 @@ mod tests {
             "the tests cite the anchor but verify content unrelated to the entry-relevant promise part"
         ));
         assert!(prompt.contains(
-            "the central, entry-relevant part of the anchor's promise is left unverified; do NOT demand from this edge promise parts belonging to other entries' responsibilities"
+            "the central, entry-relevant part of the cited anchor's promise is left unverified; do NOT demand from this edge promise parts belonging to other entries' responsibilities or anchors owned exclusively by another method"
         ));
         assert!(prompt.contains(
-            "If the tests fully verify the promise as restricted to this entry, return pass even when the anchor promises more for other entries"
+            "If the tests fully verify this cited promise as restricted to this entry, return pass even when the anchor promises more for other entries or other methods own additional anchors"
+        ));
+        assert!(prompt.contains(
+            "Do not fail because the bound tests omit anchors owned exclusively by another method"
+        ));
+        assert!(prompt.contains(
+            "If this cited anchor is shared with another method, it is still in scope for this pair and must be judged"
         ));
     }
 }

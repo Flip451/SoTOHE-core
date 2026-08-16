@@ -6,7 +6,7 @@
 GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9.
 GO-02 → T1, T2, T3.
 
-## Tasks (4/9 resolved)
+## Tasks (5/9 resolved)
 
 ### method-declaration-staging — MethodDeclaration staging and cutover
 
@@ -20,8 +20,8 @@ GO-02 → T1, T2, T3.
 
 > Targets: libs/domain/src/tddd/test_obligation/obligations.rs, libs/usecase/src/test_obligation/derive.rs, libs/usecase/src/test_obligation/evaluate/, and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test. Anchors: GO-01, IN-01, IN-02, IN-03, AC-01, AC-02, AC-03, AC-04, CN-01, CN-02, CN-03, OS-01, OS-02, OS-03, OS-04.
 
-- [x] **T4**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive.rs. Operation: implement and test derivation and structural validation. Anchors: GO-01, IN-01, IN-02, AC-01, AC-02, AC-03, CN-01, CN-02, OS-01, OS-02, OS-03.
-- [ ] **T5**: Targets: libs/usecase/src/test_obligation/evaluate/ and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test fulfillment verification and instruction rendering. Anchors: GO-01, IN-03, AC-04, CN-03, OS-02, OS-04.
+- [x] **T4**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive.rs. Operation: implement and test derivation and structural validation. Anchors: GO-01, IN-01, IN-02, AC-01, AC-02, AC-03, CN-01, CN-02, OS-01, OS-02, OS-03. (`ab81694a58e888cdaad845767d4c01168f697df2`)
+- [x] **T5**: Targets: libs/usecase/src/test_obligation/evaluate/ and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test fulfillment verification and instruction rendering. Anchors: GO-01, IN-03, AC-04, CN-03, OS-02, OS-04.
 
 ### phase-command-d3-recovery — PhaseCommandService D3 recovery
 
