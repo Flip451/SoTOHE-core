@@ -814,6 +814,25 @@ fn test_single_method_non_empty_entry_requires_full_method_anchor_declaration() 
 }
 
 #[test]
+fn test_derive_rejects_incomplete_coverage_for_modify_trait() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Modify,
+        vec![method_with_spec_refs("load", vec![])],
+        vec![spec_ref("IN-01"), spec_ref("AC-01")],
+    );
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
 fn test_single_method_empty_entry_derives_anchorless_trait_method_obligation() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
@@ -829,6 +848,24 @@ fn test_single_method_empty_entry_derives_anchorless_trait_method_obligation() {
     let saved = sink.saved.lock().unwrap().clone().unwrap();
     assert_eq!(saved.obligations().len(), 1);
     assert!(saved.obligations()[0].spec_refs().is_empty());
+}
+
+#[test]
+fn test_derive_skips_coverage_for_reference_and_delete_traits() {
+    for action in [ItemAction::Reference, ItemAction::Delete] {
+        let path = PathBuf::from("domain-types.json");
+        let catalogue = secondary_port_catalogue(
+            action,
+            vec![method_with_spec_refs("load", vec![])],
+            vec![spec_ref("IN-01")],
+        );
+        let (interactor, sink) =
+            interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+        interactor.execute(&command(vec![path])).unwrap();
+
+        assert!(sink.saved.lock().unwrap().is_some());
+    }
 }
 
 #[test]

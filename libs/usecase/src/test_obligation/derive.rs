@@ -67,8 +67,9 @@ pub trait DeriveTestObligationsApplicationService {
     /// # Errors
     ///
     /// Returns [`ObligationDeriveError`] when the branch is not the active track
-    /// branch, the rules / spec / catalogue cannot be loaded, or the derived
-    /// artifact cannot be written.
+    /// branch, the rules / spec / catalogue cannot be loaded, a derivable
+    /// `TraitEntry` fails method-anchor coverage, or the derived artifact
+    /// cannot be written.
     fn execute(&self, cmd: &DeriveTestObligationsCommand) -> Result<(), ObligationDeriveError>;
 }
 
@@ -142,6 +143,14 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
             catalogues.push((path.clone(), doc));
         }
 
+        // D1 coverage is a write-side gate on the catalogues named on this
+        // command. The shared projection below is also used by read-only
+        // `check`, which must not retroactively reject enrolled catalogues.
+        for (_, catalogue) in &catalogues {
+            validate_derivable_method_anchor_coverage(catalogue)
+                .map_err(ObligationDeriveError::InvalidCatalogueState)?;
+        }
+
         let document = derive_obligations_document(
             input.track_id().clone(),
             &rules,
@@ -158,18 +167,14 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
 ///
 /// Both the write-side derive command and the read-only check gate use this
 /// projection, so their definition of the expected artifact cannot diverge.
+/// Method-anchor coverage is intentionally not applied here: `check` re-derives
+/// to compare stored obligations, and D1 does not reject existing catalogues.
 pub(crate) fn derive_obligations_document(
     track_id: domain::TrackId,
     rules: &TestObligationRulesDocument,
     catalogues: &[(PathBuf, CatalogueDocument)],
     projector: &RoleObligationItemsProjector,
 ) -> Result<ObligationsDocument, DiagnosticMessage> {
-    for (_, catalogue) in catalogues {
-        for entry in catalogue.traits().values() {
-            validate_method_anchor_coverage(entry)?;
-        }
-    }
-
     let trait_roles = index_trait_roles(catalogues)?;
     let mut obligations: Vec<TestObligation> = Vec::new();
     for (path, catalogue) in catalogues {
@@ -195,6 +200,19 @@ pub(crate) fn derive_obligations_document(
 /// universe and `Delete` yields zero obligations.
 fn is_derivable(action: ItemAction) -> bool {
     matches!(action, ItemAction::Add | ItemAction::Modify)
+}
+
+/// Write-side D1 coverage: only derivable (`Add` / `Modify`) trait entries.
+fn validate_derivable_method_anchor_coverage(
+    catalogue: &CatalogueDocument,
+) -> Result<(), DiagnosticMessage> {
+    for entry in catalogue.traits().values() {
+        if !is_derivable(entry.action()) {
+            continue;
+        }
+        validate_method_anchor_coverage(entry)?;
+    }
+    Ok(())
 }
 
 /// Trait metadata needed to derive obligations for matching `trait_impl`s.

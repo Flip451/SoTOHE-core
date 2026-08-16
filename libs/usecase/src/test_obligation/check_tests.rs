@@ -980,6 +980,35 @@ fn method_without_spec_refs(name: &str) -> MethodDeclaration {
     )
 }
 
+fn incomplete_coverage_catalogue(action: ItemAction) -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            action,
+            ContractRole::SecondaryPort,
+            vec![method_without_spec_refs("load")],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    catalogue
+}
+
 fn anchorless_secondary_port_catalogue() -> CatalogueDocument {
     let mut catalogue = CatalogueDocument::new(
         5,
@@ -1753,6 +1782,35 @@ fn test_fulfillment_on_obligation_that_owns_no_anchors_is_orphaned() {
     let rendered = format!("{drifts:?}");
     assert!(rendered.contains("Orphaned"));
     assert!(rendered.contains("owns no anchors"));
+}
+
+#[test]
+fn test_check_does_not_reject_historical_add_catalogue_as_invalid_state() {
+    // D1: read-only check re-derives without applying write-side coverage, so
+    // an enrolled Add catalogue that predates method-level refs is not
+    // InvalidCatalogueState.
+    let catalogue = incomplete_coverage_catalogue(ItemAction::Add);
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+
+    let result =
+        anchorless_port_interactor(obligations, bindings, rules, catalogue).execute(&command());
+
+    assert!(!matches!(result, Err(ObligationCheckError::InvalidCatalogueState(_))));
+}
+
+#[test]
+fn test_check_does_not_reject_reference_trait_incomplete_coverage() {
+    let catalogue = incomplete_coverage_catalogue(ItemAction::Reference);
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+
+    let result =
+        anchorless_port_interactor(obligations, bindings, rules, catalogue).execute(&command());
+
+    assert!(!matches!(result, Err(ObligationCheckError::InvalidCatalogueState(_))));
 }
 
 #[test]

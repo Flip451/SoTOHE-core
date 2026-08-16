@@ -1713,6 +1713,35 @@
           "hash": "rvw1:sha256:19a1386ff39d7f571592328b9df60fc66a7ac5375a7b433f05396ca6b876a755",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T16:43:54Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 835,
+              "message": "The new write-side coverage gate is explicitly intended to apply to both `Add` and `Modify`, but the tests only verify rejection for `Add`; no test exercises an incomplete `Modify` trait. A regression that accidentally filters out `Modify` would pass the current suite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:378aa21fa52d7380ec17f16caf17d526c0eb8cd5c8889e60d31816108f4be81b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T16:51:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5713ed649c30cf8b6b680aff1a31f14a4f9fc405f46dec379eab00f1ae59ae2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T16:53:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5713ed649c30cf8b6b680aff1a31f14a4f9fc405f46dec379eab00f1ae59ae2",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }
