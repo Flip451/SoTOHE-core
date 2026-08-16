@@ -289,7 +289,7 @@
       }
     },
     {
-      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -313,7 +313,7 @@
       }
     },
     {
-      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -337,7 +337,7 @@
       }
     },
     {
-      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -361,7 +361,7 @@
       }
     },
     {
-      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -385,7 +385,7 @@
       }
     },
     {
-      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -409,7 +409,7 @@
       }
     },
     {
-      "claim_hash": "317849775b8b7186d9e1e0e7902f5468cef994869becb41fe9389f1d4c52612c",
+      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -428,7 +428,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。",
+        "citation": "enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。",
         "kind": "pass"
       }
     }

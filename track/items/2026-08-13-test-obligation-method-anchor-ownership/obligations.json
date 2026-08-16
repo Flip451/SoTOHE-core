@@ -35,6 +35,90 @@
         "kind": "function_role",
         "role": "FreeFunction"
       }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:validate' of PhaseCommandService",
+      "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff",
+      "id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:validate",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-09",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "PhaseCommandService",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:explain' of PhaseCommandService",
+      "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff",
+      "id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:explain",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-10",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-11",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "PhaseCommandService",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:enter' of PhaseCommandService",
+      "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff",
+      "id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:enter",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-11",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "PhaseCommandService",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
     }
   ],
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership"

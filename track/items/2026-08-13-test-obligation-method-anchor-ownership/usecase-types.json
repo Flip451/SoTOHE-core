@@ -13,11 +13,16 @@
       "action": "reference",
       "for_type": "EvaluateTestObligationsInteractor",
       "trait_ref": "EvaluateTestObligationsApplicationService"
+    },
+    {
+      "action": "reference",
+      "for_type": "PhaseCommandInteractor",
+      "trait_ref": "PhaseCommandService"
     }
   ],
   "traits": {
     "PhaseCommandService": {
-      "action": "reference",
+      "action": "modify",
       "docs": "Synchronous application service for validating, explaining, and entering configured phases.",
       "informal_grounds": [],
       "methods": [

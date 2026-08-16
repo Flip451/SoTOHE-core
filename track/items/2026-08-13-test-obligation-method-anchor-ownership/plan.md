@@ -6,7 +6,7 @@
 GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9.
 GO-02 → T1, T2, T3.
 
-## Tasks (5/9 resolved)
+## Tasks (6/9 resolved)
 
 ### method-declaration-staging — MethodDeclaration staging and cutover
 
@@ -21,13 +21,13 @@ GO-02 → T1, T2, T3.
 > Targets: libs/domain/src/tddd/test_obligation/obligations.rs, libs/usecase/src/test_obligation/derive.rs, libs/usecase/src/test_obligation/evaluate/, and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test. Anchors: GO-01, IN-01, IN-02, IN-03, AC-01, AC-02, AC-03, AC-04, CN-01, CN-02, CN-03, OS-01, OS-02, OS-03, OS-04.
 
 - [x] **T4**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive.rs. Operation: implement and test derivation and structural validation. Anchors: GO-01, IN-01, IN-02, AC-01, AC-02, AC-03, CN-01, CN-02, OS-01, OS-02, OS-03. (`ab81694a58e888cdaad845767d4c01168f697df2`)
-- [x] **T5**: Targets: libs/usecase/src/test_obligation/evaluate/ and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test fulfillment verification and instruction rendering. Anchors: GO-01, IN-03, AC-04, CN-03, OS-02, OS-04.
+- [x] **T5**: Targets: libs/usecase/src/test_obligation/evaluate/ and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test fulfillment verification and instruction rendering. Anchors: GO-01, IN-03, AC-04, CN-03, OS-02, OS-04. (`d4b3bc80034f984676a968bca84c3a44fcaa40d9`)
 
 ### phase-command-d3-recovery — PhaseCommandService D3 recovery
 
 > Targets: the method-local PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/, plus the named deviation clause in .harness/custom/review-prompts/harness-policy.md. Operation: independently restore and test validate, explain, and enter, then remove only the named track's conditional Known Accepted Deviations clause after all three recoveries. Anchors: GO-01, IN-09, IN-10, IN-11, IN-12, AC-10, AC-11, AC-12, AC-13.
 
-- [ ] **T6**: Targets: the validate-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test validate's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-09, AC-10.
+- [x] **T6**: Targets: the validate-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test validate's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-09, AC-10.
 - [ ] **T7**: Targets: the explain-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test explain's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-10, AC-11.
 - [ ] **T8**: Targets: the enter-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test enter's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-11, AC-12.
 - [ ] **T9**: Targets: .harness/custom/review-prompts/harness-policy.md. Operation: after validate, explain, and enter are re-grounded, remove only the named track's conditional Known Accepted Deviations clause; preserve all other deviation records. Anchors: GO-01, IN-12, AC-13.

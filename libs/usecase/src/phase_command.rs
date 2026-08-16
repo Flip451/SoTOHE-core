@@ -1161,6 +1161,46 @@ mod tests {
     }
 
     #[test]
+    fn test_phase_command_service_validate_can_run_without_explain_or_enter() {
+        let (service, runner) = enter_service(command_argv(&["writer"]), Vec::new());
+        let service: &dyn PhaseCommandService = &service;
+
+        assert!(
+            service
+                .validate(PhaseValidateCommand { repository_root: PathBuf::from("/repository") })
+                .is_ok()
+        );
+        assert!(runner.invocations().is_empty());
+    }
+
+    #[test]
+    fn test_phase_command_service_explain_can_run_without_validate_or_enter() {
+        let (service, runner) = enter_service(command_argv(&["writer"]), Vec::new());
+        let service: &dyn PhaseCommandService = &service;
+
+        let explanation = service
+            .explain(PhaseExplainQuery {
+                repository_root: PathBuf::from("/repository"),
+                phase_id: CommandDeclarationId::try_new("phase-one".to_owned()).unwrap(),
+            })
+            .unwrap();
+
+        assert_eq!(explanation.phase_id.as_str(), "phase-one");
+        assert!(runner.invocations().is_empty());
+    }
+
+    #[test]
+    fn test_phase_command_service_enter_can_run_without_validate_or_explain() {
+        let (service, runner) = enter_service(command_argv(&["writer"]), Vec::new());
+        let service: &dyn PhaseCommandService = &service;
+
+        let outcome = service.enter(enter_command(None)).unwrap();
+
+        assert!(matches!(outcome, super::PhaseCommandEnterOutcome::Completed { .. }));
+        assert!(!runner.invocations().is_empty());
+    }
+
+    #[test]
     fn test_phase_command_service_validate_rejects_invalid_configuration() {
         let loader = RootedValidatingLoader::new([(
             PathBuf::from("/invalid-repository"),

@@ -79,6 +79,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "d4b3bc80034f984676a968bca84c3a44fcaa40d9",
       "depends_on": [
         "T4"
       ],
@@ -92,7 +93,7 @@
       ],
       "description": "Targets: the validate-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test validate's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-09, AC-10.",
       "id": "T6",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

@@ -660,6 +660,272 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_can_run_without_explain_or_enter"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_recursive_sotp_basename_variants_before_launch"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-09",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "PhaseCommandService"
+      },
+      "key": {
+        "anchor_text_hash": "8de83d03b009b91c1d2250f947513dd12a3b4e1c43a587216aa013b51d415ddc",
+        "bound_tests_set_hash": "29d15f2e9d82d2104f12b4614bc32d8eb33c0914b89d2207dbacd993f0297f43",
+        "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:validate",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert!(service.validate(PhaseValidateCommand { repository_root: PathBuf::from(\"/repository\") }).is_ok());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_can_run_without_explain_or_enter"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_validate_rejects_recursive_sotp_basename_variants_before_launch"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-10",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "PhaseCommandService"
+      },
+      "key": {
+        "anchor_text_hash": "349b9c5d2eaba0a85b5aaab39ad0f7ed556364d1a0e6bb35cc84b35f7f7b7b47",
+        "bound_tests_set_hash": "29d15f2e9d82d2104f12b4614bc32d8eb33c0914b89d2207dbacd993f0297f43",
+        "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:validate",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "service.validate(PhaseValidateCommand { repository_root: PathBuf::from(\"/repository\") })",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_can_run_without_validate_or_enter"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-10",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "PhaseCommandService"
+      },
+      "key": {
+        "anchor_text_hash": "089fab20b48cf829138418fb0866a6352512ec2a4075132a25f66c970fbf3e6f",
+        "bound_tests_set_hash": "3b55e1aed65501e8b67ca33ab8b6a93ff940f5763b27a8beb541c5fa95aefe74",
+        "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:explain",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let explanation = service\n            .explain(PhaseExplainQuery {\n                repository_root: PathBuf::from(\"/repository\"),\n                phase_id: CommandDeclarationId::try_new(\"phase-one\".to_owned()).unwrap(),\n            })\n            .unwrap();",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_explain_can_run_without_validate_or_enter"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-11",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "PhaseCommandService"
+      },
+      "key": {
+        "anchor_text_hash": "4c01f5bc985bcd267e0db5252372f6a6d5c6d5db9a3a28fd37f07db0f88f41f1",
+        "bound_tests_set_hash": "3b55e1aed65501e8b67ca33ab8b6a93ff940f5763b27a8beb541c5fa95aefe74",
+        "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:explain",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let explanation = service\n            .explain(PhaseExplainQuery { ... })\n            .unwrap();",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_enter_can_run_without_validate_or_explain"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_config_error_without_starting_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_unknown_phase_error_without_running_commands"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-11",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "PhaseCommandService"
+      },
+      "key": {
+        "anchor_text_hash": "290f4c864fa67cf00d7de0fb180bce5b989ae94e8a73bd94ce8bb3b645902d3f",
+        "bound_tests_set_hash": "a00f8a695a0282c1370f6119bfccde1b38d08cd764df1381cbe8aee9d4ee64ba",
+        "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:enter",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let outcome = service.enter(enter_command(None)).unwrap();\n\n        match outcome {\n            PhaseCommandEnterOutcome::Completed { pre_entry_records, writer_record } => {\n                assert_eq!(pre_entry_records.len(), 2);\n                assert_eq!(writer_record.as_ref().sequence_index.as_usize(), 2);\n            }\n            PhaseCommandEnterOutcome::Blocked { .. } => panic!(\"expected completed enter outcome\"),\n        }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_service_enter_can_run_without_validate_or_explain"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_config_error_without_starting_commands"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::phase_command::tests",
+          "test_name": "test_phase_command_enter_returns_unknown_phase_error_without_running_commands"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-12",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "PhaseCommandService"
+      },
+      "key": {
+        "anchor_text_hash": "f0124ee93e51b97fbce236c4809698213146d2eb827c09154c0b3eb31fdc0067",
+        "bound_tests_set_hash": "a00f8a695a0282c1370f6119bfccde1b38d08cd764df1381cbe8aee9d4ee64ba",
+        "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff"
+      },
+      "obligation_id": {
+        "entry_key": "PhaseCommandService",
+        "item_identifier": "trait_method:enter",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let outcome = service.enter(enter_command(None)).unwrap();",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     }
   ],
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership"
