@@ -1308,6 +1308,49 @@
           "hash": "rvw1:sha256:359ea61642ba58ef5643e6bf934cf56c893c575481857ebe74b1312e7f6717a8",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:03:42Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "line": 343,
+              "message": "Mixed-provider configurations are allowed, but telemetry is constructed with only `final_provider` and uses it for both fast and final events. When fast=codex and final=grok, the fast `ReviewRound` and `ExternalSubprocess` events are mislabeled as grok, corrupting provider attribution. Preserve and emit separate fast/final providers.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ec51a376221a8a418098419ba5c4e7cfd22598e4fc383c0f5e81e12a42f4aedb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T05:08:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2106c6741f6db44288ae14148d2a630e2c62f89a4c6217717234e812438aeff1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:15:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2106c6741f6db44288ae14148d2a630e2c62f89a4c6217717234e812438aeff1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:18:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f637757164a02d65b37c87e4fce0295476af7debdfa060ae344ec19789cf4421",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:20:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f637757164a02d65b37c87e4fce0295476af7debdfa060ae344ec19789cf4421",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

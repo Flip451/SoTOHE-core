@@ -22,7 +22,11 @@ use std::time::Instant;
 
 use domain::CommitHash;
 use domain::dry_check::DryCheckFinding;
-use usecase::dry_check::{DryCheckCycleError, DryCheckInteractor, DryCheckService};
+use domain::semantic_dup::CodeFragment;
+use usecase::dry_check::{
+    DryCheckAgentError, DryCheckAgentJudgment, DryCheckAgentPort, DryCheckCycleError,
+    DryCheckInteractor, DryCheckJudgeTier, DryCheckService,
+};
 use usecase::dry_driver_shared::IoFailureDetail;
 use usecase::dry_write_driver::{
     AgentConfigResolutionFailureDetail, CapabilityName, DiffHunkListingFailureDetail,
@@ -238,16 +242,22 @@ impl DryCheckServiceFactoryPort for DryCheckServiceFactoryAdapter {
         cmd: DryCheckServiceFactoryCommand,
     ) -> Result<DryCheckServiceFactoryOutput, DryCheckServiceFactoryError> {
         let capability_name = cmd.capability_name.clone();
-        let (provider, fast_model, final_model, fast_reasoning_effort, final_reasoning_effort) =
-            checker_config::resolve_dry_checker_config(
-                &cmd.repo_root,
-                &cmd.capability_name,
-                cmd.model,
-            )
-            .map_err(|e| DryCheckServiceFactoryError::AgentConfigResolutionFailed {
-                capability_name: capability_name_or_fallback(capability_name.clone()),
-                detail: AgentConfigResolutionFailureDetail::new(e),
-            })?;
+        let (
+            fast_provider,
+            final_provider,
+            fast_model,
+            final_model,
+            fast_reasoning_effort,
+            final_reasoning_effort,
+        ) = checker_config::resolve_dry_checker_config(
+            &cmd.repo_root,
+            &cmd.capability_name,
+            cmd.model,
+        )
+        .map_err(|e| DryCheckServiceFactoryError::AgentConfigResolutionFailed {
+            capability_name: capability_name_or_fallback(capability_name.clone()),
+            detail: AgentConfigResolutionFailureDetail::new(e),
+        })?;
 
         let embedding_port = Arc::new(FastEmbedAdapter::new().map_err(|e| {
             DryCheckServiceFactoryError::EmbeddingModelLoadFailed {
@@ -272,51 +282,48 @@ impl DryCheckServiceFactoryPort for DryCheckServiceFactoryAdapter {
                 capability_name: capability_name_or_fallback(capability_name.clone()),
                 detail: AgentConfigResolutionFailureDetail::new(detail),
             };
-        let (agent, tiered_recorder) = match provider.as_str() {
-            "codex" => {
-                let (agent, recorder) = RecordingDryAgent::new(CodexDryChecker::new(
-                    fast_model.clone(),
-                    fast_reasoning_effort,
-                    final_model.clone(),
-                    final_reasoning_effort,
-                    cmd.capability_name,
-                ));
-                (Arc::new(agent) as Arc<dyn usecase::dry_check::DryCheckAgentPort>, recorder)
-            }
-            "grok" => {
-                let final_model_name =
-                    usecase::capability_exec::ModelName::try_new(final_model.clone())
-                        .map_err(|error| config_error(error.to_string()))?;
-                let definition = resolve_grok_capability_definition(
-                    &cmd.repo_root,
-                    &cmd.capability_name,
-                    &final_model_name,
-                )
-                .map_err(config_error)?;
-                let sandbox = definition.sandbox().cloned().ok_or_else(|| {
-                    config_error(
-                        "Grok dry-checker definition did not resolve a grok-sandbox permission"
-                            .to_owned(),
-                    )
-                })?;
-                let (agent, recorder) = RecordingDryAgent::new(GrokDryChecker::new(
-                    usecase::capability_exec::ModelName::try_new(fast_model.clone())
-                        .map_err(|error| config_error(error.to_string()))?,
-                    parse_grok_effort(&fast_reasoning_effort).map_err(config_error)?,
-                    final_model_name,
-                    parse_grok_effort(&final_reasoning_effort).map_err(config_error)?,
-                    usecase::dry_write_driver::CapabilityName::try_new(cmd.capability_name.clone())
-                        .map_err(|error| config_error(error.to_string()))?,
-                    sandbox,
-                    cmd.repo_root.clone(),
-                ));
-                (Arc::new(agent) as Arc<dyn usecase::dry_check::DryCheckAgentPort>, recorder)
-            }
-            other => {
-                return Err(config_error(format!(
-                    "unsupported dry-checker provider '{other}' (supported: 'codex', 'grok')"
-                )));
-            }
+        let (agent, tiered_recorder) = if fast_provider == final_provider {
+            let inner = build_dry_checker_for_provider(
+                DryCheckerLaunchSpec {
+                    provider: &fast_provider,
+                    fast_model: &fast_model,
+                    fast_reasoning_effort: &fast_reasoning_effort,
+                    final_model: &final_model,
+                    final_reasoning_effort: &final_reasoning_effort,
+                    repo_root: &cmd.repo_root,
+                    capability_name: &cmd.capability_name,
+                },
+                &config_error,
+            )?;
+            let (agent, recorder) = RecordingDryAgent::new(inner);
+            (Arc::new(agent) as Arc<dyn DryCheckAgentPort>, recorder)
+        } else {
+            let fast = build_dry_checker_for_provider(
+                DryCheckerLaunchSpec {
+                    provider: &fast_provider,
+                    fast_model: &fast_model,
+                    fast_reasoning_effort: &fast_reasoning_effort,
+                    final_model: &fast_model,
+                    final_reasoning_effort: &fast_reasoning_effort,
+                    repo_root: &cmd.repo_root,
+                    capability_name: &cmd.capability_name,
+                },
+                &config_error,
+            )?;
+            let r#final = build_dry_checker_for_provider(
+                DryCheckerLaunchSpec {
+                    provider: &final_provider,
+                    fast_model: &final_model,
+                    fast_reasoning_effort: &final_reasoning_effort,
+                    final_model: &final_model,
+                    final_reasoning_effort: &final_reasoning_effort,
+                    repo_root: &cmd.repo_root,
+                    capability_name: &cmd.capability_name,
+                },
+                &config_error,
+            )?;
+            let (agent, recorder) = RecordingDryAgent::new(TierSelectingDryAgent { fast, r#final });
+            (Arc::new(agent) as Arc<dyn DryCheckAgentPort>, recorder)
         };
 
         let service = Arc::new(DryCheckInteractor::new(
@@ -341,7 +348,8 @@ impl DryCheckServiceFactoryPort for DryCheckServiceFactoryAdapter {
         let tier_telemetry: Arc<dyn DryTierTelemetryPort> =
             Arc::new(RecordingDryTierTelemetryAdapter::new(
                 tiered_recorder,
-                provider,
+                fast_provider,
+                final_provider,
                 fast_model,
                 final_model,
                 cmd.track_id.as_ref().to_owned(),
@@ -350,6 +358,116 @@ impl DryCheckServiceFactoryPort for DryCheckServiceFactoryAdapter {
 
         Ok(DryCheckServiceFactoryOutput { service, tier_telemetry })
     }
+}
+
+enum FactoryDryChecker {
+    Codex(CodexDryChecker),
+    Grok(Box<GrokDryChecker>),
+}
+
+impl DryCheckAgentPort for FactoryDryChecker {
+    fn judge(
+        &self,
+        changed_fragment: &CodeFragment,
+        candidate_fragment: &CodeFragment,
+        tier: DryCheckJudgeTier,
+    ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
+        match self {
+            Self::Codex(agent) => agent.judge(changed_fragment, candidate_fragment, tier),
+            Self::Grok(agent) => agent.judge(changed_fragment, candidate_fragment, tier),
+        }
+    }
+}
+
+struct DryCheckerLaunchSpec<'a> {
+    provider: &'a str,
+    fast_model: &'a str,
+    fast_reasoning_effort: &'a str,
+    final_model: &'a str,
+    final_reasoning_effort: &'a str,
+    repo_root: &'a Path,
+    capability_name: &'a str,
+}
+
+struct TierSelectingDryAgent {
+    fast: FactoryDryChecker,
+    r#final: FactoryDryChecker,
+}
+
+impl DryCheckAgentPort for TierSelectingDryAgent {
+    fn judge(
+        &self,
+        changed_fragment: &CodeFragment,
+        candidate_fragment: &CodeFragment,
+        tier: DryCheckJudgeTier,
+    ) -> Result<DryCheckAgentJudgment, DryCheckAgentError> {
+        match tier {
+            DryCheckJudgeTier::Fast => {
+                self.fast.judge(changed_fragment, candidate_fragment, DryCheckJudgeTier::Fast)
+            }
+            DryCheckJudgeTier::Final => {
+                self.r#final.judge(changed_fragment, candidate_fragment, DryCheckJudgeTier::Final)
+            }
+        }
+    }
+}
+
+fn build_dry_checker_for_provider(
+    spec: DryCheckerLaunchSpec<'_>,
+    config_error: &impl Fn(String) -> DryCheckServiceFactoryError,
+) -> Result<FactoryDryChecker, DryCheckServiceFactoryError> {
+    match spec.provider {
+        "codex" => Ok(FactoryDryChecker::Codex(CodexDryChecker::new(
+            spec.fast_model.to_owned(),
+            spec.fast_reasoning_effort.to_owned(),
+            spec.final_model.to_owned(),
+            spec.final_reasoning_effort.to_owned(),
+            spec.capability_name.to_owned(),
+        ))),
+        "grok" => {
+            let fast_model_name =
+                usecase::capability_exec::ModelName::try_new(spec.fast_model.to_owned())
+                    .map_err(|error| config_error(error.to_string()))?;
+            let final_model_name =
+                usecase::capability_exec::ModelName::try_new(spec.final_model.to_owned())
+                    .map_err(|error| config_error(error.to_string()))?;
+            let sandbox = admit_grok_sandbox(
+                spec.repo_root,
+                spec.capability_name,
+                &fast_model_name,
+                &final_model_name,
+            )
+            .map_err(config_error)?;
+            Ok(FactoryDryChecker::Grok(Box::new(GrokDryChecker::new(
+                fast_model_name,
+                parse_grok_effort(spec.fast_reasoning_effort).map_err(config_error)?,
+                final_model_name,
+                parse_grok_effort(spec.final_reasoning_effort).map_err(config_error)?,
+                usecase::dry_write_driver::CapabilityName::try_new(spec.capability_name.to_owned())
+                    .map_err(|error| config_error(error.to_string()))?,
+                sandbox,
+                spec.repo_root.to_path_buf(),
+            ))))
+        }
+        other => Err(config_error(format!(
+            "unsupported dry-checker provider '{other}' (supported: 'codex', 'grok')"
+        ))),
+    }
+}
+
+fn admit_grok_sandbox(
+    repo_root: &Path,
+    capability_name: &str,
+    fast_model: &usecase::capability_exec::ModelName,
+    final_model: &usecase::capability_exec::ModelName,
+) -> Result<crate::grok_common::GrokSandbox, String> {
+    let definition = resolve_grok_capability_definition(repo_root, capability_name, fast_model)?;
+    if fast_model != final_model {
+        resolve_grok_capability_definition(repo_root, capability_name, final_model)?;
+    }
+    definition.sandbox().cloned().ok_or_else(|| {
+        "Grok dry-checker definition did not resolve a grok-sandbox permission".to_owned()
+    })
 }
 
 // ── RecordingDryTierTelemetryAdapter ──────────────────────────────────────────
@@ -363,7 +481,8 @@ impl DryCheckServiceFactoryPort for DryCheckServiceFactoryAdapter {
 /// silent no-op.
 pub struct RecordingDryTierTelemetryAdapter {
     recorder: TieredDryAgentRecorder,
-    provider: String,
+    fast_provider: String,
+    final_provider: String,
     fast_model: String,
     final_model: String,
     track_id: String,
@@ -378,7 +497,8 @@ impl RecordingDryTierTelemetryAdapter {
     /// Construct a new [`RecordingDryTierTelemetryAdapter`].
     pub fn new(
         recorder: TieredDryAgentRecorder,
-        provider: String,
+        fast_provider: String,
+        final_provider: String,
         fast_model: String,
         final_model: String,
         track_id: String,
@@ -386,7 +506,8 @@ impl RecordingDryTierTelemetryAdapter {
     ) -> Self {
         Self {
             recorder,
-            provider,
+            fast_provider,
+            final_provider,
             fast_model,
             final_model,
             track_id,
@@ -409,7 +530,7 @@ impl DryTierTelemetryPort for RecordingDryTierTelemetryAdapter {
             telemetry::emit_dry_tier_review_round(
                 writer,
                 &self.track_id,
-                &self.provider,
+                &self.fast_provider,
                 &self.fast_model,
                 "fast",
                 round,
@@ -419,7 +540,7 @@ impl DryTierTelemetryPort for RecordingDryTierTelemetryAdapter {
                 telemetry::emit_dry_tier_external_subprocess(
                     writer,
                     &self.track_id,
-                    &self.provider,
+                    &self.fast_provider,
                     round,
                     self.fallback_start,
                 );
@@ -429,7 +550,7 @@ impl DryTierTelemetryPort for RecordingDryTierTelemetryAdapter {
             telemetry::emit_dry_tier_review_round(
                 writer,
                 &self.track_id,
-                &self.provider,
+                &self.final_provider,
                 &self.final_model,
                 "final",
                 round,
@@ -439,7 +560,7 @@ impl DryTierTelemetryPort for RecordingDryTierTelemetryAdapter {
                 telemetry::emit_dry_tier_external_subprocess(
                     writer,
                     &self.track_id,
-                    &self.provider,
+                    &self.final_provider,
                     round,
                     self.fallback_start,
                 );
@@ -614,6 +735,24 @@ mod tests {
         std::fs::remove_file(skill_dir.join("SKILL.md")).unwrap();
         let missing = resolve_grok_capability_definition(dir.path(), "dry-checker", &model);
         assert!(missing.is_err(), "missing shared definition must fail closed");
+    }
+
+    #[test]
+    fn test_admit_grok_sandbox_rejects_declared_model_that_matches_only_one_tier() {
+        let dir = tempfile::tempdir().unwrap();
+        let skill_dir = dir.path().join(".agents/skills/dry-checker");
+        std::fs::create_dir_all(&skill_dir).unwrap();
+        std::fs::write(
+            skill_dir.join("SKILL.md"),
+            "---\nname: dry-checker\ndescription: Test dry-checker.\nmodel: grok-final\ngrok-sandbox: workspace\n---\n",
+        )
+        .unwrap();
+        let fast = usecase::capability_exec::ModelName::try_new("grok-fast".to_owned()).unwrap();
+        let r#final =
+            usecase::capability_exec::ModelName::try_new("grok-final".to_owned()).unwrap();
+        let error = admit_grok_sandbox(dir.path(), "dry-checker", &fast, &r#final)
+            .expect_err("declared model must match every launched tier model");
+        assert!(error.contains("does not match profile model"), "got: {error}");
     }
 
     #[test]
