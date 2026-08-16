@@ -1,0 +1,3233 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a result test covering 'entry' of TrackAddTaskInteractor",
+      "declaration_hash": "e14e2776d5bf7cf3e7fe617da8e4b84668f2c41d37d0ac25a744aed4a5934795",
+      "id": {
+        "entry_key": "TrackAddTaskInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackAddTaskInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackArchiveInteractor",
+      "declaration_hash": "2bd2343d835bc359e47e55d6ef1c65d5ece8d67a46bc22ac31cd5bd3e3b6009d",
+      "id": {
+        "entry_key": "TrackArchiveInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackArchiveInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackBaselineCaptureInteractor",
+      "declaration_hash": "7418f47b124d244756f1c964ea669a26cd8ae9be6cb7c98db10e691a77055f8e",
+      "id": {
+        "entry_key": "TrackBaselineCaptureInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBaselineCaptureInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackBaselineGraphInteractor",
+      "declaration_hash": "1ffd539bbf21810f65e59f03a2b940bb78cce0e3b90aaaa4797a718acabb3f4f",
+      "id": {
+        "entry_key": "TrackBaselineGraphInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBaselineGraphInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackBranchCreateInteractor",
+      "declaration_hash": "0ad947cb77f84a95356c3b3b605c5b1a96c089e11fa18ea50f1d57032a06c4bd",
+      "id": {
+        "entry_key": "TrackBranchCreateInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBranchCreateInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackBranchSwitchInteractor",
+      "declaration_hash": "d25f0eb9eaa9d2848bb06ba95bcb5bd9043ab6df3ebb2eca3fb5f229a671b9db",
+      "id": {
+        "entry_key": "TrackBranchSwitchInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBranchSwitchInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackCatalogueImplSignalsInteractor",
+      "declaration_hash": "dda2fda71efc39037ba637ee0437bd0d3cf64d8e006dc0d8721c4e85e7fbab4e",
+      "id": {
+        "entry_key": "TrackCatalogueImplSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueImplSignalsInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackCatalogueLintActiveInteractor",
+      "declaration_hash": "3514b2efb0fb21ad2858cfd481459f7888d1c8e80ed5f1e496123a0358a71293",
+      "id": {
+        "entry_key": "TrackCatalogueLintActiveInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueLintActiveInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackCatalogueSpecSignalsInteractor",
+      "declaration_hash": "4c108cf2c241de7bdf47aaf9dbed02d0ab4e78d8235b8f682ed175ce928d0d74",
+      "id": {
+        "entry_key": "TrackCatalogueSpecSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueSpecSignalsInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackClearOverrideInteractor",
+      "declaration_hash": "0a9b0166c62d8c79a85816503f23c13733fe8fc894b2e2bf10065c396b5f90b0",
+      "id": {
+        "entry_key": "TrackClearOverrideInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackClearOverrideInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackContractMapInteractor",
+      "declaration_hash": "3321ccf8668150cf704289303ef6dd0d8a630ee031d6f24fa71aa5f270df6f96",
+      "id": {
+        "entry_key": "TrackContractMapInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackContractMapInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackInitInteractor",
+      "declaration_hash": "a6a4e58a804528a96857493d7c61fe3681de167099cefd8a6071f8a6f1d97844",
+      "id": {
+        "entry_key": "TrackInitInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackInitInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackLintInteractor",
+      "declaration_hash": "fc7c17fe8d22a6df7fbdde5b64d385a181c6cc5383f76e8e31520a752e4a95c5",
+      "id": {
+        "entry_key": "TrackLintInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackLintInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackNextTaskInteractor",
+      "declaration_hash": "4f2927c55629c5b5b524463e864355cce90645b6362d7644d3129aa3163681aa",
+      "id": {
+        "entry_key": "TrackNextTaskInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackNextTaskInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackResolutionInteractor",
+      "declaration_hash": "07aef29fe916d84eab14898822277c9a7e013e753420794c7442cb312b683922",
+      "id": {
+        "entry_key": "TrackResolutionInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackResolutionInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackResolveInteractor",
+      "declaration_hash": "c55509105e8f63d32e0c345044d5c1ebd414f311084112db46ce2727bf022099",
+      "id": {
+        "entry_key": "TrackResolveInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackResolveInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackSetCommitHashInteractor",
+      "declaration_hash": "76aa9c879cf1ab546a6d09e06c6155b7c89fd15b46c1326f8472c7a77d3747fc",
+      "id": {
+        "entry_key": "TrackSetCommitHashInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSetCommitHashInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackSetOverrideInteractor",
+      "declaration_hash": "605ed729a7597bdc1a48929bf8a716cc71d6ca2b0c0110477d06b77bf3ced0db",
+      "id": {
+        "entry_key": "TrackSetOverrideInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSetOverrideInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackSpecElementHashInteractor",
+      "declaration_hash": "ebbca505a118edbfda3ac38a7d9cceabb99e134d08865edd117944a9b788f521",
+      "id": {
+        "entry_key": "TrackSpecElementHashInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSpecElementHashInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackSwitchBaseInteractor",
+      "declaration_hash": "4df4a2ae598ba61b667b858f613971bf76677e477d1d2489e32927d907f76172",
+      "id": {
+        "entry_key": "TrackSwitchBaseInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSwitchBaseInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackTaskCountsInteractor",
+      "declaration_hash": "9d9d182edc142e64771a6b7dfc46fc121de35eab7096e52badd4d631c505f1e0",
+      "id": {
+        "entry_key": "TrackTaskCountsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTaskCountsInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackTransitionInteractor",
+      "declaration_hash": "c66b52b562341c5ca46846b8169d6cb6d42654be1f77b3e1e208b6ba638224dc",
+      "id": {
+        "entry_key": "TrackTransitionInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTransitionInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackTypeGraphInteractor",
+      "declaration_hash": "21a50ac0d0a0fafbc087632ddd255b18d074628598ca1321eac9f2ae0fc35390",
+      "id": {
+        "entry_key": "TrackTypeGraphInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTypeGraphInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackTypeSignalsInteractor",
+      "declaration_hash": "43f93c86c5ebe0c5a9075b8061425c67617c8d834886e2ccfeb3bbc76cc7df8f",
+      "id": {
+        "entry_key": "TrackTypeSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTypeSignalsInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackViewsSyncInteractor",
+      "declaration_hash": "e8b94a76f92fa833cb31cb409b2045ba6299fc67d9a740ee6996314c70ff3ab5",
+      "id": {
+        "entry_key": "TrackViewsSyncInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackViewsSyncInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'entry' of TrackViewsValidateInteractor",
+      "declaration_hash": "db6013e7972ff9920ed83254a019b8061e470db6b8a8f906070288bb40a04a6a",
+      "id": {
+        "entry_key": "TrackViewsValidateInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackViewsValidateInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackAddTaskService",
+      "declaration_hash": "9019b20f21823d11490b24cbee87eae804c6789e9e65564417f49f423051cb24",
+      "id": {
+        "entry_key": "TrackAddTaskService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackAddTaskService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackArchiveService",
+      "declaration_hash": "860a6ba3d246d841791edd1dc527f64e9ebf842fa28e3c4e4d3d1a7e57566fd6",
+      "id": {
+        "entry_key": "TrackArchiveService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackArchiveService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackBaselineCapturePort",
+      "declaration_hash": "10380e2219ea9eaf6ab606213ee6604f087eef80659a71540686204034f3ebb5",
+      "id": {
+        "entry_key": "TrackBaselineCapturePort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBaselineCapturePort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackBaselineCaptureService",
+      "declaration_hash": "e5b4837be74b3f310807c43bc740dc39b34e9933f59ba2ab50ec3a693b472684",
+      "id": {
+        "entry_key": "TrackBaselineCaptureService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBaselineCaptureService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackBaselineGraphPort",
+      "declaration_hash": "b54620a1863ddf4fd74cdaa2fafe477f2ddc05470e34104e6fa3628231fcb9f1",
+      "id": {
+        "entry_key": "TrackBaselineGraphPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBaselineGraphPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackBaselineGraphService",
+      "declaration_hash": "4211b5325b3d807c6d4bec71d65e788e44d24bf5f1fc78fe1aed4d8459a8984e",
+      "id": {
+        "entry_key": "TrackBaselineGraphService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBaselineGraphService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackBranchCreateService",
+      "declaration_hash": "cc2d25ed6e49f246ebcfe5923bd191248ca4bc48197addafedcaee873a0c34b0",
+      "id": {
+        "entry_key": "TrackBranchCreateService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBranchCreateService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:global_for_items' of TrackBranchStrategyPort",
+      "declaration_hash": "2d0db993d0b01a02f0312d750fc5eb3ff49ace70684b64ffd4c458b56ad2a6cb",
+      "id": {
+        "entry_key": "TrackBranchStrategyPort",
+        "item_identifier": "trait_method:global_for_items",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBranchStrategyPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:snapshot_for_track' of TrackBranchStrategyPort",
+      "declaration_hash": "2d0db993d0b01a02f0312d750fc5eb3ff49ace70684b64ffd4c458b56ad2a6cb",
+      "id": {
+        "entry_key": "TrackBranchStrategyPort",
+        "item_identifier": "trait_method:snapshot_for_track",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBranchStrategyPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackBranchSwitchService",
+      "declaration_hash": "7175194ec61cf3ce5c77498e95d1b56a5b120e57430fb05462b3a4293785b051",
+      "id": {
+        "entry_key": "TrackBranchSwitchService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackBranchSwitchService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackCatalogueImplSignalsPort",
+      "declaration_hash": "3456c4a56ac008acb51ba71a0edefa7fd99565561b4aaa50154e86c1d0539299",
+      "id": {
+        "entry_key": "TrackCatalogueImplSignalsPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueImplSignalsPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackCatalogueImplSignalsService",
+      "declaration_hash": "65771517414d7bd50d154e1780d6292faa2fb5c182dbf5d86e1584cd0bb1747c",
+      "id": {
+        "entry_key": "TrackCatalogueImplSignalsService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueImplSignalsService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackCatalogueLintActivePort",
+      "declaration_hash": "f7203030a2660a4a3e282aa32843ce88c4f01dbdd2c34844c99670427e472817",
+      "id": {
+        "entry_key": "TrackCatalogueLintActivePort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueLintActivePort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackCatalogueLintActiveService",
+      "declaration_hash": "19d141ed7a6e985e8ce738f2c812a24e747336d0e7e65fde45a1be3714f7a282",
+      "id": {
+        "entry_key": "TrackCatalogueLintActiveService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueLintActiveService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackCatalogueSpecSignalsPort",
+      "declaration_hash": "741e84fb1248643ae8af3be4f78bc4e2d8f67bbe593d6799cd3d9b67010fb391",
+      "id": {
+        "entry_key": "TrackCatalogueSpecSignalsPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueSpecSignalsPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackCatalogueSpecSignalsService",
+      "declaration_hash": "1e4992aed94ed525ef417c6a358aa0473ca404260151bf9ebe64066435612129",
+      "id": {
+        "entry_key": "TrackCatalogueSpecSignalsService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCatalogueSpecSignalsService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackClearOverrideService",
+      "declaration_hash": "a7030935fd1fd4e4cb1f08da9e070e1b7c184d0af175b60bbe324434041923cb",
+      "id": {
+        "entry_key": "TrackClearOverrideService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackClearOverrideService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:persist_current_for_track' of TrackCommitHashPort",
+      "declaration_hash": "ced53992b25e77e11194522df1f4afdd6f3e4c0ffe3026f547899aa454904b24",
+      "id": {
+        "entry_key": "TrackCommitHashPort",
+        "item_identifier": "trait_method:persist_current_for_track",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackCommitHashPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackContractMapPort",
+      "declaration_hash": "ad077b04034482b0e873fc6dd1aff9a4a89801e7de3cb0cbe2c4bbe8e514e624",
+      "id": {
+        "entry_key": "TrackContractMapPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackContractMapPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackContractMapService",
+      "declaration_hash": "2f3e42e2ca88bbb9bed9496d49a1f44ef3626e726c7ccda2e126afd6bf09e6fb",
+      "id": {
+        "entry_key": "TrackContractMapService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackContractMapService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackInitService",
+      "declaration_hash": "08b2aabc3391a64890f90ae0930ffcb728bbccb48962e0cbe2f12c10f20266fc",
+      "id": {
+        "entry_key": "TrackInitService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackInitService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackLintPort",
+      "declaration_hash": "2468543e809dcd69d01e7b83313aba2897889fec6813b1341dad6403b77e35f3",
+      "id": {
+        "entry_key": "TrackLintPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackLintPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackLintService",
+      "declaration_hash": "bf217f81041f7db953106fc95411b483aa2edc165b16d3b803889b1f6a0eb9fc",
+      "id": {
+        "entry_key": "TrackLintService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackLintService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:save' of TrackMetadataPort",
+      "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9",
+      "id": {
+        "entry_key": "TrackMetadataPort",
+        "item_identifier": "trait_method:save",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackMetadataPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:find' of TrackMetadataPort",
+      "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9",
+      "id": {
+        "entry_key": "TrackMetadataPort",
+        "item_identifier": "trait_method:find",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackMetadataPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:next_task' of TrackNextTaskQueryPort",
+      "declaration_hash": "d08e4ad1d9e1e59753bcf1581c5a674e1d5254b9b25eca17f25ace7b69336180",
+      "id": {
+        "entry_key": "TrackNextTaskQueryPort",
+        "item_identifier": "trait_method:next_task",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackNextTaskQueryPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackNextTaskService",
+      "declaration_hash": "d86c6ba56f285f933b255886e8d74a07aa397b18a4e7d572759f759bf2020e59",
+      "id": {
+        "entry_key": "TrackNextTaskService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackNextTaskService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:clear_override' of TrackOverrideClearPort",
+      "declaration_hash": "914bbab87ee852cba4d6cd11bd2efd6425d68432471cea1a63526c3b24a32dd5",
+      "id": {
+        "entry_key": "TrackOverrideClearPort",
+        "item_identifier": "trait_method:clear_override",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackOverrideClearPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:set_override' of TrackOverrideSetPort",
+      "declaration_hash": "58509150401b97e6ebe21fccd73c9f02560ecfa74413b4034a61a90541f13099",
+      "id": {
+        "entry_key": "TrackOverrideSetPort",
+        "item_identifier": "trait_method:set_override",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackOverrideSetPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackResolutionPort",
+      "declaration_hash": "c3413b431cb0773d676fe4ec4dc194a8d6ec60a6f849a7ec2051a61d790e65ad",
+      "id": {
+        "entry_key": "TrackResolutionPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackResolutionPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackResolutionService",
+      "declaration_hash": "7d5c02d69cb6c40cc04117f30f6a439d1666f2f836d7850e33690061be5930a1",
+      "id": {
+        "entry_key": "TrackResolutionService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackResolutionService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackResolveService",
+      "declaration_hash": "510200446e1c4f0e6bc57f53b4ef763e5e5c01cdd352b4e024517602263eb3ab",
+      "id": {
+        "entry_key": "TrackResolveService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackResolveService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:resolve_required' of TrackSelectionPort",
+      "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a",
+      "id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_required",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSelectionPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:resolve_active' of TrackSelectionPort",
+      "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a",
+      "id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_active",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSelectionPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:resolve_views_scope' of TrackSelectionPort",
+      "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a",
+      "id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_views_scope",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSelectionPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackSetCommitHashService",
+      "declaration_hash": "fe222c31c2e7db365fa3b19089e3aa1633eee01bcae42b9aed11b482995a27b4",
+      "id": {
+        "entry_key": "TrackSetCommitHashService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSetCommitHashService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackSetOverrideService",
+      "declaration_hash": "0463dd016e8dff1cf831acee0e19cd049c899ab60d8c4eecddf79fba3ecd1982",
+      "id": {
+        "entry_key": "TrackSetOverrideService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSetOverrideService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackSpecElementHashPort",
+      "declaration_hash": "0ed7d8fa3b669f1eb30c943df94d57111a635cc75418b85efa07d8c530f45ea2",
+      "id": {
+        "entry_key": "TrackSpecElementHashPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSpecElementHashPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackSpecElementHashService",
+      "declaration_hash": "ffce69f2868c22ea1b253f19df9d88250c67f33ea8c02c9a580d424cdfdc20d8",
+      "id": {
+        "entry_key": "TrackSpecElementHashService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSpecElementHashService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackSwitchBaseService",
+      "declaration_hash": "79a91cabf975866fe38489887d1953d0d8f20b4fe9cf34755d50b0894eb8701a",
+      "id": {
+        "entry_key": "TrackSwitchBaseService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackSwitchBaseService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:add_task' of TrackTaskAddPort",
+      "declaration_hash": "dfaa9c05762c75305db0086024fcf7b18349876f0370d2564aef89556126e194",
+      "id": {
+        "entry_key": "TrackTaskAddPort",
+        "item_identifier": "trait_method:add_task",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTaskAddPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:task_counts' of TrackTaskCountsQueryPort",
+      "declaration_hash": "08b34e60f12a4f511da4691fe942c760d4a16ec9e59b00db6329c0ff80981d3c",
+      "id": {
+        "entry_key": "TrackTaskCountsQueryPort",
+        "item_identifier": "trait_method:task_counts",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTaskCountsQueryPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackTaskCountsService",
+      "declaration_hash": "8c4653d77d770e88a29b589defacb531cbcaf5f05d157984ec106788ee4cd742",
+      "id": {
+        "entry_key": "TrackTaskCountsService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTaskCountsService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:transition_task' of TrackTaskTransitionPort",
+      "declaration_hash": "2a6dabf2a8094c7ac311880bcca0872bad36a3e4ea2759adb301b6360b32c607",
+      "id": {
+        "entry_key": "TrackTaskTransitionPort",
+        "item_identifier": "trait_method:transition_task",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTaskTransitionPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackTransitionService",
+      "declaration_hash": "d250906398a0981afb366925dc2ad9e53e1592bd7ecf31ad6a7c4229972909fa",
+      "id": {
+        "entry_key": "TrackTransitionService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTransitionService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackTypeGraphPort",
+      "declaration_hash": "6f6ab54bf32b014805e966461d889713a3ec9271552c396a6d39739541c061ce",
+      "id": {
+        "entry_key": "TrackTypeGraphPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTypeGraphPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackTypeGraphService",
+      "declaration_hash": "d189f5d5a1c0de936da819883d1d6cef613aac67ad34aeb5c37b0715007fe9b2",
+      "id": {
+        "entry_key": "TrackTypeGraphService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTypeGraphService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:execute' of TrackTypeSignalsPort",
+      "declaration_hash": "e1533312346e2b0fd4a733be45b652c1f08deb1b779c52c21854e406c4da5747",
+      "id": {
+        "entry_key": "TrackTypeSignalsPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTypeSignalsPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackTypeSignalsService",
+      "declaration_hash": "64e2f986c3805e9e319188ce3e5da3232814fe15d6ef3dd1f2688334123df58b",
+      "id": {
+        "entry_key": "TrackTypeSignalsService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackTypeSignalsService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:validate' of TrackViewsPort",
+      "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231",
+      "id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:validate",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackViewsPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract test covering 'trait_method:sync' of TrackViewsPort",
+      "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231",
+      "id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:sync",
+        "obligation_kind": "contract"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackViewsPort",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackViewsSyncService",
+      "declaration_hash": "27e4f3173a31ecf1079d0207a6e5cf85e297978bb4faeb21ce4f1fca81def8bb",
+      "id": {
+        "entry_key": "TrackViewsSyncService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackViewsSyncService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a result test covering 'trait_method:execute' of TrackViewsValidateService",
+      "declaration_hash": "9b7934f23bb23f50a456d66e321abbff59f3e125a4a3f479a4a96609d45a1462",
+      "id": {
+        "entry_key": "TrackViewsValidateService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TrackViewsValidateService",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskTransitionPort' of TaskOperationInteractor",
+      "declaration_hash": "b24fa756c03ad901de2e1e741ecaa626f5bb0d23ef81dbeb1127f86db7f7fb3b",
+      "id": {
+        "entry_key": "TaskOperationInteractor",
+        "item_identifier": "trait_impl:TrackTaskTransitionPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TaskOperationInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskAddPort' of TaskOperationInteractor",
+      "declaration_hash": "e9cc1075789c357cdf502897f735fb95ed33e19be5ed89b853571720a5291b8f",
+      "id": {
+        "entry_key": "TaskOperationInteractor",
+        "item_identifier": "trait_impl:TrackTaskAddPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TaskOperationInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:TrackOverrideSetPort' of TaskOperationInteractor",
+      "declaration_hash": "dd675345800a688f094e087b8e5c75f6150c0ad4b05345e5ebadce457653c4a5",
+      "id": {
+        "entry_key": "TaskOperationInteractor",
+        "item_identifier": "trait_impl:TrackOverrideSetPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TaskOperationInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:TrackOverrideClearPort' of TaskOperationInteractor",
+      "declaration_hash": "daa602dc27bd56379583c7d1613eefcbab4053ad2578b13a4ad2dd46644272e3",
+      "id": {
+        "entry_key": "TaskOperationInteractor",
+        "item_identifier": "trait_impl:TrackOverrideClearPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TaskOperationInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:TrackNextTaskQueryPort' of TaskQueryInteractor",
+      "declaration_hash": "288e62f49f74bc67c29737b8331d308e56a0dd8a41e6c59e7d20b4a2d7459023",
+      "id": {
+        "entry_key": "TaskQueryInteractor",
+        "item_identifier": "trait_impl:TrackNextTaskQueryPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TaskQueryInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskCountsQueryPort' of TaskQueryInteractor",
+      "declaration_hash": "fe2bcd5936d3fe16af2c0c6e11525e875fd746bfc82385234b6bc6fa533fa23e",
+      "id": {
+        "entry_key": "TaskQueryInteractor",
+        "item_identifier": "trait_impl:TrackTaskCountsQueryPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TaskQueryInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackMetadataPort' of FsTrackMetadataAdapter",
+      "declaration_hash": "66b705e1511142ca0bd113169690936ed48472ce3a9dce0510d215d74e8b82a3",
+      "id": {
+        "entry_key": "FsTrackMetadataAdapter",
+        "item_identifier": "trait_impl:usecase::TrackMetadataPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "FsTrackMetadataAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackViewsPort' of FsTrackViewsAdapter",
+      "declaration_hash": "6a59b50e26ce8a8ac50b4282806c01cde4dada589860b40d4bb3c0c4ca4eb144",
+      "id": {
+        "entry_key": "FsTrackViewsAdapter",
+        "item_identifier": "trait_impl:usecase::TrackViewsPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "FsTrackViewsAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCommitHashPort' of GitTrackCommitHashAdapter",
+      "declaration_hash": "dc1502a4b8192462720bfe3993226cfaaa44ecb1777a917949dafc9fff22a704",
+      "id": {
+        "entry_key": "GitTrackCommitHashAdapter",
+        "item_identifier": "trait_impl:usecase::TrackCommitHashPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GitTrackCommitHashAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackSelectionPort' of GitTrackSelectionAdapter",
+      "declaration_hash": "258b00cbe8a7ae7fbe0a37e1a0f984b213f96fe88aa17059abe574f20eef7763",
+      "id": {
+        "entry_key": "GitTrackSelectionAdapter",
+        "item_identifier": "trait_impl:usecase::TrackSelectionPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "GitTrackSelectionAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackBranchStrategyPort' of FsTrackBranchStrategyAdapter",
+      "declaration_hash": "c2e1e3a7631b6bb83c3dc4d71a92c56e89b691e9ff18254721a404e3e103c794",
+      "id": {
+        "entry_key": "FsTrackBranchStrategyAdapter",
+        "item_identifier": "trait_impl:usecase::TrackBranchStrategyPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "FsTrackBranchStrategyAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackTypeSignalsPort' of SystemTrackTypeSignalsAdapter",
+      "declaration_hash": "61ea0eeac3ade1a73fc6f43dcb2c80528236680fcc222278479b0c3adf31bcdc",
+      "id": {
+        "entry_key": "SystemTrackTypeSignalsAdapter",
+        "item_identifier": "trait_impl:usecase::TrackTypeSignalsPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackTypeSignalsAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackBaselineGraphPort' of SystemTrackBaselineGraphAdapter",
+      "declaration_hash": "eae19118eb327a21aed2559452d4683d8bd46413b60cf99e429e3adb730cfed4",
+      "id": {
+        "entry_key": "SystemTrackBaselineGraphAdapter",
+        "item_identifier": "trait_impl:usecase::TrackBaselineGraphPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackBaselineGraphAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackContractMapPort' of SystemTrackContractMapAdapter",
+      "declaration_hash": "6923770b1b67458e1d3c224b8f3e2d01347b1989cd744bae1bf0e79c49a62ad7",
+      "id": {
+        "entry_key": "SystemTrackContractMapAdapter",
+        "item_identifier": "trait_impl:usecase::TrackContractMapPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackContractMapAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCatalogueSpecSignalsPort' of SystemTrackCatalogueSpecSignalsAdapter",
+      "declaration_hash": "5cfca8e61f5d0aafaccfdc84c3804c5bb78698fa24e6e4469ba64333ea0f51dc",
+      "id": {
+        "entry_key": "SystemTrackCatalogueSpecSignalsAdapter",
+        "item_identifier": "trait_impl:usecase::TrackCatalogueSpecSignalsPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackCatalogueSpecSignalsAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackSpecElementHashPort' of SystemTrackSpecElementHashAdapter",
+      "declaration_hash": "25451e36c222be5743c57be59c550126b3adb8d2dc202d35794440e5e9a76580",
+      "id": {
+        "entry_key": "SystemTrackSpecElementHashAdapter",
+        "item_identifier": "trait_impl:usecase::TrackSpecElementHashPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackSpecElementHashAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackBaselineCapturePort' of SystemTrackBaselineCaptureAdapter",
+      "declaration_hash": "ae22f3109f29c4b48c29fbbc4884b60b8f2f08bda62f505d8de9a71f4f4cff11",
+      "id": {
+        "entry_key": "SystemTrackBaselineCaptureAdapter",
+        "item_identifier": "trait_impl:usecase::TrackBaselineCapturePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackBaselineCaptureAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackLintPort' of SystemTrackLintAdapter",
+      "declaration_hash": "c93a2b6d3bd473b538926601f04763799728b0fbed885c757e00caac18582779",
+      "id": {
+        "entry_key": "SystemTrackLintAdapter",
+        "item_identifier": "trait_impl:usecase::TrackLintPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackLintAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCatalogueImplSignalsPort' of SystemTrackCatalogueImplSignalsAdapter",
+      "declaration_hash": "be89af56596862ce7d0e3001557b00aaa2845d78052a575a43a2ca9c1cd933c3",
+      "id": {
+        "entry_key": "SystemTrackCatalogueImplSignalsAdapter",
+        "item_identifier": "trait_impl:usecase::TrackCatalogueImplSignalsPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackCatalogueImplSignalsAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCatalogueLintActivePort' of SystemTrackCatalogueLintActiveAdapter",
+      "declaration_hash": "7ae05bd2d61547d27b6a688bb5986ba696056c128e220815f86bf4face2c43a1",
+      "id": {
+        "entry_key": "SystemTrackCatalogueLintActiveAdapter",
+        "item_identifier": "trait_impl:usecase::TrackCatalogueLintActivePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackCatalogueLintActiveAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackResolutionPort' of SystemTrackResolutionAdapter",
+      "declaration_hash": "dc08c6e618e0c472d95fd6ad88cc1166726afcfe7fefd14f9746936ef8256f99",
+      "id": {
+        "entry_key": "SystemTrackResolutionAdapter",
+        "item_identifier": "trait_impl:usecase::TrackResolutionPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackResolutionAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    },
+    {
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackTypeGraphPort' of SystemTrackTypeGraphAdapter",
+      "declaration_hash": "492229c0ace1ccce5ffb6a46b93b5b8e1243b5a28ecefd0f8c6e7907c582ae9f",
+      "id": {
+        "entry_key": "SystemTrackTypeGraphAdapter",
+        "item_identifier": "trait_impl:usecase::TrackTypeGraphPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "SystemTrackTypeGraphAdapter",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/infrastructure-types.json",
+        "section_key": "traits"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      }
+    }
+  ],
+  "track_id": "2026-08-15-track-lifecycle-pure-di"
+}

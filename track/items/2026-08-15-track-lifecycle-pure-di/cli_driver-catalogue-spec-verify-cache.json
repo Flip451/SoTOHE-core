@@ -1,0 +1,1494 @@
+{
+  "entries": [
+    {
+      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "977d342f47b1ef5ed02635fa0aa0a0ffd454ed158b07ea393627d7a346e9183b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5d5ce6a4f49bf693f5b14161aca05d7a758ef2e919f4691ee1d5625c265e61aa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d62505dc7ed3a0bbf919561f6c8d488fcc3ef2fa2a024193a544b192a91b6401",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "この track は単独でレビュー可能かつ CI-green のまま統合可能であり、未統合の migration track の変更を暗黙に前提にしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "この track は単独でレビュー可能かつ CI-green のまま統合可能であり、未統合の migration track の変更を暗黙に前提にしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9ba22c2a0c35c912afaaf83121309b49ab7a4c8f424a775cc1efe3b8e1bb56aa",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackIdInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9ba22c2a0c35c912afaaf83121309b49ab7a4c8f424a775cc1efe3b8e1bb56aa",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackIdInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e115099bac642aed38c7c80c4bed759bb5f008d02f3af1861a3c5d7ea81f9e15",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackItemsDirectoryInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e115099bac642aed38c7c80c4bed759bb5f008d02f3af1861a3c5d7ea81f9e15",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackItemsDirectoryInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f0560012e9af39459ca08b90520d6149de1c961d9efe18fa7dc5f922d54147a4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackLayerInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f0560012e9af39459ca08b90520d6149de1c961d9efe18fa7dc5f922d54147a4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackLayerInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dc5efe92b7160b6c20419f78adeb6687b806a15e3a81fefaf398b783b0bf52e4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackLayersInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dc5efe92b7160b6c20419f78adeb6687b806a15e3a81fefaf398b783b0bf52e4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackLayersInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae731e46d0b7664ffa08e67be0d56312747a72b14ffbd97ff74a395dc472966c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackLintRulesFileInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ae731e46d0b7664ffa08e67be0d56312747a72b14ffbd97ff74a395dc472966c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackLintRulesFileInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3219a63bf39d62a0ca70d4251962948158ad60f53e33ac199b163497bbdfe28d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionDiagnostic",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6b2b7f701271cb7617e41701caa6053fb4248a73fec514c383d556788dc23754",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "ADR baseline、review_v2、task_contract の各 context から旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応であり、これら対象外 context の composition root または usecase port を純 DI 化する作業を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3219a63bf39d62a0ca70d4251962948158ad60f53e33ac199b163497bbdfe28d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionDiagnostic",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "858d849b73eb0fca2f204346d4b89def8faaeab4c91a24c11d153fc97f129785",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6b2b7f701271cb7617e41701caa6053fb4248a73fec514c383d556788dc23754",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "ADR baseline、review_v2、task_contract の各 context から旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応であり、これら対象外 context の composition root または usecase port を純 DI 化する作業を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "858d849b73eb0fca2f204346d4b89def8faaeab4c91a24c11d153fc97f129785",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aeec15a8fb6f09b4929ad5baeb686771e5f66500b576552a701a9ac6c132cbd1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6b2b7f701271cb7617e41701caa6053fb4248a73fec514c383d556788dc23754",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "ADR baseline、review_v2、task_contract の各 context から旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応であり、これら対象外 context の composition root または usecase port を純 DI 化する作業を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "aeec15a8fb6f09b4929ad5baeb686771e5f66500b576552a701a9ac6c132cbd1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "049e31603cfb60c2dd581f91e83d7a45b96eed517477900369286b48b538cb58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionOutcome",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "6b2b7f701271cb7617e41701caa6053fb4248a73fec514c383d556788dc23754",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "ADR baseline、review_v2、task_contract の各 context から旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応であり、これら対象外 context の composition root または usecase port を純 DI 化する作業を含まない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同等の解決機能を維持する",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "049e31603cfb60c2dd581f91e83d7a45b96eed517477900369286b48b538cb58",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackResolutionOutcome",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7960da39f254f1077ff3f0d018692f7777d464cfdabed43a969bbb29e8d02bd6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSourceWorkspaceInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7960da39f254f1077ff3f0d018692f7777d464cfdabed43a969bbb29e8d02bd6",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSourceWorkspaceInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a4d5505478cdf14903b8e5c6b524dcef19d6f14ef3d82e47804280897dcb3b53",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecAnchorInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a4d5505478cdf14903b8e5c6b524dcef19d6f14ef3d82e47804280897dcb3b53",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecAnchorInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "971c7e6ac685d26f03adcda5c2a154ad59924015aa5d2ab06bb03dd9da27f406",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddBaselineCaptureInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "971c7e6ac685d26f03adcda5c2a154ad59924015aa5d2ab06bb03dd9da27f406",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddBaselineCaptureInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d465d4f741a9021c491c8003033de2dd2060796c90cf2bdbfdf8d21a8036518b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddBaselineGraphInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d465d4f741a9021c491c8003033de2dd2060796c90cf2bdbfdf8d21a8036518b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddBaselineGraphInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e62057dc9b366ee8789041d9cbbb20c525e9d797adc924206de708ff7762d890",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddCatalogueImplSignalsInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e62057dc9b366ee8789041d9cbbb20c525e9d797adc924206de708ff7762d890",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddCatalogueImplSignalsInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c3382615d6925b414eaa62ad39b4fffa535e923b9973c6c3b7e06dfcf857f872",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddCatalogueLintActiveInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c3382615d6925b414eaa62ad39b4fffa535e923b9973c6c3b7e06dfcf857f872",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddCatalogueLintActiveInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3941c394bb03452c4f8b581c9eabbe49feaca7642006c74656319839a30a19d2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddCatalogueSpecSignalsInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3941c394bb03452c4f8b581c9eabbe49feaca7642006c74656319839a30a19d2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddCatalogueSpecSignalsInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d28276fde67111de27eef180d66b68a8fd7ace8ad0e535195ead8b7e418cea0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddContractMapInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1d28276fde67111de27eef180d66b68a8fd7ace8ad0e535195ead8b7e418cea0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddContractMapInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0debeb82bf3df443e9ce52baf38a40ffe2b29f88b9caaf2f17914eadb8e80960",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0debeb82bf3df443e9ce52baf38a40ffe2b29f88b9caaf2f17914eadb8e80960",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0debeb82bf3df443e9ce52baf38a40ffe2b29f88b9caaf2f17914eadb8e80960",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0debeb82bf3df443e9ce52baf38a40ffe2b29f88b9caaf2f17914eadb8e80960",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "977d342f47b1ef5ed02635fa0aa0a0ffd454ed158b07ea393627d7a346e9183b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0debeb82bf3df443e9ce52baf38a40ffe2b29f88b9caaf2f17914eadb8e80960",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5d5ce6a4f49bf693f5b14161aca05d7a758ef2e919f4691ee1d5625c265e61aa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0debeb82bf3df443e9ce52baf38a40ffe2b29f88b9caaf2f17914eadb8e80960",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddDriver",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e3fc3765283bd3d431ac7ed3cc4d716e8dfe29b10aff70512c6610138411cc3f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e3fc3765283bd3d431ac7ed3cc4d716e8dfe29b10aff70512c6610138411cc3f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e3fc3765283bd3d431ac7ed3cc4d716e8dfe29b10aff70512c6610138411cc3f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "54b6ff91a6a210aee0486333249926db85a02d4938516695c10cddb007267b91",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddLintInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "54b6ff91a6a210aee0486333249926db85a02d4938516695c10cddb007267b91",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddLintInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "832fc5d6aa37014145ffa46555b068cebf3a21edfec259da4f3571c727625ede",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddSpecElementHashInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "832fc5d6aa37014145ffa46555b068cebf3a21edfec259da4f3571c727625ede",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddSpecElementHashInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6f2d64d88720cd4f82c7e8d32d2effa8fa5b4fba3d20878e5ae4ed6e8b554f65",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddTypeGraphInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6f2d64d88720cd4f82c7e8d32d2effa8fa5b4fba3d20878e5ae4ed6e8b554f65",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddTypeGraphInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c06986ac09b3ba13301b04a7e3a7aae2b5b6a2ab76cea5679223be3d4eb49a96",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddTypeSignalsInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c06986ac09b3ba13301b04a7e3a7aae2b5b6a2ab76cea5679223be3d4eb49a96",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTdddTypeSignalsInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7054eeb7cd77da1401e850b50eacc2557d845931430fa6e1fc85e4acbca13afe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphClusterDepthInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7054eeb7cd77da1401e850b50eacc2557d845931430fa6e1fc85e4acbca13afe",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphClusterDepthInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4ec06c91fa96954433e42e913f5e5a1c00f70cfc4f97780d5720670bfe9aecdd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphEdgeInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4ec06c91fa96954433e42e913f5e5a1c00f70cfc4f97780d5720670bfe9aecdd",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphEdgeInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c762c5ecd2e378ef7e5224dc289b544f2150b81cc63466e03b14c5858f8f75e8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c762c5ecd2e378ef7e5224dc289b544f2150b81cc63466e03b14c5858f8f75e8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackWorkspaceRootInput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 1
+}

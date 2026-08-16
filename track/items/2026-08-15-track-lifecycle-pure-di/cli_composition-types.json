@@ -1,0 +1,79 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "inherent_impls": [],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "TrackCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "TrackCompositionRoot": {
+      "action": "modify",
+      "docs": "Track context pure-DI composition-root wiring surface.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "name": "new",
+          "params": [],
+          "returns": "Self",
+          "is_async": false,
+          "has_default_impl": false
+        },
+        {
+          "name": "track_driver",
+          "params": [],
+          "returns": "cli_driver::track::TrackDriver",
+          "is_async": false,
+          "has_default_impl": false,
+          "receiver": "&self"
+        },
+        {
+          "name": "track_tddd_driver",
+          "params": [],
+          "returns": "cli_driver::track_tddd::TrackTdddDriver",
+          "is_async": false,
+          "has_default_impl": false,
+          "receiver": "&self"
+        },
+        {
+          "name": "track_resolution_driver",
+          "params": [],
+          "returns": "cli_driver::track_resolution::TrackResolutionDriver",
+          "is_async": false,
+          "has_default_impl": false,
+          "receiver": "&self"
+        }
+      ],
+      "module_path": "track::composition_root",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    }
+  }
+}

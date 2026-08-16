@@ -1,0 +1,78 @@
+{
+  "entries": [
+    {
+      "claim_hash": "ea9945c548f2ffaa73df450904913d2530255317c02b1e428288ef1ec60d8fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCompositionRoot",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9cdc494fc2865d8d008b456606828b2c1c6ae29fe72f6bc2c361296678d4582c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "Track context 全体の composition root の公開面は fully wired driver を引き渡す配線 API だけとなり、34 個の public execution method と 3 個の解決 helper を残さない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Track context 全体の composition root の公開面は fully wired driver を引き渡す配線 API だけとなり、34 個の public execution method と 3 個の解決 helper を残さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ea9945c548f2ffaa73df450904913d2530255317c02b1e428288ef1ec60d8fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCompositionRoot",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ea9945c548f2ffaa73df450904913d2530255317c02b1e428288ef1ec60d8fb4",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCompositionRoot",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli_composition-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "5d5ce6a4f49bf693f5b14161aca05d7a758ef2e919f4691ee1d5625c265e61aa",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 context の composition root public surface と usecase boundary の規律は既存 catalogue lint で検出可能であり、lint が検出しない逸脱は reviewer 判断に委ねる。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 1
+}

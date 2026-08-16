@@ -1,0 +1,1393 @@
+{
+  "baseline_hash": "95fe337cc28508bbd02db73d650ee50a59608fa9211f5ccf5f5bda58d166742e",
+  "declaration_hash": "3c3c7f18c1845d0b87555c1fbdebf5336fac460ab00fa0333f8a619e1b08c10e",
+  "generated_at": "2026-08-16T08:18:59Z",
+  "head_commit": "91af9981cc59ce99a9293daf20594aa516a43faf",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "ProcessExitCode"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "RenderedViewPath"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TaskCount"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackAddTaskCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackAddTaskError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackAddTaskService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackAddTaskInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackAddTaskResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackAddTaskService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackArchiveCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackArchiveError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackArchiveService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackArchiveInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackArchiveResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackArchiveService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackBaselineCaptureCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBaselineCaptureError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackBaselineCaptureService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBaselineCaptureInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackBaselineCaptureLayerResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackBaselineCapturePort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackBaselineCaptureResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackBaselineCaptureService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackBaselineGraphCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBaselineGraphError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackBaselineGraphService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBaselineGraphInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackBaselineGraphPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackBaselineGraphResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackBaselineGraphService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackBranchCreateCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBranchCreateError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackBranchCreateService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBranchCreateInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackBranchCreateResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackBranchCreateService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackBranchStrategyPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackBranchSwitchCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBranchSwitchError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackBranchSwitchService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackBranchSwitchInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackBranchSwitchResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackBranchSwitchService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCatalogueEntryCount"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueImplLayerResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueImplSignalsCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCatalogueImplSignalsError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackCatalogueImplSignalsService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCatalogueImplSignalsInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueImplSignalsPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueImplSignalsResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueImplSignalsService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueLintActiveCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCatalogueLintActiveError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackCatalogueLintActiveService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCatalogueLintActiveInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueLintActivePort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueLintActiveResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueLintActiveService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCataloguePath"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueSpecSignalsCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCatalogueSpecSignalsError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackCatalogueSpecSignalsService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackCatalogueSpecSignalsInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueSpecSignalsPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueSpecSignalsResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackCatalogueSpecSignalsService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackClearOverrideCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackClearOverrideError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackClearOverrideService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackClearOverrideInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackClearOverrideResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackClearOverrideService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackCommitHashPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackContractMapCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackContractMapError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackContractMapService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackContractMapInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackContractMapPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackContractMapResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackContractMapService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackDirectoryPath"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackIdInput"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackInitCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackInitError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackInitService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackInitInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackInitResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackInitService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackItemsDirectory"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackLayerFilter"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackLayerSelection"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackLayerSignalResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackLintCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackLintError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackLintService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackLintInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackLintPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackLintResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackLintRulesFile"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackLintService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackMetadataPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackNextTaskCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackNextTaskError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackNextTaskService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackNextTaskInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackNextTaskQueryPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackNextTaskResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackNextTaskService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackOverrideClearPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackOverrideSetPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackRenderedLayerCount"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackResolutionCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackResolutionCompatError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackResolutionService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackResolutionInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackResolutionPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackResolutionResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackResolutionService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackResolveCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackResolveError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackResolveService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackResolveInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackResolveResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackResolveService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSelection"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackSelectionPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackSetCommitHashCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSetCommitHashError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackSetCommitHashService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSetCommitHashInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackSetCommitHashResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackSetCommitHashService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackSetOverrideCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSetOverrideError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackSetOverrideService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSetOverrideInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackSetOverrideResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackSetOverrideService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSourceWorkspace"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSpecAnchorSelection"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackSpecElementHashCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSpecElementHashError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackSpecElementHashService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSpecElementHashInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackSpecElementHashPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackSpecElementHashResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackSpecElementHashService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackSwitchBaseCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSwitchBaseError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackSwitchBaseService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackSwitchBaseInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackSwitchBaseResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackSwitchBaseService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackTaskAddPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackTaskCountsCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTaskCountsError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackTaskCountsService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTaskCountsInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackTaskCountsQueryPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackTaskCountsResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackTaskCountsService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTaskTransition"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackTaskTransitionPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackTransitionCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTransitionError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackTransitionService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTransitionInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackTransitionResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackTransitionService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphClusterDepth"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphEdgeSelection"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackTypeGraphService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackTypeGraphService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackTypeSignalsCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTypeSignalsError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackTypeSignalsService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackTypeSignalsInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackTypeSignalsPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackTypeSignalsResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackTypeSignalsService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackViewSyncOutcome"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "type_name": "TrackViewsPort"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackViewsScope"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackViewsSyncCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackViewsSyncError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackViewsSyncService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackViewsSyncInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "type_name": "TrackViewsSyncResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackViewsSyncService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "command",
+      "signal": "yellow",
+      "type_name": "TrackViewsValidateCommand"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "error_type",
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackViewsValidateError"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "interactor",
+      "missing_items": [
+        "TrackViewsValidateService"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackViewsValidateInteractor"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "type_name": "TrackViewsValidateResult"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "type_name": "TrackViewsValidateService"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackWorkspaceRoot"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "value_object",
+      "missing_items": [
+        "Eq",
+        "PartialEq"
+      ],
+      "signal": "yellow",
+      "type_name": "TrackWrittenFileCount"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "unknown",
+      "missing_items": [
+        "TrackOverrideClearPort",
+        "TrackOverrideSetPort",
+        "TrackTaskAddPort",
+        "TrackTaskTransitionPort"
+      ],
+      "signal": "yellow",
+      "type_name": "TaskOperationInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "unknown",
+      "missing_items": [
+        "TrackNextTaskQueryPort",
+        "TrackTaskCountsQueryPort"
+      ],
+      "signal": "yellow",
+      "type_name": "TaskQueryInteractor"
+    }
+  ]
+}

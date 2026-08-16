@@ -1,0 +1,15 @@
+{
+  "baseline_hash": "72e0ff53a826c8141a55f8ab85b73e595947e3a40cc46452777b0c346e22a945",
+  "declaration_hash": "76ed14175faeb33b9314c7e833a19e9b52529a0c770a05f48b6316fea148c66e",
+  "generated_at": "2026-08-16T08:19:06Z",
+  "head_commit": "91af9981cc59ce99a9293daf20594aa516a43faf",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "type_name": "TrackCompositionRoot"
+    }
+  ]
+}

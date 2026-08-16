@@ -1,0 +1,141 @@
+{
+  "catalogue_declaration_hash": "010e5d56a1a3a4f4cc959be4bcb9509c99f50599c926ba8ab311aa8db02af009",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "signal": "blue",
+      "type_name": "TrackDriver"
+    },
+    {
+      "entry_hash": "9ba22c2a0c35c912afaaf83121309b49ab7a4c8f424a775cc1efe3b8e1bb56aa",
+      "signal": "blue",
+      "type_name": "TrackIdInput"
+    },
+    {
+      "entry_hash": "e115099bac642aed38c7c80c4bed759bb5f008d02f3af1861a3c5d7ea81f9e15",
+      "signal": "blue",
+      "type_name": "TrackItemsDirectoryInput"
+    },
+    {
+      "entry_hash": "f0560012e9af39459ca08b90520d6149de1c961d9efe18fa7dc5f922d54147a4",
+      "signal": "blue",
+      "type_name": "TrackLayerInput"
+    },
+    {
+      "entry_hash": "dc5efe92b7160b6c20419f78adeb6687b806a15e3a81fefaf398b783b0bf52e4",
+      "signal": "blue",
+      "type_name": "TrackLayersInput"
+    },
+    {
+      "entry_hash": "ae731e46d0b7664ffa08e67be0d56312747a72b14ffbd97ff74a395dc472966c",
+      "signal": "blue",
+      "type_name": "TrackLintRulesFileInput"
+    },
+    {
+      "entry_hash": "3219a63bf39d62a0ca70d4251962948158ad60f53e33ac199b163497bbdfe28d",
+      "signal": "blue",
+      "type_name": "TrackResolutionDiagnostic"
+    },
+    {
+      "entry_hash": "858d849b73eb0fca2f204346d4b89def8faaeab4c91a24c11d153fc97f129785",
+      "signal": "blue",
+      "type_name": "TrackResolutionDriver"
+    },
+    {
+      "entry_hash": "aeec15a8fb6f09b4929ad5baeb686771e5f66500b576552a701a9ac6c132cbd1",
+      "signal": "blue",
+      "type_name": "TrackResolutionInput"
+    },
+    {
+      "entry_hash": "049e31603cfb60c2dd581f91e83d7a45b96eed517477900369286b48b538cb58",
+      "signal": "blue",
+      "type_name": "TrackResolutionOutcome"
+    },
+    {
+      "entry_hash": "7960da39f254f1077ff3f0d018692f7777d464cfdabed43a969bbb29e8d02bd6",
+      "signal": "blue",
+      "type_name": "TrackSourceWorkspaceInput"
+    },
+    {
+      "entry_hash": "a4d5505478cdf14903b8e5c6b524dcef19d6f14ef3d82e47804280897dcb3b53",
+      "signal": "blue",
+      "type_name": "TrackSpecAnchorInput"
+    },
+    {
+      "entry_hash": "971c7e6ac685d26f03adcda5c2a154ad59924015aa5d2ab06bb03dd9da27f406",
+      "signal": "blue",
+      "type_name": "TrackTdddBaselineCaptureInput"
+    },
+    {
+      "entry_hash": "d465d4f741a9021c491c8003033de2dd2060796c90cf2bdbfdf8d21a8036518b",
+      "signal": "blue",
+      "type_name": "TrackTdddBaselineGraphInput"
+    },
+    {
+      "entry_hash": "e62057dc9b366ee8789041d9cbbb20c525e9d797adc924206de708ff7762d890",
+      "signal": "blue",
+      "type_name": "TrackTdddCatalogueImplSignalsInput"
+    },
+    {
+      "entry_hash": "c3382615d6925b414eaa62ad39b4fffa535e923b9973c6c3b7e06dfcf857f872",
+      "signal": "blue",
+      "type_name": "TrackTdddCatalogueLintActiveInput"
+    },
+    {
+      "entry_hash": "3941c394bb03452c4f8b581c9eabbe49feaca7642006c74656319839a30a19d2",
+      "signal": "blue",
+      "type_name": "TrackTdddCatalogueSpecSignalsInput"
+    },
+    {
+      "entry_hash": "1d28276fde67111de27eef180d66b68a8fd7ace8ad0e535195ead8b7e418cea0",
+      "signal": "blue",
+      "type_name": "TrackTdddContractMapInput"
+    },
+    {
+      "entry_hash": "0debeb82bf3df443e9ce52baf38a40ffe2b29f88b9caaf2f17914eadb8e80960",
+      "signal": "blue",
+      "type_name": "TrackTdddDriver"
+    },
+    {
+      "entry_hash": "e3fc3765283bd3d431ac7ed3cc4d716e8dfe29b10aff70512c6610138411cc3f",
+      "signal": "blue",
+      "type_name": "TrackTdddInput"
+    },
+    {
+      "entry_hash": "54b6ff91a6a210aee0486333249926db85a02d4938516695c10cddb007267b91",
+      "signal": "blue",
+      "type_name": "TrackTdddLintInput"
+    },
+    {
+      "entry_hash": "832fc5d6aa37014145ffa46555b068cebf3a21edfec259da4f3571c727625ede",
+      "signal": "blue",
+      "type_name": "TrackTdddSpecElementHashInput"
+    },
+    {
+      "entry_hash": "6f2d64d88720cd4f82c7e8d32d2effa8fa5b4fba3d20878e5ae4ed6e8b554f65",
+      "signal": "blue",
+      "type_name": "TrackTdddTypeGraphInput"
+    },
+    {
+      "entry_hash": "c06986ac09b3ba13301b04a7e3a7aae2b5b6a2ab76cea5679223be3d4eb49a96",
+      "signal": "blue",
+      "type_name": "TrackTdddTypeSignalsInput"
+    },
+    {
+      "entry_hash": "7054eeb7cd77da1401e850b50eacc2557d845931430fa6e1fc85e4acbca13afe",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphClusterDepthInput"
+    },
+    {
+      "entry_hash": "4ec06c91fa96954433e42e913f5e5a1c00f70cfc4f97780d5720670bfe9aecdd",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphEdgeInput"
+    },
+    {
+      "entry_hash": "c762c5ecd2e378ef7e5224dc289b544f2150b81cc63466e03b14c5858f8f75e8",
+      "signal": "blue",
+      "type_name": "TrackWorkspaceRootInput"
+    }
+  ]
+}

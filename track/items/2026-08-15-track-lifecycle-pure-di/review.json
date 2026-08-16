@@ -18,6 +18,594 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-16T07:11:17Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 1,
+              "message": "T002–T013 descriptions name command groups but no target file or symbol, so an executor must invent the implementation boundary. T014 similarly omits the concrete resolution call-site files.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 1,
+              "message": "T002–T014 bundle independently verifiable command-context units (for example T002 init/archive and T004 add-task/next-task/transition) into single tasks without naming separate boundaries; propose task splits before implementation.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/task-coverage.json",
+              "line": 1,
+              "message": "AC-06 and AC-07 are mapped only to T015, but T015 describes integration regressions and does not include a catalogue-lint validation step, canonical review-results check, or `cargo make ci-track` validation. These acceptance criteria therefore lack a plausible completing task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e555c14c6b0d11ad616825b473b4a707019cc4355c5f27f16204277cde9241cb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:24:40Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 1,
+              "message": "T001 removes the composition root’s public execution methods (`no public execution methods`) but does not update the existing CLI callers; those updates begin in T002–T027. Therefore batch B1 cannot remain CI-green as required by CN-02. Move the caller migration into T001 or make the command tasks precede/remain part of the same compiling batch.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:50f0c126dd89bb4bfc583248a82a646ef7c404d041ea04ed2243805785dc8a79",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:28:14Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 1,
+              "message": "T001 adds the contract-like prose “with shared typed inputs while preserving the existing caller-facing execution-method surface.” This restates upstream type/behavior requirements instead of limiting the task text to target + operation + anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 1,
+              "message": "T029 adds the outcome requirement “recording only a zero-findings, CI-green completion,” which restates AC-07 in the task description. Keep the validation commands and anchor, but remove the duplicated acceptance-contract prose.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1fc86ba542fb0b3544ff9da3c5e47827ab83df6abf1e2ee49d35084fb5d06e20",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:30:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf6586a031ee1a45a38a3ae83c34ea6c0df8719052d9ee43095f382122321ff0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T07:43:22Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/task-contract.json",
+              "line": 5,
+              "message": "T001 is attributed final ownership of `TrackCompositionRoot` and `TrackDriver`, but their catalogue shapes reference services/drivers introduced only by T002–T027 (`TrackInitService`…`TrackViewsValidateService`, `TrackTdddDriver`, and `TrackResolutionDriver`). Because T001 runs first and every migration task depends on it, these entries cannot conform at T001 completion while remaining CI-green. Move convergence ownership to a post-migration task such as T028, or restructure the task order and boundaries.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/task-contract.json",
+              "line": 27,
+              "message": "T023 owns the aggregate `TrackTdddDriver` and `TrackTdddInput`, but its lint-only task precedes T024–T026. Those catalogue shapes require the ContractMap, SpecElementHash, and TypeGraph inputs/services owned by those later tasks, so they cannot converge when T023 completes without implementing undocumented future-task work. Attribute the aggregates after T026 or reorder/rescope the tasks.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/task-contract.json",
+              "line": 31,
+              "message": "T027's attributed usecase entries declare module `track_lifecycle::resolution_compat`, its primary adapter declares `cli_driver::track_resolution`, and it owns an infrastructure adapter, but the task instead targets `libs/usecase/src/track_resolution.rs` and `apps/cli-composition/src/track/resolution.rs` without naming the required usecase, CLI-driver, or infrastructure targets. The described implementation therefore cannot converge with its attributed catalogue entries; align the task targets and operations with those declared modules.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 30,
+              "message": "T027 bundles four independently verifiable units: establishing the resolution boundary/wiring (IN-04/AC-04) and separately migrating the ADR-baseline, review-v2, and task-contract consumers (each IN-04/CN-01/AC-05). Each consumer has a distinct write target and focused regression surface while the old helpers can remain until T028. Split the foundation and consumer migrations into independently committable tasks before implementation starts.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 37,
+              "message": "Sections S1–S4 restate upstream sequencing and behavior in prose (for example, “before any caller migration”, “independently through…”, and “after their driver is wired”) instead of limiting themselves to concrete targets, operations, and anchor citations. Replace these restatements with target/operation/cite descriptions as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cf6586a031ee1a45a38a3ae83c34ea6c0df8719052d9ee43095f382122321ff0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:50:27Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 30,
+              "message": "T027 still bundles independently verifiable units: establish the resolution boundary/wiring and migrate the ADR-baseline, review-v2, and task-contract consumers. Each consumer has a distinct write target and its own AC-05 regression surface while the legacy helpers can remain until T028. Split this into a foundation-plus-first-consumer task and separate review-v2 and task-contract migration tasks; each should cover IN-04/CN-01/AC-05, with T028 depending on all of them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9312a14b8552660fd39970c148d4436b75648a91ea56242fd380d20b67b59f91",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T08:02:31Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 1,
+              "message": "`plan.summary` says `GO-01 → T001–T029`, but the current plan also contains T030 and T031, which implement two IN-04 resolution-consumer migrations. Goal-to-task traceability therefore omits these tasks; update the summary to include them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6534c5585d5a7362fa2351a75b2f7f104cceff2826034797775168cb05bdbd32",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T08:04:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5faaac87ee908c21492f94141fb04bc8c7d940d37e100583403153c4231dc18",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T08:09:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5faaac87ee908c21492f94141fb04bc8c7d940d37e100583403153c4231dc18",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-16T07:09:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:52ee7cf146421708e2aa3d712e1842d08837c99fd718eaa5213f9dd215d0b9c5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T07:12:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:52ee7cf146421708e2aa3d712e1842d08837c99fd718eaa5213f9dd215d0b9c5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-15T14:02:45Z",
+          "findings": [
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json",
+              "line": 119,
+              "message": "CN-03 は「適切な command-context module」の判定基準を定義していないため、型設計・実装計画が配置の意味を独自に補う必要があり、観測可能な制約になっていません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5ac5ab55b09c1554e7538e50bc56a130d7a760a9a8aeb09b99efc673ba1faf03",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T14:05:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d75301af4f5c2f15ecf2d75e4ca9230a7a971c5096b902769af3498d67edd6ac",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:11:06Z",
+          "findings": [
+            {
+              "category": "goal not anchored to an ADR decision",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json",
+              "line": 147,
+              "message": "GO-01's “standalone reviewable and CI-green delivery unit” completion condition is unsupported by its cited decisions. The cited D4 covers CLI compatibility, D5 covers execution-path convergence, and realignment D1 covers wiring-only composition roots; none establishes track independence or CI-green integration. Those requirements appear in the initiative ADR's D2/D7, but GO-01 does not cite them, leaving part of the goal unanchored.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d75301af4f5c2f15ecf2d75e4ca9230a7a971c5096b902769af3498d67edd6ac",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T14:14:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:38f1ad4020895bd65757268846056ad6fd677e6cec74a51871099af8f6b957a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:19:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2005bbb38f7ff61cd811ea2b7bc646be83a633b5d88958cedea155e9cf239f3b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T14:22:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2005bbb38f7ff61cd811ea2b7bc646be83a633b5d88958cedea155e9cf239f3b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T03:43:13Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json",
+              "line": 83,
+              "message": "AC-07 は「canonical review results」や「他の未統合 migration track を必要とせず」の判定方法・成果物を特定しておらず、実装完了時に再現可能な deterministic check として観測できません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d5929b942dac5e9bc8f0b1e912aca20da6df831792f27db48093ddbd737f1975",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T03:45:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ed13c8921c712007c8f90c34f625767a78ece1e1f9deb3263cd1e8d568a08ec3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T03:50:29Z",
+          "findings": [
+            {
+              "category": "goal not anchored to an ADR decision",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json",
+              "line": 139,
+              "message": "GO-01 still includes “standalone reviewable and CI-green delivery unit” as part of the completion state, but none of its cited decisions supports that clause: initiative D4 covers external CLI compatibility, D5 covers removal of pure-DI deviations, and boundary-rules D1 covers wiring-only composition. The ADR passages mentioning standalone review/CI are D2/D7, which the current briefing explicitly classifies as non-binding implementation-procedure records that cannot ground later spec claims. This leaves part of the goal outside the cited decision space.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ed13c8921c712007c8f90c34f625767a78ece1e1f9deb3263cd1e8d568a08ec3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T03:54:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75997140cd64d5394e26016065ee9a8f5dfd921b6f06d9e81773bda96d4ee3fc",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-15T15:42:39Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 1701,
+              "message": "All per-command error types (e.g. `TrackAddTaskError`) include `InvalidCommand`, but every service accepts an already validated Command. The catalogue does not identify any path that can construct this variant, making the shared error surface structurally imprecise.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 990,
+              "message": "`TrackCommitHashPort`, `TrackMetadataPort`, and `TrackViewsPort` are synchronous despite declaring Git/filesystem I/O, while their docs do not acknowledge the synchronous choice. This leaves the port color contract ambiguous for adapters.",
+              "severity": "P1"
+            },
+            {
+              "category": "duplicated structural declaration",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 3155,
+              "message": "`TrackSelection` and `TrackViewsSyncScope` declare identical `Active`/`Explicit(domain::TrackId)` enums with the same role and invariants, but both are added independently rather than sharing one structural declaration or using a reference.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:30c8861c4a55abbc4c376de667fc475d663be98f26929122c57a42ecd85f0872",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:17:58Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/cli_composition-types.json",
+              "line": 10,
+              "message": "`cli_composition::TrackCompositionRoot.docs` and `cli_driver::TrackDriver.docs` restate upstream behavior contracts (wiring-only composition root; validate/invoke/render primary adapter) instead of describing the change plus anchor. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 1630,
+              "message": "The 15 command entries, including `usecase::TrackAddTaskCommand`, repeat the upstream validation/conversion contract (“Validated... all concept-bearing CLI inputs are converted before service execution”) in `docs`. This should be represented by the existing spec anchors, not duplicated prose. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c4a7170057fdbec7d7243e27488d9764e22fa37be8f718f7de13c146080dd5c1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T16:47:34Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 2486,
+              "message": "`usecase::TrackIdInput`, `usecase::TrackItemsDirectory`, and `usecase::TrackWorkspaceRoot` restate validation/enforcement behavior in `docs` instead of referencing the upstream contract by anchor. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 1687,
+              "message": "The command error entries, including `usecase::TrackAddTaskError`, repeat the presentation contract (“opaque diagnostic payloads for driver presentation”) in `docs`. This upstream behavior should remain in the spec and be referenced by anchor. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 3008,
+              "message": "`usecase::TrackResolveResult.docs` explains the design rationale that enum variants make blocker-only data structurally exclusive, restating an upstream type-shape contract. See `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:75a078492be9bedb75bcdcbca619be4db709a90d0880353fe47abc92f6ee35ba",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T17:09:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cbe02199292615d03c971a339c788dcaa152f797be44fde5390224635c2edad3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T17:24:04Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/cli_composition-types.json",
+              "line": 18,
+              "message": "`cli_composition::TrackCompositionRoot` is a full-shape `modify` declaration but lists only `new` and `track_driver`. This implicitly removes the public methods defined in `track/tddd*.rs`, although `OUT-01` explicitly leaves those contexts untouched. The implementation cannot both match this catalogue and preserve the out-of-scope surface.",
+              "severity": "P1"
+            },
+            {
+              "category": "enforcement-owner contradiction",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+              "line": 132,
+              "message": "`cli_driver::TrackDriver::handle_set_commit_hash` requires `usecase::TrackIdInput`, which the production `cli` layer cannot depend on and which is not re-exposed through a driver-owned input. Conversely, `TrackTransitionCommand`, `TrackAddTaskCommand`, and `TrackSetOverrideCommand` require domain-only `TaskId`, `TaskTransition`, or `StatusOverrideKind` values but declare no usecase constructors or conversion functions. No legal delivery-layer caller can construct every validated command, leaving boundary validation without an owner.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 180,
+              "message": "`usecase::TrackBranchSwitchInteractor`, `TrackBranchCreateInteractor`, `TrackArchiveInteractor`, and `TrackSwitchBaseInteractor` inject `Arc<dyn GitWorkflowService>`, but the baseline trait has no branch-create, branch-switch, archive, workspace-scoped Git, or metadata-snapshot operations. No `modify` entry or replacement port supplies those capabilities, so these interactors cannot implement their declared execution paths from their collaborators.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 130,
+              "message": "`usecase::TrackInitInteractor` receives a preconstructed `BranchStrategyPort`, while the resolution interactors receive a preconstructed `ActiveTrackResolveService`; neither baseline contract accepts `TrackItemsDirectory` or `TrackWorkspaceRoot`. Since `TrackCompositionRoot::track_driver()` wires them before seeing command input, they cannot select the repository/config identified by `--items-dir` or `--project-root`, causing non-CWD invocations to resolve against the wrong workspace.",
+              "severity": "P1"
+            },
+            {
+              "category": "mirror chain divergence",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 4027,
+              "message": "`usecase::TrackViewsSyncCommand.scope` uses `TrackSelection::{Active, Explicit}`, and `TrackViewsPort::sync` always requires a `TrackId`. The existing `TrackInput::ViewsSync` contract also supports registry-only synchronization when no active track exists, but the new command/port chain has no corresponding state. Synchronization on `main` or another non-track branch therefore cannot preserve the current behavior.",
+              "severity": "P1"
+            },
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 1763,
+              "message": "`usecase::TrackAddTaskResult` carries the new task's `TaskStatusKind` but drops the derived `TrackStatus` that the existing command prints as `track status`. The primary adapter cannot reconstruct that aggregate status from the command or task status without re-querying application state, so the declared result cannot preserve `CN-01` stdout.",
+              "severity": "P1"
+            },
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 3006,
+              "message": "`usecase::TrackResolveResult::Blocked` omits `phase` and provides only one `reason` field, while the lower-layer resolve output contains `phase`, `reason`, `next_command`, and a separate optional blocker; the current blocked-path stdout prints all four. The driver must therefore discard either the reason or blocker as well as the phase.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cbe02199292615d03c971a339c788dcaa152f797be44fde5390224635c2edad3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T18:30:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91ad97411779b3cc88078c0914d1d15bb976a9aecd43a2466c712c387f9704e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T18:44:44Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/cli_composition-types.json",
+              "line": 21,
+              "message": "`cli_composition::TrackCompositionRoot` is a full-shape `modify`, but its method list omits `track_resolve_id`, `track_resolve_id_from_root`, `track_resolve_id_for_write`, and `track_resolve_id_from_root_for_write`. These APIs remain live in the out-of-scope ADR-baseline and review-v2 support contexts covered by OUT-02/OUT-03, so the declared post-shape either breaks surviving callers or requires undeclared public methods.",
+              "severity": "P1"
+            },
+            {
+              "category": "Interface Segregation violation",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 163,
+              "message": "`usecase::TrackTransitionInteractor`, `TrackAddTaskInteractor`, `TrackSetOverrideInteractor`, and `TrackClearOverrideInteractor` inject the existing four-method `TaskOperationService`; the query interactors similarly retain `TaskQueryService`. The command-specific boundaries therefore still delegate through bundled application-service interfaces instead of directly depending on operation-specific ports, preserving the facade behind the new one-method services and forcing command-local implementations or mocks to provide unrelated methods.",
+              "severity": "P1"
+            },
+            {
+              "category": "sync/async color mismatch",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 1110,
+              "message": "`usecase::TrackBranchStrategyPort` and `usecase::TrackSelectionPort` are synchronous ports whose methods require filesystem/config and Git resolution, respectively, but their docs do not acknowledge the synchronous blocking-I/O choice. Their corresponding `FsTrackBranchStrategyAdapter` and `GitTrackSelectionAdapter` make the I/O color explicit, leaving the port contract ambiguous.",
+              "severity": "P1"
+            },
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 2111,
+              "message": "`TrackAddTaskResult`, `TrackTransitionResult::Transitioned`, `TrackSetOverrideResult`, and `TrackClearOverrideResult` represent view synchronization only as `Vec<RenderedViewPath>`. Existing behavior treats a post-persistence sync failure as command success with a diagnostic warning; an empty vector cannot distinguish that state from “already current,” while returning the diagnostic through the outer error would incorrectly change the exit status. The successful result path needs a typed warning/sync outcome.",
+              "severity": "P1"
+            },
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 2308,
+              "message": "`usecase::TrackArchiveResult.source` and `.destination` use `RenderedViewPath`, whose declared semantics are specifically a rendered-view path. Archive source and destination are track directories, so this reuse defeats the value object's semantic boundary and allows archive locations to be represented as rendered views; use an archive/directory path type instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:91ad97411779b3cc88078c0914d1d15bb976a9aecd43a2466c712c387f9704e1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T05:07:00Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 6672,
+              "message": "`TrackResolutionCommand::DetectActive` can produce a valid inactive result, and `cli_driver::TrackResolutionOutcome` exposes `Inactive`, but `TrackResolutionService::execute` returns `Result<TrackResolutionResult, TrackResolutionCompatError>` where `TrackResolutionResult` always requires `track_id` and the only error is `Unavailable(DiagnosticText)`. The driver therefore cannot distinguish valid inactivity from failure while preserving diagnostics; one state must be lost.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4bbe1ed19e38844157e6dd4dc63738f67e713f8eea685a1a03911f8491525354",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T05:32:15Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 6672,
+              "message": "`TrackResolutionCommand::DetectActive` can produce a valid inactive result, and `cli_driver::TrackResolutionOutcome` exposes `Inactive`, but `TrackResolutionService::execute` returns a `TrackResolutionResult` that always requires `track_id`, with only `Unavailable(DiagnosticText)` as an error. The driver cannot distinguish valid inactivity from failure while preserving diagnostics; one state must be lost.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5d2f72c1437a1c33a3adcaaa8d45d8b1547787ac4f9d837a1fbb3667d2f5ab68",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T05:37:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d2f72c1437a1c33a3adcaaa8d45d8b1547787ac4f9d837a1fbb3667d2f5ab68",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:51:00Z",
+          "findings": [
+            {
+              "category": "Interface Segregation violation",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+              "line": 367,
+              "message": "`cli_driver::TrackDriver::new` still requires `legacy_track_service: Arc<dyn usecase::TrackService>`. This is the existing 16-operation bundled input port that the design requires dismantling; retaining a runtime dependency violates AC-04 and forces the driver to depend on operations already represented by narrow per-command services. OUT-03 permits unused compatibility definitions to remain, not active references. Remove this collaborator and route the remaining `TrackInput` variants through the narrow TDDD/resolution boundaries.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+              "line": 1156,
+              "message": "`cli_driver::TrackTdddInput` declares routes for only nine TDDD operations and omits the existing `TrackCompositionRoot::track_type_graph` execution method. No corresponding TypeGraph input, command, result, service, interactor, port, or adapter exists elsewhere in the scope. Because `TrackCompositionRoot`'s modified surface removes the original method, the required 34-method migration has no driver path that can preserve its current removed-command diagnostic.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/cli_driver-types.json",
+              "line": 478,
+              "message": "The docs for `cli_driver::TrackItemsDirectoryInput`, `TrackLayerInput`, `TrackLayersInput`, `TrackLintRulesFileInput`, `TrackSourceWorkspaceInput`, `TrackSpecAnchorInput`, and `TrackWorkspaceRootInput` restate AC-03 behavior by specifying validation/parsing before boundary conversion. Under `.harness/policies/no-upstream-restatement.md`, these entries must use a short identifying phrase and rely on `spec_refs` instead of reproducing that behavior contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 4351,
+              "message": "The docs for `usecase::TrackBaselineCaptureLayerResult`, `TrackBaselineCaptureResult`, `TrackCatalogueSpecSignalsResult`, `TrackLayerSignalResult`, `TrackResolutionResult`, and `TrackTypeSignalsResult` explain their variant/field semantics and the rendering behavior guaranteed by AC-03/CN-01 or IN-04/CN-01. This reproduces upstream behavior and type-shape contracts rather than using anchor-backed identifying noun phrases, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5d2f72c1437a1c33a3adcaaa8d45d8b1547787ac4f9d837a1fbb3667d2f5ab68",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:38:48Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 8659,
+              "message": "`TrackTdddInput::TypeGraph` and `TrackTypeGraphService` expose a callable TypeGraph command, but `TrackTypeGraphResult` is an enum with zero variants and `TrackTypeGraphError` only has `RemovedCommand`. Consequently every advertised TypeGraph execution is unrepresentable as success and can only fail, leaving the driver/service contract incoherent.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:85649f56b3ad4fc23035d295ada3a67d889f5508c5e9373bdd7a57ca5d31a01e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:44:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:85649f56b3ad4fc23035d295ada3a67d889f5508c5e9373bdd7a57ca5d31a01e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:55:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:85649f56b3ad4fc23035d295ada3a67d889f5508c5e9373bdd7a57ca5d31a01e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

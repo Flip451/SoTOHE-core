@@ -1,0 +1,891 @@
+{
+  "catalogue_declaration_hash": "3c3c7f18c1845d0b87555c1fbdebf5336fac460ab00fa0333f8a619e1b08c10e",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "6bcbdffd63680217512fda9f63677dc7f7d59db1eb5b20fca3de99eb7973c74d",
+      "signal": "blue",
+      "type_name": "ProcessExitCode"
+    },
+    {
+      "entry_hash": "9737c9c5edd7efc7db50f8f4a82a81016c79a7402b659bfda736c86294b47dd8",
+      "signal": "blue",
+      "type_name": "RenderedViewPath"
+    },
+    {
+      "entry_hash": "f10d987224b3f02f5b20b751f0a18f836ed04529f47596bc5c64cda79e70646f",
+      "signal": "blue",
+      "type_name": "TaskCount"
+    },
+    {
+      "entry_hash": "babc7af06fd6b308304033758697c9991524fe34d9ff8fcab1451646ba50df21",
+      "signal": "blue",
+      "type_name": "TrackAddTaskCommand"
+    },
+    {
+      "entry_hash": "2e3d3e169445afe51479fa1d32fcc14d826337ddf041c3c88a44a14177c5a9fe",
+      "signal": "blue",
+      "type_name": "TrackAddTaskError"
+    },
+    {
+      "entry_hash": "af4d92897247c36bd936604e9cd488718dd9f7f61b6ba4a35b5e80bd1f9f4a58",
+      "signal": "blue",
+      "type_name": "TrackAddTaskInteractor"
+    },
+    {
+      "entry_hash": "f3d9916c6255eec56c6eda85df65dc0e56669ce63ee7d86929df3001af256ebd",
+      "signal": "blue",
+      "type_name": "TrackAddTaskResult"
+    },
+    {
+      "entry_hash": "e6269ef05a1e5cbc5530db8ba9a1a35882009051f0437b167600b953b5982971",
+      "signal": "blue",
+      "type_name": "TrackArchiveCommand"
+    },
+    {
+      "entry_hash": "5cce908f4a25f8708a836912a75761246f9614c07d830425dc6540071d319085",
+      "signal": "blue",
+      "type_name": "TrackArchiveError"
+    },
+    {
+      "entry_hash": "e78a56c1537e6a9673cc83c7eccd62cb1ebf48763989c88574e057b78acc55cf",
+      "signal": "blue",
+      "type_name": "TrackArchiveInteractor"
+    },
+    {
+      "entry_hash": "04e8f060f0c41de12cdbc7758edcf3da794f59c2fc4ce009d1569fb8e8ac0d87",
+      "signal": "blue",
+      "type_name": "TrackArchiveResult"
+    },
+    {
+      "entry_hash": "abee1088f18b314123496dfb44971920b6feb978fd6f0d39ca99f160d290ca0c",
+      "signal": "blue",
+      "type_name": "TrackBaselineCaptureCommand"
+    },
+    {
+      "entry_hash": "cb055a3e83088fed14f1ba76bba10952881f1b3bbe7cbbb059287277e3b36108",
+      "signal": "blue",
+      "type_name": "TrackBaselineCaptureError"
+    },
+    {
+      "entry_hash": "b70947a904ff15638f2b7733a4473d8ecfc86626dc325768666a3d1b0a7887df",
+      "signal": "blue",
+      "type_name": "TrackBaselineCaptureInteractor"
+    },
+    {
+      "entry_hash": "5c8510c1c274ab311186feddd1627b978a2c4b91ecf77e538d5b54e8fad628f0",
+      "signal": "blue",
+      "type_name": "TrackBaselineCaptureLayerResult"
+    },
+    {
+      "entry_hash": "361b0323def3476efe9280250d6dd9cb121ad4e91a32914fe3d6a23584972e1c",
+      "signal": "blue",
+      "type_name": "TrackBaselineCaptureResult"
+    },
+    {
+      "entry_hash": "3f125cf5511ec6c640afc62e98c1c002aa314684492d85d03d7c173ec36c3a11",
+      "signal": "blue",
+      "type_name": "TrackBaselineGraphCommand"
+    },
+    {
+      "entry_hash": "a517b6dbf385411e132ab697db634da9c131d7099662083d3a76804efe9ca519",
+      "signal": "blue",
+      "type_name": "TrackBaselineGraphError"
+    },
+    {
+      "entry_hash": "3fc60e08319603ade3458e27b17f04809e09e71b84c2329a92e0d102761cc908",
+      "signal": "blue",
+      "type_name": "TrackBaselineGraphInteractor"
+    },
+    {
+      "entry_hash": "35aca8cb3a7a75c14ac8616e758222ed62574c7eb7923dd6fb764d6043689f3b",
+      "signal": "blue",
+      "type_name": "TrackBaselineGraphResult"
+    },
+    {
+      "entry_hash": "5585673dd8f303fe0f242d54e9c396e89881f3077be7055953aa424a64eeb07c",
+      "signal": "blue",
+      "type_name": "TrackBranchCreateCommand"
+    },
+    {
+      "entry_hash": "4947fc8c7b53fca1726e54ae6ee61e3a0345d3344ecce4a9803b0935c2a1a341",
+      "signal": "blue",
+      "type_name": "TrackBranchCreateError"
+    },
+    {
+      "entry_hash": "c9b8ffc5b23f916e9db45b004149d146d4b32d889b7302548914c404759bff2a",
+      "signal": "blue",
+      "type_name": "TrackBranchCreateInteractor"
+    },
+    {
+      "entry_hash": "d6202d02df63cf7e381fa0eb5c515c65fb98653c4edf1ed08f9d0a9a8ad3a0e8",
+      "signal": "blue",
+      "type_name": "TrackBranchCreateResult"
+    },
+    {
+      "entry_hash": "4f2c0144bb2ecc20dfde90ba29e795dac02fd43bcd596bb87b98eb02161e8b16",
+      "signal": "blue",
+      "type_name": "TrackBranchSwitchCommand"
+    },
+    {
+      "entry_hash": "4a5d33000915b8b454e6a7f4d2af5f19309efa5f9821aa2e4c916369086cadb9",
+      "signal": "blue",
+      "type_name": "TrackBranchSwitchError"
+    },
+    {
+      "entry_hash": "ba4b5ad6fc3a2f313a059062f10f98c4e38daf865048c665f197d6d917b9b162",
+      "signal": "blue",
+      "type_name": "TrackBranchSwitchInteractor"
+    },
+    {
+      "entry_hash": "7de4d3931dd043d03c52e0c1b15eaae8c94fc9f9935a13cb205c7882ae42a64b",
+      "signal": "blue",
+      "type_name": "TrackBranchSwitchResult"
+    },
+    {
+      "entry_hash": "bfa38d703da63f8ce94bc49e35bdaaddb7d1ac7561506f1ed2ee7850c07d2eb7",
+      "signal": "blue",
+      "type_name": "TrackCatalogueEntryCount"
+    },
+    {
+      "entry_hash": "d964255b1ca940a04bd9c77dafe3b2a7259df62c83c6b6be16a3ef41a8f6f312",
+      "signal": "blue",
+      "type_name": "TrackCatalogueImplLayerResult"
+    },
+    {
+      "entry_hash": "87d10c53ef1ea2b41b819977de6af9dc897bfab9e78b66f022c10ebc761ea702",
+      "signal": "blue",
+      "type_name": "TrackCatalogueImplSignalsCommand"
+    },
+    {
+      "entry_hash": "1f5845b69e9d92bb3862e2ed23e54e5765b8af0d872c1130f983b15c9dbce31d",
+      "signal": "blue",
+      "type_name": "TrackCatalogueImplSignalsError"
+    },
+    {
+      "entry_hash": "23c8ac07f7616c98d160a16eb4898099b8a86d6a40f6b2b0faf0445164c018f3",
+      "signal": "blue",
+      "type_name": "TrackCatalogueImplSignalsInteractor"
+    },
+    {
+      "entry_hash": "14e838a75224cfc5073cd43c2163e8d017794a22bfe8cbde340d18b764088ff8",
+      "signal": "blue",
+      "type_name": "TrackCatalogueImplSignalsResult"
+    },
+    {
+      "entry_hash": "49a9a088d6efdc2c508c01cd6b8c300f137f1cdae92f75be20a0f34247373cc4",
+      "signal": "blue",
+      "type_name": "TrackCatalogueLintActiveCommand"
+    },
+    {
+      "entry_hash": "9c3b32af8d63b204a41476ce52ec05af2c8af35393a9c2ff17c4990e4142aad1",
+      "signal": "blue",
+      "type_name": "TrackCatalogueLintActiveError"
+    },
+    {
+      "entry_hash": "95a437613abe681487e93ffe21f57fc4a63dbcb4e6710bf72a1a987dc21e2711",
+      "signal": "blue",
+      "type_name": "TrackCatalogueLintActiveInteractor"
+    },
+    {
+      "entry_hash": "666ff4e71b50236caa9fd5dc698ae1ddef55aa804c1074d8f69a9ed986e408b3",
+      "signal": "blue",
+      "type_name": "TrackCatalogueLintActiveResult"
+    },
+    {
+      "entry_hash": "93a788059df60fa575038dfd7ab4dbf468b928ee4c23c8864068e301ce42435f",
+      "signal": "blue",
+      "type_name": "TrackCataloguePath"
+    },
+    {
+      "entry_hash": "b6e8fca53a366db92d6a3957fe73d7f0e9535f72c1a08b295b83c377ca8ee27e",
+      "signal": "blue",
+      "type_name": "TrackCatalogueSpecSignalsCommand"
+    },
+    {
+      "entry_hash": "3309c6d4e713d9c39043f17c6b298f6b6972b1d60698d9454105bcca8da5a2d2",
+      "signal": "blue",
+      "type_name": "TrackCatalogueSpecSignalsError"
+    },
+    {
+      "entry_hash": "b7fd70127aafd51bc98b930e989cf5813483a46e4a434ce2818e053503eecd38",
+      "signal": "blue",
+      "type_name": "TrackCatalogueSpecSignalsInteractor"
+    },
+    {
+      "entry_hash": "a29a42d02704df331cb404ffc5a5c5aab1105fefaf812cdb3665406cbd40e7f2",
+      "signal": "blue",
+      "type_name": "TrackCatalogueSpecSignalsResult"
+    },
+    {
+      "entry_hash": "3bae58a3de021ce8954c58ff3d24795307b316c64bd27b5d3ca727efbdf10e87",
+      "signal": "blue",
+      "type_name": "TrackClearOverrideCommand"
+    },
+    {
+      "entry_hash": "c5b8baa50608ffc4574249f9c437d27a70f0cc6f366e981d6a80f3cda822b0a2",
+      "signal": "blue",
+      "type_name": "TrackClearOverrideError"
+    },
+    {
+      "entry_hash": "6040187a22fb2f1b82adc73e6b928359057ee307ede218bdc7eb0650036293e8",
+      "signal": "blue",
+      "type_name": "TrackClearOverrideInteractor"
+    },
+    {
+      "entry_hash": "49b1050cb1c43641e306d8d51eabe9c724c8a9e880876933a981c12b9ba12f10",
+      "signal": "blue",
+      "type_name": "TrackClearOverrideResult"
+    },
+    {
+      "entry_hash": "2ce70ea9a0b73dd7f9bc922376457652a4ca4c8d00bf948095ca4f42efe07c67",
+      "signal": "blue",
+      "type_name": "TrackContractMapCommand"
+    },
+    {
+      "entry_hash": "d5d38099459646ff020d0978e8513c53f5e9cd3b249e128709f6fc28b6704802",
+      "signal": "blue",
+      "type_name": "TrackContractMapError"
+    },
+    {
+      "entry_hash": "fd851c351bca759b9c1eafb1d12e8bf36efca05c73ab5191ab34a46025baa5cb",
+      "signal": "blue",
+      "type_name": "TrackContractMapInteractor"
+    },
+    {
+      "entry_hash": "f1cccb9825cfa548f9187c3bba5b63e031503eebba3f4129845a08987e7da248",
+      "signal": "blue",
+      "type_name": "TrackContractMapResult"
+    },
+    {
+      "entry_hash": "5ad550db25c694879174b8d1bc0213053c370158ca01ce308523914706008df6",
+      "signal": "blue",
+      "type_name": "TrackDirectoryPath"
+    },
+    {
+      "entry_hash": "f6dcddc10b523bb75c0f1dc703083721e36ba9b4af8d922f575fd799a6414fd2",
+      "signal": "blue",
+      "type_name": "TrackIdInput"
+    },
+    {
+      "entry_hash": "3f236ea7adf318c073d060e1fa8c2be990698aea444d114665d6ff1caa882a87",
+      "signal": "blue",
+      "type_name": "TrackInitCommand"
+    },
+    {
+      "entry_hash": "93f11b1dddf3ddcd80913026bbea057085d2273edcf6d282c865dc15c75720b5",
+      "signal": "blue",
+      "type_name": "TrackInitError"
+    },
+    {
+      "entry_hash": "ac7a9412999bb43061419e5a587222c29ba663a4120239bb5c107a2334a14905",
+      "signal": "blue",
+      "type_name": "TrackInitInteractor"
+    },
+    {
+      "entry_hash": "425f41e1e5de9b03ccdd2ff404645bbde13a36167b12f1b6fab36be22eb748ff",
+      "signal": "blue",
+      "type_name": "TrackInitResult"
+    },
+    {
+      "entry_hash": "68a0006f1f52f50ccc3d41a7309e20f19714ef29602bbf999719c07c4e06ce2a",
+      "signal": "blue",
+      "type_name": "TrackItemsDirectory"
+    },
+    {
+      "entry_hash": "a442b51c2dc602327bcf06b60cf0e7c6d376f3861ccc0296e1efaa696de2c733",
+      "signal": "blue",
+      "type_name": "TrackLayerFilter"
+    },
+    {
+      "entry_hash": "090d3c377ba3d58e3e5a46020a3f781f5d535ffcaba5d12642ff5e5b6c61dcae",
+      "signal": "blue",
+      "type_name": "TrackLayerSelection"
+    },
+    {
+      "entry_hash": "33fe64cb990d72d6ca89c1fd9ed7e1428808016a4486d2a046049eb5dcf84e74",
+      "signal": "blue",
+      "type_name": "TrackLayerSignalResult"
+    },
+    {
+      "entry_hash": "051ef545c293c206a8760434fdce10464b5cda4179fef4a438e789cb5758e475",
+      "signal": "blue",
+      "type_name": "TrackLintCommand"
+    },
+    {
+      "entry_hash": "643d1edebcc36bae8ce04ae11bf17a5d12bd3a93c536370bee840b6f10ca90fb",
+      "signal": "blue",
+      "type_name": "TrackLintError"
+    },
+    {
+      "entry_hash": "e1faba2f7058f809a583ed5cc48c323ae113a3ce79ef1e5e1a0a9f92cd894967",
+      "signal": "blue",
+      "type_name": "TrackLintInteractor"
+    },
+    {
+      "entry_hash": "6073992894d6473552bd7de4a5d74cc0ffb57dccb9b36eb2880e0e3a2e8f9928",
+      "signal": "blue",
+      "type_name": "TrackLintResult"
+    },
+    {
+      "entry_hash": "e9926443d7b6c279d97bacf8fd9e39543ea5059ef780940f3663e7e657588503",
+      "signal": "blue",
+      "type_name": "TrackLintRulesFile"
+    },
+    {
+      "entry_hash": "bfd38543b96efbf72e570bf864005c124b65a289b34880792e5e40a6e96e5b2a",
+      "signal": "blue",
+      "type_name": "TrackNextTaskCommand"
+    },
+    {
+      "entry_hash": "2369883267df1f714622e888b57f153653c403143d7ae362d193c036c369a213",
+      "signal": "blue",
+      "type_name": "TrackNextTaskError"
+    },
+    {
+      "entry_hash": "3a700b87af658ca1c813468b0149aa5f4d7b4b784b211a19a6883b20ca94122c",
+      "signal": "blue",
+      "type_name": "TrackNextTaskInteractor"
+    },
+    {
+      "entry_hash": "36868070251ed3d26524c9b9d3da3753766c1a689ed88ab69ae43f11b47185ac",
+      "signal": "blue",
+      "type_name": "TrackNextTaskResult"
+    },
+    {
+      "entry_hash": "e003f888e80056652d35d60f4ab6618593adf0fb9f5381d87ca51d33077d01a9",
+      "signal": "blue",
+      "type_name": "TrackRenderedLayerCount"
+    },
+    {
+      "entry_hash": "64fb7f2d44e570f6c54eb1465eb53379bc3f113e71ce4dcb2f50440d0571e573",
+      "signal": "blue",
+      "type_name": "TrackResolutionCommand"
+    },
+    {
+      "entry_hash": "d7e07083f454100cf555aac547a19bdc97cd8e9abe0f3987f93cb96a6b03379e",
+      "signal": "blue",
+      "type_name": "TrackResolutionCompatError"
+    },
+    {
+      "entry_hash": "941770af0d283e4f1b8f6e5f35fb19df58fad70ddcb9e20b4f5c393ad6e83211",
+      "signal": "blue",
+      "type_name": "TrackResolutionInteractor"
+    },
+    {
+      "entry_hash": "d14295641248a94f5d818dae3c1c16704fdc42ebbc7e609e31b9b2021a89b803",
+      "signal": "blue",
+      "type_name": "TrackResolutionResult"
+    },
+    {
+      "entry_hash": "f3685b6ab2ae4c06d58515ef27fc197cbc1d634ead0325bbbe7ea9a8c2858de8",
+      "signal": "blue",
+      "type_name": "TrackResolveCommand"
+    },
+    {
+      "entry_hash": "937ceca8a57ea3d00c9b31b10780976eed95e8638beec8e3e68d4487adf28628",
+      "signal": "blue",
+      "type_name": "TrackResolveError"
+    },
+    {
+      "entry_hash": "21218ff5f4a6b9053afa2e9ee94ff08143e0e26d8e3078706cdda81d3d792d6e",
+      "signal": "blue",
+      "type_name": "TrackResolveInteractor"
+    },
+    {
+      "entry_hash": "327a02eea815541cfc0804192e33fbee1f2cda7ad05858753824c7c542784a0e",
+      "signal": "blue",
+      "type_name": "TrackResolveResult"
+    },
+    {
+      "entry_hash": "a001fff25794777ff1900501c986b4ee3b7c050778ad692aacd8bcada47b1012",
+      "signal": "blue",
+      "type_name": "TrackSelection"
+    },
+    {
+      "entry_hash": "5d1bfe6450c5b286fc8f5b9448be681509cb48f6acfeb0f3526f8a43bba83be3",
+      "signal": "blue",
+      "type_name": "TrackSetCommitHashCommand"
+    },
+    {
+      "entry_hash": "50d7232cb4cea54e380efece00cd61afa7b8a9d8e13a04eafe9a94f0148a1f13",
+      "signal": "blue",
+      "type_name": "TrackSetCommitHashError"
+    },
+    {
+      "entry_hash": "ffa192dd8c42ef7de6b31c1080b21ff99c17f38b8b1e65fd5e0980c91d8e911a",
+      "signal": "blue",
+      "type_name": "TrackSetCommitHashInteractor"
+    },
+    {
+      "entry_hash": "799e942a0bdba1e11f1f65a9039c6a2967d1f10493932addc75734fbf805b0d5",
+      "signal": "blue",
+      "type_name": "TrackSetCommitHashResult"
+    },
+    {
+      "entry_hash": "7a7e90a72c5fb81a3f3b12802af1f7e23add30948ac4313eaf34c11902ad0ecf",
+      "signal": "blue",
+      "type_name": "TrackSetOverrideCommand"
+    },
+    {
+      "entry_hash": "19930c0b07dd1d598e7da4f8294f68902eb520b18f4a35fafab477b59aaf2844",
+      "signal": "blue",
+      "type_name": "TrackSetOverrideError"
+    },
+    {
+      "entry_hash": "de15f3cd16e085f3cc0ccaeb427a8b3e2b1f36b40182f3b7817f6342d25c8b79",
+      "signal": "blue",
+      "type_name": "TrackSetOverrideInteractor"
+    },
+    {
+      "entry_hash": "df20b0af3f2d681f2de7ea8f9edb925acd319060d62ad5b5bd3f73d7d25ed84b",
+      "signal": "blue",
+      "type_name": "TrackSetOverrideResult"
+    },
+    {
+      "entry_hash": "822e6e6a5c9cf16d6ec35f6f9c27285359ddc407d77318db1eca56f90c5fb0e5",
+      "signal": "blue",
+      "type_name": "TrackSourceWorkspace"
+    },
+    {
+      "entry_hash": "222e67c381ec264f786f8f5ed35814ccb8c0d43d011af82219dbcf6b39c3e3e2",
+      "signal": "blue",
+      "type_name": "TrackSpecAnchorSelection"
+    },
+    {
+      "entry_hash": "e9ed0c8799ccb9f2dc7db6aa3a3233e9204547c21333132f97d84c432d945c1c",
+      "signal": "blue",
+      "type_name": "TrackSpecElementHashCommand"
+    },
+    {
+      "entry_hash": "3d012bf1f9bc17483ca1ffc69391553f380d3213d85febe32f27dfd5eecabcb0",
+      "signal": "blue",
+      "type_name": "TrackSpecElementHashError"
+    },
+    {
+      "entry_hash": "1df45cb0de97d76a703b56b5d1caae8e592b19a03ce5d8557207a3efbb5f1f7d",
+      "signal": "blue",
+      "type_name": "TrackSpecElementHashInteractor"
+    },
+    {
+      "entry_hash": "0af4ba5c27643b7bea60e7825ac25f6e25fcf50ec168bb53f1af34eced89cf03",
+      "signal": "blue",
+      "type_name": "TrackSpecElementHashResult"
+    },
+    {
+      "entry_hash": "22bb4607e78a063cd1a2d882f0e0c897bb672ffe125db8e52ca2d8c400f78863",
+      "signal": "blue",
+      "type_name": "TrackSwitchBaseCommand"
+    },
+    {
+      "entry_hash": "f47d2df8d7a848c180136ffbd0aec6ac31e0099b33ed0b773fa19fa2bd042298",
+      "signal": "blue",
+      "type_name": "TrackSwitchBaseError"
+    },
+    {
+      "entry_hash": "5b6d3ce2233d4a3c37cae8c46d6d5f73cf695d1f8c8e8c2c91887722e24f131f",
+      "signal": "blue",
+      "type_name": "TrackSwitchBaseInteractor"
+    },
+    {
+      "entry_hash": "1fcfa0724ec802b1c34be6f551f7199f06d827c710fe6c8a911241184ab36bcf",
+      "signal": "blue",
+      "type_name": "TrackSwitchBaseResult"
+    },
+    {
+      "entry_hash": "6929c2b3af2a8b4c95eb93258e9ed479c308dc5e3794931cb21c150c4e516377",
+      "signal": "blue",
+      "type_name": "TrackTaskCountsCommand"
+    },
+    {
+      "entry_hash": "af5b2c8c73d75123dcd879320e60b8fcc0d7c5b847f88226f897eec355996bde",
+      "signal": "blue",
+      "type_name": "TrackTaskCountsError"
+    },
+    {
+      "entry_hash": "94129c0c03e4eae1a0d8204ea4852f399aceb8ac6776a345271eb76a3c34cb05",
+      "signal": "blue",
+      "type_name": "TrackTaskCountsInteractor"
+    },
+    {
+      "entry_hash": "ab9e5c55be6c48c91d88a2babd151d6b7bd521e2fc7c2586072504a56b89acbb",
+      "signal": "blue",
+      "type_name": "TrackTaskCountsResult"
+    },
+    {
+      "entry_hash": "aacdafa1ab3a4a2cb6f72b4f6ab68524e900b27b35172329e2b505e43817f88b",
+      "signal": "blue",
+      "type_name": "TrackTaskTransition"
+    },
+    {
+      "entry_hash": "135501fc9b8054ce69351d3a7f36e0a54efca599adb12dfa199d978afecd0cad",
+      "signal": "blue",
+      "type_name": "TrackTransitionCommand"
+    },
+    {
+      "entry_hash": "ffe8636238dffb82e8b6acc6c5ae42b86d89f4c4ddbf17f8ca78613ac9d83f74",
+      "signal": "blue",
+      "type_name": "TrackTransitionError"
+    },
+    {
+      "entry_hash": "6a24b1c5a4de3b10a2d0100da16db6fbeee5accd74b8fcd722922ff219ace670",
+      "signal": "blue",
+      "type_name": "TrackTransitionInteractor"
+    },
+    {
+      "entry_hash": "8163deee38c06dfb5df2702233129bc7a9ac660e8a24e657630f86b78b5c0e0f",
+      "signal": "blue",
+      "type_name": "TrackTransitionResult"
+    },
+    {
+      "entry_hash": "d082964ecb2e768895785e58dcda1ebf00349e7c92d19057f3cffab54c65d9e7",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphClusterDepth"
+    },
+    {
+      "entry_hash": "4657393f3c6fca4892f92d272ebeb9a37371d00427053e2418b010839e7242a4",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphCommand"
+    },
+    {
+      "entry_hash": "84f673e605c4b2a8eef14d9f456653c291dab4bcf8d480801ac3288f5944e38a",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphEdgeSelection"
+    },
+    {
+      "entry_hash": "4fb3ec9dc825ca91dae454d04ddaac922f6478d3206133067ee6f88ac36f420d",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphError"
+    },
+    {
+      "entry_hash": "3b7d4c1cbfa13290dd7cee2cd907c620b1005116c0a87bf67896f531ee0b66ec",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphInteractor"
+    },
+    {
+      "entry_hash": "6b362db3564599933cc53f67312fa6036e8c7a6195a63bec064b3883248950ae",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphResult"
+    },
+    {
+      "entry_hash": "9ba8ef394fe9a92de46d9943f2e168284da8079d8ca639a3cdb36313ee6e39de",
+      "signal": "blue",
+      "type_name": "TrackTypeSignalsCommand"
+    },
+    {
+      "entry_hash": "3691387fc54c4002614a637a7c2b45ec5b2dc1bc250722eec8c6aedde2b11f53",
+      "signal": "blue",
+      "type_name": "TrackTypeSignalsError"
+    },
+    {
+      "entry_hash": "cf4b8305cfc4dcc7e898e622c875a0cb7d8a6b79ce01d729ab01a57b78b6c582",
+      "signal": "blue",
+      "type_name": "TrackTypeSignalsInteractor"
+    },
+    {
+      "entry_hash": "52dfdb5a6fad1f912072c385fb4c2ccbef7b873ba78e74ea3d0600255160164a",
+      "signal": "blue",
+      "type_name": "TrackTypeSignalsResult"
+    },
+    {
+      "entry_hash": "ce630c8ad6ada2955bd104a563dac8e43b7c1c120155397b86ccbc5497e10102",
+      "signal": "blue",
+      "type_name": "TrackViewSyncOutcome"
+    },
+    {
+      "entry_hash": "32c1815bf3a89536e7377ac800287cc0a70d44491bacec35bf6635b7918a1c43",
+      "signal": "blue",
+      "type_name": "TrackViewsScope"
+    },
+    {
+      "entry_hash": "76a674c83d4765d15547a46346e111af8ff2306a3475590a6e221eb77edf28cc",
+      "signal": "blue",
+      "type_name": "TrackViewsSyncCommand"
+    },
+    {
+      "entry_hash": "300fdcd939514fc891469c86348945bc64e8e3f3245b6ab6efc92a0323eb41dc",
+      "signal": "blue",
+      "type_name": "TrackViewsSyncError"
+    },
+    {
+      "entry_hash": "22b9eb6066b434564239967db0eefb76c18015cfbbb1850eb821646723cfaa54",
+      "signal": "blue",
+      "type_name": "TrackViewsSyncInteractor"
+    },
+    {
+      "entry_hash": "7f9abdcfdaa24d9a2ece99dbec197e5c211d2873cdf49bc4b0823572f89581b3",
+      "signal": "blue",
+      "type_name": "TrackViewsSyncResult"
+    },
+    {
+      "entry_hash": "a2581130f440db20204bbf898cc836b3f2ca0925525ed20b32c796a1fa49d9b3",
+      "signal": "blue",
+      "type_name": "TrackViewsValidateCommand"
+    },
+    {
+      "entry_hash": "a0c23172dcc2b6d688e629dbb2c6173d88f1dbec78ec3157b7aa4bd65feb5e2a",
+      "signal": "blue",
+      "type_name": "TrackViewsValidateError"
+    },
+    {
+      "entry_hash": "911fe06dc4cb8fdd4647426485bbdc7ef19616c68dde64185a25e3dba7f03874",
+      "signal": "blue",
+      "type_name": "TrackViewsValidateInteractor"
+    },
+    {
+      "entry_hash": "1e7986dece090e04b413b24f120cb5067de90fdb25421da69ac3e8c09d20af3c",
+      "signal": "blue",
+      "type_name": "TrackViewsValidateResult"
+    },
+    {
+      "entry_hash": "da97a5928b6b0456db99a858db2ecedf84fd96596364c7ab93acdd287beded75",
+      "signal": "blue",
+      "type_name": "TrackWorkspaceRoot"
+    },
+    {
+      "entry_hash": "4248f4536a702e9494db9482fe6d83238dcfca11b61f4ff73bf89993138af610",
+      "signal": "blue",
+      "type_name": "TrackWrittenFileCount"
+    },
+    {
+      "entry_hash": "890d5451eb578ba3c6110efa2b31ff4886143c58199089e5433a6bd372e2be7f",
+      "signal": "blue",
+      "type_name": "TrackAddTaskService"
+    },
+    {
+      "entry_hash": "242cf931caf04541d2ad24f76fd252ba84bde13db103ea7d56955034778989da",
+      "signal": "blue",
+      "type_name": "TrackArchiveService"
+    },
+    {
+      "entry_hash": "8ed3bd4ee617ecd210e18ae3d0ce7230a0f8aa9400223ff77f56fe8b98138668",
+      "signal": "blue",
+      "type_name": "TrackBaselineCapturePort"
+    },
+    {
+      "entry_hash": "f6e42ecde0eb20456cf5dcf2cf100e89e1dac40cf63f9615dada620a0cfbcbee",
+      "signal": "blue",
+      "type_name": "TrackBaselineCaptureService"
+    },
+    {
+      "entry_hash": "1cb1f50f44224f7deb207e2f7eb0ce6348b85db7bc26488b801f2a32592907ab",
+      "signal": "blue",
+      "type_name": "TrackBaselineGraphPort"
+    },
+    {
+      "entry_hash": "d2d8a6ef0b0994a0ec550b6462ccc01a519d4e7eb52a18f5aa4ce2cdb806b60e",
+      "signal": "blue",
+      "type_name": "TrackBaselineGraphService"
+    },
+    {
+      "entry_hash": "ca8bc2645786dcc8ebd5a90c7ea1de1855889e690eb11bbcae9a36e42fcd9476",
+      "signal": "blue",
+      "type_name": "TrackBranchCreateService"
+    },
+    {
+      "entry_hash": "6d2e9b22e692d1eab190093a58cada97a2e128cd828bdc3824511169a9bd30d2",
+      "signal": "blue",
+      "type_name": "TrackBranchStrategyPort"
+    },
+    {
+      "entry_hash": "53f1ad6416d446ed31d7e964169b59ccf66c8b3fa75b0f54275dc92c627bd6e6",
+      "signal": "blue",
+      "type_name": "TrackBranchSwitchService"
+    },
+    {
+      "entry_hash": "839bd45c964b1afbb0c754dac97e6e2d2a401a4a98cbb1cf05a0c269935f046e",
+      "signal": "blue",
+      "type_name": "TrackCatalogueImplSignalsPort"
+    },
+    {
+      "entry_hash": "cf8f87c21d195a1bd83c2349d588a631fa384aad0e8a7dd32bd0f04f22f73152",
+      "signal": "blue",
+      "type_name": "TrackCatalogueImplSignalsService"
+    },
+    {
+      "entry_hash": "2ecb37695a27908fa7f59accad42b887ec2b8064288c3a0e4effb5cd2ffda493",
+      "signal": "blue",
+      "type_name": "TrackCatalogueLintActivePort"
+    },
+    {
+      "entry_hash": "e4948974a50ce3c3479f15f31f5a250a96ced278bd8abe8e8a98e881f83873d7",
+      "signal": "blue",
+      "type_name": "TrackCatalogueLintActiveService"
+    },
+    {
+      "entry_hash": "6402ecfd7a16489dabc03a19a2197ffaa2590aed221131708a395ac4c8ef571b",
+      "signal": "blue",
+      "type_name": "TrackCatalogueSpecSignalsPort"
+    },
+    {
+      "entry_hash": "e91a7695e0d7653e7c4fbea97151cad07fc532ec162d7eef1182e8cae0d8e70a",
+      "signal": "blue",
+      "type_name": "TrackCatalogueSpecSignalsService"
+    },
+    {
+      "entry_hash": "b677dd52bc37ccb1e4b3c59e0bc86913898a3b2ea85e68625cb8544790f66e72",
+      "signal": "blue",
+      "type_name": "TrackClearOverrideService"
+    },
+    {
+      "entry_hash": "72f839766cda6ca515413f33092cd5fd40c37c2b1ce1c011733d92dffd1df8d9",
+      "signal": "blue",
+      "type_name": "TrackCommitHashPort"
+    },
+    {
+      "entry_hash": "519026f439a6393acc37c91038ed1f6c2b0cff594b793994a4da27536bc16897",
+      "signal": "blue",
+      "type_name": "TrackContractMapPort"
+    },
+    {
+      "entry_hash": "98a766e6f706eb431ced1e821b6e128bf671ed81e242cf6a835e7cbde577b626",
+      "signal": "blue",
+      "type_name": "TrackContractMapService"
+    },
+    {
+      "entry_hash": "092e9b426c2e1b186901512503dba95de8d103505eccca23577aff59258b7dcc",
+      "signal": "blue",
+      "type_name": "TrackInitService"
+    },
+    {
+      "entry_hash": "575f7b8e5e21958b3c61b5c99c458741b0089ffb8d9901c5557e21cd0bd0964e",
+      "signal": "blue",
+      "type_name": "TrackLintPort"
+    },
+    {
+      "entry_hash": "a3e858de5044a63c99030f0012ba5f4753b1df8a543db7c401ee9ac883968a5d",
+      "signal": "blue",
+      "type_name": "TrackLintService"
+    },
+    {
+      "entry_hash": "2efc1fa745ba3a705a587eecdee0d1beaa518b98d521659c0819fc698e6db7b9",
+      "signal": "blue",
+      "type_name": "TrackMetadataPort"
+    },
+    {
+      "entry_hash": "e3061991bbd25c5fd1aef3ec177e3d01dd38144059eeefdce98a504147cf94ff",
+      "signal": "blue",
+      "type_name": "TrackNextTaskQueryPort"
+    },
+    {
+      "entry_hash": "608e659b184efd23d8ae8b734178dc9ef790b43adbe78e48c17804c138fc49b1",
+      "signal": "blue",
+      "type_name": "TrackNextTaskService"
+    },
+    {
+      "entry_hash": "f021eb22666d78d8e15d0cd9302ca742755419e958b2536b33082620ebd69b06",
+      "signal": "blue",
+      "type_name": "TrackOverrideClearPort"
+    },
+    {
+      "entry_hash": "998509796c5a74e5dc8d39346cf96bc8a916fd13d0e778b113740d28c627b08b",
+      "signal": "blue",
+      "type_name": "TrackOverrideSetPort"
+    },
+    {
+      "entry_hash": "46656e8a281d48aa527d1fb7840759efc3bf90b8f9afb11482f2fbf09f38adf8",
+      "signal": "blue",
+      "type_name": "TrackResolutionPort"
+    },
+    {
+      "entry_hash": "86658ae51246f01bdb6d1ba10bc2510a6e8d1ba48f9a3a9627563e8dcd0a0f09",
+      "signal": "blue",
+      "type_name": "TrackResolutionService"
+    },
+    {
+      "entry_hash": "7369e459ffecb79a121c7b1a36d02ea1ff8f43cdc1cc5358667022705902f76e",
+      "signal": "blue",
+      "type_name": "TrackResolveService"
+    },
+    {
+      "entry_hash": "b14e190a8a64b5e8e304a73acd7919cb5acb1ef0e7e6e5de820f44b6bde11ae4",
+      "signal": "blue",
+      "type_name": "TrackSelectionPort"
+    },
+    {
+      "entry_hash": "3a560129ae875b45280c1d80f154128d848385893b58f9d3a48b5becf2d5887c",
+      "signal": "blue",
+      "type_name": "TrackSetCommitHashService"
+    },
+    {
+      "entry_hash": "981a5861fe07fcbf04d7819aabd4a507636cac9a18574279c321a6cec65829c7",
+      "signal": "blue",
+      "type_name": "TrackSetOverrideService"
+    },
+    {
+      "entry_hash": "821d15f736f8b610f5de46c5e65d3a1f1cd911cd5b7ec6c2ed0b0e414f371d64",
+      "signal": "blue",
+      "type_name": "TrackSpecElementHashPort"
+    },
+    {
+      "entry_hash": "6d72537176e6ffa288c40c4af37021f677bebd56a1ecdef50f689ca4523a5035",
+      "signal": "blue",
+      "type_name": "TrackSpecElementHashService"
+    },
+    {
+      "entry_hash": "6ba1cc4fa5bd9ac656fee332ce4dc909eac072249ae646a3307e03bcd660def8",
+      "signal": "blue",
+      "type_name": "TrackSwitchBaseService"
+    },
+    {
+      "entry_hash": "1d1632e8be2d1966cffb596764a638c2f35ac112df0a8b36fda3fc5344f757f8",
+      "signal": "blue",
+      "type_name": "TrackTaskAddPort"
+    },
+    {
+      "entry_hash": "0abcec3e1873fd488b0486c0ef2adf55e476280c0b66dc27a853709628da11d9",
+      "signal": "blue",
+      "type_name": "TrackTaskCountsQueryPort"
+    },
+    {
+      "entry_hash": "196ec1c68785aea7bff775bd84f6821622e8e6e64fba6f8925983a3c9c5e8cae",
+      "signal": "blue",
+      "type_name": "TrackTaskCountsService"
+    },
+    {
+      "entry_hash": "b05b23d6630a41b5d542db931f1916b5ea7558ca0d0748527239e7958fc8dcea",
+      "signal": "blue",
+      "type_name": "TrackTaskTransitionPort"
+    },
+    {
+      "entry_hash": "6cbaa6cedb60be0b9ff9c57248226a5161206e9989a42eb24f6b667c64a19b16",
+      "signal": "blue",
+      "type_name": "TrackTransitionService"
+    },
+    {
+      "entry_hash": "1f4bf89b7dc9637c2c37b187f7b5ea1f233277ccf94a53d41e60e68f11333ee3",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphPort"
+    },
+    {
+      "entry_hash": "257f5632d366c14f50d284f71abd4659d9f9c80059bfda783fe937c1ec7598ae",
+      "signal": "blue",
+      "type_name": "TrackTypeGraphService"
+    },
+    {
+      "entry_hash": "9a6e733df4c5ffcb56845154b427a9a8d7ba82c97d6a6e0e7b9ac0f9c7619291",
+      "signal": "blue",
+      "type_name": "TrackTypeSignalsPort"
+    },
+    {
+      "entry_hash": "a901762c216831a8e80b49be2d692c76eaa2557ba91adf82cfbc0baf41efc8ad",
+      "signal": "blue",
+      "type_name": "TrackTypeSignalsService"
+    },
+    {
+      "entry_hash": "e1c60ccff4bf74e4ba20bb0f8282bc73edcbf8d7c5fb61947d48321cc90a8f27",
+      "signal": "blue",
+      "type_name": "TrackViewsPort"
+    },
+    {
+      "entry_hash": "2cc9caa0c9cc011c3c05d6e42e1be0c76f170189ce2877b84ce73c1fe3e6ea54",
+      "signal": "blue",
+      "type_name": "TrackViewsSyncService"
+    },
+    {
+      "entry_hash": "3ed67f2af6daf044a8cba20c505764e266d4db8dc1d178b0f8b7799beb5b3d53",
+      "signal": "blue",
+      "type_name": "TrackViewsValidateService"
+    }
+  ]
+}

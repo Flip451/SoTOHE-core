@@ -1,0 +1,1578 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        }
+      ],
+      "type_name": "TrackWorkspaceRootInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "workspace_root",
+          "params": [],
+          "receiver": "&self",
+          "returns": "TrackWorkspaceRootInput"
+        }
+      ],
+      "type_name": "TrackItemsDirectoryInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        }
+      ],
+      "type_name": "TrackSourceWorkspaceInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        }
+      ],
+      "type_name": "TrackLayerInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        }
+      ],
+      "type_name": "TrackLayersInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        }
+      ],
+      "type_name": "TrackSpecAnchorInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, TrackResolutionDiagnostic>"
+        }
+      ],
+      "type_name": "TrackLintRulesFileInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "type_signals",
+              "ty": "std::sync::Arc<dyn usecase::TrackTypeSignalsService>"
+            },
+            {
+              "name": "type_graph",
+              "ty": "std::sync::Arc<dyn usecase::TrackTypeGraphService>"
+            },
+            {
+              "name": "baseline_graph",
+              "ty": "std::sync::Arc<dyn usecase::TrackBaselineGraphService>"
+            },
+            {
+              "name": "contract_map",
+              "ty": "std::sync::Arc<dyn usecase::TrackContractMapService>"
+            },
+            {
+              "name": "catalogue_spec_signals",
+              "ty": "std::sync::Arc<dyn usecase::TrackCatalogueSpecSignalsService>"
+            },
+            {
+              "name": "spec_element_hash",
+              "ty": "std::sync::Arc<dyn usecase::TrackSpecElementHashService>"
+            },
+            {
+              "name": "baseline_capture",
+              "ty": "std::sync::Arc<dyn usecase::TrackBaselineCaptureService>"
+            },
+            {
+              "name": "lint",
+              "ty": "std::sync::Arc<dyn usecase::TrackLintService>"
+            },
+            {
+              "name": "catalogue_impl_signals",
+              "ty": "std::sync::Arc<dyn usecase::TrackCatalogueImplSignalsService>"
+            },
+            {
+              "name": "catalogue_lint_active",
+              "ty": "std::sync::Arc<dyn usecase::TrackCatalogueLintActiveService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TrackTdddInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "TrackTdddDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "message",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "TrackResolutionDiagnostic"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::TrackResolutionService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TrackResolutionInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "TrackResolutionOutcome"
+        }
+      ],
+      "type_name": "TrackResolutionDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "TrackTypeGraphClusterDepthInput"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::str::traits::FromStr"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::convert::TryFrom<String>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::convert::AsRef<str>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TrackIdInput",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TrackResolutionDiagnostic",
+      "trait_ref": "core::fmt::Display"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "TrackDriver": {
+      "action": "modify",
+      "docs": "Track lifecycle primary-adapter boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_init",
+              "ty": "std::sync::Arc<dyn usecase::TrackInitService>"
+            },
+            {
+              "name": "track_transition",
+              "ty": "std::sync::Arc<dyn usecase::TrackTransitionService>"
+            },
+            {
+              "name": "track_branch_switch",
+              "ty": "std::sync::Arc<dyn usecase::TrackBranchSwitchService>"
+            },
+            {
+              "name": "track_resolve",
+              "ty": "std::sync::Arc<dyn usecase::TrackResolveService>"
+            },
+            {
+              "name": "track_views_validate",
+              "ty": "std::sync::Arc<dyn usecase::TrackViewsValidateService>"
+            },
+            {
+              "name": "track_views_sync",
+              "ty": "std::sync::Arc<dyn usecase::TrackViewsSyncService>"
+            },
+            {
+              "name": "track_add_task",
+              "ty": "std::sync::Arc<dyn usecase::TrackAddTaskService>"
+            },
+            {
+              "name": "track_set_override",
+              "ty": "std::sync::Arc<dyn usecase::TrackSetOverrideService>"
+            },
+            {
+              "name": "track_clear_override",
+              "ty": "std::sync::Arc<dyn usecase::TrackClearOverrideService>"
+            },
+            {
+              "name": "track_next_task",
+              "ty": "std::sync::Arc<dyn usecase::TrackNextTaskService>"
+            },
+            {
+              "name": "track_task_counts",
+              "ty": "std::sync::Arc<dyn usecase::TrackTaskCountsService>"
+            },
+            {
+              "name": "track_archive",
+              "ty": "std::sync::Arc<dyn usecase::TrackArchiveService>"
+            },
+            {
+              "name": "track_branch_create",
+              "ty": "std::sync::Arc<dyn usecase::TrackBranchCreateService>"
+            },
+            {
+              "name": "track_switch_base",
+              "ty": "std::sync::Arc<dyn usecase::TrackSwitchBaseService>"
+            },
+            {
+              "name": "track_set_commit_hash",
+              "ty": "std::sync::Arc<dyn usecase::TrackSetCommitHashService>"
+            },
+          {
+            "name": "fixpoint_resolve_service",
+              "ty": "std::sync::Arc<dyn usecase::FixpointResolveDriverService>"
+            },
+            {
+              "name": "base_merge_service",
+              "ty": "std::sync::Arc<dyn usecase::BaseMergeService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle_base_merge",
+          "params": [
+            {
+              "name": "input",
+              "ty": "BaseMergeInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TrackInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle_set_commit_hash",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TrackIdInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "track",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackIdInput": {
+      "action": "reference",
+      "docs": "Validated track identifier delivery input.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackItemsDirectoryInput": {
+      "action": "add",
+      "docs": "Track items-directory primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackLayerInput": {
+      "action": "add",
+      "docs": "Track layer primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackLayersInput": {
+      "action": "add",
+      "docs": "Track layer-list primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackLintRulesFileInput": {
+      "action": "add",
+      "docs": "Track lint-rules-file primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackResolutionDiagnostic": {
+      "action": "add",
+      "docs": "TrackResolutionDiagnostic user-safe diagnostic DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackResolutionDriver": {
+      "action": "add",
+      "docs": "TrackResolutionDriver primary-adapter boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackResolutionInput": {
+      "action": "add",
+      "docs": "TrackResolutionInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadFromItems",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<TrackIdInput>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "TrackItemsDirectoryInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ReadFromRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<TrackIdInput>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "TrackWorkspaceRootInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "WriteFromItems",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<TrackIdInput>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "TrackItemsDirectoryInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "WriteFromRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<TrackIdInput>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "TrackWorkspaceRootInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DetectActive",
+            "payload": {
+              "fields": [
+                {
+                  "name": "workspace_root",
+                  "ty": "TrackWorkspaceRootInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackResolutionOutcome": {
+      "action": "add",
+      "docs": "TrackResolutionOutcome primary-adapter outcome DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Resolved",
+            "payload": {
+              "fields": [
+                "TrackIdInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Inactive",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Failed",
+            "payload": {
+              "fields": [
+                "TrackResolutionDiagnostic"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_resolution",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackSourceWorkspaceInput": {
+      "action": "add",
+      "docs": "Track source-workspace primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackSpecAnchorInput": {
+      "action": "add",
+      "docs": "Track spec-anchor primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddBaselineCaptureInput": {
+      "action": "add",
+      "docs": "TrackTdddBaselineCaptureInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "source_workspace",
+              "ty": "Option<TrackSourceWorkspaceInput>"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<TrackLayerInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddBaselineGraphInput": {
+      "action": "add",
+      "docs": "TrackTdddBaselineGraphInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layers",
+              "ty": "Option<TrackLayersInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddCatalogueImplSignalsInput": {
+      "action": "add",
+      "docs": "TrackTdddCatalogueImplSignalsInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<TrackLayerInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddCatalogueLintActiveInput": {
+      "action": "add",
+      "docs": "TrackTdddCatalogueLintActiveInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "rules_file",
+              "ty": "Option<TrackLintRulesFileInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddCatalogueSpecSignalsInput": {
+      "action": "add",
+      "docs": "TrackTdddCatalogueSpecSignalsInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<TrackLayerInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddContractMapInput": {
+      "action": "add",
+      "docs": "TrackTdddContractMapInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layers",
+              "ty": "Option<TrackLayersInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddDriver": {
+      "action": "add",
+      "docs": "TrackTdddDriver primary-adapter boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddInput": {
+      "action": "add",
+      "docs": "TrackTdddInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TypeSignals",
+            "payload": {
+              "fields": [
+                "TrackTdddTypeSignalsInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TypeGraph",
+            "payload": {
+              "fields": [
+                "TrackTdddTypeGraphInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BaselineGraph",
+            "payload": {
+              "fields": [
+                "TrackTdddBaselineGraphInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ContractMap",
+            "payload": {
+              "fields": [
+                "TrackTdddContractMapInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueSpecSignals",
+            "payload": {
+              "fields": [
+                "TrackTdddCatalogueSpecSignalsInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecElementHash",
+            "payload": {
+              "fields": [
+                "TrackTdddSpecElementHashInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BaselineCapture",
+            "payload": {
+              "fields": [
+                "TrackTdddBaselineCaptureInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Lint",
+            "payload": {
+              "fields": [
+                "TrackTdddLintInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueImplSignals",
+            "payload": {
+              "fields": [
+                "TrackTdddCatalogueImplSignalsInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueLintActive",
+            "payload": {
+              "fields": [
+                "TrackTdddCatalogueLintActiveInput"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddLintInput": {
+      "action": "add",
+      "docs": "TrackTdddLintInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layer",
+              "ty": "TrackLayerInput"
+            },
+            {
+              "name": "rules_file",
+              "ty": "Option<TrackLintRulesFileInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddSpecElementHashInput": {
+      "action": "add",
+      "docs": "TrackTdddSpecElementHashInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectoryInput"
+            },
+            {
+              "name": "anchor",
+              "ty": "Option<TrackSpecAnchorInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddTypeGraphInput": {
+      "action": "add",
+      "docs": "Track TypeGraph primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectoryInput"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<TrackLayerInput>"
+            },
+            {
+              "name": "cluster_depth",
+              "ty": "TrackTypeGraphClusterDepthInput"
+            },
+            {
+              "name": "edges",
+              "ty": "TrackTypeGraphEdgeInput"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTdddTypeSignalsInput": {
+      "action": "add",
+      "docs": "TrackTdddTypeSignalsInput typed primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<TrackIdInput>"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRootInput"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<TrackLayerInput>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTypeGraphClusterDepthInput": {
+      "action": "add",
+      "docs": "Track TypeGraph cluster-depth primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackTypeGraphEdgeInput": {
+      "action": "add",
+      "docs": "Track TypeGraph edge-selection primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Methods",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Fields",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Impls",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackWorkspaceRootInput": {
+      "action": "add",
+      "docs": "Track workspace-root primary-adapter input DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_tddd",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    }
+  }
+}
