@@ -1351,6 +1351,42 @@
           "hash": "rvw1:sha256:f637757164a02d65b37c87e4fce0295476af7debdfa060ae344ec19789cf4421",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:31:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ba4f058ec546ae291c4bfadd185bd5e45622c4c65e94ccf9adb26ffd0062a1f6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:37:50Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/grok_common.rs",
+              "line": 117,
+              "message": "Grok 1.0.3 documents JSON headless failures as `{\"type\":\"error\",\"message\":\"...\"}`, but this DTO recognizes only `failure_reason` and `error`. Serde therefore accepts the documented envelope using the default value and reports the generic “structured output is missing” message, hiding authentication/startup/runtime diagnostics and violating AC-01. Map `message` into `CapabilityFailureDetail` with deterministic precedence and add a regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ba4f058ec546ae291c4bfadd185bd5e45622c4c65e94ccf9adb26ffd0062a1f6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T05:40:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:25d0c81d6893091e5e5efd1b9699162d21cd5c160da2c1e6813ef5d7d72b8a8a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T05:41:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:25d0c81d6893091e5e5efd1b9699162d21cd5c160da2c1e6813ef5d7d72b8a8a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

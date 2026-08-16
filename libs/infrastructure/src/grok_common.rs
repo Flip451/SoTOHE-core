@@ -100,8 +100,7 @@ impl<'de> Deserialize<'de> for GrokSandbox {
 }
 
 /// Output returned by the Grok provider's JSON envelope.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(untagged)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GrokOutputEnvelope {
     /// The provider returned the schema-owned structured value.
     Succeeded {
@@ -111,23 +110,33 @@ pub enum GrokOutputEnvelope {
     /// The provider did not return a structured value.
     Failed {
         /// Diagnostic detail supplied by the provider or the envelope boundary.
-        #[serde(
-            default = "missing_structured_output_failure",
-            deserialize_with = "deserialize_failure_reason"
-        )]
         failure_reason: CapabilityFailureDetail,
     },
+}
+
+impl<'de> Deserialize<'de> for GrokOutputEnvelope {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = serde_json::Value::deserialize(deserializer)?;
+        if let Some(structured_output) = value.get("structured_output").cloned() {
+            return Ok(Self::Succeeded { structured_output });
+        }
+        Ok(Self::Failed { failure_reason: failure_detail_from_envelope(&value) })
+    }
 }
 
 fn missing_structured_output_failure() -> CapabilityFailureDetail {
     CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT)
 }
 
-fn deserialize_failure_reason<'de, D>(deserializer: D) -> Result<CapabilityFailureDetail, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    String::deserialize(deserializer).map(CapabilityFailureDetail::new)
+fn failure_detail_from_envelope(value: &serde_json::Value) -> CapabilityFailureDetail {
+    ["failure_reason", "error", "message"]
+        .into_iter()
+        .find_map(|key| value.get(key).and_then(serde_json::Value::as_str))
+        .map(CapabilityFailureDetail::new)
+        .unwrap_or_else(missing_structured_output_failure)
 }
 
 impl GrokOutputEnvelope {
@@ -267,6 +276,52 @@ mod tests {
             envelope.into_structured_output(),
             Err(GrokEnvelopeError::ProviderFailure {
                 failure_reason: CapabilityFailureDetail::new("provider timed out"),
+            }),
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_grok_output_envelope_error_field_is_used_as_failure_reason()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let envelope: GrokOutputEnvelope =
+            serde_json::from_str(r#"{"error":"provider timed out"}"#)?;
+
+        assert_eq!(
+            envelope.into_structured_output(),
+            Err(GrokEnvelopeError::ProviderFailure {
+                failure_reason: CapabilityFailureDetail::new("provider timed out"),
+            }),
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_grok_output_envelope_typed_error_message_is_used_as_failure_reason()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let envelope: GrokOutputEnvelope =
+            serde_json::from_str(r#"{"type":"error","message":"authentication failed"}"#)?;
+
+        assert_eq!(
+            envelope.into_structured_output(),
+            Err(GrokEnvelopeError::ProviderFailure {
+                failure_reason: CapabilityFailureDetail::new("authentication failed"),
+            }),
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_grok_output_envelope_failure_reason_precedes_error_and_message()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let envelope: GrokOutputEnvelope = serde_json::from_str(
+            r#"{"failure_reason":"canonical","error":"ignored-error","message":"ignored-message"}"#,
+        )?;
+
+        assert_eq!(
+            envelope.into_structured_output(),
+            Err(GrokEnvelopeError::ProviderFailure {
+                failure_reason: CapabilityFailureDetail::new("canonical"),
             }),
         );
         Ok(())
