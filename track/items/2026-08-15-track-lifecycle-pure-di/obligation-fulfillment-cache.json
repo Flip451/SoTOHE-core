@@ -1,4 +1,693 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_mismatched_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_persists_current_head_for_matching_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_maps_persistence_io_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_track_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_commit_hash"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackCommitHashPort"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "bound_tests_set_hash": "23d9c0af7a85b313c6c81b752107f2c35b34cceaf2c8f96346af25461fe8d362",
+        "declaration_hash": "ced53992b25e77e11194522df1f4afdd6f3e4c0ffe3026f547899aa454904b24"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommitHashPort",
+        "item_identifier": "trait_method:persist_current_for_track",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n            fs::read_to_string(track_dir.join(\".commit_hash\")).expect(\"commit hash is persisted\"),\n            expected\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackMetadataPort"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
+        "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9"
+      },
+      "obligation_id": {
+        "entry_key": "TrackMetadataPort",
+        "item_identifier": "trait_method:save",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\n        let loaded = adapter\n            .find(&typed_items, metadata.id())\n            .expect(\"metadata loads\")\n            .expect(\"saved metadata exists\");\n\n        assert_eq!(loaded, metadata);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackMetadataPort"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
+        "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9"
+      },
+      "obligation_id": {
+        "entry_key": "TrackMetadataPort",
+        "item_identifier": "trait_method:find",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\n        let loaded = adapter\n            .find(&typed_items, metadata.id())\n            .expect(\"metadata loads\")\n            .expect(\"saved metadata exists\");\n\n        assert_eq!(loaded, metadata);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_selection_returns_same_track"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSelectionPort"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "79faa2c32000d48e45a67bd3a490a0e906aea0179ac3e910e8b67cbd4a230883",
+        "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_required",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert_eq!(resolved, track_id);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_active_branch_returns_track"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSelectionPort"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "5957784a78ce75ab5370034523f42838ad7f94cc473a9748c34b348b34e2cfcd",
+        "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_active",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "let resolved =\n            GitTrackSelectionAdapter.resolve_active(&workspace).expect(\"active branch resolves\");\n\n        assert_eq!(resolved, TrackId::try_new(\"active-track\").expect(\"track id is valid\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_view_scope_returns_track_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_view_scope_rejects_branch_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_active_on_non_track_branch_returns_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSelectionPort"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "c37b63e57eac3f07db2fdc7773075f9fa3ea5482ca0ad3c70eaf8521c51e14a0",
+        "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_views_scope",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "let scope = adapter\n            .resolve_views_scope(&workspace, &TrackSelection::Explicit(track_id.clone()))\n            .expect(\"explicit view scope resolves\");\n        assert_eq!(scope, TrackViewsScope::Track(track_id));\n\n        let error = GitTrackSelectionAdapter\n            .resolve_views_scope(&workspace, &TrackSelection::Explicit(track_id))\n            .expect_err(\"explicit view scope must enforce the write guard\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_views_validate_and_sync_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsPort"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
+        "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:validate",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");\n\n        assert!(rendered.iter().any(|path| path.as_path().ends_with(\"registry.md\")));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_views_validate_and_sync_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsPort"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
+        "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:sync",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "adapter.validate(&workspace).expect(\"empty workspace validates\");\n        let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "FsTrackMetadataAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
+        "declaration_hash": "0d9eee1a4903c351361b45f9bf8a1238bcfc9067ef1b54f8bf807b5e91b27555"
+      },
+      "obligation_id": {
+        "entry_key": "FsTrackMetadataAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackMetadataPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\n        let loaded = adapter\n            .find(&typed_items, metadata.id())\n            .expect(\"metadata loads\")\n            .expect(\"saved metadata exists\");\n\n        assert_eq!(loaded, metadata);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "FsTrackMetadataAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
+        "declaration_hash": "0d9eee1a4903c351361b45f9bf8a1238bcfc9067ef1b54f8bf807b5e91b27555"
+      },
+      "obligation_id": {
+        "entry_key": "FsTrackMetadataAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackMetadataPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\nlet loaded = adapter\n    .find(&typed_items, metadata.id())\n    .expect(\"metadata loads\")\n    .expect(\"saved metadata exists\");\n\nassert_eq!(loaded, metadata);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_views_validate_and_sync_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "FsTrackViewsAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
+        "declaration_hash": "b2b218697164671dec46fd8527bcb6216dfd1dc702212eedb31d234a1345861d"
+      },
+      "obligation_id": {
+        "entry_key": "FsTrackViewsAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackViewsPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let workspace =\n            TrackWorkspaceRoot::try_new(root.path().to_path_buf()).expect(\"workspace is valid\");\n        let adapter = FsTrackViewsAdapter::new();\n\n        adapter.validate(&workspace).expect(\"empty workspace validates\");\n        let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");\n\n        assert!(rendered.iter().any(|path| path.as_path().ends_with(\"registry.md\")));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_views_validate_and_sync_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "FsTrackViewsAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "22e9c22c20d125932654c6bf0a066855786926b5e0c3dd18a6773bce2c0d3e54",
+        "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
+        "declaration_hash": "b2b218697164671dec46fd8527bcb6216dfd1dc702212eedb31d234a1345861d"
+      },
+      "obligation_id": {
+        "entry_key": "FsTrackViewsAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackViewsPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "adapter.validate(&workspace).expect(\"empty workspace validates\");\n        let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_child_process_entrypoint"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_mismatched_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_persists_current_head_for_matching_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_maps_persistence_io_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_track_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_commit_hash"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "GitTrackCommitHashAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "7add1876c39fa8018ba8364ea2635b185cd39f4a360aced34b44f068ea3f64a9",
+        "declaration_hash": "8338bb2caa08c45c75d15540cdb9e7b6255fcb3574e9cbdc49c2eea17f5f04f5"
+      },
+      "obligation_id": {
+        "entry_key": "GitTrackCommitHashAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackCommitHashPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": ".persist_current_for_track(&track_id)\n                    .expect(\"matching branch persists the current HEAD\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_child_process_entrypoint"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_mismatched_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_persists_current_head_for_matching_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_maps_persistence_io_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_track_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_commit_hash"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "GitTrackCommitHashAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "bound_tests_set_hash": "7add1876c39fa8018ba8364ea2635b185cd39f4a360aced34b44f068ea3f64a9",
+        "declaration_hash": "8338bb2caa08c45c75d15540cdb9e7b6255fcb3574e9cbdc49c2eea17f5f04f5"
+      },
+      "obligation_id": {
+        "entry_key": "GitTrackCommitHashAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackCommitHashPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let persisted = GitTrackCommitHashAdapter::new()\n                    .persist_current_for_track(&track_id)\n                    .expect(\"matching branch persists the current HEAD\");\n\n                assert_eq!(persisted.as_ref(), expected);\n                assert_eq!(\n                    fs::read_to_string(track_dir.join(\".commit_hash\"))\n                        .expect(\"commit hash is persisted\"),\n                    expected\n                );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_selection_returns_same_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_active_branch_returns_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_view_scope_returns_track_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_view_scope_rejects_branch_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_active_on_non_track_branch_returns_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "GitTrackSelectionAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "c8fdaba7f43285b56f832c77c4fc8fe840349315c0f8977f682b785b65bdd1e8",
+        "declaration_hash": "0db096f3c04875db471777353189de59cea42401cf180efcc064c483598078e5"
+      },
+      "obligation_id": {
+        "entry_key": "GitTrackSelectionAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackSelectionPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let resolved =\n            adapter.resolve_required(&items_dir, &selection).expect(\"explicit selection resolves\");\n        assert_eq!(resolved, track_id);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_selection_returns_same_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_active_branch_returns_track"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_view_scope_returns_track_scope"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_explicit_view_scope_rejects_branch_mismatch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_selection_active_on_non_track_branch_returns_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "GitTrackSelectionAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "bound_tests_set_hash": "c8fdaba7f43285b56f832c77c4fc8fe840349315c0f8977f682b785b65bdd1e8",
+        "declaration_hash": "0db096f3c04875db471777353189de59cea42401cf180efcc064c483598078e5"
+      },
+      "obligation_id": {
+        "entry_key": "GitTrackSelectionAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackSelectionPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let resolved =\n            GitTrackSelectionAdapter.resolve_active(&workspace).expect(\"active branch resolves\");\n\n        assert_eq!(resolved, TrackId::try_new(\"active-track\").expect(\"track id is valid\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_branch_strategy_global_config_returns_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_branch_strategy_snapshot_for_track_returns_saved_snapshot"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "FsTrackBranchStrategyAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "259e6d3428aa3ffeab7ddda7808ed6fa033c0f40c3e83ddec3475391ee9bf3a4",
+        "declaration_hash": "1b38c0aeaa03290c0ca9fb943fd736c6fb8ccf791a67fedab0b6a3e798443479"
+      },
+      "obligation_id": {
+        "entry_key": "FsTrackBranchStrategyAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackBranchStrategyPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let snapshot = FsTrackBranchStrategyAdapter\n            .global_for_items(&typed_items)\n            .expect(\"global strategy loads\");\n\n        assert_eq!(snapshot.base_branch(), \"main\");\n        assert_eq!(snapshot.merge_target(), \"main\");\n        assert_eq!(snapshot.merge_method(), MergeMethod::Squash);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_branch_strategy_global_config_returns_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_branch_strategy_snapshot_for_track_returns_saved_snapshot"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "FsTrackBranchStrategyAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "bound_tests_set_hash": "259e6d3428aa3ffeab7ddda7808ed6fa033c0f40c3e83ddec3475391ee9bf3a4",
+        "declaration_hash": "1b38c0aeaa03290c0ca9fb943fd736c6fb8ccf791a67fedab0b6a3e798443479"
+      },
+      "obligation_id": {
+        "entry_key": "FsTrackBranchStrategyAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackBranchStrategyPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "assert_eq!(snapshot.base_branch(), \"main\");\n        assert_eq!(snapshot.merge_target(), \"main\");\n        assert_eq!(snapshot.merge_method(), MergeMethod::Squash);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ],
   "track_id": "2026-08-15-track-lifecycle-pure-di"
 }

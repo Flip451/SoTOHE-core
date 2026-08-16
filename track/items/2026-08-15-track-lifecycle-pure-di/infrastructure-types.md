@@ -4,11 +4,11 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsTrackBranchStrategyAdapter | secondary_adapter | add | impl TrackBranchStrategyPort | 🟡 | 🔵 |
-| FsTrackMetadataAdapter | secondary_adapter | add | impl TrackMetadataPort | 🟡 | 🔵 |
-| FsTrackViewsAdapter | secondary_adapter | add | impl TrackViewsPort | 🟡 | 🔵 |
-| GitTrackCommitHashAdapter | secondary_adapter | add | impl TrackCommitHashPort | 🟡 | 🔵 |
-| GitTrackSelectionAdapter | secondary_adapter | add | impl TrackSelectionPort | 🟡 | 🔵 |
+| FsTrackBranchStrategyAdapter | secondary_adapter | add | impl TrackBranchStrategyPort | 🔵 | 🔵 |
+| FsTrackMetadataAdapter | secondary_adapter | add | impl TrackMetadataPort, impl Default | 🔵 | 🔵 |
+| FsTrackViewsAdapter | secondary_adapter | add | impl TrackViewsPort, impl Default | 🔵 | 🔵 |
+| GitTrackCommitHashAdapter | secondary_adapter | add | impl TrackCommitHashPort, impl Default | 🔵 | 🔵 |
+| GitTrackSelectionAdapter | secondary_adapter | add | impl TrackSelectionPort | 🔵 | 🔵 |
 | SystemTrackBaselineCaptureAdapter | secondary_adapter | add | impl TrackBaselineCapturePort | 🟡 | 🔵 |
 | SystemTrackBaselineGraphAdapter | secondary_adapter | add | impl TrackBaselineGraphPort | 🟡 | 🔵 |
 | SystemTrackCatalogueImplSignalsAdapter | secondary_adapter | add | impl TrackCatalogueImplSignalsPort | 🟡 | 🔵 |

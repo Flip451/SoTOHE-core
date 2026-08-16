@@ -477,7 +477,7 @@
           "returns": "&str"
         }
       ],
-      "type_name": "TrackIdInput"
+      "type_name": "TrackLifecycleIdInput"
     },
     {
       "methods": [
@@ -509,7 +509,7 @@
           "params": [
             {
               "name": "value",
-              "ty": "Option<TrackIdInput>"
+              "ty": "Option<TrackLifecycleIdInput>"
             }
           ],
           "returns": "Self"
@@ -530,7 +530,7 @@
             },
             {
               "name": "track_id",
-              "ty": "TrackIdInput"
+              "ty": "TrackLifecycleIdInput"
             },
             {
               "name": "title",
@@ -646,7 +646,7 @@
             },
             {
               "name": "track_id",
-              "ty": "TrackIdInput"
+              "ty": "TrackLifecycleIdInput"
             }
           ],
           "returns": "Self"
@@ -667,7 +667,7 @@
             },
             {
               "name": "track_id",
-              "ty": "TrackIdInput"
+              "ty": "TrackLifecycleIdInput"
             }
           ],
           "returns": "Self"
@@ -688,7 +688,7 @@
             },
             {
               "name": "track_id",
-              "ty": "TrackIdInput"
+              "ty": "TrackLifecycleIdInput"
             }
           ],
           "returns": "Self"
@@ -705,7 +705,7 @@
           "params": [
             {
               "name": "track_id",
-              "ty": "TrackIdInput"
+              "ty": "TrackLifecycleIdInput"
             }
           ],
           "returns": "Self"
@@ -1139,6 +1139,34 @@
         }
       ],
       "type_name": "TrackTypeGraphInteractor"
+    },
+    {
+      "impl_generics": [
+        {
+          "bounds": [
+            "domain::TrackReader",
+            "domain::ImplPlanReader",
+            "Send",
+            "Sync"
+          ],
+          "name": "S"
+        }
+      ],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "Arc<S>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "TaskQueryInteractor"
     }
   ],
   "layer": "usecase",
@@ -1385,11 +1413,11 @@
       "trait_ref": "std::error::Error"
     },
     {
-      "for_type": "TrackIdInput",
+      "for_type": "TrackLifecycleIdInput",
       "trait_ref": "PartialEq"
     },
     {
-      "for_type": "TrackIdInput",
+      "for_type": "TrackLifecycleIdInput",
       "trait_ref": "Eq"
     },
     {
@@ -1527,6 +1555,11 @@
     {
       "for_type": "TaskQueryInteractor",
       "trait_ref": "TrackTaskCountsQueryPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskQueryInteractor",
+      "trait_ref": "TaskQueryService"
     },
     {
       "for_type": "TrackLayerSelection",
@@ -1775,6 +1808,218 @@
     {
       "for_type": "TrackTypeGraphInteractor",
       "trait_ref": "TrackTypeGraphService"
+    },
+    {
+      "for_type": "ProcessExitCode",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProcessExitCode",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ProcessExitCode",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "RenderedViewPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TaskCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TaskCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TaskCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TrackAddTaskCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackAddTaskCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackAddTaskCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackCatalogueEntryCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackCatalogueEntryCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackCatalogueEntryCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TrackCataloguePath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackClearOverrideCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackClearOverrideCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackClearOverrideCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackDirectoryPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackLifecycleIdInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackItemsDirectory",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackLayerFilter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackLayerFilter",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackLayerSelection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackLayerSelection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackLayerSignalResult",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackLayerSignalResult",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackLayerSignalResult",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackLayerSignalResult",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackNextTaskCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackNextTaskCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackNextTaskCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackRenderedLayerCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackRenderedLayerCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackRenderedLayerCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TrackSelection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackSelection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackSetOverrideCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackSetOverrideCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackSetOverrideCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackSourceWorkspace",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackSpecAnchorSelection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackSpecAnchorSelection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackTaskCountsCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackTaskCountsCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackTaskCountsCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackTransitionCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackTransitionCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackTransitionCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackViewSyncOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackWorkspaceRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackWrittenFileCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackWrittenFileCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackWrittenFileCount",
+      "trait_ref": "core::marker::Copy"
     }
   ],
   "traits": {
@@ -2833,12 +3078,16 @@
           "name": "next_task",
           "params": [
             {
-              "name": "command",
-              "ty": "TrackNextTaskCommand"
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectory"
             }
           ],
           "receiver": "&self",
-          "returns": "Result<Option<NextTaskOutput>, TaskOperationError>"
+          "returns": "Result<Option<NextTaskOutput>, TrackNextTaskError>"
         }
       ],
       "module_path": "track_lifecycle::track_next_task",
@@ -2917,8 +3166,12 @@
           "name": "clear_override",
           "params": [
             {
-              "name": "command",
-              "ty": "TrackClearOverrideCommand"
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectory"
             }
           ],
           "receiver": "&self",
@@ -2955,8 +3208,20 @@
           "name": "set_override",
           "params": [
             {
-              "name": "command",
-              "ty": "TrackSetOverrideCommand"
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectory"
+            },
+            {
+              "name": "status",
+              "ty": "domain::StatusOverrideKind"
+            },
+            {
+              "name": "reason",
+              "ty": "DiagnosticText"
             }
           ],
           "receiver": "&self",
@@ -3413,8 +3678,24 @@
           "name": "add_task",
           "params": [
             {
-              "name": "command",
-              "ty": "TrackAddTaskCommand"
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectory"
+            },
+            {
+              "name": "description",
+              "ty": "domain::NonEmptyString"
+            },
+            {
+              "name": "section",
+              "ty": "Option<domain::NonEmptyString>"
+            },
+            {
+              "name": "after",
+              "ty": "Option<domain::TaskId>"
             }
           ],
           "receiver": "&self",
@@ -3451,12 +3732,16 @@
           "name": "task_counts",
           "params": [
             {
-              "name": "command",
-              "ty": "TrackTaskCountsCommand"
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectory"
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TaskCountsOutput, TaskOperationError>"
+          "returns": "Result<TaskCountsOutput, TrackTaskCountsError>"
         }
       ],
       "module_path": "track_lifecycle::track_task_counts",
@@ -3535,8 +3820,20 @@
           "name": "transition_task",
           "params": [
             {
-              "name": "command",
-              "ty": "TrackTransitionCommand"
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "TrackItemsDirectory"
+            },
+            {
+              "name": "task_id",
+              "ty": "domain::TaskId"
+            },
+            {
+              "name": "transition",
+              "ty": "TrackTaskTransition"
             }
           ],
           "receiver": "&self",
@@ -3942,7 +4239,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -3970,7 +4267,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -3998,7 +4295,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -4011,6 +4308,30 @@
           "anchor": "AC-03",
           "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TaskQueryInteractor": {
+      "action": "modify",
+      "docs": "Task query interactor (CN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
         {
           "anchor": "CN-03",
           "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
@@ -5099,7 +5420,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -5445,9 +5766,12 @@
             "name": "Checked",
             "payload": {
               "fields": [
-                "Vec<domain::CatalogueLintViolation>"
+                {
+                  "name": "layers",
+                  "ty": "Vec<TrackCatalogueLintLayerResult>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -5484,6 +5808,43 @@
         }
       ]
     },
+    "TrackCatalogueLintLayerResult": {
+      "action": "add",
+      "docs": "Catalogue-lint layer result DTO (AC-03; CN-01).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "layer",
+              "ty": "domain::LayerId"
+            },
+            {
+              "name": "violations",
+              "ty": "Vec<domain::CatalogueLintViolation>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle::tddd::catalogue_lint_active",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
     "TrackCataloguePath": {
       "action": "add",
       "docs": "Track catalogue-file path application-boundary value.",
@@ -5493,7 +5854,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -5979,12 +6340,16 @@
         "kind": "struct",
         "shape": {
           "fields": [
-            {
-              "name": "track_id",
-              "ty": "domain::TrackId"
-            },
-            {
-              "name": "catalogue_entries",
+          {
+            "name": "track_id",
+            "ty": "domain::TrackId"
+          },
+          {
+            "name": "rendered_layers",
+            "ty": "TrackRenderedLayerCount"
+          },
+          {
+            "name": "catalogue_entries",
               "ty": "TrackCatalogueEntryCount"
             },
             {
@@ -6021,7 +6386,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -6040,16 +6405,16 @@
         }
       ]
     },
-    "TrackIdInput": {
+    "TrackLifecycleIdInput": {
       "action": "add",
-      "docs": "Track identifier application-boundary value.",
+      "docs": "Validated track identifier at the track-lifecycle application boundary.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -6238,7 +6603,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -6559,7 +6924,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -6625,7 +6990,7 @@
     },
     "TrackNextTaskError": {
       "action": "add",
-      "docs": "Track NextTask application error.",
+      "docs": "Track NextTask query and application error.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -6769,7 +7134,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -7584,7 +7949,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -8048,7 +8413,7 @@
     },
     "TrackTaskCountsError": {
       "action": "add",
-      "docs": "Track TaskCounts application error.",
+      "docs": "Track TaskCounts query and application error.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -8453,7 +8818,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -9259,7 +9624,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -9287,7 +9652,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],

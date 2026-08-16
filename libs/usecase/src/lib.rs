@@ -82,6 +82,7 @@ pub mod telemetry;
 pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
+pub mod track_lifecycle;
 pub mod track_phase;
 pub mod track_resolution;
 pub mod track_service;

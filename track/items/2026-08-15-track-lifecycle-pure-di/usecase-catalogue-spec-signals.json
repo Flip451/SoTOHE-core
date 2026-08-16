@@ -1,21 +1,26 @@
 {
-  "catalogue_declaration_hash": "3c3c7f18c1845d0b87555c1fbdebf5336fac460ab00fa0333f8a619e1b08c10e",
+  "catalogue_declaration_hash": "5d97d3fe805f7cf76d452e4928138327e22552840ae26ee95f3c2ef1f688af73",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "6bcbdffd63680217512fda9f63677dc7f7d59db1eb5b20fca3de99eb7973c74d",
+      "entry_hash": "da7d1c05487589e6535c8c3ee85ff8108b4768ca7b80499b4e4d22401eff3550",
       "signal": "blue",
       "type_name": "ProcessExitCode"
     },
     {
-      "entry_hash": "9737c9c5edd7efc7db50f8f4a82a81016c79a7402b659bfda736c86294b47dd8",
+      "entry_hash": "dde6ed03033638981919af75e6b452adf072d64db00a981ebb63214b9583cf3f",
       "signal": "blue",
       "type_name": "RenderedViewPath"
     },
     {
-      "entry_hash": "f10d987224b3f02f5b20b751f0a18f836ed04529f47596bc5c64cda79e70646f",
+      "entry_hash": "a94cce36c98fa0d823f36c710c9ede4828cdd9eb6742a35b22a4c4f460fa8405",
       "signal": "blue",
       "type_name": "TaskCount"
+    },
+    {
+      "entry_hash": "996533ec048c6fac779adc5cf5058b57917deb0e3d61899ba939dbefccc3eda2",
+      "signal": "blue",
+      "type_name": "TaskQueryInteractor"
     },
     {
       "entry_hash": "babc7af06fd6b308304033758697c9991524fe34d9ff8fcab1451646ba50df21",
@@ -143,7 +148,7 @@
       "type_name": "TrackBranchSwitchResult"
     },
     {
-      "entry_hash": "bfa38d703da63f8ce94bc49e35bdaaddb7d1ac7561506f1ed2ee7850c07d2eb7",
+      "entry_hash": "77fbfae635da7211186102ba5d4e59b3e20e60e735e10569ea46e12c94cef308",
       "signal": "blue",
       "type_name": "TrackCatalogueEntryCount"
     },
@@ -188,12 +193,17 @@
       "type_name": "TrackCatalogueLintActiveInteractor"
     },
     {
-      "entry_hash": "666ff4e71b50236caa9fd5dc698ae1ddef55aa804c1074d8f69a9ed986e408b3",
+      "entry_hash": "9b049d7d959e3fe400b6aba5d3621dd326ff4fb806f4eb0e2d4cb5fb9d7a4673",
       "signal": "blue",
       "type_name": "TrackCatalogueLintActiveResult"
     },
     {
-      "entry_hash": "93a788059df60fa575038dfd7ab4dbf468b928ee4c23c8864068e301ce42435f",
+      "entry_hash": "1a16f9ee8acd40e8eb2bdeb1c6ce47d17a6b8cd32a89b01eb40e97bd593e6e0b",
+      "signal": "blue",
+      "type_name": "TrackCatalogueLintLayerResult"
+    },
+    {
+      "entry_hash": "477472c00a835712ba47ca25b55ad725f516452e89826f728122be5f0abb08db",
       "signal": "blue",
       "type_name": "TrackCataloguePath"
     },
@@ -253,19 +263,14 @@
       "type_name": "TrackContractMapInteractor"
     },
     {
-      "entry_hash": "f1cccb9825cfa548f9187c3bba5b63e031503eebba3f4129845a08987e7da248",
+      "entry_hash": "b4f187ae125152ea6eb935b390160cfa6595ca0ca6982a3a3424dfea4fd51721",
       "signal": "blue",
       "type_name": "TrackContractMapResult"
     },
     {
-      "entry_hash": "5ad550db25c694879174b8d1bc0213053c370158ca01ce308523914706008df6",
+      "entry_hash": "9ef5c7de1b4e1b169b1f53b563d8b15769b0184a1bdf0cf78fa8cb4b50f3f409",
       "signal": "blue",
       "type_name": "TrackDirectoryPath"
-    },
-    {
-      "entry_hash": "f6dcddc10b523bb75c0f1dc703083721e36ba9b4af8d922f575fd799a6414fd2",
-      "signal": "blue",
-      "type_name": "TrackIdInput"
     },
     {
       "entry_hash": "3f236ea7adf318c073d060e1fa8c2be990698aea444d114665d6ff1caa882a87",
@@ -288,7 +293,7 @@
       "type_name": "TrackInitResult"
     },
     {
-      "entry_hash": "68a0006f1f52f50ccc3d41a7309e20f19714ef29602bbf999719c07c4e06ce2a",
+      "entry_hash": "0df37cfdbb3c8ff6c5a4f15ea25a4be9617591314c682d9e2389054b6df0f64d",
       "signal": "blue",
       "type_name": "TrackItemsDirectory"
     },
@@ -306,6 +311,11 @@
       "entry_hash": "33fe64cb990d72d6ca89c1fd9ed7e1428808016a4486d2a046049eb5dcf84e74",
       "signal": "blue",
       "type_name": "TrackLayerSignalResult"
+    },
+    {
+      "entry_hash": "e7fe0850b45f5a29ef4ed393700f6f36a611c299bd44b29701f9dbaaed5d9254",
+      "signal": "blue",
+      "type_name": "TrackLifecycleIdInput"
     },
     {
       "entry_hash": "051ef545c293c206a8760434fdce10464b5cda4179fef4a438e789cb5758e475",
@@ -328,7 +338,7 @@
       "type_name": "TrackLintResult"
     },
     {
-      "entry_hash": "e9926443d7b6c279d97bacf8fd9e39543ea5059ef780940f3663e7e657588503",
+      "entry_hash": "0ca61a1a77b26eb6944073ff76b87c89a74d602e8cabfaba3947f6ba8adbaed1",
       "signal": "blue",
       "type_name": "TrackLintRulesFile"
     },
@@ -338,7 +348,7 @@
       "type_name": "TrackNextTaskCommand"
     },
     {
-      "entry_hash": "2369883267df1f714622e888b57f153653c403143d7ae362d193c036c369a213",
+      "entry_hash": "5a2ae36972399ae9fa7c1dce5b02f9d409c4a4319d28836477921c5e573012dc",
       "signal": "blue",
       "type_name": "TrackNextTaskError"
     },
@@ -353,7 +363,7 @@
       "type_name": "TrackNextTaskResult"
     },
     {
-      "entry_hash": "e003f888e80056652d35d60f4ab6618593adf0fb9f5381d87ca51d33077d01a9",
+      "entry_hash": "1084401a5817f85eeae9a1eeebb91cd3c25f02256041327f5bfc0a8e82bea3b2",
       "signal": "blue",
       "type_name": "TrackRenderedLayerCount"
     },
@@ -443,7 +453,7 @@
       "type_name": "TrackSetOverrideResult"
     },
     {
-      "entry_hash": "822e6e6a5c9cf16d6ec35f6f9c27285359ddc407d77318db1eca56f90c5fb0e5",
+      "entry_hash": "3ba4b97eb020ad896623ab29c7402ad5e6edd3f4b15e94f808c846dea589d1e8",
       "signal": "blue",
       "type_name": "TrackSourceWorkspace"
     },
@@ -498,7 +508,7 @@
       "type_name": "TrackTaskCountsCommand"
     },
     {
-      "entry_hash": "af5b2c8c73d75123dcd879320e60b8fcc0d7c5b847f88226f897eec355996bde",
+      "entry_hash": "6073026eaed72e9f37f82bca117d1ecd41fc49c8828a17984ba01c0a81fd1c47",
       "signal": "blue",
       "type_name": "TrackTaskCountsError"
     },
@@ -538,7 +548,7 @@
       "type_name": "TrackTransitionResult"
     },
     {
-      "entry_hash": "d082964ecb2e768895785e58dcda1ebf00349e7c92d19057f3cffab54c65d9e7",
+      "entry_hash": "f16df9d8d763bd90e3fa53e7ea0cfb4aada2dc53e1f00664df7359397aae5386",
       "signal": "blue",
       "type_name": "TrackTypeGraphClusterDepth"
     },
@@ -638,12 +648,12 @@
       "type_name": "TrackViewsValidateResult"
     },
     {
-      "entry_hash": "da97a5928b6b0456db99a858db2ecedf84fd96596364c7ab93acdd287beded75",
+      "entry_hash": "253b0b067e55db7bc75e03fe200c9369445d2b560b267ffe837e37a1ed0f0a2f",
       "signal": "blue",
       "type_name": "TrackWorkspaceRoot"
     },
     {
-      "entry_hash": "4248f4536a702e9494db9482fe6d83238dcfca11b61f4ff73bf89993138af610",
+      "entry_hash": "42f943f316eafd7df9fade19120c8c1148a99e8a8107bbe4e4894906b4abfd36",
       "signal": "blue",
       "type_name": "TrackWrittenFileCount"
     },
@@ -763,7 +773,7 @@
       "type_name": "TrackMetadataPort"
     },
     {
-      "entry_hash": "e3061991bbd25c5fd1aef3ec177e3d01dd38144059eeefdce98a504147cf94ff",
+      "entry_hash": "fbededb0561c786f4a0d1987051265191a7e07e94f35a8223f12622333bc7d6f",
       "signal": "blue",
       "type_name": "TrackNextTaskQueryPort"
     },
@@ -773,12 +783,12 @@
       "type_name": "TrackNextTaskService"
     },
     {
-      "entry_hash": "f021eb22666d78d8e15d0cd9302ca742755419e958b2536b33082620ebd69b06",
+      "entry_hash": "b302b65aaab5519dab0058ffc8009fd0cb1c89cb91df2f2516783cda9c1f4596",
       "signal": "blue",
       "type_name": "TrackOverrideClearPort"
     },
     {
-      "entry_hash": "998509796c5a74e5dc8d39346cf96bc8a916fd13d0e778b113740d28c627b08b",
+      "entry_hash": "996b32ca7e8ea5e6bcb374038a2823f311d75c974a67de7be99ce6eadcbf4c7c",
       "signal": "blue",
       "type_name": "TrackOverrideSetPort"
     },
@@ -828,12 +838,12 @@
       "type_name": "TrackSwitchBaseService"
     },
     {
-      "entry_hash": "1d1632e8be2d1966cffb596764a638c2f35ac112df0a8b36fda3fc5344f757f8",
+      "entry_hash": "95f5242fbb7466c84f34f6baf4ef240c5695882aba52cdf52089c36e114853cf",
       "signal": "blue",
       "type_name": "TrackTaskAddPort"
     },
     {
-      "entry_hash": "0abcec3e1873fd488b0486c0ef2adf55e476280c0b66dc27a853709628da11d9",
+      "entry_hash": "c28d0c0cb2471c531400a58b838e6a4809a70c3ec3a1028515658cd4377dcc57",
       "signal": "blue",
       "type_name": "TrackTaskCountsQueryPort"
     },
@@ -843,7 +853,7 @@
       "type_name": "TrackTaskCountsService"
     },
     {
-      "entry_hash": "b05b23d6630a41b5d542db931f1916b5ea7558ca0d0748527239e7958fc8dcea",
+      "entry_hash": "0f0e6c7eedb3c88370b3c6f079c492afb50f56ac7dc1bb227b1f9142861fee89",
       "signal": "blue",
       "type_name": "TrackTaskTransitionPort"
     },

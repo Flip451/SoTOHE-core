@@ -1,60 +1,63 @@
 {
   "baseline_hash": "8c3bfd5daee36ee658380e92b29c825810ba1f7aa661bf00c08322eae9ed6625",
-  "declaration_hash": "525384bcffd5a05044c1e91d1b7fa5437d8bc0595508503b6e44329542973990",
-  "generated_at": "2026-08-16T08:19:02Z",
-  "head_commit": "91af9981cc59ce99a9293daf20594aa516a43faf",
+  "declaration_hash": "ca18909cf891c84f999061c7b31b075b1b9c3a396ada154bdd71534bb3e766d8",
+  "generated_at": "2026-08-16T23:32:24Z",
+  "head_commit": "a81e5c102541b68cf3fc80a4b2937c2335362e46",
   "schema_version": 4,
   "signals": [
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
-        "usecase::TrackBranchStrategyPort"
+      "found_items": [
+        "usecase::track_lifecycle::TrackBranchStrategyPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "FsTrackBranchStrategyAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
-        "usecase::TrackMetadataPort"
+      "found_items": [
+        "Default",
+        "usecase::track_lifecycle::TrackMetadataPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "FsTrackMetadataAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
-        "usecase::TrackViewsPort"
+      "found_items": [
+        "Default",
+        "usecase::track_lifecycle::TrackViewsPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "FsTrackViewsAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
-        "usecase::TrackCommitHashPort"
+      "found_items": [
+        "Default",
+        "usecase::track_lifecycle::TrackCommitHashPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "GitTrackCommitHashAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
-        "usecase::TrackSelectionPort"
+      "found_items": [
+        "usecase::track_lifecycle::TrackSelectionPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "GitTrackSelectionAdapter"
     },
     {
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackBaselineCapturePort"
+        "usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackBaselineCaptureAdapter"
@@ -63,7 +66,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackBaselineGraphPort"
+        "usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackBaselineGraphAdapter"
@@ -72,7 +75,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackCatalogueImplSignalsPort"
+        "usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackCatalogueImplSignalsAdapter"
@@ -81,7 +84,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackCatalogueLintActivePort"
+        "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackCatalogueLintActiveAdapter"
@@ -90,7 +93,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackCatalogueSpecSignalsPort"
+        "usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackCatalogueSpecSignalsAdapter"
@@ -99,7 +102,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackContractMapPort"
+        "usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackContractMapAdapter"
@@ -108,7 +111,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackLintPort"
+        "usecase::track_lifecycle::tddd::lint::TrackLintPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackLintAdapter"
@@ -117,7 +120,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackResolutionPort"
+        "usecase::track_lifecycle::resolution_compat::TrackResolutionPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackResolutionAdapter"
@@ -126,7 +129,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackSpecElementHashPort"
+        "usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackSpecElementHashAdapter"
@@ -135,7 +138,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackTypeGraphPort"
+        "usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackTypeGraphAdapter"
@@ -144,7 +147,7 @@
       "found_type": false,
       "kind_tag": "secondary_adapter",
       "missing_items": [
-        "usecase::TrackTypeSignalsPort"
+        "usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort"
       ],
       "signal": "yellow",
       "type_name": "SystemTrackTypeSignalsAdapter"

@@ -44,67 +44,79 @@
   "trait_impls": [
     {
       "for_type": "FsTrackMetadataAdapter",
-      "trait_ref": "usecase::TrackMetadataPort"
+      "trait_ref": "usecase::track_lifecycle::TrackMetadataPort"
     },
     {
       "for_type": "FsTrackViewsAdapter",
-      "trait_ref": "usecase::TrackViewsPort"
+      "trait_ref": "usecase::track_lifecycle::TrackViewsPort"
     },
     {
       "for_type": "GitTrackCommitHashAdapter",
-      "trait_ref": "usecase::TrackCommitHashPort"
+      "trait_ref": "usecase::track_lifecycle::TrackCommitHashPort"
     },
     {
       "for_type": "GitTrackSelectionAdapter",
-      "trait_ref": "usecase::TrackSelectionPort"
+      "trait_ref": "usecase::track_lifecycle::TrackSelectionPort"
     },
     {
       "for_type": "FsTrackBranchStrategyAdapter",
-      "trait_ref": "usecase::TrackBranchStrategyPort"
+      "trait_ref": "usecase::track_lifecycle::TrackBranchStrategyPort"
     },
     {
       "for_type": "SystemTrackTypeSignalsAdapter",
-      "trait_ref": "usecase::TrackTypeSignalsPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort"
     },
     {
       "for_type": "SystemTrackBaselineGraphAdapter",
-      "trait_ref": "usecase::TrackBaselineGraphPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort"
     },
     {
       "for_type": "SystemTrackContractMapAdapter",
-      "trait_ref": "usecase::TrackContractMapPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort"
     },
     {
       "for_type": "SystemTrackCatalogueSpecSignalsAdapter",
-      "trait_ref": "usecase::TrackCatalogueSpecSignalsPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort"
     },
     {
       "for_type": "SystemTrackSpecElementHashAdapter",
-      "trait_ref": "usecase::TrackSpecElementHashPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort"
     },
     {
       "for_type": "SystemTrackBaselineCaptureAdapter",
-      "trait_ref": "usecase::TrackBaselineCapturePort"
+      "trait_ref": "usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort"
     },
     {
       "for_type": "SystemTrackLintAdapter",
-      "trait_ref": "usecase::TrackLintPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::lint::TrackLintPort"
     },
     {
       "for_type": "SystemTrackCatalogueImplSignalsAdapter",
-      "trait_ref": "usecase::TrackCatalogueImplSignalsPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort"
     },
     {
       "for_type": "SystemTrackCatalogueLintActiveAdapter",
-      "trait_ref": "usecase::TrackCatalogueLintActivePort"
+      "trait_ref": "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
     },
     {
       "for_type": "SystemTrackResolutionAdapter",
-      "trait_ref": "usecase::TrackResolutionPort"
+      "trait_ref": "usecase::track_lifecycle::resolution_compat::TrackResolutionPort"
     },
     {
       "for_type": "SystemTrackTypeGraphAdapter",
-      "trait_ref": "usecase::TrackTypeGraphPort"
+      "trait_ref": "usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort"
+    },
+    {
+      "for_type": "FsTrackMetadataAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsTrackViewsAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "GitTrackCommitHashAdapter",
+      "trait_ref": "core::default::Default"
     }
   ],
   "traits": {},

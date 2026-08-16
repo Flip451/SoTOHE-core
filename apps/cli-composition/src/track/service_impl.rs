@@ -25,7 +25,9 @@ fn composition_to_output(
 
 /// Implementation of [`TrackService`] that delegates to [`TrackCompositionRoot`].
 ///
-/// Constructed by the `track_driver()` factory in `TrackCompositionRoot`.
+/// Constructed by the `track_driver()` factory in `TrackCompositionRoot`. This
+/// compatibility facade intentionally does not retain the lifecycle secondary
+/// ports; command-context migrations wire and consume those ports directly.
 pub struct TrackServiceImpl;
 
 impl TrackService for TrackServiceImpl {

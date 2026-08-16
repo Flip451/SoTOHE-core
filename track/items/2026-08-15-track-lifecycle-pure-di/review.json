@@ -19,6 +19,46 @@
         }
       ]
     },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-16T12:35:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c6243217f0ac067b676b79b51d5632aff1e9ae1a4a6f43bfdab057cfa3f8cf47",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:44:43Z",
+          "findings": [
+            {
+              "category": "behavior_regression",
+              "file": "apps/cli-composition/src/track/ops.rs",
+              "line": 169,
+              "message": "`track_next_task_resolved` now requires `items_dir` to end in `<project-root>/track/items` and invokes `git rev-parse` through `build_branch_reader`; the same regression exists in `track_task_counts_resolved`. These pre-resolved paths previously queried `FsTrackStore` directly, and the CLI accepts other items-root paths when an explicit track ID is supplied. T001 therefore changes existing command behavior and adds unnecessary direct I/O even though the legacy query API never reads the injected branch reader. Keep this wiring off the legacy resolved paths until the lifecycle driver owns active selection.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture_violation",
+              "file": "apps/cli-composition/src/track/service_impl.rs",
+              "line": 33,
+              "message": "The five lifecycle ports added to `TrackServiceImpl` are only retained in underscore-prefixed fields; no `TrackService` method consumes them, and every method still enters the old `TrackCompositionRoot` execution path. Consequently every `track_driver()` constructs unused adapters and `Arc` references, while future command interactors cannot receive them through the erased `Arc<dyn TrackService>`. This is dead runtime wiring in the compatibility facade rather than a usable DI handoff and obstructs the T002 migration seam.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c6243217f0ac067b676b79b51d5632aff1e9ae1a4a6f43bfdab057cfa3f8cf47",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:02:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69f57d9bb8a21bf500ac8588122568e34ba9d473258c33d653e10ea1f9dee2cd",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -180,6 +220,534 @@
           "hash": "rvw1:sha256:a5faaac87ee908c21492f94141fb04bc8c7d940d37e100583403153c4231dc18",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T11:43:32Z",
+          "findings": [
+            {
+              "category": "out_of_scope leak into a task",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 338,
+              "message": "T028 includes final convergence/removal work explicitly anchored to OUT-03 and OUT-04, although the briefing marks semantic_dup/final convergence/crate reorganization as out of scope. Remove that work from this task or constrain it to the in-scope migration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fffc44824f830b3d39c1331276bc13d930279c1578b7a63fa8c0695faccf6c12",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T11:46:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acb5ed952606a876200cf7607e4039978559e0404d1a5f3ffbd0e016756e4bf9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:10:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acb5ed952606a876200cf7607e4039978559e0404d1a5f3ffbd0e016756e4bf9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:17:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acb5ed952606a876200cf7607e4039978559e0404d1a5f3ffbd0e016756e4bf9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T17:32:31Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 79,
+              "message": "T001 restates an upstream architecture contract in prose: “proving `TaskQueryInteractor` remains co-located in the command-context module and is not split into another crate.” Keep the target, operation, and anchor cite, but remove this behavioral/rationale restatement per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01dce3dba8a80faeca70512797a2a33f7a759e62f8265350146a1de39e5189d0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T17:34:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0b643c8d190d9b7d5ba8e5a4cbea77110e9f6e67f3d74acdce52e4a0cef25260",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T18:05:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0b643c8d190d9b7d5ba8e5a4cbea77110e9f6e67f3d74acdce52e4a0cef25260",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T18:35:44Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 347,
+              "message": "T029 cannot successfully run `bin/sotp review check-approved` as an implementation step. Entering the task changes `impl-plan.json` to `in_progress`, and the batch later changes it to `done`, so the impl-plan review hash is stale until the workflow's post-implementation review. Moving T029 to B20 does not resolve this ordering problem because review still occurs after task implementation. Remove this check from the task and rely on the review/commit workflow, or otherwise move it to a post-review workflow stage.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 339,
+              "message": "T028 is still `todo` but bundles several independently verifiable behavior units: final composition-root/driver reference convergence (AC-01/AC-04), branch-strategy and selection port/adapter migrations (AC-03/CN-01), and metadata port/adapter migration with persistence regression (AC-03/AC-05). Split these units before implementation and redistribute their task-contract attributions and estimates; each can be completed and tested at its own call sites without requiring the other units.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0b643c8d190d9b7d5ba8e5a4cbea77110e9f6e67f3d74acdce52e4a0cef25260",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T18:38:30Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 347,
+              "message": "T029 cannot successfully run `bin/sotp review check-approved` during implementation: its own `todo → in_progress → done` transitions change `impl-plan.json`, leaving the impl-plan review hash stale until the subsequent review phase. B20 therefore still invokes approval before the required approval artifact exists. Remove this check from the implementation task and leave it to the review/commit workflow, or move it to a genuine post-review stage.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 339,
+              "message": "T028 is `todo` but bundles independently verifiable units: composition-root/driver reference convergence (AC-01/AC-04), branch-strategy and selection port/adapter migrations (AC-03/CN-01), and metadata port/adapter migration with persistence regression (AC-03/AC-05). Split these units before implementation and redistribute their task-contract attributions and estimates.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0b643c8d190d9b7d5ba8e5a4cbea77110e9f6e67f3d74acdce52e4a0cef25260",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T18:42:08Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/batch-plan.json",
+              "line": 38,
+              "message": "B20 avoidably serializes T029 after T028. Once T028 is placed first in B19, T029's sole dependency is satisfied; T029 has no write target and declares zero lines, so adding it to B19 leaves totals at usecase 300, infrastructure 250, cli_driver 310, cli_composition 380, and cli 480—each within the 500-line ceiling. Put T029 after T028 in B19 and remove B20.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 339,
+              "message": "T028 is `todo` but bundles independently verifiable units: composition-root/driver reference convergence (AC-01/AC-04), branch-strategy and selection port/adapter migrations (AC-03/CN-01), and metadata port/adapter migration with persistence regression (AC-03/AC-05). Split these units before implementation and redistribute their task-contract attributions and estimates.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:32c17dea8466a0fa1de514738c6e76561d8ba621634a25b74b89ba180a92513a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T18:57:51Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 73,
+              "message": "The `plan.summary` GO-01 traceability is stale: it says `GO-01 → T001–T031`, but the plan now includes T032 and T033 as additional implementation tasks. Update the summary so goal-to-task traceability covers the complete task set.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ad06980548748c8f7a98ee8b69d7a6f72cf340e56bd419d2cd5cc2a36934ccae",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T18:59:44Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 59,
+              "message": "Section S4 includes T032 and T033, but its description only identifies resolution compatibility and three consumer contexts; it does not identify the branch-strategy/selection or metadata-port migrations those tasks perform. Add those targets and operations to S4 or move the tasks to an accurately described section.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5925ee0fa0be8672b4305eae8463679949b46cce58706b3af96d1070b7ae8509",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T19:02:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6182c1509df1acb052e969757d577e0d325a8a0efb72f1432b6f14631f16abee",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T19:02:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6182c1509df1acb052e969757d577e0d325a8a0efb72f1432b6f14631f16abee",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T19:08:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6182c1509df1acb052e969757d577e0d325a8a0efb72f1432b6f14631f16abee",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T19:12:13Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/batch-plan.json",
+              "line": 40,
+              "message": "Batch B2 groups T027 and T033 despite a concrete write-target collision in `libs/usecase/src/track_lifecycle/mod.rs`: T027 must register the new `track_lifecycle::resolution_compat` module there, while T033 targets `TrackMetadataPort`, which is declared in that same file, and budgets usecase production/test edits. These independent tasks therefore lack isolated write ownership and cannot safely share B2; move T033 to a non-overlapping batch or assign the shared file to one task.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6182c1509df1acb052e969757d577e0d325a8a0efb72f1432b6f14631f16abee",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T19:18:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:efcd2b3f87bfacbd3ce96b2c86107c9fac65a8e08fe58627de770bd85bef17cc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T19:23:20Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/batch-plan.json",
+              "line": 40,
+              "message": "T010 and T032 are both todo and become ready after T001, but T032 is deferred to B19 while B11 remains a singleton containing T010. Their declared targets do not overlap: T010 owns `track_set_override.rs` and its CLI/driver/composition wiring, while T032 owns `TrackBranchStrategyPort`/`TrackSelectionPort` and the corresponding infrastructure adapters. Their combined estimates are usecase 430, infrastructure 240, cli_driver 95, cli_composition 105, and cli 130—each below the 500-line ceiling. Move T032 into B11 alongside T010; T028 can continue to depend on it from B19.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:efcd2b3f87bfacbd3ce96b2c86107c9fac65a8e08fe58627de770bd85bef17cc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T19:28:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6182c1509df1acb052e969757d577e0d325a8a0efb72f1432b6f14631f16abee",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T19:34:28Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/batch-plan.json",
+              "line": 40,
+              "message": "B2 groups T027 and T033 despite a concrete write-ownership collision in `libs/usecase/src/track_lifecycle/mod.rs`: `resolution_compat.rs` does not yet exist, so T027 must register/re-export its new `TrackResolution*` module from that parent file, while T033 targets `TrackMetadataPort`, which is declared in the same file. Move T033 to B18 with T026; those targets do not overlap and their combined estimates remain within every 500-line ceiling (usecase 420, infrastructure 310, cli_driver 230, cli_composition 220, cli 240).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6182c1509df1acb052e969757d577e0d325a8a0efb72f1432b6f14631f16abee",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T19:40:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea15bca8748afc1608dfafa7f6618c6eabdcfd155d43097f7eca1ed6c7d15483",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T19:44:21Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/batch-plan.json",
+              "line": 40,
+              "message": "T014 and T033 are both todo and ready immediately after T001, but T033 is deferred to B18 while B15 remains a singleton containing T014. Their declared write targets do not overlap: T014 owns `track_task_counts.rs` and its CLI/driver/composition path, while T033 owns `TrackMetadataPort` and `FsTrackMetadataAdapter` in the usecase/infrastructure layers. Their combined estimates are usecase 315, infrastructure 160, cli_driver 85, cli_composition 95, and cli 120, all below the 500-line ceiling. Move T033 into B15 alongside T014; T026 can remain in B18.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ea15bca8748afc1608dfafa7f6618c6eabdcfd155d43097f7eca1ed6c7d15483",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T23:24:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea15bca8748afc1608dfafa7f6618c6eabdcfd155d43097f7eca1ed6c7d15483",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:25:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea15bca8748afc1608dfafa7f6618c6eabdcfd155d43097f7eca1ed6c7d15483",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:28:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea15bca8748afc1608dfafa7f6618c6eabdcfd155d43097f7eca1ed6c7d15483",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-16T12:36:35Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 162,
+              "message": "The adapter exposes environment-dependent absolute paths through the usecase-facing `DiagnosticText`: canonicalization failures include `git.root().display()`, missing-track errors include `track_dir.display()`, and `FsCommitHashStore` errors are forwarded verbatim. These diagnostics can reach CLI stderr and disclose the local repository layout. Return stable, path-free diagnostics (or sanitize paths) at this boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:381c0e2d5736d3aff5a653feee5e522d32423808a0234baa2ad79fbc7e3ed3b3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:40:32Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 162,
+              "message": "Production errors from this adapter expose environment-dependent absolute paths through the usecase-facing `DiagnosticText`: canonicalization failures include `git.root().display()`, missing-track errors include `track_dir.display()`, and `FsCommitHashStore` errors are forwarded verbatim. These diagnostics can reach CLI stderr and disclose the local repository layout; sanitize paths or return stable path-free diagnostics at this boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:381c0e2d5736d3aff5a653feee5e522d32423808a0234baa2ad79fbc7e3ed3b3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:48:08Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 300,
+              "message": "The new error mappers sanitize paths by discarding nearly all underlying diagnostics: `TrackReadError::Repository::Message`, `TrackWriteError::Repository::Message`, Git command failures (including stderr), render I/O errors, and commit-hash I/O errors all become generic text. This loses actionable distinctions such as malformed metadata, permission failures, symlink rejection, and Git stderr, violating the adapter contract to preserve diagnostic information. Preserve safe error details while removing only environment-dependent paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d1be9e44aae497139a1b478d371fb229cc567449f30c89bbe6e65ea1823f7d88",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:48:12Z",
+          "findings": [
+            {
+              "category": "process",
+              "file": "tmp/reviewer-runtime/briefing-infrastructure.md",
+              "line": 1,
+              "message": "Re-reading the current briefing, severity policy, scoped file, and diff before the final re-adjudication.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d1be9e44aae497139a1b478d371fb229cc567449f30c89bbe6e65ea1823f7d88",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:49:12Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 150,
+              "message": "The adapter still collapses important underlying failures into generic diagnostics: HEAD-resolution errors are discarded at `map_err(|_| ...)`, `CommitHashError::Io` loses its safe error kind/detail, and active-track resolution loses the specific detached/non-track/invalid-branch reason. This violates the briefing’s requirement to preserve diagnostic information while avoiding absolute paths; retain safe structured reasons rather than discarding them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d1be9e44aae497139a1b478d371fb229cc567449f30c89bbe6e65ea1823f7d88",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:06:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3c802c561bf5272a536eb7fe66de931e65cab248f6473264cebcb7e252cb0a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:07:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f3c802c561bf5272a536eb7fe66de931e65cab248f6473264cebcb7e252cb0a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:12:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62aaba6e517f9292e6c4472bf1f0868bf554820debaf3bf7d00adbcf726a2f2d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:16:14Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 253,
+              "message": "`TrackSelection::Explicit` is returned without the existing write guard. The current views-sync path verifies that an explicit ID matches the branch-derived track before rendering; this adapter would let `FsTrackViewsAdapter::sync` overwrite another track's rendered files from the wrong branch. Resolve explicit view selections through the write-guarded branch comparison and add a mismatch regression test.",
+              "severity": "P0"
+            },
+            {
+              "category": "behavioral-regression",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 255,
+              "message": "`TrackSelection::Active` propagates branch discovery/resolution failures, so views sync on `main`, detached HEAD, or outside Git cannot select `RegistryOnly`. The existing command deliberately falls back to registry-only synchronization when no active track is detected; this changes its exit/output behavior and leaves the adapter's `RegistryOnly` path unreachable. Preserve that fallback and test a non-track branch.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 710,
+              "message": "The only `GitTrackCommitHashAdapter` test exits at the branch-mismatch check, before HEAD resolution, trusted-root handling, or `.commit_hash` persistence. It therefore cannot fulfill the bound `persist_current_for_track` contract or the required happy-path coverage. Add an adapter-level success test that verifies the returned HEAD and persisted file, plus the relevant I/O failure path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:62aaba6e517f9292e6c4472bf1f0868bf554820debaf3bf7d00adbcf726a2f2d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:18:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62aaba6e517f9292e6c4472bf1f0868bf554820debaf3bf7d00adbcf726a2f2d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:19:01Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 253,
+              "message": "`TrackSelection::Explicit` bypasses the existing views-sync write guard and returns the requested track without verifying that the current branch is `track/<id>`. Once this adapter is wired, `FsTrackViewsAdapter::sync` can overwrite another track's rendered files from the wrong branch. Resolve explicit view selections through the branch-matching write guard and test mismatch rejection before synchronization.",
+              "severity": "P0"
+            },
+            {
+              "category": "behavioral-regression",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 255,
+              "message": "The active view-selection path propagates branch discovery/resolution failures instead of returning `RegistryOnly`. Existing views-sync behavior intentionally falls back to registry-only synchronization on `main`, detached HEAD, or Git discovery failure; the new implementation changes that behavior and never produces `RegistryOnly` itself. Preserve the fallback and cover a non-track branch.",
+              "severity": "P1"
+            },
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 161,
+              "message": "`Path::is_dir()` silently converts every metadata error—including permission failures—into `false`, which is then misreported as a missing track. This loses required adapter diagnostics and also follows directory symlinks during the precheck. Use fallible `symlink_metadata`/`metadata`, distinguish `NotFound`, reject symlinks explicitly, and propagate other I/O failures through `DiagnosticText`.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 710,
+              "message": "The only adapter-level test for `persist_current_for_track` exits at the branch-mismatch check, before HEAD resolution, trusted-root validation, or `.commit_hash` persistence, yet it is recorded as fulfilling the whole port contract. Add a happy-path test verifying the returned HEAD and persisted file, plus an I/O failure case for the adapter mapping.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:62aaba6e517f9292e6c4472bf1f0868bf554820debaf3bf7d00adbcf726a2f2d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:23:03Z",
+          "findings": [
+            {
+              "category": "error-handling",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 161,
+              "message": "`Path::is_dir()` silently converts permission and other metadata failures into `false`, then reports every failure as a nonexistent track. This loses required adapter diagnostics and follows directory symlinks during the precheck. Use fallible metadata inspection, distinguish `NotFound`, explicitly reject symlinks, and propagate other I/O errors through sanitized `DiagnosticText`.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 671,
+              "message": "The new branch-mismatch and registry-fallback tests are not enrolled in the `resolve_views_scope` or `GitTrackSelectionAdapter` records in `test-bindings.json`; those records still cite only explicit success. Because the obligation references CN-01, the bound evidence still does not verify the preserved write guard or registry-only fallback. Bind these regression tests to the relevant obligations.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 793,
+              "message": "The new happy-path and symlink tests are not enrolled in the `TrackCommitHashPort` or `GitTrackCommitHashAdapter` records; both remain bound solely to the mismatch test that exits before HEAD resolution and persistence. Consequently the formal AC-05 contract evidence still does not cover the method's successful persistence behavior. Add the new tests to both binding records.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f55fe258e325f583a82f33ac4918cf413aef082798c51502ae0ede64998e3df9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:30:37Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 708,
+              "message": "The branch-mismatch and registry-only fallback tests remain absent from both the `resolve_views_scope` fulfillment and `GitTrackSelectionAdapter` conformance records in `test-bindings.json`. The bound evidence still covers only successful resolution and therefore does not establish the CN-01 write guard or fallback behavior. Bind both regression tests to the relevant obligations.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation",
+              "file": "libs/infrastructure/src/track/mod.rs",
+              "line": 830,
+              "message": "The successful persistence, persistence-I/O failure, and symlink-rejection tests are not enrolled in the `TrackCommitHashPort` or `GitTrackCommitHashAdapter` records. Both obligations remain bound solely to the branch-mismatch test, which exits before HEAD resolution and persistence, so the formal AC-05 evidence still does not cover the adapter's core behavior. Add the new tests to both binding records.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a4f46d72a5e09e3223bc5ac7253c913a5c56f6eee899c1c1763516927ffb8bf0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:43:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c0898335c10ac19e18afb94e92b0aff2904e5d5108e3bfb35d36c7dd301a9a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:47:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c0898335c10ac19e18afb94e92b0aff2904e5d5108e3bfb35d36c7dd301a9a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:48:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f6c0898335c10ac19e18afb94e92b0aff2904e5d5108e3bfb35d36c7dd301a9a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -196,6 +764,56 @@
           "at": "2026-08-16T07:12:02Z",
           "findings": [],
           "hash": "rvw1:sha256:52ee7cf146421708e2aa3d712e1842d08837c99fd718eaa5213f9dd215d0b9c5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T11:43:00Z",
+          "findings": [
+            {
+              "category": "missing-test-binding",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 3,
+              "message": "`bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` fails with unresolved edges: this file contains only 21 fulfillment records while `obligations.json` contains 101 obligations. Add fulfillment records for every derived obligation, or valid waivers where applicable, so the commit gate can establish totality.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:575804e5c33b7bc01890380cec378bd0af8a7a42a799e10497324638b748a2bb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:10:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:575804e5c33b7bc01890380cec378bd0af8a7a42a799e10497324638b748a2bb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:15:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:575804e5c33b7bc01890380cec378bd0af8a7a42a799e10497324638b748a2bb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T17:31:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d79520a7dc2645cb67812abc2f7272900dcacb3c7466d20127c72792f1a40cc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T18:05:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d79520a7dc2645cb67812abc2f7272900dcacb3c7466d20127c72792f1a40cc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T18:47:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d79520a7dc2645cb67812abc2f7272900dcacb3c7466d20127c72792f1a40cc",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -602,6 +1220,299 @@
           "at": "2026-08-16T06:55:11Z",
           "findings": [],
           "hash": "rvw1:sha256:85649f56b3ad4fc23035d295ada3a67d889f5508c5e9373bdd7a57ca5d31a01e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:10:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7966749eec4c1d9bf385bfb3d28977b7bf8d87708e6e25c9d62f62af0b3ba989",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:16:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e104fde549feb0ae282b44758740a0a8f39800ceb6ca22937982880275c0de7b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:37:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e104fde549feb0ae282b44758740a0a8f39800ceb6ca22937982880275c0de7b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:51:05Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 1171,
+              "message": "`usecase::TaskQueryInteractor` is unconditionally declared to implement `TrackNextTaskQueryPort` and `TrackTaskCountsQueryPort`, whose commands allow `TrackSelection::Active`, but both `new(store)` and `with_branch_reader(store, None)` construct it without the collaborator required to resolve that variant. This makes a valid port implementation state unusable by construction. Require the resolver/reader for the new port implementation or move selection resolution exclusively into the command-specific interactors.",
+              "severity": "P1"
+            },
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 5730,
+              "message": "`usecase::TrackCatalogueLintActiveResult::Checked` flattens all layers into `Vec<CatalogueLintViolation>`, although `CatalogueLintViolation` contains no layer identity. The current command renders a `[layer]` prefix for every violation and reports the number of checked layers, so the primary adapter cannot reconstruct either part from this result. Preserve per-layer groups or include layer identity and the checked-layer count.",
+              "severity": "P1"
+            },
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 6272,
+              "message": "`usecase::TrackContractMapResult` omits the rendered-layer count, while the existing command's stdout includes `layers=<rendered_layer_count>` alongside the entry count and warnings. For `TrackLayerFilter::All`, that value cannot be derived by the primary adapter from the command, so CN-01 output equivalence is unrepresentable. Add `TrackRenderedLayerCount` to the result.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e104fde549feb0ae282b44758740a0a8f39800ceb6ca22937982880275c0de7b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T15:09:35Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 4271,
+              "message": "`TaskQueryInteractor` の `docs` が、型の識別名ではなく branch reader 注入と selection resolution の設計意図・挙動を再記述しています。`docs` は anchor cite と短い識別句に留めるべきです。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 5765,
+              "message": "`TrackCatalogueLintLayerResult` の `docs` が、違反保持の挙動と primary adapter のレンダリング理由・checked-layer count を再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、anchor cite と短い識別句へ縮約すべきです。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:91592fc1db9d47051e6e493dd71aa222b9511347178ef7a12ff320e4116368bd",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T15:11:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b6c2ba9e13b134354a7d7aa58b1fbc0926f9971a42cbab94fd48aa9baa295ba4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:16:09Z",
+          "findings": [
+            {
+              "category": "Single Responsibility violation",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 1166,
+              "message": "`usecase::TaskQueryInteractor` still implements the baseline `TaskQueryService`, whose methods receive an explicit track ID, but its only post-change constructor now requires `BranchReaderPort`. This forces legacy explicit-ID query callers to inject an unused Git-selection collaborator and combines storage querying with active-track resolution, even though `TrackNextTaskInteractor` and `TrackTaskCountsInteractor` already inject `TrackSelectionPort`. Preserve the focused baseline constructor and move resolution solely to those command-specific interactors, or introduce a separate lifecycle adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b6c2ba9e13b134354a7d7aa58b1fbc0926f9971a42cbab94fd48aa9baa295ba4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T15:34:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00e096473524d872fa256199834eec251a169ad13f7333bd51df307ad3265a41",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:45:41Z",
+          "findings": [
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 3090,
+              "message": "`TrackNextTaskQueryPort::next_task` and `TrackTaskCountsQueryPort::task_counts` accept an already validated `domain::TrackId` and perform no task mutation, yet return the nine-variant legacy `TaskOperationError`. Only query failures such as `TrackNotFound` and `StoreFailed` are reachable; `InvalidTrackId`, `InvalidTaskId`, `InvalidCommitHash`, `TaskNotFound`, `TransitionFailed`, `BranchGuardFailed`, and `BranchlessGuardFailed` cannot arise from these contracts. Introduce a query-specific error surface instead of forcing the narrow ports to expose unrelated variants.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:00e096473524d872fa256199834eec251a169ad13f7333bd51df307ad3265a41",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T16:00:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a4b58d177ee97ee75e27ba7ca6af3c5df14188afbe52f633c3910416514b3020",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T17:14:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3961aa238335c79fa91135a2c0dda8aa5e1feabcb7eeb72a57d83505e471bf1e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T17:17:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3961aa238335c79fa91135a2c0dda8aa5e1feabcb7eeb72a57d83505e471bf1e",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-16T12:37:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6fa466b12b518f05ece5e9a8872032a61928b601226bd24fb63ef23cde8528fb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:45:13Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/usecase/src/track_lifecycle/mod.rs",
+              "line": 328,
+              "message": "The six command-specific secondary ports are declared in the shared `track_lifecycle` root instead of their approved command-context modules (`track_transition`, `track_add_task`, etc.). This leaves each per-subcommand module containing only its DTO and violates the 1-subcommand/1-usecase module boundary. Move each port beside its command/interactor, re-exporting it from the root if compatibility requires that path.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 869,
+              "message": "`test_task_interactors_implement_track_lifecycle_ports` only checks generic trait bounds; it never calls any of the six new public trait implementations or exercises explicit/active selection and failure propagation. Incorrect transition mapping, delegation, or branch-resolution behavior would still satisfy every recorded conformance binding. Add happy-path and error-path behavioral tests for these public APIs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6fa466b12b518f05ece5e9a8872032a61928b601226bd24fb63ef23cde8528fb",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:04:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9cb349e6dd2d56d5d924efb31c3f5efb1bb825f3978b91ca1f201cb71fd5ced3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:06:32Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 904,
+              "message": "The new lifecycle tests import port traits from child command modules (for example `track_add_task::TrackTaskAddPort`), but those traits are defined/re-exported at `track_lifecycle` level and are not members of the child modules. The test target therefore fails to compile; import these traits from `crate::track_lifecycle::{...}` instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9cb349e6dd2d56d5d924efb31c3f5efb1bb825f3978b91ca1f201cb71fd5ced3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:11:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:64393fb575ce286f6aa1a2f75bc7f19e3f39762a20275ab9384fac1f1dfc0673",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:14:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:64393fb575ce286f6aa1a2f75bc7f19e3f39762a20275ab9384fac1f1dfc0673",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T17:54:00Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 564,
+              "message": "`TaskQueryInteractor` still owns `branch_reader` and resolves `TrackSelection::Active`, while the frozen contract requires query interactors to receive an already-resolved `domain::TrackId` and use `TrackSelectionPort` in command-specific interactors. The associated test calls the already-removed `TaskQueryInteractor::with_branch_reader` at line 960, so the usecase test target does not compile. Remove this query-side selection resolution and move Active-resolution tests to the later command-specific interactor tasks.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9f6e793efd05af7cced517cb5e239e7247b9c5f81dc60bef31df089e9a30d2e4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T18:02:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d31f70ed456a249a775a3dade1a7165499b365d5161cf448d723c826d7c146f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T18:12:41Z",
+          "findings": [
+            {
+              "category": "architecture_violation",
+              "file": "libs/usecase/src/task_ops.rs",
+              "line": 579,
+              "message": "TaskOperationInteractor no longer implements the frozen secondary-port contracts. Those four ports must receive an already-resolved TrackId and validated domain arguments, but the new implementations accept Track*Command values containing TrackSelection and resolve Active through the legacy BranchReaderPort. This moves selection orchestration into the bundled legacy interactor and obstructs later one-usecase decomposition. Restore the catalogue signatures for transition/add/set/clear and remove this helper and its T001 Active-selection tests.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "libs/usecase/src/track_lifecycle/track_next_task.rs",
+              "line": 18,
+              "message": "TrackNextTaskQueryPort returns TaskOperationError, while the frozen catalogue requires Result<Option<NextTaskOutput>, TrackNextTaskError>. Defining the trait with the legacy shared error means TaskQueryInteractor only conforms to the altered local trait, not the frozen usecase contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "contract_conformance",
+              "file": "libs/usecase/src/track_lifecycle/track_task_counts.rs",
+              "line": 18,
+              "message": "TrackTaskCountsQueryPort returns TaskOperationError, while the frozen catalogue requires Result<TaskCountsOutput, TrackTaskCountsError>. This changes the usecase error boundary and prevents TaskQueryInteractor from implementing the declared frozen contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9d31f70ed456a249a775a3dade1a7165499b365d5161cf448d723c826d7c146f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T18:13:03Z",
+          "findings": [
+            {
+              "category": "architecture/type-contract",
+              "file": "libs/usecase/src/track_service.rs",
+              "line": 170,
+              "message": "`TaskOperationInteractor`'s four new secondary-port implementations (`TrackTaskTransitionPort`, `TrackTaskAddPort`, `TrackOverrideSetPort`, and `TrackOverrideClearPort`) accept command-context objects and resolve `TrackSelection` themselves. The frozen catalogue requires these ports to receive an already-resolved `domain::TrackId` plus typed operation arguments; selection belongs in the later command-specific interactors through `TrackSelectionPort`. This also makes the T001 Active-failure test at `task_ops.rs:973` cement behavior assigned to later decomposition. Align all four traits/impls with the catalogued signatures and remove the added selection resolver and misplaced test.",
+              "severity": "P1"
+            },
+            {
+              "category": "error-contract",
+              "file": "libs/usecase/src/track_lifecycle/track_next_task.rs",
+              "line": 22,
+              "message": "`TrackNextTaskQueryPort` returns the broad `TaskOperationError`, while the frozen contract requires `TrackNextTaskError`; `TrackTaskCountsQueryPort` has the analogous mismatch with `TrackTaskCountsError` at `track_task_counts.rs:22`. Their implementations therefore expose mutation and branch-guard failures that cannot arise from these storage queries and leave T007/T014 requiring a breaking interface change. Use and map the command-specific query error types.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9d31f70ed456a249a775a3dade1a7165499b365d5161cf448d723c826d7c146f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T18:26:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5f4bcb872ed92eafb225f6162dce16a3053a0c5af1851ad17eb40e6e18e354a9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T18:27:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5f4bcb872ed92eafb225f6162dce16a3053a0c5af1851ad17eb40e6e18e354a9",
           "type": "final",
           "verdict": "zero_findings"
         }

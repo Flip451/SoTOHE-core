@@ -1,6 +1,30 @@
 {
   "obligations": [
     {
+      "brief": "Author a result test covering 'entry' of TaskQueryInteractor",
+      "declaration_hash": "079d993c157d26795c4018869586240b3aba4ca77cde0ac25f26af58c8f2654c",
+      "id": {
+        "entry_key": "TaskQueryInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "spec_refs": [
+        {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "TaskQueryInteractor",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+        "section_key": "types"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      }
+    },
+    {
       "brief": "Author a result test covering 'entry' of TrackAddTaskInteractor",
       "declaration_hash": "e14e2776d5bf7cf3e7fe617da8e4b84668f2c41d37d0ac25a744aed4a5934795",
       "id": {
@@ -1734,7 +1758,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:next_task' of TrackNextTaskQueryPort",
-      "declaration_hash": "d08e4ad1d9e1e59753bcf1581c5a674e1d5254b9b25eca17f25ace7b69336180",
+      "declaration_hash": "a07356f70c081c6bb190ecfea824c89ce6d9262f44279c7751de4c385c8801ca",
       "id": {
         "entry_key": "TrackNextTaskQueryPort",
         "item_identifier": "trait_method:next_task",
@@ -1798,7 +1822,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:clear_override' of TrackOverrideClearPort",
-      "declaration_hash": "914bbab87ee852cba4d6cd11bd2efd6425d68432471cea1a63526c3b24a32dd5",
+      "declaration_hash": "6a32b4f9edbf55a4215a7ee88386090abc1f9d3b0e781e43322e91de0cafc33d",
       "id": {
         "entry_key": "TrackOverrideClearPort",
         "item_identifier": "trait_method:clear_override",
@@ -1826,7 +1850,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:set_override' of TrackOverrideSetPort",
-      "declaration_hash": "58509150401b97e6ebe21fccd73c9f02560ecfa74413b4034a61a90541f13099",
+      "declaration_hash": "870343f64144121d59473a80ccadbe311c148192b82702eae9cee3d7991dc68b",
       "id": {
         "entry_key": "TrackOverrideSetPort",
         "item_identifier": "trait_method:set_override",
@@ -2202,7 +2226,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:add_task' of TrackTaskAddPort",
-      "declaration_hash": "dfaa9c05762c75305db0086024fcf7b18349876f0370d2564aef89556126e194",
+      "declaration_hash": "582cccbc10a15bbb7600cbb49a2415a9843219572bd88319252899b267da0274",
       "id": {
         "entry_key": "TrackTaskAddPort",
         "item_identifier": "trait_method:add_task",
@@ -2230,7 +2254,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:task_counts' of TrackTaskCountsQueryPort",
-      "declaration_hash": "08b34e60f12a4f511da4691fe942c760d4a16ec9e59b00db6329c0ff80981d3c",
+      "declaration_hash": "5afced5bdaf7077fdf120991f8f10ba8ba04ee161eafa4aebc54b09fbc54ff69",
       "id": {
         "entry_key": "TrackTaskCountsQueryPort",
         "item_identifier": "trait_method:task_counts",
@@ -2294,7 +2318,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:transition_task' of TrackTaskTransitionPort",
-      "declaration_hash": "2a6dabf2a8094c7ac311880bcca0872bad36a3e4ea2759adb301b6360b32c607",
+      "declaration_hash": "95f7f8911b9c4c9df857bfa00be028314075ef3a2a573a762df399f320407858",
       "id": {
         "entry_key": "TrackTaskTransitionPort",
         "item_identifier": "trait_method:transition_task",
@@ -2614,7 +2638,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskTransitionPort' of TaskOperationInteractor",
-      "declaration_hash": "b24fa756c03ad901de2e1e741ecaa626f5bb0d23ef81dbeb1127f86db7f7fb3b",
+      "declaration_hash": "a6ad770a003aa30d3225f22e5ae210151043780899889f595c05ca7577af36aa",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackTaskTransitionPort",
@@ -2642,7 +2666,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskAddPort' of TaskOperationInteractor",
-      "declaration_hash": "e9cc1075789c357cdf502897f735fb95ed33e19be5ed89b853571720a5291b8f",
+      "declaration_hash": "9b1c44c563009ced0ba6a28f78c29137d38809c76dc64fbd20bbea48d601f4c2",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackTaskAddPort",
@@ -2670,7 +2694,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackOverrideSetPort' of TaskOperationInteractor",
-      "declaration_hash": "dd675345800a688f094e087b8e5c75f6150c0ad4b05345e5ebadce457653c4a5",
+      "declaration_hash": "94f889f213b90f01b328eb508980b51ec08213ed9a515df495af109ef3dc2109",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackOverrideSetPort",
@@ -2698,7 +2722,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackOverrideClearPort' of TaskOperationInteractor",
-      "declaration_hash": "daa602dc27bd56379583c7d1613eefcbab4053ad2578b13a4ad2dd46644272e3",
+      "declaration_hash": "89c32581fbddc36467a6b9e597e753aeacdd65e799115dd598bf2998922c8c7a",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackOverrideClearPort",
@@ -2726,7 +2750,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackNextTaskQueryPort' of TaskQueryInteractor",
-      "declaration_hash": "288e62f49f74bc67c29737b8331d308e56a0dd8a41e6c59e7d20b4a2d7459023",
+      "declaration_hash": "fdcc6301b23d7b3bb9e2f0733b7553ed6005b3b5035bc6b69e1f0193b006bde5",
       "id": {
         "entry_key": "TaskQueryInteractor",
         "item_identifier": "trait_impl:TrackNextTaskQueryPort",
@@ -2754,7 +2778,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskCountsQueryPort' of TaskQueryInteractor",
-      "declaration_hash": "fe2bcd5936d3fe16af2c0c6e11525e875fd746bfc82385234b6bc6fa533fa23e",
+      "declaration_hash": "52ae972a0cd19805b389780928686b5e440c484f7f8413ed5a6b18553ec3fbc9",
       "id": {
         "entry_key": "TaskQueryInteractor",
         "item_identifier": "trait_impl:TrackTaskCountsQueryPort",
@@ -2781,11 +2805,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackMetadataPort' of FsTrackMetadataAdapter",
-      "declaration_hash": "66b705e1511142ca0bd113169690936ed48472ce3a9dce0510d215d74e8b82a3",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackMetadataPort' of FsTrackMetadataAdapter",
+      "declaration_hash": "0d9eee1a4903c351361b45f9bf8a1238bcfc9067ef1b54f8bf807b5e91b27555",
       "id": {
         "entry_key": "FsTrackMetadataAdapter",
-        "item_identifier": "trait_impl:usecase::TrackMetadataPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackMetadataPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -2809,11 +2833,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackViewsPort' of FsTrackViewsAdapter",
-      "declaration_hash": "6a59b50e26ce8a8ac50b4282806c01cde4dada589860b40d4bb3c0c4ca4eb144",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackViewsPort' of FsTrackViewsAdapter",
+      "declaration_hash": "b2b218697164671dec46fd8527bcb6216dfd1dc702212eedb31d234a1345861d",
       "id": {
         "entry_key": "FsTrackViewsAdapter",
-        "item_identifier": "trait_impl:usecase::TrackViewsPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackViewsPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -2837,11 +2861,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCommitHashPort' of GitTrackCommitHashAdapter",
-      "declaration_hash": "dc1502a4b8192462720bfe3993226cfaaa44ecb1777a917949dafc9fff22a704",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackCommitHashPort' of GitTrackCommitHashAdapter",
+      "declaration_hash": "8338bb2caa08c45c75d15540cdb9e7b6255fcb3574e9cbdc49c2eea17f5f04f5",
       "id": {
         "entry_key": "GitTrackCommitHashAdapter",
-        "item_identifier": "trait_impl:usecase::TrackCommitHashPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackCommitHashPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -2865,11 +2889,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackSelectionPort' of GitTrackSelectionAdapter",
-      "declaration_hash": "258b00cbe8a7ae7fbe0a37e1a0f984b213f96fe88aa17059abe574f20eef7763",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackSelectionPort' of GitTrackSelectionAdapter",
+      "declaration_hash": "0db096f3c04875db471777353189de59cea42401cf180efcc064c483598078e5",
       "id": {
         "entry_key": "GitTrackSelectionAdapter",
-        "item_identifier": "trait_impl:usecase::TrackSelectionPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackSelectionPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -2893,11 +2917,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackBranchStrategyPort' of FsTrackBranchStrategyAdapter",
-      "declaration_hash": "c2e1e3a7631b6bb83c3dc4d71a92c56e89b691e9ff18254721a404e3e103c794",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackBranchStrategyPort' of FsTrackBranchStrategyAdapter",
+      "declaration_hash": "1b38c0aeaa03290c0ca9fb943fd736c6fb8ccf791a67fedab0b6a3e798443479",
       "id": {
         "entry_key": "FsTrackBranchStrategyAdapter",
-        "item_identifier": "trait_impl:usecase::TrackBranchStrategyPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackBranchStrategyPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -2921,11 +2945,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackTypeSignalsPort' of SystemTrackTypeSignalsAdapter",
-      "declaration_hash": "61ea0eeac3ade1a73fc6f43dcb2c80528236680fcc222278479b0c3adf31bcdc",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort' of SystemTrackTypeSignalsAdapter",
+      "declaration_hash": "22986fb5fe0b1e53f1bd18e59dfa9389f4370a0ced7a89624ecd86b64c75c06c",
       "id": {
         "entry_key": "SystemTrackTypeSignalsAdapter",
-        "item_identifier": "trait_impl:usecase::TrackTypeSignalsPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -2949,11 +2973,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackBaselineGraphPort' of SystemTrackBaselineGraphAdapter",
-      "declaration_hash": "eae19118eb327a21aed2559452d4683d8bd46413b60cf99e429e3adb730cfed4",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort' of SystemTrackBaselineGraphAdapter",
+      "declaration_hash": "72a5b9320dad772a172ba4169c2ae3402d170bdc754c77af153f6b973d387de6",
       "id": {
         "entry_key": "SystemTrackBaselineGraphAdapter",
-        "item_identifier": "trait_impl:usecase::TrackBaselineGraphPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -2977,11 +3001,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackContractMapPort' of SystemTrackContractMapAdapter",
-      "declaration_hash": "6923770b1b67458e1d3c224b8f3e2d01347b1989cd744bae1bf0e79c49a62ad7",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort' of SystemTrackContractMapAdapter",
+      "declaration_hash": "ac48416d5f3b75eee99f4490385569dd8d4871056eb679ad2f17f0bbad035e1c",
       "id": {
         "entry_key": "SystemTrackContractMapAdapter",
-        "item_identifier": "trait_impl:usecase::TrackContractMapPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3005,11 +3029,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCatalogueSpecSignalsPort' of SystemTrackCatalogueSpecSignalsAdapter",
-      "declaration_hash": "5cfca8e61f5d0aafaccfdc84c3804c5bb78698fa24e6e4469ba64333ea0f51dc",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort' of SystemTrackCatalogueSpecSignalsAdapter",
+      "declaration_hash": "3feed57bb569b64225a7ba5a10e5389966fb4175dfeb63ff3a487cba562c4c1a",
       "id": {
         "entry_key": "SystemTrackCatalogueSpecSignalsAdapter",
-        "item_identifier": "trait_impl:usecase::TrackCatalogueSpecSignalsPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3033,11 +3057,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackSpecElementHashPort' of SystemTrackSpecElementHashAdapter",
-      "declaration_hash": "25451e36c222be5743c57be59c550126b3adb8d2dc202d35794440e5e9a76580",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort' of SystemTrackSpecElementHashAdapter",
+      "declaration_hash": "656641cd77ab8c40a4f9a696737bfcd5a239f9f0befeca469a857717006b9157",
       "id": {
         "entry_key": "SystemTrackSpecElementHashAdapter",
-        "item_identifier": "trait_impl:usecase::TrackSpecElementHashPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3061,11 +3085,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackBaselineCapturePort' of SystemTrackBaselineCaptureAdapter",
-      "declaration_hash": "ae22f3109f29c4b48c29fbbc4884b60b8f2f08bda62f505d8de9a71f4f4cff11",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort' of SystemTrackBaselineCaptureAdapter",
+      "declaration_hash": "71633f33f91124a01e17b111e5b9e194570bde39d30bbcd40e20e3e1331ae580",
       "id": {
         "entry_key": "SystemTrackBaselineCaptureAdapter",
-        "item_identifier": "trait_impl:usecase::TrackBaselineCapturePort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3089,11 +3113,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackLintPort' of SystemTrackLintAdapter",
-      "declaration_hash": "c93a2b6d3bd473b538926601f04763799728b0fbed885c757e00caac18582779",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::lint::TrackLintPort' of SystemTrackLintAdapter",
+      "declaration_hash": "528d828e52209f5748d11607588c794d2cf2e89d070fa77f637b35ca746d72b3",
       "id": {
         "entry_key": "SystemTrackLintAdapter",
-        "item_identifier": "trait_impl:usecase::TrackLintPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::lint::TrackLintPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3117,11 +3141,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCatalogueImplSignalsPort' of SystemTrackCatalogueImplSignalsAdapter",
-      "declaration_hash": "be89af56596862ce7d0e3001557b00aaa2845d78052a575a43a2ca9c1cd933c3",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort' of SystemTrackCatalogueImplSignalsAdapter",
+      "declaration_hash": "c8298a0831d752f355ccb18736eafb236ca1d66bae17267b1bd1d4b11420a4bf",
       "id": {
         "entry_key": "SystemTrackCatalogueImplSignalsAdapter",
-        "item_identifier": "trait_impl:usecase::TrackCatalogueImplSignalsPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3145,11 +3169,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackCatalogueLintActivePort' of SystemTrackCatalogueLintActiveAdapter",
-      "declaration_hash": "7ae05bd2d61547d27b6a688bb5986ba696056c128e220815f86bf4face2c43a1",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort' of SystemTrackCatalogueLintActiveAdapter",
+      "declaration_hash": "36277b0eddd3a1af4ae616022cce6377861b3d516e7df7c772ddd7c1368deea0",
       "id": {
         "entry_key": "SystemTrackCatalogueLintActiveAdapter",
-        "item_identifier": "trait_impl:usecase::TrackCatalogueLintActivePort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3173,11 +3197,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackResolutionPort' of SystemTrackResolutionAdapter",
-      "declaration_hash": "dc08c6e618e0c472d95fd6ad88cc1166726afcfe7fefd14f9746936ef8256f99",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::resolution_compat::TrackResolutionPort' of SystemTrackResolutionAdapter",
+      "declaration_hash": "392c272acb2252239f8113ed3a535caa60e1ae19b62b26dcd1492e94281c756e",
       "id": {
         "entry_key": "SystemTrackResolutionAdapter",
-        "item_identifier": "trait_impl:usecase::TrackResolutionPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::resolution_compat::TrackResolutionPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [
@@ -3201,11 +3225,11 @@
       }
     },
     {
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::TrackTypeGraphPort' of SystemTrackTypeGraphAdapter",
-      "declaration_hash": "492229c0ace1ccce5ffb6a46b93b5b8e1243b5a28ecefd0f8c6e7907c582ae9f",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort' of SystemTrackTypeGraphAdapter",
+      "declaration_hash": "300f33140711c55f69309ea2f220ee43a67fe07374817fff11e02628ed7300ba",
       "id": {
         "entry_key": "SystemTrackTypeGraphAdapter",
-        "item_identifier": "trait_impl:usecase::TrackTypeGraphPort",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort",
         "obligation_kind": "contract_conformance"
       },
       "spec_refs": [

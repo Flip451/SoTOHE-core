@@ -3,15 +3,15 @@
 
 ## Summary
 
-GO-01 → T001–T031; each independently verifiable command context has its own implementation task, followed by convergence and validation.
+GO-01 → T001–T033; each independently verifiable command context has its own implementation task, followed by remaining migration and validation.
 
-## Tasks (0/31 resolved)
+## Tasks (1/33 resolved)
 
 ### S1 — Shared wiring
 
 > In `libs/usecase/src/track_service.rs`, `apps/cli-composition/src/track/{composition_root.rs,mod.rs}`, and `apps/cli-driver/src/track.rs`, add the DI wiring seam. [IN-01; IN-02; CN-02; CN-03; AC-01; AC-04]
 
-- [ ] **T001**: In `libs/usecase/src/track_service.rs`, `apps/cli-composition/src/track/{composition_root.rs,mod.rs}`, `apps/cli-driver/src/track.rs`, and the track adapters, add the `TaskOperationInteractor`/`TaskQueryInteractor` and `TrackCompositionRoot`/`TrackDriver` DI wiring seam. [IN-01; IN-02; CN-02; CN-03; AC-01; AC-04]
+- [x] **T001**: In `libs/usecase/src/{track_service.rs,task_ops.rs}` and the existing DI seam, complete the `TaskOperationInteractor`/`TaskQueryInteractor` foundation, add focused regression coverage, and add deterministic `TaskQueryInteractor` topology coverage. [IN-01; IN-02; CN-01; CN-02; CN-03; AC-01; AC-03; AC-04]
 
 ### S2 — Track lifecycle command contexts
 
@@ -26,12 +26,12 @@ GO-01 → T001–T031; each independently verifiable command context has its own
 - [ ] **T008**: Implement the `TrackTransition*` boundary in `libs/usecase/src/track_lifecycle/track_transition.rs`; update `apps/cli/src/commands/track/transition.rs`, the driver, composition wiring, and transition regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T009**: Implement the `TrackClearOverride*` boundary in `libs/usecase/src/track_lifecycle/track_clear_override.rs`; update the clear-override handler in `apps/cli/src/commands/track/state_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T010**: Implement the `TrackSetOverride*` boundary in `libs/usecase/src/track_lifecycle/track_set_override.rs`; update the set-override handler in `apps/cli/src/commands/track/state_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
-- [ ] **T011**: Implement the `TrackSetCommitHash*` boundary in `libs/usecase/src/track_lifecycle/track_set_commit_hash.rs`; update `apps/cli/src/commands/track/set_commit_hash.rs`, `apps/cli-composition/src/track/set_commit_hash.rs`, the driver, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [ ] **T011**: Implement the `TrackSetCommitHash*` boundary in `libs/usecase/src/track_lifecycle/track_set_commit_hash.rs`; integrate `TrackCommitHashPort` and `GitTrackCommitHashAdapter` through `apps/cli/src/commands/track/set_commit_hash.rs`, `apps/cli-composition/src/track/set_commit_hash.rs`, and the driver; add the before/after CLI persistence regression. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T012**: Implement the `TrackSwitchBase*` boundary in `libs/usecase/src/track_lifecycle/track_switch_base.rs`; update the switch-base handler in `apps/cli/src/commands/track/branch_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T013**: Implement the `TrackResolve*` command boundary in `libs/usecase/src/track_lifecycle/track_resolve.rs`; update `apps/cli/src/commands/track/resolve.rs`, the driver, composition wiring, and CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T014**: Implement the `TrackTaskCounts*` boundary in `libs/usecase/src/track_lifecycle/track_task_counts.rs`; update the task-counts handler in `apps/cli/src/commands/track/{dispatch.rs,validate.rs}`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
-- [ ] **T015**: Implement the `TrackViewsSync*` boundary in `libs/usecase/src/track_lifecycle/track_views_sync.rs`; update `apps/cli/src/commands/track/views.rs`, the driver, composition wiring, and sync regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
-- [ ] **T016**: Implement the `TrackViewsValidate*` boundary in `libs/usecase/src/track_lifecycle/track_views_validate.rs`; update `apps/cli/src/commands/track/validate.rs`, the driver, composition wiring, and validation regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [ ] **T015**: Implement the `TrackViewsSync*` boundary in `libs/usecase/src/track_lifecycle/track_views_sync.rs`; integrate `TrackViewsPort` through `apps/cli/src/commands/track/views.rs`, the driver, and composition wiring, with sync and port-contract regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [ ] **T016**: Implement the `TrackViewsValidate*` boundary in `libs/usecase/src/track_lifecycle/track_views_validate.rs`; integrate `FsTrackViewsAdapter` through `apps/cli/src/commands/track/validate.rs`, the driver, and composition wiring, with validation and adapter-conformance regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 
 ### S3 — TDDD command contexts
 
@@ -48,12 +48,14 @@ GO-01 → T001–T031; each independently verifiable command context has its own
 - [ ] **T025**: Implement the `TrackSpecElementHash*` boundary in `libs/usecase/src/track_lifecycle/tddd/spec_element_hash.rs`; wire `apps/cli/src/commands/track/tddd/spec_element_hash.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T026**: Implement the `TrackTypeGraph*` boundary in `libs/usecase/src/track_lifecycle/tddd/type_graph.rs`; wire `apps/cli/src/commands/track/tddd/graph.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 
-### S4 — Resolution and convergence
+### S4 — Resolution and validation
 
-> In the resolution compatibility modules and three consumer contexts, establish and migrate the resolution boundary before removing residual execution paths and running final validation. [IN-01; IN-02; IN-04; OUT-02; OUT-03; OUT-04; CN-01; CN-02; CN-03; AC-01; AC-04; AC-05; AC-06; AC-07]
+> In the resolution compatibility modules and three consumer contexts, and in `libs/usecase/src/track_lifecycle/` (`TrackBranchStrategyPort`, `TrackSelectionPort`, `TrackMetadataPort`) plus `libs/infrastructure/src/track/` (`FsTrackBranchStrategyAdapter`, `GitTrackSelectionAdapter`, `FsTrackMetadataAdapter`), establish and migrate the resolution, branch-strategy/selection, and metadata boundaries before replacing remaining execution-path references and running validation. [IN-01; IN-02; IN-04; OUT-02; CN-01; CN-02; CN-03; AC-01; AC-03; AC-04; AC-05; AC-06; AC-07]
 
 - [ ] **T027**: In `libs/{usecase,infrastructure}/src/track_lifecycle/resolution_compat.rs`, `apps/cli-driver/src/track_resolution.rs`, `apps/cli-composition/src/track/resolution.rs`, and `apps/cli/src/commands/adr_baseline.rs`, establish and wire the `TrackResolution*` compatibility boundary, migrate the ADR-baseline resolution call site, and add focused regressions. [IN-01; IN-02; IN-04; OUT-02; CN-01; CN-02; AC-01; AC-04; AC-05]
 - [ ] **T030**: In `apps/cli-composition/src/review_v2/helpers.rs`, migrate the review-v2 resolution call site to the wired `TrackResolution*` boundary and add its focused CLI-behavior regression. [IN-04; CN-01; CN-02; AC-05]
 - [ ] **T031**: In `apps/cli/src/commands/task_contract.rs`, migrate the task-contract resolution call site to the wired `TrackResolution*` boundary and add its focused CLI-behavior regression. [IN-04; CN-01; CN-02; AC-05]
-- [ ] **T028**: In `apps/cli-composition/src/track/{composition_root.rs,service_impl.rs,shim.rs}`, `apps/cli-driver/src/{track.rs,track_tddd.rs}`, and lifecycle command callers under `apps/cli/src/commands/track/`, converge `TrackCompositionRoot`, `TrackDriver`, `TrackTdddDriver`, and `TrackTdddInput`, remove surviving `TrackService`/`service_impl.rs`/shim execution-path references, and add final integration regressions. [IN-01; IN-02; OUT-03; OUT-04; CN-01; CN-02; CN-03; AC-01; AC-04; AC-05]
-- [ ] **T029**: Validate the finalized paths rooted at `apps/cli-composition/src/track/composition_root.rs` and `libs/usecase/src/track_lifecycle/`: run `bin/sotp catalogue-lint check-active-track`, canonical `bin/sotp review results`/`check-approved`, and `cargo make ci-track`. [CN-02; AC-06; AC-07]
+- [ ] **T032**: In `libs/usecase/src/track_lifecycle/` (`TrackBranchStrategyPort`, `TrackSelectionPort`) and `libs/infrastructure/src/track/` (`FsTrackBranchStrategyAdapter`, `GitTrackSelectionAdapter`), migrate branch-strategy and selection access behind the declared ports and add adapter-contract regressions. [IN-01; IN-02; CN-01; CN-02; AC-03]
+- [ ] **T033**: In `libs/usecase/src/track_lifecycle/` (`TrackMetadataPort`) and `libs/infrastructure/src/track/` (`FsTrackMetadataAdapter`), migrate metadata persistence behind the declared port and add persistence regressions. [IN-01; IN-02; CN-02; AC-03; AC-05]
+- [ ] **T028**: In `apps/cli-composition/src/track/{composition_root.rs,service_impl.rs,shim.rs}`, `apps/cli-driver/src/{track.rs,track_tddd.rs}`, and lifecycle command callers under `apps/cli/src/commands/track/`, replace remaining execution-path references with the wired `TrackDriver` and `TrackTdddDriver` routes and add focused CLI regressions. [IN-01; IN-02; CN-01; CN-02; CN-03; AC-01; AC-04]
+- [ ] **T029**: Validate the finalized paths rooted at `apps/cli-composition/src/track/composition_root.rs` and `libs/usecase/src/track_lifecycle/`: run `bin/sotp catalogue-lint check-active-track` and `cargo make ci-track`. [CN-02; AC-06; AC-07]
