@@ -97,6 +97,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "203fcdff70083dfeb409f925b1a9cc2f65d06cbc",
       "depends_on": [
         "T5"
       ],
@@ -110,7 +111,7 @@
       ],
       "description": "Targets: the enter-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test enter's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-11, AC-12.",
       "id": "T8",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -120,7 +121,7 @@
       ],
       "description": "Targets: .harness/custom/review-prompts/harness-policy.md. Operation: after validate, explain, and enter are re-grounded, remove only the named track's conditional Known Accepted Deviations clause; preserve all other deviation records. Anchors: GO-01, IN-12, AC-13.",
       "id": "T9",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }
