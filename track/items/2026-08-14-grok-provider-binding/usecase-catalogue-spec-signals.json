@@ -1,0 +1,31 @@
+{
+  "catalogue_declaration_hash": "66b60a14b60a6407914a4031191531529b515528952c053d271a4c99b27c4d1b",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "0a48b8e79e8c4e10f47ee2faf23710edb1b48add48c6740217a716f645ce79b4",
+      "signal": "blue",
+      "type_name": "CapabilityProviderPort"
+    },
+    {
+      "entry_hash": "f1cdecd910ca7de06587b27bab0ed0a272438d5cb8d63eec940117536b392cff",
+      "signal": "blue",
+      "type_name": "DryCheckAgentPort"
+    },
+    {
+      "entry_hash": "8c42c53ca2da059036ef81d030db0b6e7a4298e8a032827663e87341fae2932e",
+      "signal": "blue",
+      "type_name": "HookDispatchService"
+    },
+    {
+      "entry_hash": "696bfa35c5f2ed34b01d79c603b0164b1e2a70fca67288b1761598c9c1a6152a",
+      "signal": "blue",
+      "type_name": "ReviewFixRunner"
+    },
+    {
+      "entry_hash": "b8978e96e8d474e4528b7d6732c500ce9bb64f998b686d8c3308fa7e2c452137",
+      "signal": "blue",
+      "type_name": "Reviewer"
+    }
+  ]
+}

@@ -370,6 +370,8 @@ mod tests {
         );
         let adapter = super::super::RecordingDryTierTelemetryAdapter::new(
             make_tiered_recorder_fast_only(1),
+            "codex".to_owned(),
+            "codex".to_owned(),
             "fast-model".to_owned(),
             "final-model".to_owned(),
             "test-track".to_owned(),

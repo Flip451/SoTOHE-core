@@ -1,0 +1,39 @@
+{
+  "baseline_hash": "31c16b4069767cc61c9a690ab903c7f76f6d0a0f50ec5948a0e87910fa1fd879",
+  "declaration_hash": "66b60a14b60a6407914a4031191531529b515528952c053d271a4c99b27c4d1b",
+  "generated_at": "2026-08-16T09:03:27Z",
+  "head_commit": "0b22da4ab8847e34e3211192fd8628b571eafcdb",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "CapabilityProviderPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "DryCheckAgentPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "HookDispatchService"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ReviewFixRunner"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "Reviewer"
+    }
+  ]
+}

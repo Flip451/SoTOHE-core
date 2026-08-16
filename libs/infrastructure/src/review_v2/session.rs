@@ -50,7 +50,9 @@ impl ReviewerSession {
     pub(super) fn resumable_id(&self) -> Option<String> {
         let key = self.key.as_ref()?;
         let entry = self.cache.load(key).ok().flatten()?;
-        (entry.provider().as_str() == self.provider && entry.model() == &self.model)
+        (entry.provider().as_str() == self.provider
+            && entry.model() == &self.model
+            && entry.effort() == self.effort)
             .then(|| entry.session_id().as_str().to_owned())
     }
 
@@ -144,11 +146,19 @@ mod tests {
     }
 
     fn entry(provider: &str, model: &str) -> ProviderSessionCacheEntry {
+        entry_with_effort(provider, model, ReasoningEffort::High)
+    }
+
+    fn entry_with_effort(
+        provider: &str,
+        model: &str,
+        effort: ReasoningEffort,
+    ) -> ProviderSessionCacheEntry {
         ProviderSessionCacheEntry::new(
             ProviderSessionId::try_new("prior-session".to_owned()).unwrap(),
             ProviderName::try_new(provider.to_owned()).unwrap(),
             ModelName::try_new(model.to_owned()).unwrap(),
-            ReasoningEffort::Low,
+            effort,
         )
     }
 
@@ -191,6 +201,13 @@ mod tests {
             saved: Mutex::new(vec![]),
         });
         assert_eq!(session(mismatch, RoundType::Fast).resumable_id(), None);
+        let effort_mismatch = Arc::new(FakeCache {
+            entry: Some(entry_with_effort("claude", "model-current", ReasoningEffort::Low)),
+            expected_key: Some(key(RoundType::Fast)),
+            fail_load: false,
+            saved: Mutex::new(vec![]),
+        });
+        assert_eq!(session(effort_mismatch, RoundType::Fast).resumable_id(), None);
         let failure = Arc::new(FakeCache {
             entry: None,
             expected_key: Some(key(RoundType::Fast)),

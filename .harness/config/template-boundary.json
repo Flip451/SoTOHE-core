@@ -19,6 +19,7 @@
     { "pattern": ".codex", "classification": "include" },
     { "pattern": ".gemini", "classification": "include" },
     { "pattern": ".githooks", "classification": "include" },
+    { "pattern": ".grok", "classification": "include" },
     { "pattern": ".github", "classification": "overlay" },
     { "pattern": ".harness/briefings", "classification": "include" },
     { "pattern": ".harness/capabilities", "classification": "include" },

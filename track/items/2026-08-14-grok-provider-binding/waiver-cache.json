@@ -1,0 +1,77 @@
+{
+  "entries": [
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokEnvelopeError"
+      },
+      "key": {
+        "anchor_text_hash": "a7b35973e8bdccf001b34012cac03a4004b84a33a4cf6a84d856ae8c692e1f92",
+        "declaration_hash": "c9c347198231bacc2480d7a478aa63bb060b961a93332d91a9701d9a5e0761a5",
+        "waived_reason_hash": "b43426a21d671c1a64fae9e2364693f6db4b9f99ea9840698472246aa77b6151"
+      },
+      "obligation_id": {
+        "entry_key": "GrokEnvelopeError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "variants: [VariantDecl { name: VariantName(Identifier(\"ProviderFailure\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"failure_reason\")), ty: TypeRef(\"usecase::capability_exec::CapabilityFailureDetail\") }]) }]",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-08",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokOutputEnvelope"
+      },
+      "key": {
+        "anchor_text_hash": "d2c9d7fba850ee3082e21fb6d1c42cea7dbb0fcb2f7adb137b1a3b096f5cf45a",
+        "declaration_hash": "afd44a6bc8cefdf852cddd768f3aed6bdb22395bc3f797562d569e332e3c9a34",
+        "waived_reason_hash": "0e6d608d5ed6425cd58966609e9db0d0fc5b13e4d60a39ba0f1b07406aaf4230"
+      },
+      "obligation_id": {
+        "entry_key": "GrokOutputEnvelope",
+        "item_identifier": "voluntary:AC-08",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry ... kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Succeeded\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"structured_output\")), ty: TypeRef(\"serde_json::Value\") }]) }, VariantDecl { name: VariantName(Identifier(\"Failed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"failure_reason\")), ty: TypeRef(\"usecase::capability_exec::CapabilityFailureDetail\") }]) }] ... methods: [], generics: [], where_predicates: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        "entry_key": "GrokSandbox"
+      },
+      "key": {
+        "anchor_text_hash": "a7b35973e8bdccf001b34012cac03a4004b84a33a4cf6a84d856ae8c692e1f92",
+        "declaration_hash": "4a6f049dc0b23f0cfacbb586cec193b2a429a4afdddaf9f1e0f8e64f96f6525d",
+        "waived_reason_hash": "17581db0e078b48e56c94836d2f395ddd8589d92d3219fa3476216fb1a9f56e6"
+      },
+      "obligation_id": {
+        "entry_key": "GrokSandbox",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ],
+  "track_id": "2026-08-14-grok-provider-binding"
+}
