@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "9274ca19a0ef68cabc2d88c61b64fe94b8fe9e05901487bbb8fb1704c09cf3a6",
+  "catalogue_declaration_hash": "b2c389415bf015bcd5ebf0f283f77e1c317fdf6a4dd21771bd9d0f498932c19d",
   "schema_version": 1,
   "signals": [
     {
@@ -11,6 +11,11 @@
       "entry_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
       "signal": "blue",
       "type_name": "TestObligation"
+    },
+    {
+      "entry_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
     }
   ]
 }

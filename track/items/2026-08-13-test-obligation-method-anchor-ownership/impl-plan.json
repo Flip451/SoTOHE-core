@@ -61,6 +61,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "12f0d9b7",
       "depends_on": [
         "T2"
       ],
@@ -74,7 +75,7 @@
       ],
       "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive.rs. Operation: implement and test derivation and structural validation. Anchors: GO-01, IN-01, IN-02, AC-01, AC-02, AC-03, CN-01, CN-02, OS-01, OS-02, OS-03.",
       "id": "T4",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

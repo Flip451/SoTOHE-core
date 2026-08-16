@@ -3,9 +3,254 @@
     {
       "bound_tests": [
         {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_obligations_own_only_each_method_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_empty_entry_derives_anchorless_trait_method_obligation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
+      },
+      "key": {
+        "anchor_text_hash": "fd1d058263a2425b2ce5327bc38e8a4d01569dbc5721ad1198d1b20ad898b6d9",
+        "bound_tests_set_hash": "40375f8e002ca4bcb2bd8fc2bbbba5c98a0b2e6e9688df29067631173860fc97",
+        "declaration_hash": "4f6995974e3e0f8057db71e0a68af73be11b2b1026bba9ac70685f5d9eb6093d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n    assert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_obligations_own_only_each_method_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_empty_entry_derives_anchorless_trait_method_obligation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
+      },
+      "key": {
+        "anchor_text_hash": "6a263f6ab00d46dff9b91e3501e0a8e2357b1226a03cc9cca5d00770880a7b51",
+        "bound_tests_set_hash": "40375f8e002ca4bcb2bd8fc2bbbba5c98a0b2e6e9688df29067631173860fc97",
+        "declaration_hash": "4f6995974e3e0f8057db71e0a68af73be11b2b1026bba9ac70685f5d9eb6093d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            result,\n            Err(\n                domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(\n                    _\n                )\n            )\n        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_obligations_own_only_each_method_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_empty_entry_derives_anchorless_trait_method_obligation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
+      },
+      "key": {
+        "anchor_text_hash": "729a557ff53a36dbbb9eca0469274764ccb4e10aea395cafc802926868b58aaf",
+        "bound_tests_set_hash": "40375f8e002ca4bcb2bd8fc2bbbba5c98a0b2e6e9688df29067631173860fc97",
+        "declaration_hash": "4f6995974e3e0f8057db71e0a68af73be11b2b1026bba9ac70685f5d9eb6093d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));\n\nassert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\nassert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_obligations_own_only_each_method_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_empty_entry_derives_anchorless_trait_method_obligation"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
+      },
+      "key": {
+        "anchor_text_hash": "0334106b1c8ae37e2900444b351c0535147885c7f5325d7874274fdabf1d2121",
+        "bound_tests_set_hash": "40375f8e002ca4bcb2bd8fc2bbbba5c98a0b2e6e9688df29067631173860fc97",
+        "declaration_hash": "4f6995974e3e0f8057db71e0a68af73be11b2b1026bba9ac70685f5d9eb6093d"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));\n\nassert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\nassert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
           "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "GO-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "0e3eaf0e3ecd65b29b40728647fbb963fc9035ece2c1a6d3a16ae52e5bfe4d9f",
+        "bound_tests_set_hash": "2cb7f4a091811911e4856f8a6bcd180ac97a1d5b469471859d2ad39f82c7860b",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:GO-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_with_shared_ref_receiver"
         }
       ],
       "edge_id": {
@@ -17,8 +262,8 @@
       },
       "key": {
         "anchor_text_hash": "7832dd1acaf6b20685546ab28b16143bc0b980e04580cada69645626c0e6cb9a",
-        "bound_tests_set_hash": "779179d10c664a5ac8f9e5f0074ec1b342c12be55dc89cfc3145fc8c3d91e0c6",
-        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+        "bound_tests_set_hash": "9c1d34317ea91393978f628fe38d322ca8f9adf824110522c5b8ee48e481810c",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -26,7 +271,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );",
+        "citation": "assert_eq!(decl.spec_refs(), &[spec_ref]);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -35,8 +280,90 @@
       "bound_tests": [
         {
           "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "fd1d058263a2425b2ce5327bc38e8a4d01569dbc5721ad1198d1b20ad898b6d9",
+        "bound_tests_set_hash": "2cb7f4a091811911e4856f8a6bcd180ac97a1d5b469471859d2ad39f82c7860b",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:IN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());\n\n        assert!(declaration.spec_refs().is_empty());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "6a263f6ab00d46dff9b91e3501e0a8e2357b1226a03cc9cca5d00770880a7b51",
+        "bound_tests_set_hash": "8c06bc733e46144d9ae5b0311be10e20d04128c8787a1db58a9cb3cd00042dce",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]) ... vec![spec_ref(\"IN-01\")] ... Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_));\n\nmethod_with_spec_refs(\"load\", vec![spec_ref(\"IN-01\")]) ... vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")] ... Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_));\n\nlet cases: Vec<Vec<SpecRef>> = vec![vec![], vec![spec_ref(\"IN-01\")]]; ... vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")] ... Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_with_shared_ref_receiver"
         }
       ],
       "edge_id": {
@@ -48,8 +375,8 @@
       },
       "key": {
         "anchor_text_hash": "1a9ccc1be429517f0795c316a8ba3c60851953593dcc952f6b6e72b6417bdd18",
-        "bound_tests_set_hash": "779179d10c664a5ac8f9e5f0074ec1b342c12be55dc89cfc3145fc8c3d91e0c6",
-        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+        "bound_tests_set_hash": "9c1d34317ea91393978f628fe38d322ca8f9adf824110522c5b8ee48e481810c",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -57,7 +384,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );",
+        "citation": "assert_eq!(decl.spec_refs(), &[spec_ref]);\n        assert_eq!(decl.docs(), Some(&docs));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -65,9 +392,91 @@
     {
       "bound_tests": [
         {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
-          "test_name": "test_existing_catalogue_without_method_level_spec_refs_remains_compatible"
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "4baafde0be28d4211cc1417fc27f17721eab507daabd540aea6ac87a5f2127d0",
+        "bound_tests_set_hash": "2cb7f4a091811911e4856f8a6bcd180ac97a1d5b469471859d2ad39f82c7860b",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:AC-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "729a557ff53a36dbbb9eca0469274764ccb4e10aea395cafc802926868b58aaf",
+        "bound_tests_set_hash": "8c06bc733e46144d9ae5b0311be10e20d04128c8787a1db58a9cb3cd00042dce",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
         }
       ],
       "edge_id": {
@@ -79,8 +488,8 @@
       },
       "key": {
         "anchor_text_hash": "dc31ead9d9f8b872e221b92f9f1bd09b2f22376c00225f2f5241df91feac9fc0",
-        "bound_tests_set_hash": "533cf89d27b85e0947ae930338020983405a2ea2788d57ed086c3699c7ff365e",
-        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+        "bound_tests_set_hash": "2cb7f4a091811911e4856f8a6bcd180ac97a1d5b469471859d2ad39f82c7860b",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -88,7 +497,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(entry.methods()[0].spec_refs().is_empty());",
+        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());\n\n        assert!(declaration.spec_refs().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -97,8 +506,8 @@
       "bound_tests": [
         {
           "layer": "domain",
-          "module_path": "domain::tddd::catalogue_linter::tests",
-          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
         }
       ],
       "edge_id": {
@@ -110,8 +519,8 @@
       },
       "key": {
         "anchor_text_hash": "33047b21fa31a7260f4882f76bf0ace8afd0c74c1a1ed6526a4258d821a2f701",
-        "bound_tests_set_hash": "779179d10c664a5ac8f9e5f0074ec1b342c12be55dc89cfc3145fc8c3d91e0c6",
-        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+        "bound_tests_set_hash": "833ce7103d264aac5c32fd6ce31dfbb0c6975d4bb90cd7f9e468872d9b1e0e65",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -119,7 +528,84 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );",
+        "citation": "assert_eq!(shape[\"has_stripped_fields\"], true);\n        assert_eq!(shape[\"fields\"].as_array().map(Vec::len), Some(0));\n...\n        assert!(type_names.iter().all(|ty| {\n            !ty.split(['<', '>', ',', ' '])\n                .any(|part| matches!(part, \"String\" | \"PathBuf\" | \"i32\" | \"u32\" | \"usize\"))\n        }));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_obligations_own_only_each_method_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "0334106b1c8ae37e2900444b351c0535147885c7f5325d7874274fdabf1d2121",
+        "bound_tests_set_hash": "13b381f0a83ea0248d70c928f3a49e0f7ea3d1bdecd3e2872bedb5c3e2971c28",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n    assert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_derive_validates_only_catalogues_supplied_on_the_command"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "MethodDeclaration"
+      },
+      "key": {
+        "anchor_text_hash": "7f9460b4f3ca3ef77f25b21a7894a73975c299bf0673ff63948b86c93c152d5e",
+        "bound_tests_set_hash": "f9970a1dd10ffb6e574ff573ee6e4772e1719ae98174042bd35464fc264d9812",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
+      },
+      "obligation_id": {
+        "entry_key": "MethodDeclaration",
+        "item_identifier": "voluntary:CN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "interactor.execute(&command(vec![valid_path])).unwrap();",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
@@ -130,6 +616,11 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
           "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_with_shared_ref_receiver"
         }
       ],
       "edge_id": {
@@ -141,8 +632,8 @@
       },
       "key": {
         "anchor_text_hash": "d62a0bbc73bf1ad0416064b340595598ec8177433bac9dbd41052d299e6c1dab",
-        "bound_tests_set_hash": "93b8b0bda7e4a6ede3e5bf316441897bccc0cc798511341a25b67b9a917aca15",
-        "declaration_hash": "1646665bde35e3a7e1516be58ffc131b3ffe2cb3d1a71e131aaed34179d86293"
+        "bound_tests_set_hash": "9c1d34317ea91393978f628fe38d322ca8f9adf824110522c5b8ee48e481810c",
+        "declaration_hash": "df2581b76524a7ec522edebff70d5c3f210fe8b2fd0000a69555403eb27d7be5"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",

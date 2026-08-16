@@ -1,4 +1,41 @@
 {
-  "obligations": [],
+  "obligations": [
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+      "declaration_hash": "4f6995974e3e0f8057db71e0a68af73be11b2b1026bba9ac70685f5d9eb6093d",
+      "id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    }
+  ],
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership"
 }

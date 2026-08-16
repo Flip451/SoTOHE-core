@@ -127,6 +127,24 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-16T12:41:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d62d7b704cb6057c1065c0ba780e0e139a337fb04e0e90943f4d575b0d835b0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:58:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d62d7b704cb6057c1065c0ba780e0e139a337fb04e0e90943f4d575b0d835b0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -206,6 +224,35 @@
           "at": "2026-08-14T12:28:00Z",
           "findings": [],
           "hash": "rvw1:sha256:7e03a1448580b14666cd34cf8351bd9e5d62eb1022abc76f8d1d2ae5648af911",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:41:48Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 870,
+              "message": "This permanent domain test hardcodes a track-specific `domain-types.json` path, coupling the domain crate's test build to a mutable/renamable track artifact. Removing or renaming that track directory will make unrelated domain tests fail to compile; use a stable fixture or test the Rust API directly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2d9fc57cd77ce61a5871041f5558462b93c43e09a98dfd2d5a1a15ef763888a6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:56:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fc55f389ab8ba2ae99140de96088f75169479a92a0e90fb1567c9bd84ee50e42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:11:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fc55f389ab8ba2ae99140de96088f75169479a92a0e90fb1567c9bd84ee50e42",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -775,6 +822,27 @@
           "hash": "rvw1:sha256:aead5508ec7e3b90fd8860b91d632bc0f4adf5ff7b9f0377838dcb632981adff",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:24:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98accade9e04102057a86c46aa0238042a77f65797ae4d6fdd33616100522dc9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:30:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98accade9e04102057a86c46aa0238042a77f65797ae4d6fdd33616100522dc9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:58:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67d46f00133c7bb8f3cbb51dec4933cf8beca2b5afbf70b38b335d4f5ed65a14",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1033,6 +1101,57 @@
           "at": "2026-08-14T12:41:10Z",
           "findings": [],
           "hash": "rvw1:sha256:b79495ba41beb8ff4b41cdb7697b63bcaa240057107da0d2bd003ce833693fc3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:25:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c0df283c04fb10e67b67f782a0a9d345aaec829074edf82ff1f4f41816e1ff0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:32:33Z",
+          "findings": [
+            {
+              "category": "Testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 82,
+              "message": "The IN-02, AC-02, and CN-01 records now bind different usecase tests than the frozen fulfilled verdicts. `bin/sotp test-obligation check` currently reports `TestChanged` for all three edges, so the T4-done obligation gate is not green. Re-run the host-owned evaluation for these binding sets and commit fresh verdicts; repair any bindings the evaluator rejects.",
+              "severity": "P1"
+            },
+            {
+              "category": "Testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 213,
+              "message": "The CN-01 binding contains only rejection cases for out-of-catalogue, uncovered, and partial single-method anchors. CN-01 also requires shared ownership to be accepted, but no bound test exercises that positive case, so a regression rejecting anchors shared by multiple methods could still satisfy this evidence set. Add the existing `test_trait_method_obligations_own_only_each_method_spec_refs` positive test to this record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:519d00bac6e752cc902174facf7f935a2d3a93ef3793f7c3956a525f714950f1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:14:53Z",
+          "findings": [
+            {
+              "category": "Testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 5,
+              "message": "The new fulfillment record targets an obligation whose declaration hash is already stale. On the current tree, `bin/sotp test-obligation check` fails with `differing_obligations=[domain::tddd::test_obligation::obligations::validate_method_anchor_coverage:Logic:entry (declaration_hash)]`, contradicting the briefing’s green-gate claim and blocking the done T4 lane. Re-run `test-obligation derive`, then refresh evaluation verdicts if the regenerated hash invalidates them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fa336ea2174ad66f7d2251ba165afec1bddd80f03420af43b949f70348e2a740",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:18:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fa336ea2174ad66f7d2251ba165afec1bddd80f03420af43b949f70348e2a740",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1303,6 +1422,35 @@
           "hash": "rvw1:sha256:cd6870077e2fd5560ac1a599d5e51cbafa83859488fceacf397dd6b28d8608a5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:56:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 6,
+              "message": "`domain::tddd::test_obligation::obligations::validate_method_anchor_coverage` has `docs` that restates the upstream behavior contract in prose (method refs must be a covering subset). Per `.harness/policies/no-upstream-restatement.md`, replace this with an anchor-based identification such as the operation plus `IN-01`, `IN-02`, `AC-02`, and `CN-01`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:21b8fa88138c8b51856058181b22ef8046f778ae146f764ea790fa020e6eb345",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:07:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c1498440d71c075e2c2120ae27364185641b70ac0c01dd87ef187275f0459974",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:15:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c1498440d71c075e2c2120ae27364185641b70ac0c01dd87ef187275f0459974",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1319,6 +1467,50 @@
           "at": "2026-08-14T10:54:51Z",
           "findings": [],
           "hash": "rvw1:sha256:510e0bdf1838d19e72b02b15cbfcd31285c6783d8154885470270522ab17d74f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:42:42Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 167,
+              "message": "非遡及要件を満たしていません。全ての入力 trait に検証を適用するため、method-level `spec_refs` を持たない legacy entry も entry-level anchor の全体被覆を要求され、既存 catalogue が拒否されます。また導出側も method refs がない legacy entry の anchor を空にしており、従来の entry-level anchor を保持しません。明示的な method-level 宣言を持つ entry のみに新検証・method単位導出を適用してください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:9f8f84f0ae2f1a31ff11c31cbb72db6fbed3e93de1c451e61d86605d7d8570b4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:48:04Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 587,
+              "message": "The usecase layer reimplements the catalogue coverage rule in `validate_method_anchor_coverage` instead of calling the domain-owned validation required by the briefing. This duplicates domain business logic in the orchestrator and allows future domain/usecase validation semantics to diverge; move the rule to the domain API and keep only the call site in `derive.rs`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9f8f84f0ae2f1a31ff11c31cbb72db6fbed3e93de1c451e61d86605d7d8570b4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:57:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b220bad5cfeed08c7a198f0c73192c07497a57571ec4bed476abcff4f082c013",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:11:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b220bad5cfeed08c7a198f0c73192c07497a57571ec4bed476abcff4f082c013",
           "type": "final",
           "verdict": "zero_findings"
         }

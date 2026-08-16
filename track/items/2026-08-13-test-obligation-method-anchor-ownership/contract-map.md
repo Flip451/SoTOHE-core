@@ -65,6 +65,7 @@ subgraph domain["domain"]
     T28_domain_domain_TestObligation_spec_refs([spec_refs])
     T28_domain_domain_TestObligation_owns_edge([owns_edge])
   end
+  F89_domain_domain_domain__tddd__test_obligation__obligations__validate_method_anchor_coverage[[validate_method_anchor_coverage]]
   end
 end
 subgraph usecase["usecase"]
@@ -133,6 +134,8 @@ class T28_domain_domain_TestObligation_declaration_hash method_node
 class T28_domain_domain_TestObligation_spec_refs method_node
 class T28_domain_domain_TestObligation_owns_edge method_node
 class T28_domain_domain_TestObligation__self value_object
+class F89_domain_domain_domain__tddd__test_obligation__obligations__validate_method_anchor_coverage free_function
+class F89_domain_domain_domain__tddd__test_obligation__obligations__validate_method_anchor_coverage function_node
 class R35_usecase_usecase_PhaseCommandService_validate method_node
 class R35_usecase_usecase_PhaseCommandService_explain method_node
 class R35_usecase_usecase_PhaseCommandService_enter method_node

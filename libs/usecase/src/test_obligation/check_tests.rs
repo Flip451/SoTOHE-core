@@ -18,8 +18,9 @@ use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, ModulePath, StructKind, StructShape, TraitEntry,
-    TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
+    CatalogueDocument, CrateName, DeletionRecord, MethodDeclaration, MethodName, ModulePath,
+    StructKind, StructShape, TraitEntry, TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2,
+    TypeName, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecSectionKind,
@@ -876,14 +877,31 @@ fn money_catalogue_with_role(role: DataRole) -> CatalogueDocument {
     doc
 }
 
+fn covering_method(name: &str, anchor: &str) -> MethodDeclaration {
+    MethodDeclaration::new(
+        MethodName::new(name).unwrap(),
+        None,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        false,
+        vec![],
+        vec![],
+        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new(anchor).unwrap())],
+        None,
+    )
+}
+
 fn trait_impl_catalogue() -> CatalogueDocument {
     let mut catalogue = money_catalogue_with_role(DataRole::value_object());
+    let entry_refs =
+        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new("IN-05").unwrap())];
     catalogue.insert_trait(
         TraitName::new("MyPort").unwrap(),
         TraitEntry::new(
             ItemAction::Reference,
             ContractRole::SecondaryPort,
-            vec![],
+            vec![covering_method("load", "IN-05")],
             vec![],
             vec![],
             vec![],
@@ -891,10 +909,7 @@ fn trait_impl_catalogue() -> CatalogueDocument {
             vec![],
             ModulePath::root(),
             None,
-            vec![SpecRef::new(
-                PathBuf::from("spec.json"),
-                SpecElementId::try_new("IN-05").unwrap(),
-            )],
+            entry_refs,
             vec![],
         ),
     );
@@ -994,10 +1009,12 @@ fn shared_edge_waiver_rules_doc() -> TestObligationRulesDocument {
 }
 
 fn trait_entry(role: ContractRole) -> TraitEntry {
+    let entry_refs =
+        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new("IN-05").unwrap())];
     TraitEntry::new(
         ItemAction::Add,
         role,
-        vec![],
+        vec![covering_method("verify", "IN-05")],
         vec![],
         vec![],
         vec![],
@@ -1005,7 +1022,7 @@ fn trait_entry(role: ContractRole) -> TraitEntry {
         vec![],
         ModulePath::root(),
         None,
-        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new("IN-05").unwrap())],
+        entry_refs,
         vec![],
     )
 }

@@ -9,14 +9,77 @@
 //! CN-11 / AC-03).
 
 use crate::TrackId;
+use crate::plan_ref::SpecRef;
+use crate::tddd::catalogue_v2::TraitEntry;
 use crate::tddd::semantic_verify::CatalogueEntryRef;
 use crate::tddd::test_obligation::errors::TestBindingConsistencyError;
 use crate::tddd::test_obligation::hashes::DeclarationHash;
 use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationEdgeId,
-    TestObligationId,
+    TestObligationId, unavailable_diagnostic_message,
 };
 use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
+
+/// Validates method-level spec_refs against a trait's entry-level catalogue.
+///
+/// Every method-level reference must belong to the entry-level set, and the
+/// union of method references must cover that set. A single-method trait with
+/// a non-empty entry-level set must declare the complete set on that method.
+///
+/// # Errors
+///
+/// Returns a [`DiagnosticMessage`] when a method cites an absent anchor or the
+/// method union does not cover the entry-level catalogue.
+pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), DiagnosticMessage> {
+    for method in entry.methods() {
+        for method_ref in method.spec_refs() {
+            if !contains_spec_ref(entry.spec_refs(), method_ref) {
+                return Err(coverage_diag(&format!(
+                    "method '{}' declares spec anchor '{}#{}' absent from the trait entry-level spec_refs",
+                    method.name().as_str(),
+                    method_ref.file.display(),
+                    method_ref.anchor.as_ref(),
+                )));
+            }
+        }
+    }
+
+    if entry.methods().len() == 1
+        && !entry.spec_refs().is_empty()
+        && let Some(method) = entry.methods().first()
+        && let Some(unassigned) = entry
+            .spec_refs()
+            .iter()
+            .find(|entry_ref| !contains_spec_ref(method.spec_refs(), entry_ref))
+    {
+        return Err(coverage_diag(&format!(
+            "single-method trait must declare entry-level spec anchor '{}#{}' on its method",
+            unassigned.file.display(),
+            unassigned.anchor.as_ref(),
+        )));
+    }
+
+    if let Some(unassigned) = entry.spec_refs().iter().find(|entry_ref| {
+        !entry.methods().iter().any(|method| contains_spec_ref(method.spec_refs(), entry_ref))
+    }) {
+        return Err(coverage_diag(&format!(
+            "trait entry spec anchor '{}#{}' is not assigned to any method",
+            unassigned.file.display(),
+            unassigned.anchor.as_ref(),
+        )));
+    }
+
+    Ok(())
+}
+
+fn contains_spec_ref(refs: &[SpecRef], target: &SpecRef) -> bool {
+    refs.iter().any(|candidate| candidate.file == target.file && candidate.anchor == target.anchor)
+}
+
+fn coverage_diag(detail: &str) -> DiagnosticMessage {
+    DiagnosticMessage::try_new(detail.to_owned())
+        .unwrap_or_else(|_| unavailable_diagnostic_message())
+}
 
 /// A single derived test obligation for one catalogue entry.
 #[derive(Debug, Clone, PartialEq, Eq)]

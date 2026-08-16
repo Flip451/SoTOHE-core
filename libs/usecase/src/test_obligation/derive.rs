@@ -17,7 +17,7 @@ use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
     CatalogueDocumentLoaderPort, TrackStatusReaderPort,
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
-use domain::tddd::catalogue_v2::{CatalogueDocument, TraitRefScope};
+use domain::tddd::catalogue_v2::{CatalogueDocument, TraitEntry, TraitRefScope};
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::errors::{ObligationDeriveError, TrackStatusReadFailureKind};
 use domain::tddd::test_obligation::hashes::DeclarationHash;
@@ -25,7 +25,9 @@ use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationId,
     TestObligationItemIdentifier,
 };
-use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
+use domain::tddd::test_obligation::obligations::{
+    ObligationsDocument, TestObligation, validate_method_anchor_coverage,
+};
 use domain::tddd::test_obligation::ports::{
     ObligationsArtifactPort, TestObligationRulesLoaderPort,
 };
@@ -162,6 +164,12 @@ pub(crate) fn derive_obligations_document(
     catalogues: &[(PathBuf, CatalogueDocument)],
     projector: &RoleObligationItemsProjector,
 ) -> Result<ObligationsDocument, DiagnosticMessage> {
+    for (_, catalogue) in catalogues {
+        for entry in catalogue.traits().values() {
+            validate_method_anchor_coverage(entry)?;
+        }
+    }
+
     let trait_roles = index_trait_roles(catalogues)?;
     let mut obligations: Vec<TestObligation> = Vec::new();
     for (path, catalogue) in catalogues {
@@ -314,15 +322,69 @@ fn derive_trait_obligations(
         let anchors = anchors_from_spec_refs(entry.spec_refs())?;
 
         if let Some(role_rules) = find_contract_role_rules(rules, entry.role()) {
-            emit_rules(
-                role_rules,
-                &entry_key,
-                &target,
-                &role_kind,
-                &decl_hash,
-                &anchors,
+            emit_trait_role_rules(
+                role_rules, projector, entry, &entry_key, &target, &role_kind, &decl_hash,
+                &anchors, out,
+            )?;
+        }
+    }
+    Ok(())
+}
+
+/// Emits trait obligations, assigning method-axis items only their method refs.
+#[allow(clippy::too_many_arguments)]
+fn emit_trait_role_rules(
+    role_rules: &RoleObligationRules,
+    projector: &RoleObligationItemsProjector,
+    entry: &TraitEntry,
+    entry_key: &CatalogueEntryKey,
+    target: &CatalogueEntryRef,
+    role_kind: &TargetEntryRoleKind,
+    decl_hash: &DeclarationHash,
+    entry_anchors: &[TestObligationAnchorId],
+    out: &mut Vec<TestObligation>,
+) -> Result<(), DiagnosticMessage> {
+    for rule in role_rules.obligations() {
+        if matches!(
+            rule.per_axis(),
+            TestObligationPerAxis::Method | TestObligationPerAxis::TraitMethod
+        ) {
+            let mut item_ids = projector.contract_role_items(entry, rule.per_axis());
+            if let Some(minimum) = rule.minimum() {
+                while item_ids.len() < minimum.as_usize() {
+                    let filler =
+                        TestObligationItemIdentifier::try_new(format!("min#{}", item_ids.len()))
+                            .map_err(|_| diag("empty min filler"))?;
+                    item_ids.push(filler);
+                }
+            }
+
+            for (method_index, item) in item_ids.into_iter().enumerate() {
+                let anchors = match entry.methods().get(method_index) {
+                    Some(method) => anchors_from_spec_refs(method.spec_refs())?,
+                    None => entry_anchors.to_vec(),
+                };
+                let obligation = build_obligation(
+                    entry_key,
+                    target,
+                    role_kind,
+                    rule.kind(),
+                    &item,
+                    decl_hash,
+                    &anchors,
+                )?;
+                out.push(obligation);
+            }
+        } else {
+            emit_rule_items(
+                rule,
+                entry_key,
+                target,
+                role_kind,
+                decl_hash,
+                entry_anchors,
                 out,
-                |axis| projector.contract_role_items(entry, axis),
+                projector.contract_role_items(entry, rule.per_axis()),
             )?;
         }
     }

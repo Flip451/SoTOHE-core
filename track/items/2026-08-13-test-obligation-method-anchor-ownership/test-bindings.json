@@ -1,4 +1,314 @@
 {
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership",
-  "records": []
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_obligations_own_only_each_method_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_empty_entry_derives_anchorless_trait_method_obligation"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_with_shared_ref_receiver"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_with_shared_ref_receiver"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_obligations_own_only_each_method_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_derive_validates_only_catalogues_supplied_on_the_command"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_metadata_through_accessors"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_with_shared_ref_receiver"
+        }
+      ]
+    }
+  ]
 }

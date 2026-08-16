@@ -3,21 +3,46 @@
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership",
   "entries": {
     "T4": [
-      { "layer": "domain", "entry_key": "MethodDeclaration" },
-      { "layer": "domain", "entry_key": "TestObligation" },
-      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" }
+      {
+        "layer": "domain",
+        "entry_key": "MethodDeclaration"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TestObligation"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "DeriveTestObligationsInteractor"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
+      }
     ],
     "T5": [
-      { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" }
+      {
+        "layer": "usecase",
+        "entry_key": "EvaluateTestObligationsInteractor"
+      }
     ],
     "T6": [
-      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+      {
+        "layer": "usecase",
+        "entry_key": "PhaseCommandService"
+      }
     ],
     "T7": [
-      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+      {
+        "layer": "usecase",
+        "entry_key": "PhaseCommandService"
+      }
     ],
     "T8": [
-      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+      {
+        "layer": "usecase",
+        "entry_key": "PhaseCommandService"
+      }
     ]
   }
 }

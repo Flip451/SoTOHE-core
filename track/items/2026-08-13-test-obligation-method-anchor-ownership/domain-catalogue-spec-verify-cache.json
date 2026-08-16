@@ -503,6 +503,102 @@
         "citation": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。",
         "kind": "pass"
       }
+    },
+    {
+      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1cbf339f3ebdf7164e9d769eba4268ece1691d0b5eb1645f0f9b37cad01608c8",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9ccf91b78a331c4d73b570dace51140c4c9983d0eacfd5452e4ee33910105705",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "089d11c73c1a5ae135d8d77db1502e7057196817fdc9d0946fd63338649a41d9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "61971870ffefb373af766d432f9abd5f06785f2e0d4e0b3437893a2a15bb5255",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "kind": "pass"
+      }
     }
   ],
   "layer": "domain",

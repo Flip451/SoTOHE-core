@@ -1,8 +1,83 @@
 {
   "crate_name": "domain",
-  "functions": {},
+  "functions": {
+    "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage": {
+      "action": "add",
+      "docs": "T4 coverage validator (IN-01, IN-02, AC-02, CN-01).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "entry",
+          "ty": "&TraitEntry"
+        }
+      ],
+      "returns": "Result<(), DiagnosticMessage>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ]
+    }
+  },
   "layer": "domain",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "MethodDeclaration",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
   "traits": {},
   "types": {
     "MethodDeclaration": {
@@ -380,47 +455,5 @@
         }
       ]
     }
-  },
-  "trait_impls": [
-    {
-      "action": "reference",
-      "for_type": "MethodDeclaration",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "action": "reference",
-      "for_type": "MethodDeclaration",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "action": "reference",
-      "for_type": "MethodDeclaration",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "action": "reference",
-      "for_type": "MethodDeclaration",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "action": "reference",
-      "for_type": "TestObligation",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "action": "reference",
-      "for_type": "TestObligation",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "action": "reference",
-      "for_type": "TestObligation",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "action": "reference",
-      "for_type": "TestObligation",
-      "trait_ref": "core::cmp::Eq"
-    }
-  ]
+  }
 }

@@ -842,6 +842,64 @@ mod tests {
     }
 
     #[test]
+    fn test_method_declaration_lint_surface_is_accessor_only() {
+        let declaration = MethodDeclaration::new(
+            MethodName::new("load").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            None,
+        );
+
+        assert_eq!(declaration.name().as_str(), "load");
+        assert_eq!(declaration.receiver(), Some(SelfReceiver::SharedRef));
+        assert!(declaration.params().is_empty());
+        assert_eq!(declaration.returns().as_str(), "()");
+        assert!(!declaration.is_async());
+        assert!(declaration.docs().is_none());
+    }
+
+    #[test]
+    fn test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint() {
+        let raw = include_str!("method_declaration_lint_fixture.json");
+        let doc: serde_json::Value = serde_json::from_str(raw).unwrap();
+        let shape = &doc["kind"]["shape"];
+        assert_eq!(shape["has_stripped_fields"], true);
+        assert_eq!(shape["fields"].as_array().map(Vec::len), Some(0));
+
+        let methods = doc["methods"].as_array().expect("methods");
+        let type_names: Vec<String> = methods
+            .iter()
+            .flat_map(|method| {
+                let mut types = Vec::new();
+                if let Some(returns) = method["returns"].as_str() {
+                    types.push(returns.to_owned());
+                }
+                if let Some(params) = method["params"].as_array() {
+                    for param in params {
+                        if let Some(ty) = param["ty"].as_str() {
+                            types.push(ty.to_owned());
+                        }
+                    }
+                }
+                types
+            })
+            .collect();
+        assert!(type_names.iter().any(|ty| ty.contains("MethodName")));
+        assert!(type_names.iter().any(|ty| ty.contains("SpecRef")));
+        assert!(type_names.iter().any(|ty| ty.contains("DocString")));
+        assert!(type_names.iter().all(|ty| {
+            !ty.split(['<', '>', ',', ' '])
+                .any(|part| matches!(part, "String" | "PathBuf" | "i32" | "u32" | "usize"))
+        }));
+    }
+
+    #[test]
     fn test_method_declaration_can_set_has_default_impl_true_for_provided_trait_method() {
         // Per ADR 2026-05-08-0248 D13: traits with provided default impls must be
         // expressible at the catalogue level so the A-codec can emit has_body=true.
