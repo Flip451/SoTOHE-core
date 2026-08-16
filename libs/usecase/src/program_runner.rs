@@ -23,10 +23,20 @@ impl ProgramExitCode {
     }
 }
 
+/// Captured diagnostic bytes for one child-process output stream.
+///
+/// `TruncatedTail` indicates that the stream exceeded its configured capture
+/// capacity and only the most recent bytes were retained.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CapturedStreamOutput {
+    Complete(Vec<u8>),
+    TruncatedTail(Vec<u8>),
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CapturedProgramOutput {
-    pub stdout: Vec<u8>,
-    pub stderr: Vec<u8>,
+    pub stdout: CapturedStreamOutput,
+    pub stderr: CapturedStreamOutput,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -39,16 +49,9 @@ pub struct ProgramInvocation {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ProgramOutputStream {
-    Stdout,
-    Stderr,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProgramRunOutcome {
     Exited { exit_code: ProgramExitCode, output: CapturedProgramOutput },
     TimedOut { output: CapturedProgramOutput },
-    OutputLimitExceeded { stream: ProgramOutputStream, output: CapturedProgramOutput },
 }
 
 #[derive(Debug, Error)]
@@ -76,7 +79,7 @@ pub struct ProgramExecutionRecord {
 /// A program execution record whose outcome is known to be a zero exit.
 ///
 /// The inner record is private so callers cannot construct a successful record
-/// from a timeout, output-limit, or non-zero-exit outcome.
+/// from a timeout or non-zero-exit outcome.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SuccessfulProgramExecutionRecord {
     record: ProgramExecutionRecord,
@@ -116,9 +119,7 @@ impl ProgramExecutionRecord {
                     record: self,
                 })
             }
-            ProgramRunOutcome::Exited { .. }
-            | ProgramRunOutcome::TimedOut { .. }
-            | ProgramRunOutcome::OutputLimitExceeded { .. } => {
+            ProgramRunOutcome::Exited { .. } | ProgramRunOutcome::TimedOut { .. } => {
                 ClassifiedProgramExecutionRecord::Failed(FailedProgramExecutionRecord {
                     record: self,
                 })
@@ -133,8 +134,8 @@ mod tests {
     use crate::operator_command::{CommandArgument, ConfiguredCommand};
 
     use super::{
-        CapturedProgramOutput, ClassifiedProgramExecutionRecord, ProgramExecutionRecord,
-        ProgramExitCode, ProgramOutputStream, ProgramRunOutcome,
+        CapturedProgramOutput, CapturedStreamOutput, ClassifiedProgramExecutionRecord,
+        ProgramExecutionRecord, ProgramExitCode, ProgramRunOutcome,
     };
 
     fn record(outcome: ProgramRunOutcome) -> ProgramExecutionRecord {
@@ -150,7 +151,10 @@ mod tests {
     }
 
     fn output() -> CapturedProgramOutput {
-        CapturedProgramOutput { stdout: Vec::new(), stderr: Vec::new() }
+        CapturedProgramOutput {
+            stdout: CapturedStreamOutput::Complete(Vec::new()),
+            stderr: CapturedStreamOutput::Complete(Vec::new()),
+        }
     }
 
     #[test]
@@ -194,22 +198,31 @@ mod tests {
     }
 
     #[test]
-    fn test_program_execution_record_classify_output_limit_returns_output_limit_failure() {
-        let classified = record(ProgramRunOutcome::OutputLimitExceeded {
-            stream: ProgramOutputStream::Stdout,
-            output: output(),
+    fn test_program_execution_record_classify_zero_exit_with_truncated_output_returns_succeeded() {
+        let classified = record(ProgramRunOutcome::Exited {
+            exit_code: ProgramExitCode::new(0),
+            output: CapturedProgramOutput {
+                stdout: CapturedStreamOutput::TruncatedTail(b"tail".to_vec()),
+                stderr: CapturedStreamOutput::Complete(Vec::new()),
+            },
         })
         .classify();
 
         match classified {
-            ClassifiedProgramExecutionRecord::Failed(failure) => {
+            ClassifiedProgramExecutionRecord::Succeeded(success) => {
                 assert!(matches!(
-                    failure.as_ref().outcome,
-                    ProgramRunOutcome::OutputLimitExceeded { .. }
+                    success.as_ref().outcome,
+                    ProgramRunOutcome::Exited {
+                        output: CapturedProgramOutput {
+                            stdout: CapturedStreamOutput::TruncatedTail(_),
+                            ..
+                        },
+                        ..
+                    }
                 ));
             }
-            ClassifiedProgramExecutionRecord::Succeeded(success) => {
-                panic!("expected output-limit failure record, got {success:?}");
+            ClassifiedProgramExecutionRecord::Failed(failure) => {
+                panic!("expected truncated zero-exit record to remain successful, got {failure:?}");
             }
         }
     }

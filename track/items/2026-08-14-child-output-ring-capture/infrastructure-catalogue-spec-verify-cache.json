@@ -1,0 +1,198 @@
+{
+  "entries": [
+    {
+      "claim_hash": "ec3b9bc799102aab6e1855e5b3056c8af85bf612746dd46443c086537d2853a1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3bcfe690c34957b262a335b8ed20d017b139dff93877750e0dbc377830251c29",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Change diagnostic stdout and stderr capture in the review-fix runner to fixed-capacity tail-ring retention, including a clear indication when earlier output was truncated."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Change diagnostic stdout and stderr capture in the review-fix runner to fixed-capacity tail-ring retention, including a clear indication when earlier output was truncated.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ec3b9bc799102aab6e1855e5b3056c8af85bf612746dd46443c086537d2853a1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1003efd9b1798840e3d76fcdcbe90a7df2cb4dad37934190e5ace839136c3b73",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Preserve the separate bounded, fail-closed handling for child output whose contents are consumed as validation input, including verdict-envelope extraction."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Preserve the separate bounded, fail-closed handling for child output whose contents are consumed as validation input, including verdict-envelope extraction.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ec3b9bc799102aab6e1855e5b3056c8af85bf612746dd46443c086537d2853a1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ea132633e44070a88ad7b969f2303f9b5eee2c734ac709eec86489a706e7dd8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "The diagnostic-capture policy must remain separate from output used as a verification input, so that validation paths retain their bounded, fail-closed behavior."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The diagnostic-capture policy must remain separate from output used as a verification input, so that validation paths retain their bounded, fail-closed behavior.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ec3b9bc799102aab6e1855e5b3056c8af85bf612746dd46443c086537d2853a1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "66a020a362adaca6baa35086b3decff3b853ade32b95d79812b3fa38babc7399",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A review-fix runner child that emits diagnostic stdout or stderr beyond the fixed capture capacity continues running until it exits or the existing timeout stops it; the captured diagnostic output contains the most recent retained content and an explicit truncation indication."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A review-fix runner child that emits diagnostic stdout or stderr beyond the fixed capture capacity continues running until it exits or the existing timeout stops it; the captured diagnostic output contains the most recent retained content and an explicit truncation indication.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ec3b9bc799102aab6e1855e5b3056c8af85bf612746dd46443c086537d2853a1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexReviewFixRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "486ca28f09aee99b8cfa2a2594b850714d12e28cedeb944b3c9aa71aa632bfcc",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A path that reads child output as validation input, including verdict-envelope extraction, retains its existing output bound and fails closed when that bound is exceeded."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A path that reads child output as validation input, including verdict-envelope extraction, retains its existing output bound and fails closed when that bound is exceeded.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e045783815ca54c8d37027f6c184a2d06c6a5d810ca01598a1a9e8aaf9bbb82f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProcessProgramRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e045783815ca54c8d37027f6c184a2d06c6a5d810ca01598a1a9e8aaf9bbb82f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProcessProgramRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7bac7919bdcc840142794c1ba455c6a437bcd352c957e64d1c1544bbc493bc49",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e045783815ca54c8d37027f6c184a2d06c6a5d810ca01598a1a9e8aaf9bbb82f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ProcessProgramRunner",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dcd676ae123d27215a2c6d904a75bfa2cceb6337d0d3364dc791f48844766f05",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}

@@ -1,0 +1,15 @@
+{
+  "baseline_hash": "3f9cc49b11f36cfe4d1279089391e343723f7b0111316c6336534ea7e811b951",
+  "declaration_hash": "13a53a23f5dd1caac982abdb30e7f0c3be628a9d4cba8f71100391b9f63a676b",
+  "generated_at": "2026-08-15T08:33:16Z",
+  "head_commit": "7ace28261a9bbbff969fe788c220eebe6e30681d",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "cli_composition::telemetry_wiring::emit_review_round"
+    }
+  ]
+}

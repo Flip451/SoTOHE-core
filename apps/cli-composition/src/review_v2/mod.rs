@@ -6,7 +6,6 @@ pub(crate) mod commit_hash;
 mod helpers;
 #[cfg(test)]
 pub(crate) use helpers::process_guards;
-pub(crate) use helpers::record_instant_once;
 mod inputs;
 pub(crate) mod null_reviewer;
 mod pre_review_command;
@@ -38,7 +37,11 @@ use helpers::{
     outcome_to_run_review_output, resolve_track_id_or_branch, resolve_track_id_or_branch_write,
     validate_all_paths,
 };
-use run::{run_claude_review_str, run_codex_review_str, run_grok_review_str};
+use run::{
+    run_claude_review_str, run_claude_review_str_with_subprocess_start, run_codex_review_str,
+    run_codex_review_str_with_subprocess_start, run_grok_review_str,
+    run_grok_review_str_with_subprocess_start,
+};
 use scope::validate_scope_for_track_str;
 use session_context::reviewer_session_context;
 use shared::{build_scope_query_interactor_no_diff_str, build_scope_query_interactor_str};
@@ -48,7 +51,9 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use infrastructure::agent_profiles::ResolvedExecution;
-use infrastructure::review_v2::{ClaudeReviewer, CodexReviewer, GrokReviewer};
+use infrastructure::review_v2::{
+    ClaudeReviewer, CodexReviewer, GrokReviewer, ReviewYieldRecordingReviewer,
+};
 use usecase::{capability_exec::ReasoningEffort, dry_write_driver::CapabilityName};
 
 use crate::{CommandOutcome, error::CompositionError};
@@ -112,27 +117,24 @@ impl ReviewCompositionRoot {
         );
 
         let round_start = std::time::Instant::now();
-        let run_result =
-            run_codex_review_str(&track_id, &input.items_dir, &group, &input.round_type, reviewer);
+        let reviewer = ReviewYieldRecordingReviewer::new_for_subprocess_timing(reviewer);
+        let subprocess_start_reader = reviewer.subprocess_started_at_reader();
+        let run_result = run_codex_review_str_with_subprocess_start(
+            &track_id,
+            &input.items_dir,
+            &group,
+            &input.round_type,
+            reviewer,
+            subprocess_start_reader,
+        );
 
-        // Emit ReviewRound telemetry at the composition layer (T006 / AC-03 /
-        // IN-03). Completed and SubprocessFailed outcomes also emit
-        // ExternalSubprocess because the reviewer process was launched. Skipped
-        // emits only ReviewRound with zero findings. Err remains a pre-subprocess
-        // composition failure and does not emit.
+        // Provider-specific review entry points retain subprocess telemetry for
+        // diagnostics, but do not emit structured review-yield measurements.
+        // Those records belong exclusively to `review_run_local_ungated`.
         if let Some((ref w, ref tid)) =
             crate::telemetry_wiring::resolve_telemetry_writer_for_track(&input.items_dir, &track_id)
         {
-            if let Some(telemetry) = review_telemetry_for_outcome(&run_result, &input.round_type) {
-                crate::telemetry_wiring::emit_review_round(
-                    w,
-                    tid,
-                    "codex",
-                    &input.model,
-                    telemetry.round_type,
-                    telemetry.findings_count,
-                    round_start,
-                );
+            if let Some(telemetry) = review_telemetry_for_outcome(&run_result) {
                 if telemetry.emit_subprocess {
                     crate::telemetry_wiring::emit_external_subprocess(
                         w,
@@ -203,24 +205,23 @@ impl ReviewCompositionRoot {
         );
 
         let round_start = std::time::Instant::now();
-        let run_result =
-            run_claude_review_str(&track_id, &input.items_dir, &group, &input.round_type, reviewer);
+        let reviewer = ReviewYieldRecordingReviewer::new_for_subprocess_timing(reviewer);
+        let subprocess_start_reader = reviewer.subprocess_started_at_reader();
+        let run_result = run_claude_review_str_with_subprocess_start(
+            &track_id,
+            &input.items_dir,
+            &group,
+            &input.round_type,
+            reviewer,
+            subprocess_start_reader,
+        );
 
-        // Emit review telemetry (T006 / AC-03 / IN-03).
-        // See review_run_codex for the full rationale.
+        // See review_run_codex for why this entry point emits only subprocess
+        // diagnostics and no structured review-yield measurement.
         if let Some((ref w, ref tid)) =
             crate::telemetry_wiring::resolve_telemetry_writer_for_track(&input.items_dir, &track_id)
         {
-            if let Some(telemetry) = review_telemetry_for_outcome(&run_result, &input.round_type) {
-                crate::telemetry_wiring::emit_review_round(
-                    w,
-                    tid,
-                    "claude",
-                    &input.model,
-                    telemetry.round_type,
-                    telemetry.findings_count,
-                    round_start,
-                );
+            if let Some(telemetry) = review_telemetry_for_outcome(&run_result) {
                 if telemetry.emit_subprocess {
                     crate::telemetry_wiring::emit_external_subprocess(
                         w,
@@ -306,7 +307,11 @@ impl ReviewCompositionRoot {
         let timeout = Duration::from_secs(input.timeout_seconds);
 
         let round_start = std::time::Instant::now();
-        let (run_result, provider_name, effective_model) = match provider.as_str() {
+        let telemetry_inputs = crate::telemetry_wiring::resolve_telemetry_inputs_for_track(
+            &input.items_dir,
+            &track_id,
+        );
+        let (run_result, provider_name) = match provider.as_str() {
             "codex" => {
                 let session = reviewer_session_context(
                     &track_id,
@@ -327,14 +332,31 @@ impl ReviewCompositionRoot {
                     session.prompt,
                     session.cache,
                 );
-                let result = run_codex_review_str(
-                    &track_id,
-                    &input.items_dir,
-                    &group,
-                    &input.round_type,
-                    reviewer,
-                );
-                (result, "codex".to_owned(), model)
+                let result = if let Some((config, anchored_items_dir)) = telemetry_inputs.as_ref() {
+                    let reviewer = ReviewYieldRecordingReviewer::new(
+                        reviewer,
+                        config.clone(),
+                        anchored_items_dir.clone(),
+                    );
+                    let subprocess_start_reader = reviewer.subprocess_started_at_reader();
+                    run_codex_review_str_with_subprocess_start(
+                        &track_id,
+                        &input.items_dir,
+                        &group,
+                        &input.round_type,
+                        reviewer,
+                        subprocess_start_reader,
+                    )
+                } else {
+                    run_codex_review_str(
+                        &track_id,
+                        &input.items_dir,
+                        &group,
+                        &input.round_type,
+                        reviewer,
+                    )
+                };
+                (result, "codex".to_owned())
             }
             "claude" => {
                 let session = reviewer_session_context(
@@ -356,14 +378,31 @@ impl ReviewCompositionRoot {
                     session.prompt,
                     session.cache,
                 );
-                let result = run_claude_review_str(
-                    &track_id,
-                    &input.items_dir,
-                    &group,
-                    &input.round_type,
-                    reviewer,
-                );
-                (result, "claude".to_owned(), model)
+                let result = if let Some((config, anchored_items_dir)) = telemetry_inputs.as_ref() {
+                    let reviewer = ReviewYieldRecordingReviewer::new(
+                        reviewer,
+                        config.clone(),
+                        anchored_items_dir.clone(),
+                    );
+                    let subprocess_start_reader = reviewer.subprocess_started_at_reader();
+                    run_claude_review_str_with_subprocess_start(
+                        &track_id,
+                        &input.items_dir,
+                        &group,
+                        &input.round_type,
+                        reviewer,
+                        subprocess_start_reader,
+                    )
+                } else {
+                    run_claude_review_str(
+                        &track_id,
+                        &input.items_dir,
+                        &group,
+                        &input.round_type,
+                        reviewer,
+                    )
+                };
+                (result, "claude".to_owned())
             }
             "grok" => {
                 let session = reviewer_session_context(
@@ -408,14 +447,31 @@ impl ReviewCompositionRoot {
                     session.cache,
                     repo_root,
                 );
-                let result = run_grok_review_str(
-                    &track_id,
-                    &input.items_dir,
-                    &group,
-                    &input.round_type,
-                    reviewer,
-                );
-                (result, "grok".to_owned(), model)
+                let result = if let Some((config, anchored_items_dir)) = telemetry_inputs.as_ref() {
+                    let reviewer = ReviewYieldRecordingReviewer::new(
+                        reviewer,
+                        config.clone(),
+                        anchored_items_dir.clone(),
+                    );
+                    let subprocess_start_reader = reviewer.subprocess_started_at_reader();
+                    run_grok_review_str_with_subprocess_start(
+                        &track_id,
+                        &input.items_dir,
+                        &group,
+                        &input.round_type,
+                        reviewer,
+                        subprocess_start_reader,
+                    )
+                } else {
+                    run_grok_review_str(
+                        &track_id,
+                        &input.items_dir,
+                        &group,
+                        &input.round_type,
+                        reviewer,
+                    )
+                };
+                (result, "grok".to_owned())
             }
             other => {
                 return Err(CompositionError::WiringFailed(format!(
@@ -425,21 +481,15 @@ impl ReviewCompositionRoot {
             }
         };
 
-        // Emit review telemetry (T006 / AC-03 / IN-03).
-        // See review_run_codex for the full rationale.
-        if let Some((ref w, ref tid)) =
-            crate::telemetry_wiring::resolve_telemetry_writer_for_track(&input.items_dir, &track_id)
-        {
-            if let Some(telemetry) = review_telemetry_for_outcome(&run_result, &input.round_type) {
-                crate::telemetry_wiring::emit_review_round(
-                    w,
-                    tid,
-                    &provider_name,
-                    &effective_model,
-                    telemetry.round_type,
-                    telemetry.findings_count,
-                    round_start,
-                );
+        // Only the infrastructure reviewer decorator records ReviewRound. The
+        // composition root retains the existing ExternalSubprocess diagnostic
+        // event for this local entry point.
+        let telemetry_writer = crate::telemetry_wiring::resolve_telemetry_writer_for_track(
+            &input.items_dir,
+            &track_id,
+        );
+        if let Some((ref w, ref tid)) = telemetry_writer {
+            if let Some(telemetry) = review_telemetry_for_outcome(&run_result) {
                 if telemetry.emit_subprocess {
                     crate::telemetry_wiring::emit_external_subprocess(
                         w,
@@ -588,6 +638,8 @@ mod tests {
     use std::path::{Path, PathBuf};
     use std::process::Command;
     use std::sync::{Arc, Mutex};
+    #[cfg(unix)]
+    use std::time::UNIX_EPOCH;
 
     use super::{ReviewCompositionRoot, ReviewRunCodexInput};
     use cli_driver::review::{
@@ -707,10 +759,8 @@ mod tests {
         let run_result: Result<super::CodexReviewOutcome, super::shared::ReviewSharedError> =
             Ok(super::CodexReviewOutcome::Skipped { scope_label: "cli_composition".to_owned() });
 
-        let telemetry = super::review_telemetry_for_outcome(&run_result, "fast").unwrap();
+        let telemetry = super::review_telemetry_for_outcome(&run_result).unwrap();
 
-        assert_eq!(telemetry.findings_count, 0);
-        assert_eq!(telemetry.round_type, "fast");
         assert!(!telemetry.verdict_parse_failed);
         assert!(!telemetry.emit_subprocess);
     }
@@ -915,6 +965,25 @@ exit 0
 printf '{"verdict":"zero_findings","findings":[]}\n' > "$out"
 exit 0
 "#,
+        );
+    }
+
+    #[cfg(unix)]
+    fn write_fake_codex_reviewer_bin_with_invocation_marker(bin_dir: &std::path::Path) {
+        let marker = bin_dir.join(".reviewer-invoked");
+        write_fake_codex_bin_with_body(
+            bin_dir,
+            &format!(
+                r#"
+: > '{}'
+sleep 0.05
+: > '{}'
+printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$out"
+exit 0
+"#,
+                marker.display(),
+                bin_dir.join(".reviewer-invocation-window-end").display()
+            ),
         );
     }
 
@@ -1422,6 +1491,55 @@ exit 0
         make_executable(&claude);
     }
 
+    #[cfg(unix)]
+    fn write_fake_claude_reviewer_bin_with_invocation_marker(bin_dir: &std::path::Path) {
+        fs::create_dir_all(bin_dir).unwrap();
+        let claude = bin_dir.join("claude");
+        let marker = bin_dir.join(".reviewer-invoked");
+        let script = format!(
+            r#"#!/bin/sh
+: > '{}'
+sleep 0.05
+: > '{}'
+printf '%s\n' '{{"type":"result","structured_output":{{"verdict":"zero_findings","findings":[]}}}}'
+exit 0
+"#,
+            marker.display(),
+            bin_dir.join(".reviewer-invocation-window-end").display()
+        );
+        fs::write(&claude, script).unwrap();
+        make_executable(&claude);
+    }
+
+    #[cfg(unix)]
+    fn write_delayed_git_bin(bin_dir: &std::path::Path) {
+        fs::create_dir_all(bin_dir).unwrap();
+        let real_git = Command::new("sh").args(["-c", "command -v git"]).output().unwrap();
+        assert!(real_git.status.success(), "git must be available for this regression");
+        let real_git_path = String::from_utf8(real_git.stdout).unwrap().trim().to_owned();
+        std::os::unix::fs::symlink(real_git_path, bin_dir.join("git.real")).unwrap();
+        let git = bin_dir.join("git");
+        fs::write(
+            &git,
+            r#"#!/bin/sh
+case "$*" in
+  *"diff --name-only -z --diff-filter=ACDMRT"*)
+    delay_marker="$(dirname "$0")/.review-delay-used"
+    setup_marker="$(dirname "$0")/.review-setup-finished"
+    if [ ! -e "$delay_marker" ]; then
+      : > "$delay_marker"
+      sleep 0.75
+      : > "$setup_marker"
+    fi
+    ;;
+esac
+exec "$(dirname "$0")/git.real" "$@"
+"#,
+        )
+        .unwrap();
+        make_executable(&git);
+    }
+
     fn prepend_path(bin_dir: &std::path::Path) -> EnvGuard {
         let previous_path = std::env::var_os("PATH").unwrap_or_default();
         let mut test_path = bin_dir.as_os_str().to_os_string();
@@ -1436,6 +1554,8 @@ exit 0
         model: &str,
         command: &str,
         round_type: &str,
+        scope: &str,
+        reasoning_effort: &str,
     ) {
         let telemetry_path = track_dir.join("logs/telemetry.jsonl");
         let content = fs::read_to_string(&telemetry_path).unwrap();
@@ -1444,15 +1564,44 @@ exit 0
 
         assert!(
             events.iter().any(|event| {
+                let Some(round) = event.get("round") else {
+                    return false;
+                };
                 event.get("event_type").and_then(serde_json::Value::as_str) == Some("ReviewRound")
-                    && event.get("provider").and_then(serde_json::Value::as_str) == Some(provider)
-                    && event.get("model").and_then(serde_json::Value::as_str) == Some(model)
-                    && event.get("round_type").and_then(serde_json::Value::as_str)
+                    && round.get("scope").and_then(serde_json::Value::as_str) == Some(scope)
+                    && round.get("provider").and_then(serde_json::Value::as_str) == Some(provider)
+                    && round.get("model").and_then(serde_json::Value::as_str) == Some(model)
+                    && round.get("round_type").and_then(serde_json::Value::as_str)
                         == Some(round_type)
-                    && event.get("findings_count").and_then(serde_json::Value::as_u64) == Some(0)
+                    && round.get("reasoning_effort").and_then(serde_json::Value::as_str)
+                        == Some(reasoning_effort)
+                    && round.get("findings_count").and_then(serde_json::Value::as_u64) == Some(0)
             }),
             "ReviewRound telemetry missing from {content}"
         );
+        assert_external_subprocess_telemetry(&events, &content, command);
+    }
+
+    fn assert_no_review_round_telemetry(track_dir: &std::path::Path, command: &str) {
+        let telemetry_path = track_dir.join("logs/telemetry.jsonl");
+        let content = fs::read_to_string(&telemetry_path).unwrap();
+        let events: Vec<serde_json::Value> =
+            content.lines().map(|line| serde_json::from_str(line).unwrap()).collect();
+
+        assert!(
+            !events.iter().any(|event| {
+                event.get("event_type").and_then(serde_json::Value::as_str) == Some("ReviewRound")
+            }),
+            "excluded provider-specific review entry point emitted ReviewRound: {content}"
+        );
+        assert_external_subprocess_telemetry(&events, &content, command);
+    }
+
+    fn assert_external_subprocess_telemetry(
+        events: &[serde_json::Value],
+        content: &str,
+        command: &str,
+    ) {
         assert!(
             events.iter().any(|event| {
                 event.get("event_type").and_then(serde_json::Value::as_str)
@@ -1463,6 +1612,71 @@ exit 0
                         == Some(false)
             }),
             "ExternalSubprocess telemetry missing from {content}"
+        );
+    }
+
+    #[cfg(unix)]
+    fn external_subprocess_start_epoch_nanos(track_dir: &std::path::Path, command: &str) -> u128 {
+        let content = fs::read_to_string(track_dir.join("logs/telemetry.jsonl")).unwrap();
+        let event = content
+            .lines()
+            .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+            .find(|event| {
+                event.get("event_type").and_then(serde_json::Value::as_str)
+                    == Some("ExternalSubprocess")
+                    && event.get("command").and_then(serde_json::Value::as_str) == Some(command)
+            })
+            .expect("ExternalSubprocess event must be recorded");
+        let duration_ms = event
+            .get("duration_ms")
+            .and_then(serde_json::Value::as_u64)
+            .expect("ExternalSubprocess duration must be recorded");
+        let timestamp = event
+            .get("timestamp")
+            .and_then(serde_json::Value::as_str)
+            .expect("ExternalSubprocess timestamp must be recorded");
+        let event_epoch_nanos = chrono::DateTime::parse_from_rfc3339(timestamp)
+            .expect("ExternalSubprocess timestamp must be RFC 3339")
+            .timestamp_nanos_opt()
+            .expect("ExternalSubprocess timestamp must fit in nanoseconds");
+        u128::try_from(event_epoch_nanos)
+            .expect("ExternalSubprocess timestamp must be after the Unix epoch")
+            .checked_sub(u128::from(duration_ms) * 1_000_000)
+            .expect("ExternalSubprocess duration must not predate its timestamp")
+    }
+
+    #[cfg(unix)]
+    fn marker_modified_epoch_nanos(marker: &std::path::Path) -> u128 {
+        fs::metadata(marker)
+            .unwrap_or_else(|error| {
+                panic!("timing marker {} is missing: {error}", marker.display())
+            })
+            .modified()
+            .expect("timing marker modification time must be available")
+            .duration_since(UNIX_EPOCH)
+            .expect("timing marker must be after the Unix epoch")
+            .as_nanos()
+    }
+
+    #[cfg(unix)]
+    fn assert_external_subprocess_start_order(
+        track_dir: &std::path::Path,
+        command: &str,
+        setup_finished_marker: &std::path::Path,
+        reviewer_invocation_window_end_marker: &std::path::Path,
+    ) {
+        let setup_finished_at = marker_modified_epoch_nanos(setup_finished_marker);
+        let reviewer_invocation_window_end_at =
+            marker_modified_epoch_nanos(reviewer_invocation_window_end_marker);
+        let subprocess_started_at = external_subprocess_start_epoch_nanos(track_dir, command);
+
+        assert!(
+            setup_finished_at <= subprocess_started_at,
+            "{command} ExternalSubprocess must start after pre-review setup: setup={setup_finished_at}, start={subprocess_started_at}, reviewer_window_end={reviewer_invocation_window_end_at}"
+        );
+        assert!(
+            subprocess_started_at <= reviewer_invocation_window_end_at,
+            "{command} ExternalSubprocess must start during reviewer invocation: setup={setup_finished_at}, start={subprocess_started_at}, reviewer_window_end={reviewer_invocation_window_end_at}"
         );
     }
 
@@ -1537,7 +1751,8 @@ exit 0
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("review-run-codex-2026");
         let bin_dir = repo.track_dir.join("fake-bin-codex");
-        write_fake_codex_reviewer_bin(&bin_dir);
+        write_delayed_git_bin(&bin_dir);
+        write_fake_codex_reviewer_bin_with_invocation_marker(&bin_dir);
         let _path_guard = prepend_path(&bin_dir);
         let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
         let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
@@ -1560,7 +1775,26 @@ exit 0
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
-        assert_review_telemetry(&repo.track_dir, "codex", "codex-review-model", "codex", "fast");
+        assert_no_review_round_telemetry(&repo.track_dir, "codex");
+        assert_external_subprocess_start_order(
+            &repo.track_dir,
+            "codex",
+            &bin_dir.join(".review-setup-finished"),
+            &bin_dir.join(".reviewer-invocation-window-end"),
+        );
+
+        let telemetry_path = repo.track_dir.join("logs/telemetry.jsonl");
+        let telemetry = fs::read_to_string(&telemetry_path).unwrap();
+        let review_rounds = telemetry
+            .lines()
+            .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+            .filter(|event| {
+                event.get("event_type").and_then(serde_json::Value::as_str) == Some("ReviewRound")
+            })
+            .count();
+        // Provider-specific review_run_codex is an excluded entry point; the
+        // recording decorator is installed only by review_run_local_ungated.
+        assert_eq!(review_rounds, 0, "excluded codex review emitted a ReviewRound: {telemetry}");
     }
 
     #[cfg(unix)]
@@ -1677,7 +1911,8 @@ exit 0
         let _lock = cwd_lock().lock().unwrap();
         let repo = setup_review_entrypoint_repo("review-run-claude-2026");
         let bin_dir = repo.track_dir.join("fake-bin-claude");
-        write_fake_claude_reviewer_bin(&bin_dir);
+        write_delayed_git_bin(&bin_dir);
+        write_fake_claude_reviewer_bin_with_invocation_marker(&bin_dir);
         let _path_guard = prepend_path(&bin_dir);
         let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
         let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
@@ -1700,7 +1935,26 @@ exit 0
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
-        assert_review_telemetry(&repo.track_dir, "claude", "claude-review-model", "claude", "fast");
+        assert_no_review_round_telemetry(&repo.track_dir, "claude");
+        assert_external_subprocess_start_order(
+            &repo.track_dir,
+            "claude",
+            &bin_dir.join(".review-setup-finished"),
+            &bin_dir.join(".reviewer-invocation-window-end"),
+        );
+
+        let telemetry_path = repo.track_dir.join("logs/telemetry.jsonl");
+        let telemetry = fs::read_to_string(&telemetry_path).unwrap();
+        let review_rounds = telemetry
+            .lines()
+            .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+            .filter(|event| {
+                event.get("event_type").and_then(serde_json::Value::as_str) == Some("ReviewRound")
+            })
+            .count();
+        // Provider-specific review_run_claude is an excluded entry point; the
+        // recording decorator is installed only by review_run_local_ungated.
+        assert_eq!(review_rounds, 0, "excluded claude review emitted a ReviewRound: {telemetry}");
     }
 
     #[cfg(unix)]
@@ -1733,7 +1987,206 @@ exit 0
         assert_eq!(outcome.exit_code, 0);
         assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
         assert!(repo.track_dir.join("review.json").exists());
-        assert_review_telemetry(&repo.track_dir, "claude", "review-fast", "claude", "fast");
+
+        let telemetry_path = repo.track_dir.join("logs/telemetry.jsonl");
+        let telemetry = fs::read_to_string(&telemetry_path).unwrap();
+        let review_round = telemetry
+            .lines()
+            .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+            .find(|event| {
+                let event_type = event.get("event_type").and_then(serde_json::Value::as_str);
+                event_type == Some("ReviewRound")
+            })
+            .expect("a completed local review must persist ReviewRound telemetry");
+        let round = review_round
+            .get("round")
+            .expect("ReviewRound telemetry must contain the structured round");
+        assert_eq!(round.get("scope").unwrap(), "cli_composition");
+        assert_eq!(round.get("round_type").unwrap(), "fast");
+        assert_eq!(round.get("provider").unwrap(), "claude");
+        assert_eq!(round.get("model").unwrap(), "review-fast");
+        assert_eq!(round.get("reasoning_effort").unwrap(), "low");
+        assert_eq!(round.get("findings_count").unwrap(), 0);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_local_empty_scope_does_not_emit_review_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-empty-scope-2026");
+        fs::write(
+            repo._dir.path().join(".harness/config/review-scope.json"),
+            r#"{"version":2,"groups":{"cli_composition":{"patterns":["src/**"]},"empty_scope":{"patterns":["empty/**"]}},"review_operational":["track/items/<track-id>/**"]}"#,
+        )
+        .unwrap();
+        write_agent_profiles(repo._dir.path(), "claude");
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let outcome = ReviewCompositionRoot::new()
+            .review_run_local_ungated(crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "empty_scope".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            })
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.summary.as_deref().unwrap_or("").contains("zero_findings"));
+        assert!(
+            !repo.track_dir.join("logs/telemetry.jsonl").exists(),
+            "an empty scope must not emit ReviewRound telemetry"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_local_failed_subprocess_does_not_emit_review_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-failed-subprocess-2026");
+        write_agent_profiles(repo._dir.path(), "codex");
+        let bin_dir = repo.track_dir.join("fake-bin-local-failure");
+        write_fake_codex_bin_with_body(
+            &bin_dir,
+            r#"
+printf '{"verdict":"invalid","findings":[]}\n' > "$out"
+exit 0
+"#,
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let result = ReviewCompositionRoot::new().review_run_local_ungated(
+            crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            },
+        );
+        let error = match result {
+            Ok(_) => panic!("an invalid reviewer verdict must fail the local review"),
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("reviewer"), "unexpected error: {error}");
+        assert_no_review_round_telemetry(&repo.track_dir, "codex");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_local_post_verdict_failure_emits_review_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-post-verdict-failure-2026");
+        write_agent_profiles(repo._dir.path(), "codex");
+        std::os::unix::fs::symlink(
+            repo.track_dir.join("review-target.json"),
+            repo.track_dir.join("review.json"),
+        )
+        .unwrap();
+        let bin_dir = repo.track_dir.join("fake-bin-local-post-verdict-failure");
+        write_fake_codex_reviewer_bin(&bin_dir);
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let result = ReviewCompositionRoot::new().review_run_local_ungated(
+            crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            },
+        );
+        match result {
+            Ok(_) => panic!("review record persistence failure must fail the local review"),
+            Err(error) => {
+                assert!(error.to_string().contains("record failed"), "unexpected error: {error}")
+            }
+        }
+
+        assert_review_telemetry(
+            &repo.track_dir,
+            "codex",
+            "review-fast",
+            "codex",
+            "fast",
+            "cli_composition",
+            "low",
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn review_run_local_zero_findings_after_file_change_emits_review_telemetry() {
+        let _lock = cwd_lock().lock().unwrap();
+        let repo = setup_review_entrypoint_repo("review-run-local-file-change-zero-findings-2026");
+        write_agent_profiles(repo._dir.path(), "codex");
+        let bin_dir = repo.track_dir.join("fake-bin-local-file-change");
+        write_fake_codex_bin_with_body(
+            &bin_dir,
+            r#"
+printf '{"verdict":"zero_findings","findings":[]}\n' > "$out"
+printf 'changed during review\n' > src/lib.rs
+exit 0
+"#,
+        );
+        let _path_guard = prepend_path(&bin_dir);
+        let _telemetry_guard = EnvGuard::set("SOTP_TELEMETRY", OsString::from("1"));
+        let _telemetry_dir_guard = EnvGuard::remove("SOTP_TELEMETRY_DIR");
+        let _cwd_guard = CwdGuard::save_current();
+        std::env::set_current_dir(repo._dir.path()).unwrap();
+
+        let result = ReviewCompositionRoot::new().review_run_local_ungated(
+            crate::review_v2::ReviewRunLocalInput {
+                model: None,
+                timeout_seconds: 10,
+                briefing_file: None,
+                prompt: Some("Review.".to_owned()),
+                track_id: Some(repo.track_id.clone()),
+                round_type: "fast".to_owned(),
+                group: "cli_composition".to_owned(),
+                items_dir: repo.items_dir.clone(),
+            },
+        );
+        let error = match result {
+            Ok(_) => panic!("a file change during review must fail the local review"),
+            Err(error) => error,
+        };
+
+        assert!(
+            error.to_string().contains("file changed during review"),
+            "unexpected error: {error}"
+        );
+        assert_review_telemetry(
+            &repo.track_dir,
+            "codex",
+            "review-fast",
+            "codex",
+            "fast",
+            "cli_composition",
+            "low",
+        );
     }
 
     #[cfg(unix)]
@@ -1778,7 +2231,15 @@ exit 0
 
         let arguments = fs::read_to_string(arguments_log).unwrap();
         assert_grok_invocation(&arguments, "review-fast", "low", None);
-        assert_review_telemetry(&repo.track_dir, "grok", "review-fast", "grok", "fast");
+        assert_review_telemetry(
+            &repo.track_dir,
+            "grok",
+            "review-fast",
+            "grok",
+            "fast",
+            "cli_composition",
+            "low",
+        );
     }
 
     #[cfg(unix)]
@@ -1977,7 +2438,15 @@ exit 0
         );
         let verdict = fs::read_to_string(repo.track_dir.join("review.json")).unwrap();
         assert!(verdict.contains("zero_findings"), "verdict was not recorded: {verdict}");
-        assert_review_telemetry(&repo.track_dir, "codex", "review-fast", "codex", "fast");
+        assert_review_telemetry(
+            &repo.track_dir,
+            "codex",
+            "review-fast",
+            "codex",
+            "fast",
+            "cli_composition",
+            "max",
+        );
     }
 
     #[cfg(unix)]

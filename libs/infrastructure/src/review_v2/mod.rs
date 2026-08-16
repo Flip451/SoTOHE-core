@@ -4,6 +4,7 @@
 
 pub mod check_zero_findings;
 pub mod claude_reviewer;
+mod codex_process;
 pub mod codex_reviewer;
 pub mod diff_getter;
 pub mod grok_reviewer;
@@ -14,6 +15,7 @@ pub mod review_fix_adapter;
 pub(crate) mod review_fix_briefing;
 mod review_fix_grok;
 pub mod review_fix_runner;
+pub mod review_yield;
 pub mod scope_config_loader;
 mod session;
 
@@ -30,4 +32,5 @@ pub use persistence::{FsCommitHashStore, FsReviewStore};
 pub use results::{ResultsRoundAdapter, ResultsScopeAdapter, ResultsStateAdapter};
 pub use review_fix_adapter::{GitReviewFixTrackResolver, ReviewFixRunnerAdapter};
 pub use review_fix_runner::CodexReviewFixRunner;
+pub use review_yield::ReviewYieldRecordingReviewer;
 pub use scope_config_loader::load_v2_scope_config;

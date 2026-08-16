@@ -1,0 +1,69 @@
+{
+  "baseline_hash": "00b80e232752c18dac1ad6caf89a469e0213d9777879555967618718aa23f57d",
+  "declaration_hash": "d7ddf49df67f240e5e90b2333e4abbf2e8c1f97f8014194abf3d7a80487f5206",
+  "generated_at": "2026-08-14T16:24:45Z",
+  "head_commit": "0eb8410999b38b1c28e5742fd2e8c08d2c43bdea",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "CapturedProgramOutput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "CapturedStreamOutput"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "ProgramRunOutcome"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "ProgramOutputStream"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "FailedProgramExecutionRecord"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "ProgramExecutionRecord"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ProgramRunnerPort"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "type_name": "ReviewFixRunner"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "SuccessfulProgramExecutionRecord"
+    }
+  ]
+}

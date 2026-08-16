@@ -1,0 +1,442 @@
+{
+  "entries": [
+    {
+      "claim_hash": "d7a1c6240c97b494781846a7ddf144eee7b58d2278994d4f5940ea61c8542fa3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Allow long-running child processes to complete while retaining bounded, useful diagnostic output, without weakening the fail-closed output handling required when child output is itself a verification input."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断目的の出力（review-fix runner の stdout / stderr、program_runner の同等面）は、固定容量の末尾リングで保持する。上限到達は打ち切りであって異常ではなく、プロセスは実行を継続する。停止は既存のタイムアウトが担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d7a1c6240c97b494781846a7ddf144eee7b58d2278994d4f5940ea61c8542fa3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Allow long-running child processes to complete while retaining bounded, useful diagnostic output, without weakening the fail-closed output handling required when child output is itself a verification input."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "verdict envelope の抽出のように、内容そのものを検証入力とする経路の上限と fail-closed は不変とする。診断のための記録と、検証のための入力を分けて扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3bcfe690c34957b262a335b8ed20d017b139dff93877750e0dbc377830251c29",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Change diagnostic stdout and stderr capture in the review-fix runner to fixed-capacity tail-ring retention, including a clear indication when earlier output was truncated."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断目的の出力（review-fix runner の stdout / stderr、program_runner の同等面）は、固定容量の末尾リングで保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断目的の出力（review-fix runner の stdout / stderr、program_runner の同等面）は、固定容量の末尾リングで保持する。上限到達は打ち切りであって異常ではなく、プロセスは実行を継続する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1003efd9b1798840e3d76fcdcbe90a7df2cb4dad37934190e5ace839136c3b73",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Preserve the separate bounded, fail-closed handling for child output whose contents are consumed as validation input, including verdict-envelope extraction."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "verdict envelope の抽出のように、内容そのものを検証入力とする経路の上限と fail-closed は不変とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1e18415132faa48117c9316f09f5a22f8845c98ee94b1d27f6d4cf5577dc3889",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "Using tail-ring capture for verdict envelopes or any other child-output path whose contents are used as verification input."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "verdict envelope の抽出のように、内容そのものを検証入力とする経路の上限と fail-closed は不変とする。診断のための記録と、検証のための入力を分けて扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ebbd826b0988f03cd20116bd7d38150d718db35e62236d77f993b68d676001e9",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "Changing timeout behavior, invocation-config validation, repository-root working-directory enforcement, recursion detection, or first-failure command sequencing."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "停止は既存のタイムアウトが担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ebbd826b0988f03cd20116bd7d38150d718db35e62236d77f993b68d676001e9",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "Changing timeout behavior, invocation-config validation, repository-root working-directory enforcement, recursion detection, or first-failure command sequencing."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「schema version」「各 argv の非空」「phase または scope declaration の一意性」「repository-root 固定 cwd」「明示 timeout または約 60 分の既定 timeout」「phase engine の再帰呼び出し」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "497ceafde9bb104e1403826cd785855d8433c835daf12b9b9bca187abf92fced",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "Providing durable full-log storage for diagnostic output beyond the bounded tail retained by the process runner."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断目的の出力（review-fix runner の stdout / stderr、program_runner の同等面）は、固定容量の末尾リングで保持する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7bac7919bdcc840142794c1ba455c6a437bcd352c957e64d1c1544bbc493bc49",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Diagnostic child-output capture has a fixed memory capacity and preserves the tail rather than treating capacity exhaustion as a process failure; the existing timeout remains responsible for stopping a non-terminating child."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断目的の出力（review-fix runner の stdout / stderr、program_runner の同等面）は、固定容量の末尾リングで保持する。上限到達は打ち切りであって異常ではなく、プロセスは実行を継続する。停止は既存のタイムアウトが担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ea132633e44070a88ad7b969f2303f9b5eee2c734ac709eec86489a706e7dd8c",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "The diagnostic-capture policy must remain separate from output used as a verification input, so that validation paths retain their bounded, fail-closed behavior."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断のための記録と、検証のための入力を分けて扱う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "faf6bc03f807d70b869da2836d7ff4590237748ee91d77a8dd49ac3f0270f79b",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断目的の出力（review-fix runner の stdout / stderr、program_runner の同等面）は、固定容量の末尾リングで保持する。上限到達は打ち切りであって異常ではなく、プロセスは実行を継続する。停止は既存のタイムアウトが担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "faf6bc03f807d70b869da2836d7ff4590237748ee91d77a8dd49ac3f0270f79b",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "usecase layer は、「どの順で、何個の command を実行し、失敗したらどこで止めるか」という進行を受け持つ。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "faf6bc03f807d70b869da2836d7ff4590237748ee91d77a8dd49ac3f0270f79b",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "The change refines only diagnostic-output handling within infrastructure-owned bounded process execution; it does not alter command sequencing, command interpretation, or the existing invocation-validation contract."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「bounded output — command の出力が上限なく増え続けないため。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "66a020a362adaca6baa35086b3decff3b853ade32b95d79812b3fa38babc7399",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A review-fix runner child that emits diagnostic stdout or stderr beyond the fixed capture capacity continues running until it exits or the existing timeout stops it; the captured diagnostic output contains the most recent retained content and an explicit truncation indication."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "上限到達は打ち切りであって異常ではなく、プロセスは実行を継続する。停止は既存のタイムアウトが担う。保持した内容には切り詰めが起きた旨を明示する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dcd676ae123d27215a2c6d904a75bfa2cceb6337d0d3364dc791f48844766f05",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "診断目的の出力（review-fix runner の stdout / stderr、program_runner の同等面）は、固定容量の末尾リングで保持する。上限到達は打ち切りであって異常ではなく、プロセスは実行を継続する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "486ca28f09aee99b8cfa2a2594b850714d12e28cedeb944b3c9aa71aa632bfcc",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A path that reads child output as validation input, including verdict-envelope extraction, retains its existing output bound and fails closed when that bound is exceeded."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "verdict envelope の抽出のように、内容そのものを検証入力とする経路の上限と fail-closed は不変とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f4f48e107dc9c5d0de62500a77a824cb8efd45992b3a5b5a837c0e6b71dc426a",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Phase-command and pre-review execution continue to reject invalid invocation configuration, use the repository-root working directory, enforce their timeout and recursion protections, and stop at the first command failure."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "448960e996250f0f7df856c08dc777685493a38071c2a4c6029bc5910af47867",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1048-child-output-ring-capture.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "上限到達は打ち切りであって異常ではなく、プロセスは実行を継続する。停止は既存のタイムアウトが担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f4f48e107dc9c5d0de62500a77a824cb8efd45992b3a5b5a837c0e6b71dc426a",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Phase-command and pre-review execution continue to reject invalid invocation configuration, use the repository-root working directory, enforce their timeout and recursion protections, and stop at the first command failure."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "2919225aca7ba1926770cce548e45eb0758a464712d221b588b4ee8e60439b2d",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-02-0806-operator-owned-phase-command-config.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「phase command config と pre-review gate config は、少なくとも次を検証する。」／「repository-root 固定 cwd」／「明示 timeout または約 60 分の既定 timeout」／「phase engine の再帰呼び出し」／「その結果を D2 / D4 の first-failure stop へ渡す。」",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

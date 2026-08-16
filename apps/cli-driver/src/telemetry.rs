@@ -10,7 +10,9 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use usecase::TelemetryAggregateService;
+use usecase::capability_exec::ReasoningEffort;
 use usecase::telemetry::TelemetryReportOutput;
+use usecase::telemetry::review_yield::ReviewYieldValue;
 
 use crate::render::CommandOutcome;
 
@@ -471,6 +473,20 @@ fn format_report(track_id: &str, output: &TelemetryReportOutput) -> String {
     }
     lines.push(String::new());
 
+    lines.push("Review yield metrics:".to_owned());
+    if output.review_yield_metrics.is_empty() {
+        lines.push("  (no review yield data recorded)".to_owned());
+    } else {
+        for metric in &output.review_yield_metrics {
+            let (axis, value) = review_yield_value_label(&metric.value);
+            lines.push(format!(
+                "  {axis}={value}: {} execution(s), {} basis points detection rate",
+                metric.execution_count, metric.detection_rate
+            ));
+        }
+    }
+    lines.push(String::new());
+
     let skipped_lines = output.skipped_lines.as_ref();
     lines.push(format!("Skipped lines: {skipped_lines}"));
     if *skipped_lines > 0 {
@@ -484,19 +500,47 @@ fn format_report(track_id: &str, output: &TelemetryReportOutput) -> String {
     lines.join("\n")
 }
 
+fn review_yield_value_label(value: &ReviewYieldValue) -> (&'static str, String) {
+    match value {
+        ReviewYieldValue::Scope(scope) => ("scope", scope.to_string()),
+        ReviewYieldValue::RoundType(round_type) => ("round_type", round_type.to_string()),
+        ReviewYieldValue::Provider(provider) => ("provider", provider.to_string()),
+        ReviewYieldValue::Model(model) => ("model", model.to_string()),
+        ReviewYieldValue::ReasoningEffort(effort) => {
+            ("reasoning_effort", reasoning_effort_label(*effort).to_owned())
+        }
+    }
+}
+
+fn reasoning_effort_label(effort: ReasoningEffort) -> &'static str {
+    match effort {
+        ReasoningEffort::Low => "low",
+        ReasoningEffort::Medium => "medium",
+        ReasoningEffort::High => "high",
+        ReasoningEffort::XHigh => "xhigh",
+        ReasoningEffort::Max => "max",
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
     use std::ffi::OsString;
+    use std::num::NonZeroU64;
     use std::path::Path;
     use std::time::{Duration, Instant};
 
+    use usecase::capability_exec::{ModelName, ProviderName};
     use usecase::telemetry::{
         TelemetryAggregateServiceError, TelemetryArchivedService, TelemetryEmitService,
         TelemetryReportService,
         command_trace::{
             CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric,
             SotpCommandIdentity, TelemetrySkippedLineCount,
+        },
+        review_yield::{
+            ReviewDetectionRateBasisPoints, ReviewExecutionCount, ReviewYieldMetric,
+            ReviewYieldValue,
         },
     };
 
@@ -741,6 +785,7 @@ mod tests {
                 hook_blocks: Vec::new(),
                 skipped_lines: TelemetrySkippedLineCount::from(0),
                 command_metrics: Vec::new(),
+                review_yield_metrics: Vec::new(),
             })
         }
     }
@@ -802,6 +847,7 @@ mod tests {
                 hook_blocks: Vec::new(),
                 skipped_lines: TelemetrySkippedLineCount::from(0),
                 command_metrics: Vec::new(),
+                review_yield_metrics: Vec::new(),
             })
         }
     }
@@ -1083,6 +1129,7 @@ mod tests {
                 hook_blocks: Vec::new(),
                 skipped_lines: TelemetrySkippedLineCount::from(0),
                 command_metrics: vec![metric],
+                review_yield_metrics: Vec::new(),
             },
         });
         let driver = build_driver(service);
@@ -1103,6 +1150,74 @@ mod tests {
     }
 
     #[test]
+    fn test_telemetry_report_review_yield_metrics_render_each_accessible_axis() {
+        let execution_count = ReviewExecutionCount::new(NonZeroU64::new(3).unwrap());
+        let detection_rate = ReviewDetectionRateBasisPoints::try_new(6_666).unwrap();
+        let service = Arc::new(MetricsService {
+            report: TelemetryReportOutput {
+                phase_durations: Vec::new(),
+                errors: Vec::new(),
+                hook_blocks: Vec::new(),
+                skipped_lines: TelemetrySkippedLineCount::from(0),
+                command_metrics: Vec::new(),
+                review_yield_metrics: vec![
+                    ReviewYieldMetric {
+                        value: ReviewYieldValue::Scope(
+                            domain::review_v2::ScopeName::parse("cli_driver").unwrap(),
+                        ),
+                        execution_count,
+                        detection_rate,
+                    },
+                    ReviewYieldMetric {
+                        value: ReviewYieldValue::RoundType(domain::review_v2::RoundType::Final),
+                        execution_count,
+                        detection_rate,
+                    },
+                    ReviewYieldMetric {
+                        value: ReviewYieldValue::Provider(ProviderName::try_new("codex").unwrap()),
+                        execution_count,
+                        detection_rate,
+                    },
+                    ReviewYieldMetric {
+                        value: ReviewYieldValue::Model(ModelName::try_new("gpt-5").unwrap()),
+                        execution_count,
+                        detection_rate,
+                    },
+                    ReviewYieldMetric {
+                        value: ReviewYieldValue::ReasoningEffort(ReasoningEffort::High),
+                        execution_count,
+                        detection_rate,
+                    },
+                ],
+            },
+        });
+        let driver = build_driver(service);
+
+        let outcome = driver.handle(TelemetryInput::Report(TelemetryReportInput {
+            track_id: "test-track".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+        }));
+        let report = outcome.stdout.expect("successful report has stdout");
+
+        assert!(report.contains("Review yield metrics:"));
+        assert!(
+            report.contains("scope=cli_driver: 3 execution(s), 6666 basis points detection rate")
+        );
+        assert!(
+            report.contains("round_type=final: 3 execution(s), 6666 basis points detection rate")
+        );
+        assert!(
+            report.contains("provider=codex: 3 execution(s), 6666 basis points detection rate")
+        );
+        assert!(report.contains("model=gpt-5: 3 execution(s), 6666 basis points detection rate"));
+        assert!(
+            report.contains(
+                "reasoning_effort=high: 3 execution(s), 6666 basis points detection rate"
+            )
+        );
+    }
+
+    #[test]
     fn test_telemetry_report_empty_command_metrics_renders_empty_data_message() {
         let service = Arc::new(MetricsService {
             report: TelemetryReportOutput {
@@ -1111,6 +1226,7 @@ mod tests {
                 hook_blocks: Vec::new(),
                 skipped_lines: TelemetrySkippedLineCount::from(0),
                 command_metrics: Vec::new(),
+                review_yield_metrics: Vec::new(),
             },
         });
         let driver = build_driver(service);
@@ -1128,6 +1244,13 @@ mod tests {
                 .as_deref()
                 .is_some_and(|report| report.contains("  (no command data recorded)"))
         );
+        assert!(
+            outcome
+                .stdout
+                .as_deref()
+                .is_some_and(|report| report.contains("  (no review yield data recorded)"))
+        );
+        assert!(outcome.stdout.as_deref().is_some_and(|report| !report.contains("detection rate")));
     }
 
     #[test]
@@ -1139,6 +1262,7 @@ mod tests {
                 hook_blocks: Vec::new(),
                 skipped_lines: TelemetrySkippedLineCount::from(1),
                 command_metrics: Vec::new(),
+                review_yield_metrics: Vec::new(),
             },
         });
         let driver = build_driver(service);

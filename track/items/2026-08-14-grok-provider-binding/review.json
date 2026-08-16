@@ -111,6 +111,38 @@
           "hash": "rvw1:sha256:7c5eaf4a03b21d481a0c0a443e0a1ef290e85076b23047f8e12e70319225189a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:20:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:524653aa3fb14420ab9b5b4ca7655f961d748be744d15ab82aab2775d76da61b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:23:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:524653aa3fb14420ab9b5b4ca7655f961d748be744d15ab82aab2775d76da61b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-16T06:20:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7ebad0431d26fec6d412d8de3a529ff8530b4574722a88498c1e532d72427cb2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:24:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7ebad0431d26fec6d412d8de3a529ff8530b4574722a88498c1e532d72427cb2",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -309,6 +341,42 @@
           "hash": "rvw1:sha256:280b6b326eb7f342e2cb49d211e666597ca57ea644541171516207ed2639239c",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:21:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8161a4cb35172fcdc006125982686e9f77cd55105cde830f55bf5a6c455e9ca8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:27:31Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 2234,
+              "message": "`assert_review_telemetry` now requires `scope` and `reasoning_effort`, but the Grok test still supplies only five arguments. On Unix this produces E0061 and prevents the cli-composition test target—and therefore CI—from compiling. Pass the expected scope and effort values here.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:8161a4cb35172fcdc006125982686e9f77cd55105cde830f55bf5a6c455e9ca8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:29:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0bb8e6cea86ebae306e58437390936de83979de4a7e9eec49806a92c245162b0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:32:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0bb8e6cea86ebae306e58437390936de83979de4a7e9eec49806a92c245162b0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -339,6 +407,20 @@
           "at": "2026-08-15T12:59:04Z",
           "findings": [],
           "hash": "rvw1:sha256:2349c98ed639315519385c67227fd9952faa62716166406c8d0fad5d23a7f104",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:20:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0456830b47e7ac18112427783f34ba23614ef1907607cddd49f77064a029b46",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:24:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0456830b47e7ac18112427783f34ba23614ef1907607cddd49f77064a029b46",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1387,6 +1469,64 @@
           "hash": "rvw1:sha256:25d0c81d6893091e5e5efd1b9699162d21cd5c160da2c1e6813ef5d7d72b8a8a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:21:42Z",
+          "findings": [
+            {
+              "category": "serde codec",
+              "file": "libs/infrastructure/src/telemetry/mod.rs",
+              "line": 84,
+              "message": "`TelemetryEvent::ReviewRound` changes its wire shape from flat `provider`/`model`/`round_type`/`findings_count` fields to nested `round`, but keeps `schema_version: 1`. Existing schema-1 JSONL records therefore fail `TelemetryEvent` deserialization and are silently counted as skipped by the report adapter, causing historical review telemetry to disappear from aggregation. Bump the event schema version and provide an explicit compatibility path, or preserve parsing for the legacy shape.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2f46bd50cc2a856304398429dc72d83be885df27f20be8d7b8366028ea1ceaea",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:23:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f46bd50cc2a856304398429dc72d83be885df27f20be8d7b8366028ea1ceaea",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:28:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f46bd50cc2a856304398429dc72d83be885df27f20be8d7b8366028ea1ceaea",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:35:30Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/telemetry.rs",
+              "line": 373,
+              "message": "The updated test constructs `RecordingDryTierTelemetryAdapter` with two extra provider arguments (`\"codex\"`, `\"codex\"`), but `RecordingDryTierTelemetryAdapter::new` accepts only seven parameters and has no provider parameters. This test code does not compile; remove the extra arguments or update the constructor consistently.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c21fe139a13f2419d9921d501ba42a66435e4dd7357e0a38fbd28a82ce443f11",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:36:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c21fe139a13f2419d9921d501ba42a66435e4dd7357e0a38fbd28a82ce443f11",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:43:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c21fe139a13f2419d9921d501ba42a66435e4dd7357e0a38fbd28a82ce443f11",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1792,6 +1932,20 @@
           "hash": "rvw1:sha256:e6c9613a77dbde1ce84edcc17fbe28e9d31276d291bfba6a2e0ececcea437d3b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:19:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a870442d2a2e633f37117508bc8f70b9cebf84161b478300e5f125a3afb51bbe",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:24:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a870442d2a2e633f37117508bc8f70b9cebf84161b478300e5f125a3afb51bbe",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1808,6 +1962,20 @@
           "at": "2026-08-15T08:24:22Z",
           "findings": [],
           "hash": "rvw1:sha256:4843f3e23be9eb90e55adef575984eb0ce8fb195cd3c16eeea4d14b849ef1162",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:21:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c2769779e0d4497de0ea69ab3eeba90d7e3700c8d279f79141dcb394b829e67",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:25:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c2769779e0d4497de0ea69ab3eeba90d7e3700c8d279f79141dcb394b829e67",
           "type": "final",
           "verdict": "zero_findings"
         }

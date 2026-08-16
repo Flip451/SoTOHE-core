@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "claim_hash": "6513c08781959305af5a29bd378c8574c60b4766f1c53c5c7dbb01c113ae646f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "cli_composition::telemetry_wiring::emit_review_round",
+          "file_path": "track/items/2026-08-14-review-yield-measurement/cli_composition-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ae2ff6c754d5ee26fb109896250d7bf62b129d9afe9bd4f50e4b4549c96c5104",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "The feature neither adds nor removes review, gate, or inspection work, and produces no measurement records for the excluded review and gate entry points."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "produces no measurement records for the excluded review and gate entry points",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 1
+}

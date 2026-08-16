@@ -1,0 +1,16 @@
+{
+  "catalogue_declaration_hash": "fdaed0ca84b4c369996aaa0010d3ac21f4dfddbd283850966e4841eecac9ed0f",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "ec3b9bc799102aab6e1855e5b3056c8af85bf612746dd46443c086537d2853a1",
+      "signal": "blue",
+      "type_name": "CodexReviewFixRunner"
+    },
+    {
+      "entry_hash": "e045783815ca54c8d37027f6c184a2d06c6a5d810ca01598a1a9e8aaf9bbb82f",
+      "signal": "blue",
+      "type_name": "ProcessProgramRunner"
+    }
+  ]
+}

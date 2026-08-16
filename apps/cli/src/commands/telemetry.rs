@@ -1,7 +1,8 @@
 //! CLI subcommands for `sotp telemetry`: workflow telemetry tools.
 //!
 //! Provides:
-//! - `report <track-id>`: aggregate and display telemetry for a track.
+//! - `report <track-id>`: aggregate and display telemetry for a track,
+//!   including structured-review execution counts and detection rates.
 //!
 //! This is a pure display command (OS-04): it reads and prints telemetry data
 //! without emitting any `TelemetryEvent` itself.  No file IO is performed on
@@ -26,8 +27,9 @@ use crate::commands::driver_outcome_to_exit;
 #[derive(Debug, Subcommand)]
 pub enum TelemetryCommand {
     /// Aggregate and display telemetry for a track: phase durations, command
-    /// frequency, command duration, command failure rate, errors, hook blocks,
-    /// and skipped-line count.
+    /// frequency, command duration, command failure rate, structured-review
+    /// execution counts and detection rates, errors, hook blocks, and
+    /// skipped-line count.
     ///
     /// Reads `track/items/<track-id>/logs/telemetry.jsonl` (or the directory
     /// specified by `--items-dir`) and prints a human-readable summary to
@@ -53,12 +55,14 @@ pub struct ReportArgs {
 
 /// Execute `sotp telemetry <subcommand>`.
 pub fn execute(cmd: TelemetryCommand) -> ExitCode {
+    let driver = TelemetryCompositionRoot::new().telemetry_driver();
     match cmd {
-        TelemetryCommand::Report(args) => driver_outcome_to_exit(
-            TelemetryCompositionRoot::new().telemetry_driver().handle(TelemetryInput::Report(
-                TelemetryReportInput { track_id: args.track_id, items_dir: args.items_dir },
-            )),
-        ),
+        TelemetryCommand::Report(args) => {
+            driver_outcome_to_exit(driver.handle(TelemetryInput::Report(TelemetryReportInput {
+                track_id: args.track_id,
+                items_dir: args.items_dir,
+            })))
+        }
     }
 }
 
@@ -116,6 +120,17 @@ mod tests {
     fn test_telemetry_report_requires_track_id() {
         let result = TestCli::try_parse_from(["telemetry", "report"]);
         assert!(result.is_err(), "track_id is required and must be rejected when absent");
+    }
+
+    #[test]
+    fn test_telemetry_report_execute_propagates_report_failure() {
+        let items_dir = tempfile::tempdir().unwrap();
+        let exit = execute(TelemetryCommand::Report(ReportArgs {
+            track_id: "missing-track".to_owned(),
+            items_dir: items_dir.path().to_path_buf(),
+        }));
+
+        assert_eq!(exit, ExitCode::FAILURE);
     }
 
     #[test]

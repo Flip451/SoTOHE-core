@@ -33,6 +33,6 @@
 | CodexDryFixLocalRunner | secondary_adapter | reference | impl Default | 🔵 | 🔵 |
 | GrokCapabilityAdapter | secondary_adapter | add | impl CapabilityProviderPort | 🔵 | 🔵 |
 | GrokDryChecker | secondary_adapter | add | impl DryCheckAgentPort, impl Debug | 🔵 | 🔵 |
-| GrokReviewer | secondary_adapter | add | impl Reviewer | 🔵 | 🔵 |
+| GrokReviewer | secondary_adapter | add | impl Reviewer, impl ResolvedReviewer | 🔵 | 🔵 |
 | ReviewFixRunnerAdapter | secondary_adapter | reference | impl ReviewFixRunner | 🔵 | 🔵 |
 

@@ -1,8 +1,8 @@
 {
-  "baseline_hash": "1db98d07f55de7d5c620ae7123f843d04d964cd7c3be044e33c7dd186d48c599",
-  "declaration_hash": "1d9d7cdf4ed5f9b16a8d7f3d7bf2a63f4645d7a714e5ca734ac3d98688e90ac4",
-  "generated_at": "2026-08-16T05:41:48Z",
-  "head_commit": "621e5247081c0d3511ab8a29e51d360cf984489d",
+  "baseline_hash": "acf4870d433e68c129e8eacf8ebe8f10ed291b57be4f8ba88806777e1c418c9a",
+  "declaration_hash": "d1eda6a047b69246decd253b0399f9dc0665a1972bb8024fef1738d86a2183aa",
+  "generated_at": "2026-08-16T06:44:08Z",
+  "head_commit": "82cf963e8e6ad53ddad3c68c1b653347eae90b5d",
   "schema_version": 4,
   "signals": [
     {
@@ -66,6 +66,7 @@
     },
     {
       "found_items": [
+        "usecase::review_v2::ports::ResolvedReviewer",
         "usecase::review_v2::ports::Reviewer"
       ],
       "found_type": true,

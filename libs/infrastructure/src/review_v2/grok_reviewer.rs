@@ -17,7 +17,9 @@ use domain::review_v2::{
 use domain::{CommitHash, TrackId};
 use usecase::capability_exec::{GROK_PROVIDER_NAME, ModelName, ProviderName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
-use usecase::review_v2::{ReviewerError, ports::Reviewer};
+use usecase::review_v2::{
+    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ports::Reviewer,
+};
 use usecase::review_workflow::{
     ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict, classify_review_verdict,
     normalize_final_message, parse_review_final_message, render_review_payload,
@@ -42,6 +44,7 @@ pub struct GrokReviewer {
     base_prompt: String,
     scope_label: String,
     session: ReviewerSession,
+    assignment: ResolvedReviewerAssignment,
     repo_root: PathBuf,
     runtime_dir: PathBuf,
     provider: ProviderName,
@@ -71,6 +74,13 @@ impl GrokReviewer {
         repo_root: PathBuf,
     ) -> GrokReviewer {
         let runtime_dir = repo_root.join(REVIEW_RUNTIME_DIR);
+        let assignment = ResolvedReviewerAssignment::new(
+            track_id.clone(),
+            scope.clone(),
+            GROK_PROVIDER_NAME.clone(),
+            model.clone(),
+            effort,
+        );
         Self {
             session: ReviewerSession::new(
                 track_id,
@@ -87,6 +97,7 @@ impl GrokReviewer {
             timeout,
             base_prompt: base_prompt.as_str().to_owned(),
             scope_label: scope.to_string(),
+            assignment,
             repo_root,
             runtime_dir,
             provider: GROK_PROVIDER_NAME.clone(),
@@ -205,6 +216,12 @@ impl GrokReviewer {
             return self.run_attempt(target, None);
         }
         attempted
+    }
+}
+
+impl ResolvedReviewer for GrokReviewer {
+    fn resolved_assignment(&self) -> &ResolvedReviewerAssignment {
+        &self.assignment
     }
 }
 
@@ -496,6 +513,22 @@ mod tests {
             Arc::new(MemorySessionCache::with_entry(None)),
         );
         accepts_port(&reviewer);
+    }
+
+    #[test]
+    fn test_grok_reviewer_resolved_assignment_returns_adapter_values() {
+        let reviewer = reviewer(
+            Arc::new(RecordingProcessRunner::default()),
+            Arc::new(MemorySessionCache::with_entry(None)),
+        );
+        let assignment =
+            <GrokReviewer as usecase::review_v2::ResolvedReviewer>::resolved_assignment(&reviewer);
+
+        assert_eq!(assignment.track_id().as_ref(), "grok-review-test");
+        assert_eq!(assignment.scope(), &ScopeName::Other);
+        assert_eq!(assignment.provider().as_str(), GROK_PROVIDER_NAME.as_str());
+        assert_eq!(assignment.model().as_str(), "grok-review-model");
+        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);
     }
 
     #[test]

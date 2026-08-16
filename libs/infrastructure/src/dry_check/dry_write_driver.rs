@@ -523,7 +523,8 @@ impl DryTierTelemetryPort for RecordingDryTierTelemetryAdapter {
             return;
         };
 
-        // T013 / IN-07 / AC-09 / CN-10: emit per-tier ReviewRound telemetry.
+        // T013 / IN-07 / AC-09 / CN-10: retain per-tier dry-check telemetry;
+        // structured review-yield records are reserved for `review local`.
         let (fast_telemetry, final_telemetry) =
             telemetry::dry_tiered_telemetry_for_result(dry_result, &self.recorder);
         if let Some(ref round) = fast_telemetry {

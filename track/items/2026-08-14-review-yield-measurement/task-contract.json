@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-14-review-yield-measurement",
+  "entries": {
+    "T001": [
+      {"layer": "usecase", "entry_key": "ReviewDetectionRateBasisPoints"},
+      {"layer": "usecase", "entry_key": "ReviewExecutionCount"},
+      {"layer": "usecase", "entry_key": "ReviewFindingCount"},
+      {"layer": "usecase", "entry_key": "ReviewCycleError"},
+      {"layer": "usecase", "entry_key": "ReviewYieldMetric"},
+      {"layer": "usecase", "entry_key": "ReviewYieldValue"},
+      {"layer": "usecase", "entry_key": "ReviewYieldValueError"},
+      {"layer": "usecase", "entry_key": "TelemetryReportOutput"},
+      {"layer": "usecase", "entry_key": "ResolvedReviewerAssignment"},
+      {"layer": "usecase", "entry_key": "Reviewer"},
+      {"layer": "usecase", "entry_key": "ResolvedReviewer"}
+    ],
+    "T002": [
+      {"layer": "infrastructure", "entry_key": "StructuredReviewRoundDto"},
+      {"layer": "infrastructure", "entry_key": "TelemetryEvent"},
+      {"layer": "infrastructure", "entry_key": "TelemetryReportSnapshot"},
+      {"layer": "infrastructure", "entry_key": "ClaudeReviewer"},
+      {"layer": "infrastructure", "entry_key": "TelemetryWriter"},
+      {"layer": "infrastructure", "entry_key": "CodexReviewer"},
+      {"layer": "infrastructure", "entry_key": "ReviewYieldRecordingReviewer"}
+    ],
+    "T004": [
+      {"layer": "cli_composition", "entry_key": "cli_composition::telemetry_wiring::emit_review_round"}
+    ],
+    "T005": []
+  }
+}
