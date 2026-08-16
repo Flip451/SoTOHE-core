@@ -331,6 +331,20 @@ impl CheckTestObligationsInteractor {
                 })
                 .collect();
             let fulfilled = fulfillment_tests(bindings, obligation.id());
+            if edges.is_empty() {
+                // D1: an obligation that owns no anchors is not a fulfillment
+                // target. A fulfillment record would pass the presence check
+                // while evaluate plans zero verifier actions.
+                if fulfilled.is_some() {
+                    gate.structural_drift(TestObligationDrift::orphaned_edge(
+                        synthetic_edge(obligation.id()),
+                        diag(
+                            "fulfillment binds an obligation that owns no anchors; omit the record or use voluntary/waiver on a cited edge",
+                        ),
+                    ));
+                }
+                continue;
+            }
             let any_voluntary = edges.iter().any(|edge| voluntary_tests(bindings, edge).is_some());
             let any_waived = edges.iter().any(|edge| waived_reason(bindings, edge).is_some());
 

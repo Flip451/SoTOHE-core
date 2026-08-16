@@ -524,6 +524,43 @@ fn empty_rules_doc() -> TestObligationRulesDocument {
     .unwrap()
 }
 
+fn secondary_port_trait_method_rules_doc() -> TestObligationRulesDocument {
+    let empty = || RoleObligationRules::new(vec![]);
+    let data_roles: Vec<(DataRole, RoleObligationRules)> =
+        DATA_ROLE_NAMES.iter().map(|name| (name.parse::<DataRole>().unwrap(), empty())).collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "SecondaryPort" {
+                RoleObligationRules::new(vec![TestObligationRule::new(
+                    TestObligationKind::Contract,
+                    TestObligationPerAxis::TraitMethod,
+                    None,
+                    None,
+                )])
+            } else {
+                empty()
+            };
+            (name.parse::<ContractRole>().unwrap(), rules)
+        })
+        .collect();
+    let function_roles =
+        vec![(FunctionRole::FreeFunction, empty()), (FunctionRole::UseCaseFunction, empty())];
+    let patterns = vec![(TestObligationPatternKind::Typestate, empty())];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), empty()))
+        .collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
+
 fn track() -> TrackId {
     TrackId::try_new("my-track").unwrap()
 }
@@ -555,6 +592,42 @@ fn task_contract_reader_with(task_ids: &[&str]) -> Arc<dyn TaskContractReaderPor
         entries.insert(TaskId::try_new((*task_id).to_owned()).unwrap(), vec![entry.clone()]);
     }
     Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap()))
+}
+
+fn test_port_task_contract_reader() -> Arc<dyn TaskContractReaderPort> {
+    let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+    let entry = ContractedEntryRef::new(
+        LayerId::try_new("domain").unwrap(),
+        CatalogueEntryKey::try_new("TestPort".to_owned()).unwrap(),
+    );
+    let mut entries = BTreeMap::new();
+    entries.insert(task_id, vec![entry]);
+    Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap()))
+}
+
+fn anchorless_port_interactor(
+    obligations: ObligationsDocument,
+    bindings: TestBindingsDocument,
+    rules: TestObligationRulesDocument,
+    catalogue: CatalogueDocument,
+) -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        Arc::new(StubRules { doc: rules }),
+        Arc::new(StubObligations(Some(obligations))),
+        Arc::new(StubBindings(Some(bindings))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(Some(ObligationFulfillmentCacheDocument::new(
+            track(),
+            Vec::new(),
+        )))),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(catalogue)),
+        test_port_task_contract_reader(),
+        impl_plan_reader(),
+    )
 }
 
 fn missing_binding_interactor_with_statuses(
@@ -890,6 +963,47 @@ fn covering_method(name: &str, anchor: &str) -> MethodDeclaration {
         vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new(anchor).unwrap())],
         None,
     )
+}
+
+fn method_without_spec_refs(name: &str) -> MethodDeclaration {
+    MethodDeclaration::new(
+        MethodName::new(name).unwrap(),
+        None,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        false,
+        vec![],
+        vec![],
+        vec![],
+        None,
+    )
+}
+
+fn anchorless_secondary_port_catalogue() -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![method_without_spec_refs("load")],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    catalogue
 }
 
 fn trait_impl_catalogue() -> CatalogueDocument {
@@ -1612,6 +1726,49 @@ fn test_orphaned_waiver_binding_is_a_drift() {
         interactor_with_rules(Some(obligations), Some(bindings), None, None, empty_rules_doc())
             .execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_fulfillment_on_obligation_that_owns_no_anchors_is_orphaned() {
+    // D1: a derived obligation with empty spec_refs is not a fulfillment target.
+    // Presence of a fulfillment record must not pass check while evaluate plans
+    // zero verifier actions.
+    let catalogue = anchorless_secondary_port_catalogue();
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    assert_eq!(obligations.obligations().len(), 1);
+    assert!(obligations.obligations()[0].spec_refs().is_empty());
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![fulfillment_binding_for(&obligations.obligations()[0])],
+    );
+
+    let result =
+        anchorless_port_interactor(obligations, bindings, rules, catalogue).execute(&command());
+
+    let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+        panic!("fulfillment on an anchorless obligation must be a structural drift");
+    };
+    assert_eq!(drifts.as_slice().len(), 1);
+    let rendered = format!("{drifts:?}");
+    assert!(rendered.contains("Orphaned"));
+    assert!(rendered.contains("owns no anchors"));
+}
+
+#[test]
+fn test_anchorless_obligation_without_fulfillment_is_not_missing() {
+    // D1: owning no anchors means there is nothing to fulfill; absence of a
+    // fulfillment record is not `missing`.
+    let catalogue = anchorless_secondary_port_catalogue();
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+
+    let outcome = anchorless_port_interactor(obligations, bindings, rules, catalogue)
+        .execute(&command())
+        .unwrap();
+
+    assert!(outcome.resolved_edges().is_empty());
 }
 
 #[test]
