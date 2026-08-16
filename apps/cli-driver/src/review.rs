@@ -817,6 +817,18 @@ mod tests {
 
     struct CodexAggregateService {
         received: Mutex<Option<ReviewRunInput>>,
+        local_received: Mutex<Option<LocalReviewInput>>,
+    }
+
+    struct LocalReviewInput {
+        model: Option<String>,
+        timeout_seconds: u64,
+        briefing_file: Option<PathBuf>,
+        prompt: Option<String>,
+        track_id: Option<String>,
+        round_type: String,
+        group: String,
+        items_dir: PathBuf,
     }
 
     impl ReviewService for CodexAggregateService {
@@ -837,16 +849,31 @@ mod tests {
 
         fn run_local(
             &self,
-            _model: Option<String>,
-            _timeout_seconds: u64,
-            _briefing_file: Option<PathBuf>,
-            _prompt: Option<String>,
-            _track_id: Option<String>,
-            _round_type: String,
-            _group: String,
-            _items_dir: PathBuf,
+            model: Option<String>,
+            timeout_seconds: u64,
+            briefing_file: Option<PathBuf>,
+            prompt: Option<String>,
+            track_id: Option<String>,
+            round_type: String,
+            group: String,
+            items_dir: PathBuf,
         ) -> usecase::review_v2::ReviewRunLocalOutput {
-            panic!("Codex aggregate test must not invoke local review")
+            *self.local_received.lock().expect("capture lock is healthy") =
+                Some(LocalReviewInput {
+                    model,
+                    timeout_seconds,
+                    briefing_file,
+                    prompt,
+                    track_id,
+                    round_type,
+                    group,
+                    items_dir,
+                });
+            ReviewRunLocalOutput {
+                summary: Some("grok review completed".to_owned()),
+                diagnostics: Vec::new(),
+                exit_code: 0,
+            }
         }
 
         fn check_approved(
@@ -983,7 +1010,10 @@ mod tests {
 
     #[test]
     fn test_review_driver_hands_codex_input_to_injected_aggregate_service() {
-        let service = Arc::new(CodexAggregateService { received: Mutex::new(None) });
+        let service = Arc::new(CodexAggregateService {
+            received: Mutex::new(None),
+            local_received: Mutex::new(None),
+        });
         let driver = ReviewDriver::new(
             service.clone(),
             Arc::new(UnusedReviewService { results_service: None }),
@@ -1019,6 +1049,49 @@ mod tests {
         assert_eq!(received.items_dir, PathBuf::from("track/items"));
         assert_eq!(outcome.exit_code, 0);
         assert_eq!(outcome.stdout.as_deref(), Some("aggregate review completed"));
+    }
+
+    #[test]
+    fn test_review_driver_hands_grok_via_local_input_to_injected_aggregate_service() {
+        let service = Arc::new(CodexAggregateService {
+            received: Mutex::new(None),
+            local_received: Mutex::new(None),
+        });
+        let driver = ReviewDriver::new(
+            service.clone(),
+            Arc::new(UnusedReviewService { results_service: None }),
+            Arc::new(CapturingCheckZeroFindingsService::new(Ok(
+                ReviewCheckZeroFindingsOutcome::CurrentFinalZeroFindings,
+            ))),
+        );
+
+        let outcome = driver.handle(ReviewInput::RunLocal(
+            Some("grok-review-model".to_owned()),
+            90,
+            Some(PathBuf::from("briefing.md")),
+            Some("review through the Grok local provider".to_owned()),
+            Some("grok-local-handoff-2026".to_owned()),
+            "fast".to_owned(),
+            "cli_driver".to_owned(),
+            PathBuf::from("track/items"),
+        ));
+
+        let received = service
+            .local_received
+            .lock()
+            .expect("capture lock is healthy")
+            .take()
+            .expect("driver must invoke the provider-resolved local service once");
+        assert_eq!(received.model.as_deref(), Some("grok-review-model"));
+        assert_eq!(received.timeout_seconds, 90);
+        assert_eq!(received.briefing_file, Some(PathBuf::from("briefing.md")));
+        assert_eq!(received.prompt.as_deref(), Some("review through the Grok local provider"));
+        assert_eq!(received.track_id.as_deref(), Some("grok-local-handoff-2026"));
+        assert_eq!(received.round_type, "fast");
+        assert_eq!(received.group, "cli_driver");
+        assert_eq!(received.items_dir, PathBuf::from("track/items"));
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("grok review completed"));
     }
 
     #[test]

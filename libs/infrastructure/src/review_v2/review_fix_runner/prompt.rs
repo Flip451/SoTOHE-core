@@ -44,7 +44,7 @@ pub(super) fn build_prompt(
     build_prompt_with_context(scope, command, &briefing_content)
 }
 
-pub(super) fn build_prompt_with_context(
+pub(crate) fn build_prompt_with_context(
     scope: &str,
     command: &RunReviewFixCommand,
     briefing_content: &str,

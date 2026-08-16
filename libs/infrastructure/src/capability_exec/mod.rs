@@ -4,6 +4,7 @@ pub mod agent_profiles;
 pub mod claude;
 pub mod codex;
 pub(crate) mod front_matter;
+pub mod grok;
 pub(crate) mod path_guard;
 pub(crate) mod process;
 pub(crate) mod prompt;

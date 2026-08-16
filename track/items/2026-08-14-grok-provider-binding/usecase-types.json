@@ -1,0 +1,305 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {
+    "CapabilityProviderPort": {
+      "action": "reference",
+    "docs": "Baseline-identical capability-provider port carried for edge exposure.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "params": [
+            {
+              "name": "request",
+              "ty": "&CapabilityDispatchRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CapabilityDispatchOutcome, CapabilityExecError>"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "DryCheckAgentPort": {
+      "action": "reference",
+    "docs": "Baseline-identical DRY-check agent port carried for edge exposure.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "judge",
+          "params": [
+            {
+              "name": "changed_fragment",
+              "ty": "&domain::semantic_dup::CodeFragment"
+            },
+            {
+              "name": "candidate_fragment",
+              "ty": "&domain::semantic_dup::CodeFragment"
+            },
+            {
+              "name": "tier",
+              "ty": "DryCheckJudgeTier"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<DryCheckAgentJudgment, DryCheckAgentError>"
+        }
+      ],
+      "module_path": "dry_check::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "HookDispatchService": {
+      "action": "reference",
+    "docs": "Baseline-identical hook application-service boundary carried for edge exposure; hook selector and prompt/result text are opaque boundary text.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dispatch",
+          "params": [
+            {
+              "name": "hook_name",
+              "ty": "String"
+            },
+            {
+              "name": "command",
+              "ty": "HookDispatchCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<HookVerdictOutput, HookDispatchError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check_skill_compliance",
+          "params": [
+            {
+              "name": "prompt",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<String>"
+        }
+      ],
+      "module_path": "hook_dispatch",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewFixRunner": {
+      "action": "reference",
+    "docs": "Baseline-identical review-fix runner port carried for edge exposure.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_fix",
+          "params": [
+            {
+              "name": "command",
+              "ty": "RunReviewFixCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewFixOutput, ReviewFixRunnerError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "Reviewer": {
+      "action": "reference",
+    "docs": "Baseline-identical reviewer port carried for edge exposure.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::Verdict, domain::review_v2::LogInfo), ReviewerError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::FastVerdict, domain::review_v2::LogInfo), ReviewerError>"
+        }
+      ],
+      "module_path": "review_v2::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {}
+}

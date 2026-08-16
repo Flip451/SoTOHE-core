@@ -1,0 +1,47 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$(git rev-parse --show-toplevel)/.grok/hooks/sotp-hook.sh\" skill-compliance || exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "run_terminal_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$(git rev-parse --show-toplevel)/.grok/hooks/sotp-hook.sh\" hooks-path-setup",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "run_terminal_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$(git rev-parse --show-toplevel)/.grok/hooks/sotp-hook.sh\" block-direct-git-ops",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "run_terminal_command|search_replace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$(git rev-parse --show-toplevel)/.grok/hooks/sotp-hook.sh\" block-test-file-deletion",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

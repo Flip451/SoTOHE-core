@@ -874,4 +874,39 @@ mod tests {
         assert_eq!(collected.final_message.as_deref(), Some(b"specialist final report".as_slice()));
         Ok(())
     }
+
+    #[test]
+    fn test_grok_json_envelope_captures_structured_output_and_camel_case_session_id()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let collected = collect_provider_output(
+            Cursor::new(
+                br#"{"sessionId":"grok-session","structured_output":{"status":"ok"},"text":"ignore-me"}"#,
+            ),
+            &provider,
+        )?;
+
+        assert_eq!(collected.session_id.as_deref(), Some("grok-session"));
+        assert_eq!(
+            collected.final_message.as_deref(),
+            Some(br#"{"sessionId":"grok-session","structured_output":{"status":"ok"},"text":"ignore-me"}"#.as_slice()),
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_grok_json_envelope_above_session_event_limit_is_retained()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let event = serde_json::json!({
+            "structured_output": "x".repeat(MAX_PROVIDER_SESSION_EVENT_BYTES),
+        });
+        let encoded = serde_json::to_vec(&event)?;
+        assert!(encoded.len() > MAX_PROVIDER_SESSION_EVENT_BYTES);
+
+        let collected = collect_provider_output(Cursor::new(&encoded), &provider)?;
+
+        assert_eq!(collected.final_message.as_deref(), Some(encoded.as_slice()));
+        Ok(())
+    }
 }

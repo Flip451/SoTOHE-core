@@ -1,4 +1,4 @@
-//! Review cycle execution helpers (Codex and Claude).
+//! Review cycle execution helpers (Codex, Claude, and Grok).
 
 use std::path::{Path, PathBuf};
 use std::time::Instant;
@@ -396,6 +396,47 @@ where
     )
 }
 
+/// Runs the full Grok review cycle from string inputs.
+///
+/// Mirrors [`run_codex_review_str`] for the Grok typed-pipeline adapter. The
+/// helper only supplies the reviewer to the shared review-cycle machinery.
+///
+/// # Errors
+/// Returns a human-readable error string on failure at any step.
+pub(crate) fn run_grok_review_str<R>(
+    track_id_str: &str,
+    items_dir: &Path,
+    group_str: &str,
+    round_type_str: &str, // "fast" | "final"
+    reviewer: R,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer, None)
+}
+
+pub(crate) fn run_grok_review_str_with_subprocess_start<R>(
+    track_id_str: &str,
+    items_dir: &Path,
+    group_str: &str,
+    round_type_str: &str,
+    reviewer: R,
+    subprocess_start_reader: SubprocessStartReader,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(
+        track_id_str,
+        items_dir,
+        group_str,
+        round_type_str,
+        reviewer,
+        Some(subprocess_start_reader),
+    )
+}
+
 fn run_review_str_with_reviewer<R>(
     track_id_str: &str,
     items_dir: &Path,
@@ -518,6 +559,7 @@ fn reviewer_unexpected_after_spawn(message: &str) -> bool {
         || message.starts_with("failed to read output-last-message ")
         || message.starts_with("verdict construction:")
         || message.starts_with("failed to serialize reviewer final payload:")
+        || message.starts_with("Grok provider failed:")
 }
 
 #[cfg(test)]
@@ -970,6 +1012,15 @@ mod tests {
     #[test]
     fn test_reviewer_unexpected_after_spawn_classifies_child_poll_failure() {
         let error = ReviewerError::Unexpected("failed to poll reviewer child: io".to_owned());
+
+        assert!(reviewer_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
+    fn test_reviewer_unexpected_after_spawn_classifies_grok_provider_failure() {
+        let error = ReviewerError::Unexpected(
+            "Grok provider failed: provider declined structured output".to_owned(),
+        );
 
         assert!(reviewer_error_is_subprocess_failure(&error));
     }

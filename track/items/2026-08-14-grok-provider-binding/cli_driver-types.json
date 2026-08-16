@@ -1,0 +1,382 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "CapabilityDriver": {
+      "action": "reference",
+    "docs": "Baseline-identical capability primary adapter carried for edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn CapabilityExecService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CapabilityExecDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    },
+    "CommandOutcome": {
+      "action": "reference",
+      "docs": "Baseline-identical rendered command result returned by the hook primary adapter after Grok input translation; stdout and stderr are unconstrained opaque process text and exit_code is an opaque process status.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "success",
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure",
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "render",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    },
+    "HookDriver": {
+      "action": "reference",
+    "docs": "Hook primary-adapter boundary updated for this track; see the cited spec anchors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hook_dispatch_service",
+              "ty": "std::sync::Arc<dyn usecase::hook_dispatch::HookDispatchService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "HookInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "hook",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    },
+    "HookInput": {
+      "action": "reference",
+      "docs": "Baseline-identical typed hook-driver input produced after provider envelope normalization; its Vec<String> payload is the intentionally opaque ordered git-hook argv forwarded without domain interpretation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Dispatch",
+            "payload": {
+              "fields": [
+                "HookName",
+                "Vec<String>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "hook",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    },
+    "ReviewDriver": {
+      "action": "reference",
+    "docs": "Baseline-identical review primary adapter carried for edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn ReviewService>"
+            },
+            {
+              "name": "results",
+              "ty": "Arc<dyn ReviewResultsService>"
+            },
+            {
+              "name": "check_zero_findings",
+              "ty": "Arc<dyn ReviewCheckZeroFindingsService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    },
+    "ReviewFixDriver": {
+      "action": "reference",
+    "docs": "Baseline-identical review-fix primary adapter carried for edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn RunReviewFixService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewFixInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    }
+  }
+}

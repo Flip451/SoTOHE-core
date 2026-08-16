@@ -7,7 +7,7 @@ use domain::TrackId;
 use infrastructure::agent_profiles::AGENT_PROFILES_PATH;
 use infrastructure::capability_exec::{
     agent_profiles::AgentProfilesCapabilityAdapter, claude::ClaudeCapabilityAdapter,
-    codex::CodexCapabilityAdapter, source::FsCapabilitySourceAdapter,
+    codex::CodexCapabilityAdapter, grok::GrokCapabilityAdapter, source::FsCapabilitySourceAdapter,
 };
 use infrastructure::conventions_resolve::FsConventionRequirementAdapter;
 use infrastructure::git_cli::SystemGitRepo;
@@ -71,6 +71,12 @@ impl CapabilityCompositionRoot {
                 track_id.clone(),
             )),
             Arc::new(CodexCapabilityAdapter::new(
+                self.repo_root.clone(),
+                self.runtime_dir.clone(),
+                session_cache.clone(),
+                track_id.clone(),
+            )),
+            Arc::new(GrokCapabilityAdapter::new(
                 self.repo_root.clone(),
                 self.runtime_dir.clone(),
                 session_cache,
@@ -298,6 +304,59 @@ mod tests {
         Ok(bin_dir)
     }
 
+    #[cfg(unix)]
+    fn write_fake_grok_bin(root: &Path) -> Result<PathBuf, Box<dyn std::error::Error>> {
+        use std::os::unix::fs::PermissionsExt;
+
+        let bin_dir = root.join("fake-bin");
+        fs::create_dir_all(&bin_dir)?;
+        let grok = bin_dir.join("grok");
+        fs::write(
+            &grok,
+            "#!/bin/sh\nprintf '%s\\n' \"$@\" > tmp/grok-args\nprintf '%s\\n' '{\"sessionId\":\"grok-test-session\",\"structured_output\":{\"result\":\"ok\"}}'\nexit 23\n",
+        )?;
+        let mut permissions = fs::metadata(&grok)?.permissions();
+        permissions.set_mode(0o755);
+        fs::set_permissions(&grok, permissions)?;
+        Ok(bin_dir)
+    }
+
+    fn write_grok_dispatch_fixture(root: &Path) -> Result<(), Box<dyn std::error::Error>> {
+        write_file(
+            root,
+            ".harness/config/agent-profiles.json",
+            r#"{
+                "schema_version": 1,
+                "providers": {
+                    "grok": {
+                        "label": "Test Grok provider",
+                        "supported_reasoning_efforts": ["low", "medium", "high", "xhigh", "max"]
+                    }
+                },
+                "capabilities": {
+                    "implementer": {
+                        "provider": "grok",
+                        "model": "grok-test-model",
+                        "reasoning_effort": "high",
+                        "execution_mode": "orchestrator-output"
+                    }
+                }
+            }"#,
+        )?;
+        write_file(
+            root,
+            ".harness/prompts/capability-exec-discipline.md",
+            "Do not stage changes.",
+        )?;
+        write_file(root, "tmp/briefing.md", "Implement the assigned task.")?;
+        write_file(
+            root,
+            ".agents/skills/implementer/SKILL.md",
+            "---\nname: implementer\ndescription: Shared Grok adapter fixture.\nmodel: grok-test-model\ngrok-sandbox: workspace\n---\nshared adapter body\n",
+        )?;
+        Ok(())
+    }
+
     #[test]
     fn test_capability_composition_root_builds_driver_without_a_caller_profile()
     -> Result<(), Box<dyn std::error::Error>> {
@@ -475,6 +534,60 @@ mod tests {
         assert!(output.contains("CAPABILITY_EXEC_OUTCOME: executed"));
         assert!(output.contains("provider: claude"));
         assert!(!output.contains("delegate-in-host"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capability_composition_root_omitted_host_executes_grok_adapter_subprocess()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let _environment = process_env_lock().lock().expect("process environment lock is acquired");
+        let directory = tempfile::tempdir()?;
+        write_grok_dispatch_fixture(directory.path())?;
+        let bin_dir = write_fake_grok_bin(directory.path())?;
+        let _path = PathGuard::prepend(&bin_dir);
+        let root = CapabilityCompositionRoot::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
+        );
+
+        let outcome = root.capability_driver().handle(input_without_host("implementer"));
+        let output = outcome.stdout.expect("subprocess outcome is rendered");
+        let args = fs::read_to_string(directory.path().join("tmp/grok-args"))?;
+
+        assert_eq!(outcome.exit_code, 23);
+        assert!(output.contains("CAPABILITY_EXEC_OUTCOME: executed"));
+        assert!(output.contains("provider: grok"));
+        assert!(!output.contains("delegate-in-host"));
+        assert!(args.contains("--model\ngrok-test-model\n"));
+        assert!(args.contains("--reasoning-effort\nhigh\n"));
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_capability_composition_root_grok_host_executes_grok_adapter_subprocess_without_delegation()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let _environment = process_env_lock().lock().expect("process environment lock is acquired");
+        let directory = tempfile::tempdir()?;
+        write_grok_dispatch_fixture(directory.path())?;
+        let bin_dir = write_fake_grok_bin(directory.path())?;
+        let _path = PathGuard::prepend(&bin_dir);
+        let root = CapabilityCompositionRoot::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
+        );
+
+        let outcome = root.capability_driver().handle(input_for("implementer", "grok"));
+        let output = outcome.stdout.expect("subprocess outcome is rendered");
+        let args = fs::read_to_string(directory.path().join("tmp/grok-args"))?;
+
+        assert_eq!(outcome.exit_code, 23);
+        assert!(output.contains("CAPABILITY_EXEC_OUTCOME: executed"));
+        assert!(output.contains("provider: grok"));
+        assert!(!output.contains("delegate-in-host"));
+        assert!(args.contains("--model\ngrok-test-model\n"));
+        assert!(args.contains("--reasoning-effort\nhigh\n"));
         Ok(())
     }
 
