@@ -1,8 +1,8 @@
 {
   "baseline_hash": "1550ed8a0b5532def664d5ecb2192e494789123f7fcc93ebb669d041b46dbb94",
-  "declaration_hash": "d435545724117505e4fa016886ae422e075729563fe1ee761da88e5385c21ae1",
-  "generated_at": "2026-08-17T07:00:27Z",
-  "head_commit": "d3a90e14f288573f579624b16a0ee1524946219f",
+  "declaration_hash": "4b2f2ede64f782471982050bd6eca1d7d54acecaa0fcd1f60d6a67111d285e8f",
+  "generated_at": "2026-08-17T09:43:24Z",
+  "head_commit": "636d7c0bfcb890f0395e7b32b4734b8b7397136a",
   "schema_version": 4,
   "signals": [
     {
@@ -274,41 +274,54 @@
       "type_name": "TrackBaselineGraphService"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBranchCreateCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackBranchCreateError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackBranchCreateService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackBranchCreateInteractor"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBranchCreateResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBranchCreateService"
     },
     {
@@ -375,47 +388,55 @@
       "type_name": "TrackCatalogueImplLayerResult"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueImplSignalsCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackCatalogueImplSignalsError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackCatalogueImplSignalsService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackCatalogueImplSignalsInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueImplSignalsPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueImplSignalsResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueImplSignalsService"
     },
     {

@@ -13,6 +13,9 @@ use usecase::fixpoint_resolve_driver::{
 use usecase::track_lifecycle::track_archive::{
     TrackArchiveCommand, TrackArchiveError, TrackArchiveService,
 };
+use usecase::track_lifecycle::track_branch_create::{
+    TrackBranchCreateCommand, TrackBranchCreateError, TrackBranchCreateService,
+};
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
 use usecase::track_lifecycle::{TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput};
 use usecase::track_service::{TrackCommandOutput, TrackService};
@@ -237,6 +240,7 @@ fn render_base_merge_result(
 pub struct TrackDriver {
     track_init_service: Arc<dyn TrackInitService>,
     track_archive_service: Arc<dyn TrackArchiveService>,
+    track_branch_create_service: Arc<dyn TrackBranchCreateService>,
     service: Arc<dyn TrackService>,
     fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
     base_merge_service: Arc<dyn BaseMergeService>,
@@ -247,6 +251,7 @@ impl TrackDriver {
     pub fn new(
         track_init_service: Arc<dyn TrackInitService>,
         track_archive_service: Arc<dyn TrackArchiveService>,
+        track_branch_create_service: Arc<dyn TrackBranchCreateService>,
         service: Arc<dyn TrackService>,
         fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
         base_merge_service: Arc<dyn BaseMergeService>,
@@ -254,6 +259,7 @@ impl TrackDriver {
         Self {
             track_init_service,
             track_archive_service,
+            track_branch_create_service,
             service,
             fixpoint_resolve_service,
             base_merge_service,
@@ -281,6 +287,11 @@ impl TrackDriver {
             TrackInput::Archive { items_dir, track_id } => {
                 render_track_archive_outcome(&*self.track_archive_service, items_dir, track_id)
             }
+            TrackInput::BranchCreate { items_dir, track_id } => render_track_branch_create_outcome(
+                &*self.track_branch_create_service,
+                items_dir,
+                track_id,
+            ),
             TrackInput::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
                 service_output_to_outcome(self.service.transition(
                     items_dir,
@@ -292,9 +303,6 @@ impl TrackDriver {
             }
             TrackInput::Resolve { items_dir, track_id } => {
                 service_output_to_outcome(self.service.resolve(items_dir, track_id))
-            }
-            TrackInput::BranchCreate { items_dir, track_id } => {
-                service_output_to_outcome(self.service.branch_create(items_dir, track_id))
             }
             TrackInput::BranchSwitch { items_dir, track_id } => {
                 service_output_to_outcome(self.service.branch_switch(items_dir, track_id))
@@ -419,6 +427,49 @@ fn track_archive_error_to_outcome(error: TrackArchiveError) -> CommandOutcome {
     CommandOutcome::failure(Some(error.to_string()))
 }
 
+fn render_track_branch_create_outcome(
+    service: &dyn TrackBranchCreateService,
+    items_dir: PathBuf,
+    track_id: String,
+) -> CommandOutcome {
+    let track_id = match TrackLifecycleIdInput::try_new(track_id) {
+        Ok(track_id) => track_id,
+        Err(error) => return track_branch_create_invalid_track_id(error),
+    };
+
+    let items_dir_for_error = items_dir.clone();
+    let items_dir = match TrackItemsDirectory::try_new(items_dir) {
+        Ok(items_dir) => items_dir,
+        Err(_) => return track_branch_create_invalid_items_dir(&items_dir_for_error),
+    };
+    let command = TrackBranchCreateCommand::new(items_dir, track_id);
+    service
+        .execute(command)
+        .map(|_| CommandOutcome::success(None))
+        .unwrap_or_else(track_branch_create_error_to_outcome)
+}
+
+fn track_branch_create_error_to_outcome(error: TrackBranchCreateError) -> CommandOutcome {
+    track_branch_create_failure(error)
+}
+
+fn track_branch_create_failure(error: impl std::fmt::Display) -> CommandOutcome {
+    CommandOutcome::failure(Some(format!("[ERROR] {error}")))
+}
+
+fn track_branch_create_invalid_track_id(error: impl std::fmt::Display) -> CommandOutcome {
+    let error = error.to_string();
+    let legacy_error = error.strip_prefix("invalid track id: ").unwrap_or(&error);
+    track_branch_create_failure(legacy_error)
+}
+
+fn track_branch_create_invalid_items_dir(items_dir: &std::path::Path) -> CommandOutcome {
+    CommandOutcome::failure(Some(format!(
+        "[ERROR] --items-dir must point to '<project-root>/track/items'; got {}",
+        items_dir.display()
+    )))
+}
+
 // ---------------------------------------------------------------------------
 // Render helpers (previously duplicated from cli_composition; now unused in
 // cli_driver since delegation happens via TrackService)
@@ -479,6 +530,8 @@ mod tests {
 
     struct UnusedTrackArchiveService;
 
+    struct UnusedTrackBranchCreateService;
+
     impl TrackInitService for UnusedTrackInitService {
         fn execute(
             &self,
@@ -495,6 +548,49 @@ mod tests {
         ) -> Result<usecase::track_lifecycle::track_archive::TrackArchiveResult, TrackArchiveError>
         {
             unreachable!()
+        }
+    }
+
+    impl TrackBranchCreateService for UnusedTrackBranchCreateService {
+        fn execute(
+            &self,
+            _: TrackBranchCreateCommand,
+        ) -> Result<
+            usecase::track_lifecycle::track_branch_create::TrackBranchCreateResult,
+            TrackBranchCreateError,
+        > {
+            unreachable!()
+        }
+    }
+
+    struct RecordingTrackBranchCreateService {
+        calls: Mutex<Vec<(PathBuf, String)>>,
+        error: Option<String>,
+    }
+
+    impl TrackBranchCreateService for RecordingTrackBranchCreateService {
+        fn execute(
+            &self,
+            command: TrackBranchCreateCommand,
+        ) -> Result<
+            usecase::track_lifecycle::track_branch_create::TrackBranchCreateResult,
+            TrackBranchCreateError,
+        > {
+            self.calls
+                .lock()
+                .unwrap()
+                .push((command.items_dir.as_path().to_path_buf(), command.track_id.to_string()));
+            match &self.error {
+                Some(error) => Err(TrackBranchCreateError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+                None => {
+                    Ok(usecase::track_lifecycle::track_branch_create::TrackBranchCreateResult {
+                        branch: TrackBranch::try_new(format!("track/{}", command.track_id))
+                            .expect("created branch is valid"),
+                    })
+                }
+            }
         }
     }
 
@@ -660,6 +756,7 @@ mod tests {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             service,
@@ -675,6 +772,7 @@ mod tests {
         let driver = TrackDriver::new(
             service.clone(),
             Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -703,6 +801,7 @@ mod tests {
         let driver = TrackDriver::new(
             service.clone(),
             Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -714,8 +813,35 @@ mod tests {
             description: "New Track".to_owned(),
         });
 
-        assert_eq!(outcome.exit_code, 1);
         assert!(outcome.stderr.unwrap().contains("invalid track id"));
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_branch_create_invalid_items_dir_preserves_error_prefix() {
+        let service = Arc::new(RecordingTrackBranchCreateService {
+            calls: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchCreate {
+            items_dir: PathBuf::from("wrong/items"),
+            track_id: "branch-track".to_owned(),
+        });
+
+        let expected_stderr =
+            "[ERROR] --items-dir must point to '<project-root>/track/items'; got wrong/items";
+        assert_eq!(outcome.stderr.as_deref(), Some(expected_stderr));
+        assert_eq!(outcome.exit_code, 1);
         assert!(service.calls.lock().unwrap().is_empty());
     }
 
@@ -728,6 +854,7 @@ mod tests {
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
             service.clone(),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -761,6 +888,7 @@ mod tests {
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
             service.clone(),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -785,6 +913,7 @@ mod tests {
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
             service.clone(),
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -809,6 +938,7 @@ mod tests {
         let driver = TrackDriver::new(
             Arc::new(UnusedTrackInitService),
             service,
+            Arc::new(UnusedTrackBranchCreateService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -820,6 +950,109 @@ mod tests {
         });
 
         assert_eq!(outcome.stderr.as_deref(), Some("archive failed"));
+        assert_eq!(outcome.exit_code, 1);
+    }
+
+    #[test]
+    fn test_track_driver_branch_create_valid_input_routes_to_branch_create_service() {
+        let service = Arc::new(RecordingTrackBranchCreateService {
+            calls: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchCreate {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "branch-track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(
+            service.calls.lock().unwrap().as_slice(),
+            &[(PathBuf::from("track/items"), "branch-track".to_owned())]
+        );
+    }
+
+    #[test]
+    fn test_track_driver_branch_create_invalid_input_returns_failure_without_service_call() {
+        let service = Arc::new(RecordingTrackBranchCreateService {
+            calls: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchCreate {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "../escape".to_owned(),
+        });
+
+        let expected_stderr = "[ERROR] track id '../escape' must be a lowercase slug";
+        assert_eq!(outcome.stderr.as_deref(), Some(expected_stderr));
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_branch_create_empty_track_id_preserves_validation_diagnostic() {
+        let service = Arc::new(RecordingTrackBranchCreateService {
+            calls: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchCreate {
+            items_dir: PathBuf::from("track/items"),
+            track_id: String::new(),
+        });
+
+        assert_eq!(outcome.stderr.as_deref(), Some("[ERROR] string must not be empty"));
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_branch_create_service_error_maps_to_failure_outcome() {
+        let service = Arc::new(RecordingTrackBranchCreateService {
+            calls: Mutex::new(Vec::new()),
+            error: Some("branch creation failed".to_owned()),
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            service,
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchCreate {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "branch-track".to_owned(),
+        });
+
+        assert_eq!(outcome.stderr.as_deref(), Some("[ERROR] branch creation failed"));
         assert_eq!(outcome.exit_code, 1);
     }
 

@@ -293,6 +293,79 @@
           "hash": "rvw1:sha256:f82a3ee68c7a6052ef101500f26b91422914f67728695af062b878e4021a3db5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:02:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:988e5a1bb5e771c1ded267664056d432086fe6c4f5282da084be91db7927eca6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:19:18Z",
+          "findings": [
+            {
+              "category": "CLI output compatibility",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs",
+              "line": 38,
+              "message": "Red signals produce an outcome with the Markdown report in stdout, no stderr, and exit code 1. Passing that outcome to `track_driver_outcome_to_result` prints the report but converts every nonzero exit into `CliError`, fabricating `track command failed`, which `execute_with_error_chain` then writes to stderr. Previously this diagnostic returned exit code 1 with empty stderr, so the change violates the required stdout/stderr compatibility. Preserve report-only nonzero outcomes while continuing to route genuine driver failures through the error-chain helper.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:988e5a1bb5e771c1ded267664056d432086fe6c4f5282da084be91db7927eca6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:32:57Z",
+          "findings": [
+            {
+              "category": "thin-bin architecture",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs",
+              "line": 39,
+              "message": "The handler now infers command semantics from the outcome shape: `nonzero + stdout + no stderr` is treated as a report rather than a failure. This command-specific branching violates the thin-bin rule and can misclassify any driver failure with the same shape, bypassing `track_driver_outcome_to_result` and the error chain. Represent the disposition explicitly at the driver boundary or centralize it in a shared outcome emitter so this handler remains parse-dispatch-emit only.",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs",
+              "line": 39,
+              "message": "None of the tests exercises the newly added outcome-emission branch or a successful execution; all existing cases return errors. The public API therefore lacks the required happy-path coverage, and the red-report stdout/stderr/exit-code compatibility fix can regress unnoticed. Add tests around an injectable/shared emitter covering clean success, red-report exit 1 with empty stderr, and a genuine driver failure.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b5f792d5762be297c8a4e7674cea6182c70e137a37eff361a7c2989fcfab5120",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:54:37Z",
+          "findings": [
+            {
+              "category": "error handling",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs",
+              "line": 38,
+              "message": "`handle_catalogue_impl_signals` maps service failures to `CommandOutcome::failure(Some(...))`, but `emit_command_outcome` always returns `Ok(ExitCode)`. Consequently symlink/configuration failures become `Ok(ExitCode::FAILURE)`, the existing error-path tests fail, and `execute_with_error_chain` cannot record the diagnostic. Route stderr-bearing failures through a shared helper that returns `CliError`, while continuing to emit report outcomes—including red reports—through `emit_command_outcome`, without handler-local shape branching.",
+              "severity": "P1"
+            },
+            {
+              "category": "test coverage",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs",
+              "line": 21,
+              "message": "The changed public command still has no happy-path or red-report execution test; every existing test targets validation or service failure. Add coverage asserting successful stdout/exit 0 and red-report stdout/empty-stderr/exit 1 behavior through the shared emitter path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3a4e149e239830cedbc99bf41f67947ff645916ba1c8c72a5cd6fccfd1ed5cb8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:21:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:39ec9a211cef5c87e71693d0ef1b19394711a5db2c7575c6c0941499d2eba6b6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -395,6 +468,20 @@
           "at": "2026-08-17T05:29:22Z",
           "findings": [],
           "hash": "rvw1:sha256:98e377551d60fa48e575e33d7966ae711686d5d7a3262035f2f53d064d59325d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:02:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1661466d7689afb4d8f1b6af2ea84a126c90aca06e7669169f56117e5837a7b5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:19:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1661466d7689afb4d8f1b6af2ea84a126c90aca06e7669169f56117e5837a7b5",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -522,6 +609,125 @@
           "at": "2026-08-17T06:55:53Z",
           "findings": [],
           "hash": "rvw1:sha256:e22494eb47550793068be75eb4db0a017b6e67cb4ea8c33e5e872a8fd8263554",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:02:06Z",
+          "findings": [
+            {
+              "category": "logic",
+              "file": "apps/cli-driver/src/track_tddd.rs",
+              "line": 329,
+              "message": "The driver determines the exit status by searching rendered Markdown for `\"🔴\"` instead of using typed signal state. This makes the primary adapter's correctness depend on presentation text and can return exit code 0/1 incorrectly when the result text changes or does not encode the semantic red state; preserve `any_red`/typed signal information in the use-case result and render from that.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8d7503a09d31fcfc096bae599c28132ab55f1d1a371418ff695c01338661e2b2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:10:29Z",
+          "findings": [
+            {
+              "category": "logic",
+              "file": "apps/cli-driver/src/track_tddd.rs",
+              "line": 329,
+              "message": "The exit code is derived solely from `result.layers`, but the production `TrackCatalogueImplSignalsService` result currently leaves `layers` empty while placing the evaluated report in `text`. Consequently, catalogue reports containing red violations return exit code 0 instead of 1, breaking the command's prior observable failure behavior. Preserve the typed violation state in the use-case result or derive it before the adapter boundary.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ea06ac592d060372bf51ef8961894a30fb08fd73ed06aee3c8961b837457e8db",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:22:23Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 437,
+              "message": "`BranchCreate` no longer preserves the existing stderr contract. Previously, failures passed through `TrackServiceImpl::composition_to_output`, which rendered them as `[ERROR] {message}`; the new validation branches and service-error mapper emit only the raw message. Invalid paths/IDs and strategy or Git failures therefore change user-visible stderr, violating the required preservation of previous observables. Restore the legacy error presentation and add exact-output regression tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ea06ac592d060372bf51ef8961894a30fb08fd73ed06aee3c8961b837457e8db",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:29:12Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 437,
+              "message": "The branch-create validation paths still bypass `track_branch_create_failure`, so invalid items directories and track IDs omit the required `[ERROR] ` prefix. The new exact-output test at line 830 therefore fails; the formatter was applied to `render_track_init_outcome` instead. Route both validation errors here through the branch-create failure renderer.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a6da78c7a110f46203867ad1b9ae1d7924823a5b066628dc808f79835a3f3c50",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:33:29Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 435,
+              "message": "The legacy prefix is restored, but validation diagnostics still change. Previously invalid items paths rendered `[ERROR] --items-dir must point to '<project-root>/track/items'; got …`, and invalid IDs rendered `[ERROR] track id '…' must be a lowercase slug`; these usecase wrappers now produce `track items directory must end …` and add `invalid track id:` respectively. This violates the required stderr preservation (apart from the accepted ParentDir behavior), and the new tests incorrectly lock in the changed text. Translate these validation failures to the exact legacy diagnostics.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:76b1de4ef6c72a5a85c09200a4748025f5dcecb41702bf3001bfad173d0f548c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:38:23Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 442,
+              "message": "The driver now independently classifies raw paths by scanning for `ParentDir` before interpreting `TrackItemsDirectory::try_new`. This duplicates a usecase validation rule inside the primary adapter and can diverge as the value-object rules evolve, violating the scope’s input→invoke→render boundary. Have the usecase boundary expose a typed validation reason (for example, parent traversal versus wrong layout) and let this driver only render that reason.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:15fcaefe2bb358a298baebae31ea6b7539e25d6ea91dfb031e210c08d70899a1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:41:26Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 438,
+              "message": "Discarding the track-ID validation error and always rendering the lowercase-slug diagnostic changes the empty/whitespace-ID contract. `TrackId::try_new(\"\")` previously surfaced `string must not be empty`, so the old route emitted `[ERROR] string must not be empty`; this code emits `[ERROR] track id '' must be a lowercase slug`. Preserve the typed validation reason from the usecase boundary instead of reconstructing one message for every failure, and add empty/whitespace regression coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8fe1d32c0e2fd1bb5377ced48d23c23b08dddb7567fcd93e3cdbcc62da8d2c03",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:44:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8e6c483e5b66d0b566f6b25ac6c81a177a82f96f36d9d4e24026ccdffea96f23",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:55:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19c5e79c781ac1a0fa165d7b8282a4b1a732e17bbc99484b81f6447784ecf16d",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1029,6 +1235,20 @@
           "hash": "rvw1:sha256:75c6f48310e6e598d85cd2f46f0e5d70bd07ce5d37d323aa4c4fb4679e981f91",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:01:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3534c718bd409bdc4201263da88c6a75790fa6322b7c65b5c801c7189c9ead30",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:16:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3534c718bd409bdc4201263da88c6a75790fa6322b7c65b5c801c7189c9ead30",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1461,6 +1681,101 @@
           "hash": "rvw1:sha256:5d1816f5c2506f1abef08642ce25e1f8142084ec6a78c5733d205bc0f0e66443",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:02:52Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 62,
+              "message": "The adapter discards the per-layer signal data and always returns `layers: Vec::new()` after successful evaluation. This violates `TrackCatalogueImplSignalsResult`'s port contract and leaves downstream consumers unable to use the structured results; map the existing report into layer results or change the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0e240a0d20398c3c3134e8e45772ab52a8a154f25237be046057089e5a76a5d0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:13:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6938c30d5ce7fd08ca70ce01b8529a8c6cf95e1a2b38dca078ba356fd3693c0a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:20:45Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 100,
+              "message": "`parse_report_layers` splits rows on every `|`, but evaluator item identities can legitimately contain that character—for example, an impl key containing a char const-generic such as `Foo<'|'>: Trait`. The existing formatter emits such identities unescaped, so this adapter reports “extra columns” and converts a previously successful evaluation into `ExecutionFailed`, dropping the prior stdout. Parse the fixed columns from the right or return structured signals directly, and add a delimiter-containing regression test.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 19,
+              "message": "The new public adapter has only an execute-level failure test; no happy-path test exercises its concrete dependency wiring, exact report-text preservation, and structured layer conversion. A wiring or successful-output regression can therefore compile while all adapter tests pass. Add a successful fixture-backed `execute` test as required for public APIs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6938c30d5ce7fd08ca70ce01b8529a8c6cf95e1a2b38dca078ba356fd3693c0a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:33:35Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 212,
+              "message": "The new happy-path test expects the report to start directly with the layer header, but the existing formatter always writes a leading newline before every layer (`writeln!(report)` before the header). Because the adapter correctly returns `report.text` unchanged, this assertion fails on every successful execution. Include the leading newline in the expected prefix (or compare against the actual preserved report contract).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a69798a6a16ba58b93a3906ca031c5725b8c5f7f294ce411be403978daedd97c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:38:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1c230904b37fd6d6478bb41f68b9512c0099c81f816fe7cd12b2c05201027640",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:54:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d418fb5b354a409d9dbb5df8156e207b258146efa9f45cbf7b98167e4a2ff753",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:27:28Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 19,
+              "message": "The public adapter still has no happy-path test for `execute`: its only execute-level test stops at the missing-rules error, while the remaining success tests exercise only the report parser or mocked driver/service layers. Consequently, a wrong concrete adapter selection or successful-path wiring regression could compile without being detected. Add a self-contained successful `execute` test that verifies the concrete execution path and structured result.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4276647e28626fac8988aa444688a92285080738b18597c464479a2882347d50",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:41:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4276647e28626fac8988aa444688a92285080738b18597c464479a2882347d50",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1628,6 +1943,50 @@
           "at": "2026-08-17T06:34:11Z",
           "findings": [],
           "hash": "rvw1:sha256:ce0b9b4966d5b4e71381df9d2e28bb38ffdab2cdc5aea3cdab4efe60ad68f6c7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:02:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22a08870de4a14111554533bcb6e23d2125c500cd2d03bc15f72613c4b74ffdc",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:21:01Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 227,
+              "message": "The AC-03 waiver is no longer valid: `TrackCatalogueImplSignalsResult` now carries a `text: String` containing the exact preformatted markdown that the driver forwards to stdout, contradicting this record's claim that the DTO is presentation-free and masking AC-03's requirement that presentation formatting belong to the primary adapter. The adjacent CN-01 waiver is likewise based on the old declaration; `bin/sotp test-obligation check` currently fails with `DeclChanged` for both edges. Remove the formatted text from the usecase result or replace the waiver with valid coverage, then re-evaluate the obligation caches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:22a08870de4a14111554533bcb6e23d2125c500cd2d03bc15f72613c4b74ffdc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:58:02Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 204,
+              "message": "The AC-03 binding remains stale against its cited tests. `bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` still fails with `TestChanged` for `TrackBranchCreateError`, because the bound test bodies changed after the verdict was frozen. Re-evaluate the binding after finalizing those tests, or restore the evaluated bodies, so the required obligation gate passes.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:22a08870de4a14111554533bcb6e23d2125c500cd2d03bc15f72613c4b74ffdc",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:05:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22a08870de4a14111554533bcb6e23d2125c500cd2d03bc15f72613c4b74ffdc",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2215,6 +2574,27 @@
           "hash": "rvw1:sha256:92ef3ac19e0992838b019951765340e4fc17f345534aa0aef687bded8ed6b368",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:01:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5f45b7ebbb186b28ab88b0f112551462fe13e2593709db6c8f29de2f986c96b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:20:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5f45b7ebbb186b28ab88b0f112551462fe13e2593709db6c8f29de2f986c96b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:56:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9d818ad59713863aee79721b273e32bf7e4231e0e68b1715ce38cdc671ed3f1a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2418,6 +2798,58 @@
           "at": "2026-08-17T06:40:28Z",
           "findings": [],
           "hash": "rvw1:sha256:9bdfc161fcaf658bb1a0965d959c52b3de494cda241b01a99f89be1615b95659",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:02:23Z",
+          "findings": [
+            {
+              "category": "purity",
+              "file": "libs/usecase/src/track_lifecycle/tddd/catalogue_impl_signals.rs",
+              "line": 28,
+              "message": "`TrackCatalogueImplSignalsResult` exposes `text: String` containing exact markdown, and the CLI driver renders this field directly. This couples the usecase result to CLI presentation, violating the presentation-free command/result boundary; return structured signal data and format it in the adapter instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8548f6be2f3efd0c1d9c044bbdd2aa62ccdc28c3a3a2f086fe3480be75c73083",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:21:20Z",
+          "findings": [
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/track_lifecycle/track_branch_create.rs",
+              "line": 97,
+              "message": "`execute` reconstructs `track/<id>` after `TrackGitInteractor` has independently created that branch. This duplicates the `TrackId`→`TrackBranch` domain rule in the usecase layer, so a naming-rule change could make the returned branch differ from the branch actually created—or fail only after the git side effect. Move this conversion onto `domain::TrackBranch` and use the same domain value for creation and the result.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8548f6be2f3efd0c1d9c044bbdd2aa62ccdc28c3a3a2f086fe3480be75c73083",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:29:35Z",
+          "findings": [
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/track_lifecycle/track_branch_create.rs",
+              "line": 92,
+              "message": "`execute` still constructs `track/<id>` itself while `TrackGitInteractor::create_track_branch` independently constructs the same name. Moving this validation before the Git call avoids a post-side-effect failure, but the `TrackId` → `TrackBranch` rule remains duplicated in the usecase layer; a naming-rule change could make the returned branch differ from the branch actually created. Put this conversion on `domain::TrackBranch` and use the same domain value throughout the Git flow and result.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f046aa59cafaeba87cf1264aff29217f2bdd8c81d5ef58c675eced4ec1d9f923",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:54:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:289328b45814c7831bb7754d8d0efb5b211ce70d91fba83da85aab86dded97a2",
           "type": "final",
           "verdict": "zero_findings"
         }

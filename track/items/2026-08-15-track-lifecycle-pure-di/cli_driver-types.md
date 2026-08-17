@@ -23,7 +23,7 @@
 | TrackSpecAnchorInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddBaselineCaptureInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddBaselineGraphInput | dto | add | — | 🔵 | 🔵 |
-| TrackTdddCatalogueImplSignalsInput | dto | add | — | 🟡 | 🔵 |
+| TrackTdddCatalogueImplSignalsInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddCatalogueLintActiveInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddCatalogueSpecSignalsInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddContractMapInput | dto | add | — | 🟡 | 🔵 |

@@ -75,6 +75,12 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
             Arc::new(infrastructure::git_cli::workflow_adapter::FsWorkspaceAdapter::new()),
         ));
+    let track_branch_create_service =
+        Arc::new(usecase::track_lifecycle::track_branch_create::TrackBranchCreateInteractor::new(
+            Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
+            Arc::new(infrastructure::git_cli::workflow_adapter::FsWorkspaceAdapter::new()),
+            Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -99,6 +105,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
     cli_driver::track::TrackDriver::new(
         track_init_service,
         track_archive_service,
+        track_branch_create_service,
         service,
         fixpoint_resolve_service,
         base_merge_service,
@@ -127,5 +134,19 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             baseline_graph_resolver,
         ),
     );
-    cli_driver::track_tddd::TrackTdddDriver::new(service, baseline_graph_service)
+    let catalogue_impl_signals_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::catalogue_impl_signals::SystemTrackCatalogueImplSignalsAdapter,
+    );
+    let catalogue_impl_signals_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let catalogue_impl_signals_service = Arc::new(
+        usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsInteractor::new(
+            catalogue_impl_signals_operation,
+            catalogue_impl_signals_resolver,
+        ),
+    );
+    cli_driver::track_tddd::TrackTdddDriver::new(
+        service,
+        baseline_graph_service,
+        catalogue_impl_signals_service,
+    )
 }

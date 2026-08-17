@@ -11,7 +11,7 @@
 | GitTrackSelectionAdapter | secondary_adapter | add | impl TrackSelectionPort | 🔵 | 🔵 |
 | SystemTrackBaselineCaptureAdapter | secondary_adapter | add | impl TrackBaselineCapturePort, impl Clone, impl Copy, impl Debug, impl Default | 🔵 | 🔵 |
 | SystemTrackBaselineGraphAdapter | secondary_adapter | add | impl TrackBaselineGraphPort | 🔵 | 🔵 |
-| SystemTrackCatalogueImplSignalsAdapter | secondary_adapter | add | impl TrackCatalogueImplSignalsPort | 🟡 | 🔵 |
+| SystemTrackCatalogueImplSignalsAdapter | secondary_adapter | add | impl TrackCatalogueImplSignalsPort | 🔵 | 🔵 |
 | SystemTrackCatalogueLintActiveAdapter | secondary_adapter | add | impl TrackCatalogueLintActivePort | 🟡 | 🔵 |
 | SystemTrackCatalogueSpecSignalsAdapter | secondary_adapter | add | impl TrackCatalogueSpecSignalsPort | 🟡 | 🔵 |
 | SystemTrackContractMapAdapter | secondary_adapter | add | impl TrackContractMapPort | 🟡 | 🔵 |

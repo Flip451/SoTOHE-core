@@ -1,8 +1,8 @@
 {
   "baseline_hash": "a62b806bbba22eb27eaaaf3e08c4b2db31c67a44f8ea36fde1269079b30f3c13",
   "declaration_hash": "e03293018e7d01332f050a3fb07a44c4ca3d5f30914acb16e254228e8957ab0e",
-  "generated_at": "2026-08-17T07:00:30Z",
-  "head_commit": "d3a90e14f288573f579624b16a0ee1524946219f",
+  "generated_at": "2026-08-17T09:43:28Z",
+  "head_commit": "636d7c0bfcb890f0395e7b32b4734b8b7397136a",
   "schema_version": 4,
   "signals": [
     {
@@ -76,12 +76,12 @@
       "type_name": "SystemTrackBaselineGraphAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
+      "found_items": [
         "usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "SystemTrackCatalogueImplSignalsAdapter"
     },
     {

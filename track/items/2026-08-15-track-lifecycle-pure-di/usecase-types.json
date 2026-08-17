@@ -403,6 +403,10 @@
               "ty": "Arc<dyn GitPrimitivePort>"
             },
             {
+              "name": "fs",
+              "ty": "Arc<dyn TrackArchiveFsPort>"
+            },
+            {
               "name": "branch_strategy",
               "ty": "Arc<dyn TrackBranchStrategyPort>"
             }
@@ -2223,6 +2227,66 @@
     },
     {
       "for_type": "TrackBaselineGraphResult",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBranchCreateCommand",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackBranchCreateCommand",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBranchCreateCommand",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBranchCreateError",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackBranchCreateError",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBranchCreateError",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBranchCreateResult",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackBranchCreateResult",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBranchCreateResult",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackCatalogueImplSignalsCommand",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackCatalogueImplSignalsCommand",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackCatalogueImplSignalsCommand",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackCatalogueImplSignalsError",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackCatalogueImplSignalsError",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackCatalogueImplSignalsError",
       "trait_ref": "Eq"
     }
   ],

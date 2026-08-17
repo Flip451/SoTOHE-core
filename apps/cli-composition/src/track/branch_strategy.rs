@@ -148,6 +148,8 @@ mod tests {
     use std::path::Path;
     use std::process::Command;
 
+    use cli_driver::track::TrackInput;
+
     use super::switch_base_error_to_outcome;
 
     fn write_branch_strategy_config(root: &Path) {
@@ -218,8 +220,10 @@ mod tests {
         let composition = crate::TrackCompositionRoot::new();
 
         for track_id in ["2026-07-31-later-track", "2026-07-01-earlier-track"] {
-            let outcome =
-                composition.track_branch_create(items_dir.clone(), track_id.to_owned()).unwrap();
+            let outcome = composition.track_driver().handle(TrackInput::BranchCreate {
+                items_dir: items_dir.clone(),
+                track_id: track_id.to_owned(),
+            });
             assert_eq!(outcome.exit_code, 0);
 
             let status = Command::new("git")
@@ -258,8 +262,8 @@ mod tests {
         let track_id = "legacy-suffix-track-2026-07-31";
 
         let outcome = crate::TrackCompositionRoot::new()
-            .track_branch_create(items_dir, track_id.to_owned())
-            .unwrap();
+            .track_driver()
+            .handle(TrackInput::BranchCreate { items_dir, track_id: track_id.to_owned() });
 
         assert_eq!(outcome.exit_code, 0);
         let branch = Command::new("git")

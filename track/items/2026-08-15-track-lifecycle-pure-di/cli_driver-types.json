@@ -466,6 +466,18 @@
     {
       "for_type": "TrackTdddBaselineGraphInput",
       "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackTdddCatalogueImplSignalsInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackTdddCatalogueImplSignalsInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackTdddCatalogueImplSignalsInput",
+      "trait_ref": "core::cmp::PartialEq"
     }
   ],
   "traits": {},
