@@ -1643,6 +1643,28 @@
           "hash": "rvw1:sha256:0f982b2b6049805bb47e32ee9bec72741cf430bdb08209ffd2b6e8fac2e26116",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T13:17:18Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/grok_common.rs",
+              "line": 172,
+              "message": "is_grok_stream_result_or_failure treats a JSON-null field as a match: `value.get(\"failure_reason\").is_some()` is true for `\"failure_reason\": null`, and `structured_output_value` returns `Some(Value::Null)` for `\"structured_output\": null`. A post-result event carrying an explicit null (e.g. `{\"type\":\"end\",\"failure_reason\":null}`, a common shape when a serializer emits optional fields as nulls) would therefore still overwrite the preceding structured-output line — contradicting this diff's own documented contract (\"a later `type=end` (or any other event without structured output or a failure) must not\" replace the result) and reproducing the exact P0 class this change fixes. Predicate behavior is confirmed from the code; the triggering stream shape is not evidenced in-repo (PLAUSIBLE). Harden by treating null-valued fields as absent: `.filter(|value| !value.is_null())` in `structured_output_value` (also aligns GrokOutputEnvelope decoding — `Succeeded(Null)` becomes `Failed(missing structured output)`, which downstream already requires) and a non-null check for `failure_reason` in the stream filter.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:485fec0daaaf49197e7e50becfd68ab65c7375bf45519b71d85eb30d52d6094e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T13:25:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d3dcf3f129a065d366f452dd728c2ba470b6059a7a4dfa7943e83e5312223f1",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

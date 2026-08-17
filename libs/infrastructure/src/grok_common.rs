@@ -128,15 +128,21 @@ impl<'de> Deserialize<'de> for GrokOutputEnvelope {
 }
 
 fn structured_output_value(value: &serde_json::Value) -> Option<serde_json::Value> {
-    value.get("structured_output").or_else(|| value.get("structuredOutput")).cloned()
+    value
+        .get("structured_output")
+        .or_else(|| value.get("structuredOutput"))
+        .filter(|candidate| !candidate.is_null())
+        .cloned()
 }
 
 /// Selects the Grok envelope bytes from provider stdout.
 ///
-/// Prefers the last NDJSON line that carries structured output or a terminal
-/// failure. Otherwise the whole buffer is treated as one JSON document so a
-/// pretty-printed `--output-format json` object is still admitted. Envelope
-/// text is not used as a result channel; callers still decode through
+/// Prefers the last NDJSON line that carries structured output. A later
+/// failure line may replace that result; a later `type=end` (or any other
+/// event without structured output or a failure) must not. Otherwise the
+/// whole buffer is treated as one JSON document so a pretty-printed
+/// `--output-format json` object is still admitted. Envelope text is not
+/// used as a result channel; callers still decode through
 /// [`GrokOutputEnvelope`].
 pub(crate) fn grok_envelope_bytes_from_stdout(stdout: &[u8]) -> Option<Vec<u8>> {
     let text = std::str::from_utf8(stdout).ok()?;
@@ -146,7 +152,7 @@ pub(crate) fn grok_envelope_bytes_from_stdout(stdout: &[u8]) -> Option<Vec<u8>> 
         if line.is_empty() {
             continue;
         }
-        if is_grok_stream_terminal_envelope(line) {
+        if is_grok_stream_result_or_failure(line) {
             last_stream = Some(line.as_bytes().to_vec());
         }
     }
@@ -163,16 +169,13 @@ pub(crate) fn grok_envelope_bytes_from_stdout(stdout: &[u8]) -> Option<Vec<u8>> 
         .map(|_| trimmed.as_bytes().to_vec())
 }
 
-fn is_grok_stream_terminal_envelope(line: &str) -> bool {
+fn is_grok_stream_result_or_failure(line: &str) -> bool {
     let Ok(value) = serde_json::from_str::<serde_json::Value>(line) else {
         return false;
     };
     structured_output_value(&value).is_some()
-        || value.get("failure_reason").is_some()
-        || matches!(
-            value.get("type").and_then(serde_json::Value::as_str),
-            Some("result" | "error" | "end")
-        )
+        || value.get("failure_reason").is_some_and(|reason| !reason.is_null())
+        || value.get("type").and_then(serde_json::Value::as_str) == Some("error")
 }
 
 fn missing_structured_output_failure() -> CapabilityFailureDetail {
@@ -435,5 +438,67 @@ mod tests {
             bytes.as_slice(),
             br#"{"type":"result","structuredOutput":{"result":"second"}}"#,
         );
+    }
+
+    #[test]
+    fn test_grok_envelope_bytes_from_ndjson_keeps_structured_output_after_end_event() {
+        let stdout = concat!(
+            r#"{"type":"result","structured_output":{"result":"keep"}}"#,
+            "\n",
+            r#"{"type":"end"}"#,
+            "\n",
+        );
+        let bytes = grok_envelope_bytes_from_stdout(stdout.as_bytes()).expect("envelope");
+        assert_eq!(bytes.as_slice(), br#"{"type":"result","structured_output":{"result":"keep"}}"#,);
+    }
+
+    #[test]
+    fn test_grok_envelope_bytes_from_ndjson_ignores_null_failure_reason_on_end_event() {
+        let stdout = concat!(
+            r#"{"type":"result","structured_output":{"result":"keep"}}"#,
+            "\n",
+            r#"{"type":"end","failure_reason":null}"#,
+            "\n",
+        );
+        let bytes = grok_envelope_bytes_from_stdout(stdout.as_bytes()).expect("envelope");
+        assert_eq!(bytes.as_slice(), br#"{"type":"result","structured_output":{"result":"keep"}}"#,);
+    }
+
+    #[test]
+    fn test_grok_envelope_bytes_from_ndjson_ignores_null_structured_output_after_result() {
+        let stdout = concat!(
+            r#"{"type":"result","structured_output":{"result":"keep"}}"#,
+            "\n",
+            r#"{"type":"end","structured_output":null}"#,
+            "\n",
+        );
+        let bytes = grok_envelope_bytes_from_stdout(stdout.as_bytes()).expect("envelope");
+        assert_eq!(bytes.as_slice(), br#"{"type":"result","structured_output":{"result":"keep"}}"#,);
+    }
+
+    #[test]
+    fn test_grok_envelope_bytes_from_ndjson_later_failure_reason_replaces_result() {
+        let stdout = concat!(
+            r#"{"type":"result","structured_output":{"result":"first"}}"#,
+            "\n",
+            r#"{"failure_reason":"provider timed out"}"#,
+            "\n",
+        );
+        let bytes = grok_envelope_bytes_from_stdout(stdout.as_bytes()).expect("envelope");
+        assert_eq!(bytes.as_slice(), br#"{"failure_reason":"provider timed out"}"#,);
+    }
+
+    #[test]
+    fn test_grok_output_envelope_null_structured_output_is_provider_failure()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let envelope: GrokOutputEnvelope = serde_json::from_str(r#"{"structured_output":null}"#)?;
+
+        assert_eq!(
+            envelope.into_structured_output(),
+            Err(GrokEnvelopeError::ProviderFailure {
+                failure_reason: CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT),
+            }),
+        );
+        Ok(())
     }
 }
