@@ -68,8 +68,8 @@
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
-      "provider": "grok",
-      "model": "grok-4.6",
+      "provider": "claude",
+      "model": "claude-fable-5",
       "fast_model": "gpt-5.6-luna",
       "fast_provider": "codex",
       "reasoning_effort": "xhigh",

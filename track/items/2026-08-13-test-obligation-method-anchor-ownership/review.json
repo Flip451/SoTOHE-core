@@ -423,6 +423,35 @@
           "hash": "rvw1:sha256:f72d6a18a3a1a4b8edc048a3320adde96a3e41037865bfa57cde6b6c670b5c53",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:12:15Z",
+          "findings": [
+            {
+              "category": "doc-contract-contradiction",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 27,
+              "message": "Doc comment contradicts the enforced invariant: it states \"the union of method references must cover that set\" and that a single-method trait \"must declare the complete set on that method\", but after this change only Add/Modify method references count toward coverage — Reference/Delete method refs never satisfy it, and declaring the full set on a single Reference/Delete method is no longer sufficient (it is unconditionally rejected by the union check). This is a factual contract mismatch, not phrasing.",
+              "severity": "minor"
+            },
+            {
+              "category": "diagnostic-contradiction",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 49,
+              "message": "The single-method special-case branch was not updated alongside the Add/Modify union-check change and now (a) is fully subsumed by the union check (single Add/Modify method: identical condition; single Reference/Delete method: union check always fails for a non-empty entry set), and (b) for a single Reference/Delete method emits \"single-method trait must declare entry-level spec anchor ... on its method\" — an unrealizable remedy, since declaring the anchors on that method is still rejected by the union check. Fail-closed behavior is preserved, but the diagnostic contradicts the new invariant; restrict the branch to Add/Modify methods or remove it so the accurate \"not assigned to any add/modify method\" message is emitted.",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:bb03422f26cae6485464b9ab78517d1c9fc275dd0ce5677756e3769703ac2dd0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T12:27:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6815486666da1899b9897e3cd19fe6a287986bee8855be2b7d99082a78df6393",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -489,6 +518,13 @@
           "at": "2026-08-17T10:50:09Z",
           "findings": [],
           "hash": "rvw1:sha256:8d990bc888d4e123a768f331b6d56ac7ee0a1f43e1377a5c0b20be55c412efed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:08:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd958617e101e9e6035d17df97cf2828268fa6ca2738fe11424cc3ea17ee2992",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1569,6 +1605,42 @@
           "at": "2026-08-17T11:03:33Z",
           "findings": [],
           "hash": "rvw1:sha256:5fdda51912bf2b69de56c564a727bde71aef186de74e27c229cc899ac6ef4b99",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:11:46Z",
+          "findings": [
+            {
+              "category": "documentation",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 416,
+              "message": "The doc comment block starting \"Builds the argument list for the `claude -p` invocation.\" (lines 392-415), including the numbered CN-05 read-only contract description, is now attached to the newly inserted helper `claude_review_json_schema()` instead of `build_claude_args`. Only its final paragraph (the `$schema` stripping rationale) describes the helper; the rest is factually wrong for that function, and the security-critical `build_claude_args` is left undocumented. The new fallible helper also lacks an `# Errors` section. Split the doc block: keep the `$schema`-stripping paragraph (plus an `# Errors` section) on `claude_review_json_schema`, and move the argv/CN-05 contract documentation back onto `build_claude_args`.",
+              "severity": "P3"
+            }
+          ],
+          "hash": "rvw1:sha256:176adc6887784e7edf9208002fba2fe8ba785a81f05493ed9514a4e9ff86ea57",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T12:26:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d93be8cdc369712c52f22ef7955aa6651d88ecc48f2b39646e5638232d56a832",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:46:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f547918488ffd50ff0c5c66a7f6508dbbe6045729aa578acf91e8c67b17e312",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:58:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f982b2b6049805bb47e32ee9bec72741cf430bdb08209ffd2b6e8fac2e26116",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2817,6 +2889,56 @@
           "at": "2026-08-17T11:01:18Z",
           "findings": [],
           "hash": "rvw1:sha256:688bf916ef3e5a9c97a6ff3a65e75e19b75d369e8511d23a400650c5a40338f8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:17:41Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 208,
+              "message": "Add/Modify method 義務を emit するようになった Reference/Delete 親 TraitEntry が D1 anchor-membership 検証を bypass する。validate_derivable_method_anchor_coverage は is_derivable(entry.action()) の TraitEntry にのみ validate_method_anchor_coverage を適用するため、非 derivable 親の Add/Modify method が entry-level spec_refs に存在しない anchor を宣言しても拒否されず、その anchor がそのまま義務に載る。AC-02 第 1 節(method が entry-level に存在しない anchor を担当する宣言は構造検証で拒否される — 親 action の限定なし)と不整合。例: Reference 親 TestPort (entry spec_refs=[IN-01]) の Add method load が spec_refs=[IN-99] を宣言 → Add 親なら拒否される宣言が derive を通過し IN-99 anchored の義務が artifact に書かれる。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 307,
+              "message": "type 経路の method 軸義務が method 自身の spec_refs を使わず、常に親 entry の anchors で grounding される。derive_type_obligations → emit_rules → emit_rule_items は全 item に entry-level anchors を渡し、trait 経路の method_anchors_for_item に相当する per-method 解決がない。今回 method_axes_only で Reference/Delete 親 type も method 軸を emit するため、production rules の DomainService (logic_result per method) で現実に発火する: Reference 親 type の Add method は AC-03 で非空 spec_refs を強制されるのに、生成される method:<name> 義務は変更されていない親の anchors(親 spec_refs が空なら anchor ゼロ)を持ち、method の宣言 anchor は使われない。AC-14 の「TypeEntry.methods も義務ゲート上独立」と不整合で、fulfillment 検証が誤った anchor を対象にする。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 389,
+              "message": "minimum floor filler が method_axes_only でも無条件に適用され、非 derivable 親が親所有の捏造義務を emit しうる (latent)。emit_trait_role_rules の method 軸分岐 (389-396) と emit_rules→emit_rule_items (539-556→572-577) の両方で、consumer 編集可能な .harness/config/test-obligation-rules.json の method/trait_method rule に min を付けると、Add/Modify method を持たない Reference/Delete 親からも min#0… item が emit され、method_anchors_for_item の fallback (':' なし → entry_anchors) により親 entry anchors 付きの親レベル義務になる。module doc の「Reference/Delete entries emit only Add/Modify method axes」および briefing checklist「非 derivable 親は親レベル義務を emit しない」に反する。committed rules doc には method 軸 min がないため現時点では発火しない。",
+              "severity": "P3"
+            },
+            {
+              "category": "test-coverage",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 882,
+              "message": "変更挙動の test 固定が trait 経路の半分のみ。(a) type 経路の positive ケース — Reference/Delete TypeEntry の Add method が method:<name> を emit すること — が未固定で、test 用 rules doc には data-role の Method 軸 rule 自体が存在しない。(b) trait 経路の suppression ケース — Reference 親 + 非 method 軸 contract rule (例: entry 軸) が zero emission になること (derive.rs:411 の else if !method_axes_only 分岐) — も未固定。briefing checklist 1-2 項の type 側/suppression 側が regression 検出不能。",
+              "severity": "P3"
+            },
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 539,
+              "message": "「どの軸が method 軸か」の分類 matches!(per_axis, Method | TraitMethod) が derive.rs:384-387 と 539-544 の 2 箇所に重複した。projection.rs の module doc は usecase が role/軸を解釈しない方針を明言しており、この分類は domain vocab 型 TestObligationPerAxis に is_method_axis() として置くべき (TestObligationDriftKind::is_existence / is_freshness の前例あり)。2 箇所が drift すると trait 経路と type 経路の method_axes_only 意味論が静かに乖離する。",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:4e1e6ddf384a031ad77725440d55796d9323ce57809f04eeb69bc6e5ce7812e3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T12:39:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261d53d70e89509bb1067d635d8d5d11e6647366a5362d9bf708d21d66a59a8a",
           "type": "final",
           "verdict": "zero_findings"
         }

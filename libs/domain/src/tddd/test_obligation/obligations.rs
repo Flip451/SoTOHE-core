@@ -23,14 +23,18 @@ use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
 
 /// Validates method-level spec_refs against a trait's entry-level catalogue.
 ///
-/// Every method-level reference must belong to the entry-level set, and the
-/// union of method references must cover that set. A single-method trait with
-/// a non-empty entry-level set must declare the complete set on that method.
+/// Every method-level reference must belong to the entry-level set, including
+/// methods on a Reference/Delete parent. The union of Add/Modify method
+/// references must cover that set only when the parent itself is Add/Modify.
+/// A single Add/Modify method on such a parent with a non-empty entry-level
+/// set must declare the complete set. Reference/Delete method refs never
+/// satisfy coverage.
 ///
 /// # Errors
 ///
 /// Returns a [`DiagnosticMessage`] when a method cites an absent anchor or the
-/// method union does not cover the entry-level catalogue.
+/// method union does not cover the entry-level catalogue of an Add/Modify
+/// parent.
 pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), DiagnosticMessage> {
     validate_add_modify_methods_have_spec_refs(entry.methods())?;
     for method in entry.methods() {
@@ -46,9 +50,14 @@ pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), Diagnos
         }
     }
 
+    if !matches!(entry.action(), ItemAction::Add | ItemAction::Modify) {
+        return Ok(());
+    }
+
     if entry.methods().len() == 1
         && !entry.spec_refs().is_empty()
         && let Some(method) = entry.methods().first()
+        && matches!(method.action(), ItemAction::Add | ItemAction::Modify)
         && let Some(unassigned) = entry
             .spec_refs()
             .iter()
@@ -62,10 +71,13 @@ pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), Diagnos
     }
 
     if let Some(unassigned) = entry.spec_refs().iter().find(|entry_ref| {
-        !entry.methods().iter().any(|method| contains_spec_ref(method.spec_refs(), entry_ref))
+        !entry.methods().iter().any(|method| {
+            matches!(method.action(), ItemAction::Add | ItemAction::Modify)
+                && contains_spec_ref(method.spec_refs(), entry_ref)
+        })
     }) {
         return Err(coverage_diag(&format!(
-            "trait entry spec anchor '{}#{}' is not assigned to any method",
+            "trait entry spec anchor '{}#{}' is not assigned to any add/modify method",
             unassigned.file.display(),
             unassigned.anchor.as_ref(),
         )));
@@ -797,6 +809,44 @@ mod tests {
             )])
             .is_err()
         );
+    }
+
+    #[test]
+    fn test_add_method_on_reference_parent_cannot_declare_absent_anchor() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Reference,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![method("load", ItemAction::Add, vec![spec_ref("IN-99")])],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_err());
+    }
+
+    #[test]
+    fn test_reference_method_cannot_cover_entry_anchors_alone() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Add,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![method("load", ItemAction::Reference, vec![spec_ref("IN-01")])],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_err());
     }
 
     #[test]

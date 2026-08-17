@@ -248,8 +248,8 @@ fn rules_doc_with_secondary_port_method_rules() -> TestObligationRulesDocument {
     rules_doc_with_secondary_port_axis_rules(TestObligationPerAxis::Method)
 }
 
-fn rules_doc_with_secondary_port_axis_rules(
-    per_axis: TestObligationPerAxis,
+fn rules_doc_with_secondary_port_rules(
+    secondary_port_rules: Vec<TestObligationRule>,
 ) -> TestObligationRulesDocument {
     let data_roles: Vec<(DataRole, RoleObligationRules)> = DATA_ROLE_NAMES
         .iter()
@@ -259,11 +259,7 @@ fn rules_doc_with_secondary_port_axis_rules(
         .iter()
         .map(|name| {
             let rules = if *name == "SecondaryPort" {
-                RoleObligationRules::new(vec![rule(
-                    TestObligationKind::Contract,
-                    per_axis.clone(),
-                    None,
-                )])
+                RoleObligationRules::new(secondary_port_rules.clone())
             } else {
                 RoleObligationRules::new(vec![])
             };
@@ -287,6 +283,68 @@ fn rules_doc_with_secondary_port_axis_rules(
         trait_impls,
     )
     .unwrap()
+}
+
+fn rules_doc_with_secondary_port_axis_rules(
+    per_axis: TestObligationPerAxis,
+) -> TestObligationRulesDocument {
+    rules_doc_with_secondary_port_rules(vec![rule(TestObligationKind::Contract, per_axis, None)])
+}
+
+fn rules_doc_with_domain_service_rules(
+    domain_service_rules: Vec<TestObligationRule>,
+) -> TestObligationRulesDocument {
+    let data_roles: Vec<(DataRole, RoleObligationRules)> = DATA_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "DomainService" {
+                RoleObligationRules::new(domain_service_rules.clone())
+            } else {
+                RoleObligationRules::new(vec![])
+            };
+            (name.parse::<DataRole>().unwrap(), rules)
+        })
+        .collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), RoleObligationRules::new(vec![])))
+        .collect();
+    let function_roles = vec![
+        (FunctionRole::FreeFunction, RoleObligationRules::new(vec![])),
+        (FunctionRole::UseCaseFunction, RoleObligationRules::new(vec![])),
+    ];
+    let patterns = vec![(TestObligationPatternKind::Typestate, RoleObligationRules::new(vec![]))];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), RoleObligationRules::new(vec![])))
+        .collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
+
+fn domain_service_type(
+    action: ItemAction,
+    methods: Vec<MethodDeclaration>,
+    spec_refs: Vec<SpecRef>,
+) -> TypeEntry {
+    TypeEntry::new(
+        action,
+        DataRole::domain_service(),
+        TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+        methods,
+        vec![],
+        vec![],
+        ModulePath::root(),
+        None,
+        spec_refs,
+        vec![],
+    )
 }
 
 fn invariant(name: &str) -> InvariantDecl {
@@ -876,6 +934,149 @@ fn test_method_action_does_not_inherit_parent_and_defaults_to_add() {
         result,
         Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
     ));
+}
+
+#[test]
+fn test_add_method_on_reference_trait_is_derived() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Reference,
+        vec![method_with_action("load", ItemAction::Add, vec![spec_ref("IN-01")])],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let items: Vec<&str> =
+        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
+    assert_eq!(items, vec!["trait_method:load"]);
+}
+
+#[test]
+fn test_add_method_on_reference_trait_rejects_absent_anchor() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Reference,
+        vec![method_with_action("load", ItemAction::Add, vec![spec_ref("IN-99")])],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_reference_trait_does_not_emit_parent_level_axes() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Reference,
+        vec![method_with_action("load", ItemAction::Add, vec![spec_ref("IN-01")])],
+        vec![spec_ref("IN-01")],
+    );
+    let rules = rules_doc_with_secondary_port_rules(vec![
+        rule(TestObligationKind::Contract, TestObligationPerAxis::TraitMethod, None),
+        rule(TestObligationKind::Result, TestObligationPerAxis::Entry, None),
+    ]);
+    let (interactor, sink) = interactor(rules, catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let items: Vec<&str> =
+        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
+    assert_eq!(items, vec!["trait_method:load"]);
+}
+
+#[test]
+fn test_method_axes_only_does_not_emit_minimum_fillers() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Reference,
+        vec![method_with_action("load", ItemAction::Reference, vec![])],
+        vec![spec_ref("IN-01")],
+    );
+    let rules = rules_doc_with_secondary_port_rules(vec![rule(
+        TestObligationKind::Contract,
+        TestObligationPerAxis::TraitMethod,
+        Some(1),
+    )]);
+    let (interactor, sink) = interactor(rules, catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    assert!(saved.obligations().is_empty());
+}
+
+#[test]
+fn test_add_method_on_reference_type_is_derived() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = catalogue_with_type(
+        "Compute",
+        domain_service_type(
+            ItemAction::Reference,
+            vec![method_with_action("compute", ItemAction::Add, vec![spec_ref("IN-13")])],
+            vec![spec_ref("IN-13")],
+        ),
+    );
+    let rules = rules_doc_with_domain_service_rules(vec![
+        rule(TestObligationKind::LogicResult, TestObligationPerAxis::Method, None),
+        rule(TestObligationKind::Result, TestObligationPerAxis::Entry, None),
+    ]);
+    let (interactor, sink) = interactor(rules, catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let items: Vec<&str> =
+        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
+    assert_eq!(items, vec!["method:compute"]);
+    assert_eq!(saved.obligations()[0].spec_refs()[0].element_id(), "IN-13");
+}
+
+#[test]
+fn test_type_method_obligations_own_only_each_method_spec_refs() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = catalogue_with_type(
+        "Compute",
+        domain_service_type(
+            ItemAction::Add,
+            vec![
+                method_with_spec_refs("load", vec![spec_ref("IN-01")]),
+                method_with_spec_refs("save", vec![spec_ref("AC-01")]),
+            ],
+            vec![spec_ref("IN-01"), spec_ref("AC-01")],
+        ),
+    );
+    let rules = rules_doc_with_domain_service_rules(vec![rule(
+        TestObligationKind::LogicResult,
+        TestObligationPerAxis::Method,
+        None,
+    )]);
+    let (interactor, sink) = interactor(rules, catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let refs_by_item: HashMap<_, _> = saved
+        .obligations()
+        .iter()
+        .map(|obligation| {
+            (
+                obligation.id().item_identifier().as_str(),
+                obligation
+                    .spec_refs()
+                    .iter()
+                    .map(TestObligationAnchorId::element_id)
+                    .collect::<Vec<_>>(),
+            )
+        })
+        .collect();
+    assert_eq!(refs_by_item.get("method:load"), Some(&vec!["IN-01"]));
+    assert_eq!(refs_by_item.get("method:save"), Some(&vec!["AC-01"]));
 }
 
 #[test]
