@@ -119,11 +119,14 @@ pub(super) fn collect_provider_output<R: Read>(
 }
 
 fn collect_grok_provider_output<R: Read>(
-    pipe: R,
+    mut pipe: R,
 ) -> Result<ProviderCollectedOutput, std::io::Error> {
-    let mut reader = pipe.take(MAX_PROVIDER_FINAL_MESSAGE_BYTES.saturating_add(1));
     let mut stdout = Vec::new();
-    reader.read_to_end(&mut stdout)?;
+    pipe.by_ref()
+        .take(MAX_PROVIDER_FINAL_MESSAGE_BYTES.saturating_add(1))
+        .read_to_end(&mut stdout)?;
+    // Drain remaining stdout so a verbose Grok child cannot block on a full pipe.
+    std::io::copy(&mut pipe, &mut std::io::sink())?;
     if stdout.len() > MAX_PROVIDER_FINAL_MESSAGE_BYTES as usize {
         return Err(std::io::Error::new(
             ErrorKind::InvalidData,

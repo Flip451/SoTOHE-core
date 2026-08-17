@@ -1665,6 +1665,28 @@
           "hash": "rvw1:sha256:2d3dcf3f129a065d366f452dd728c2ba470b6059a7a4dfa7943e83e5312223f1",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T15:03:28Z",
+          "findings": [
+            {
+              "category": "environment",
+              "file": null,
+              "line": null,
+              "message": "レビュー対象の briefing、severity policy、current diff、指定ソースを read-only 環境で読み込めませんでした。shell が bubblewrap の namespace 制限で起動せず、レビュー完了不能です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:feaf08805c32309d17cae889a00215d71939b896b16f40b95e8519d91325eef5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T15:10:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:feaf08805c32309d17cae889a00215d71939b896b16f40b95e8519d91325eef5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

@@ -929,4 +929,23 @@ mod tests {
         assert_eq!(collected.final_message.as_deref(), Some(encoded.as_slice()));
         Ok(())
     }
+
+    #[test]
+    fn test_grok_stdout_over_limit_is_rejected_after_draining()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let envelope = br#"{"sessionId":"grok-session","structured_output":{"status":"ok"}}"#;
+        let mut stdout = vec![b'x'; MAX_PROVIDER_FINAL_MESSAGE_BYTES as usize + 64];
+        stdout.splice(..envelope.len(), envelope.iter().copied());
+
+        let mut cursor = Cursor::new(stdout);
+        let error = match collect_provider_output(&mut cursor, &provider) {
+            Ok(_) => return Err("oversized grok stdout must be rejected".into()),
+            Err(error) => error,
+        };
+
+        assert!(error.to_string().contains("exceeds"));
+        assert_eq!(cursor.position() as usize, cursor.get_ref().len());
+        Ok(())
+    }
 }
