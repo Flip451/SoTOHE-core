@@ -1263,6 +1263,10 @@ fn cached_waiver_doc_with_fingerprint(
 ) -> WaiverCacheDocument {
     let declaration =
         crate::test_obligation::find_declaration_text(&[money_catalogue()], "Money").unwrap();
+    let declaration = format!(
+        "{declaration}\n## Obligation item\n{}",
+        obligation().id().item_identifier().as_str()
+    );
     let key = WaiverCacheKey::new(
         WaivedReasonHash::new(sum_hash(waiver_reason().as_str().as_bytes())),
         DeclarationHash::new(sum_hash(declaration.as_bytes())),
@@ -2549,6 +2553,45 @@ fn test_matching_waiver_cache_reuses_frozen_verdict() {
     assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 0);
     let saved = h.waiver_cache.saved.lock().unwrap().clone().unwrap();
     assert!(matches!(saved.entries()[0].verdict(), WaiverVerdict::Waived { .. }));
+}
+
+#[test]
+fn test_parent_only_waiver_declaration_hash_reverifies() {
+    let declaration =
+        crate::test_obligation::find_declaration_text(&[money_catalogue()], "Money").unwrap();
+    let parent_only_key = WaiverCacheKey::new(
+        WaivedReasonHash::new(sum_hash(waiver_reason().as_str().as_bytes())),
+        DeclarationHash::new(sum_hash(declaration.as_bytes())),
+        AnchorTextHash::new(sum_hash(anchor_text().as_bytes())),
+    );
+    let cache = WaiverCacheDocument::new(
+        track(),
+        vec![WaiverCacheEntry::new(
+            edge(),
+            Some(obligation().id().clone()),
+            parent_only_key,
+            WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("parent-only waiver".to_owned()).unwrap(),
+            },
+            Some(waiver_verifier_fingerprint()),
+        )],
+    );
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(waiver_bindings()),
+        fulfillment_fail(),
+        fulfillment_fail(),
+        WaiverVerdict::Waived {
+            citation: EvidenceCitation::try_new("item-scoped waiver".to_owned()).unwrap(),
+        },
+        None,
+        Some(cache),
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 1);
 }
 
 #[test]

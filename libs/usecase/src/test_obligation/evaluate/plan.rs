@@ -375,6 +375,10 @@ impl EvaluateTestObligationsInteractor {
         existing_waiver_cache: Option<&WaiverCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) {
+        let declaration = declaration_with_obligation_item(
+            &declaration,
+            obligation_id.item_identifier().as_str(),
+        );
         let reason_hash = WaivedReasonHash::new(self.hasher.sha256(reason.as_str().as_bytes()));
         let declaration_hash_actual =
             DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
@@ -395,10 +399,6 @@ impl EvaluateTestObligationsInteractor {
             }));
             return;
         }
-        let declaration = declaration_with_obligation_item(
-            &declaration,
-            obligation_id.item_identifier().as_str(),
-        );
         plan.push(PlannedAction::Waiver(WaiverLlmTask {
             edge_id: edge_id.clone(),
             obligation_id,
