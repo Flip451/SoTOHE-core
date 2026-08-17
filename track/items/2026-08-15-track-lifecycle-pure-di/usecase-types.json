@@ -2152,6 +2152,78 @@
     {
       "for_type": "TrackBaselineCaptureResult",
       "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackArchiveCommand",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackArchiveCommand",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackArchiveCommand",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackArchiveError",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackArchiveError",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackArchiveError",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackArchiveResult",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackArchiveResult",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackArchiveResult",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBaselineGraphCommand",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackBaselineGraphCommand",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBaselineGraphCommand",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBaselineGraphError",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackBaselineGraphError",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBaselineGraphError",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBaselineGraphResult",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackBaselineGraphResult",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBaselineGraphResult",
+      "trait_ref": "Eq"
     }
   ],
   "traits": {

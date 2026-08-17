@@ -121,6 +121,178 @@
           "hash": "rvw1:sha256:29df40733e03668d2bc63c52cfedf03afe6ac0ce82cfaf32f3da6478eabb3100",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:17:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f82a3ee68c7a6052ef101500f26b91422914f67728695af062b878e4021a3db5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:34:58Z",
+          "findings": [
+            {
+              "category": "write_guard_bypass",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 39,
+              "message": "The old baseline-graph path re-ran the write guard against `items_dir`. The new input always supplies `track_id: Some(...)`, but `GitTrackSelectionAdapter::resolve_required` returns explicit IDs without checking the target checkout's branch. A nested checkout below `workspace_root` can therefore have graph files overwritten while it is on `main` or another track branch. Enforce write resolution against the actual `items_dir` inside the use-case path before rendering.",
+              "severity": "P0"
+            },
+            {
+              "category": "cli_compatibility",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 30,
+              "message": "`TrackItemsDirectoryInput` and `TrackWorkspaceRootInput` reject parent-relative paths, so valid prior invocations such as `--workspace-root ../.. --items-dir ../../track/items` now fail before dispatch. This narrows the CLI path contract contrary to CN-01. Normalize accepted paths before constructing the typed inputs, or preserve the previous accepted syntax.",
+              "severity": "P1"
+            },
+            {
+              "category": "stderr_contract",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 35,
+              "message": "Invalid `--layers` stderr changed from `invalid layer id '<token>': ...` to `invalid layer id: ...`. CN-01 explicitly requires stderr preservation. Retain the legacy diagnostic and add an exact-output regression test.",
+              "severity": "P1"
+            },
+            {
+              "category": "error_handling",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 41,
+              "message": "Replacing the fallible `emit_command_outcome` path with `track_driver_outcome_to_result` routes success output through `println!`, which panics on a broken stdout pipe. Previously the write error propagated as `CliError::Io`; piped callers can now receive a panic and exit 101 instead of the established failure behavior. Use a fallible stream emitter.",
+              "severity": "P1"
+            },
+            {
+              "category": "cli_compatibility",
+              "file": "apps/cli/src/commands/track/archive.rs",
+              "line": 27,
+              "message": "Routing archive through the new driver now rejects canonical parent-relative values such as `../../track/items`, which the previous implementation accepted when resolving the repository root. This changes `--items-dir` behavior and its stderr despite CN-01 requiring CLI compatibility. Normalize the path without narrowing accepted syntax before constructing the validated use-case input.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f82a3ee68c7a6052ef101500f26b91422914f67728695af062b878e4021a3db5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T05:55:54Z",
+          "findings": [
+            {
+              "category": "path_resolution",
+              "file": "apps/cli/src/commands/track/archive.rs",
+              "line": 25,
+              "message": "This lexical `ParentDir` collapse is not equivalent to filesystem path resolution. For example, `link/../track/items` resolves `..` relative to a symlink target, while this closure retargets it relative to the process directory; `missing/../track/items` is also converted from an invalid path into a valid one. Because dispatch guards the original path but the driver mutates the normalized path, archive can move a different checkout's track without that checkout having been guarded. Path resolution also constitutes forbidden business logic in the thin bin; preserve the transport value and handle compatibility/validation behind the driver boundary.",
+              "severity": "P0"
+            },
+            {
+              "category": "path_resolution",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 31,
+              "message": "The hand-written lexical normalizer can redirect `items_dir` or `workspace_root` when a component before `..` is a symlink or does not exist, causing baseline files to be read from or written to a different workspace than the CLI path denotes. This path transformation and `current_dir` lookup also violate the thin-bin parse→driver→emit role. Move filesystem-aware path compatibility into the driver/use-case boundary.",
+              "severity": "P0"
+            },
+            {
+              "category": "business_logic_in_bin",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 56,
+              "message": "The bin now splits the layer CSV, performs per-token domain validation, parses the driver's diagnostic text, and constructs command-specific stderr. Validation and presentation belong to `cli_driver`, not `apps/cli`. This also changes error precedence: with an invalid layer and an items checkout on the wrong branch, the new code reports the layer error before the write guard, whereas the previous implementation guarded first. Pass the parsed input to the driver and preserve the legacy diagnostic there.",
+              "severity": "P1"
+            },
+            {
+              "category": "driver_coordinate_violation",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 79,
+              "message": "The handler invokes the legacy write-resolution operation before the new driver and then deliberately passes `track_id: None` to force another resolution. This is multi-step application orchestration and Git-backed business validation in the bin, violating the required parse→wired driver→emit path and the no-op-port-bypass check. The baseline-graph use case/selection port must enforce write semantics for the explicit typed ID; the bin should call only that driver path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:57316d3da12dc3ace9345e39b30ee0a2b320b55afa77962454c0ff46ae65e7a2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:03:47Z",
+          "findings": [
+            {
+              "category": "cli_compatibility",
+              "file": "apps/cli/src/commands/track/archive.rs",
+              "line": 27,
+              "message": "The new archive driver rejects parent-relative canonical paths because its `TrackItemsDirectory` conversion forbids `ParentDir`. The previous execution path accepted values such as `../../track/items`, resolved them using normal filesystem semantics, and archived successfully. This changes the documented `--items-dir` contract. Preserve compatibility behind the driver/use-case boundary; do not normalize lexically in this handler.",
+              "severity": "P1"
+            },
+            {
+              "category": "cli_compatibility",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 30,
+              "message": "Constructing these typed path inputs now rejects previously accepted invocations such as `--workspace-root ../.. --items-dir ../../track/items`. This narrows both path arguments contrary to the required CLI compatibility. The handlers should remain thin; adjust the driver/use-case path boundary to preserve filesystem path semantics without lexical `ParentDir` collapsing here.",
+              "severity": "P1"
+            },
+            {
+              "category": "stderr_contract",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 35,
+              "message": "Invalid `--layers` stderr changed from `invalid layer id '<token>': ...` to `invalid layer id: ...`. The briefing requires stderr to remain unchanged. Preserve the legacy diagnostic inside `TrackLayersInput` or the driver rather than formatting it in the bin.",
+              "severity": "P1"
+            },
+            {
+              "category": "write_guard_bypass",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 39,
+              "message": "The driver receives an explicit track ID, but the current `TrackSelectionPort::resolve_required` returns explicit selections unchanged instead of applying the write-branch guard against `items_dir`. Production dispatch guards `workspace_root`, so a nested checkout under that root can have graph files overwritten while on another branch. Enforce explicit write selection behind the driver/use-case boundary; do not pre-resolve it in this handler.",
+              "severity": "P0"
+            },
+            {
+              "category": "error_handling",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 41,
+              "message": "This replaces the previous fallible `emit_command_outcome` path with a helper that uses `println!`/`eprintln!`. A closed stdout pipe therefore panics and exits 101 instead of propagating `CliError::Io` and preserving the prior failure behavior. Emit the driver's `CommandOutcome` through a fallible stream writer.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f82a3ee68c7a6052ef101500f26b91422914f67728695af062b878e4021a3db5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:41:37Z",
+          "findings": [
+            {
+              "category": "business_logic_in_bin",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 73,
+              "message": "The archive path still performs Git-backed track-ID resolution in the bin before calling the new driver. This is application validation and multi-step orchestration, and it keeps the archive execution path dependent on the legacy composition resolution helper instead of parse → wired driver → emit. Pass the optional selection through a typed archive input and enforce active/explicit write selection behind the driver/use-case boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "business_logic_in_bin",
+              "file": "apps/cli/src/commands/track/dispatch.rs",
+              "line": 138,
+              "message": "Baseline-graph still pre-resolves the write ID against `workspace_root` before invoking its handler, even though the driver/use-case path now enforces explicit selection against `items_dir`. The workspace-root write guard must also move behind that boundary so dispatch only constructs typed input and calls the wired driver; retaining this step violates the briefing's explicit no-pre-resolution rule.",
+              "severity": "P1"
+            },
+            {
+              "category": "error_handling",
+              "file": "apps/cli/src/commands/track/tddd/baseline_graph.rs",
+              "line": 43,
+              "message": "Driver execution failures are now returned as `CommandOutcome { stderr, exit_code: 1 }`, but `emit_command_outcome` prints that stderr and returns `Ok(ExitCode::FAILURE)`. Consequently `execute_with_error_chain` records no diagnostic and completion telemetry persists `error_chain: None`; the previous composition path propagated render failures as `Err` and retained the message. Preserve the failure diagnostic for the caller while emitting it exactly once.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:40b540ce090711107c060db3252f51171593b73fd2fadefba48e13d5a58f901b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:55:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1905beef75b050adf3a41389b7a2f9c8e72cae7a10e6c60e2c5d45f6f7b0cefb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:59:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f82a3ee68c7a6052ef101500f26b91422914f67728695af062b878e4021a3db5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -211,6 +383,20 @@
           "hash": "rvw1:sha256:633ae77ba4a0628b85b0982f13fb5079425f8be4bf5e05f97e373bbde06e2e41",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:17:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98e377551d60fa48e575e33d7966ae711686d5d7a3262035f2f53d064d59325d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:29:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98e377551d60fa48e575e33d7966ae711686d5d7a3262035f2f53d064d59325d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -271,6 +457,71 @@
           "at": "2026-08-17T04:14:56Z",
           "findings": [],
           "hash": "rvw1:sha256:a9dddba907d202ccb3f9206a15ff4b1a7ab5a91674e7e117ec26803cf5a27933",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:16:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82ecfc11984ea3156a27802e1eeb4fcb3d443c5aeb589ae94b8ce5230a56654f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:32:27Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 154,
+              "message": "`TrackResolutionDriver::resolve` is a public driver operation but returns `TrackResolutionOutcome`, leaving CLI callers to interpret success, inactivity, and failures. The cli_driver policy requires equivalent operations to render a `CommandOutcome`; either render stdout/stderr and exit status here or move this typed resolution helper outside the public driver boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "apps/cli-driver/src/track_tddd.rs",
+              "line": 29,
+              "message": "The new public `TrackItemsDirectoryInput::try_new` failure path and its compatibility diagnostic are untested. The invalid baseline-graph test constructs the private field directly and only exercises `into_usecase`, so regressions in CLI-facing validation would pass. Add a test invoking `try_new` with a noncanonical path and asserting the diagnostic.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:82ecfc11984ea3156a27802e1eeb4fcb3d443c5aeb589ae94b8ce5230a56654f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:01:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1507108ac152b73b5710e9f52b59818c43b1f7d4b12fc8910e742335d102cdcd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:40:32Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli-driver/src/lib.rs",
+              "line": 57,
+              "message": "`canonicalize_existing_parent_path` performs real filesystem I/O inside `cli_driver` and is called during Archive, resolution, and TDDD input translation. This gives the primary adapter an uninjected infrastructure dependency and adds an external operation before the single use-case invocation, violating the required `input → invoke → render` flow. Move filesystem canonicalization behind a use-case port implemented in infrastructure and wired by `cli_composition`, or keep adapter normalization purely syntactic.",
+              "severity": "P1"
+            },
+            {
+              "category": "error_handling",
+              "file": "apps/cli-driver/src/lib.rs",
+              "line": 62,
+              "message": "`unwrap_or(value)` silently treats every canonicalization failure as though the path merely did not exist. Permission errors, symlink loops, and other I/O failures are consequently replaced by an unrelated path-validation diagnostic instead of being propagated. Handle only an explicitly accepted error such as `NotFound` as fallback and return a typed failure for other errors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7092bd82fa5cc9a58becea7a47faa3f1a8f7335e4d820fa2be45b7611950bb6d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:55:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e22494eb47550793068be75eb4db0a017b6e67cb4ea8c33e5e872a8fd8263554",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -764,6 +1015,20 @@
           "hash": "rvw1:sha256:a5a91d19dfdbc6e8f2803bcd26e4ddcfd6ad8940ec5778ccae7cd90a9e0781ee",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:16:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75c6f48310e6e598d85cd2f46f0e5d70bd07ce5d37d323aa4c4fb4679e981f91",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:29:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75c6f48310e6e598d85cd2f46f0e5d70bd07ce5d37d323aa4c4fb4679e981f91",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1145,6 +1410,57 @@
           "hash": "rvw1:sha256:f7b6c2b35594964a50680bad740a7faf0faf7232f91a87452fd1adb6070dd443",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:17:04Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_graph.rs",
+              "line": 24,
+              "message": "The adapter passes caller-controlled `command.items_dir` directly into `BaselineGraphLoaderAdapter` and `BaselineGraphWriterAdapter`, while only using `workspace_root` as the `trusted_root`. Neither adapter verifies that `items_dir` (or the resulting track paths) is beneath that trusted root; `reject_symlinks_below` does not enforce containment. A path such as `../outside` can therefore read baselines from and write graph files outside the workspace. Validate the resolved items directory under `workspace_root` and fail closed before constructing the adapters.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:eae9787c1d48a856ac04f796c46f0362768c4d9b05fcb219a65e1383bcaf191f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T05:25:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3cb6abccc13b13f7357536d8d94224b8638703a6a25423a7742fd7f348a196af",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:32:20Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_graph.rs",
+              "line": 18,
+              "message": "The new public adapter has only error-path tests (missing rules and out-of-root items); no happy-path test runs a valid fixture through the reused loader/renderer/writer and verifies the rendered layer count, written file count, layer filtering, and output files. This leaves the new wiring and result mapping unprotected, contrary to the repository requirement for happy-path and error-case coverage of public APIs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3cb6abccc13b13f7357536d8d94224b8638703a6a25423a7742fd7f348a196af",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T05:40:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ed8ffe01bc33a687a8ec97bfe95bb903ffc5552f5da354e53e83ec0318084f57",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:41:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d1816f5c2506f1abef08642ce25e1f8142084ec6a78c5733d205bc0f0e66443",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1291,6 +1607,27 @@
           "at": "2026-08-17T04:16:00Z",
           "findings": [],
           "hash": "rvw1:sha256:e7638a5c0c8cd47783e3aefe19bc6dc5b5902f5009fa6115adf935bdc9ec709a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:17:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f13f173ba11ba9c10b1f3141f3fe752b3fcfc8f597bc68e50de8721df60fe530",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:29:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f13f173ba11ba9c10b1f3141f3fe752b3fcfc8f597bc68e50de8721df60fe530",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:34:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ce0b9b4966d5b4e71381df9d2e28bb38ffdab2cdc5aea3cdab4efe60ad68f6c7",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1864,6 +2201,20 @@
           "hash": "rvw1:sha256:fcabd5087aeef66df76d728b5931f557e253eaf70f1daf1f922c2c4938e590d5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:17:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92ef3ac19e0992838b019951765340e4fc17f345534aa0aef687bded8ed6b368",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:32:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:92ef3ac19e0992838b019951765340e4fc17f345534aa0aef687bded8ed6b368",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2046,6 +2397,27 @@
           "at": "2026-08-17T04:14:48Z",
           "findings": [],
           "hash": "rvw1:sha256:88230806b195b98e244ea06a7560d8fff7a15249e7b0f7f06d2fabc013de1ba6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:17:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e947ddaadbd59a318a495acd12f7422126e7095a7fc5152037ff77180f5f5f81",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:32:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e947ddaadbd59a318a495acd12f7422126e7095a7fc5152037ff77180f5f5f81",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:40:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bdfc161fcaf658bb1a0965d959c52b3de494cda241b01a99f89be1615b95659",
           "type": "final",
           "verdict": "zero_findings"
         }

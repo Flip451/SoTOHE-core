@@ -70,6 +70,11 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
             Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
         ));
+    let track_archive_service =
+        Arc::new(usecase::track_lifecycle::track_archive::TrackArchiveInteractor::new(
+            Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
+            Arc::new(infrastructure::git_cli::workflow_adapter::FsWorkspaceAdapter::new()),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -93,6 +98,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
     ));
     cli_driver::track::TrackDriver::new(
         track_init_service,
+        track_archive_service,
         service,
         fixpoint_resolve_service,
         base_merge_service,
@@ -111,5 +117,15 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             operation, resolver,
         ),
     );
-    cli_driver::track_tddd::TrackTdddDriver::new(service)
+    let baseline_graph_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::baseline_graph::SystemTrackBaselineGraphAdapter,
+    );
+    let baseline_graph_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let baseline_graph_service = Arc::new(
+        usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphInteractor::new(
+            baseline_graph_operation,
+            baseline_graph_resolver,
+        ),
+    );
+    cli_driver::track_tddd::TrackTdddDriver::new(service, baseline_graph_service)
 }

@@ -1,6 +1,7 @@
 //! Shared TDDD value objects used by Track command contexts.
 
 pub mod baseline_capture;
+pub mod baseline_graph;
 
 use std::path::{Path, PathBuf};
 

@@ -10,8 +10,11 @@ use usecase::base_merge::{BaseMergeCommand, BaseMergeOutcome, BaseMergeService};
 use usecase::fixpoint_resolve_driver::{
     FixpointResolveDriverInput, FixpointResolveDriverOutcome, FixpointResolveDriverService,
 };
+use usecase::track_lifecycle::track_archive::{
+    TrackArchiveCommand, TrackArchiveError, TrackArchiveService,
+};
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
-use usecase::track_lifecycle::{TrackItemsDirectory, TrackLifecycleIdInput};
+use usecase::track_lifecycle::{TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput};
 use usecase::track_service::{TrackCommandOutput, TrackService};
 
 use crate::render::CommandOutcome;
@@ -233,6 +236,7 @@ fn render_base_merge_result(
 /// exposes `handle(input) -> CommandOutcome`.
 pub struct TrackDriver {
     track_init_service: Arc<dyn TrackInitService>,
+    track_archive_service: Arc<dyn TrackArchiveService>,
     service: Arc<dyn TrackService>,
     fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
     base_merge_service: Arc<dyn BaseMergeService>,
@@ -242,11 +246,18 @@ impl TrackDriver {
     /// Create a new `TrackDriver` with the given services.
     pub fn new(
         track_init_service: Arc<dyn TrackInitService>,
+        track_archive_service: Arc<dyn TrackArchiveService>,
         service: Arc<dyn TrackService>,
         fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
         base_merge_service: Arc<dyn BaseMergeService>,
     ) -> Self {
-        Self { track_init_service, service, fixpoint_resolve_service, base_merge_service }
+        Self {
+            track_init_service,
+            track_archive_service,
+            service,
+            fixpoint_resolve_service,
+            base_merge_service,
+        }
     }
 
     /// Handle a guarded base-to-track merge through the application service.
@@ -267,6 +278,9 @@ impl TrackDriver {
                 track_id,
                 description,
             ),
+            TrackInput::Archive { items_dir, track_id } => {
+                render_track_archive_outcome(&*self.track_archive_service, items_dir, track_id)
+            }
             TrackInput::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
                 service_output_to_outcome(self.service.transition(
                     items_dir,
@@ -313,9 +327,6 @@ impl TrackDriver {
             }
             TrackInput::TaskCounts { items_dir, track_id } => {
                 service_output_to_outcome(self.service.task_counts(items_dir, track_id))
-            }
-            TrackInput::Archive { items_dir, track_id } => {
-                service_output_to_outcome(self.service.archive(items_dir, track_id))
             }
             TrackInput::DetectActive { project_root } => {
                 service_output_to_outcome(self.service.detect_active(project_root))
@@ -368,6 +379,43 @@ fn render_track_init_outcome(
 }
 
 fn track_init_error_to_outcome(error: TrackInitError) -> CommandOutcome {
+    CommandOutcome::failure(Some(error.to_string()))
+}
+
+fn render_track_archive_outcome(
+    service: &dyn TrackArchiveService,
+    items_dir: PathBuf,
+    track_id: String,
+) -> CommandOutcome {
+    let items_dir = match TrackItemsDirectory::try_new(items_dir) {
+        Ok(items_dir) => items_dir,
+        Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+    };
+    let track_id = match TrackLifecycleIdInput::try_new(track_id) {
+        Ok(track_id) => track_id,
+        Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+    };
+    let command = TrackArchiveCommand::new(items_dir, track_id);
+    service
+        .execute(command)
+        .map(render_track_archive_result)
+        .unwrap_or_else(track_archive_error_to_outcome)
+}
+
+fn render_track_archive_result(
+    result: usecase::track_lifecycle::track_archive::TrackArchiveResult,
+) -> CommandOutcome {
+    let source: &TrackDirectoryPath = &result.source;
+    let destination: &TrackDirectoryPath = &result.destination;
+    CommandOutcome::success(Some(format!(
+        "[OK] Archived track '{}': {} → {}",
+        result.track_id,
+        source.as_path().display(),
+        destination.as_path().display(),
+    )))
+}
+
+fn track_archive_error_to_outcome(error: TrackArchiveError) -> CommandOutcome {
     CommandOutcome::failure(Some(error.to_string()))
 }
 
@@ -429,12 +477,58 @@ mod tests {
 
     struct UnusedTrackInitService;
 
+    struct UnusedTrackArchiveService;
+
     impl TrackInitService for UnusedTrackInitService {
         fn execute(
             &self,
             _: TrackInitCommand,
         ) -> Result<usecase::track_lifecycle::track_init::TrackInitResult, TrackInitError> {
             unreachable!()
+        }
+    }
+
+    impl TrackArchiveService for UnusedTrackArchiveService {
+        fn execute(
+            &self,
+            _: TrackArchiveCommand,
+        ) -> Result<usecase::track_lifecycle::track_archive::TrackArchiveResult, TrackArchiveError>
+        {
+            unreachable!()
+        }
+    }
+
+    struct RecordingTrackArchiveService {
+        calls: Mutex<Vec<(PathBuf, String)>>,
+        result: Result<(), String>,
+    }
+
+    impl TrackArchiveService for RecordingTrackArchiveService {
+        fn execute(
+            &self,
+            command: TrackArchiveCommand,
+        ) -> Result<usecase::track_lifecycle::track_archive::TrackArchiveResult, TrackArchiveError>
+        {
+            self.calls
+                .lock()
+                .unwrap()
+                .push((command.items_dir.as_path().to_path_buf(), command.track_id.to_string()));
+            match &self.result {
+                Ok(()) => Ok(usecase::track_lifecycle::track_archive::TrackArchiveResult {
+                    track_id: command.track_id,
+                    source: TrackDirectoryPath::try_new(PathBuf::from(
+                        "/workspace/track/items/archive-track",
+                    ))
+                    .expect("source path is valid"),
+                    destination: TrackDirectoryPath::try_new(PathBuf::from(
+                        "/workspace/track/archive/archive-track",
+                    ))
+                    .expect("destination path is valid"),
+                }),
+                Err(error) => Err(TrackArchiveError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+            }
         }
     }
 
@@ -565,6 +659,7 @@ mod tests {
     fn base_merge_driver<T: BaseMergeService + 'static>(service: Arc<T>) -> TrackDriver {
         TrackDriver::new(
             Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             service,
@@ -579,6 +674,7 @@ mod tests {
         });
         let driver = TrackDriver::new(
             service.clone(),
+            Arc::new(UnusedTrackArchiveService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -606,6 +702,7 @@ mod tests {
         });
         let driver = TrackDriver::new(
             service.clone(),
+            Arc::new(UnusedTrackArchiveService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -620,6 +717,110 @@ mod tests {
         assert_eq!(outcome.exit_code, 1);
         assert!(outcome.stderr.unwrap().contains("invalid track id"));
         assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_archive_valid_input_routes_to_archive_service() {
+        let service = Arc::new(RecordingTrackArchiveService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(()),
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::Archive {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "archive-track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "[OK] Archived track 'archive-track': /workspace/track/items/archive-track → \
+/workspace/track/archive/archive-track"
+            )
+        );
+        assert_eq!(
+            service.calls.lock().unwrap().as_slice(),
+            &[(PathBuf::from("track/items"), "archive-track".to_owned())]
+        );
+    }
+
+    #[test]
+    fn test_track_driver_archive_rejects_parent_relative_items_path_without_filesystem_access() {
+        let service = Arc::new(RecordingTrackArchiveService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(()),
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::Archive {
+            items_dir: PathBuf::from("/workspace/anchor/../track/items"),
+            track_id: "archive-track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert!(outcome.stderr.unwrap().contains("parent traversal"));
+        assert_eq!(service.calls.lock().unwrap().as_slice(), &[]);
+    }
+
+    #[test]
+    fn test_track_driver_archive_invalid_items_dir_returns_failure_without_service_call() {
+        let service = Arc::new(RecordingTrackArchiveService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(()),
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::Archive {
+            items_dir: PathBuf::from("wrong/items"),
+            track_id: "archive-track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert!(outcome.stderr.unwrap().contains("track/items"));
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_archive_service_error_maps_to_failure_outcome() {
+        let service = Arc::new(RecordingTrackArchiveService {
+            calls: Mutex::new(Vec::new()),
+            result: Err("archive failed".to_owned()),
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            service,
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::Archive {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "archive-track".to_owned(),
+        });
+
+        assert_eq!(outcome.stderr.as_deref(), Some("archive failed"));
+        assert_eq!(outcome.exit_code, 1);
     }
 
     fn base_merge_direction() -> BaseMergeDirection {

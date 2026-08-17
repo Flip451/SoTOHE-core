@@ -5,7 +5,7 @@
 
 GO-01 → T001–T033; each independently verifiable command context has its own implementation task, followed by remaining migration and validation.
 
-## Tasks (6/33 resolved)
+## Tasks (8/33 resolved)
 
 ### S1 — Shared wiring
 
@@ -17,8 +17,8 @@ GO-01 → T001–T033; each independently verifiable command context has its own
 
 > In `libs/usecase/src/track_lifecycle/`, `apps/cli/src/commands/track/`, `apps/cli-driver/src/track.rs`, and `apps/cli-composition/src/track/`, implement and wire the non-TDDD command boundaries. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 
-- [x] **T002**: Implement the `TrackInit*` boundary in `libs/usecase/src/track_lifecycle/track_init.rs`; wire the `init` handler in `apps/cli/src/commands/track/` through `apps/cli-driver/src/track.rs` and `apps/cli-composition/src/track/ops.rs`, with CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
-- [ ] **T003**: Implement the `TrackArchive*` boundary in `libs/usecase/src/track_lifecycle/track_archive.rs`; wire `apps/cli/src/commands/track/archive.rs` through the track driver and composition root, with CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [x] **T002**: Implement the `TrackInit*` boundary in `libs/usecase/src/track_lifecycle/track_init.rs`; wire the `init` handler in `apps/cli/src/commands/track/` through `apps/cli-driver/src/track.rs` and `apps/cli-composition/src/track/ops.rs`, with CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`d3a90e14f288573f579624b16a0ee1524946219f`)
+- [x] **T003**: Implement the `TrackArchive*` boundary in `libs/usecase/src/track_lifecycle/track_archive.rs`; wire `apps/cli/src/commands/track/archive.rs` through the track driver and composition root, with CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T004**: Implement the `TrackBranchCreate*` boundary in `libs/usecase/src/track_lifecycle/track_branch_create.rs`; update the branch-create path in `apps/cli/src/commands/track/branch_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T005**: Implement the `TrackBranchSwitch*` boundary in `libs/usecase/src/track_lifecycle/track_branch_switch.rs`; update the branch-switch path in `apps/cli/src/commands/track/branch_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T006**: Implement the `TrackAddTask*` boundary in `libs/usecase/src/track_lifecycle/track_add_task.rs`; update the add-task dispatch in `apps/cli/src/commands/track/{dispatch.rs,state_ops.rs}`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
@@ -37,8 +37,8 @@ GO-01 → T001–T033; each independently verifiable command context has its own
 
 > In `libs/usecase/src/track_lifecycle/tddd/`, `apps/cli/src/commands/track/tddd/`, `apps/cli-driver/src/track_tddd.rs`, and `apps/cli-composition/src/track/tddd.rs`, implement and wire the TDDD command boundaries. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 
-- [x] **T017**: Implement the `TrackBaselineCapture*` boundary in `libs/usecase/src/track_lifecycle/tddd/baseline_capture.rs`; wire `apps/cli/src/commands/track/tddd/baseline.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
-- [ ] **T018**: Implement the `TrackBaselineGraph*` boundary in `libs/usecase/src/track_lifecycle/tddd/baseline_graph.rs`; wire `apps/cli/src/commands/track/tddd/baseline_graph.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [x] **T017**: Implement the `TrackBaselineCapture*` boundary in `libs/usecase/src/track_lifecycle/tddd/baseline_capture.rs`; wire `apps/cli/src/commands/track/tddd/baseline.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`d3a90e14f288573f579624b16a0ee1524946219f`)
+- [x] **T018**: Implement the `TrackBaselineGraph*` boundary in `libs/usecase/src/track_lifecycle/tddd/baseline_graph.rs`; wire `apps/cli/src/commands/track/tddd/baseline_graph.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T019**: Implement the `TrackCatalogueImplSignals*` boundary in `libs/usecase/src/track_lifecycle/tddd/catalogue_impl_signals.rs`; wire `apps/cli/src/commands/track/tddd/catalogue_impl_signals.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T020**: Implement the `TrackCatalogueSpecSignals*` boundary in `libs/usecase/src/track_lifecycle/tddd/catalogue_spec_signals.rs`; wire the catalogue-spec-signals handler in `apps/cli/src/commands/track/tddd/`, driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 - [ ] **T021**: Implement the `TrackTypeSignals*` boundary in `libs/usecase/src/track_lifecycle/tddd/type_signals.rs`; wire its handler in `apps/cli/src/commands/track/tddd/` through the driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]

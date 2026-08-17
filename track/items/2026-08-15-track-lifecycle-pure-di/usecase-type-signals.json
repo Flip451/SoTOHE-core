@@ -1,8 +1,8 @@
 {
   "baseline_hash": "1550ed8a0b5532def664d5ecb2192e494789123f7fcc93ebb669d041b46dbb94",
-  "declaration_hash": "9187a2b71cc6718de2b1087c5e3bd50a4fd5864a53e238db50313ad9f2100c77",
-  "generated_at": "2026-08-17T04:29:32Z",
-  "head_commit": "a051be92848a54dc9361630a4128108e3f88d92a",
+  "declaration_hash": "d435545724117505e4fa016886ae422e075729563fe1ee761da88e5385c21ae1",
+  "generated_at": "2026-08-17T07:00:27Z",
+  "head_commit": "d3a90e14f288573f579624b16a0ee1524946219f",
   "schema_version": 4,
   "signals": [
     {
@@ -96,41 +96,54 @@
       "type_name": "TrackAddTaskService"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackArchiveCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackArchiveError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackArchiveService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackArchiveInteractor"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackArchiveResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackArchiveService"
     },
     {
@@ -204,47 +217,60 @@
       "type_name": "TrackBaselineCaptureService"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineGraphCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackBaselineGraphError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackBaselineGraphService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackBaselineGraphInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineGraphPort"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineGraphResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineGraphService"
     },
     {

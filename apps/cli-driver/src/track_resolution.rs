@@ -26,7 +26,7 @@ impl TrackResolutionDiagnostic {
         &self.message
     }
 
-    fn new(message: impl Into<String>) -> Self {
+    pub(crate) fn new(message: impl Into<String>) -> Self {
         Self { message: message.into() }
     }
 }
@@ -65,7 +65,7 @@ pub struct TrackItemsDirectoryInput {
 }
 
 impl TrackItemsDirectoryInput {
-    /// Validates and wraps a canonical `track/items` path.
+    /// Validates and wraps a `track/items` path.
     pub fn try_new(value: PathBuf) -> Result<Self, TrackResolutionDiagnostic> {
         TrackItemsDirectory::try_new(value.clone()).map_err(|error| {
             if error.to_string().contains("must end in 'track/items'") {
@@ -80,7 +80,7 @@ impl TrackItemsDirectoryInput {
         Ok(Self { value })
     }
 
-    /// Derives the workspace-root input from this canonical items directory.
+    /// Derives the workspace-root input from this items directory.
     #[must_use]
     pub fn workspace_root(&self) -> TrackWorkspaceRootInput {
         let root = self

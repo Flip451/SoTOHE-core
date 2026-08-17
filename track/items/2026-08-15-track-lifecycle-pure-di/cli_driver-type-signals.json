@@ -1,8 +1,8 @@
 {
   "baseline_hash": "41113f2dbbd1778473992d003e8ee985df3cd929d6c50cfadab2e4d61ba762bd",
-  "declaration_hash": "9e3cab524d0283f1c35f21c1f1cf9fa034ea42d0e79125e02367f827864b80a9",
-  "generated_at": "2026-08-17T04:29:37Z",
-  "head_commit": "a051be92848a54dc9361630a4128108e3f88d92a",
+  "declaration_hash": "11f1fbeab67a8ff243af583d432255956a56eb5a25908bcf22729e0ee1f9813d",
+  "generated_at": "2026-08-17T07:00:31Z",
+  "head_commit": "d3a90e14f288573f579624b16a0ee1524946219f",
   "schema_version": 4,
   "signals": [
     {
@@ -37,9 +37,15 @@
       "type_name": "TrackLayerInput"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackLayersInput"
     },
     {
@@ -124,9 +130,14 @@
       "type_name": "TrackTdddBaselineCaptureInput"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTdddBaselineGraphInput"
     },
     {

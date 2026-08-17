@@ -275,7 +275,10 @@ impl TrackSelectionPort for GitTrackSelectionAdapter {
         selection: &TrackSelection,
     ) -> Result<TrackId, usecase::git_workflow::DiagnosticText> {
         match selection {
-            TrackSelection::Explicit(track_id) => Ok(track_id.clone()),
+            TrackSelection::Explicit(track_id) => {
+                let root = workspace_root_for_items(items_dir.as_path())?;
+                self.resolve_for_write(&TrackWorkspaceRoot::try_new(root)?, track_id)
+            }
             TrackSelection::Active => {
                 let root = workspace_root_for_items(items_dir.as_path())?;
                 self.resolve_active(&TrackWorkspaceRoot::try_new(root)?)
@@ -677,15 +680,35 @@ mod lifecycle_adapter_tests {
 
     #[test]
     fn test_git_track_selection_explicit_selection_returns_same_track() {
+        let root = tempdir().expect("temporary root is created");
+        init_git_repo_on_branch(root.path(), "track/explicit-track");
+        let items_path = root.path().join("track/items");
+        fs::create_dir_all(&items_path).expect("items directory exists");
         let adapter = GitTrackSelectionAdapter;
-        let items_dir = TrackItemsDirectory::try_new("workspace/track/items".into())
-            .expect("items path is valid");
+        let items_dir = TrackItemsDirectory::try_new(items_path).expect("items path is valid");
         let track_id = TrackId::try_new("explicit-track").expect("track id is valid");
         let selection = TrackSelection::Explicit(track_id.clone());
 
         let resolved =
             adapter.resolve_required(&items_dir, &selection).expect("explicit selection resolves");
         assert_eq!(resolved, track_id);
+    }
+
+    #[test]
+    fn test_git_track_selection_explicit_selection_rejects_branch_mismatch_for_write() {
+        let root = tempdir().expect("temporary root is created");
+        init_git_repo_on_branch(root.path(), "track/active-track");
+        let items_path = root.path().join("track/items");
+        fs::create_dir_all(&items_path).expect("items directory exists");
+        let items_dir = TrackItemsDirectory::try_new(items_path).expect("items path is valid");
+        let selection =
+            TrackSelection::Explicit(TrackId::try_new("other-track").expect("track id is valid"));
+
+        let error = GitTrackSelectionAdapter
+            .resolve_required(&items_dir, &selection)
+            .expect_err("explicit baseline-graph selection must enforce the write guard");
+
+        assert!(error.to_string().contains("WRITE guard mismatch"));
     }
 
     #[test]
