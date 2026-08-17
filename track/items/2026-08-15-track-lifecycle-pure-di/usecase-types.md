@@ -10,8 +10,8 @@
 | TrackLayerSelection | enum | add | All, One | 🔵 | 🔵 |
 | TrackLayerSignalResult | enum | add | Evaluated, Skipped | 🔵 | 🔵 |
 | TrackNextTaskResult | enum | add | Found, NoOpenTask | 🟡 | 🔵 |
-| TrackResolutionCommand | enum | add | ReadFromItems, ReadFromRoot, WriteFromItems, WriteFromRoot, DetectActive | 🟡 | 🔵 |
-| TrackResolutionResult | enum | add | Resolved, Inactive | 🟡 | 🔵 |
+| TrackResolutionCommand | enum | add | ReadFromItems, ReadFromRoot, WriteFromItems, WriteFromRoot, DetectActive | 🔵 | 🔵 |
+| TrackResolutionResult | enum | add | Resolved, Inactive | 🔵 | 🔵 |
 | TrackResolveResult | enum | add | Ready, Blocked | 🟡 | 🔵 |
 | TrackSelection | enum | add | Active, Explicit | 🔵 | 🔵 |
 | TrackSpecAnchorSelection | enum | add | All, One | 🔵 | 🔵 |
@@ -62,7 +62,7 @@
 | TrackInitError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackLintError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackNextTaskError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
-| TrackResolutionCompatError | error_type | add | Unavailable | 🟡 | 🔵 |
+| TrackResolutionCompatError | error_type | add | Unavailable | 🔵 | 🔵 |
 | TrackResolveError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackSetCommitHashError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackSetOverrideError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
@@ -92,7 +92,7 @@
 | TrackNextTaskQueryPort | secondary_port | add | fn next_task(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory) -> Result<Option<NextTaskOutput>, TrackNextTaskError> | 🔵 | 🔵 |
 | TrackOverrideClearPort | secondary_port | add | fn clear_override(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
 | TrackOverrideSetPort | secondary_port | add | fn set_override(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory, status: domain::StatusOverrideKind, reason: DiagnosticText) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
-| TrackResolutionPort | secondary_port | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🟡 | 🔵 |
+| TrackResolutionPort | secondary_port | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🔵 | 🔵 |
 | TrackSelectionPort | secondary_port | add | fn resolve_required(&self, items_dir: &TrackItemsDirectory, selection: &TrackSelection) -> Result<domain::TrackId, DiagnosticText>, fn resolve_active(&self, workspace_root: &TrackWorkspaceRoot) -> Result<domain::TrackId, DiagnosticText>, fn resolve_views_scope(&self, workspace_root: &TrackWorkspaceRoot, selection: &TrackSelection) -> Result<TrackViewsScope, DiagnosticText> | 🔵 | 🔵 |
 | TrackSpecElementHashPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🟡 | 🔵 |
 | TrackTaskAddPort | secondary_port | add | fn add_task(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory, description: domain::NonEmptyString, section: Option<domain::NonEmptyString>, after: Option<domain::TaskId>) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
@@ -120,7 +120,7 @@
 | TrackInitService | application_service | add | fn execute(&self, command: TrackInitCommand) -> Result<TrackInitResult, TrackInitError> | 🟡 | 🔵 |
 | TrackLintService | application_service | add | fn execute(&self, command: TrackLintCommand) -> Result<TrackLintResult, TrackLintError> | 🟡 | 🔵 |
 | TrackNextTaskService | application_service | add | fn execute(&self, command: TrackNextTaskCommand) -> Result<TrackNextTaskResult, TrackNextTaskError> | 🟡 | 🔵 |
-| TrackResolutionService | application_service | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🟡 | 🔵 |
+| TrackResolutionService | application_service | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🔵 | 🔵 |
 | TrackResolveService | application_service | add | fn execute(&self, command: TrackResolveCommand) -> Result<TrackResolveResult, TrackResolveError> | 🟡 | 🔵 |
 | TrackSetCommitHashService | application_service | add | fn execute(&self, command: TrackSetCommitHashCommand) -> Result<TrackSetCommitHashResult, TrackSetCommitHashError> | 🟡 | 🔵 |
 | TrackSetOverrideService | application_service | add | fn execute(&self, command: TrackSetOverrideCommand) -> Result<TrackSetOverrideResult, TrackSetOverrideError> | 🟡 | 🔵 |
@@ -152,7 +152,7 @@
 | TrackInitInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackLintInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackNextTaskInteractor | interactor | add | — | 🟡 | 🔵 |
-| TrackResolutionInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackResolutionInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackResolveInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackSetCommitHashInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackSetOverrideInteractor | interactor | add | — | 🟡 | 🔵 |

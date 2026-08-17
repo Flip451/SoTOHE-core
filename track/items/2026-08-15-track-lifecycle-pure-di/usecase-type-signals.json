@@ -1,8 +1,8 @@
 {
-  "baseline_hash": "95fe337cc28508bbd02db73d650ee50a59608fa9211f5ccf5f5bda58d166742e",
-  "declaration_hash": "5d97d3fe805f7cf76d452e4928138327e22552840ae26ee95f3c2ef1f688af73",
-  "generated_at": "2026-08-16T23:32:21Z",
-  "head_commit": "a81e5c102541b68cf3fc80a4b2937c2335362e46",
+  "baseline_hash": "1550ed8a0b5532def664d5ecb2192e494789123f7fcc93ebb669d041b46dbb94",
+  "declaration_hash": "adf29c56d4096b79299e273debf41e58da5e4c53fabd4315a8fde6028ef07be7",
+  "generated_at": "2026-08-17T02:46:51Z",
+  "head_commit": "05298cd6ed086a66f945e83e36267ef533549304",
   "schema_version": 4,
   "signals": [
     {
@@ -812,47 +812,59 @@
       "type_name": "TrackRenderedLayerCount"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolutionCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackResolutionCompatError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackResolutionService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackResolutionInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolutionPort"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolutionResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolutionService"
     },
     {

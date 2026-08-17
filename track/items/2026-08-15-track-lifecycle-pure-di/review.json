@@ -19,6 +19,90 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-17T01:51:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:65219c81d82e5a8ffce83552a3f6621f7349bfee2f9a3033accf0ad127fd0a01",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:10:10Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 187,
+              "message": "`resolve_for_read` handles an explicit track ID locally and returns before constructing `TrackResolutionInput` or calling the wired driver. This reimplements the READ explicit-override resolution rule in the bin, contrary to the thin-bin policy and the briefing requirement that ADR-baseline resolution flow through `track_resolution_driver()`. Pass the optional ID through `ReadFromItems` and let the driver/usecase resolve it.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 159,
+              "message": "`TrackItemsDirectoryInput::try_new` rejects paths containing `..`, whereas the replaced `track_resolve_project_root` accepted canonical-suffix paths such as `../track/items`. Invoking ADR-baseline from a repository subdirectory now fails with exit 1 instead of operating on the repository, violating CN-01/AC-05 compatibility. Preserve or normalize previously valid paths at the compatibility boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:65219c81d82e5a8ffce83552a3f6621f7349bfee2f9a3033accf0ad127fd0a01",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:25:20Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 18,
+              "message": "`normalize_items_dir!` implements path normalization, branching, and a current-directory lookup inside the bin. This is application-level transformation and orchestration, contrary to the thin-bin requirement that `apps/cli` only construct typed inputs, obtain a wired driver, and emit its outcome. Move compatibility handling into the track-resolution driver/usecase/adapter boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 34,
+              "message": "Lexically resolving `..` with `PathBuf::pop()` can retarget persistence. For example, if `/repo-a/link` points to `/repo-b/subdir`, the legacy path `/repo-a/link/../track/items` resolves through the filesystem to `/repo-b/track/items`, while this macro rewrites it to `/repo-a/track/items`. Snapshot or restore can consequently operate on the wrong repository. Preserve filesystem path semantics rather than lexically collapsing parent components.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:daece30d6108d1370741ac1775344700141d572fbb59abeedd1c038ce9bd4417",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:32:08Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 18,
+              "message": "`normalize_items_dir!` performs branching path-resolution logic and direct filesystem I/O (`std::fs::canonicalize`) in the bin. This violates the thin-bin policy and the briefing’s explicit instruction not to reintroduce `normalize_items_dir`; compatibility validation belongs in `TrackItemsDirectoryInput` or the resolution adapter.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 27,
+              "message": "Canonicalizing before validating changes the accepted CLI contract. For example, an existing `track/tmp/../items` path was rejected by the legacy helper because it was not lexically `<project-root>/track/items`, but canonicalization rewrites it to that directory and allows snapshot/restore to proceed. It also rewrites paths shown in failure diagnostics. This changes arguments, stderr, exit behavior, and potentially persistence contrary to CN-01.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:63291ed97d742dfd1f3f03b0cf50ea411a9f506dc7ef430f2503e71b64464c8f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:36:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42761f0c3eb70150454c2e9912ce41a2ef8876a1a8b3df2d4d5e7fb520911864",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
     "cli_composition": {
       "rounds": [
         {
@@ -54,6 +138,90 @@
           "at": "2026-08-16T13:02:10Z",
           "findings": [],
           "hash": "rvw1:sha256:69f57d9bb8a21bf500ac8588122568e34ba9d473258c33d653e10ea1f9dee2cd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T01:51:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3956a629a97ad9af93a75c104e3e9e4f0afda2434581ce55688d58bb8ff695bf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:11:26Z",
+          "findings": [
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/review_v2/helpers.rs",
+              "line": 81,
+              "message": "`ReviewCompositionRoot::review_run_codex` and the other review entry points reach this helper, which calls `TrackResolutionDriver::resolve`; that method executes `TrackResolutionService::execute`. This leaves application-flow invocation inside `cli_composition`. The CLI caller should obtain the wired driver from `TrackCompositionRoot` and invoke it outside the composition layer.",
+              "severity": "P1"
+            },
+            {
+              "category": "render leak",
+              "file": "apps/cli-composition/src/review_v2/helpers.rs",
+              "line": 53,
+              "message": "The migrated helper constructs user-facing diagnostics (`invalid --track-id` here and `current workspace has no active track` below) and translates `TrackResolutionOutcome` into command-facing errors. Diagnostic rendering/mapping belongs in `cli_driver` or the CLI boundary; `cli_composition` should only wire and return the driver.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3956a629a97ad9af93a75c104e3e9e4f0afda2434581ce55688d58bb8ff695bf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:30:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3956a629a97ad9af93a75c104e3e9e4f0afda2434581ce55688d58bb8ff695bf",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-17T01:51:27Z",
+          "findings": [
+            {
+              "category": "boundary_contract",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 154,
+              "message": "`TrackResolutionDriver::resolve` is a public primary-adapter operation but returns `TrackResolutionOutcome` instead of `CommandOutcome`. This leaves error rendering and exit-code signaling to callers, contrary to the cli_driver boundary contract; map failures to `CommandOutcome.stderr` and return the rendered outcome from the driver.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6557eb3579d8e061e66f941eee15f6d053a964c44f79961dcf0e04027210f303",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:06:29Z",
+          "findings": [
+            {
+              "category": "boundary_contract",
+              "file": "apps/cli-driver/src/track_resolution.rs",
+              "line": 154,
+              "message": "`TrackResolutionDriver::resolve` is a public primary-adapter operation but returns `TrackResolutionOutcome` instead of `CommandOutcome`. Errors therefore remain unrendered and exit-code signaling is delegated to callers, violating the cli_driver boundary contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6557eb3579d8e061e66f941eee15f6d053a964c44f79961dcf0e04027210f303",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:30:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6557eb3579d8e061e66f941eee15f6d053a964c44f79961dcf0e04027210f303",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:42:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6557eb3579d8e061e66f941eee15f6d053a964c44f79961dcf0e04027210f303",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -504,6 +672,20 @@
           "hash": "rvw1:sha256:ea15bca8748afc1608dfafa7f6618c6eabdcfd155d43097f7eca1ed6c7d15483",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T01:40:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:60a09dc251cce55623d12631293f0f5fdf88ebcb8482aca16fb7b4cc82f9ee44",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T01:52:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:60a09dc251cce55623d12631293f0f5fdf88ebcb8482aca16fb7b4cc82f9ee44",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -748,6 +930,71 @@
           "hash": "rvw1:sha256:f6c0898335c10ac19e18afb94e92b0aff2904e5d5108e3bfb35d36c7dd301a9a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T01:52:24Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/track_lifecycle/resolution_compat.rs",
+              "line": 82,
+              "message": "Write/read resolution uses `SystemGitRepo::discover_from`, which honors ambient `GIT_DIR`; a caller can therefore resolve the branch from a different repository than the supplied workspace root, allowing the write guard to validate the wrong repository. Use the isolated discovery path for this gate-relevant adapter.",
+              "severity": "P0"
+            },
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/track_lifecycle/resolution_compat.rs",
+              "line": 131,
+              "message": "`InvalidTrackId` is converted to `Inactive`, silently treating a malformed `track/*` branch as “no active track.” This diverges from the existing fail-closed detection behavior, which only treats detached/no/non-track branches as inactive; malformed track branches should remain an unavailable/error outcome.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:10831fc8a4b57138e39afe9542a8ec546c3c3962d2bfa10d0b13f05af7c736e9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:02:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3ade0e03cfbc83b6cafb6361bea588f355d1d9699480fe4312a9e30aa65cf0e7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:11:11Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/track_lifecycle/resolution_compat.rs",
+              "line": 83,
+              "message": "`discover_from_isolated` clears repository-selecting environment variables only during discovery. `ActiveTrackResolveInteractor` subsequently calls `SystemGitRepo::current_branch()`, which starts a new git process inheriting `GIT_DIR`, `GIT_WORK_TREE`, and related variables. Consequently, `WriteFrom*` can validate an explicit track ID against a different repository's branch before callers write under the supplied workspace. Keep repository isolation in force for the branch read and add an environment-redirection regression test.",
+              "severity": "P0"
+            },
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/track_lifecycle/resolution_compat.rs",
+              "line": 83,
+              "message": "The adapter passes the caller-supplied workspace path directly to git without rejecting symlink components. For `WriteFromItems` and `WriteFromRoot`, the branch guard can therefore inspect a symlink target, and a retargeted link can make subsequent persistence operate on another tree. Apply the existing fail-closed real-file pattern (`reject_symlinks_up_to_root`/`discover_isolated_repo_for_items_dir`) before discovery and cover symlinked roots in tests, consistent with the symlink-rejection tests in `scope_config_loader.rs`.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:742b1b64b26492762572fcc2f0a429469a5a4d5ba65c667cf3f5473a70ef1467",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:26:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:22f696c83d488d3cd9ac4cafd2f97741c23b6bfe4087cf6a85e9b6e73cbdc6fe",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:30:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:10be56be501e91f8e9c102959cc9328fa7ae28619ea62441130432396eab9991",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -814,6 +1061,72 @@
           "at": "2026-08-16T18:47:41Z",
           "findings": [],
           "hash": "rvw1:sha256:5d79520a7dc2645cb67812abc2f7272900dcacb3c7466d20127c72792f1a40cc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T01:40:32Z",
+          "findings": [
+            {
+              "category": "test-obligation-gate",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 43,
+              "message": "The new TrackResolutionDriver × CN-01 voluntary binding at line 43 does not pass the deterministic obligation check: `bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` reports two `TestChanged` drifts because bound test bodies changed since their cached verdicts were frozen. Refresh/re-evaluate the obligation cache before accepting this binding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4a5eee39e2db968ec3d91fe44c783a2d579ea9da017ad966981a35a0a172785d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T01:50:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:efca18d9187252ec2e58112be630093e6fe6a472fba0d93d2bc1ee20c89d5f9e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:13:10Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 33,
+              "message": "The SystemTrackResolutionAdapter fulfillment binds only the ReadFromItems/Active happy-path test. Because this obligation covers both IN-04 and CN-01 without edge-specific waivers, that single assertion marks the entire adapter contract fulfilled while write guarding, inactive detection, and error behavior remain absent from the binding. Bind the existing write/detect/error tests and resolve CN-01 with appropriate edge-local evidence or a valid waiver.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 42,
+              "message": "The TrackResolutionDriver × IN-04 binding covers only Resolved and service-error outcomes. It omits the existing inactive-result and five-variant command-routing tests, so the central migrated driver behavior can pass the obligation gate without evidence for Inactive or four input-routing branches. Add those existing tests to this edge binding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:efca18d9187252ec2e58112be630093e6fe6a472fba0d93d2bc1ee20c89d5f9e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:22:12Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 33,
+              "message": "The SystemTrackResolutionAdapter fulfillment omits three current contract regressions: `test_system_track_resolution_adapter_write_guard_ignores_ambient_repository_selection`, `test_system_track_resolution_adapter_write_from_root_rejects_symlinked_workspace_root`, and `test_system_track_resolution_adapter_write_from_items_rejects_symlinked_items_path`. Consequently, the obligation gate does not protect the adapter’s repository-isolation and symlink-rejection behavior even though the adjacent waiver claims its write-guard and error behavior is bound by infrastructure tests. Add these tests to the fulfillment record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:79d65b7efdd579e471973ceef9452ad2022f73880842a2062c3d1c435424d05f",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T02:25:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9c62ed0d3f8e63bdf45170beb182e79e8c93222e4e254bccfd0d18fc20d019f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1359,6 +1672,20 @@
           "hash": "rvw1:sha256:3961aa238335c79fa91135a2c0dda8aa5e1feabcb7eeb72a57d83505e471bf1e",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T01:51:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:57365e052a746f2e90e144b3f2580780c1f436e113310fe0afb8deb2558b8421",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:11:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:57365e052a746f2e90e144b3f2580780c1f436e113310fe0afb8deb2558b8421",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1513,6 +1840,20 @@
           "at": "2026-08-16T18:27:01Z",
           "findings": [],
           "hash": "rvw1:sha256:5f4bcb872ed92eafb225f6162dce16a3053a0c5af1851ad17eb40e6e18e354a9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T01:52:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:11c0da03c4ee568f21a183e269977f1a843ef4c1c359fe9ce9ab61a4fb6b189b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T02:09:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:11c0da03c4ee568f21a183e269977f1a843ef4c1c359fe9ce9ab61a4fb6b189b",
           "type": "final",
           "verdict": "zero_findings"
         }

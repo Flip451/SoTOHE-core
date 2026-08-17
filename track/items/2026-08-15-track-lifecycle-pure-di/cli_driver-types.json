@@ -300,8 +300,88 @@
       "trait_ref": "core::fmt::Display"
     },
     {
+      "for_type": "TrackItemsDirectoryInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackItemsDirectoryInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackItemsDirectoryInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackItemsDirectoryInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackResolutionDiagnostic",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackResolutionDiagnostic",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackResolutionDiagnostic",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackResolutionDiagnostic",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
       "for_type": "TrackResolutionDiagnostic",
       "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TrackResolutionDriver",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackResolutionInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackResolutionInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackResolutionInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackResolutionInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackResolutionOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackResolutionOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackResolutionOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackWorkspaceRootInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackWorkspaceRootInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackWorkspaceRootInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackWorkspaceRootInput",
+      "trait_ref": "core::cmp::PartialEq"
     }
   ],
   "traits": {},

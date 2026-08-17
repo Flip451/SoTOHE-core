@@ -3,6 +3,414 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "07aef29fe916d84eab14898822277c9a7e013e753420794c7442cb312b683922",
+        "waived_reason_hash": "15ff7b06860d9f35756c4f826d5d7c06f07d50096e9d9aa25c15b1f8ef6fda3d"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: Interactor, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"resolution_compat\")]), docs: Some(DocString(\"TrackResolutionInteractor command-context interactor.\")), spec_refs: [SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"IN-04\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"CN-01\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionPort"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "c3413b431cb0773d676fe4ec4dc194a8d6ec60a6f849a7ec2051a61d790e65ad",
+        "waived_reason_hash": "7520d41ea0eab4b3c09a6093c121947f98784b51411ea9bbe958fc5afaf2a7f8"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionPort"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "declaration_hash": "c3413b431cb0773d676fe4ec4dc194a8d6ec60a6f849a7ec2051a61d790e65ad",
+        "waived_reason_hash": "a50c8dd5b9250ed1f9942e44f90b1bb38311d661d930e161fa28acb1e3354d6a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "Synchronous Track Resolution secondary port; adapter-owned blocking I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionService"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "7d5c02d69cb6c40cc04117f30f6a439d1666f2f836d7850e33690061be5930a1",
+        "waived_reason_hash": "6ce1262b5527fe9b0295bee20287339fa14e5b21cf0bf6078e7350cc525d76fd"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "Synchronous Track Resolution application-service input port; secondary-adapter-owned blocking I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "SystemTrackResolutionAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "392c272acb2252239f8113ed3a535caa60e1ae19b62b26dcd1492e94281c756e",
+        "waived_reason_hash": "1626dc318bf5cf6d63acfa23745cd0a6c88f5758c70272981ae7b593d31d6e45"
+      },
+      "obligation_id": {
+        "entry_key": "SystemTrackResolutionAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::resolution_compat::TrackResolutionPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "declaration_hash": "53b8fa1aeec9edec0884aa1a9968b74ac6c1634dfa7e7b5b361bee9098c39645",
+        "waived_reason_hash": "db82779d882289f2ddc1aa52b3f7e8115a76246e3683244d01c851af55827c65"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionCommand",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"ReadFromItems\"))",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "53b8fa1aeec9edec0884aa1a9968b74ac6c1634dfa7e7b5b361bee9098c39645",
+        "waived_reason_hash": "8a1ba966e61fd4ecca403155a3ce7c4985962514191eed52aaea0245efbd3445"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: Command, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"ReadFromItems\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track\")), ty: TypeRef(\"TrackSelection\") }, FieldDecl { name: FieldName(Identifier(\"items_dir\")), ty: TypeRef(\"TrackItemsDirectory\") }]) }, VariantDecl { name: VariantName(Identifier(\"ReadFromRoot\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track\")), ty: TypeRef(\"TrackSelection\") }, FieldDecl { name: FieldName(Identifier(\"workspace_root\")), ty: TypeRef(\"TrackWorkspaceRoot\") }]) }, VariantDecl { name: VariantName(Identifier(\"WriteFromItems\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track\")), ty: TypeRef(\"TrackSelection\") }, FieldDecl { name: FieldName(Identifier(\"items_dir\")), ty: TypeRef(\"TrackItemsDirectory\") }]) }, VariantDecl { name: VariantName(Identifier(\"WriteFromRoot\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track\")), ty: TypeRef(\"TrackSelection\") }, FieldDecl { name: FieldName(Identifier(\"workspace_root\")), ty: TypeRef(\"TrackWorkspaceRoot\") }]) }, VariantDecl { name: VariantName(Identifier(\"DetectActive\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"workspace_root\")), ty: TypeRef(\"TrackWorkspaceRoot\") }]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"resolution_compat\")]), docs: Some(DocString(\"TrackResolutionCommand typed application command.\")), spec_refs: [SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"IN-04\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"CN-03\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionCompatError"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "declaration_hash": "01200b836425163b6cb9f31e7b0c1aa1b8de117be501c68236d9a7c2b56c617e",
+        "waived_reason_hash": "de59b81db565ab7311294e2ade4a8ce654c9eb63717eca212f1d7973820e215c"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionCompatError",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Unavailable\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }]",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionCompatError"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "01200b836425163b6cb9f31e7b0c1aa1b8de117be501c68236d9a7c2b56c617e",
+        "waived_reason_hash": "a516cbd8d0989482e95d4b2bb84f8910f5b4fa2b2a5e5cb5dea143e227821951"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionCompatError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Track command contexts と旧 resolution helper を利用する対象外 context の call site\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionResult"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "1ec6bfe109033d3ad93e29c9b083b84760611a9118691540895d420c1172ec9d",
+        "waived_reason_hash": "9f44ed6320996efa610014c1c662dc8917c75721347c3da071d424440476bdc9"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionResult",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionDiagnostic"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "declaration_hash": "76267dd0aeafce49b9bc18938ab67b5992575c59654aa542f1bfae2184f8238b",
+        "waived_reason_hash": "dd51b8d62a37ecc78e89d897b1b8dc9484c14dd00749962e276091cc0ca84e73"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionDiagnostic",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackResolutionDiagnostic user-safe diagnostic DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionDiagnostic"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "76267dd0aeafce49b9bc18938ab67b5992575c59654aa542f1bfae2184f8238b",
+        "waived_reason_hash": "f317c8f45788336204dcc08bb0ccfa0dd6b5ce14448cb05d09475aefd2467dab"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionDiagnostic",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackResolutionDiagnostic user-safe diagnostic DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionDriver"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "40900bc422a1e783d56e4b1c46106f57cd23a4c309dbc3b30be8b001abb6f900",
+        "waived_reason_hash": "25c1bb742b43a0d2de7e3db8803cdb7b7ca1710946198cc71959b47494d31983"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionDriver",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionInput"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "declaration_hash": "54b937a43584d2a6673c4d11e76401935385c425938ee5c3ee6c3c3e25556c08",
+        "waived_reason_hash": "8c516ec277a2a3a906c982d49b9fd5ec5be71ad7e42f36a66d1c572341ccf83c"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionInput",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: [], generics: [], where_predicates: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionInput"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "54b937a43584d2a6673c4d11e76401935385c425938ee5c3ee6c3c3e25556c08",
+        "waived_reason_hash": "cc4851b754f533da8512bd8323321a45dc7a513a6281418818520d051830d820"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "declaration_hash": "76f3bef3be37431a1ab0e807d7238b757158a3d1c7f09cd7c2d232b8020a993c",
+        "waived_reason_hash": "163866df9f06f76580adb66d5e477132b84bf740b6d175c97e2f89a33e6551ab"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionOutcome",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Enum",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "76f3bef3be37431a1ab0e807d7238b757158a3d1c7f09cd7c2d232b8020a993c",
+        "waived_reason_hash": "92d8515c0e4ced6fe2a2eba254590a3221be99e8e341b531fdbf56ff8b761906"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionOutcome",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackResolutionOutcome primary-adapter outcome DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "AC-03",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },

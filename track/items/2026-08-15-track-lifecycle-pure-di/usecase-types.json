@@ -1778,8 +1778,28 @@
       "trait_ref": "TrackCatalogueLintActiveService"
     },
     {
+      "for_type": "TrackResolutionCommand",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackResolutionCommand",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackResolutionCommand",
+      "trait_ref": "Eq"
+    },
+    {
       "for_type": "TrackResolutionCompatError",
       "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackResolutionCompatError",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackResolutionCompatError",
+      "trait_ref": "Eq"
     },
     {
       "for_type": "TrackResolutionCompatError",
@@ -1788,6 +1808,18 @@
     {
       "for_type": "TrackResolutionCompatError",
       "trait_ref": "std::error::Error"
+    },
+    {
+      "for_type": "TrackResolutionResult",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackResolutionResult",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackResolutionResult",
+      "trait_ref": "Eq"
     },
     {
       "for_type": "TrackResolutionInteractor",

@@ -687,6 +687,231 @@
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_track_resolution_interactor_forwards_command_and_result"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "bound_tests_set_hash": "df61ef7af3adc8587d3093f5628c91280fe700030d85e5339b288e04421f6729",
+        "declaration_hash": "07aef29fe916d84eab14898822277c9a7e013e753420794c7442cb312b683922"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(result, Ok(TrackResolutionResult::Inactive));\n        assert_eq!(port.commands.lock().unwrap().len(), 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_track_resolution_interactor_forwards_command_and_result"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionService"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "bound_tests_set_hash": "df61ef7af3adc8587d3093f5628c91280fe700030d85e5339b288e04421f6729",
+        "declaration_hash": "7d5c02d69cb6c40cc04117f30f6a439d1666f2f836d7850e33690061be5930a1"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "assert_eq!(result, Ok(TrackResolutionResult::Inactive));\n        assert_eq!(port.commands.lock().unwrap().len(), 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_read_resolves_track_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_detect_active_on_main_returns_inactive"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_detect_active_invalid_track_branch_returns_unavailable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_write_mismatch_returns_branch_diagnostic"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_write_guard_ignores_ambient_repository_selection"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_write_from_root_rejects_symlinked_workspace_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_write_from_items_rejects_symlinked_items_path"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_missing_repository_returns_diagnostic"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "SystemTrackResolutionAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "bound_tests_set_hash": "d1eb4b5bf19361ab594e0a851ebc42ec7140ff2141630e806dcd0d4f270364d0",
+        "declaration_hash": "392c272acb2252239f8113ed3a535caa60e1ae19b62b26dcd1492e94281c756e"
+      },
+      "obligation_id": {
+        "entry_key": "SystemTrackResolutionAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::resolution_compat::TrackResolutionPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "let result = SystemTrackResolutionAdapter.execute(TrackResolutionCommand::ReadFromItems {\n    track: TrackSelection::Active,\n    items_dir: items(root.path()),\n});\n\nassert_eq!(\n    result,\n    Ok(TrackResolutionResult::Resolved(TrackId::try_new(\"compat-track\").unwrap()))\n);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_track_resolution_interactor_forwards_command_and_result"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_read_resolves_track_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_detect_active_on_main_returns_inactive"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_resolved_result"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_inactive_result"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionResult"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "bound_tests_set_hash": "7281df04e8163753db48c9fe407e0df7fe9e8bb84fe11fbc340a70946251c0d0",
+        "declaration_hash": "1ec6bfe109033d3ad93e29c9b083b84760611a9118691540895d420c1172ec9d"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionResult",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(result, Ok(TrackResolutionResult::Resolved(TrackId::try_new(\"compat-track\").unwrap())))",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_resolved_result"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_inactive_result"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_service_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_input_variants_route_matching_commands"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionDriver"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "bound_tests_set_hash": "bce2742f68bc44fbebe0fc851e3334f097340fba7e8f8250e8a4c246f804ab0b",
+        "declaration_hash": "40900bc422a1e783d56e4b1c46106f57cd23a4c309dbc3b30be8b001abb6f900"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionDriver",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(commands.first(), Some(TrackResolutionCommand::ReadFromItems { .. })));\n        assert!(matches!(commands.get(1), Some(TrackResolutionCommand::ReadFromRoot { .. })));\n        assert!(matches!(commands.get(2), Some(TrackResolutionCommand::WriteFromItems { .. })));\n        assert!(matches!(commands.get(3), Some(TrackResolutionCommand::WriteFromRoot { .. })));\n        assert!(matches!(commands.get(4), Some(TrackResolutionCommand::DetectActive { .. })));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ],
   "track_id": "2026-08-15-track-lifecycle-pure-di"

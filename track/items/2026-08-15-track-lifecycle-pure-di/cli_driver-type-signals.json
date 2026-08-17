@@ -1,8 +1,8 @@
 {
-  "baseline_hash": "c8c8880e1cf15e2c114cfbdb4e07ef9b61a0efb112e08fe859180b6872a72694",
-  "declaration_hash": "010e5d56a1a3a4f4cc959be4bcb9509c99f50599c926ba8ab311aa8db02af009",
-  "generated_at": "2026-08-16T23:32:25Z",
-  "head_commit": "a81e5c102541b68cf3fc80a4b2937c2335362e46",
+  "baseline_hash": "41113f2dbbd1778473992d003e8ee985df3cd929d6c50cfadab2e4d61ba762bd",
+  "declaration_hash": "2c9f6fcefe9ec1282bfc82cc1022a41eff0d5d1bed46bed40dafd2167ff58a36",
+  "generated_at": "2026-08-17T02:46:55Z",
+  "head_commit": "05298cd6ed086a66f945e83e36267ef533549304",
   "schema_version": 4,
   "signals": [
     {
@@ -12,9 +12,15 @@
       "type_name": "TrackDriver"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackItemsDirectoryInput"
     },
     {
@@ -36,30 +42,48 @@
       "type_name": "TrackLintRulesFileInput"
     },
     {
-      "found_type": false,
-      "kind_tag": "dto",
-      "missing_items": [
-        "Display"
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
       "type_name": "TrackResolutionDiagnostic"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug"
+      ],
+      "found_type": true,
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolutionDriver"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolutionInput"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolutionOutcome"
     },
     {
@@ -159,7 +183,13 @@
       "type_name": "TrackTypeGraphEdgeInput"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
       "signal": "yellow",
       "type_name": "TrackWorkspaceRootInput"

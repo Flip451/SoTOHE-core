@@ -41,6 +41,7 @@ pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track;
+pub mod track_resolution;
 pub mod verify;
 
 pub use render::CommandOutcome;

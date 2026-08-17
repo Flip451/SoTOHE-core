@@ -38,6 +38,20 @@ impl TrackCompositionRoot {
     pub fn track_driver(&self) -> cli_driver::track::TrackDriver {
         build_track_driver()
     }
+
+    /// Build the compatibility resolution driver used by foreign command
+    /// contexts while the legacy resolution wrappers remain in place.
+    pub fn track_resolution_driver(&self) -> cli_driver::track_resolution::TrackResolutionDriver {
+        use std::sync::Arc;
+
+        let adapter = Arc::new(
+            infrastructure::track_lifecycle::resolution_compat::SystemTrackResolutionAdapter,
+        );
+        let service = Arc::new(
+            usecase::track_lifecycle::resolution_compat::TrackResolutionInteractor::new(adapter),
+        );
+        cli_driver::track_resolution::TrackResolutionDriver::new(service)
+    }
 }
 
 pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {

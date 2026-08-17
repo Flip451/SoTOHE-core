@@ -65,6 +65,7 @@ pub mod template_export;
 pub mod test_obligation;
 pub mod track;
 pub(crate) mod track_artifact;
+pub mod track_lifecycle;
 mod trusted_file;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
