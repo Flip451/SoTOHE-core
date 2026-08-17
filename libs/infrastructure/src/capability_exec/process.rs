@@ -895,6 +895,26 @@ mod tests {
     }
 
     #[test]
+    fn test_grok_pretty_printed_camel_case_structured_output_is_collected()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let stdout = br#"{
+  "text": "{\"result\": \"OK\"}",
+  "sessionId": "grok-session",
+  "structuredOutput": {
+    "result": "OK"
+  }
+}
+"#;
+        let collected = collect_provider_output(Cursor::new(stdout.as_slice()), &provider)?;
+        assert_eq!(collected.session_id.as_deref(), Some("grok-session"));
+        let message = collected.final_message.ok_or("envelope")?;
+        let envelope: crate::grok_common::GrokOutputEnvelope = serde_json::from_slice(&message)?;
+        assert_eq!(envelope.into_structured_output()?, serde_json::json!({"result": "OK"}),);
+        Ok(())
+    }
+
+    #[test]
     fn test_grok_json_envelope_above_session_event_limit_is_retained()
     -> Result<(), Box<dyn std::error::Error>> {
         let provider = ProviderName::try_new("grok".to_owned())?;

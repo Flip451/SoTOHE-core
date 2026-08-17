@@ -16,7 +16,7 @@
 
 use crate::plan_ref::SpecRef;
 use crate::tddd::catalogue_v2::identifiers::{DocString, MethodName, ParamName, TypeRef};
-use crate::tddd::catalogue_v2::roles::SelfReceiver;
+use crate::tddd::catalogue_v2::roles::{ItemAction, SelfReceiver};
 
 // ---------------------------------------------------------------------------
 // MethodGenericParam — a single generic type parameter on a method (V2)
@@ -226,6 +226,8 @@ pub struct MethodDeclaration {
     /// The containing entry retains the complete entry-level catalogue while this
     /// collection records only the anchors owned by the method.
     pub(crate) spec_refs: Vec<SpecRef>,
+    /// TDDD action for this method. Independent of the parent entry action.
+    pub(crate) action: ItemAction,
 }
 
 impl MethodDeclaration {
@@ -242,6 +244,7 @@ impl MethodDeclaration {
         generics: Vec<MethodGenericParam>,
         where_predicates: Vec<WherePredicateDecl>,
         spec_refs: Vec<SpecRef>,
+        action: ItemAction,
         docs: Option<DocString>,
     ) -> Self {
         Self {
@@ -255,6 +258,7 @@ impl MethodDeclaration {
             where_predicates,
             docs,
             spec_refs,
+            action,
         }
     }
 
@@ -276,6 +280,7 @@ impl MethodDeclaration {
             where_predicates: vec![],
             docs: None,
             spec_refs: vec![],
+            action: ItemAction::Add,
         }
     }
 
@@ -331,6 +336,12 @@ impl MethodDeclaration {
     #[must_use]
     pub fn spec_refs(&self) -> &[SpecRef] {
         &self.spec_refs
+    }
+
+    /// Returns this method's TDDD action.
+    #[must_use]
+    pub fn action(&self) -> ItemAction {
+        self.action
     }
 
     /// Returns the optional method documentation.
@@ -521,6 +532,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert_eq!(decl.name, name);
@@ -545,6 +557,17 @@ mod tests {
     }
 
     #[test]
+    fn test_method_declaration_associated_function_defaults_action_to_add() {
+        let decl = MethodDeclaration::associated_function(
+            MethodName::new("new").unwrap(),
+            vec![],
+            TypeRef::new("Self").unwrap(),
+        );
+
+        assert_eq!(decl.action(), ItemAction::Add);
+    }
+
+    #[test]
     fn test_method_declaration_with_owned_receiver() {
         let name = MethodName::new("consume").unwrap();
         let returns = TypeRef::new("()").unwrap();
@@ -558,6 +581,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert_eq!(decl.receiver, Some(SelfReceiver::Owned));
@@ -581,6 +605,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert_eq!(decl.receiver, Some(SelfReceiver::ExclusiveRef));
@@ -601,6 +626,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             Some(DocString::new("Execute the use case.".to_string())),
         );
         assert!(decl.is_async);
@@ -627,6 +653,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert_eq!(decl.params.len(), 2);
@@ -648,6 +675,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let b = MethodDeclaration::new(
@@ -660,6 +688,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert_eq!(a, b);
@@ -696,6 +725,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert!(decl.generics.is_empty());
@@ -715,6 +745,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert!(
@@ -767,6 +798,7 @@ mod tests {
             generics.clone(),
             where_predicates.clone(),
             vec![spec_ref.clone()],
+            ItemAction::Add,
             Some(docs.clone()),
         );
 
@@ -779,7 +811,27 @@ mod tests {
         assert_eq!(decl.generics(), generics.as_slice());
         assert_eq!(decl.where_predicates(), where_predicates.as_slice());
         assert_eq!(decl.spec_refs(), &[spec_ref]);
+        assert_eq!(decl.action(), ItemAction::Add);
         assert_eq!(decl.docs(), Some(&docs));
+    }
+
+    #[test]
+    fn test_method_declaration_new_preserves_independent_action() {
+        let decl = MethodDeclaration::new(
+            MethodName::new("save").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Modify,
+            None,
+        );
+        assert_eq!(decl.action(), ItemAction::Modify);
+        assert_ne!(decl.action(), ItemAction::Add);
     }
 
     #[test]
@@ -803,6 +855,7 @@ mod tests {
             vec![],
             vec![],
             vec![load_ref.clone()],
+            ItemAction::Add,
             None,
         );
         let save = MethodDeclaration::new(
@@ -815,6 +868,7 @@ mod tests {
             vec![],
             vec![],
             vec![save_ref.clone()],
+            ItemAction::Add,
             None,
         );
 
@@ -835,6 +889,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -853,6 +908,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -915,6 +971,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert!(decl.has_default_impl);
@@ -934,6 +991,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let mut provided_method = abstract_method.clone();
@@ -958,6 +1016,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let owned = MethodDeclaration::new(
@@ -970,6 +1029,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert_ne!(associated, owned);
@@ -1084,6 +1144,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         assert!(decl.where_predicates.is_empty());
@@ -1143,6 +1204,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let mut constrained = unconstrained.clone();

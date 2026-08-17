@@ -1,6 +1,7 @@
 ---
 name: type-designer
 sandbox: workspace-write
+grok-sandbox: workspace
 description: Use when Codex is assigned the SoTOHE Phase 2 type-designer capability. Produces per-layer TDDD type catalogues via the generate + annotate workflow (`sotp catalog`) from the spec, ADRs, baselines, and type-design conventions, then verifies type and catalogue-spec signals.
 ---
 

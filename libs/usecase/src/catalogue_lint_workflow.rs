@@ -734,6 +734,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         )
     }

@@ -2905,6 +2905,109 @@ mod tests {
 
         let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, decoded);
+        assert_eq!(entry.methods()[0].action(), ItemAction::Add);
+    }
+
+    #[test]
+    fn test_method_action_omitted_decodes_as_add() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "LegacyPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Value"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let method =
+            &doc.traits().get(&TraitName::new("LegacyPort").unwrap()).unwrap().methods()[0];
+        assert_eq!(method.action(), ItemAction::Add);
+    }
+
+    #[test]
+    fn test_method_action_round_trip_independent_of_entry_action() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "ApplicationService": {
+      "action": "modify",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "save",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "action": "reference"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.traits().values().next().unwrap();
+        assert_eq!(entry.action(), ItemAction::Modify);
+        assert_eq!(entry.methods()[0].action(), ItemAction::Reference);
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let encoded_json = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();
+        assert_eq!(encoded_json["traits"]["ApplicationService"]["action"], "modify");
+        assert_eq!(
+            encoded_json["traits"]["ApplicationService"]["methods"][0]["action"],
+            "reference"
+        );
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, decoded);
+    }
+
+    #[test]
+    fn test_method_action_invalid_value_returns_decode_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "LegacyPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Value",
+          "action": "archive"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "invalid method action must fail closed: {result:?}"
+        );
     }
 
     #[test]

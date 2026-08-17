@@ -7,7 +7,7 @@
 //! exhaustive per-axis `match` in the domain preserves hexagonal purity: the
 //! role → item mapping is a domain rule, not application plumbing.
 
-use crate::tddd::catalogue_v2::roles::DataRole;
+use crate::tddd::catalogue_v2::roles::{DataRole, ItemAction};
 use crate::tddd::catalogue_v2::{TraitEntry, TypeEntry, TypeKindV2, TypeRef};
 use crate::tddd::test_obligation::ids::TestObligationItemIdentifier;
 use crate::tddd::test_obligation::vocab::TestObligationPerAxis;
@@ -34,9 +34,12 @@ impl RoleObligationItemsProjector {
     ) -> Vec<TestObligationItemIdentifier> {
         let raw = match per_axis {
             TestObligationPerAxis::Invariant => invariant_items(entry.role()),
-            TestObligationPerAxis::Method => {
-                entry.methods().iter().map(|m| format!("method:{}", m.name.as_str())).collect()
-            }
+            TestObligationPerAxis::Method => entry
+                .methods()
+                .iter()
+                .filter(|method| is_derivable_method(method.action()))
+                .map(|m| format!("method:{}", m.name.as_str()))
+                .collect(),
             TestObligationPerAxis::Handles => handles_items(entry.role()),
             TestObligationPerAxis::ReactsTo => reacts_to_items(entry.role()),
             TestObligationPerAxis::Emits => emits_items(entry.role()),
@@ -58,6 +61,7 @@ impl RoleObligationItemsProjector {
             TestObligationPerAxis::Method | TestObligationPerAxis::TraitMethod => entry
                 .methods()
                 .iter()
+                .filter(|method| is_derivable_method(method.action()))
                 .map(|m| format!("{}:{}", per_axis.as_kebab(), m.name.as_str()))
                 .collect(),
             TestObligationPerAxis::Entry => vec!["entry".to_owned()],
@@ -115,6 +119,10 @@ impl RoleObligationItemsProjector {
     pub fn type_has_typestate(&self, entry: &TypeEntry) -> bool {
         matches!(entry.kind(), TypeKindV2::Struct(sk) if sk.typestate.is_some())
     }
+}
+
+fn is_derivable_method(action: ItemAction) -> bool {
+    matches!(action, ItemAction::Add | ItemAction::Modify)
 }
 
 /// Wraps raw item strings into validated identifiers.
@@ -236,6 +244,22 @@ mod tests {
         TypeKindV2::Struct(StructKind::new(StructShape::Unit, None))
     }
 
+    fn method(name: &str, action: ItemAction) -> MethodDeclaration {
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            action,
+            None,
+        )
+    }
+
     #[test]
     fn data_role_items_enumerates_invariants() {
         // IN-05 / CN-10 / CN-16: one boundary item per declared invariant.
@@ -260,6 +284,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let entry = type_entry(DataRole::domain_service(), plain_struct(), vec![method]);
@@ -425,6 +450,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let port = TraitEntry::new(
@@ -459,5 +485,42 @@ mod tests {
             ),
             vec!["trait_impl:usecase::OrderPort"]
         );
+    }
+
+    #[test]
+    fn contract_role_items_method_axis_omits_non_derivable_methods_by_name() {
+        for (action, name) in [(ItemAction::Reference, "reference"), (ItemAction::Delete, "delete")]
+        {
+            let entry = type_entry(
+                DataRole::domain_service(),
+                plain_struct(),
+                vec![method(name, action), method("save", ItemAction::Add)],
+            );
+            assert_eq!(
+                items_as_str(&projector().data_role_items(&entry, &TestObligationPerAxis::Method)),
+                vec!["method:save"]
+            );
+
+            let port = TraitEntry::new(
+                ItemAction::Add,
+                ContractRole::SecondaryPort,
+                vec![method(name, action), method("save", ItemAction::Add)],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            );
+            assert_eq!(
+                items_as_str(
+                    &projector().contract_role_items(&port, &TestObligationPerAxis::TraitMethod)
+                ),
+                vec!["trait_method:save"]
+            );
+        }
     }
 }

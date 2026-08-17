@@ -1,19 +1,24 @@
 {
-  "catalogue_declaration_hash": "b2c389415bf015bcd5ebf0f283f77e1c317fdf6a4dd21771bd9d0f498932c19d",
+  "catalogue_declaration_hash": "8eccc692807af8f96a5a887eb96a5143049e5550bf3c2e8e6cb3969964c71556",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "entry_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "signal": "blue",
       "type_name": "MethodDeclaration"
     },
     {
-      "entry_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "entry_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "signal": "blue",
       "type_name": "TestObligation"
     },
     {
-      "entry_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "entry_hash": "82bbbe65740b9f0a427bb93fbe94c19ec66ef8321d00da49776c94476f67ae62",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs"
+    },
+    {
+      "entry_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
       "signal": "blue",
       "type_name": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
     }

@@ -547,6 +547,9 @@ pub(super) struct MethodDeclarationDto {
     /// compatibility with catalogues that predate method-level grounding.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub(super) spec_refs: Vec<SpecRefDto>,
+    /// TDDD action for this method. Defaults to `"add"` (same as entry `action`).
+    #[serde(default = "default_action")]
+    pub(super) action: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

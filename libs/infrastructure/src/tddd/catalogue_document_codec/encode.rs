@@ -382,6 +382,7 @@ fn method_decl_to_dto_with_outer_generics(
         where_predicates,
         docs: m.docs().map(|docs| docs.as_str().to_owned()),
         spec_refs: spec_refs_to_dtos(m.spec_refs()),
+        action: m.action().to_string(),
     })
 }
 

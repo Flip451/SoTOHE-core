@@ -2641,6 +2641,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         )
     }
@@ -2675,6 +2676,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         )
     }
@@ -4147,6 +4149,7 @@ mod tests {
                     ("generics", "Vec<MethodGenericParam>"),
                     ("where_predicates", "Vec<WherePredicateDecl>"),
                     ("spec_refs", "Vec<SpecRef>"),
+                    ("action", "ItemAction"),
                     ("docs", "Option<DocString>"),
                 ],
                 "Self",
@@ -4170,6 +4173,7 @@ mod tests {
             method_shared_ref_no_params("generics", "&[MethodGenericParam]"),
             method_shared_ref_no_params("where_predicates", "&[WherePredicateDecl]"),
             method_shared_ref_no_params("spec_refs", "&[SpecRef]"),
+            method_shared_ref_no_params("action", "ItemAction"),
             method_shared_ref_no_params("docs", "Option<&DocString>"),
             method_shared_ref_no_params("signature_string", "String"),
         ];
@@ -4211,7 +4215,7 @@ mod tests {
                 None => panic!("active catalogue fixture must contain MethodDeclaration"),
             };
         assert_eq!(method_entry.action(), ItemAction::Modify);
-        assert_eq!(method_entry.methods().len(), 13);
+        assert_eq!(method_entry.methods().len(), 14);
 
         let mut all_catalogues = BTreeMap::new();
         for layer_name in

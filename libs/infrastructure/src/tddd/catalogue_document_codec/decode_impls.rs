@@ -206,6 +206,8 @@ pub(super) fn method_decl_from_dto_with_outer_generics(
 
     let spec_refs = spec_refs_from_dtos(&dto.spec_refs)
         .map_err(|e| err(format!("invalid {}: {}", e.field, e.reason)))?;
+    let action = ItemAction::from_str(&dto.action)
+        .map_err(|e| err(format!("invalid method action '{}': {e}", dto.action)))?;
     Ok(MethodDeclaration::new(
         name,
         receiver,
@@ -216,6 +218,7 @@ pub(super) fn method_decl_from_dto_with_outer_generics(
         generics,
         where_predicates,
         spec_refs,
+        action,
         dto.docs.map(DocString::new),
     ))
 }
@@ -366,6 +369,7 @@ pub(super) fn function_entry_from_dto(
 #[cfg(test)]
 mod tests {
     use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl};
+    use domain::tddd::catalogue_v2::roles::ItemAction;
     use domain::tddd::catalogue_v2::{
         AssocConstName, MethodDeclaration, MethodName, TypeName, TypeRef,
     };
@@ -383,6 +387,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         ))
     }

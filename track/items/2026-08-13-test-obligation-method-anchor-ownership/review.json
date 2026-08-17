@@ -138,6 +138,34 @@
           "hash": "rvw1:sha256:62c35dee101ed0534ccf7b5df1b34a1893bd6cdc56ddea30c3f65502bd27122b",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:00:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6d228197a5745d658a7efc2742e51f4c3c908f77ff512785980b0a86d1c045",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:02:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6d228197a5745d658a7efc2742e51f4c3c908f77ff512785980b0a86d1c045",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca7dc44714212b100ee42917690b7d4d0387a0bd81ea3f8390a51bdaa05c3548",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:27:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca7dc44714212b100ee42917690b7d4d0387a0bd81ea3f8390a51bdaa05c3548",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -154,6 +182,39 @@
           "at": "2026-08-16T12:58:03Z",
           "findings": [],
           "hash": "rvw1:sha256:7d62d7b704cb6057c1065c0ba780e0e139a337fb04e0e90943f4d575b0d835b0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-17T09:35:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7bbda3d3533c42a829c74b80ba13189b56de5a128350f4f372b5b8867779a55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:41:02Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "apps/cli-composition/src/test_obligation.rs",
+              "line": 545,
+              "message": "The test now copies the active track's `impl-plan.json` without pinning an unfinished task. Once T10–T13 are completed, the copied plan derives `TrackStatus::Done`, so the `InProgress` assertion fails and derive is rejected. This makes the regression test—and eventually CI—depend on the track remaining unfinished. Preserve an active status in the temporary fixture while continuing to use this current-schema catalogue.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d7bbda3d3533c42a829c74b80ba13189b56de5a128350f4f372b5b8867779a55",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:47:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82d9f2e5821e6b0ae0aabc92ed97df1246de006211908a5178ff5f0edbd625c1",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -283,6 +344,85 @@
           "hash": "rvw1:sha256:793b397bc353bdf5e355f1be79fe7f3e37d7fae0f831ede0acd3c4e2f639870d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:45:33Z",
+          "findings": [
+            {
+              "category": "logic correctness",
+              "file": "libs/domain/src/tddd/test_obligation/projection.rs",
+              "line": 64,
+              "message": "Filtering methods here breaks the positional mapping used by the caller: `emit_trait_role_rules` enumerates these returned items, then indexes the original `entry.methods()` by that enumeration index. If a `Reference`/`Delete` method precedes an `Add`/`Modify` method, the obligation for the latter receives the former method's anchors (or wrong fallback anchors), so method-level obligations are mis-grounded. Return the selected method indices/objects or make the caller map by method name.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55a66273398da7781aeb5f44654b92e449ce57465633d4d4b6b6c483eb50172a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:54:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e45d67fcbc0d485f9c1c90f259d08fd2ba1c7a26f1e383984e87aa7f98c5ef4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:02:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d1653e62c280e8f93c732f15cd158d485888af40a5a8cd61286616097e9c4e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:20:16Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 4151,
+              "message": "The test that claims to mirror the active `MethodDeclaration` catalogue surface is stale: `new` omits the new `action: ItemAction` parameter, the method list omits `action()`, and the expected count remains 13. Consequently, this test can pass without applying the catalogue lint rules to the newly added API surface. Add both declarations and update the count to 14.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/test_obligation/projection.rs",
+              "line": 475,
+              "message": "The projector regression test covers only a `Reference` method through `contract_role_items(...TraitMethod)`. It does not exercise `Delete` or the separately changed `data_role_items(...Method)` branch, so regressions that emit obligations for those non-derivable methods would pass. Add table-driven Reference/Delete coverage for both public projection paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5d1653e62c280e8f93c732f15cd158d485888af40a5a8cd61286616097e9c4e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:28:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d30f60410505412c875ba0902b5be118b7a3bd5309d189c6f607892d36d2e4f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:50:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f72d6a18a3a1a4b8edc048a3320adde96a3e41037865bfa57cde6b6c670b5c53",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:55:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f72d6a18a3a1a4b8edc048a3320adde96a3e41037865bfa57cde6b6c670b5c53",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:58:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f72d6a18a3a1a4b8edc048a3320adde96a3e41037865bfa57cde6b6c670b5c53",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -299,6 +439,56 @@
           "at": "2026-08-16T15:16:08Z",
           "findings": [],
           "hash": "rvw1:sha256:fe55ef97d7985d6094904766281108bf779a3e1294c1d16bf394df5971c7214d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:47:24Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 107,
+              "message": "`pr-reviewer` is routed to `provider: grok` with `model: grok-4.6`, but this capability is not a provider-CLI dispatch. `AgentProfiles::resolve_execution` treats `pr-reviewer` as the sole HostedService branch (model/effort are ignored), and `usecase::pr_review::validate_reviewer_provider` admits only `codex` because `/track:pr-review` posts `@codex review` to Codex Cloud. This change fail-closes `pr_trigger_review` / `pr_review_cycle` with \"reviewer provider 'grok' does not support structured output; requires one of: codex\". The new `.agents/skills/pr-reviewer/SKILL.md` cannot make this dispatchable: hosted execution never admits `grok-sandbox`. Keep `pr-reviewer.provider` as `codex` (model/effort are not required) until a non-hosted grok PR-review path exists.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 113,
+              "message": "`ref-verifier-chain1` final is routed to `provider: grok`. The dedicated typed-pipeline runner (`libs/infrastructure/src/ref_verify/process_runner.rs` `run_ref_verifier_agent`) only launches `claude` / `codex` / `gemini` and fail-closes with \"unsupported ref-verifier provider 'grok'\". Fast stays Codex and still works; commit/merge final Chain-1 ref-verify will not. Adding `.agents/skills/ref-verifier-chain1/SKILL.md` `grok-sandbox` does not create a grok launch arm (ADR 2026-08-14-1225 D5 requires the dedicated path). Keep this final provider on `codex` until that arm exists.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 123,
+              "message": "`ref-verifier-chain2` final is routed to `provider: grok`. It uses the same `run_ref_verifier_agent` match as Chain 1 (`claude` / `codex` / `gemini` only) and will fail closed on final catalogue-spec ref-verify with \"unsupported ref-verifier provider 'grok'\". The new `.agents/skills/ref-verifier-chain2/SKILL.md` is not consulted by this runner. Keep this final provider on `codex` until the dedicated path has a grok contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 133,
+              "message": "`obligation-fulfillment-verifier` final is routed to `provider: grok`. Fulfillment verification reuses `make_agent_process_runner` / `run_ref_verifier_agent`, which has no grok arm, so final obligation-fulfillment judgements fail closed with \"unsupported ref-verifier provider 'grok'\". Fast stays Codex. `.agents/skills/obligation-fulfillment-verifier/SKILL.md` cannot admit a launch this runner never performs. Keep this final provider on `codex` until the shared semantic-verifier pipeline has a grok contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 142,
+              "message": "`waiver-verifier` final is routed to `provider: grok`. Waiver verification uses the same shared semantic-verifier runner as fulfillment/ref-verify (`claude` / `codex` / `gemini` only), so final waiver judgements fail closed with \"unsupported ref-verifier provider 'grok'\". Fast stays Codex. `.agents/skills/waiver-verifier/SKILL.md` is unused by this path. Keep this final provider on `codex` until the dedicated runner has a grok contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6921fe840fd5fc9703b8e13baaab40f22246c94d433b870865f04381ecd8d633",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T10:50:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d990bc888d4e123a768f331b6d56ac7ee0a1f43e1377a5c0b20be55c412efed",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -973,6 +1163,290 @@
           "hash": "rvw1:sha256:ade5fd3ad2397096bf0d978c6b54e2b3d91c9929ce1a078b291521a3199cd9ef",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:01:04Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 144,
+              "message": "T10 restates upstream behavior in prose (\"treat omission as add without parent-action inheritance; reject empty or omitted spec_refs...\"). Keep only target + operation + anchor cites per no-upstream-restatement policy.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 153,
+              "message": "T11 restates the behavior contract (\"apply only to command-named catalogues, while unnamed catalogues are neither rewritten nor rejected\"). Replace the prose with target + operation + anchor cites.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 42,
+              "message": "The method-action-reentry plan section repeats the upstream behavior contract (independent action, non-empty refs, and command-only schema application). Reduce it to target + operation + anchor cites.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:263ca25a68aa297b5719692af88c3f60bd3b176dca8fecbf518cc71d75227260",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:04:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f738097dc222d4429a82a058cf2265af7729457f869b6661b7ffe48e13388d14",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:10:44Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 144,
+              "message": "T10 は IN-13 / AC-14 を担当する一方、対象を `libs/domain/src/tddd/` と domain tests に限定しています。しかし `MethodDeclaration.action` の JSON round-trip と省略時 `add` を成立させるには `libs/infrastructure/src/tddd/catalogue_document_codec/` の DTO・decode・encode、および全層の `MethodDeclaration` construction call sites の更新が必要です。T11 もこれらを所有せず、batch-plan の T10 見積りにも infrastructure scope がありません。現状では executor が未宣言の境界を発明しなければ AC-14 を完了できないため、具体的な対象と scope estimates を追加するか専用 task を設けてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 144,
+              "message": "未着手の T10 は、(1) MethodDeclaration の独立 action・default add・親 action 非継承（IN-13 / AC-14）と、(2) Add/Modify method の非空 spec_refs 検証と anchor projection（IN-14 / AC-03 / CN-01）という個別に検証可能な behavior unit を一つに束ねています。schema/codec unit と validation/projection unit に分割し、後者を前者へ依存させたうえで T11 を後続させてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f738097dc222d4429a82a058cf2265af7729457f869b6661b7ffe48e13388d14",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:19:04Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 60,
+              "message": "Task descriptions T10, T12, and T11 restate upstream behavior contracts in prose (for example, defaulting omitted action, non-empty spec_refs enforcement, sibling-substitution behavior, and unnamed-catalogue behavior). Reduce them to target + operation + anchor cites per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 27,
+              "message": "B-10 unnecessarily serializes T11 after B-09. Once T12 runs first within B-09, T11 is dependency-ready; T12 targets domain files while T11 targets usecase selection/derive files, and their per-scope totals (domain 300; usecase 260) fit the 500-line ceiling. Place T11 in B-09 after T12, or provide a concrete ownership/ceiling reason.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2dbefdc47b24b5b8ea04e7d57edf409a251b6ccc515a06f80b38a08e63aef4f7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:23:53Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 77,
+              "message": "`plan.summary` が削除されており、impl-plan SSoT 上の GO-01 / GO-02 からタスクへのトレーサビリティがありません。GO 要素は task-coverage.json ではなく `impl-plan.json` の `plan.summary` で追跡する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fc6326f772769829b50238259c2f6e274bca0dfbd883cb36f19857f954cd1cb0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:26:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc2d48f277e305642d2d5ee8bfd264731e77dc0cb75416319053799d206f95a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:32:39Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 6,
+              "message": "T4 still owns `MethodDeclaration`, but T4 completed before the delta added the current `action` constructor parameter/accessor; the implementation therefore could not have converged with the current catalogue shape at T4 completion. T10 is the correct convergence owner, so remove the T4 attribution.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 31,
+              "message": "AC-03 still maps to T4 even though AC-03 was replaced by the delta: T4 implemented the former allow-empty behavior, while current AC-03 requires rejecting empty `spec_refs` on Add/Modify methods. Retain the current T12/T11 mappings but remove T4 from AC-03.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 38,
+              "message": "AC-14 maps only to T10, whose work stops at the MethodDeclaration schema/codec and constructor migration. AC-14 also requires action-specific obligation-gate behavior; that behavior belongs to T12's projection and T11's derivation boundary, as corroborated by their attributed catalogue entries. Map AC-14 to the task(s) implementing and testing those gate semantics and cite it in their descriptions.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 66,
+              "message": "T12 bundles two independently testable behavior units in separate symbols/files: Add/Modify `spec_refs` validation (`IN-14`/`AC-03`) and action-aware method obligation projection (`AC-14`). Split these into separate pre-implementation tasks with focused tests and update coverage, attribution, estimates, and batches accordingly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2cc2d48f277e305642d2d5ee8bfd264731e77dc0cb75416319053799d206f95a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:36:51Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 72,
+              "message": "T13 restates the upstream behavior contract in prose: “add/modify/reference/delete receive their obligation-gate semantics.” Keep only the target, operation, and AC-14 anchor; the semantics belong in the upstream spec. See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a3271182b819b745d55f2ec9e3a6757db6e01268555d31c3746b31340113e242",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:39:48Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 66,
+              "message": "T12's description restates the upstream behavior contract in prose — “reject empty or absent method spec_refs for add and modify actions” — instead of limiting the plan text to target + operation + anchor cite. Replace the behavior wording with an operation-only description and retain IN-14/AC-03 anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aa437a60821c0a880d5ddeebf696a99a05312ea3c0da12222dc21bad77132542",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:42:17Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 65,
+              "message": "T10→T12→T13→T11 is only described textually; none of these tasks declares `depends_on`. Since batch execution orders tasks by declared dependencies, B-09 cannot guarantee this required sequence, allowing T11 to run before the artifacts produced by T12/T13. Add the dependency edges.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 85,
+              "message": "`plan.summary` omits T13 from GO-01, although T13 implements the action-aware projection required for each trait_method obligation to own only its method-relevant anchors. This leaves GO-01 goal traceability incomplete.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:137ac8141b989ce59bb8fa6d22ce2859905e8c923257f69113c7f4527a9d774c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:44:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0206132778fcc88033213290ac51415f993f60703d55b956733fbc81d5c915f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:50:30Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 24,
+              "message": "T4 と section `obligation-ownership` は現在も AC-03 を引用していますが、delta により AC-03 は Add/Modify method の非空 `spec_refs` 検証へ置き換わっています。T4 は変更前の検証を完了した task であり、現行 `task-coverage.json` でも AC-03 の担当は T12/T11 に修正済みです。この引用は新しい AC-03 を完了済み task へ誤って追跡するため、T4 と同 section から AC-03 を除去してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0206132778fcc88033213290ac51415f993f60703d55b956733fbc81d5c915f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:52:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d5a1f5626f464db1cf42124f00bf66bc57853fa8a5fe186e8ec48c43a64b5f3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:59:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d5a1f5626f464db1cf42124f00bf66bc57853fa8a5fe186e8ec48c43a64b5f3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:29:25Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 47,
+              "message": "`T12`, `T13`, and `T11` are in the same `B-09` batch with no dependency edges, despite the plan declaring the order `T10 → T12 → T13 → T11`. `T11` consumes the validation and projection behavior owned by `T12` and `T13`, so it may run before those producers complete. Add dependencies (at minimum `T12 -> T11` and `T13 -> T11`) or split the batch.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:462a1d61e078fc8b87307bd0b8e1eba0b569392971dcef8b55f99dab7372b86e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:32:33Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 28,
+              "message": "B-09, B-10, and B-11 unnecessarily serialize T12, T13, and T11. After T10, these tasks have distinct concrete targets (obligations.rs, projection.rs, and derive.rs), no declared dependency requiring separate batches, and their combined estimates fit the resolved 500-line ceilings (domain 160/200; usecase 140/120). They can share one batch with producer-first execution if needed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:74e93b61347a368b07d5164e80f960fb4eb11265cbc54f21329a3ae9e2285698",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:40:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:462a1d61e078fc8b87307bd0b8e1eba0b569392971dcef8b55f99dab7372b86e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:42:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:462a1d61e078fc8b87307bd0b8e1eba0b569392971dcef8b55f99dab7372b86e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:03:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c226e098a29f228832924f54f27174da714b1dc74673b751f7b39946c61c32ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:14:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c226e098a29f228832924f54f27174da714b1dc74673b751f7b39946c61c32ef",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1046,6 +1520,34 @@
           "at": "2026-08-16T13:59:15Z",
           "findings": [],
           "hash": "rvw1:sha256:6fc1c944d9a9037716256febd73c1d385140865a14fbdf7f01e093e115b723e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:55:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:366ac118ee27954d3324925cc0546c40f6244d850ef1cfe09298f08120d7afa0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:05:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:366ac118ee27954d3324925cc0546c40f6244d850ef1cfe09298f08120d7afa0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:58:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c6b5c5e5c300ea9ab0fffab0a6f339ace6854e1731a4a1cbdc2616a20c75cf05",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T11:03:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5fdda51912bf2b69de56c564a727bde71aef186de74e27c229cc899ac6ef4b99",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1326,6 +1828,70 @@
           "hash": "rvw1:sha256:ea0957d31aad10256cb865205b9e86d2593dce4d185dcd086fe17313076bc777",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:55:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:808b5179a5ab1020aa405b3d1c280ec82c59cf315d138016305ac7b1f065218a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:08:53Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 63,
+              "message": "The active domain catalogue adds the `validate_add_modify_methods_have_spec_refs` logic obligation, but this records array contains no fulfillment for it. `bin/sotp test-obligation check` confirms that exact obligation is missing from the derived artifact; after re-derivation the binding will still be absent and the obligation gate cannot pass. Add a fulfillment using its direct happy/error tests.",
+              "severity": "P1"
+            },
+            {
+              "category": "artifact_consistency",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 394,
+              "message": "`MethodDeclaration` now actively cites IN-13 and AC-15, but the voluntary records stop after AC-14. Bindings are resolved by exact entry-key/anchor pairs, so tests attached to the validator obligation or another anchor do not resolve these two direct edges. Add voluntary bindings for IN-13 and AC-15.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 50,
+              "message": "The fulfillment still does not prove the omitted-action portion of IN-13/AC-14. Despite its name, `test_method_action_does_not_inherit_parent_and_defaults_to_add` constructs the method with an explicit `ItemAction::Add`; none of this fulfillment's tests decodes an omitted action or exercises that behavior through TypeEntry/inherent-impl methods. Bind evidence that actually covers defaulting and the affected method containers, or correct the obligation grounding.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 175,
+              "message": "The GO-02, IN-05, AC-06, and CN-05 lint bindings only parse a hand-written shape fixture or test constructors/accessors; none runs the configured catalogue linter against the active `MethodDeclaration` entry. A linter regression can therefore pass while these edges appear covered. Bind a test that evaluates the applicable lint rules and verifies both the valid entry and failure sentinels.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:808b5179a5ab1020aa405b3d1c280ec82c59cf315d138016305ac7b1f065218a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:36:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bba82992d9c56d4ceedf97756b1f087ace0326d18f36386f63a269903f48e58b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:54:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:962be675a9c9a1944b1d315e2b5440a0df2b7a1029e6372490d505f3d219b3ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:57:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:962be675a9c9a1944b1d315e2b5440a0df2b7a1029e6372490d505f3d219b3ae",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1504,6 +2070,56 @@
           "hash": "rvw1:sha256:0cfd07df5356a09f284abb127880d1a08a5a130de2ea1ddd3a3ef675f821a3a3",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:05:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8a41f3cf4b72fad70597be4d3178f9690a208086938015b07a8817d9cc65c8d8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:08:13Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 119,
+              "message": "AC-15 は適用対象を「この決定を実装する作業および後続作業が書く catalogue」という履歴上の由来で定義していますが、その由来を判定できる catalogue field、version、path、または command predicate がありません。同じ未定義の「本決定を適用する catalogue」が AC-01/02/03/06 と IN-14 も制御しているため、任意の catalogue に新しい action/spec_refs 規則を適用すべきかを決定的に検証できず、後続フェーズが対象選択を発明する必要があります。機械的に観測可能な適用条件へ落とし込む必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8a41f3cf4b72fad70597be4d3178f9690a208086938015b07a8817d9cc65c8d8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T05:11:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:175a3eca8c1ec6e556f3d92a8ff335b3fd390de9e3cb21da2f96c9b4987c39a1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:12:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:175a3eca8c1ec6e556f3d92a8ff335b3fd390de9e3cb21da2f96c9b4987c39a1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:18:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec99016af444c53bcb0012ad9e528ddef01604a54dbad0397c7f6c8fce0fd10",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:19:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec99016af444c53bcb0012ad9e528ddef01604a54dbad0397c7f6c8fce0fd10",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1664,6 +2280,159 @@
           "at": "2026-08-17T00:04:04Z",
           "findings": [],
           "hash": "rvw1:sha256:2fd4ed684b5d3e64705edd58c528027d67e31e518a97d4c45e964027d2623dbd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:33:15Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 103,
+              "message": "`domain::MethodDeclaration` docs restate upstream design rationale for bool accessors and `signature_string`; keep only the change surface and anchor references per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 386,
+              "message": "`domain::TestObligation` docs restate the upstream rationale for `owns_edge` being a bool; keep catalogue docs limited to the declared surface and anchor references.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 103,
+              "message": "Existing `domain::MethodDeclaration` methods omit method-level `action`, which defaults to `add`, despite already existing unchanged in the frozen rustdoc baseline. Declare their actual per-method actions and grounding explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3fcfb5ba166547108af902b8487d016e7dd57ce14a2f5c014f50d6954ebcffc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:10:16Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 185,
+              "message": "`domain::MethodDeclaration`'s `associated_function` method is declared `action: reference`, but this track adds the `action: ItemAction` parameter to its signature. Because the method exists in the frozen baseline and its signature changes, it must be `modify`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 220,
+              "message": "The existing `domain::MethodDeclaration` methods `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` are declared `action: add` even though these method signatures already exist in the frozen rustdoc baseline and are unchanged by this track. Their method actions should be `reference`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 141,
+              "message": "`usecase::DeriveTestObligationsInteractor` docs restate upstream behavior by describing derivation as consuming independent method-action and path-scoped Add/Modify grounding semantics. Keep the catalogue docs to the public change surface and anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d91341c1383b19050d014e1c9e053e878409a0e14a9c28f7478cb3fc3250b497",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:19:57Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 5,
+              "message": "`domain::validate_method_anchor_coverage` replaces its anchor-based docs with prose enumerating the upstream behavior contract (method-level anchor ownership, independent method action, and path-scoped Add/Modify grounding). Keep the docs to the change surface plus anchor citations; do not restate the upstream contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d05de9346c929cd87e62db2d7892931925b46b320d09a7b6e7cee462934de62",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:22:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:417b582823e99d85a87e3704c2d5ca2decde22794861b0724ea8b3b09803dab3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:31:28Z",
+          "findings": [
+            {
+              "category": "action incoherent with diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 207,
+              "message": "`domain::MethodDeclaration` misclassifies the newly introduced accessors `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` as `reference`. The frozen rustdoc baseline exposes only `new`, `associated_function`, and `signature_string` as inherent methods; former public fields do not make these accessor method identities pre-existing. Marking them `reference` incorrectly places this track's additions outside the change/obligation surface. Their method actions should be `add`; their existing non-empty `spec_refs` already satisfy the Add-method requirement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:417b582823e99d85a87e3704c2d5ca2decde22794861b0724ea8b3b09803dab3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:39:42Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 206,
+              "message": "The existing `domain::MethodDeclaration` methods `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` are declared `action: add` even though their signatures are already present in the frozen rustdoc baseline and unchanged by this track. They should be declared `reference`; only the new `action` accessor is an add.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:41:46Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 206,
+              "message": "The existing `domain::MethodDeclaration` methods `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` are declared `action: add` even though their signatures are already present in the frozen rustdoc baseline and unchanged by this track. They should be `reference`; only the new `action` accessor is an add.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:43:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:51:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:04:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddcaeec2b91dc705c02b94b66ad87c0e101fa45061397f230bb9536c45263e67",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:15:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddcaeec2b91dc705c02b94b66ad87c0e101fa45061397f230bb9536c45263e67",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1869,6 +2638,164 @@
           "at": "2026-08-17T00:07:11Z",
           "findings": [],
           "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:01:27Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 152,
+              "message": "This emits a fulfillment skeleton record for obligations with empty `spec_refs`, directly violating D1 and causing the persisted skeleton to be rejected as an orphan by `check`. Anchorless obligations must be filtered out.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 369,
+              "message": "This changes anchorless obligations from non-fulfillment targets into required voluntary/waiver targets, so a valid unbound empty-`spec_refs` obligation now produces a `Missing` drift. `check` should only orphan an actual fulfillment record and otherwise skip the obligation.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 183,
+              "message": "This reports an unbound empty-`spec_refs` obligation as missing. Per D1, `results` must not classify anchorless obligations as fulfillment gaps; the empty-edge branch should return without adding a finding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39b243099f059b27298b23fe0eee61e2c03b0727062ce68935405be0d97c9562",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T03:08:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f7db5574b6640d72f3f709fa62c998baba69e499353f7e644d401acf8e773d6a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:11:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f7db5574b6640d72f3f709fa62c998baba69e499353f7e644d401acf8e773d6a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:14:31Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 152,
+              "message": "This emits a fulfillment skeleton record for obligations with empty `spec_refs`, violating D1 and causing the persisted skeleton to be rejected as an orphan by `check`. Anchorless obligations must be filtered out.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 369,
+              "message": "This changes anchorless obligations into required voluntary/waiver targets, so an unbound empty-`spec_refs` obligation now produces a `Missing` drift. `check` should only orphan an actual fulfillment record and otherwise skip the obligation.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 183,
+              "message": "This reports an unbound empty-`spec_refs` obligation as missing. Per D1, `results` must not classify anchorless obligations as fulfillment gaps; the empty-edge branch should return without adding a finding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39b243099f059b27298b23fe0eee61e2c03b0727062ce68935405be0d97c9562",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:55:47Z",
+          "findings": [
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 219,
+              "message": "`validate_method_anchor_coverage_for_methods` reimplements the domain rule that Add/Modify methods must have non-empty `spec_refs` instead of delegating to a domain API. This violates the usecase purity constraint that method-anchor coverage rules remain in `domain`; expose/reuse a domain validator for type and inherent-impl methods.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d4f4aa41c2ee08f084a30a34320b7fbd15617dc6c2cf740192984c675a9d8cb7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:02:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7cb82970a2477b42f4db48100e1554b26ee17b8b17292fb505f8b32f4cdc0c62",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:19:16Z",
+          "findings": [
+            {
+              "category": "orchestration correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 211,
+              "message": "The early `continue` skips every method-level validation for `Reference`/`Delete` trait entries, even though method actions are independent of the parent action. Consequently, a command-named catalogue containing a `Reference` trait with an `Add` method whose `spec_refs` are empty is accepted; `test_method_action_does_not_inherit_parent_and_defaults_to_add` will fail. Validate Add/Modify methods for every trait before restricting parent-level anchor-coverage validation to derivable traits.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7cb82970a2477b42f4db48100e1554b26ee17b8b17292fb505f8b32f4cdc0c62",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:27:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fdfcc25351f14da96ce01f641fa23f69a959bd04e0ceb718acd999f273b5ca57",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:50:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1e923315bf5ff6ae7f8f674aa080f2f6d6be0e1e2b09fb532592f0517941776c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:55:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b00c37b2daf75325d827ff995f191e96393b49413e6da043b83269c79e756",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:59:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b00c37b2daf75325d827ff995f191e96393b49413e6da043b83269c79e756",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:10:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45dd5d9908fd4223949e7aab298199b6ed898613ca2fce269b086c13dfe4550b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:47:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45dd5d9908fd4223949e7aab298199b6ed898613ca2fce269b086c13dfe4550b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T11:01:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:688bf916ef3e5a9c97a6ff3a65e75e19b75d369e8511d23a400650c5a40338f8",
           "type": "final",
           "verdict": "zero_findings"
         }

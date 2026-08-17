@@ -26,7 +26,8 @@ use domain::tddd::test_obligation::ids::{
     TestObligationItemIdentifier,
 };
 use domain::tddd::test_obligation::obligations::{
-    ObligationsDocument, TestObligation, validate_method_anchor_coverage,
+    ObligationsDocument, TestObligation, validate_add_modify_methods_have_spec_refs,
+    validate_method_anchor_coverage,
 };
 use domain::tddd::test_obligation::ports::{
     ObligationsArtifactPort, TestObligationRulesLoaderPort,
@@ -206,11 +207,26 @@ fn is_derivable(action: ItemAction) -> bool {
 fn validate_derivable_method_anchor_coverage(
     catalogue: &CatalogueDocument,
 ) -> Result<(), DiagnosticMessage> {
+    validate_named_catalogue_add_modify_methods(catalogue)?;
     for entry in catalogue.traits().values() {
-        if !is_derivable(entry.action()) {
-            continue;
+        if is_derivable(entry.action()) {
+            validate_method_anchor_coverage(entry)?;
         }
-        validate_method_anchor_coverage(entry)?;
+    }
+    Ok(())
+}
+
+fn validate_named_catalogue_add_modify_methods(
+    catalogue: &CatalogueDocument,
+) -> Result<(), DiagnosticMessage> {
+    for entry in catalogue.traits().values() {
+        validate_add_modify_methods_have_spec_refs(entry.methods())?;
+    }
+    for entry in catalogue.types().values() {
+        validate_add_modify_methods_have_spec_refs(entry.methods())?;
+    }
+    for inherent in catalogue.inherent_impls() {
+        validate_add_modify_methods_have_spec_refs(&inherent.methods)?;
     }
     Ok(())
 }
@@ -377,11 +393,8 @@ fn emit_trait_role_rules(
                 }
             }
 
-            for (method_index, item) in item_ids.into_iter().enumerate() {
-                let anchors = match entry.methods().get(method_index) {
-                    Some(method) => anchors_from_spec_refs(method.spec_refs())?,
-                    None => entry_anchors.to_vec(),
-                };
+            for item in item_ids {
+                let anchors = method_anchors_for_item(entry.methods(), &item, entry_anchors)?;
                 let obligation = build_obligation(
                     entry_key,
                     target,
@@ -600,6 +613,21 @@ fn catalogue_key(key: &str) -> Result<CatalogueEntryKey, DiagnosticMessage> {
     CatalogueEntryKey::try_new(key.to_owned()).map_err(|_| diag("empty catalogue entry key"))
 }
 
+/// Resolves method-axis anchors by method name, not projected-item position.
+fn method_anchors_for_item(
+    methods: &[domain::tddd::catalogue_v2::MethodDeclaration],
+    item: &TestObligationItemIdentifier,
+    entry_anchors: &[TestObligationAnchorId],
+) -> Result<Vec<TestObligationAnchorId>, DiagnosticMessage> {
+    let Some((_, method_name)) = item.as_str().rsplit_once(':') else {
+        return Ok(entry_anchors.to_vec());
+    };
+    match methods.iter().find(|method| method.name().as_str() == method_name) {
+        Some(method) => anchors_from_spec_refs(method.spec_refs()),
+        None => Ok(entry_anchors.to_vec()),
+    }
+}
+
 /// Converts catalogue `spec_refs` to obligation anchor ids.
 fn anchors_from_spec_refs(
     refs: &[SpecRef],
@@ -666,7 +694,7 @@ fn find_trait_impl_rules<'a>(
         .trait_impls()
         .iter()
         .find(|(r, _)| r.variant_name() == role.variant_name())
-        .map(|(_, rules)| rules)
+        .map(|(_, r)| r)
 }
 
 #[cfg(test)]

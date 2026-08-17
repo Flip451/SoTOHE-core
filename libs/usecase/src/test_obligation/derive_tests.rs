@@ -15,9 +15,9 @@ use domain::tddd::catalogue_v2::roles::{
     ContractRole, DataRole, FunctionRole, InvariantDecl, InvariantPredicate, ItemAction,
 };
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DocString, InvariantName, MethodDeclaration, MethodName,
-    ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2, TraitName,
-    TypeEntry, TypeKindV2, TypeName, TypeRef,
+    CatalogueDocument, CrateName, DocString, InherentImplDeclV2, InvariantName, MethodDeclaration,
+    MethodName, ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2,
+    TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
 };
 use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, TestObligationRulesLoadError, TrackStatusReadFailureKind,
@@ -301,6 +301,14 @@ fn spec_ref(anchor: &str) -> SpecRef {
 }
 
 fn method_with_spec_refs(name: &str, spec_refs: Vec<SpecRef>) -> MethodDeclaration {
+    method_with_action(name, ItemAction::Add, spec_refs)
+}
+
+fn method_with_action(
+    name: &str,
+    action: ItemAction,
+    spec_refs: Vec<SpecRef>,
+) -> MethodDeclaration {
     MethodDeclaration::new(
         MethodName::new(name).unwrap(),
         Some(SelfReceiver::SharedRef),
@@ -311,6 +319,7 @@ fn method_with_spec_refs(name: &str, spec_refs: Vec<SpecRef>) -> MethodDeclarati
         vec![],
         vec![],
         spec_refs,
+        action,
         None,
     )
 }
@@ -402,6 +411,7 @@ fn fulfillment_cache_port_entry(docs: Option<DocString>) -> TraitEntry {
                 vec![],
                 vec![],
                 vec![spec_ref("AC-06")],
+                ItemAction::Add,
                 None,
             ),
             MethodDeclaration::new(
@@ -413,7 +423,8 @@ fn fulfillment_cache_port_entry(docs: Option<DocString>) -> TraitEntry {
                 false,
                 vec![],
                 vec![],
-                vec![],
+                vec![spec_ref("AC-06")],
+                ItemAction::Add,
                 None,
             ),
         ],
@@ -523,6 +534,7 @@ fn test_derivation_reads_secondary_port_methods_and_saves_stable_obligations() {
                     vec![],
                     vec![],
                     vec![spec_ref("AC-03")],
+                    ItemAction::Add,
                     None,
                 ),
                 MethodDeclaration::new(
@@ -534,7 +546,8 @@ fn test_derivation_reads_secondary_port_methods_and_saves_stable_obligations() {
                     false,
                     vec![],
                     vec![],
-                    vec![],
+                    vec![spec_ref("AC-03")],
+                    ItemAction::Add,
                     None,
                 ),
             ],
@@ -619,6 +632,7 @@ fn test_spec_document_loader_port_load_method_derives_contract_obligation() {
                 vec![],
                 vec![],
                 vec![spec_ref("IN-07")],
+                ItemAction::Add,
                 None,
             )],
             vec![],
@@ -718,7 +732,7 @@ fn test_method_axis_obligations_also_use_each_method_spec_refs() {
 }
 
 #[test]
-fn test_trait_method_without_spec_refs_owns_no_anchors_when_siblings_cover_entry() {
+fn test_trait_method_without_spec_refs_is_rejected_for_add_method() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Add,
@@ -728,18 +742,14 @@ fn test_trait_method_without_spec_refs_owns_no_anchors_when_siblings_cover_entry
         ],
         vec![spec_ref("IN-01")],
     );
-    let (interactor, sink) =
+    let (interactor, _) =
         interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
 
-    interactor.execute(&command(vec![path])).unwrap();
-
-    let saved = sink.saved.lock().unwrap().clone().unwrap();
-    let save = saved
-        .obligations()
-        .iter()
-        .find(|obligation| obligation.id().item_identifier().as_str() == "trait_method:save")
-        .unwrap();
-    assert!(save.spec_refs().is_empty());
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
 }
 
 #[test]
@@ -749,7 +759,7 @@ fn test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state
         ItemAction::Add,
         vec![
             method_with_spec_refs("load", vec![spec_ref("IN-02")]),
-            method_with_spec_refs("save", vec![]),
+            method_with_spec_refs("save", vec![spec_ref("IN-01")]),
         ],
         vec![spec_ref("IN-01")],
     );
@@ -771,7 +781,7 @@ fn test_trait_method_anchor_union_must_cover_entry_catalogue() {
         ItemAction::Add,
         vec![
             method_with_spec_refs("load", vec![spec_ref("IN-01")]),
-            method_with_spec_refs("save", vec![]),
+            method_with_spec_refs("save", vec![spec_ref("IN-01")]),
         ],
         vec![spec_ref("IN-01"), spec_ref("AC-01")],
     );
@@ -833,21 +843,247 @@ fn test_derive_rejects_incomplete_coverage_for_modify_trait() {
 }
 
 #[test]
-fn test_single_method_empty_entry_derives_anchorless_trait_method_obligation() {
+fn test_modify_method_without_spec_refs_is_rejected() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Modify,
+        vec![method_with_action("load", ItemAction::Modify, vec![])],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_method_action_does_not_inherit_parent_and_defaults_to_add() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Reference,
+        vec![method_with_action("load", ItemAction::Add, vec![])],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_reference_method_on_add_trait_is_not_derived() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Add,
+        vec![
+            method_with_spec_refs("load", vec![spec_ref("IN-01")]),
+            method_with_action("save", ItemAction::Reference, vec![]),
+        ],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let items: Vec<&str> =
+        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
+    assert_eq!(items, vec!["trait_method:load"]);
+}
+
+#[test]
+fn test_delete_method_on_add_trait_is_not_derived() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Add,
+        vec![
+            method_with_spec_refs("load", vec![spec_ref("IN-01")]),
+            method_with_action("save", ItemAction::Delete, vec![]),
+        ],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let items: Vec<&str> =
+        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
+    assert_eq!(items, vec!["trait_method:load"]);
+}
+
+#[test]
+fn test_empty_add_method_is_rejected_even_when_sibling_has_spec_refs() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Add,
+        vec![
+            method_with_spec_refs("save", vec![spec_ref("IN-01")]),
+            method_with_spec_refs("load", vec![]),
+        ],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_reference_method_does_not_steal_later_add_method_anchors() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Add,
+        vec![
+            method_with_action("skip", ItemAction::Reference, vec![]),
+            method_with_spec_refs("save", vec![spec_ref("IN-01")]),
+        ],
+        vec![spec_ref("IN-01")],
+    );
+    let (interactor, sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    interactor.execute(&command(vec![path])).unwrap();
+    let saved = sink.saved.lock().unwrap().clone().unwrap();
+    let save = saved
+        .obligations()
+        .iter()
+        .find(|o| o.id().item_identifier().as_str() == "trait_method:save")
+        .expect("save method obligation");
+    let anchors: Vec<&str> = save.spec_refs().iter().map(|a| a.element_id()).collect();
+    assert_eq!(anchors, vec!["IN-01"]);
+}
+
+#[test]
+fn test_type_entry_add_method_without_spec_refs_is_rejected() {
+    let path = PathBuf::from("domain-types.json");
+    let entry = TypeEntry::new(
+        ItemAction::Add,
+        DataRole::domain_service(),
+        TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+        vec![method_with_action("compute", ItemAction::Add, vec![])],
+        vec![],
+        vec![],
+        ModulePath::root(),
+        None,
+        vec![spec_ref("IN-13")],
+        vec![],
+    );
+    let catalogue = catalogue_with_type("Compute", entry);
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_type_entry_omitted_method_action_does_not_inherit_parent() {
+    let path = PathBuf::from("domain-types.json");
+    let omitted_add = MethodDeclaration::associated_function(
+        MethodName::new("compute").unwrap(),
+        vec![],
+        TypeRef::new("()").unwrap(),
+    );
+    let entry = TypeEntry::new(
+        ItemAction::Reference,
+        DataRole::domain_service(),
+        TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+        vec![omitted_add],
+        vec![],
+        vec![],
+        ModulePath::root(),
+        None,
+        vec![spec_ref("IN-13")],
+        vec![],
+    );
+    let catalogue = catalogue_with_type("Compute", entry);
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_inherent_impl_add_method_without_spec_refs_is_rejected() {
+    let path = PathBuf::from("domain-types.json");
+    let mut catalogue = catalogue_with_type("Compute", value_object_entry(ItemAction::Add, vec![]));
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Compute").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![method_with_action("compute", ItemAction::Add, vec![])],
+    });
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_inherent_impl_omitted_method_action_does_not_inherit_parent() {
+    let path = PathBuf::from("domain-types.json");
+    let mut catalogue =
+        catalogue_with_type("Compute", value_object_entry(ItemAction::Reference, vec![]));
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Compute").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![MethodDeclaration::associated_function(
+            MethodName::new("compute").unwrap(),
+            vec![],
+            TypeRef::new("()").unwrap(),
+        )],
+    });
+    let (interactor, _) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
+
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
+}
+
+#[test]
+fn test_single_method_empty_entry_rejects_add_method_without_spec_refs() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Add,
         vec![method_with_spec_refs("load", vec![])],
         vec![],
     );
-    let (interactor, sink) =
+    let (interactor, _) =
         interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
 
-    interactor.execute(&command(vec![path])).unwrap();
-
-    let saved = sink.saved.lock().unwrap().clone().unwrap();
-    assert_eq!(saved.obligations().len(), 1);
-    assert!(saved.obligations()[0].spec_refs().is_empty());
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
 }
 
 #[test]
@@ -856,7 +1092,7 @@ fn test_derive_skips_coverage_for_reference_and_delete_traits() {
         let path = PathBuf::from("domain-types.json");
         let catalogue = secondary_port_catalogue(
             action,
-            vec![method_with_spec_refs("load", vec![])],
+            vec![method_with_action("load", action, vec![])],
             vec![spec_ref("IN-01")],
         );
         let (interactor, sink) =
@@ -882,6 +1118,7 @@ fn test_derive_validates_only_catalogues_supplied_on_the_command() {
         vec![method_with_spec_refs("load", vec![])],
         vec![spec_ref("IN-01")],
     );
+    let unused_snapshot = unused_invalid.clone();
     let (interactor, sink) = interactor_with_catalogues(
         rules_doc_with_secondary_port_contract_rules(),
         vec![(valid_path.clone(), valid), (unused_invalid_path, unused_invalid)],
@@ -890,6 +1127,7 @@ fn test_derive_validates_only_catalogues_supplied_on_the_command() {
     interactor.execute(&command(vec![valid_path])).unwrap();
 
     assert!(sink.saved.lock().unwrap().is_some());
+    assert!(unused_snapshot.traits().values().next().unwrap().methods()[0].spec_refs().is_empty());
 }
 
 fn obligations_artifact_port_catalogue(docs: Option<DocString>) -> CatalogueDocument {
@@ -911,6 +1149,7 @@ fn obligations_artifact_port_catalogue(docs: Option<DocString>) -> CatalogueDocu
                     vec![],
                     vec![],
                     vec![spec_ref("AC-03")],
+                    ItemAction::Add,
                     None,
                 ),
                 MethodDeclaration::new(
@@ -922,7 +1161,8 @@ fn obligations_artifact_port_catalogue(docs: Option<DocString>) -> CatalogueDocu
                     false,
                     vec![],
                     vec![],
-                    vec![],
+                    vec![spec_ref("AC-03")],
+                    ItemAction::Add,
                     None,
                 ),
             ],

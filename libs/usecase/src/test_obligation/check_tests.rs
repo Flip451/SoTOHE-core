@@ -961,6 +961,7 @@ fn covering_method(name: &str, anchor: &str) -> MethodDeclaration {
         vec![],
         vec![],
         vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new(anchor).unwrap())],
+        ItemAction::Add,
         None,
     )
 }
@@ -976,6 +977,7 @@ fn method_without_spec_refs(name: &str) -> MethodDeclaration {
         vec![],
         vec![],
         vec![],
+        ItemAction::Add,
         None,
     )
 }

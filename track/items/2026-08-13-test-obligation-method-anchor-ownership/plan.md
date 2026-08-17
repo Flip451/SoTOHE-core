@@ -3,10 +3,10 @@
 
 ## Summary
 
-GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9.
-GO-02 → T1, T2, T3.
+GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11.
+GO-02 → T1, T2, T3, T10, T11.
 
-## Tasks (9/9 resolved)
+## Tasks (9/13 resolved)
 
 ### method-declaration-staging — MethodDeclaration staging and cutover
 
@@ -18,9 +18,9 @@ GO-02 → T1, T2, T3.
 
 ### obligation-ownership — Obligation ownership
 
-> Targets: libs/domain/src/tddd/test_obligation/obligations.rs, libs/usecase/src/test_obligation/derive.rs, libs/usecase/src/test_obligation/evaluate/, and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test. Anchors: GO-01, IN-01, IN-02, IN-03, AC-01, AC-02, AC-03, AC-04, CN-01, CN-02, CN-03, OS-01, OS-02, OS-03, OS-04.
+> Targets: libs/domain/src/tddd/test_obligation/obligations.rs, libs/usecase/src/test_obligation/derive.rs, libs/usecase/src/test_obligation/evaluate/, and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test. Anchors: GO-01, IN-01, IN-02, IN-03, AC-01, AC-02, AC-04, CN-01, CN-02, CN-03, OS-01, OS-02, OS-03, OS-04.
 
-- [x] **T4**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive.rs. Operation: implement and test derivation and structural validation. Anchors: GO-01, IN-01, IN-02, AC-01, AC-02, AC-03, CN-01, CN-02, OS-01, OS-02, OS-03. (`ab81694a58e888cdaad845767d4c01168f697df2`)
+- [x] **T4**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive.rs. Operation: implement and test derivation and structural validation. Anchors: GO-01, IN-01, IN-02, AC-01, AC-02, CN-01, CN-02, OS-01, OS-02, OS-03. (`ab81694a58e888cdaad845767d4c01168f697df2`)
 - [x] **T5**: Targets: libs/usecase/src/test_obligation/evaluate/ and libs/infrastructure/src/test_obligation/fulfillment_verifier.rs. Operation: implement and test fulfillment verification and instruction rendering. Anchors: GO-01, IN-03, AC-04, CN-03, OS-02, OS-04. (`d4b3bc80034f984676a968bca84c3a44fcaa40d9`)
 
 ### phase-command-d3-recovery — PhaseCommandService D3 recovery
@@ -31,3 +31,12 @@ GO-02 → T1, T2, T3.
 - [x] **T7**: Targets: the explain-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test explain's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-10, AC-11. (`203fcdff70083dfeb409f925b1a9cc2f65d06cbc`)
 - [x] **T8**: Targets: the enter-specific PhaseCommandService grounding and fulfillment evidence in libs/usecase/src/phase_command/. Operation: restore and test enter's method-scoped anchors and method-local fulfillment evidence. Anchors: GO-01, IN-11, AC-12. (`1696565bbb5f5cd9ace924ff288cbe5d8701031a`)
 - [x] **T9**: Targets: .harness/custom/review-prompts/harness-policy.md. Operation: after validate, explain, and enter are re-grounded, remove only the named track's conditional Known Accepted Deviations clause; preserve all other deviation records. Anchors: GO-01, IN-12, AC-13. (`1696565bbb5f5cd9ace924ff288cbe5d8701031a`)
+
+### method-action-reentry — Method action enforcement and command scoping
+
+> Targets: MethodDeclaration schema/codec and all construction call sites, then domain validation, action-aware anchor projection, and command-directed selection in libs/usecase/src/test_obligation/. Operation: make the schema/codec, validation, projection, and command-scoping units separately implementable and testable in that order. Anchors: GO-01, GO-02, IN-13, IN-14, AC-03, AC-14, AC-15, CN-01, CN-02, OS-01.
+
+- [~] **T10**: Targets: libs/domain/src/tddd/catalogue_v2/methods.rs; libs/infrastructure/src/tddd/catalogue_document_codec/ DTO, decode, encode, and codec tests; and every libs/domain, libs/usecase, and libs/infrastructure MethodDeclaration::new construction call site. Operation: extend the MethodDeclaration schema, update the JSON codec, migrate constructor arity, and add focused tests. Anchors: GO-02, IN-13, AC-14.
+- [ ] **T12**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and related domain tests. Operation: implement and test method spec_refs validation. Anchors: GO-01, IN-14, AC-03, CN-01.
+- [ ] **T13**: Targets: libs/domain/src/tddd/test_obligation/projection.rs and related domain tests. Operation: implement and test action-aware method-obligation projection. Anchors: AC-14.
+- [ ] **T11**: Targets: libs/usecase/src/test_obligation/derive.rs, its command-directed catalogue selection boundary, and related tests. Operation: implement and test the command-directed catalogue selection boundary. Anchors: GO-01, GO-02, IN-14, AC-03, AC-14, AC-15, CN-02, OS-01.

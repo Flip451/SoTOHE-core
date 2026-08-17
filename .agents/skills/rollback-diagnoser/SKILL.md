@@ -1,6 +1,7 @@
 ---
 name: rollback-diagnoser
 sandbox: read-only
+grok-sandbox: read-only
 description: Use when Codex is assigned the SoTOHE `rollback-diagnoser` capability. Receives a diagnostic input (PreReviewGate Blocked summary / SoT-scope review finding on adr/spec/types/impl-plan / external PR-reviewer comment), reads the SoT chain top-down, and returns a structured `{routing_target, reason, recommended_next_action}` routing decision the calling orchestrator dispatches. Diagnose-only — never edits SoT artifacts, never invokes writer agents.
 ---
 

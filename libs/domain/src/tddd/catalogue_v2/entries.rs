@@ -672,6 +672,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let field_ty = TypeRef::new("String").unwrap();
@@ -802,6 +803,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let entry = TraitEntry::new(
@@ -1322,6 +1324,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let method_b = MethodDeclaration::new(
@@ -1334,6 +1337,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
 

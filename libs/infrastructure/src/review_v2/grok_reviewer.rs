@@ -600,6 +600,28 @@ mod tests {
     }
 
     #[test]
+    fn test_grok_reviewer_camel_case_structured_output_is_accepted()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let runner = Arc::new(RecordingProcessRunner {
+            responses: Mutex::new(vec![Ok(ProviderProcessOutput {
+                exit_code: 0,
+                session_id: Some("camel-session".to_owned()),
+                final_message: Some(
+                    br#"{"structuredOutput":{"result":"{\"verdict\":\"zero_findings\",\"findings\":[]}"},"text":"{\"verdict\":\"findings_remain\",\"findings\":[]}"}"#
+                        .to_vec(),
+                ),
+            })]),
+            ..Default::default()
+        });
+        let reviewer = reviewer(runner, Arc::new(MemorySessionCache::with_entry(None)));
+
+        let (verdict, _) = reviewer.review(&ReviewTarget::new(vec![]))?;
+
+        assert!(matches!(verdict, Verdict::ZeroFindings));
+        Ok(())
+    }
+
+    #[test]
     fn test_grok_reviewer_successful_review_uses_only_structured_result_not_envelope_text()
     -> Result<(), Box<dyn std::error::Error>> {
         let runner = Arc::new(RecordingProcessRunner {

@@ -11,5 +11,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs | free_function | add | fn(methods: &[MethodDeclaration]) -> Result<(), DiagnosticMessage> | 🔵 | 🔵 |
 | domain::tddd::test_obligation::obligations::validate_method_anchor_coverage | free_function | add | fn(entry: &TraitEntry) -> Result<(), DiagnosticMessage> | 🔵 | 🔵 |
 

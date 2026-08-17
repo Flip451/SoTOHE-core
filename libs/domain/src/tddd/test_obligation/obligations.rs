@@ -10,7 +10,8 @@
 
 use crate::TrackId;
 use crate::plan_ref::SpecRef;
-use crate::tddd::catalogue_v2::TraitEntry;
+use crate::tddd::catalogue_v2::roles::ItemAction;
+use crate::tddd::catalogue_v2::{MethodDeclaration, TraitEntry};
 use crate::tddd::semantic_verify::CatalogueEntryRef;
 use crate::tddd::test_obligation::errors::TestBindingConsistencyError;
 use crate::tddd::test_obligation::hashes::DeclarationHash;
@@ -31,6 +32,7 @@ use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
 /// Returns a [`DiagnosticMessage`] when a method cites an absent anchor or the
 /// method union does not cover the entry-level catalogue.
 pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), DiagnosticMessage> {
+    validate_add_modify_methods_have_spec_refs(entry.methods())?;
     for method in entry.methods() {
         for method_ref in method.spec_refs() {
             if !contains_spec_ref(entry.spec_refs(), method_ref) {
@@ -69,6 +71,28 @@ pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), Diagnos
         )));
     }
 
+    Ok(())
+}
+
+/// Validates that every Add/Modify method declares non-empty `spec_refs`.
+///
+/// # Errors
+///
+/// Returns a [`DiagnosticMessage`] when an Add or Modify method has empty
+/// `spec_refs`.
+pub fn validate_add_modify_methods_have_spec_refs(
+    methods: &[MethodDeclaration],
+) -> Result<(), DiagnosticMessage> {
+    for method in methods {
+        if matches!(method.action(), ItemAction::Add | ItemAction::Modify)
+            && method.spec_refs().is_empty()
+        {
+            return Err(coverage_diag(&format!(
+                "add/modify method '{}' must declare non-empty spec_refs",
+                method.name().as_str(),
+            )));
+        }
+    }
     Ok(())
 }
 
@@ -734,5 +758,91 @@ mod tests {
         assert!(detail.as_str().contains("added=6"));
         assert!(detail.as_str().contains("showing 5 of 6"));
         assert!(detail.as_str().contains("missing_from_artifact"));
+    }
+
+    fn method(name: &str, action: ItemAction, spec_refs: Vec<SpecRef>) -> MethodDeclaration {
+        MethodDeclaration::new(
+            crate::tddd::catalogue_v2::MethodName::new(name).unwrap(),
+            Some(crate::tddd::catalogue_v2::roles::SelfReceiver::SharedRef),
+            vec![],
+            crate::tddd::catalogue_v2::TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            spec_refs,
+            action,
+            None,
+        )
+    }
+
+    fn spec_ref(anchor: &str) -> SpecRef {
+        SpecRef::new(
+            std::path::PathBuf::from("track/items/x/spec.json"),
+            crate::SpecElementId::try_new(anchor).unwrap(),
+        )
+    }
+
+    #[test]
+    fn test_add_modify_methods_without_spec_refs_are_rejected() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method("load", ItemAction::Add, vec![],)])
+                .is_err()
+        );
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Modify,
+                vec![],
+            )])
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_reference_method_without_spec_refs_is_accepted() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Reference,
+                vec![],
+            )])
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_add_method_with_spec_refs_is_accepted() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Add,
+                vec![spec_ref("IN-14")],
+            )])
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_delete_method_without_spec_refs_is_accepted() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Delete,
+                vec![],
+            )])
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_empty_add_method_is_rejected_even_when_sibling_has_spec_refs() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[
+                method("save", ItemAction::Add, vec![spec_ref("IN-14")]),
+                method("load", ItemAction::Add, vec![]),
+            ])
+            .is_err()
+        );
     }
 }

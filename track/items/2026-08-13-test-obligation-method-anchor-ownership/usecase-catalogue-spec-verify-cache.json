@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -25,7 +25,7 @@
       }
     },
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -49,7 +49,7 @@
       }
     },
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -73,7 +73,7 @@
       }
     },
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -82,22 +82,46 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "7a5a264a1b4d4fde9a0f44bf15077d8a87a74be2b2d9347981ea9a89d41f33fd",
+      "evidence_hash": "89b64ff2e7a210507edfcde43eac9d15154a2a8d16346215dde8eedf1f003481",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-13",
+          "section": "in_scope",
+          "text_label": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0ba0d2f560e8f543f3d8729dd4f8ca0ff59fe987f0917d634bf825f2915a5fcd",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
+          "text_label": "コマンドが指名する catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
+        "citation": "コマンドが指名する catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -106,22 +130,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "089d11c73c1a5ae135d8d77db1502e7057196817fdc9d0946fd63338649a41d9",
+      "evidence_hash": "1826cfa96cebaa06e93da60bb3a8c422eaf92cc1f93956edfde090ae683b3ee1",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+          "text_label": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "citation": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -130,22 +154,70 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2b12874af00c94c3cc60b16623e552fb3b884aa876531df609984b33b1808138",
+      "evidence_hash": "03fe38c320297979dca095062a2f1612ea7ab5a13d3ba282f03dd9ec325ba4e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。"
+          "text_label": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。",
+        "citation": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "627e21fcaf9cc38852593ce83993161993673543155f107a09e5588f74300b4e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
+      "claim_origin": {
+        "data": {
+          "entry_key": "DeriveTestObligationsInteractor",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "051780ed504568f61fe6462a2859adcc8a5ab085c5e3ccdfa4fde5eddcdd219b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -164,12 +236,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "edfea66670b3649e60173867a25e118ae57dc74070e43b5813977ba0667a10d9",
+      "claim_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
       "claim_origin": {
         "data": {
           "entry_key": "DeriveTestObligationsInteractor",
@@ -178,22 +250,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "028b1dbfe902a3b1c1b76f91b2b1c34891afb3707040fbaa8520cd58b6c55a67",
+      "evidence_hash": "116abb5b360f2ce15c45081fe5ffc3ceb33f77648a0482e20c033c64e9ed4982",
       "evidence_origin": {
         "data": {
           "element_id": "CN-02",
           "section": "constraint",
-          "text_label": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。"
+          "text_label": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ適用する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。",
+        "citation": "新 schema は、コマンドが path で指名する catalogue にだけ適用する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "5e82907568197cefae4e2195455149fc162e84637daf3689131f0728c851718b",
+      "claim_hash": "d4917027731187bb0a0b9eb56f65811547a4af5867450fa84a1a32a6fe1b1ac6",
       "claim_origin": {
         "data": {
           "entry_key": "EvaluateTestObligationsInteractor",
@@ -217,7 +289,7 @@
       }
     },
     {
-      "claim_hash": "5e82907568197cefae4e2195455149fc162e84637daf3689131f0728c851718b",
+      "claim_hash": "d4917027731187bb0a0b9eb56f65811547a4af5867450fa84a1a32a6fe1b1ac6",
       "claim_origin": {
         "data": {
           "entry_key": "EvaluateTestObligationsInteractor",
@@ -241,7 +313,7 @@
       }
     },
     {
-      "claim_hash": "5e82907568197cefae4e2195455149fc162e84637daf3689131f0728c851718b",
+      "claim_hash": "d4917027731187bb0a0b9eb56f65811547a4af5867450fa84a1a32a6fe1b1ac6",
       "claim_origin": {
         "data": {
           "entry_key": "EvaluateTestObligationsInteractor",
@@ -265,7 +337,7 @@
       }
     },
     {
-      "claim_hash": "5e82907568197cefae4e2195455149fc162e84637daf3689131f0728c851718b",
+      "claim_hash": "d4917027731187bb0a0b9eb56f65811547a4af5867450fa84a1a32a6fe1b1ac6",
       "claim_origin": {
         "data": {
           "entry_key": "EvaluateTestObligationsInteractor",
@@ -289,7 +361,7 @@
       }
     },
     {
-      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
+      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -313,7 +385,7 @@
       }
     },
     {
-      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
+      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -337,7 +409,7 @@
       }
     },
     {
-      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
+      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -361,7 +433,7 @@
       }
     },
     {
-      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
+      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -385,7 +457,7 @@
       }
     },
     {
-      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
+      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -409,7 +481,7 @@
       }
     },
     {
-      "claim_hash": "817526f3bb50989d694195ea3c72db6f0921b923f94956d3805af80884bb5bea",
+      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -428,7 +500,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。",
+        "citation": "PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。",
         "kind": "pass"
       }
     }

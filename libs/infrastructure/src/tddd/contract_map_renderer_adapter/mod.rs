@@ -720,6 +720,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -814,6 +815,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         let m2 = MethodDeclaration::new(
@@ -826,6 +828,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -1828,6 +1831,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -1983,6 +1987,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -2076,6 +2081,7 @@ include_function_roles = []
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 None,
             );
             doc.insert_type(
@@ -2146,6 +2152,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -2218,6 +2225,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -2419,6 +2427,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_trait(
@@ -2571,6 +2580,7 @@ include_function_roles = []
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_trait(

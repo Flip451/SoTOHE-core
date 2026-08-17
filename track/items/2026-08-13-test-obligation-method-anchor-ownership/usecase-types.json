@@ -22,11 +22,12 @@
   ],
   "traits": {
     "PhaseCommandService": {
-      "action": "modify",
+      "action": "reference",
       "docs": "Synchronous application service for validating, explaining, and entering configured phases.",
       "informal_grounds": [],
       "methods": [
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "validate",
@@ -50,6 +51,7 @@
           ]
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "explain",
@@ -73,6 +75,7 @@
           ]
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "enter",
@@ -135,7 +138,7 @@
   "types": {
     "DeriveTestObligationsInteractor": {
       "action": "reference",
-      "docs": "Referenced existing DeriveTestObligationsInteractor constructor and service implementation; see the cited specification anchors.",
+      "docs": "Reference the DeriveTestObligationsInteractor public surface (IN-13; AC-14, AC-15).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -147,6 +150,7 @@
       },
       "methods": [
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -201,6 +205,10 @@
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
+          "anchor": "IN-13",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
           "anchor": "AC-01",
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
@@ -210,6 +218,14 @@
         },
         {
           "anchor": "AC-03",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-15",
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
@@ -236,6 +252,7 @@
       },
       "methods": [
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",

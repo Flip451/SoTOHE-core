@@ -32,7 +32,102 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_empty_entry_derives_anchorless_trait_method_obligation"
+          "test_name": "test_single_method_empty_entry_rejects_add_method_without_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_without_spec_refs_is_rejected_for_add_method"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_modify_method_without_spec_refs_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_method_action_does_not_inherit_parent_and_defaults_to_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_method_action_omitted_decodes_as_add"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_reference_method_on_add_trait_is_not_derived"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_delete_method_on_add_trait_is_not_derived"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_empty_add_method_is_rejected_even_when_sibling_has_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_type_entry_add_method_without_spec_refs_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_inherent_impl_add_method_without_spec_refs_is_rejected"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_type_entry_omitted_method_action_does_not_inherit_parent"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_inherent_impl_omitted_method_action_does_not_inherit_parent"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_derive_validates_only_catalogues_supplied_on_the_command"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_add_modify_methods_without_spec_refs_are_rejected"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_reference_method_without_spec_refs_is_accepted"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_add_method_with_spec_refs_is_accepted"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_delete_method_without_spec_refs_is_accepted"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_empty_add_method_is_rejected_even_when_sibling_has_spec_refs"
         }
       ]
     },
@@ -82,6 +177,11 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
           "test_name": "test_method_declaration_with_shared_ref_receiver"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
         }
       ]
     },
@@ -158,6 +258,43 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
           "test_name": "test_method_declaration_with_shared_ref_receiver"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "IN-13"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_associated_function_defaults_action_to_add"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_independent_action"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_method_action_omitted_decodes_as_add"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_method_action_round_trip_independent_of_entry_action"
         }
       ]
     },
@@ -221,14 +358,19 @@
       },
       "tests": [
         {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::methods::tests",
-          "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_without_spec_refs_is_rejected_for_add_method"
         },
         {
-          "layer": "domain",
-          "module_path": "domain::tddd::catalogue_v2::methods::tests",
-          "test_name": "test_method_declaration_new_with_empty_spec_refs_owns_no_anchors"
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_single_method_empty_entry_rejects_add_method_without_spec_refs"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_modify_method_without_spec_refs_is_rejected"
         }
       ]
     },
@@ -246,6 +388,11 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
           "test_name": "test_method_declaration_catalogue_shape_meets_public_field_and_primitive_lint"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
         }
       ]
     },
@@ -322,91 +469,80 @@
           "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
           "test_name": "test_method_declaration_with_shared_ref_receiver"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_method_declaration_active_catalogue_entry_passes_applicable_lint_rules"
         }
       ]
     },
     {
-      "kind": "fulfillment",
-      "obligation_id": {
-        "entry_key": "PhaseCommandService",
-        "item_identifier": "trait_method:validate",
-        "obligation_kind": "result"
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "AC-14"
+        }
       },
       "tests": [
         {
-          "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_validate_returns_success_and_loader_error"
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_associated_function_defaults_action_to_add"
         },
         {
-          "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_validate_can_run_without_explain_or_enter"
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_v2::methods::tests",
+          "test_name": "test_method_declaration_new_preserves_independent_action"
         },
         {
-          "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_validate_rejects_invalid_configuration"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_method_action_omitted_decodes_as_add"
         },
         {
-          "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_validate_rejects_all_declared_invalid_configurations"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_method_action_round_trip_independent_of_entry_action"
         },
         {
-          "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_validate_rejects_recursive_sotp_basename_variants_before_launch"
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::catalogue_document_codec::tests",
+          "test_name": "test_method_action_invalid_value_returns_decode_error"
         }
       ]
     },
     {
-      "kind": "fulfillment",
-      "obligation_id": {
-        "entry_key": "PhaseCommandService",
-        "item_identifier": "trait_method:explain",
-        "obligation_kind": "result"
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_explain_returns_selected_declaration"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_explain_can_run_without_validate_or_enter"
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "MethodDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+          "element_id": "AC-15"
         }
-      ]
-    },
-    {
-      "kind": "fulfillment",
-      "obligation_id": {
-        "entry_key": "PhaseCommandService",
-        "item_identifier": "trait_method:enter",
-        "obligation_kind": "result"
       },
       "tests": [
         {
           "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_enter_runs_pre_entry_commands_sequentially_at_repository_root"
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_trait_method_without_spec_refs_is_rejected_for_add_method"
         },
         {
           "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_service_enter_can_run_without_validate_or_explain"
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_modify_method_without_spec_refs_is_rejected"
         },
         {
           "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_enter_returns_config_error_without_starting_commands"
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_derive_validates_only_catalogues_supplied_on_the_command"
         },
         {
           "layer": "usecase",
-          "module_path": "usecase::phase_command::tests",
-          "test_name": "test_phase_command_enter_returns_unknown_phase_error_without_running_commands"
+          "module_path": "usecase::test_obligation::derive_tests",
+          "test_name": "test_reference_method_on_add_trait_is_not_derived"
         }
       ]
     }

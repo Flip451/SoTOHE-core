@@ -1,16 +1,10 @@
 {
-  "baseline_hash": "771808fae407c23b0b521bf5ca7c575e3559528d0b376808851656b14170e6ef",
-  "declaration_hash": "2eb561714c15e217e521ab8bf2fa4846537983e472b0e81df87196ee45894025",
-  "generated_at": "2026-08-17T00:47:44Z",
-  "head_commit": "7f5ded3721537cdffddd22f77aaa00ac1bf01718",
+  "baseline_hash": "e50a5024d2530d71dec6f1b171e1cc018ca5e319880174e3a031af5986868cdc",
+  "declaration_hash": "41ff1982e4beb63f9b68e40ed7417a0f76cf87ac90d2912b4d6d73c451f17d22",
+  "generated_at": "2026-08-17T11:06:00Z",
+  "head_commit": "71eedb434eeec0ddbaaafe2cd12b622b64a3e473",
   "schema_version": 4,
   "signals": [
-    {
-      "found_type": true,
-      "kind_tag": "application_service",
-      "signal": "blue",
-      "type_name": "PhaseCommandService"
-    },
     {
       "found_type": true,
       "kind_tag": "interactor",
@@ -22,6 +16,12 @@
       "kind_tag": "interactor",
       "signal": "blue",
       "type_name": "EvaluateTestObligationsInteractor"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "type_name": "PhaseCommandService"
     }
   ]
 }

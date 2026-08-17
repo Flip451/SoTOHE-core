@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -25,7 +25,7 @@
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -34,22 +34,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "c3582f72c5c4c22d2f4de67f3f0248899f873bdd91485339f670146357c88270",
+      "evidence_hash": "cd969d9de3dc90748f19fccf9e839d49c3f7b785fb285f155f88d05c8ada0d75",
       "evidence_origin": {
         "data": {
           "element_id": "GO-02",
           "section": "goal",
-          "text_label": "D1 の method-level spec_refs を active catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。"
+          "text_label": "D1 の method-level spec_refs をコマンドが指名する catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "D1 の method-level spec_refs を active catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。",
+        "citation": "D1 の method-level spec_refs をコマンドが指名する catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -68,12 +68,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし",
+        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -97,7 +97,7 @@
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -106,22 +106,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "156d8b8003661e4a3a15989430c09fd0c4aa0b1fb733c95cde16e0ebf48d0a65",
+      "evidence_hash": "de98ee3032983f56a17761aef1703c35eeeaae480da5427255ebef9997f22f16",
       "evidence_origin": {
         "data": {
           "element_id": "IN-05",
           "section": "in_scope",
-          "text_label": "D1 のためにアクティブな catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。"
+          "text_label": "D1 のためにコマンドが指名する catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "D1 のためにアクティブな catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。",
+        "citation": "D1 のためにコマンドが指名する catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -130,22 +130,46 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "7a5a264a1b4d4fde9a0f44bf15077d8a87a74be2b2d9347981ea9a89d41f33fd",
+      "evidence_hash": "89b64ff2e7a210507edfcde43eac9d15154a2a8d16346215dde8eedf1f003481",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-13",
+          "section": "in_scope",
+          "text_label": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "0ba0d2f560e8f543f3d8729dd4f8ca0ff59fe987f0917d634bf825f2915a5fcd",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
+          "text_label": "コマンドが指名する catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
+        "citation": "コマンドが指名する catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -154,22 +178,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "089d11c73c1a5ae135d8d77db1502e7057196817fdc9d0946fd63338649a41d9",
+      "evidence_hash": "1826cfa96cebaa06e93da60bb3a8c422eaf92cc1f93956edfde090ae683b3ee1",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+          "text_label": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "citation": "method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -178,22 +202,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2b12874af00c94c3cc60b16623e552fb3b884aa876531df609984b33b1808138",
+      "evidence_hash": "03fe38c320297979dca095062a2f1612ea7ab5a13d3ba282f03dd9ec325ba4e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。"
+          "text_label": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。",
+        "citation": "action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -202,22 +226,70 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "d7343c63610450a2a58dd1fe051c791281ba0ceddefd68207f44daa87d4e6290",
+      "evidence_hash": "0e757b75eff6b3b9e0ce480e85872da9fe44d70d3554ec3ef091c5132a0bfd12",
       "evidence_origin": {
         "data": {
           "element_id": "AC-06",
           "section": "acceptance_criteria",
-          "text_label": "アクティブな catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。"
+          "text_label": "コマンドが指名する catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "アクティブな catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。",
+        "citation": "コマンドが指名する catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "627e21fcaf9cc38852593ce83993161993673543155f107a09e5588f74300b4e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
+      "claim_origin": {
+        "data": {
+          "entry_key": "MethodDeclaration",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "051780ed504568f61fe6462a2859adcc8a5ab085c5e3ccdfa4fde5eddcdd219b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -241,7 +313,7 @@
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -250,22 +322,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "028b1dbfe902a3b1c1b76f91b2b1c34891afb3707040fbaa8520cd58b6c55a67",
+      "evidence_hash": "116abb5b360f2ce15c45081fe5ffc3ceb33f77648a0482e20c033c64e9ed4982",
       "evidence_origin": {
         "data": {
           "element_id": "CN-02",
           "section": "constraint",
-          "text_label": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。"
+          "text_label": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ適用する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。",
+        "citation": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ適用する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "aef3936db99c330bb5816692e9616d97f3c27b1734feeb1736e6586f35c2a2cd",
+      "claim_hash": "9c96f59933cc4c9264b5d9208844922262ffee403a05b9539d6ac8964bf21261",
       "claim_origin": {
         "data": {
           "entry_key": "MethodDeclaration",
@@ -274,12 +346,12 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "b0dbdee240cf0961c4e7f30fd8583fb81771bc6b256a55fd1baf6b81a669c250",
+      "evidence_hash": "d651fc24fca57238b8ab5af479f582348fe6714b586c692a90d784af009185a1",
       "evidence_origin": {
         "data": {
           "element_id": "CN-05",
           "section": "constraint",
-          "text_label": "MethodDeclaration の lint-compliance remediation は、D1 の method-level spec_refs を active catalogue で宣言・評価できる状態にするため、既存宣言の name、receiver、params、returns、async/default-implementation status、generics、where predicates、docs という観測可能な method contract information を保持したまま、宣言された entry に適用される catalogue lint 規則へ適合させる。"
+          "text_label": "MethodDeclaration の lint-compliance remediation は、D1 の method-level spec_refs をコマンドが指名する catalogue で宣言・評価できる状態にするため、既存宣言の name、receiver、params、returns、async/default-implementation status、generics、where predicates、docs という観測可能な method contract information を保持したまま、宣言された entry に適用される catalogue lint 規則へ適合させる。"
         },
         "kind": "spec_element"
       },
@@ -289,7 +361,7 @@
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -313,7 +385,7 @@
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -337,7 +409,7 @@
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -361,7 +433,7 @@
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -370,22 +442,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "7a5a264a1b4d4fde9a0f44bf15077d8a87a74be2b2d9347981ea9a89d41f33fd",
+      "evidence_hash": "0ba0d2f560e8f543f3d8729dd4f8ca0ff59fe987f0917d634bf825f2915a5fcd",
       "evidence_origin": {
         "data": {
           "element_id": "AC-01",
           "section": "acceptance_criteria",
-          "text_label": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
+          "text_label": "コマンドが指名する catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "アクティブな catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
+        "citation": "コマンドが指名する catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -394,22 +466,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "2b12874af00c94c3cc60b16623e552fb3b884aa876531df609984b33b1808138",
+      "evidence_hash": "03fe38c320297979dca095062a2f1612ea7ab5a13d3ba282f03dd9ec325ba4e0",
       "evidence_origin": {
         "data": {
           "element_id": "AC-03",
           "section": "acceptance_criteria",
-          "text_label": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。"
+          "text_label": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "method の担当 anchor を宣言しない場合、その trait_method 義務は anchor を所有しない。entry-level anchor が空の単一 method trait と既存 catalogue は、method-level の新しい宣言を追加しなくても従来どおり扱われる。",
+        "citation": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -433,7 +505,7 @@
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -452,12 +524,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -466,22 +538,22 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "028b1dbfe902a3b1c1b76f91b2b1c34891afb3707040fbaa8520cd58b6c55a67",
+      "evidence_hash": "116abb5b360f2ce15c45081fe5ffc3ceb33f77648a0482e20c033c64e9ed4982",
       "evidence_origin": {
         "data": {
           "element_id": "CN-02",
           "section": "constraint",
-          "text_label": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。"
+          "text_label": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ適用する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "新しい method-level anchor 所有権と coverage 検証は、評価対象のアクティブな catalogue にのみ適用し、既存 catalogue を遡及的に不適合にしない。",
+        "citation": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ適用する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "407ee7605444617adbcea162fabb3f88c132e60432eb86f74670866570fc86fc",
+      "claim_hash": "aa7f7644fd10b47250a55a9dd64e34dd81ee464fa99dec532e41fbd2f40ca760",
       "claim_origin": {
         "data": {
           "entry_key": "TestObligation",
@@ -505,7 +577,55 @@
       }
     },
     {
-      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_hash": "82bbbe65740b9f0a427bb93fbe94c19ec66ef8321d00da49776c94476f67ae62",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1531a7b007c74cb61a6d8b4c9d400afd77fae488e599582c62076fd4e2e58e34",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-14",
+          "section": "in_scope",
+          "text_label": "コマンドが指名する catalogue で、add または modify の method に非空の spec_refs を要求し、兄弟 method による代替を認めない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンドが指名する catalogue で、add または modify の method に非空の spec_refs を要求し、兄弟 method による代替を認めない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "82bbbe65740b9f0a427bb93fbe94c19ec66ef8321d00da49776c94476f67ae62",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "03fe38c320297979dca095062a2f1612ea7ab5a13d3ba282f03dd9ec325ba4e0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -524,12 +644,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
+        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -553,7 +673,7 @@
       }
     },
     {
-      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -562,22 +682,118 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "089d11c73c1a5ae135d8d77db1502e7057196817fdc9d0946fd63338649a41d9",
+      "evidence_hash": "89b64ff2e7a210507edfcde43eac9d15154a2a8d16346215dde8eedf1f003481",
       "evidence_origin": {
         "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+          "element_id": "IN-13",
+          "section": "in_scope",
+          "text_label": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "アクティブな catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "citation": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "dbfbe6486b9857c168e5be6b18017867f6c0f34052e3dd275409e453fc39e31e",
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "1826cfa96cebaa06e93da60bb3a8c422eaf92cc1f93956edfde090ae683b3ee1",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "03fe38c320297979dca095062a2f1612ea7ab5a13d3ba282f03dd9ec325ba4e0",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "627e21fcaf9cc38852593ce83993161993673543155f107a09e5588f74300b4e",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-14",
+          "section": "acceptance_criteria",
+          "text_label": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "051780ed504568f61fe6462a2859adcc8a5ab085c5e3ccdfa4fde5eddcdd219b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-15",
+          "section": "acceptance_criteria",
+          "text_label": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
       "claim_origin": {
         "data": {
           "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",

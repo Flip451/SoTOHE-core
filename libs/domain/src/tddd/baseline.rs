@@ -411,7 +411,7 @@ mod tests {
     use super::*;
     use crate::schema::TypeKind;
     use crate::tddd::catalogue_v2::identifiers::{DocString, MethodName, ParamName, TypeRef};
-    use crate::tddd::catalogue_v2::roles::SelfReceiver;
+    use crate::tddd::catalogue_v2::roles::{ItemAction, SelfReceiver};
     use crate::timestamp::Timestamp;
 
     fn unit_method(name: &str) -> MethodDeclaration {
@@ -425,6 +425,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         )
     }
@@ -509,6 +510,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 None,
             )],
         );
@@ -528,6 +530,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 None,
             )],
         );
@@ -565,6 +568,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 None, // no docs
             )],
         );
@@ -581,6 +585,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 Some(DocString::new("Saves the entity.".to_string())), // docs differ
             )],
         );
@@ -610,6 +615,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 None,
             )],
         );
@@ -629,6 +635,7 @@ mod tests {
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 None,
             )],
         );
@@ -678,6 +685,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             None,
         )]);
         let b = TraitBaselineEntry::new(vec![MethodDeclaration::new(
@@ -690,6 +698,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
+            ItemAction::Add,
             Some(DocString::new("Returns the entity, if found.".to_string())),
         )]);
         assert!(
@@ -729,6 +738,7 @@ mod tests {
                     vec![],
                     vec![],
                     vec![],
+                    ItemAction::Add,
                     None,
                 )],
             ),

@@ -1,9 +1,33 @@
 {
   "crate_name": "domain",
   "functions": {
+    "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs": {
+      "action": "add",
+      "docs": "Add the Add/Modify method spec_refs validator (IN-14, AC-03).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "methods",
+          "ty": "&[MethodDeclaration]"
+        }
+      ],
+      "returns": "Result<(), DiagnosticMessage>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-14",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ]
+    },
     "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage": {
       "action": "add",
-      "docs": "T4 coverage validator (IN-01, IN-02, AC-02, CN-01).",
+      "docs": "Add the method-anchor coverage validator (IN-01, IN-02, IN-13; AC-02, AC-03, AC-14, AC-15; CN-01).",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -24,7 +48,23 @@
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
+          "anchor": "IN-13",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
           "anchor": "AC-02",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-15",
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
@@ -82,7 +122,7 @@
   "types": {
     "MethodDeclaration": {
       "action": "modify",
-      "docs": "Modified MethodDeclaration surface with typed method-level spec_refs and lint-conformant accessors; see the cited specification anchors.",
+    "docs": "Modify the MethodDeclaration surface (IN-05, IN-13; AC-03, AC-06, AC-14).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -93,8 +133,9 @@
         }
       },
       "methods": [
-        {
-          "has_default_impl": false,
+      {
+        "action": "modify",
+        "has_default_impl": false,
           "is_async": false,
           "name": "new",
           "params": [
@@ -135,14 +176,29 @@
               "ty": "Vec<SpecRef>"
             },
             {
+              "name": "action",
+              "ty": "ItemAction"
+            },
+            {
               "name": "docs",
               "ty": "Option<DocString>"
             }
           ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-13",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            },
+            {
+              "anchor": "AC-14",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            }
+          ]
+      },
+      {
+        "action": "reference",
+        "has_default_impl": false,
           "is_async": false,
           "name": "associated_function",
           "params": [
@@ -159,90 +215,270 @@
               "ty": "TypeRef"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-13",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            },
+            {
+              "anchor": "AC-14",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            }
+          ]
         },
-        {
-          "has_default_impl": false,
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "name",
           "params": [],
-          "receiver": "&self",
-          "returns": "&MethodName"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "&MethodName",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "receiver",
           "params": [],
-          "receiver": "&self",
-          "returns": "Option<SelfReceiver>"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "Option<SelfReceiver>",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "params",
           "params": [],
-          "receiver": "&self",
-          "returns": "&[ParamDeclaration]"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "&[ParamDeclaration]",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "returns",
           "params": [],
-          "receiver": "&self",
-          "returns": "&TypeRef"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "&TypeRef",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "is_async",
           "params": [],
-          "receiver": "&self",
-          "returns": "bool"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "bool",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "has_default_impl",
           "params": [],
-          "receiver": "&self",
-          "returns": "bool"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "bool",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "generics",
           "params": [],
-          "receiver": "&self",
-          "returns": "&[MethodGenericParam]"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "&[MethodGenericParam]",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "where_predicates",
           "params": [],
-          "receiver": "&self",
-          "returns": "&[WherePredicateDecl]"
-        },
-        {
-          "has_default_impl": false,
+        "receiver": "&self",
+        "returns": "&[WherePredicateDecl]",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
           "is_async": false,
           "name": "spec_refs",
           "params": [],
-          "receiver": "&self",
-          "returns": "&[SpecRef]"
-        },
-        {
+        "receiver": "&self",
+        "returns": "&[SpecRef]",
+        "spec_refs": [
+          {
+            "anchor": "IN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-06",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "CN-05",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+        "action": "add",
+        "has_default_impl": false,
+          "is_async": false,
+          "name": "action",
+          "params": [],
+        "receiver": "&self",
+        "returns": "ItemAction",
+        "spec_refs": [
+          {
+            "anchor": "IN-13",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          },
+          {
+            "anchor": "AC-14",
+            "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+          }
+        ]
+      },
+      {
+          "action": "add",
           "has_default_impl": false,
           "is_async": false,
           "name": "docs",
           "params": [],
           "receiver": "&self",
-          "returns": "Option<&DocString>"
+          "returns": "Option<&DocString>",
+          "spec_refs": [
+            {
+              "anchor": "IN-05",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            },
+            {
+              "anchor": "AC-06",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            },
+            {
+              "anchor": "CN-05",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+            }
+          ]
         },
-        {
-          "has_default_impl": false,
+      {
+        "action": "reference",
+        "has_default_impl": false,
           "is_async": false,
           "name": "signature_string",
           "params": [],
@@ -276,6 +512,10 @@
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
+          "anchor": "IN-13",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
           "anchor": "AC-01",
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
@@ -289,6 +529,14 @@
         },
         {
           "anchor": "AC-06",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-14",
+          "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "anchor": "AC-15",
           "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
@@ -307,7 +555,7 @@
     },
     "TestObligation": {
       "action": "reference",
-      "docs": "Referenced existing TestObligation public surface for contract exposure; see the cited specification anchors.",
+    "docs": "Reference the TestObligation public surface (IN-03; AC-04).",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -319,6 +567,7 @@
       },
       "methods": [
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -351,6 +600,7 @@
           "returns": "Self"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "id",
@@ -359,6 +609,7 @@
           "returns": "&TestObligationId"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "target_entry",
@@ -367,6 +618,7 @@
           "returns": "&CatalogueEntryRef"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "target_role",
@@ -375,6 +627,7 @@
           "returns": "&TargetEntryRoleKind"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "brief",
@@ -383,6 +636,7 @@
           "returns": "&TestObligationBrief"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "declaration_hash",
@@ -391,6 +645,7 @@
           "returns": "&DeclarationHash"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "spec_refs",
@@ -399,6 +654,7 @@
           "returns": "&[TestObligationAnchorId]"
         },
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "owns_edge",

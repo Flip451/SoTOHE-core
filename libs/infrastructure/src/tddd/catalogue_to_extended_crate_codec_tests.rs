@@ -190,6 +190,7 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
                 vec![],
                 vec![],
                 vec![],
+                ItemAction::Add,
                 None,
             )],
             vec![],
@@ -319,6 +320,7 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     vec![],
                     vec![],
                     vec![],
+                    ItemAction::Add,
                     None,
                 ),
                 MethodDeclaration::new(
@@ -331,6 +333,7 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     vec![],
                     vec![],
                     vec![],
+                    ItemAction::Add,
                     None,
                 ),
             ],
@@ -892,6 +895,7 @@ fn test_encode_method_generic_param_type_emits_type_generic() {
         }],
         vec![],
         vec![],
+        ItemAction::Add,
         None,
     );
     doc.insert_type(
@@ -1760,6 +1764,7 @@ fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() 
         vec![],
         vec![],
         vec![],
+        ItemAction::Add,
         None,
     );
     doc.insert_trait(
@@ -1812,6 +1817,7 @@ fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false(
         vec![],
         vec![],
         vec![],
+        ItemAction::Add,
         None,
     );
     // has_default_impl is explicitly false via MethodDeclaration::new.
@@ -1869,6 +1875,7 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
         vec![],
         vec![],
         vec![],
+        ItemAction::Add,
         None,
     );
     assert!(!method.has_default_impl());

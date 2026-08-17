@@ -120,11 +120,59 @@ impl<'de> Deserialize<'de> for GrokOutputEnvelope {
         D: Deserializer<'de>,
     {
         let value = serde_json::Value::deserialize(deserializer)?;
-        if let Some(structured_output) = value.get("structured_output").cloned() {
+        if let Some(structured_output) = structured_output_value(&value) {
             return Ok(Self::Succeeded { structured_output });
         }
         Ok(Self::Failed { failure_reason: failure_detail_from_envelope(&value) })
     }
+}
+
+fn structured_output_value(value: &serde_json::Value) -> Option<serde_json::Value> {
+    value.get("structured_output").or_else(|| value.get("structuredOutput")).cloned()
+}
+
+/// Selects the Grok envelope bytes from provider stdout.
+///
+/// Prefers the last NDJSON line that carries structured output or a terminal
+/// failure. Otherwise the whole buffer is treated as one JSON document so a
+/// pretty-printed `--output-format json` object is still admitted. Envelope
+/// text is not used as a result channel; callers still decode through
+/// [`GrokOutputEnvelope`].
+pub(crate) fn grok_envelope_bytes_from_stdout(stdout: &[u8]) -> Option<Vec<u8>> {
+    let text = std::str::from_utf8(stdout).ok()?;
+    let mut last_stream = None;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        if is_grok_stream_terminal_envelope(line) {
+            last_stream = Some(line.as_bytes().to_vec());
+        }
+    }
+    if last_stream.is_some() {
+        return last_stream;
+    }
+    let trimmed = text.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    serde_json::from_str::<serde_json::Value>(trimmed)
+        .ok()
+        .filter(serde_json::Value::is_object)
+        .map(|_| trimmed.as_bytes().to_vec())
+}
+
+fn is_grok_stream_terminal_envelope(line: &str) -> bool {
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(line) else {
+        return false;
+    };
+    structured_output_value(&value).is_some()
+        || value.get("failure_reason").is_some()
+        || matches!(
+            value.get("type").and_then(serde_json::Value::as_str),
+            Some("result" | "error" | "end")
+        )
 }
 
 fn missing_structured_output_failure() -> CapabilityFailureDetail {
@@ -168,6 +216,7 @@ pub enum GrokEnvelopeError {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
 
@@ -340,5 +389,51 @@ mod tests {
             }),
         );
         Ok(())
+    }
+
+    #[test]
+    fn test_grok_output_envelope_camel_case_structured_output_returns_value()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let envelope: GrokOutputEnvelope =
+            serde_json::from_str(r#"{"structuredOutput":{"result":"OK"},"text":"ignore-me"}"#)?;
+
+        assert_eq!(envelope.into_structured_output()?, serde_json::json!({"result": "OK"}),);
+        Ok(())
+    }
+
+    #[test]
+    fn test_grok_envelope_bytes_from_pretty_printed_json_document() {
+        let stdout = r#"{
+  "text": "{\"result\": \"OK\"}",
+  "sessionId": "grok-session",
+  "structuredOutput": {
+    "result": "OK"
+  }
+}
+"#;
+        let bytes = grok_envelope_bytes_from_stdout(stdout.as_bytes()).expect("envelope");
+        let envelope: GrokOutputEnvelope =
+            serde_json::from_slice(&bytes).expect("pretty-printed envelope decodes");
+        assert_eq!(
+            envelope.into_structured_output().expect("structured output"),
+            serde_json::json!({"result": "OK"}),
+        );
+    }
+
+    #[test]
+    fn test_grok_envelope_bytes_from_ndjson_prefers_last_structured_output() {
+        let stdout = concat!(
+            r#"{"type":"text","data":"ignore"}"#,
+            "\n",
+            r#"{"type":"result","structured_output":{"result":"first"}}"#,
+            "\n",
+            r#"{"type":"result","structuredOutput":{"result":"second"}}"#,
+            "\n",
+        );
+        let bytes = grok_envelope_bytes_from_stdout(stdout.as_bytes()).expect("envelope");
+        assert_eq!(
+            bytes.as_slice(),
+            br#"{"type":"result","structuredOutput":{"result":"second"}}"#,
+        );
     }
 }

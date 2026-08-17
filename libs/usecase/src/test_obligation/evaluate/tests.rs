@@ -734,6 +734,7 @@ fn method_anchor_ownership_catalogue() -> CatalogueDocument {
             vec![],
             vec![],
             anchors.iter().map(|anchor| method_owned_spec_ref(anchor)).collect(),
+            ItemAction::Add,
             None,
         )
     };
@@ -859,6 +860,7 @@ fn money_catalogue() -> CatalogueDocument {
                     vec![],
                     vec![],
                     vec![],
+                    ItemAction::Add,
                     None,
                 ),
                 MethodDeclaration::new(
@@ -871,6 +873,7 @@ fn money_catalogue() -> CatalogueDocument {
                     vec![],
                     vec![],
                     vec![],
+                    ItemAction::Add,
                     None,
                 ),
             ],

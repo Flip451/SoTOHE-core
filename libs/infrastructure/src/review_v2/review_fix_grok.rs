@@ -17,7 +17,7 @@ use usecase::review_v2::run_review_fix::{
 
 use crate::capability_exec::grok::{build_grok_args, resolve_grok_capability_definition};
 use crate::capability_exec::process::run_command_with_bounded_output;
-use crate::grok_common::{GrokOutputEnvelope, GrokSandbox};
+use crate::grok_common::{GrokOutputEnvelope, GrokSandbox, grok_envelope_bytes_from_stdout};
 use crate::provider_session::FsProviderSessionCacheAdapter;
 
 fn parse_sentinel(output: &str) -> Option<&'static str> {
@@ -147,7 +147,13 @@ fn parse_output(stdout: &[u8], exit_ok: bool) -> Result<LaunchOutput, ReviewFixR
             session_id: None,
         });
     }
-    let value: serde_json::Value = serde_json::from_slice(stdout).map_err(|error| {
+    let envelope_bytes = grok_envelope_bytes_from_stdout(stdout).ok_or_else(|| {
+        ReviewFixRunnerError::Unexpected(diagnostic(
+            "cannot decode Grok review-fix envelope: structured-output envelope is missing"
+                .to_owned(),
+        ))
+    })?;
+    let value: serde_json::Value = serde_json::from_slice(&envelope_bytes).map_err(|error| {
         ReviewFixRunnerError::Unexpected(diagnostic(format!(
             "cannot decode Grok review-fix envelope: {error}"
         )))

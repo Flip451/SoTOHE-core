@@ -1,8 +1,36 @@
 {
   "obligations": [
     {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+      "declaration_hash": "f16ac9ab78ae4e45557af18af903242cb2dbf5cdb1549a94369bb8b8052565c5",
+      "id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-14",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
       "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
-      "declaration_hash": "4f6995974e3e0f8057db71e0a68af73be11b2b1026bba9ac70685f5d9eb6093d",
+      "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b",
       "id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
         "item_identifier": "entry",
@@ -18,7 +46,23 @@
           "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
+          "element_id": "IN-13",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
           "element_id": "AC-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-14",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-15",
           "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
         },
         {
@@ -34,90 +78,6 @@
       "target_role": {
         "kind": "function_role",
         "role": "FreeFunction"
-      }
-    },
-    {
-      "brief": "Author a result test covering 'trait_method:validate' of PhaseCommandService",
-      "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff",
-      "id": {
-        "entry_key": "PhaseCommandService",
-        "item_identifier": "trait_method:validate",
-        "obligation_kind": "result"
-      },
-      "spec_refs": [
-        {
-          "element_id": "IN-09",
-          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-        },
-        {
-          "element_id": "AC-10",
-          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-        }
-      ],
-      "target_entry": {
-        "entry_key": "PhaseCommandService",
-        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
-        "section_key": "traits"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "ApplicationService"
-      }
-    },
-    {
-      "brief": "Author a result test covering 'trait_method:explain' of PhaseCommandService",
-      "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff",
-      "id": {
-        "entry_key": "PhaseCommandService",
-        "item_identifier": "trait_method:explain",
-        "obligation_kind": "result"
-      },
-      "spec_refs": [
-        {
-          "element_id": "IN-10",
-          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-        },
-        {
-          "element_id": "AC-11",
-          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-        }
-      ],
-      "target_entry": {
-        "entry_key": "PhaseCommandService",
-        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
-        "section_key": "traits"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "ApplicationService"
-      }
-    },
-    {
-      "brief": "Author a result test covering 'trait_method:enter' of PhaseCommandService",
-      "declaration_hash": "dbdcc28555e45d99f1fb1409e04cf6f3e54f63d0c79a3ca03a98ba785e5f4eff",
-      "id": {
-        "entry_key": "PhaseCommandService",
-        "item_identifier": "trait_method:enter",
-        "obligation_kind": "result"
-      },
-      "spec_refs": [
-        {
-          "element_id": "IN-11",
-          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-        },
-        {
-          "element_id": "AC-12",
-          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-        }
-      ],
-      "target_entry": {
-        "entry_key": "PhaseCommandService",
-        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
-        "section_key": "traits"
-      },
-      "target_role": {
-        "kind": "contract_role",
-        "role": "ApplicationService"
       }
     }
   ],

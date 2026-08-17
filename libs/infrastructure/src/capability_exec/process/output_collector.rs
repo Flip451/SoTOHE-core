@@ -13,6 +13,8 @@ use std::os::windows::fs::OpenOptionsExt;
 
 use usecase::capability_exec::{CapabilityExecError, ProviderName};
 
+use crate::grok_common::grok_envelope_bytes_from_stdout;
+
 use super::termination::terminate_provider_process_group;
 use super::{PROVIDER_LOG_DRAIN_TIMEOUT, dispatch_error};
 
@@ -73,6 +75,9 @@ pub(super) fn collect_provider_output<R: Read>(
     pipe: R,
     provider: &ProviderName,
 ) -> Result<ProviderCollectedOutput, std::io::Error> {
+    if provider.as_str() == "grok" {
+        return collect_grok_provider_output(pipe);
+    }
     let mut reader = BufReader::new(pipe);
     let max_event_bytes = max_provider_event_bytes(provider);
     let mut event = Vec::with_capacity(max_event_bytes);
@@ -110,6 +115,23 @@ pub(super) fn collect_provider_output<R: Read>(
     if !discarding_event {
         collect_event_fields(&event, provider, &mut session_id, &mut final_message);
     }
+    Ok(ProviderCollectedOutput { session_id, final_message })
+}
+
+fn collect_grok_provider_output<R: Read>(
+    pipe: R,
+) -> Result<ProviderCollectedOutput, std::io::Error> {
+    let mut reader = pipe.take(MAX_PROVIDER_FINAL_MESSAGE_BYTES.saturating_add(1));
+    let mut stdout = Vec::new();
+    reader.read_to_end(&mut stdout)?;
+    if stdout.len() > MAX_PROVIDER_FINAL_MESSAGE_BYTES as usize {
+        return Err(std::io::Error::new(
+            ErrorKind::InvalidData,
+            format!("Grok stdout exceeds {MAX_PROVIDER_FINAL_MESSAGE_BYTES} bytes"),
+        ));
+    }
+    let final_message = grok_envelope_bytes_from_stdout(&stdout);
+    let session_id = final_message.as_deref().and_then(extract_provider_session_id);
     Ok(ProviderCollectedOutput { session_id, final_message })
 }
 
