@@ -10,7 +10,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -19,7 +19,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "trait_method 義務は、その method の spec_refs だけを所有する。entry-level spec_refs は trait 全体と仕様を結ぶために使い、義務へはコピーしない。",
+        "citation": "- trait_method 義務は、その method の spec_refs だけを所有する。entry-level spec_refs は trait 全体と仕様を結ぶために使い、義務へはコピーしない。",
         "kind": "pass"
       }
     },
@@ -33,7 +33,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -42,7 +42,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。全 anchor に担当義務があるため、検証漏れを防ぎながら、各 method に自 method のテストだけを結び付けられる。",
+        "citation": "「fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。」「各 method に自 method のテストだけを結び付けられる。」",
         "kind": "pass"
       }
     },
@@ -56,7 +56,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -65,7 +65,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「D1 の method-level spec_refs を導入し、trait_method 義務の anchor 所有権を method 単位にする」および「この条件を満たさない catalogue は構造検証で棄却する。」「評価対象のアクティブな catalogue だけが上記の検証を受ける。」",
+        "citation": "「method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。…この条件を満たさない catalogue は構造検証で棄却する。」",
         "kind": "pass"
       }
     },
@@ -102,7 +102,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -111,7 +111,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "MethodDeclaration に、仕様要素への構造化参照の配列 `spec_refs` を追加する。schema 上は任意だが、以下の検証規則によって必須になる場合がある。entry-level spec_refs は全 anchor の総目録、各 method の spec_refs はその中の担当分とする。\n- trait_method 義務は、その method の spec_refs だけを所有する。entry-level spec_refs は trait 全体と仕様を結ぶために使い、義務へはコピーしない。",
+        "citation": "MethodDeclaration に、仕様要素への構造化参照の配列 `spec_refs` を追加する。schema 上は任意だが、以下の検証規則によって必須になる場合がある。entry-level spec_refs は全 anchor の総目録、各 method の spec_refs はその中の担当分とする。trait_method 義務は、その method の spec_refs だけを所有する。entry-level spec_refs は trait 全体と仕様を結ぶために使い、義務へはコピーしない。",
         "kind": "pass"
       }
     },
@@ -125,7 +125,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -134,7 +134,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。…単一 method で entry に anchor がある場合は、その全てを method に明記する。",
+        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。... 単一 method で entry に anchor がある場合は、その全てを method に明記する。",
         "kind": "pass"
       }
     },
@@ -148,7 +148,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -157,7 +157,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "D1 の割り当て検証を通過した後、fulfillment と指示書は、その義務が所有する anchor だけを扱う。",
+        "citation": "D1 の割り当て検証を通過した後、fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。",
         "kind": "pass"
       }
     },
@@ -171,7 +171,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -217,7 +217,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -240,7 +240,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -263,7 +263,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -286,7 +286,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -295,7 +295,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "暫定受容の逸脱記録（Known Accepted Deviations）を撤去する。機構変更だけでなく、ここまでを本 refinement の完了条件とする。",
+        "citation": "暫定受容の逸脱記録（Known Accepted Deviations）を撤去する。",
         "kind": "pass"
       }
     },
@@ -309,7 +309,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -332,7 +332,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -355,7 +355,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -364,7 +364,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "trait_method 義務は、その method の spec_refs だけを所有する。entry-level spec_refs は trait 全体と仕様を結ぶために使い、義務へはコピーしない。",
+        "citation": "trait_method 義務は、その method の spec_refs だけを所有する。",
         "kind": "pass"
       }
     },
@@ -378,7 +378,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -401,7 +401,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -410,7 +410,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「schema 追加は後方互換とし、既存 catalogue には遡って適用しない。評価対象のアクティブな catalogue だけが上記の検証を受ける。」／「この条件を満たさない catalogue は構造検証で棄却する。」",
+        "citation": "schema 追加は後方互換とし、既存 catalogue には遡って適用しない。評価対象のアクティブな catalogue だけが上記の検証を受ける。",
         "kind": "pass"
       }
     },
@@ -424,7 +424,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -447,7 +447,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -470,7 +470,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -479,7 +479,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "D1 の割り当て検証を通過した後、fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。全 anchor に担当義務があるため、検証漏れを防ぎながら、各 method に自 method のテストだけを結び付けられる。",
+        "citation": "D1 の割り当て検証を通過した後、fulfillment と指示書は、その義務が所有する anchor だけを扱う。",
         "kind": "pass"
       }
     },
@@ -493,7 +493,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -502,7 +502,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「MethodDeclaration に、仕様要素への構造化参照の配列 `spec_refs` を追加する。schema 上は任意だが、以下の検証規則によって必須になる場合がある。」また、「評価対象のアクティブな catalogue だけが上記の検証を受ける。」",
+        "citation": "「MethodDeclaration に、仕様要素への構造化参照の配列 `spec_refs` を追加する。schema 上は任意だが、以下の検証規則によって必須になる場合がある。」および「評価対象のアクティブな catalogue だけが上記の検証を受ける。」",
         "kind": "pass"
       }
     },
@@ -539,7 +539,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -548,7 +548,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "entry-level spec_refs は全 anchor の総目録、各 method の spec_refs はその中の担当分とする。trait_method 義務は、その method の spec_refs だけを所有する。",
+        "citation": "entry-level spec_refs は全 anchor の総目録、各 method の spec_refs はその中の担当分とする。",
         "kind": "pass"
       }
     },
@@ -562,7 +562,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -571,7 +571,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。この条件を満たさない catalogue は構造検証で棄却する。単一 method で entry に anchor がある場合は、その全てを method に明記する。",
+        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。同じ anchor を複数 method が担当してもよい。この条件を満たさない catalogue は構造検証で棄却する。単一 method で entry に anchor がある場合は、その全てを method に明記する。",
         "kind": "pass"
       }
     },
@@ -585,7 +585,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -594,7 +594,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "spec_refs を書かなかった method は anchor を持たない。複数 method では他 method が全 anchor を担当していれば省略でき、単一 method では entry-level spec_refs が空の場合だけ省略できる。",
+        "citation": "spec_refs を書かなかった method は anchor を持たない。複数 method では他 method が全 anchor を担当していれば省略でき、単一 method では entry-level spec_refs が空の場合だけ省略できる。anchor を持たない義務には既存の自発的な結び付け・免除の規則を使う。",
         "kind": "pass"
       }
     },
@@ -608,7 +608,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D2",
@@ -631,7 +631,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -654,7 +654,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -677,7 +677,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -700,7 +700,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D3",
@@ -723,7 +723,7 @@
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "3798eab24426a91b7e19d67fc3bb8e1191e0d710c989b2640b0b3a6b7e6bd76e",
+      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
@@ -732,7 +732,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "評価対象のアクティブな catalogue だけが上記の検証を受ける。",
+        "citation": "「評価対象のアクティブな catalogue だけが上記の検証を受ける。」",
         "kind": "pass"
       }
     },
