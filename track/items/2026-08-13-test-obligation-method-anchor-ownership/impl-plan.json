@@ -119,16 +119,19 @@
       "status": "done"
     },
     {
+      "commit_hash": "701256308832e5ddff442732ff7574cf814edf98",
       "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs and related domain tests. Operation: implement and test method spec_refs validation. Anchors: GO-01, IN-14, AC-03, CN-01.",
       "id": "T12",
       "status": "done"
     },
     {
+      "commit_hash": "701256308832e5ddff442732ff7574cf814edf98",
       "description": "Targets: libs/domain/src/tddd/test_obligation/projection.rs and related domain tests. Operation: implement and test action-aware method-obligation projection. Anchors: AC-14.",
       "id": "T13",
       "status": "done"
     },
     {
+      "commit_hash": "701256308832e5ddff442732ff7574cf814edf98",
       "description": "Targets: libs/usecase/src/test_obligation/derive.rs, its command-directed catalogue selection boundary, and related tests. Operation: implement and test the command-directed catalogue selection boundary. Anchors: GO-01, GO-02, IN-14, AC-03, AC-14, AC-15, CN-02, OS-01.",
       "id": "T11",
       "status": "done"
