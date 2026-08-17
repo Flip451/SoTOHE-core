@@ -1,0 +1,19 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {
+    "cli_composition::telemetry_wiring::emit_review_round": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {}
+}

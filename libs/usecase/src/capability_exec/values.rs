@@ -270,6 +270,10 @@ pub static CODEX_PROVIDER_NAME: LazyLock<ProviderName> =
 pub static CLAUDE_PROVIDER_NAME: LazyLock<ProviderName> =
     LazyLock::new(|| ProviderName("claude".to_owned()));
 
+/// Fixed provider identifier used by the Grok adapter.
+pub static GROK_PROVIDER_NAME: LazyLock<ProviderName> =
+    LazyLock::new(|| ProviderName("grok".to_owned()));
+
 /// Fixed path used by the repository-owned capability discipline source.
 pub static CAPABILITY_EXEC_DISCIPLINE_PATH: LazyLock<CapabilityFilePath> = LazyLock::new(|| {
     CapabilityFilePath(PathBuf::from(".harness/prompts/capability-exec-discipline.md"))

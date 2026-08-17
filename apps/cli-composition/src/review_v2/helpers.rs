@@ -1,21 +1,11 @@
 //! Private helpers shared across `CliApp` `review_v2` methods.
 
 use std::path::PathBuf;
-use std::sync::Mutex;
-use std::time::Instant;
 
 use crate::error::CompositionError;
 
 use super::shared::CodexReviewOutcome;
 use usecase::review_v2::RunReviewOutput;
-
-pub(crate) fn record_instant_once(slot: &Mutex<Option<Instant>>) {
-    if let Ok(mut recorded_at) = slot.lock() {
-        if recorded_at.is_none() {
-            *recorded_at = Some(Instant::now());
-        }
-    }
-}
 
 // ---------------------------------------------------------------------------
 // Track-ID resolution

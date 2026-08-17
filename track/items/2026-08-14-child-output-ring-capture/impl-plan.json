@@ -1,0 +1,63 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Update review-fix runner diagnostic capture and focused infrastructure regressions. [D1; IN-01; IN-03; CN-02; AC-01; AC-03]"
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Review-fix diagnostic capture"
+      },
+      {
+        "description": [
+          "Update the program-runner outcome contract, infrastructure adapter, and related regressions. [IN-02; CN-01; CN-03; AC-02; AC-04]"
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Program-runner capture contract and adapter"
+      },
+      {
+        "description": [
+          "Update downstream outcome rendering and regression coverage after the program-runner contract is available. [IN-02; OS-02; CN-03; AC-02; AC-04]"
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Phase-command propagation"
+      }
+    ],
+    "summary": [
+      "GO-01 → T001, T002, T003."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "a700c6810f60a85c256919e37ef55924591bcb19",
+      "description": "Update the review-fix runner's diagnostic capture and focused infrastructure regressions. [D1; D2; IN-01; IN-03; OS-01; CN-02; CN-03; AC-01; AC-03]",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "0eb8410999b38b1c28e5742fd2e8c08d2c43bdea",
+      "description": "Apply the catalogued captured-stream outcome contract to the program runner and infrastructure adapter; update usecase and adapter regressions, including the ProgramRunnerPort contract obligation. [D1; IN-02; OS-02; OS-03; CN-01; CN-03; AC-02; AC-04]",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "commit_hash": "0eb8410999b38b1c28e5742fd2e8c08d2c43bdea",
+      "depends_on": [
+        "T002"
+      ],
+      "description": "Adapt phase-command rendering and CLI/composition regressions to the captured-stream outcome. [D1; D2; IN-02; OS-02; CN-03; AC-02; AC-04]",
+      "id": "T003",
+      "status": "done"
+    }
+  ]
+}

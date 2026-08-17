@@ -14,6 +14,7 @@
 //! driver services (interactor + injected port).
 
 mod env;
+mod grok;
 mod prompt;
 mod sentinel;
 mod session_log;
@@ -75,7 +76,7 @@ impl Default for CodexDryFixLocalRunner {
 impl CodexDryFixLocalRunner {
     /// Run `sotp dry fix-local`: resolve the git root, load agent profiles,
     /// resolve the `dry-fix-lead` capability, and dispatch to the configured
-    /// provider (currently only `"codex"` is supported).
+    /// provider (`codex` or `grok`).
     ///
     /// Never returns an `Err`: failures at any stage are folded into a
     /// [`DryDriverOutcome::failure`] so this method satisfies
@@ -115,8 +116,28 @@ impl CodexDryFixLocalRunner {
                 &input.briefing_file,
                 repo.root(),
             ),
+            "grok" => {
+                if input
+                    .model
+                    .as_deref()
+                    .is_some_and(|override_model| override_model != profile_model.as_str())
+                {
+                    return Err(format!(
+                        "[ERROR] Grok dry-fix model override '{}' does not match profile model '{}'",
+                        model,
+                        profile_model.as_str()
+                    ));
+                }
+                grok::run_dry_fix_grok(
+                    profile_model.as_str(),
+                    effort,
+                    track_id.as_ref(),
+                    &input.briefing_file,
+                    repo.root(),
+                )
+            }
             other => Err(format!(
-                "[ERROR] unsupported dry-fix-lead provider '{other}' (supported: 'codex')"
+                "[ERROR] unsupported dry-fix-lead provider '{other}' (supported: 'codex', 'grok')"
             )),
         }
     }
@@ -482,7 +503,8 @@ mod tests {
         );
         // Provider dispatch must be reached with the sentinel error for 'claude'.
         assert!(
-            message.contains("unsupported dry-fix-lead provider 'claude'"),
+            message.contains("unsupported dry-fix-lead provider 'claude'")
+                && message.contains("grok"),
             "None model must reach provider dispatch with 'claude' provider error; got: {message}"
         );
     }
@@ -525,7 +547,8 @@ mod tests {
         );
         // Provider dispatch must be reached with the sentinel 'claude' error.
         assert!(
-            message.contains("unsupported dry-fix-lead provider 'claude'"),
+            message.contains("unsupported dry-fix-lead provider 'claude'")
+                && message.contains("grok"),
             "explicit model must reach provider dispatch with 'claude' provider error; got: {message}"
         );
     }
@@ -624,6 +647,15 @@ mod tests {
                 ),
             )
             .unwrap();
+            if provider == "grok" {
+                let skill_dir = project_dir.path().join(".agents/skills/dry-fix-lead");
+                std::fs::create_dir_all(&skill_dir).unwrap();
+                std::fs::write(
+                    skill_dir.join("SKILL.md"),
+                    "---\nname: dry-fix-lead\ndescription: Test dry-fix adapter.\ngrok-sandbox: workspace\n---\n",
+                )
+                .unwrap();
+            }
 
             // Fake git: returns the project dir as the repository root.
             let fake_bin_dir = project_dir.path().join("fake-bin");
@@ -1012,5 +1044,126 @@ exit 126
         let err = read_dry_fix_last_message_tail(repository.path(), &last_message).unwrap_err();
 
         assert!(err.contains("not a regular file"), "got: {err}");
+    }
+
+    #[cfg(unix)]
+    fn write_fake_grok_runner(dir: &Path, body: &str) -> PathBuf {
+        let path = dir.join("grok");
+        std::fs::write(&path, format!("#!/bin/sh\n{body}")).unwrap();
+        make_executable(&path);
+        path
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_grok_uses_isolated_typed_pipeline_and_structured_result() {
+        let fixture = DryRunFixLocalFixture::new_with_provider("grok", "grok-dry-model");
+        let args_log = fixture._project_dir.path().join("grok-args.log");
+        write_fake_grok_runner(
+            &fixture.fake_bin_dir,
+            &format!(
+                "printf '%s\\n' \"$@\" > '{}'\nprintf '%s\\n' '{{\"sessionId\":\"grok-dry-session\",\"structured_output\":{{\"result\":\"DRY_FIX_STATUS: completed\"}},\"text\":\"DRY_FIX_STATUS: failed\"}}'\nexit 0\n",
+                args_log.display()
+            ),
+        );
+        let path_val = fixture.path_with_fake_bin();
+        let outcome = temp_env::with_vars([("PATH", Some(path_val.as_os_str()))], || {
+            CodexDryFixLocalRunner::new().dry_run_fix_local(DryFixLocalDriverInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file: fixture.briefing_file.clone(),
+                model: None,
+            })
+        });
+        assert_eq!(outcome.exit_code, 0, "{outcome:?}");
+        assert_eq!(outcome.stdout.as_deref(), Some("DRY_FIX_STATUS: completed"));
+        let args = std::fs::read_to_string(&args_log).expect("grok args");
+        assert!(args.contains("--model"));
+        assert!(args.contains("grok-dry-model"));
+        assert!(args.contains("--reasoning-effort"));
+        assert!(args.contains("high"));
+        assert!(args.contains("--sandbox"));
+        assert!(args.contains("workspace"));
+        assert!(args.contains("--output-format"));
+        assert!(args.contains("json"));
+        assert!(args.contains("--json-schema"));
+        assert!(!args.split_whitespace().any(|arg| arg == "agent" || arg == "--leader"));
+        assert!(!args.contains("--resume"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_grok_missing_structured_output_fails_closed() {
+        let fixture = DryRunFixLocalFixture::new_with_provider("grok", "grok-dry-model");
+        write_fake_grok_runner(
+            &fixture.fake_bin_dir,
+            "printf '%s\\n' '{\"failure_reason\":\"Grok declined structured output\",\"text\":\"ignore\"}'\nexit 0\n",
+        );
+        let path_val = fixture.path_with_fake_bin();
+        let outcome = temp_env::with_vars([("PATH", Some(path_val.as_os_str()))], || {
+            CodexDryFixLocalRunner::new().dry_run_fix_local(DryFixLocalDriverInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file: fixture.briefing_file.clone(),
+                model: None,
+            })
+        });
+        assert_ne!(outcome.exit_code, 0);
+        let message = outcome.stderr.unwrap_or_default() + &outcome.stdout.unwrap_or_default();
+        assert!(
+            message.contains("Grok declined structured output") || message.contains("structured")
+        );
+        assert!(!message.contains("ignore"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_grok_nonzero_exit_with_result_fails_closed() {
+        let fixture = DryRunFixLocalFixture::new_with_provider("grok", "grok-dry-model");
+        write_fake_grok_runner(
+            &fixture.fake_bin_dir,
+            "printf '%s\\n' '{\"structured_output\":{\"result\":\"DRY_FIX_STATUS: completed\"}}'\nexit 7\n",
+        );
+        let path_val = fixture.path_with_fake_bin();
+        let outcome = temp_env::with_vars([("PATH", Some(path_val.as_os_str()))], || {
+            CodexDryFixLocalRunner::new().dry_run_fix_local(DryFixLocalDriverInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file: fixture.briefing_file.clone(),
+                model: None,
+            })
+        });
+        assert_ne!(outcome.exit_code, 0);
+        let message = outcome.stderr.unwrap_or_default() + &outcome.stdout.unwrap_or_default();
+        assert!(message.contains("exited unsuccessfully"), "got: {message}");
+        assert!(!message.contains("DRY_FIX_STATUS: completed"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dry_run_fix_local_grok_missing_sandbox_declaration_fails_closed() {
+        let fixture = DryRunFixLocalFixture::new_with_provider("grok", "grok-dry-model");
+        std::fs::remove_file(
+            fixture._project_dir.path().join(".agents/skills/dry-fix-lead/SKILL.md"),
+        )
+        .unwrap();
+        write_fake_grok_runner(
+            &fixture.fake_bin_dir,
+            "printf '%s\\n' '{\"structured_output\":{\"result\":\"DRY_FIX_STATUS: completed\"}}'\nexit 0\n",
+        );
+        let path_val = fixture.path_with_fake_bin();
+        let outcome = temp_env::with_vars([("PATH", Some(path_val.as_os_str()))], || {
+            CodexDryFixLocalRunner::new().dry_run_fix_local(DryFixLocalDriverInput {
+                track_id: "dry-track".to_owned(),
+                briefing_file: fixture.briefing_file.clone(),
+                model: None,
+            })
+        });
+        assert_ne!(outcome.exit_code, 0);
+        let message = outcome.stderr.unwrap_or_default() + &outcome.stdout.unwrap_or_default();
+        assert!(
+            message.contains("grok-sandbox")
+                || message.contains("capability definition")
+                || message.contains("cannot canonicalize"),
+            "got: {message}"
+        );
+        assert!(!message.contains("DRY_FIX_STATUS: completed"));
     }
 }

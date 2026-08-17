@@ -1,0 +1,68 @@
+{
+  "baseline_hash": "eb021ed67fe3074f7b7de6aab88613d35769219cdb65d2f446baaa330fbdd77f",
+  "declaration_hash": "f864e70e2cc5219c3caa67a52d6c806d70232d11ab664ec697acdf1a56fff5d7",
+  "generated_at": "2026-08-15T08:33:12Z",
+  "head_commit": "7ace28261a9bbbff969fe788c220eebe6e30681d",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "usecase::review_v2::ports::ResolvedReviewer"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "ClaudeReviewer"
+    },
+    {
+      "found_items": [
+        "usecase::review_v2::ports::ResolvedReviewer"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "CodexReviewer"
+    },
+    {
+      "found_items": [
+        "usecase::review_v2::ports::Reviewer"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "ReviewYieldRecordingReviewer"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize",
+        "Eq",
+        "PartialEq",
+        "Serialize"
+      ],
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "StructuredReviewRoundDto"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TelemetryEvent"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "TelemetryReportSnapshot"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "TelemetryWriter"
+    }
+  ]
+}

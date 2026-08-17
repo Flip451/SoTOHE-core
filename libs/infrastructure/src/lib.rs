@@ -28,6 +28,7 @@ pub mod dry_check;
 pub mod file_port;
 pub mod gh_cli;
 pub mod git_cli;
+pub mod grok_common;
 pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;

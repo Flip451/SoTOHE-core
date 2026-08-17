@@ -101,6 +101,7 @@ impl TelemetryReportPort for FsTelemetryReportAdapter {
             hook_blocks,
             skipped_lines: infra_output.skipped_lines,
             command_metrics: infra_output.command_metrics,
+            review_yield_metrics: infra_output.review_yield_metrics,
         })
     }
 }
@@ -160,11 +161,8 @@ impl TelemetryEmitDynamicPort for FsTelemetryEmitDynamicAdapter {
             ))
         })?;
         let anchored_items_dir = anchor_root.join("track").join("items");
-        let writer = TelemetryWriter::new(
-            TelemetryConfig::from_env(),
-            track_id.as_ref().to_owned(),
-            anchored_items_dir,
-        );
+        let writer =
+            TelemetryWriter::new(TelemetryConfig::from_env(), track_id.clone(), anchored_items_dir);
 
         let timestamp = chrono::Utc::now().to_rfc3339();
         // The existing TelemetryWriter is the sole active-track sink. Its
@@ -432,6 +430,7 @@ mod tests {
         FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter, ensure_trusted_root,
         resolve_items_dir_under_current_repo, resolve_project_root_from_items_dir,
     };
+    use usecase::telemetry::review_yield::ReviewYieldValue;
     use usecase::telemetry::{
         TelemetryEmitDynamicPort as _, TelemetryEmitDynamicPortError,
         TelemetryReportError as UsecaseError, TelemetryReportPort as _,
@@ -651,6 +650,7 @@ mod tests {
         assert!(output.errors.is_empty());
         assert!(output.hook_blocks.is_empty());
         assert_eq!(*output.skipped_lines.as_ref(), 0);
+        assert!(output.review_yield_metrics.is_empty());
     }
 
     #[test]
@@ -678,6 +678,98 @@ mod tests {
         assert_eq!(*metric.failures().as_ref(), 1);
         assert_eq!(*metric.total_duration().as_ref(), 200);
         assert_eq!(metric.failure_rate().value(), 5_000);
+    }
+
+    #[test]
+    fn test_aggregate_projects_review_yield_metrics_to_usecase_output() {
+        let tmp = tempdir_in_current_repo();
+        let logs_dir = tmp.path().join("some-track").join("logs");
+        std::fs::create_dir_all(&logs_dir).unwrap();
+        std::fs::write(
+            logs_dir.join("telemetry.jsonl"),
+            concat!(
+                r#"{"event_type":"ReviewRound","schema_version":1,"track_id":"some-track","round":{"scope":"architecture","round_type":"fast","provider":"codex","model":"gpt-5","reasoning_effort":"high","findings_count":1},"duration_ms":120,"timestamp":"2026-06-10T00:00:00Z"}"#,
+                "\n",
+                r#"{"event_type":"ReviewRound","schema_version":1,"track_id":"some-track","round":{"scope":"architecture","round_type":"fast","provider":"codex","model":"gpt-5","reasoning_effort":"high","findings_count":0},"duration_ms":80,"timestamp":"2026-06-10T00:00:01Z"}"#,
+                "\n"
+            ),
+        )
+        .unwrap();
+
+        let output = FsTelemetryReportAdapter::new().aggregate("some-track", tmp.path()).unwrap();
+
+        assert_eq!(output.review_yield_metrics.len(), 5);
+        let provider_metric = output
+            .review_yield_metrics
+            .iter()
+            .find(|metric| {
+                metric.value
+                    == ReviewYieldValue::Provider(
+                        usecase::capability_exec::ProviderName::try_new("codex").unwrap(),
+                    )
+            })
+            .unwrap();
+        assert_eq!(provider_metric.execution_count.to_string(), "2");
+        assert_eq!(provider_metric.detection_rate.to_string(), "5000");
+    }
+
+    #[test]
+    fn test_telemetry_report_output_aggregation_preserves_all_observed_state() {
+        let tmp = tempdir_in_current_repo();
+        let track_dir = tmp.path().join("some-track");
+        let logs_dir = track_dir.join("logs");
+        std::fs::create_dir_all(&logs_dir).unwrap();
+        let telemetry_path = logs_dir.join("telemetry.jsonl");
+        std::fs::write(
+            &telemetry_path,
+            concat!(
+                r#"{"event_type":"ReviewRound","schema_version":1,"track_id":"some-track","round":{"scope":"architecture","round_type":"fast","provider":"codex","model":"gpt-5","reasoning_effort":"high","findings_count":1},"duration_ms":120,"timestamp":"2026-06-10T00:00:00Z"}"#,
+                "\n",
+                r#"{"event_type":"ReviewRound","schema_version":1,"track_id":"some-track","round":{"scope":"architecture","round_type":"fast","provider":"codex","model":"gpt-5","reasoning_effort":"high","findings_count":0},"duration_ms":80,"timestamp":"2026-06-10T00:00:01Z"}"#,
+                "\n"
+            ),
+        )
+        .unwrap();
+
+        let review_results_path = track_dir.join("review.json");
+        std::fs::write(&review_results_path, br#"{"schema_version":2,"scopes":{}}"#).unwrap();
+        let configuration_path = tmp.path().join(".harness/config/review-scope.json");
+        std::fs::create_dir_all(configuration_path.parent().unwrap()).unwrap();
+        std::fs::write(&configuration_path, br#"{"scopes":{"architecture":{"required":true}}}"#)
+            .unwrap();
+
+        // The adapter projects a TelemetryReportOutput only; aggregation must not
+        // write telemetry, review results, configuration, or inspection state.
+        let telemetry_before = std::fs::read(&telemetry_path).unwrap();
+        let review_results_before = std::fs::read(&review_results_path).unwrap();
+        let configuration_before = std::fs::read(&configuration_path).unwrap();
+        let inspection_rounds_before = String::from_utf8_lossy(&telemetry_before)
+            .matches("\"event_type\":\"ReviewRound\"")
+            .count();
+
+        let output = FsTelemetryReportAdapter::new().aggregate("some-track", tmp.path()).unwrap();
+
+        let telemetry_after = std::fs::read(&telemetry_path).unwrap();
+        let review_results_after = std::fs::read(&review_results_path).unwrap();
+        let configuration_after = std::fs::read(&configuration_path).unwrap();
+        let inspection_rounds_after = String::from_utf8_lossy(&telemetry_after)
+            .matches("\"event_type\":\"ReviewRound\"")
+            .count();
+
+        assert_eq!(output.review_yield_metrics.len(), 5);
+        assert_eq!(telemetry_after, telemetry_before, "aggregation must not mutate telemetry");
+        assert_eq!(
+            review_results_after, review_results_before,
+            "aggregation must not mutate review results"
+        );
+        assert_eq!(
+            configuration_after, configuration_before,
+            "aggregation must not mutate configuration"
+        );
+        assert_eq!(
+            inspection_rounds_after, inspection_rounds_before,
+            "aggregation must not alter inspection behavior by adding or removing review rounds"
+        );
     }
 
     #[test]

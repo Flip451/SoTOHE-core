@@ -17,8 +17,9 @@ use std::sync::Arc;
 pub use values::{
     BriefingText, CAPABILITY_EXEC_DISCIPLINE_PATH, CLAUDE_PROVIDER_NAME, CODEX_PROVIDER_NAME,
     CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
-    CapabilityProviderBinding, DisciplineText, ExecutionMode, ModelName, ModelProviderName,
-    ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
+    CapabilityProviderBinding, DisciplineText, ExecutionMode, GROK_PROVIDER_NAME, ModelName,
+    ModelProviderName, ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet,
+    TimeoutSeconds,
 };
 
 use crate::conventions_resolve::{

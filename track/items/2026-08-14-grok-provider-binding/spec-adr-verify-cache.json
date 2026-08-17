@@ -1,0 +1,1017 @@
+{
+  "entries": [
+    {
+      "claim_hash": "cc90c1046f3c977bf1495e982fc690b4da5ca54b2bdbf6e735c0f933495f8da3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Enable Grok CLI as a subscription-authenticated provider for the repository's capability and typed-pipeline execution contracts, while preserving deterministic, isolated, fail-closed dispatch behavior and leaving the shipped default provider selection unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "capability の実行体として grok CLI を追加する。briefing はファイル指定で渡し、返却スキーマは起動時に渡して構造化出力を要求する。抽出は envelope の構造化出力フィールドのみを読み、値が無い場合は同 envelope の失敗理由を診断として fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc90c1046f3c977bf1495e982fc690b4da5ca54b2bdbf6e735c0f933495f8da3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Enable Grok CLI as a subscription-authenticated provider for the repository's capability and typed-pipeline execution contracts, while preserving deterministic, isolated, fail-closed dispatch behavior and leaving the shipped default provider selection unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "共有プロセスへの接続を無効化して起動し、capability ごとに独立したセッションとする。モデルは profile の値を明示的に渡し、実行時の既定選択に委ねない。reasoning effort は既存の effort 語彙から供給する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc90c1046f3c977bf1495e982fc690b4da5ca54b2bdbf6e735c0f933495f8da3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Enable Grok CLI as a subscription-authenticated provider for the repository's capability and typed-pipeline execution contracts, while preserving deterministic, isolated, fail-closed dispatch behavior and leaving the shipped default provider selection unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "### D3: 権限は grok が解決した adapter 定義に宣言し、未宣言は fail-closed とする\n\ngrok 向け capability の権限（読み取り専用か書き込み可か）は、D6 で解決した adapter 定義の frontmatter に宣言し、dispatch が `grok --sandbox` へ機械変換する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc90c1046f3c977bf1495e982fc690b4da5ca54b2bdbf6e735c0f933495f8da3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Enable Grok CLI as a subscription-authenticated provider for the repository's capability and typed-pipeline execution contracts, while preserving deterministic, isolated, fail-closed dispatch behavior and leaving the shipped default provider selection unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "grok は `agent-profiles.json` の `execution_mode` が `orchestrator-output` の capability にも `typed-pipeline` の capability にも provider として載る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc90c1046f3c977bf1495e982fc690b4da5ca54b2bdbf6e735c0f933495f8da3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Enable Grok CLI as a subscription-authenticated provider for the repository's capability and typed-pipeline execution contracts, while preserving deterministic, isolated, fail-closed dispatch behavior and leaving the shipped default provider selection unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "shipped default の `agent-profiles.json` は grok を指さない。grok 向けの sample profile を既存の sample 群と同列に同梱し、adapter 定義には sandbox / 権限の宣言例を入れる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cc90c1046f3c977bf1495e982fc690b4da5ca54b2bdbf6e735c0f933495f8da3",
+      "claim_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "Enable Grok CLI as a subscription-authenticated provider for the repository's capability and typed-pipeline execution contracts, while preserving deterministic, isolated, fail-closed dispatch behavior and leaving the shipped default provider selection unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "\"grok の起動は、既存の provider 非依存な dispatch 契約を grok の起動指定へ写す。capability ごとの例外表は持たない。\"",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9aee48d97cdd5f415b1125118c4fcaaa2b57d3675b89b3181dca3e4cce67207e",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Grok provider executions accept a briefing file and a structured-output schema, and derive the returned value exclusively from the envelope's structured-output field. A missing value fails closed and reports the envelope's failure reason; the envelope text field is not a return channel."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "briefing はファイル指定で渡し、返却スキーマは起動時に渡して構造化出力を要求する。抽出は envelope の構造化出力フィールドのみを読み、値が無い場合は同 envelope の失敗理由を診断として fail-closed とする。envelope 内のテキスト欄は途中経過を含むため、返却の抽出には用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9c8e40b1f569d2085ab03cef82d25183905491fac76e92a24581739250174f2a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "共有プロセスへの接続を無効化して起動し、capability ごとに独立したセッションとする。モデルは profile の値を明示的に渡し、実行時の既定選択に委ねない。reasoning effort は既存の effort 語彙から供給する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "9c8e40b1f569d2085ab03cef82d25183905491fac76e92a24581739250174f2a",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Every Grok capability execution runs as an independent subprocess with shared-process connection disabled, an explicit model resolved from the capability profile, and reasoning effort resolved from that profile."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "**model**: profile の当該 capability の `model` だけを権威とする。起動時に明示し、実行時の既定選択に落とさない（D2）。\n- **effort**: profile から解決した reasoning effort を起動指定へ渡す。\n再開は独立した grok プロセスとして起動し、共有プロセスへは接続しない（D2・D4）。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1dc831e4e85d7f62abeb9b2992652d8787bd243a01d738a6a2627979d676c1a6",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "Grok is eligible as both an orchestrator host and a provider. When the host and provider are both Grok, dispatch still starts an independent Grok subprocess rather than delegating in-host."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "grok は capability の実行体であると同時に orchestrator host にもなりうる。host が grok で capability の provider も grok のときは、in-host 委譲を行わず、常に独立した grok プロセスを起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4bdf2da9dfd7acd8d615cb657194029070d713df7176e782734d35bbd6e148b1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "grok は `agent-profiles.json` の `execution_mode` が `orchestrator-output` の capability にも `typed-pipeline` の capability にも provider として載る。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4bdf2da9dfd7acd8d615cb657194029070d713df7176e782734d35bbd6e148b1",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "The profile-defined capability universe may route Grok through both execution modes: orchestrator-output uses the capability-exec Grok path, while typed-pipeline retains its dedicated execution paths with the same Grok launch contract."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「grok の起動は、既存の provider 非依存な dispatch 契約を grok の起動指定へ写す。capability ごとの例外表は持たない。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fed7c207e84c732d7a0b621dfa831ea4f1f3aa8f672a3db83c24ec3aed6dfa75",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Compatible capability definitions are discovered from the shared .agents/ surface. Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary; Grok-only project files are limited to surfaces the shared definition cannot provide."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「Codex の sandbox 拡張 `sandbox:`（`read-only` / `workspace-write`）は grok の sandbox 語彙（`read-only` / `workspace` / `strict` および project profile）と一致しない。同じキーに grok の値を混ぜず、Codex 値からの暗黙変換もしない。相当する独自拡張 key の名前は `grok-sandbox` とする。値は grok の `--sandbox` 語彙とする。」および「.agents/ 共用は前提」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "fed7c207e84c732d7a0b621dfa831ea4f1f3aa8f672a3db83c24ec3aed6dfa75",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-05",
+          "section": "in_scope",
+          "text_label": "Compatible capability definitions are discovered from the shared .agents/ surface. Grok-specific sandbox permission is declared as grok-sandbox on that adapter definition, using Grok's accepted sandbox vocabulary; Grok-only project files are limited to surfaces the shared definition cannot provide."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "Grok はリポジトリの `.agents/skills/`（および `commands/`）を既に発見する。capability の存在確認・本文は、この面を grok の adapter 定義として使う。同じ skill を `.grok/skills/` に複製しない。\n\nD3 の `grok-sandbox` は、この共有 skill の frontmatter に Codex の `sandbox` とは別に足す。本文は増やさない。\n\n`.grok/` に置くのは、`.agents/` が担えない面だけである。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ac704ad1f99b73af664ece7df013e31840ed2d1f2ee608faa561d0983f1077f4",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-06",
+          "section": "in_scope",
+          "text_label": "The repository ships a Grok sample profile and adapter permission declaration examples without changing the shipped default profile to select Grok."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "shipped default の `agent-profiles.json` は grok を指さない。grok 向けの sample profile を既存の sample 群と同列に同梱し、adapter 定義には sandbox / 権限の宣言例を入れる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "358c0a51af5235f5e99e96674299ad86c9a1c4fc54a92aada28e50250b09048b",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-07",
+          "section": "in_scope",
+          "text_label": "When Grok is the host, its project hook surface is .grok/hooks/. Grok envelope and tool names are translated into the existing hook-handler contract, and untranslatable hook input fails closed."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D9",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "grok を orchestrator host として使うときの PreToolUse / UserPromptSubmit ガードは、プロジェクトの `.grok/hooks/` に grok 固有語彙で宣言する。」「`sotp hook dispatch` は grok の封筒（camelCase の tool 名と入力、Grok の tool 識別子）を、既存の Claude 封筒と同じ内部契約へ写してから handler に渡す。写像不能な封筒は fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d7a16d1bb2bc8315c41ff5b991745ac93a267e601910c4ee076da39426b60328",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-01",
+          "section": "out_of_scope",
+          "text_label": "Routing Grok through the Codex custom-provider path or requiring an API key is out of scope; Grok is added as its own provider adapter for its CLI sign-in authentication path."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "capability の実行体として grok CLI を追加する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "dd7192fb348e459c993648b33f1cdc956b83aadb225b3409369c6fcfd2f101d3",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-02",
+          "section": "out_of_scope",
+          "text_label": "Using the envelope text field as a fallback or alternative result-extraction channel is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "envelope 内のテキスト欄は途中経過を含むため、返却の抽出には用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1bab15d6001a18fedaac63999ae8d3403d562386bb8c89b1dd6db6ad1c097973",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "Shared-process connections and in-host Grok delegation are out of scope, including when Grok is the active orchestrator host."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "共有プロセスへの接続を無効化して起動し、capability ごとに独立したセッションとする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1bab15d6001a18fedaac63999ae8d3403d562386bb8c89b1dd6db6ad1c097973",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-03",
+          "section": "out_of_scope",
+          "text_label": "Shared-process connections and in-host Grok delegation are out of scope, including when Grok is the active orchestrator host."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "host が grok で capability の provider も grok のときは、in-host 委譲を行わず、常に独立した grok プロセスを起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f7bb07258b08e691bf9e533ca3aadd4a146e8c1d96f8aa7f9fdcb18ae03d418a",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-04",
+          "section": "out_of_scope",
+          "text_label": "Hard-coding or enumerating the capability universe, and merging typed-pipeline execution into capability exec, are out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "呼び出せる capability の宇宙は `agent-profiles.json` である。名前をこの ADR にも実装にも列挙しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b89ffdd3b7e3043bcd6a310cbd6484e509f3d659a7657217b57597ff04f742bd",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-05",
+          "section": "out_of_scope",
+          "text_label": "Duplicating shared capability bodies in .grok/skills/, accepting a Grok sandbox value through the Codex sandbox key, or accepting unrestricted sandbox mode is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「.agents/ 共用は前提」／「同じキーに grok の値を混ぜず、Codex 値からの暗黙変換もしない。相当する独自拡張 key の名前は `grok-sandbox` とする。値は grok の `--sandbox` 語彙とする。`off`（制限なし）は全権相当として受理しない。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b89ffdd3b7e3043bcd6a310cbd6484e509f3d659a7657217b57597ff04f742bd",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-05",
+          "section": "out_of_scope",
+          "text_label": "Duplicating shared capability bodies in .grok/skills/, accepting a Grok sandbox value through the Codex sandbox key, or accepting unrestricted sandbox mode is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "同じ skill を `.grok/skills/` に複製しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bbccb9d5cc36526d4e2e229a681aac2a3c0d767f14bda7b125f7509627a589f5",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-06",
+          "section": "out_of_scope",
+          "text_label": "Changing the shipped default profile to use Grok, or replacing the Claude host configuration surface, is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "shipped default の `agent-profiles.json` は grok を指さない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bbccb9d5cc36526d4e2e229a681aac2a3c0d767f14bda7b125f7509627a589f5",
+      "claim_origin": {
+        "data": {
+          "element_id": "OS-06",
+          "section": "out_of_scope",
+          "text_label": "Changing the shipped default profile to use Grok, or replacing the Claude host configuration surface, is out of scope."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D9",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "`.claude/settings.json` は Claude 面として残す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d16b7fc3ff21a25dcd4e33db383aafe77ade8062b7775bd48d227dcad27e892e",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "存在しない名前、または adapter 定義を欠く名前は fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d16b7fc3ff21a25dcd4e33db383aafe77ade8062b7775bd48d227dcad27e892e",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when the profile capability is absent or its required adapter definition is absent."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "dispatch は解決した定義の存在を起動前に検証し、欠如は fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2a57ae72552a3991af655b1c54545d95c9cc49fe745deedad2eb3426ea7ac7bb",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when grok-sandbox is undeclared for an execution request or its value is unsupported or unrestricted. An undeclared grok-sandbox resolves to read-only only for diagnosis and validation; it never authorizes dispatch."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D3 未宣言は診断時 read-only、dispatch は宣言欠如でもファイル欠如でも拒否",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c99acb50383460874ab17a960407d1aedcb11749859c9f97349f65447e802f48",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-05",
+          "section": "constraint",
+          "text_label": "Dispatch fails closed when model or effort cannot be resolved, or when a declared adapter model does not exactly match the profile projection."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adapter 定義が model を宣言する場合は profile 値の投影として完全一致を検証し、欠如・不一致は fail-closed。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "18fc87a458d86bba647c32db4f295315b0b22ba4a7270e2e85c14da1c56325ee",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "Grok follows the existing model, effort, and session-resume dispatch contract without Grok-specific capability exceptions. A resumed execution remains an independent subprocess and explicitly receives model, effort, and permission settings; failed, expired, provider-mismatched, or model-mismatched resume falls back to a new session without rejecting the dispatch for that reason alone."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "grok の起動は、既存の provider 非依存な dispatch 契約を grok の起動指定へ写す。capability ごとの例外表は持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "4d1788ded7cb16861f1a4db24f67235a4b6c0df637bb2bae13ed92084eb8a192",
+      "claim_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "Grok host hooks reuse the existing policy handlers; .grok/hooks/ is the canonical Grok-specific declaration surface and .claude/settings.json remains the Claude-specific surface."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D9",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "policy 本体は既存 handler であり、grok 用に別 policy を持たない。」「.claude/settings.json は Claude 面として残す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "229c1ddb3eab1407f071225c06584fed5d7e69b4135b8995252fd2b76cc08be9",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "A successful Grok provider execution returns only the envelope structured-output value. If that value is absent, the execution fails closed and exposes the envelope failure reason rather than treating envelope text as a result."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "抽出は envelope の構造化出力フィールドのみを読み、値が無い場合は同 envelope の失敗理由を診断として fail-closed とする。envelope 内のテキスト欄は途中経過を含むため、返却の抽出には用いない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b15df19059b673d69daaccec188176d0f20b11f2712a4e5a5bfaafc5c43fa281",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "共有プロセスへの接続を無効化して起動し、capability ごとに独立したセッションとする。モデルは profile の値を明示的に渡し、実行時の既定選択に委ねない。reasoning effort は既存の effort 語彙から供給する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b15df19059b673d69daaccec188176d0f20b11f2712a4e5a5bfaafc5c43fa281",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "Each Grok capability dispatch starts an isolated subprocess with no shared-process connection and passes the profile-resolved model and reasoning effort explicitly. The same behavior occurs when Grok hosts a Grok-provided capability."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D4",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "host が grok で capability の provider も grok のときは、in-host 委譲を行わず、常に独立した grok プロセスを起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D5",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「存在しない名前、または adapter 定義を欠く名前は fail-closed とする。」「`orchestrator-output` は既存の `capability exec` に grok adapter arm を 1 本追加して起動する。新しい `orchestrator-output` 名の追加に arm の増設は要らない。`typed-pipeline` は専用経路に grok の起動契約（D1・D8）を載せる。typed-pipeline を `capability exec` に合流させない。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "grok 向け capability の権限（読み取り専用か書き込み可か）は、D6 で解決した adapter 定義の frontmatter に宣言し、dispatch が `grok --sandbox` へ機械変換する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "346a1f8641d8c091489f29fb7a419b947a4dacc1ebbf4af20c48f592a48a74ab",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "A profile-defined Grok capability is dispatchable only when the capability name exists in the profile, its shared adapter definition exists, and that definition declares a valid grok-sandbox. It then uses its applicable execution mode: orchestrator-output uses capability exec, and typed-pipeline uses its dedicated path. Adding a new orchestrator-output capability does not require a new per-capability Grok dispatch arm."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "capability の存在確認・本文は、この面を grok の adapter 定義として使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "239f609388cb1f0c2911e7135404153aae529fd549a8444fe29429afa7e33a34",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D3 未宣言は診断時 read-only、dispatch は宣言欠如でもファイル欠如でも拒否",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "239f609388cb1f0c2911e7135404153aae529fd549a8444fe29429afa7e33a34",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability whose shared adapter definition is missing or lacks a valid grok-sandbox declaration, and rejects an unsupported or unrestricted Grok sandbox. Diagnostic resolution of an undeclared grok-sandbox is read-only and does not make execution admissible."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D6",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "dispatch は解決した定義の存在を起動前に検証し、欠如は fail-closed とする。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "94889cf74e0b26e71637c1c82eba3e92c4e013b4f61743229d0fd6cf3896d552",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "A resumed Grok dispatch explicitly re-supplies model, effort, and permission settings, remains an independent process, and falls back to a new session when resume is unavailable, expired, or incompatible without adding a Grok-only dispatch exception."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "**resume**: 既存の session 再開契約を grok でも使う。... 再開は独立した grok プロセスとして起動し、共有プロセスへは接続しない（D2・D4）。再開時も model / effort / 権限の起動指定を毎回明示し、前回 session の引き継ぎに依存しない。再開失敗・期限切れ・provider または model の不一致は新規 session へ fallback し、dispatch 自体は止めない。\n\n既存契約が検査対象外としている経路（hosted 側実行で dispatch から model / effort を注入できないもの）は対象外のままとする。例外を grok 側で増やさない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "bb434a0138a45aef24d5337c07debf7e9695415f8aefc9e6c655cfb5b1e2f3c7",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-06",
+          "section": "acceptance_criteria",
+          "text_label": "The shipped profile continues to select no Grok provider by default, while a Grok sample profile and shared-adapter permission declaration example are present for consumers who opt in."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D7",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "shipped default の `agent-profiles.json` は grok を指さない。grok 向けの sample profile を既存の sample 群と同列に同梱し、adapter 定義には sandbox / 権限の宣言例を入れる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0765fbb71547646c46f15cebcf901985382c634ec2c5b5063751f987303bf8ee",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-07",
+          "section": "acceptance_criteria",
+          "text_label": "When Grok is the host, .grok/hooks/ declares the host guards and Grok hook envelopes and tool names are mapped to the existing handler contract. An input that cannot be mapped is rejected, and the Claude configuration surface remains unchanged."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D9",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "「grok を orchestrator host として使うときの PreToolUse / UserPromptSubmit ガードは、プロジェクトの `.grok/hooks/` に grok 固有語彙で宣言する。」「`sotp hook dispatch` は grok の封筒（camelCase の tool 名と入力、Grok の tool 識別子）を、既存の Claude 封筒と同じ内部契約へ写してから handler に渡す。写像不能な封筒は fail-closed とする。」「`.claude/settings.json` は Claude 面として残す。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "8293608393c163ecedf9ff8a2cb5984cd6e88d3d9823b31409bc054f2c0bcc87",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-08",
+          "section": "acceptance_criteria",
+          "text_label": "Grok is executed as the Grok CLI provider adapter, not as a Codex custom-provider implementation."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "capability の実行体として grok CLI を追加する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "f01d558c53164df59de532fdee0906adfeefb63dd7961321b5e26489ee603f24",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "Dispatch rejects a Grok capability when its model or reasoning effort cannot be resolved, or when a declared adapter model does not exactly match the profile projection."
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "44060267a41738eae7b0776ff22fbb71ece596a726f61d30bdd5baf0ea9c4332",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D8",
+          "file_path": "knowledge/adr/2026-08-14-1225-grok-provider-binding.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "adapter 定義が model を宣言する場合は profile 値の投影として完全一致を検証し、欠如・不一致は fail-closed。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "schema_version": 1
+}

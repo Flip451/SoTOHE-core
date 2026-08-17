@@ -183,6 +183,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [type-signals cache は clean な同一 HEAD commit でのみ再利用する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
 | [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
 | [check-zero-findings は空 scope を pass させる](2026-08-13-1736-check-zero-findings-empty-scope-pass.md) | Proposed | 2026-08-13 |
+| [子プロセスの診断出力は末尾リングで保持し、出力量で kill しない](2026-08-14-1048-child-output-ring-capture.md) | Proposed | 2026-08-14 |
 
 ### ADR 運用
 
@@ -260,6 +261,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [reasoning effort に max 段を追加し、限定レーンを Luna Max へ移行する](2026-08-02-0151-codex-reasoning-effort-max.md) | Proposed | 2026-08-02 |
 | [capability routing を中華系プロバイダーへ拡張可能にする](2026-08-02-0151-multi-provider-capability-routing.md) | Proposed | 2026-08-02 |
 | [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
+| [grok を第三の provider binding として追加する](2026-08-14-1225-grok-provider-binding.md) | Proposed | 2026-08-14 |
 
 ### テスト・CI ツーリング
 
@@ -299,3 +301,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [機械導出される義務成果物を review 運用成果物として扱う](2026-07-25-0715-derived-obligation-artifact-review-scope.md) | Proposed | 2026-07-25 |
 | [`sotp review results` の scope selector と列挙範囲を一致させる](2026-08-10-0814-review-results-scope-selection.md) | Proposed | 2026-08-10 |
 | [review-fix コマンド群の delivery boundary と briefing の信頼境界](2026-08-11-1857-review-fix-delivery-boundary.md) | Deprecated | 2026-08-11 |
+| [review-yield を計測する](2026-08-14-0428-review-yield-measurement.md) | Proposed | 2026-08-14 |

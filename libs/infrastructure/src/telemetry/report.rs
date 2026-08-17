@@ -7,6 +7,7 @@
 
 use std::collections::HashMap;
 use std::io::{self, BufRead};
+use std::num::NonZeroU64;
 use std::path::{Path, PathBuf};
 
 use domain::TrackId;
@@ -16,8 +17,11 @@ use usecase::telemetry::command_trace::{
     CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric, SotpCommandIdentity,
     TelemetrySkippedLineCount,
 };
+use usecase::telemetry::review_yield::{
+    ReviewDetectionRateBasisPoints, ReviewExecutionCount, ReviewYieldMetric, ReviewYieldValue,
+};
 
-use crate::telemetry::TelemetryEvent;
+use crate::telemetry::{StructuredReviewRoundDto, TelemetryEvent};
 use crate::track::symlink_guard::reject_symlinks_below;
 
 // ---------------------------------------------------------------------------
@@ -28,7 +32,8 @@ use crate::track::symlink_guard::reject_symlinks_below;
 ///
 /// Carries phase-by-phase duration summary, error list, hook block list, and
 /// the count of lines skipped due to parse failures or unknown `schema_version`
-/// (fail-open per CN-04).
+/// (fail-open per CN-04), together with structured-review yield metrics grouped
+/// by each recorded measurement axis.
 #[derive(Debug, Clone)]
 pub struct TelemetryReportSnapshot {
     /// Per-phase aggregated duration, derived from `TrackSubcommand` events.
@@ -42,6 +47,8 @@ pub struct TelemetryReportSnapshot {
     pub skipped_lines: TelemetrySkippedLineCount,
     /// Per-command execution metrics parsed from persisted command records.
     pub command_metrics: Vec<CommandExecutionMetric>,
+    /// Structured-review yield metrics grouped by each recorded measurement axis.
+    pub review_yield_metrics: Vec<ReviewYieldMetric>,
 }
 
 /// Per-phase aggregated duration in the telemetry report.
@@ -85,6 +92,91 @@ pub struct TelemetryHookBlockEntry {
     pub timestamp: String,
     /// Hook identifier that triggered the block.
     pub hook_name: String,
+}
+
+struct ReviewYieldAccumulator {
+    value: ReviewYieldValue,
+    execution_count: u64,
+    detected_rounds: u64,
+}
+
+fn record_review_yield_round(
+    round: &StructuredReviewRoundDto,
+    accumulators: &mut Vec<ReviewYieldAccumulator>,
+) -> bool {
+    let detected = round.findings_count().value() > 0;
+    let values = [
+        ReviewYieldValue::Scope(round.scope().clone()),
+        ReviewYieldValue::RoundType(round.round_type()),
+        ReviewYieldValue::Provider(round.provider().clone()),
+        ReviewYieldValue::Model(round.model().clone()),
+        ReviewYieldValue::ReasoningEffort(round.reasoning_effort()),
+    ];
+    let mut projection_truncated = false;
+
+    for value in values {
+        if let Some(accumulator) =
+            accumulators.iter_mut().find(|accumulator| accumulator.value == value)
+        {
+            accumulator.execution_count = accumulator.execution_count.saturating_add(1);
+            if detected {
+                accumulator.detected_rounds = accumulator.detected_rounds.saturating_add(1);
+            }
+        } else if accumulators.len() < MAX_TELEMETRY_RETAINED_ENTRIES {
+            accumulators.push(ReviewYieldAccumulator {
+                value,
+                execution_count: 1,
+                detected_rounds: u64::from(detected),
+            });
+        } else {
+            projection_truncated = true;
+        }
+    }
+
+    projection_truncated
+}
+
+fn project_review_yield_metrics(
+    accumulators: Vec<ReviewYieldAccumulator>,
+) -> (Vec<ReviewYieldMetric>, u64) {
+    let mut skipped_metrics: u64 = 0;
+    let mut metrics = Vec::with_capacity(accumulators.len());
+
+    for accumulator in accumulators {
+        let Some(execution_count) = NonZeroU64::new(accumulator.execution_count) else {
+            skipped_metrics = skipped_metrics.saturating_add(1);
+            continue;
+        };
+        let basis_points = (u128::from(accumulator.detected_rounds) * 10_000)
+            / u128::from(accumulator.execution_count);
+        let Ok(basis_points) = u16::try_from(basis_points) else {
+            skipped_metrics = skipped_metrics.saturating_add(1);
+            continue;
+        };
+        let Ok(detection_rate) = ReviewDetectionRateBasisPoints::try_new(basis_points) else {
+            skipped_metrics = skipped_metrics.saturating_add(1);
+            continue;
+        };
+
+        metrics.push(ReviewYieldMetric {
+            value: accumulator.value,
+            execution_count: ReviewExecutionCount::new(execution_count),
+            detection_rate,
+        });
+    }
+
+    metrics.sort_by_key(|metric| review_yield_axis_rank(&metric.value));
+    (metrics, skipped_metrics)
+}
+
+fn review_yield_axis_rank(value: &ReviewYieldValue) -> u8 {
+    match value {
+        ReviewYieldValue::Scope(_) => 0,
+        ReviewYieldValue::RoundType(_) => 1,
+        ReviewYieldValue::Provider(_) => 2,
+        ReviewYieldValue::Model(_) => 3,
+        ReviewYieldValue::ReasoningEffort(_) => 4,
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -238,6 +330,7 @@ impl TelemetryReport {
             hook_blocks: Vec::new(),
             skipped_lines: TelemetrySkippedLineCount::from(0),
             command_metrics: Vec::new(),
+            review_yield_metrics: Vec::new(),
         };
 
         if !self.guard_path(&logs_dir)? {
@@ -271,6 +364,7 @@ impl TelemetryReport {
             let mut errors: Vec<TelemetryErrorEntry> = Vec::new();
             let mut hook_blocks: Vec<TelemetryHookBlockEntry> = Vec::new();
             let mut command_map: HashMap<SotpCommandIdentity, (u64, u64, u64)> = HashMap::new();
+            let mut review_yield_accumulators = Vec::new();
             let mut skipped_lines: u64 = 0;
             for log_path in log_paths {
                 let file =
@@ -406,6 +500,12 @@ impl TelemetryReport {
                                     skipped_lines = skipped_lines.saturating_add(1);
                                 }
                             }
+                            TelemetryEvent::ReviewRound { round, .. } => {
+                                if record_review_yield_round(&round, &mut review_yield_accumulators)
+                                {
+                                    skipped_lines = skipped_lines.saturating_add(1);
+                                }
+                            }
                             _ => {}
                         },
                         Err(_) => skipped_lines = skipped_lines.saturating_add(1),
@@ -439,12 +539,17 @@ impl TelemetryReport {
             command_metrics
                 .sort_by(|left, right| left.command().as_str().cmp(right.command().as_str()));
 
+            let (review_yield_metrics, skipped_review_metrics) =
+                project_review_yield_metrics(review_yield_accumulators);
+            skipped_lines = skipped_lines.saturating_add(skipped_review_metrics);
+
             let snapshot = TelemetryReportSnapshot {
                 phase_durations,
                 errors,
                 hook_blocks,
                 skipped_lines: TelemetrySkippedLineCount::from(skipped_lines),
                 command_metrics,
+                review_yield_metrics,
             };
 
             Ok(snapshot)
@@ -547,6 +652,7 @@ mod tests {
     use super::*;
     use std::io::{Cursor, Write};
     use tempfile::TempDir;
+    use usecase::telemetry::review_yield::{ReviewYieldMetric, ReviewYieldValue};
 
     fn write_jsonl<L>(dir: &std::path::Path, track_id: &str, lines: &[L])
     where
@@ -574,6 +680,20 @@ mod tests {
     const HOOK_BLOCK_LINE: &str = r#"{"event_type":"HookBlock","schema_version":1,"track_id":"t","hook_name":"block-direct-git-ops","timestamp":"2026-06-10T02:00:00Z"}"#;
     const COMMAND_SUCCESS_LINE: &str = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track plan","exit_code":0,"duration_ms":120,"timestamp":"2026-06-10T00:00:00Z"}"#;
     const COMMAND_FAILURE_LINE: &str = r#"{"event_type":"TrackSubcommand","schema_version":1,"track_id":"t","command":"track plan","exit_code":17,"duration_ms":80,"timestamp":"2026-06-10T00:00:00Z"}"#;
+    const REVIEW_ROUND_FAST_CODEX_WITH_FINDINGS: &str = r#"{"event_type":"ReviewRound","schema_version":1,"track_id":"t","round":{"scope":"architecture","round_type":"fast","provider":"codex","model":"gpt-5","reasoning_effort":"high","findings_count":2},"duration_ms":120,"timestamp":"2026-06-10T00:00:00Z"}"#;
+    const REVIEW_ROUND_FAST_CODEX_WITHOUT_FINDINGS: &str = r#"{"event_type":"ReviewRound","schema_version":1,"track_id":"t","round":{"scope":"architecture","round_type":"fast","provider":"codex","model":"gpt-5","reasoning_effort":"high","findings_count":0},"duration_ms":80,"timestamp":"2026-06-10T00:01:00Z"}"#;
+    const REVIEW_ROUND_FINAL_CLAUDE_WITH_FINDINGS: &str = r#"{"event_type":"ReviewRound","schema_version":1,"track_id":"t","round":{"scope":"architecture","round_type":"final","provider":"claude","model":"claude-sonnet","reasoning_effort":"max","findings_count":1},"duration_ms":240,"timestamp":"2026-06-10T00:02:00Z"}"#;
+
+    fn assert_review_yield_metric(
+        metrics: &[ReviewYieldMetric],
+        value: ReviewYieldValue,
+        execution_count: &str,
+        detection_rate: &str,
+    ) {
+        let metric = metrics.iter().find(|metric| metric.value == value).unwrap();
+        assert_eq!(metric.execution_count.to_string(), execution_count);
+        assert_eq!(metric.detection_rate.to_string(), detection_rate);
+    }
 
     /// Happy path: aggregate collects phase durations, errors, and hook blocks.
     #[test]
@@ -600,6 +720,7 @@ mod tests {
         assert_eq!(output.hook_blocks.len(), 1);
         let hb = output.hook_blocks.first().unwrap();
         assert_eq!(hb.hook_name, "block-direct-git-ops");
+        assert!(output.review_yield_metrics.is_empty());
     }
 
     /// Multiple TrackSubcommand events for the same command are accumulated.
@@ -656,6 +777,116 @@ mod tests {
         assert_eq!(*metric.failures().as_ref(), 1);
         assert_eq!(*metric.total_duration().as_ref(), 360);
         assert_eq!(metric.failure_rate().value(), 2_500);
+    }
+
+    #[test]
+    fn test_aggregate_projects_review_yield_metrics_for_each_axis() {
+        let tmp = TempDir::new().unwrap();
+        write_jsonl(
+            tmp.path(),
+            "t",
+            &[
+                REVIEW_ROUND_FAST_CODEX_WITH_FINDINGS,
+                REVIEW_ROUND_FAST_CODEX_WITHOUT_FINDINGS,
+                REVIEW_ROUND_FINAL_CLAUDE_WITH_FINDINGS,
+            ],
+        );
+
+        let report = TelemetryReport::new(tmp.path().to_path_buf());
+        let output = report.aggregate(&track_id("t")).unwrap();
+
+        assert_eq!(output.review_yield_metrics.len(), 9);
+        assert_review_yield_metric(
+            &output.review_yield_metrics,
+            ReviewYieldValue::Scope(domain::review_v2::ScopeName::parse("architecture").unwrap()),
+            "3",
+            "6666",
+        );
+        assert_review_yield_metric(
+            &output.review_yield_metrics,
+            ReviewYieldValue::RoundType(domain::review_v2::RoundType::Fast),
+            "2",
+            "5000",
+        );
+        assert_review_yield_metric(
+            &output.review_yield_metrics,
+            ReviewYieldValue::RoundType(domain::review_v2::RoundType::Final),
+            "1",
+            "10000",
+        );
+        assert_review_yield_metric(
+            &output.review_yield_metrics,
+            ReviewYieldValue::Provider(
+                usecase::capability_exec::ProviderName::try_new("codex").unwrap(),
+            ),
+            "2",
+            "5000",
+        );
+        assert_review_yield_metric(
+            &output.review_yield_metrics,
+            ReviewYieldValue::Model(usecase::capability_exec::ModelName::try_new("gpt-5").unwrap()),
+            "2",
+            "5000",
+        );
+        assert_review_yield_metric(
+            &output.review_yield_metrics,
+            ReviewYieldValue::ReasoningEffort(usecase::capability_exec::ReasoningEffort::High),
+            "2",
+            "5000",
+        );
+    }
+
+    #[test]
+    fn test_telemetry_report_snapshot_aggregation_preserves_all_observed_state() {
+        let tmp = TempDir::new().unwrap();
+        write_jsonl(
+            tmp.path(),
+            "t",
+            &[REVIEW_ROUND_FAST_CODEX_WITH_FINDINGS, REVIEW_ROUND_FAST_CODEX_WITHOUT_FINDINGS],
+        );
+
+        let track_dir = tmp.path().join("t");
+        let telemetry_path = track_dir.join("logs/telemetry.jsonl");
+        let review_results_path = track_dir.join("review.json");
+        std::fs::write(&review_results_path, br#"{"schema_version":2,"scopes":{}}"#).unwrap();
+        let configuration_path = tmp.path().join(".harness/config/review-scope.json");
+        std::fs::create_dir_all(configuration_path.parent().unwrap()).unwrap();
+        std::fs::write(&configuration_path, br#"{"scopes":{"architecture":{"required":true}}}"#)
+            .unwrap();
+
+        // The aggregation creates a TelemetryReportSnapshot from telemetry; it must not
+        // write the telemetry, review results, configuration, or inspection state.
+        let telemetry_before = std::fs::read(&telemetry_path).unwrap();
+        let review_results_before = std::fs::read(&review_results_path).unwrap();
+        let configuration_before = std::fs::read(&configuration_path).unwrap();
+        let inspection_rounds_before = String::from_utf8_lossy(&telemetry_before)
+            .matches("\"event_type\":\"ReviewRound\"")
+            .count();
+
+        let output =
+            TelemetryReport::new(tmp.path().to_path_buf()).aggregate(&track_id("t")).unwrap();
+
+        let telemetry_after = std::fs::read(&telemetry_path).unwrap();
+        let review_results_after = std::fs::read(&review_results_path).unwrap();
+        let configuration_after = std::fs::read(&configuration_path).unwrap();
+        let inspection_rounds_after = String::from_utf8_lossy(&telemetry_after)
+            .matches("\"event_type\":\"ReviewRound\"")
+            .count();
+
+        assert_eq!(output.review_yield_metrics.len(), 5);
+        assert_eq!(telemetry_after, telemetry_before, "aggregation must not mutate telemetry");
+        assert_eq!(
+            review_results_after, review_results_before,
+            "aggregation must not mutate review results"
+        );
+        assert_eq!(
+            configuration_after, configuration_before,
+            "aggregation must not mutate configuration"
+        );
+        assert_eq!(
+            inspection_rounds_after, inspection_rounds_before,
+            "aggregation must not alter inspection behavior by adding or removing review rounds"
+        );
     }
 
     #[test]

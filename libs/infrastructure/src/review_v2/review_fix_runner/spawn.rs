@@ -13,8 +13,7 @@ use crate::codex_common::REVIEW_RUNTIME_DIR;
 
 use super::launch_context::{
     FIXER_RUNTIME_TIMEOUT, TrustedLaunchContext, receive_child_output_collector,
-    spawn_child_output_collector, wait_for_child_with_timeout,
-    wait_for_child_with_timeout_or_cancellation,
+    spawn_child_output_tail_collector, wait_for_child_with_timeout,
 };
 use super::session_log::write_session_log;
 
@@ -232,7 +231,6 @@ mod platform_tests {
 #[allow(clippy::expect_used)]
 mod tests {
     use std::process::{Command, Stdio};
-    use std::sync::mpsc;
     use std::time::{Duration, Instant};
 
     use super::{create_runtime_file, write_prompt_before_deadline};
@@ -258,14 +256,12 @@ mod tests {
             .stderr(Stdio::null())
             .spawn()
             .expect("stdin-holding child fixture");
-        let (_sender, receiver) = mpsc::channel();
         let started = Instant::now();
 
         let result = write_prompt_before_deadline(
             child.stdin.take(),
             vec![b'x'; 16 * 1024 * 1024],
             Instant::now(),
-            &receiver,
         );
 
         assert!(result.is_err(), "expired deadline must reject the prompt write");
@@ -285,7 +281,7 @@ pub(super) fn spawn_and_collect_codex(
     prompt: &str,
     launch_context: &TrustedLaunchContext,
     runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
-) -> Result<(String, ExitStatus, RuntimeFile), ReviewFixRunnerError> {
+) -> Result<(ExitStatus, RuntimeFile), ReviewFixRunnerError> {
     let mut log_file = launch_context.create_runtime_file("review-fix-codex-session", "log")?;
     let mut command = Command::new(bin);
     command.args(args);
@@ -304,21 +300,13 @@ pub(super) fn spawn_and_collect_codex(
         )))
     })?;
     let process_id = child.id();
-    let (output_limit_sender, output_limit_receiver) = mpsc::channel();
     let stdout_pipe = child.stdout.take();
-    let stdout_limit_sender = output_limit_sender.clone();
-    let stdout_collector =
-        spawn_child_output_collector(stdout_pipe, false, "stdout", Some(stdout_limit_sender));
+    let stdout_collector = spawn_child_output_tail_collector(stdout_pipe, false, "stdout");
     let stderr_pipe = child.stderr.take();
-    let stderr_collector =
-        spawn_child_output_collector(stderr_pipe, true, "stderr", Some(output_limit_sender));
+    let stderr_collector = spawn_child_output_tail_collector(stderr_pipe, true, "stderr");
     let deadline = Instant::now().checked_add(FIXER_RUNTIME_TIMEOUT).unwrap_or_else(Instant::now);
-    let prompt_write_result = write_prompt_before_deadline(
-        child.stdin.take(),
-        prompt.as_bytes().to_vec(),
-        deadline,
-        &output_limit_receiver,
-    );
+    let prompt_write_result =
+        write_prompt_before_deadline(child.stdin.take(), prompt.as_bytes().to_vec(), deadline);
     if let Err(message) = prompt_write_result {
         let exit_status = wait_for_child_with_timeout(&mut child, Duration::ZERO, "codex fixer")
             .map_or_else(|error| error, |status| status.to_string());
@@ -344,12 +332,7 @@ pub(super) fn spawn_and_collect_codex(
         )));
     }
     let remaining = deadline.saturating_duration_since(Instant::now());
-    let exit_status = wait_for_child_with_timeout_or_cancellation(
-        &mut child,
-        remaining,
-        "codex fixer",
-        Some(&output_limit_receiver),
-    );
+    let exit_status = wait_for_child_with_timeout(&mut child, remaining, "codex fixer");
     let (stdout, stdout_error) = collector_result_for_log(
         receive_child_output_collector(stdout_collector, process_id, "codex fixer", "stdout"),
         "stdout",
@@ -387,14 +370,13 @@ pub(super) fn spawn_and_collect_codex(
             format!("{error}; session log: {}", log_file.path().display()),
         )));
     }
-    Ok((stdout, exit_status, log_file))
+    Ok((exit_status, log_file))
 }
 
 fn write_prompt_before_deadline(
     stdin: Option<std::process::ChildStdin>,
     prompt: Vec<u8>,
     deadline: Instant,
-    output_limit_receiver: &mpsc::Receiver<String>,
 ) -> Result<(), String> {
     let (sender, receiver) = mpsc::sync_channel(1);
     let writer = thread::spawn(move || {
@@ -407,9 +389,6 @@ fn write_prompt_before_deadline(
         let _ = sender.send(result);
     });
     let result = loop {
-        if let Ok(reason) = output_limit_receiver.try_recv() {
-            break Err(format!("codex fixer was terminated after {reason}"));
-        }
         let remaining = deadline.saturating_duration_since(Instant::now());
         if remaining.is_zero() {
             break Err(format!(

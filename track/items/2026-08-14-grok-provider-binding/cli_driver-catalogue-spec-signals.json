@@ -1,0 +1,36 @@
+{
+  "catalogue_declaration_hash": "f4ed30d57304f4f9856b390126914192fae46ea634bf816f6cf705075f5f5dcf",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "7462dc609d18d1d24eb33d4eb12e0af7d429ab5d22274601711478f4b7b66f9a",
+      "signal": "blue",
+      "type_name": "CapabilityDriver"
+    },
+    {
+      "entry_hash": "dea2812c31ec4f1c2f8e1cd695e2ce51281093d1f0315d3eaf546fe8a4cbbe60",
+      "signal": "blue",
+      "type_name": "CommandOutcome"
+    },
+    {
+      "entry_hash": "ebc1e1ca1ab9de6efd7b8bcd67438e38550172b56692b1887b86322322341de3",
+      "signal": "blue",
+      "type_name": "HookDriver"
+    },
+    {
+      "entry_hash": "bdb6557de376e8ea3037e778e740701a9714bc6eb27621d5265801cdcdc75f2e",
+      "signal": "blue",
+      "type_name": "HookInput"
+    },
+    {
+      "entry_hash": "990b9d125f18745f854f854c167cd9237175c8e1582a3b0b83b00071126fbc89",
+      "signal": "blue",
+      "type_name": "ReviewDriver"
+    },
+    {
+      "entry_hash": "a6ffae5978e2f408f0064dcf7aedf4085c2f20ea8dce498be14ccdb65ee845db",
+      "signal": "blue",
+      "type_name": "ReviewFixDriver"
+    }
+  ]
+}

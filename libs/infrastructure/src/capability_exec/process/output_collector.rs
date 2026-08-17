@@ -66,14 +66,16 @@ pub(super) fn receive_provider_output(
 /// Drains provider output while retaining only bounded protocol fields.
 ///
 /// Provider event envelopes are a control channel, never the capability result.
-/// Claude's single JSON envelope carries its final `result`; Codex writes its
+/// Claude's single JSON envelope carries its final `result`, Grok's JSON
+/// envelope carries its structured-output boundary, and Codex writes its
 /// authoritative final message to `--output-last-message` instead.
 pub(super) fn collect_provider_output<R: Read>(
     pipe: R,
     provider: &ProviderName,
 ) -> Result<ProviderCollectedOutput, std::io::Error> {
     let mut reader = BufReader::new(pipe);
-    let mut event = Vec::with_capacity(MAX_PROVIDER_SESSION_EVENT_BYTES);
+    let max_event_bytes = max_provider_event_bytes(provider);
+    let mut event = Vec::with_capacity(max_event_bytes);
     let mut discarding_event = false;
     let mut session_id = None;
     let mut final_message = None;
@@ -87,7 +89,7 @@ pub(super) fn collect_provider_output<R: Read>(
         let event_bytes = newline.unwrap_or(buffer.len());
         let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
         if !discarding_event {
-            let remaining = MAX_PROVIDER_SESSION_EVENT_BYTES.saturating_sub(event.len());
+            let remaining = max_event_bytes.saturating_sub(event.len());
             if event_bytes <= remaining {
                 if let Some(part) = buffer.get(..event_bytes) {
                     event.extend_from_slice(part);
@@ -111,6 +113,14 @@ pub(super) fn collect_provider_output<R: Read>(
     Ok(ProviderCollectedOutput { session_id, final_message })
 }
 
+fn max_provider_event_bytes(provider: &ProviderName) -> usize {
+    if provider.as_str() == "grok" {
+        usize::try_from(MAX_PROVIDER_FINAL_MESSAGE_BYTES).unwrap_or(usize::MAX)
+    } else {
+        MAX_PROVIDER_SESSION_EVENT_BYTES
+    }
+}
+
 fn collect_event_fields(
     event: &[u8],
     provider: &ProviderName,
@@ -123,6 +133,9 @@ fn collect_event_fields(
     if final_message.is_none() && provider.as_str() == "claude" {
         *final_message = extract_claude_final_message(event);
     }
+    if final_message.is_none() && provider.as_str() == "grok" {
+        *final_message = extract_grok_final_message(event);
+    }
 }
 
 fn extract_provider_session_id(event: &[u8]) -> Option<String> {
@@ -130,7 +143,8 @@ fn extract_provider_session_id(event: &[u8]) -> Option<String> {
     let value = serde_json::from_str::<serde_json::Value>(event.trim()).ok()?;
     value
         .get("session_id")
-        .or_else(|| value.get("thread_id"))?
+        .or_else(|| value.get("thread_id"))
+        .or_else(|| value.get("sessionId"))?
         .as_str()
         .filter(|id| !id.trim().is_empty())
         .map(str::to_owned)
@@ -140,6 +154,19 @@ fn extract_claude_final_message(event: &[u8]) -> Option<Vec<u8>> {
     let event = std::str::from_utf8(event).ok()?;
     let value = serde_json::from_str::<serde_json::Value>(event.trim()).ok()?;
     value.get("result")?.as_str().map(|result| result.as_bytes().to_vec())
+}
+
+fn extract_grok_final_message(event: &[u8]) -> Option<Vec<u8>> {
+    let event_text = std::str::from_utf8(event).ok()?;
+    let value = serde_json::from_str::<serde_json::Value>(event_text.trim()).ok()?;
+    let is_envelope = value.get("structured_output").is_some()
+        || value.get("failure_reason").is_some()
+        || value.get("text").is_some()
+        || value.get("error").is_some();
+    let is_terminal_stream_event = value.get("type").and_then(serde_json::Value::as_str)
+        == Some("end")
+        || value.get("type").and_then(serde_json::Value::as_str) == Some("error");
+    (is_envelope || is_terminal_stream_event).then(|| event_text.trim().as_bytes().to_vec())
 }
 
 pub(super) fn initialize_output_last_message(

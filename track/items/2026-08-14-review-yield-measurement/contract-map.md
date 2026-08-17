@@ -1,0 +1,286 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
+    direction TB
+  subgraph T42_usecase_usecase_ResolvedReviewerAssignment["review_v2::ports::ResolvedReviewerAssignment"]
+    direction TB
+    T42_usecase_usecase_ResolvedReviewerAssignment__self[ResolvedReviewerAssignment]
+    T42_usecase_usecase_ResolvedReviewerAssignment_new([new])
+    T42_usecase_usecase_ResolvedReviewerAssignment_track_id([track_id])
+    T42_usecase_usecase_ResolvedReviewerAssignment_scope([scope])
+    T42_usecase_usecase_ResolvedReviewerAssignment_provider([provider])
+    T42_usecase_usecase_ResolvedReviewerAssignment_model([model])
+    T42_usecase_usecase_ResolvedReviewerAssignment_reasoning_effort([reasoning_effort])
+  end
+  subgraph T32_usecase_usecase_ReviewCycleError["review_v2::error::ReviewCycleError"]
+    direction TB
+    T32_usecase_usecase_ReviewCycleError__self[ReviewCycleError]
+    T32_usecase_usecase_ReviewCycleError_UnknownScope[UnknownScope]
+    T32_usecase_usecase_ReviewCycleError_FileChangedDuringReview[FileChangedDuringReview]
+    T32_usecase_usecase_ReviewCycleError_Diff[Diff]
+    T32_usecase_usecase_ReviewCycleError_PostReviewDiff[PostReviewDiff]
+    T32_usecase_usecase_ReviewCycleError_Hash[Hash]
+    T32_usecase_usecase_ReviewCycleError_PostReviewHash[PostReviewHash]
+    T32_usecase_usecase_ReviewCycleError_Reviewer[Reviewer]
+    T32_usecase_usecase_ReviewCycleError_Reader[Reader]
+  end
+  subgraph R32_usecase_usecase_ResolvedReviewer["review_v2::ports::ResolvedReviewer"]
+    direction TB
+    R32_usecase_usecase_ResolvedReviewer__self[ResolvedReviewer]
+    R32_usecase_usecase_ResolvedReviewer_resolved_assignment([resolved_assignment])
+  end
+  subgraph R24_usecase_usecase_Reviewer["review_v2::ports::Reviewer"]
+    direction TB
+    R24_usecase_usecase_Reviewer__self[Reviewer]
+    R24_usecase_usecase_Reviewer_review([review])
+    R24_usecase_usecase_Reviewer_fast_review([fast_review])
+  end
+  end
+  subgraph usecase_usecase_module_telemetry["usecase::telemetry"]
+    direction TB
+  subgraph T46_usecase_usecase_ReviewDetectionRateBasisPoints["telemetry::review_yield::ReviewDetectionRateBasisPoints"]
+    direction TB
+    T46_usecase_usecase_ReviewDetectionRateBasisPoints__self[ReviewDetectionRateBasisPoints]
+    T46_usecase_usecase_ReviewDetectionRateBasisPoints_try_new([try_new])
+  end
+  subgraph T36_usecase_usecase_ReviewExecutionCount["telemetry::review_yield::ReviewExecutionCount"]
+    direction TB
+    T36_usecase_usecase_ReviewExecutionCount__self[ReviewExecutionCount]
+    T36_usecase_usecase_ReviewExecutionCount_new([new])
+  end
+  subgraph T34_usecase_usecase_ReviewFindingCount["telemetry::review_yield::ReviewFindingCount"]
+    direction TB
+    T34_usecase_usecase_ReviewFindingCount__self[ReviewFindingCount]
+    T34_usecase_usecase_ReviewFindingCount_new([new])
+    T34_usecase_usecase_ReviewFindingCount_value([value])
+  end
+  subgraph T33_usecase_usecase_ReviewYieldMetric["telemetry::review_yield::ReviewYieldMetric"]
+    direction TB
+    T33_usecase_usecase_ReviewYieldMetric__self[ReviewYieldMetric]
+  end
+  subgraph T32_usecase_usecase_ReviewYieldValue["telemetry::review_yield::ReviewYieldValue"]
+    direction TB
+    T32_usecase_usecase_ReviewYieldValue__self[ReviewYieldValue]
+    T32_usecase_usecase_ReviewYieldValue_Scope[Scope]
+    T32_usecase_usecase_ReviewYieldValue_RoundType[RoundType]
+    T32_usecase_usecase_ReviewYieldValue_Provider[Provider]
+    T32_usecase_usecase_ReviewYieldValue_Model[Model]
+    T32_usecase_usecase_ReviewYieldValue_ReasoningEffort[ReasoningEffort]
+  end
+  subgraph T37_usecase_usecase_ReviewYieldValueError["telemetry::review_yield::ReviewYieldValueError"]
+    direction TB
+    T37_usecase_usecase_ReviewYieldValueError__self[ReviewYieldValueError]
+    T37_usecase_usecase_ReviewYieldValueError_DetectionRateOutOfRange[DetectionRateOutOfRange]
+  end
+  subgraph T37_usecase_usecase_TelemetryReportOutput["telemetry::report::TelemetryReportOutput"]
+    direction TB
+    T37_usecase_usecase_TelemetryReportOutput__self[TelemetryReportOutput]
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_review_v2["infrastructure::review_v2"]
+    direction TB
+  subgraph T44_infrastructure_infrastructure_ClaudeReviewer["review_v2::claude_reviewer::ClaudeReviewer"]
+    direction TB
+    T44_infrastructure_infrastructure_ClaudeReviewer__self[ClaudeReviewer]
+    T44_infrastructure_infrastructure_ClaudeReviewer_new([new])
+    T44_infrastructure_infrastructure_ClaudeReviewer_with_scope_label([with_scope_label])
+  end
+  subgraph T43_infrastructure_infrastructure_CodexReviewer["review_v2::codex_reviewer::CodexReviewer"]
+    direction TB
+    T43_infrastructure_infrastructure_CodexReviewer__self[CodexReviewer]
+    T43_infrastructure_infrastructure_CodexReviewer_new([new])
+    T43_infrastructure_infrastructure_CodexReviewer_with_scope_label([with_scope_label])
+  end
+  subgraph T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer["review_v2::review_yield::ReviewYieldRecordingReviewer"]
+    direction TB
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self[ReviewYieldRecordingReviewer]
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new([new])
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new_for_subprocess_timing([new_for_subprocess_timing])
+    T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_subprocess_started_at_reader([subprocess_started_at_reader])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_telemetry["infrastructure::telemetry"]
+    direction TB
+  subgraph T54_infrastructure_infrastructure_StructuredReviewRoundDto["telemetry::review_yield::StructuredReviewRoundDto"]
+    direction TB
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto__self[StructuredReviewRoundDto]
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto_new([new])
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto_scope([scope])
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto_round_type([round_type])
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto_provider([provider])
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto_model([model])
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto_reasoning_effort([reasoning_effort])
+    T54_infrastructure_infrastructure_StructuredReviewRoundDto_findings_count([findings_count])
+  end
+  subgraph T44_infrastructure_infrastructure_TelemetryEvent["telemetry::TelemetryEvent"]
+    direction TB
+    T44_infrastructure_infrastructure_TelemetryEvent__self[TelemetryEvent]
+    T44_infrastructure_infrastructure_TelemetryEvent_TrackSubcommand[TrackSubcommand]
+    T44_infrastructure_infrastructure_TelemetryEvent_GateEval[GateEval]
+    T44_infrastructure_infrastructure_TelemetryEvent_ReviewRound[ReviewRound]
+    T44_infrastructure_infrastructure_TelemetryEvent_ExternalSubprocess[ExternalSubprocess]
+    T44_infrastructure_infrastructure_TelemetryEvent_HookBlock[HookBlock]
+    T44_infrastructure_infrastructure_TelemetryEvent_AdvisoryHookFired[AdvisoryHookFired]
+    T44_infrastructure_infrastructure_TelemetryEvent_NonZeroExit[NonZeroExit]
+  end
+  subgraph T53_infrastructure_infrastructure_TelemetryReportSnapshot["telemetry::report::TelemetryReportSnapshot"]
+    direction TB
+    T53_infrastructure_infrastructure_TelemetryReportSnapshot__self[TelemetryReportSnapshot]
+  end
+  subgraph T45_infrastructure_infrastructure_TelemetryWriter["telemetry::writer::TelemetryWriter"]
+    direction TB
+    T45_infrastructure_infrastructure_TelemetryWriter__self[TelemetryWriter]
+    T45_infrastructure_infrastructure_TelemetryWriter_new([new])
+    T45_infrastructure_infrastructure_TelemetryWriter_track_id([track_id])
+    T45_infrastructure_infrastructure_TelemetryWriter_write([write])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+end
+T42_usecase_usecase_ResolvedReviewerAssignment_new --> T42_usecase_usecase_ResolvedReviewerAssignment__self
+R32_usecase_usecase_ResolvedReviewer_resolved_assignment --> T42_usecase_usecase_ResolvedReviewerAssignment__self
+T46_usecase_usecase_ReviewDetectionRateBasisPoints_try_new --> T37_usecase_usecase_ReviewYieldValueError__self
+T46_usecase_usecase_ReviewDetectionRateBasisPoints_try_new --> T46_usecase_usecase_ReviewDetectionRateBasisPoints__self
+T36_usecase_usecase_ReviewExecutionCount_new --> T36_usecase_usecase_ReviewExecutionCount__self
+T34_usecase_usecase_ReviewFindingCount_new --> T34_usecase_usecase_ReviewFindingCount__self
+T33_usecase_usecase_ReviewYieldMetric__self --o|value| T32_usecase_usecase_ReviewYieldValue__self
+T33_usecase_usecase_ReviewYieldMetric__self --o|execution_count| T36_usecase_usecase_ReviewExecutionCount__self
+T33_usecase_usecase_ReviewYieldMetric__self --o|detection_rate| T46_usecase_usecase_ReviewDetectionRateBasisPoints__self
+T37_usecase_usecase_TelemetryReportOutput__self --o|review_yield_metrics| T33_usecase_usecase_ReviewYieldMetric__self
+T44_infrastructure_infrastructure_ClaudeReviewer_new --> T44_infrastructure_infrastructure_ClaudeReviewer__self
+T44_infrastructure_infrastructure_ClaudeReviewer_with_scope_label --> T44_infrastructure_infrastructure_ClaudeReviewer__self
+T43_infrastructure_infrastructure_CodexReviewer_new --> T43_infrastructure_infrastructure_CodexReviewer__self
+T43_infrastructure_infrastructure_CodexReviewer_with_scope_label --> T43_infrastructure_infrastructure_CodexReviewer__self
+T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new --> T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self
+T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new_for_subprocess_timing --> T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self
+T54_infrastructure_infrastructure_StructuredReviewRoundDto_new --o T42_usecase_usecase_ResolvedReviewerAssignment__self
+T54_infrastructure_infrastructure_StructuredReviewRoundDto_new --o T34_usecase_usecase_ReviewFindingCount__self
+T54_infrastructure_infrastructure_StructuredReviewRoundDto_new --> T54_infrastructure_infrastructure_StructuredReviewRoundDto__self
+T54_infrastructure_infrastructure_StructuredReviewRoundDto_findings_count --> T34_usecase_usecase_ReviewFindingCount__self
+T44_infrastructure_infrastructure_TelemetryEvent_ReviewRound --o|round| T54_infrastructure_infrastructure_StructuredReviewRoundDto__self
+T53_infrastructure_infrastructure_TelemetryReportSnapshot__self --o|review_yield_metrics| T33_usecase_usecase_ReviewYieldMetric__self
+T45_infrastructure_infrastructure_TelemetryWriter_new --> T45_infrastructure_infrastructure_TelemetryWriter__self
+T45_infrastructure_infrastructure_TelemetryWriter_write --o T44_infrastructure_infrastructure_TelemetryEvent__self
+T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self -.impl.-> R24_usecase_usecase_Reviewer__self
+T44_infrastructure_infrastructure_ClaudeReviewer__self -.impl.-> R24_usecase_usecase_Reviewer__self
+T44_infrastructure_infrastructure_ClaudeReviewer__self -.impl.-> R32_usecase_usecase_ResolvedReviewer__self
+T43_infrastructure_infrastructure_CodexReviewer__self -.impl.-> R24_usecase_usecase_Reviewer__self
+T43_infrastructure_infrastructure_CodexReviewer__self -.impl.-> R32_usecase_usecase_ResolvedReviewer__self
+class T42_usecase_usecase_ResolvedReviewerAssignment_new method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_track_id method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_scope method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_provider method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_model method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment_reasoning_effort method_node
+class T42_usecase_usecase_ResolvedReviewerAssignment__self value_object
+class T32_usecase_usecase_ReviewCycleError_UnknownScope variant_node
+class T32_usecase_usecase_ReviewCycleError_FileChangedDuringReview variant_node
+class T32_usecase_usecase_ReviewCycleError_Diff variant_node
+class T32_usecase_usecase_ReviewCycleError_PostReviewDiff variant_node
+class T32_usecase_usecase_ReviewCycleError_Hash variant_node
+class T32_usecase_usecase_ReviewCycleError_PostReviewHash variant_node
+class T32_usecase_usecase_ReviewCycleError_Reviewer variant_node
+class T32_usecase_usecase_ReviewCycleError_Reader variant_node
+class T32_usecase_usecase_ReviewCycleError__self error_type
+class R32_usecase_usecase_ResolvedReviewer_resolved_assignment method_node
+class R32_usecase_usecase_ResolvedReviewer__self secondary_port
+class R24_usecase_usecase_Reviewer_review method_node
+class R24_usecase_usecase_Reviewer_fast_review method_node
+class R24_usecase_usecase_Reviewer__self secondary_port
+class T46_usecase_usecase_ReviewDetectionRateBasisPoints_try_new method_node
+class T46_usecase_usecase_ReviewDetectionRateBasisPoints__self value_object
+class T36_usecase_usecase_ReviewExecutionCount_new method_node
+class T36_usecase_usecase_ReviewExecutionCount__self value_object
+class T34_usecase_usecase_ReviewFindingCount_new method_node
+class T34_usecase_usecase_ReviewFindingCount_value method_node
+class T34_usecase_usecase_ReviewFindingCount__self value_object
+class T33_usecase_usecase_ReviewYieldMetric__self dto
+class T32_usecase_usecase_ReviewYieldValue_Scope variant_node
+class T32_usecase_usecase_ReviewYieldValue_RoundType variant_node
+class T32_usecase_usecase_ReviewYieldValue_Provider variant_node
+class T32_usecase_usecase_ReviewYieldValue_Model variant_node
+class T32_usecase_usecase_ReviewYieldValue_ReasoningEffort variant_node
+class T32_usecase_usecase_ReviewYieldValue__self value_object
+class T37_usecase_usecase_ReviewYieldValueError_DetectionRateOutOfRange variant_node
+class T37_usecase_usecase_ReviewYieldValueError__self error_type
+class T37_usecase_usecase_TelemetryReportOutput__self dto
+class T44_infrastructure_infrastructure_ClaudeReviewer_new method_node
+class T44_infrastructure_infrastructure_ClaudeReviewer_with_scope_label method_node
+class T44_infrastructure_infrastructure_ClaudeReviewer__self secondary_adapter
+class T43_infrastructure_infrastructure_CodexReviewer_new method_node
+class T43_infrastructure_infrastructure_CodexReviewer_with_scope_label method_node
+class T43_infrastructure_infrastructure_CodexReviewer__self secondary_adapter
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new method_node
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_new_for_subprocess_timing method_node
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer_subprocess_started_at_reader method_node
+class T58_infrastructure_infrastructure_ReviewYieldRecordingReviewer__self secondary_adapter
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto_new method_node
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto_scope method_node
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto_round_type method_node
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto_provider method_node
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto_model method_node
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto_reasoning_effort method_node
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto_findings_count method_node
+class T54_infrastructure_infrastructure_StructuredReviewRoundDto__self dto
+class T44_infrastructure_infrastructure_TelemetryEvent_TrackSubcommand variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_GateEval variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_ReviewRound variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_ExternalSubprocess variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_HookBlock variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_AdvisoryHookFired variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent_NonZeroExit variant_node
+class T44_infrastructure_infrastructure_TelemetryEvent__self dto
+class T53_infrastructure_infrastructure_TelemetryReportSnapshot__self dto
+class T45_infrastructure_infrastructure_TelemetryWriter_new method_node
+class T45_infrastructure_infrastructure_TelemetryWriter_track_id method_node
+class T45_infrastructure_infrastructure_TelemetryWriter_write method_node
+class T45_infrastructure_infrastructure_TelemetryWriter__self secondary_adapter
+```

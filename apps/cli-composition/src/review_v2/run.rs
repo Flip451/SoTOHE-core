@@ -1,22 +1,19 @@
-//! Review cycle execution helpers (Codex and Claude).
+//! Review cycle execution helpers (Codex, Claude, and Grok).
 
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use domain::TrackId;
 use domain::review_v2::{
-    FastVerdict, LogInfo, MainScopeName, ReviewOutcome, ReviewTarget, ReviewWriter, ScopeName,
-    Verdict,
+    FastVerdict, MainScopeName, ReviewOutcome, ReviewWriter, ScopeName, Verdict,
 };
-use infrastructure::review_v2::{
-    ClaudeReviewer, CodexReviewer, FsReviewStore, GitDiffGetter, SystemReviewHasher,
-};
+use infrastructure::review_v2::{FsReviewStore, GitDiffGetter, SystemReviewHasher};
 use usecase::review_v2::error::{ReviewCycleError, ReviewerError};
 use usecase::review_v2::{DiffGetter, ReviewCycle, ReviewHasher, Reviewer};
 
 use super::shared::{CodexReviewOutcome, build_v2_shared, repo_root_from_items_dir, with_repo_cwd};
+
+type SubprocessStartReader = Box<dyn Fn() -> Option<Instant> + Send + Sync + 'static>;
 
 // ---------------------------------------------------------------------------
 // Shared verdict rendering
@@ -70,7 +67,7 @@ fn dispatch_review_cycle<R, H, D>(
     round_type_str: &str,
     cycle: ReviewCycle<R, H, D>,
     review_store: FsReviewStore,
-    findings_recorder: ReviewFindingsRecorder,
+    subprocess_start_reader: Option<&SubprocessStartReader>,
 ) -> Result<CodexReviewOutcome, String>
 where
     R: Reviewer,
@@ -85,27 +82,22 @@ where
             Err(e) => return Err(format!("[ERROR] invalid scope name: {e}")),
         }
     };
-
+    let fallback_subprocess_started_at = Instant::now();
     match round_type_str {
         "final" => match cycle.review(&scope) {
             Ok(ReviewOutcome::Skipped) => {
                 Ok(CodexReviewOutcome::Skipped { scope_label: group_str.to_owned() })
             }
             Ok(ReviewOutcome::Reviewed { verdict, hash, .. }) => {
-                // Compute findings_count before write_verdict so we can carry it into
-                // SubprocessFailed when persistence fails (the subprocess produced a valid
-                // verdict — underreporting as 0 would be wrong).
                 let findings_count = findings_count_final(&verdict);
-                // write_verdict runs after the subprocess. A record-write failure
-                // must not suppress telemetry, so convert it to SubprocessFailed
-                // (verdict_parse_failed=false — the subprocess produced a valid verdict).
                 if let Err(e) = review_store.write_verdict(&scope, &verdict, &hash) {
                     return Ok(CodexReviewOutcome::SubprocessFailed {
                         error: format!("[ERROR] record failed: {e}"),
-                        round_type: "final".to_owned(),
                         verdict_parse_failed: false,
-                        findings_count,
-                        subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                        subprocess_started_at: subprocess_started_at(
+                            subprocess_start_reader,
+                            fallback_subprocess_started_at,
+                        ),
                     });
                 }
                 let rendered = match &verdict {
@@ -119,10 +111,11 @@ where
                         // preserve telemetry as a subprocess-involved failure.
                         return Ok(CodexReviewOutcome::SubprocessFailed {
                             error: e,
-                            round_type: "final".to_owned(),
                             verdict_parse_failed: false,
-                            findings_count,
-                            subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                            subprocess_started_at: subprocess_started_at(
+                                subprocess_start_reader,
+                                fallback_subprocess_started_at,
+                            ),
                         });
                     }
                 };
@@ -130,7 +123,10 @@ where
                     verdict_json: json,
                     exit_code,
                     findings_count,
-                    subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
                 })
             }
             // Map only subprocess-involved reviewer failures to SubprocessFailed.
@@ -145,10 +141,11 @@ where
                     let verdict_parse_failed = matches!(inner, ReviewerError::IllegalVerdict);
                     Ok(CodexReviewOutcome::SubprocessFailed {
                         error: format!("[ERROR] reviewer error: {inner}"),
-                        round_type: "final".to_owned(),
                         verdict_parse_failed,
-                        findings_count: 0,
-                        subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                        subprocess_started_at: subprocess_started_at(
+                            subprocess_start_reader,
+                            fallback_subprocess_started_at,
+                        ),
                     })
                 } else {
                     Err(format!("[ERROR] reviewer error: {inner}"))
@@ -157,30 +154,43 @@ where
             Err(e @ ReviewCycleError::FileChangedDuringReview) => {
                 Ok(CodexReviewOutcome::SubprocessFailed {
                     error: format!("[ERROR] {e}"),
-                    round_type: "final".to_owned(),
                     verdict_parse_failed: false,
-                    findings_count: findings_recorder.recorded_count().unwrap_or(0),
-                    subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
                 })
             }
             Err(e @ ReviewCycleError::Reader(_)) => Ok(CodexReviewOutcome::SubprocessFailed {
                 error: format!("[ERROR] {e}"),
-                round_type: "final".to_owned(),
                 verdict_parse_failed: false,
-                findings_count: 0,
-                subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                subprocess_started_at: subprocess_started_at(
+                    subprocess_start_reader,
+                    fallback_subprocess_started_at,
+                ),
             }),
+            Err(e @ ReviewCycleError::PostReviewHash(_)) => {
+                Ok(CodexReviewOutcome::SubprocessFailed {
+                    error: format!("[ERROR] {e}"),
+                    verdict_parse_failed: false,
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
+                })
+            }
+            Err(e @ ReviewCycleError::PostReviewDiff(_)) => {
+                Ok(CodexReviewOutcome::SubprocessFailed {
+                    error: format!("[ERROR] {e}"),
+                    verdict_parse_failed: false,
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
+                })
+            }
             Err(e @ (ReviewCycleError::Diff(_) | ReviewCycleError::Hash(_))) => {
-                match findings_recorder.recorded_count() {
-                    Some(findings_count) => Ok(CodexReviewOutcome::SubprocessFailed {
-                        error: format!("[ERROR] {e}"),
-                        round_type: "final".to_owned(),
-                        verdict_parse_failed: false,
-                        findings_count,
-                        subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
-                    }),
-                    None => Err(format!("[ERROR] {e}")),
-                }
+                Err(format!("[ERROR] {e}"))
             }
             Err(e) => Err(format!("[ERROR] {e}")),
         },
@@ -189,17 +199,15 @@ where
                 Ok(CodexReviewOutcome::Skipped { scope_label: group_str.to_owned() })
             }
             Ok(ReviewOutcome::Reviewed { verdict, hash, .. }) => {
-                // Compute findings_count before write_fast_verdict (mirrors "final" branch).
                 let findings_count = findings_count_fast(&verdict);
-                // write_fast_verdict runs after the subprocess. Convert failure to
-                // SubprocessFailed to ensure telemetry is emitted (verdict_parse_failed=false).
                 if let Err(e) = review_store.write_fast_verdict(&scope, &verdict, &hash) {
                     return Ok(CodexReviewOutcome::SubprocessFailed {
                         error: format!("[ERROR] record failed: {e}"),
-                        round_type: "fast".to_owned(),
                         verdict_parse_failed: false,
-                        findings_count,
-                        subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                        subprocess_started_at: subprocess_started_at(
+                            subprocess_start_reader,
+                            fallback_subprocess_started_at,
+                        ),
                     });
                 }
                 let rendered = match &verdict {
@@ -215,10 +223,11 @@ where
                         // preserve telemetry as a subprocess-involved failure.
                         return Ok(CodexReviewOutcome::SubprocessFailed {
                             error: e,
-                            round_type: "fast".to_owned(),
                             verdict_parse_failed: false,
-                            findings_count,
-                            subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                            subprocess_started_at: subprocess_started_at(
+                                subprocess_start_reader,
+                                fallback_subprocess_started_at,
+                            ),
                         });
                     }
                 };
@@ -226,7 +235,10 @@ where
                     verdict_json: json,
                     exit_code,
                     findings_count,
-                    subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
                 })
             }
             // Subprocess-launched errors (mirror of "final" branch above).
@@ -235,10 +247,11 @@ where
                     let verdict_parse_failed = matches!(inner, ReviewerError::IllegalVerdict);
                     Ok(CodexReviewOutcome::SubprocessFailed {
                         error: format!("[ERROR] reviewer error: {inner}"),
-                        round_type: "fast".to_owned(),
                         verdict_parse_failed,
-                        findings_count: 0,
-                        subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                        subprocess_started_at: subprocess_started_at(
+                            subprocess_start_reader,
+                            fallback_subprocess_started_at,
+                        ),
                     })
                 } else {
                     Err(format!("[ERROR] reviewer error: {inner}"))
@@ -247,30 +260,43 @@ where
             Err(e @ ReviewCycleError::FileChangedDuringReview) => {
                 Ok(CodexReviewOutcome::SubprocessFailed {
                     error: format!("[ERROR] {e}"),
-                    round_type: "fast".to_owned(),
                     verdict_parse_failed: false,
-                    findings_count: findings_recorder.recorded_count().unwrap_or(0),
-                    subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
                 })
             }
             Err(e @ ReviewCycleError::Reader(_)) => Ok(CodexReviewOutcome::SubprocessFailed {
                 error: format!("[ERROR] {e}"),
-                round_type: "fast".to_owned(),
                 verdict_parse_failed: false,
-                findings_count: 0,
-                subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
+                subprocess_started_at: subprocess_started_at(
+                    subprocess_start_reader,
+                    fallback_subprocess_started_at,
+                ),
             }),
+            Err(e @ ReviewCycleError::PostReviewHash(_)) => {
+                Ok(CodexReviewOutcome::SubprocessFailed {
+                    error: format!("[ERROR] {e}"),
+                    verdict_parse_failed: false,
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
+                })
+            }
+            Err(e @ ReviewCycleError::PostReviewDiff(_)) => {
+                Ok(CodexReviewOutcome::SubprocessFailed {
+                    error: format!("[ERROR] {e}"),
+                    verdict_parse_failed: false,
+                    subprocess_started_at: subprocess_started_at(
+                        subprocess_start_reader,
+                        fallback_subprocess_started_at,
+                    ),
+                })
+            }
             Err(e @ (ReviewCycleError::Diff(_) | ReviewCycleError::Hash(_))) => {
-                match findings_recorder.recorded_count() {
-                    Some(findings_count) => Ok(CodexReviewOutcome::SubprocessFailed {
-                        error: format!("[ERROR] {e}"),
-                        round_type: "fast".to_owned(),
-                        verdict_parse_failed: false,
-                        findings_count,
-                        subprocess_started_at: findings_recorder.subprocess_started_at_or_now(),
-                    }),
-                    None => Err(format!("[ERROR] {e}")),
-                }
+                Err(format!("[ERROR] {e}"))
             }
             Err(e) => Err(format!("[ERROR] {e}")),
         },
@@ -278,12 +304,15 @@ where
     }
 }
 
+fn subprocess_started_at(reader: Option<&SubprocessStartReader>, fallback: Instant) -> Instant {
+    reader.and_then(|read| read()).unwrap_or(fallback)
+}
+
 // ---------------------------------------------------------------------------
 // Public entry points — thin wrappers over run_review_str_inner
 // ---------------------------------------------------------------------------
 
-type ReviewDispatchParts<R, H, D> =
-    (ReviewCycle<R, H, D>, FsReviewStore, ReviewFindingsRecorder, PathBuf, Vec<String>);
+type ReviewDispatchParts<R, H, D> = (ReviewCycle<R, H, D>, FsReviewStore, PathBuf, Vec<String>);
 
 /// Runs the full Codex review cycle from string inputs.
 ///
@@ -293,14 +322,38 @@ type ReviewDispatchParts<R, H, D> =
 ///
 /// # Errors
 /// Returns a human-readable error string on failure at any step.
-pub(crate) fn run_codex_review_str(
+pub(crate) fn run_codex_review_str<R>(
     track_id_str: &str,
     items_dir: &Path,
     group_str: &str,
     round_type_str: &str, // "fast" | "final"
-    reviewer: CodexReviewer,
-) -> Result<CodexReviewOutcome, String> {
-    run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer)
+    reviewer: R,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer, None)
+}
+
+pub(crate) fn run_codex_review_str_with_subprocess_start<R>(
+    track_id_str: &str,
+    items_dir: &Path,
+    group_str: &str,
+    round_type_str: &str,
+    reviewer: R,
+    subprocess_start_reader: SubprocessStartReader,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(
+        track_id_str,
+        items_dir,
+        group_str,
+        round_type_str,
+        reviewer,
+        Some(subprocess_start_reader),
+    )
 }
 
 /// Runs the full Claude review cycle from string inputs.
@@ -309,14 +362,79 @@ pub(crate) fn run_codex_review_str(
 ///
 /// # Errors
 /// Returns a human-readable error string on failure at any step.
-pub(crate) fn run_claude_review_str(
+pub(crate) fn run_claude_review_str<R>(
     track_id_str: &str,
     items_dir: &Path,
     group_str: &str,
     round_type_str: &str, // "fast" | "final"
-    reviewer: ClaudeReviewer,
-) -> Result<CodexReviewOutcome, String> {
-    run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer)
+    reviewer: R,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer, None)
+}
+
+pub(crate) fn run_claude_review_str_with_subprocess_start<R>(
+    track_id_str: &str,
+    items_dir: &Path,
+    group_str: &str,
+    round_type_str: &str,
+    reviewer: R,
+    subprocess_start_reader: SubprocessStartReader,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(
+        track_id_str,
+        items_dir,
+        group_str,
+        round_type_str,
+        reviewer,
+        Some(subprocess_start_reader),
+    )
+}
+
+/// Runs the full Grok review cycle from string inputs.
+///
+/// Mirrors [`run_codex_review_str`] for the Grok typed-pipeline adapter. The
+/// helper only supplies the reviewer to the shared review-cycle machinery.
+///
+/// # Errors
+/// Returns a human-readable error string on failure at any step.
+pub(crate) fn run_grok_review_str<R>(
+    track_id_str: &str,
+    items_dir: &Path,
+    group_str: &str,
+    round_type_str: &str, // "fast" | "final"
+    reviewer: R,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(track_id_str, items_dir, group_str, round_type_str, reviewer, None)
+}
+
+pub(crate) fn run_grok_review_str_with_subprocess_start<R>(
+    track_id_str: &str,
+    items_dir: &Path,
+    group_str: &str,
+    round_type_str: &str,
+    reviewer: R,
+    subprocess_start_reader: SubprocessStartReader,
+) -> Result<CodexReviewOutcome, String>
+where
+    R: Reviewer,
+{
+    run_review_str_with_reviewer(
+        track_id_str,
+        items_dir,
+        group_str,
+        round_type_str,
+        reviewer,
+        Some(subprocess_start_reader),
+    )
 }
 
 fn run_review_str_with_reviewer<R>(
@@ -325,29 +443,34 @@ fn run_review_str_with_reviewer<R>(
     group_str: &str,
     round_type_str: &str,
     reviewer: R,
+    subprocess_start_reader: Option<SubprocessStartReader>,
 ) -> Result<CodexReviewOutcome, String>
 where
     R: Reviewer,
 {
-    run_review_str_inner(track_id_str, items_dir, group_str, round_type_str, |tid| {
-        build_review_dispatch_parts(tid, items_dir, reviewer)
-    })
+    run_review_str_inner(
+        track_id_str,
+        items_dir,
+        group_str,
+        round_type_str,
+        subprocess_start_reader,
+        |tid| build_review_dispatch_parts(tid, items_dir, reviewer),
+    )
 }
 
 fn build_review_dispatch_parts<R>(
     track_id: &TrackId,
     items_dir: &Path,
     reviewer: R,
-) -> Result<ReviewDispatchParts<FindingsCountReviewer<R>, SystemReviewHasher, GitDiffGetter>, String>
+) -> Result<ReviewDispatchParts<R, SystemReviewHasher, GitDiffGetter>, String>
 where
     R: Reviewer,
 {
     let (scope_config, review_store, _commit_hash_store, base, diagnostics) =
         build_v2_shared(track_id, items_dir).map_err(|e| e.to_string())?;
     let repo_root = repo_root_from_items_dir(items_dir).map_err(|e| e.to_string())?;
-    let (reviewer, findings_recorder) = FindingsCountReviewer::new(reviewer);
     let cycle = ReviewCycle::new(base, scope_config, reviewer, GitDiffGetter, SystemReviewHasher);
-    Ok((cycle, review_store, findings_recorder, repo_root, diagnostics))
+    Ok((cycle, review_store, repo_root, diagnostics))
 }
 
 /// Shared implementation: parse `track_id`, invoke `builder` to obtain the
@@ -364,6 +487,7 @@ fn run_review_str_inner<R, H, D, B>(
     _items_dir: &Path,
     group_str: &str,
     round_type_str: &str,
+    subprocess_start_reader: Option<SubprocessStartReader>,
     builder: B,
 ) -> Result<CodexReviewOutcome, String>
 where
@@ -376,11 +500,17 @@ where
 
     let track_id =
         TrackId::try_new(track_id_str).map_err(|e| format!("[ERROR] invalid track id: {e}"))?;
-    let (cycle, review_store, findings_recorder, repo_root, diagnostics) =
+    let (cycle, review_store, repo_root, diagnostics) =
         builder(&track_id).map_err(|e| format!("[ERROR] v2 composition failed: {e}"))?;
     let outcome = with_repo_cwd(&repo_root, || {
-        dispatch_review_cycle(group_str, round_type_str, cycle, review_store, findings_recorder)
-            .map_err(|e: String| ReviewSharedError::Git(e))
+        dispatch_review_cycle(
+            group_str,
+            round_type_str,
+            cycle,
+            review_store,
+            subprocess_start_reader.as_ref(),
+        )
+        .map_err(|e: String| ReviewSharedError::Git(e))
     })
     .map_err(|e| {
         let s = e.to_string();
@@ -394,88 +524,9 @@ where
 }
 
 // ---------------------------------------------------------------------------
-// Reviewer telemetry capture
+// Findings-count helpers used by the command result projection
 // ---------------------------------------------------------------------------
 
-#[derive(Clone)]
-struct ReviewFindingsRecorder {
-    count: Arc<AtomicU64>,
-    subprocess_started_at: Arc<Mutex<Option<Instant>>>,
-}
-
-impl ReviewFindingsRecorder {
-    const UNSET: u64 = u64::MAX;
-
-    fn new() -> Self {
-        Self {
-            count: Arc::new(AtomicU64::new(Self::UNSET)),
-            subprocess_started_at: Arc::new(Mutex::new(None)),
-        }
-    }
-
-    fn record_subprocess_started(&self) {
-        super::record_instant_once(&self.subprocess_started_at);
-    }
-
-    fn record(&self, count: u32) {
-        self.count.store(u64::from(count), Ordering::Relaxed);
-    }
-
-    fn recorded_count(&self) -> Option<u32> {
-        match self.count.load(Ordering::Relaxed) {
-            Self::UNSET => None,
-            value => u32::try_from(value).ok(),
-        }
-    }
-
-    fn subprocess_started_at(&self) -> Option<Instant> {
-        self.subprocess_started_at.lock().ok().and_then(|started_at| *started_at)
-    }
-
-    fn subprocess_started_at_or_now(&self) -> Instant {
-        self.subprocess_started_at().unwrap_or_else(Instant::now)
-    }
-}
-
-struct FindingsCountReviewer<R> {
-    inner: R,
-    recorder: ReviewFindingsRecorder,
-}
-
-impl<R> FindingsCountReviewer<R> {
-    fn new(inner: R) -> (Self, ReviewFindingsRecorder) {
-        let recorder = ReviewFindingsRecorder::new();
-        (Self { inner, recorder: recorder.clone() }, recorder)
-    }
-}
-
-impl<R: Reviewer> Reviewer for FindingsCountReviewer<R> {
-    fn review(&self, target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
-        self.recorder.record_subprocess_started();
-        let result = self.inner.review(target);
-        if let Ok((verdict, _log_info)) = &result {
-            self.recorder.record(findings_count_final(verdict));
-        }
-        result
-    }
-
-    fn fast_review(&self, target: &ReviewTarget) -> Result<(FastVerdict, LogInfo), ReviewerError> {
-        self.recorder.record_subprocess_started();
-        let result = self.inner.fast_review(target);
-        if let Ok((verdict, _log_info)) = &result {
-            self.recorder.record(findings_count_fast(verdict));
-        }
-        result
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Findings-count helpers
-// ---------------------------------------------------------------------------
-
-/// Returns the number of findings from a final `Verdict`.
-///
-/// Used to populate the `findings_count` field of `TelemetryEvent::ReviewRound`.
 fn findings_count_final(verdict: &domain::review_v2::Verdict) -> u32 {
     use domain::review_v2::Verdict;
     match verdict {
@@ -484,9 +535,6 @@ fn findings_count_final(verdict: &domain::review_v2::Verdict) -> u32 {
     }
 }
 
-/// Returns the number of findings from a fast `FastVerdict`.
-///
-/// Used to populate the `findings_count` field of `TelemetryEvent::ReviewRound`.
 fn findings_count_fast(verdict: &domain::review_v2::FastVerdict) -> u32 {
     use domain::review_v2::FastVerdict;
     match verdict {
@@ -511,26 +559,29 @@ fn reviewer_unexpected_after_spawn(message: &str) -> bool {
         || message.starts_with("failed to read output-last-message ")
         || message.starts_with("verdict construction:")
         || message.starts_with("failed to serialize reviewer final payload:")
+        || message.starts_with("Grok provider failed:")
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::process::Command;
-    use std::sync::Arc;
-    use std::time::Duration;
+    use std::sync::{Arc, Mutex, atomic::Ordering};
+    use std::time::{Duration, Instant};
 
     use domain::{
         TrackId,
-        review_v2::{RoundType, ScopeName},
+        review_v2::{LogInfo, ReviewTarget, RoundType, ScopeName},
     };
-    use infrastructure::review_v2::ClaudeReviewer;
+    use infrastructure::review_v2::{ClaudeReviewer, ReviewYieldRecordingReviewer};
+    use infrastructure::telemetry::TelemetryConfig;
     use usecase::{
-        capability_exec::{ModelName, ReasoningEffort},
+        capability_exec::{ModelName, ProviderName, ReasoningEffort},
         provider_session::{
             ProviderSessionCacheEntry, ProviderSessionCacheError, ProviderSessionCacheKey,
             ProviderSessionCachePort, ReviewerPrompt,
         },
+        review_v2::{ResolvedReviewer, ResolvedReviewerAssignment},
     };
 
     use super::*;
@@ -966,6 +1017,15 @@ mod tests {
     }
 
     #[test]
+    fn test_reviewer_unexpected_after_spawn_classifies_grok_provider_failure() {
+        let error = ReviewerError::Unexpected(
+            "Grok provider failed: provider declined structured output".to_owned(),
+        );
+
+        assert!(reviewer_error_is_subprocess_failure(&error));
+    }
+
+    #[test]
     fn test_reviewer_unexpected_before_spawn_is_not_subprocess_failure() {
         let error =
             ReviewerError::Unexpected("failed to write output-schema: disk full".to_owned());
@@ -1080,14 +1140,83 @@ mod tests {
         }
     }
 
+    struct ZeroFindingsReviewer;
+
+    impl Reviewer for ZeroFindingsReviewer {
+        fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
+            Ok((Verdict::ZeroFindings, LogInfo::new("test log")))
+        }
+
+        fn fast_review(
+            &self,
+            _target: &ReviewTarget,
+        ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
+            Ok((FastVerdict::ZeroFindings, LogInfo::new("test log")))
+        }
+    }
+
+    struct NoVerdictReviewer;
+
+    impl Reviewer for NoVerdictReviewer {
+        fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
+            Err(ReviewerError::Timeout)
+        }
+
+        fn fast_review(
+            &self,
+            _target: &ReviewTarget,
+        ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
+            Err(ReviewerError::Timeout)
+        }
+    }
+
+    struct AssignedZeroFindingsReviewer {
+        assignment: ResolvedReviewerAssignment,
+    }
+
+    impl Reviewer for AssignedZeroFindingsReviewer {
+        fn review(&self, _target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
+            Ok((Verdict::ZeroFindings, LogInfo::new("test log")))
+        }
+
+        fn fast_review(
+            &self,
+            _target: &ReviewTarget,
+        ) -> Result<(FastVerdict, LogInfo), ReviewerError> {
+            Ok((FastVerdict::ZeroFindings, LogInfo::new("test log")))
+        }
+    }
+
+    impl ResolvedReviewer for AssignedZeroFindingsReviewer {
+        fn resolved_assignment(&self) -> &ResolvedReviewerAssignment {
+            &self.assignment
+        }
+    }
+
+    struct SetupDelayHasher {
+        setup_finished_at: Arc<Mutex<Option<Instant>>>,
+    }
+
+    impl ReviewHasher for SetupDelayHasher {
+        fn calc(
+            &self,
+            _target: &ReviewTarget,
+        ) -> Result<domain::review_v2::ReviewHash, usecase::review_v2::error::ReviewHasherError>
+        {
+            let mut setup_finished_at = self.setup_finished_at.lock().unwrap();
+            if setup_finished_at.is_none() {
+                std::thread::sleep(Duration::from_millis(20));
+                *setup_finished_at = Some(Instant::now());
+            }
+            domain::review_v2::ReviewHash::computed(format!("rvw1:sha256:{}", "1".repeat(64)))
+                .map_err(|e| usecase::review_v2::error::ReviewHasherError::Failed(e.to_string()))
+        }
+    }
+
     fn hash_cycle_with_hasher<H>(
         review_store_root: &std::path::Path,
         hasher: H,
-    ) -> (
-        ReviewCycle<FindingsCountReviewer<FindingsReviewer>, H, StaticDiffGetter>,
-        FsReviewStore,
-        ReviewFindingsRecorder,
-    )
+    ) -> (ReviewCycle<FindingsReviewer, H, StaticDiffGetter>, FsReviewStore)
     where
         H: ReviewHasher,
     {
@@ -1105,61 +1234,209 @@ mod tests {
             review_store_root.join("review.json"),
             review_store_root.to_path_buf(),
         );
-        let (reviewer, findings_recorder) = FindingsCountReviewer::new(FindingsReviewer);
-        let cycle = ReviewCycle::new(base, scope_config, reviewer, StaticDiffGetter, hasher);
-        (cycle, review_store, findings_recorder)
+        let cycle =
+            ReviewCycle::new(base, scope_config, FindingsReviewer, StaticDiffGetter, hasher);
+        (cycle, review_store)
     }
 
     fn changed_hash_cycle(
         review_store_root: &std::path::Path,
-    ) -> (
-        ReviewCycle<FindingsCountReviewer<FindingsReviewer>, ChangingHasher, StaticDiffGetter>,
-        FsReviewStore,
-        ReviewFindingsRecorder,
-    ) {
+    ) -> (ReviewCycle<FindingsReviewer, ChangingHasher, StaticDiffGetter>, FsReviewStore) {
         hash_cycle_with_hasher(review_store_root, ChangingHasher::new())
     }
 
-    fn post_review_hash_error_cycle(
+    fn zero_findings_hash_cycle<H>(
         review_store_root: &std::path::Path,
-    ) -> (
-        ReviewCycle<FindingsCountReviewer<FindingsReviewer>, FailingSecondHasher, StaticDiffGetter>,
-        FsReviewStore,
-        ReviewFindingsRecorder,
-    ) {
-        hash_cycle_with_hasher(review_store_root, FailingSecondHasher::new())
+        hasher: H,
+    ) -> (ReviewCycle<ZeroFindingsReviewer, H, StaticDiffGetter>, FsReviewStore)
+    where
+        H: ReviewHasher,
+    {
+        let track_id = domain::TrackId::try_new("my-test-track-2026").unwrap();
+        let scope_config = domain::review_v2::ReviewScopeConfig::new(
+            &track_id,
+            vec![("infra".to_owned(), vec!["src/**".to_owned()], None, None)],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
+        let base = domain::CommitHash::try_new("0".repeat(40)).unwrap();
+        let review_store = FsReviewStore::new(
+            review_store_root.join("review.json"),
+            review_store_root.to_path_buf(),
+        );
+        let cycle =
+            ReviewCycle::new(base, scope_config, ZeroFindingsReviewer, StaticDiffGetter, hasher);
+        (cycle, review_store)
     }
 
     fn assert_failure_preserves_findings_count<H>(
         round_type: &str,
         make_cycle: impl FnOnce(
             &std::path::Path,
+        )
+            -> (ReviewCycle<FindingsReviewer, H, StaticDiffGetter>, FsReviewStore),
+        expect_message: &str,
+    ) where
+        H: ReviewHasher,
+    {
+        let dir = tempfile::tempdir().unwrap();
+        let (cycle, review_store) = make_cycle(dir.path());
+
+        let outcome = dispatch_review_cycle("infra", round_type, cycle, review_store, None)
+            .expect(expect_message);
+
+        assert!(
+            matches!(
+                outcome,
+                CodexReviewOutcome::SubprocessFailed { verdict_parse_failed: false, .. }
+            ),
+            "expected SubprocessFailed after reviewer invocation"
+        );
+    }
+
+    fn assert_zero_findings_failure_is_observed<H>(
+        round_type: &str,
+        make_cycle: impl FnOnce(
+            &std::path::Path,
         ) -> (
-            ReviewCycle<FindingsCountReviewer<FindingsReviewer>, H, StaticDiffGetter>,
+            ReviewCycle<ZeroFindingsReviewer, H, StaticDiffGetter>,
             FsReviewStore,
-            ReviewFindingsRecorder,
         ),
         expect_message: &str,
     ) where
         H: ReviewHasher,
     {
         let dir = tempfile::tempdir().unwrap();
-        let (cycle, review_store, findings_recorder) = make_cycle(dir.path());
+        let (cycle, review_store) = make_cycle(dir.path());
 
-        let outcome =
-            dispatch_review_cycle("infra", round_type, cycle, review_store, findings_recorder)
-                .expect(expect_message);
+        let outcome = dispatch_review_cycle("infra", round_type, cycle, review_store, None)
+            .expect(expect_message);
 
         assert!(
             matches!(
                 outcome,
-                CodexReviewOutcome::SubprocessFailed {
-                    findings_count: 2,
-                    verdict_parse_failed: false,
-                    ..
-                }
+                CodexReviewOutcome::SubprocessFailed { verdict_parse_failed: false, .. }
             ),
-            "expected SubprocessFailed with findings_count=2"
+            "zero findings must remain an observed verdict after a post-verdict failure"
+        );
+    }
+
+    #[test]
+    fn test_dispatch_review_cycle_fast_file_changed_marks_zero_findings_as_observed() {
+        assert_zero_findings_failure_is_observed(
+            "fast",
+            |root| zero_findings_hash_cycle(root, ChangingHasher::new()),
+            "file changed maps to subprocess failure outcome",
+        );
+    }
+
+    #[test]
+    fn test_dispatch_review_cycle_final_post_review_hash_error_marks_zero_findings_as_observed() {
+        assert_zero_findings_failure_is_observed(
+            "final",
+            |root| zero_findings_hash_cycle(root, FailingSecondHasher::new()),
+            "post-review hash error maps to subprocess failure outcome",
+        );
+    }
+
+    #[test]
+    fn test_dispatch_review_cycle_fast_timeout_marks_verdict_as_not_observed() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = domain::TrackId::try_new("my-test-track-2026").unwrap();
+        let scope_config = domain::review_v2::ReviewScopeConfig::new(
+            &track_id,
+            vec![("infra".to_owned(), vec!["src/**".to_owned()], None, None)],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
+        let base = domain::CommitHash::try_new("0".repeat(40)).unwrap();
+        let review_store =
+            FsReviewStore::new(dir.path().join("review.json"), dir.path().to_path_buf());
+        let cycle = ReviewCycle::new(
+            base,
+            scope_config,
+            NoVerdictReviewer,
+            StaticDiffGetter,
+            ChangingHasher::new(),
+        );
+
+        let before_review = Instant::now();
+        let outcome = dispatch_review_cycle("infra", "fast", cycle, review_store, None)
+            .expect("timeout maps to subprocess failure outcome");
+
+        match outcome {
+            CodexReviewOutcome::SubprocessFailed { subprocess_started_at, .. } => {
+                assert!(subprocess_started_at >= before_review);
+                assert!(subprocess_started_at <= Instant::now());
+            }
+            _ => panic!("expected subprocess failure"),
+        }
+    }
+
+    #[test]
+    fn test_dispatch_review_cycle_uses_first_reviewer_invocation_for_subprocess_start() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = TrackId::try_new("timing-regression-2026").unwrap();
+        let scope_config = domain::review_v2::ReviewScopeConfig::new(
+            &track_id,
+            vec![("infra".to_owned(), vec!["src/**".to_owned()], None, None)],
+            vec![],
+            vec![],
+            None,
+        )
+        .unwrap();
+        let base = domain::CommitHash::try_new("0".repeat(40)).unwrap();
+        let review_store =
+            FsReviewStore::new(dir.path().join("review.json"), dir.path().to_path_buf());
+        let setup_finished_at = Arc::new(Mutex::new(None));
+        let reviewer = AssignedZeroFindingsReviewer {
+            assignment: ResolvedReviewerAssignment::new(
+                track_id,
+                ScopeName::Other,
+                ProviderName::try_new("codex").unwrap(),
+                ModelName::try_new("gpt-5.4").unwrap(),
+                ReasoningEffort::High,
+            ),
+        };
+
+        let outcome = temp_env::with_var("SOTP_TELEMETRY", Some("0"), || {
+            let recording = ReviewYieldRecordingReviewer::new(
+                reviewer,
+                TelemetryConfig::from_env(),
+                dir.path().to_path_buf(),
+            );
+            let subprocess_start_reader = recording.subprocess_started_at_reader();
+            let cycle = ReviewCycle::new(
+                base,
+                scope_config,
+                recording,
+                StaticDiffGetter,
+                SetupDelayHasher { setup_finished_at: Arc::clone(&setup_finished_at) },
+            );
+            dispatch_review_cycle(
+                "infra",
+                "fast",
+                cycle,
+                review_store,
+                Some(&subprocess_start_reader),
+            )
+            .expect("delayed setup must still produce a completed review")
+        });
+
+        let setup_finished_at = setup_finished_at.lock().unwrap().expect("setup timestamp");
+        let subprocess_started_at = match outcome {
+            CodexReviewOutcome::FastCompleted { subprocess_started_at, .. } => {
+                subprocess_started_at
+            }
+            _ => panic!("expected a completed fast review"),
+        };
+        assert!(
+            subprocess_started_at >= setup_finished_at,
+            "ExternalSubprocess must start at reviewer invocation, after pre-review setup"
         );
     }
 
@@ -1179,23 +1456,5 @@ mod tests {
     #[test]
     fn test_dispatch_review_cycle_final_file_changed_preserves_findings_count() {
         assert_file_changed_preserves_findings_count("final");
-    }
-
-    fn assert_post_review_hash_error_preserves_findings_count(round_type: &str) {
-        assert_failure_preserves_findings_count(
-            round_type,
-            post_review_hash_error_cycle,
-            "post-review hash error maps to subprocess failure outcome",
-        );
-    }
-
-    #[test]
-    fn test_dispatch_review_cycle_fast_post_review_hash_error_preserves_findings_count() {
-        assert_post_review_hash_error_preserves_findings_count("fast");
-    }
-
-    #[test]
-    fn test_dispatch_review_cycle_final_post_review_hash_error_preserves_findings_count() {
-        assert_post_review_hash_error_preserves_findings_count("final");
     }
 }
