@@ -239,10 +239,8 @@ pub(crate) fn obligation_declaration_text(
     catalogues: &[CatalogueDocument],
     obligation: &TestObligation,
 ) -> Option<String> {
-    if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
-        return trait_impl_declaration_text(catalogues, obligation);
-    }
-    target_entry_declaration_text(catalogues, obligation.target_entry())
+    let all: Vec<&CatalogueDocument> = catalogues.iter().collect();
+    declaration_for_obligation_in(all.iter().copied(), &all, obligation)
 }
 
 /// Resolves the declaration text for a derived obligation from its recorded
@@ -252,23 +250,51 @@ pub(crate) fn obligation_declaration_text_from_loaded(
     catalogues: &[LoadedCatalogueDocument],
     obligation: &TestObligation,
 ) -> Option<String> {
-    let matching = catalogues
+    let matching: Vec<&CatalogueDocument> = catalogues
         .iter()
         .filter(|catalogue| catalogue.matches_file_path(&obligation.target_entry().file_path))
-        .map(LoadedCatalogueDocument::document);
-    if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
-        let all = catalogues.iter().map(LoadedCatalogueDocument::document).collect::<Vec<_>>();
-        return trait_impl_declaration_text_in(matching, &all, obligation);
-    }
-    target_entry_declaration_text_in(matching, obligation.target_entry())
+        .map(LoadedCatalogueDocument::document)
+        .collect();
+    let all: Vec<&CatalogueDocument> =
+        catalogues.iter().map(LoadedCatalogueDocument::document).collect();
+    declaration_for_obligation_in(matching, &all, obligation)
 }
 
-#[cfg(test)]
-fn target_entry_declaration_text(
-    catalogues: &[CatalogueDocument],
-    target: &CatalogueEntryRef,
+fn declaration_for_obligation_in<'a>(
+    catalogues: impl IntoIterator<Item = &'a CatalogueDocument>,
+    all_catalogues: &[&CatalogueDocument],
+    obligation: &TestObligation,
 ) -> Option<String> {
-    target_entry_declaration_text_in(catalogues.iter(), target)
+    let catalogues: Vec<&CatalogueDocument> = catalogues.into_iter().collect();
+    if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
+        return trait_impl_declaration_text_in(catalogues, all_catalogues, obligation);
+    }
+    let type_text =
+        target_entry_declaration_text_in(catalogues.iter().copied(), obligation.target_entry())?;
+    let Some(method_name) = obligation.id().item_identifier().as_str().strip_prefix("method:")
+    else {
+        return Some(type_text);
+    };
+    if obligation.target_entry().section_key != CatalogueSectionKey::Types {
+        return Some(type_text);
+    }
+    let type_name = obligation.target_entry().entry_key.as_str();
+    for catalogue in catalogues {
+        if let Some((_, entry)) =
+            catalogue.types().iter().find(|(name, _)| name.as_str() == type_name)
+            && entry.methods().iter().any(|method| method.name().as_str() == method_name)
+        {
+            return Some(type_text);
+        }
+        for inherent in catalogue.inherent_impls() {
+            if inherent.type_name.as_str() == type_name
+                && inherent.methods.iter().any(|method| method.name().as_str() == method_name)
+            {
+                return Some(format!("type: {type_text}\ninherent_impl: {inherent:?}"));
+            }
+        }
+    }
+    Some(type_text)
 }
 
 fn target_entry_declaration_text_in<'a>(
@@ -283,15 +309,6 @@ fn target_entry_declaration_text_in<'a>(
         }
     }
     None
-}
-
-#[cfg(test)]
-fn trait_impl_declaration_text(
-    catalogues: &[CatalogueDocument],
-    obligation: &TestObligation,
-) -> Option<String> {
-    let all = catalogues.iter().collect::<Vec<_>>();
-    trait_impl_declaration_text_in(catalogues.iter(), &all, obligation)
 }
 
 fn trait_impl_declaration_text_in<'a>(

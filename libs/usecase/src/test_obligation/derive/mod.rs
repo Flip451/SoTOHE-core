@@ -43,6 +43,8 @@ use super::{
     sha256_content_hash,
 };
 
+mod inherent;
+
 /// Command input for [`DeriveTestObligationsApplicationService`] (IN-07).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DeriveTestObligationsCommand {
@@ -187,12 +189,19 @@ pub(crate) fn derive_obligations_document(
             &trait_roles,
             &mut obligations,
         )?;
+        inherent::derive_inherent_impl_obligations(
+            rules,
+            projector,
+            catalogue,
+            &file_path,
+            &mut obligations,
+        )?;
     }
     Ok(ObligationsDocument::new(track_id, obligations))
 }
 
 /// Whether a parent entry emits its full role axes (Add / Modify).
-fn is_derivable(action: ItemAction) -> bool {
+pub(super) fn is_derivable(action: ItemAction) -> bool {
     matches!(action, ItemAction::Add | ItemAction::Modify)
 }
 
@@ -469,7 +478,7 @@ fn derive_trait_impl_obligations(
 }
 
 #[allow(clippy::too_many_arguments)]
-fn emit_rules<F>(
+pub(super) fn emit_rules<F>(
     role_rules: &RoleObligationRules,
     entry_key: &CatalogueEntryKey,
     target: &CatalogueEntryRef,
@@ -574,11 +583,11 @@ fn build_obligation(
     ))
 }
 
-fn declaration_hash<T: std::fmt::Debug>(entry: &T) -> DeclarationHash {
+pub(super) fn declaration_hash<T: std::fmt::Debug>(entry: &T) -> DeclarationHash {
     DeclarationHash::new(sha256_content_hash(format!("{entry:?}").as_bytes()))
 }
 
-fn catalogue_key(key: &str) -> Result<CatalogueEntryKey, DiagnosticMessage> {
+pub(super) fn catalogue_key(key: &str) -> Result<CatalogueEntryKey, DiagnosticMessage> {
     CatalogueEntryKey::try_new(key.to_owned()).map_err(|_| diag("empty catalogue entry key"))
 }
 
@@ -596,7 +605,7 @@ fn method_anchors_for_item(
     }
 }
 
-fn anchors_from_spec_refs(
+pub(super) fn anchors_from_spec_refs(
     refs: &[SpecRef],
 ) -> Result<Vec<TestObligationAnchorId>, DiagnosticMessage> {
     let mut anchors = Vec::with_capacity(refs.len());
@@ -611,7 +620,7 @@ fn anchors_from_spec_refs(
     Ok(anchors)
 }
 
-fn find_data_role_rules<'a>(
+pub(super) fn find_data_role_rules<'a>(
     rules: &'a TestObligationRulesDocument,
     role: &DataRole,
 ) -> Option<&'a RoleObligationRules> {
@@ -660,5 +669,5 @@ fn find_trait_impl_rules<'a>(
 }
 
 #[cfg(test)]
-#[path = "derive_tests.rs"]
+#[path = "../derive_tests.rs"]
 mod tests;

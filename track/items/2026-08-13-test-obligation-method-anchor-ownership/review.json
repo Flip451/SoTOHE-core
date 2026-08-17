@@ -2963,6 +2963,85 @@
           "hash": "rvw1:sha256:261d53d70e89509bb1067d635d8d5d11e6647366a5362d9bf708d21d66a59a8a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T13:54:12Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 41,
+              "message": "Duplicate obligation identities: derive_inherent_impl_obligations projects inherent-block methods without deduplicating against TypeEntry.methods (or across blocks). The canonical merge semantics already exist in domain (collect_methods_for_type: method name is the logical identity; identical duplicates across the two sources are legal and ignored; differing duplicates fail closed) but are not applied. A linter-legal catalogue declaring the same method identically in types[].methods and an inherent block makes derive emit two obligations with the same id (entry_key, kind, method:<name>) and different decl hashes; evaluate resolves both declarations to the same TypeEntry text, producing two fulfillment cache entries with an identical complete identity, so the next lookup_current returns AmbiguousCurrentEntries and the check gate reports corrupt cache state permanently (evaluate re-emits both rows every run and never heals).",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 39,
+              "message": "Inherent-only method obligations are adjudicated and freshness-tracked against a declaration that does not contain the method: the obligation's decl_hash is Debug(inherent block) but evaluate/check resolve declaration text via entry_declaration_text, which for Types returns only the TypeEntry Debug (mod.rs:158-178) and ignores inherent_impls. Consequences: (a) the fulfillment/waiver verifier judges method:<name> obligations with an EntryDeclaration that never declares the method's signature/contract; (b) the cache-key declaration hash tracks only the TypeEntry, so semantically editing the inherent method's declaration never fires decl_changed drift (check.rs:522-523, 655) and the frozen verdict survives a change to the very declaration under test — asymmetric with entry-declared methods and defeating the CN-04 freshness model for this obligation class.",
+              "severity": "P1"
+            },
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 57,
+              "message": "Business logic leak: inherent_method_items re-implements the Method-axis projection decision (is_derivable filter + `method:` identifier format) in usecase. This decision-table interpretation belongs on domain's RoleObligationItemsProjector (projection.rs data_role_items, owner of CN-10/IN-05 semantics); derive_obligations_document threads the projector to every other derive function but not the inherent path. The `method:` format is now defined independently in domain (projection.rs:41) and usecase (inherent.rs:68) and implicitly coupled to method_anchors_for_item's rsplit_once(':'), so the two derivation sources can silently diverge. Move the projection onto RoleObligationItemsProjector (e.g. an inherent_method_items method).",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 27,
+              "message": "Fail-open on broken owner reference: an inherent block whose type_name resolves to no types[] entry in the same catalogue silently yields zero obligations (continue). Unlike trait_impl's External case there is no legitimate \"external\" inherent impl — an unresolved owner is always a catalogue inconsistency, and neither the codec, catalogue-lint (which walks from type entries), nor the derive-side D2 validation detects an orphan block. This silently reintroduces the exact P0 gap this change fixes (inherent-only methods producing no obligations) for orphan blocks; it should fail closed with a DiagnosticMessage.",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 398,
+              "message": "Waiver lane still has the sibling-ambiguity defect the fulfillment fix addresses: emit_waiver_action builds the WaiverPair without the obligation item identifier, so per-owner waiver adjudications for sibling method obligations of one entry sharing an anchor are byte-identical (same reason, declaration, anchor_text). The waiver verifier cannot tell which method's obligation the waiver claims — the same defect class as PR #247 P0 #2, fixed only in emit_fulfillment_action. Cache entries are disambiguated by obligation_id so no corruption occurs, but the adjudication input is indistinguishable across siblings.",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 453,
+              "message": "Verdicts frozen under the pre-fix pair construction are never re-adjudicated: the cache key intentionally excludes the `## Obligation item` suffix (checklist §3) and the verifier fingerprint hashes only the infrastructure prompt preamble (fulfillment_verifier.rs:74-78), which this diff does not change, so the evidence-format change is invisible to the freshness model. The current track's obligation-fulfillment-cache.json holds 25 frozen verdicts produced without the item identifier that all remain fresh (no same-entry sibling pairs exist in the current cache, so present harm is limited). D3 waives legacy hash compatibility — bumping the verifier prompt preamble/fingerprint (or folding a pair-format version into it) would retire pre-fix verdicts safely.",
+              "severity": "P3"
+            }
+          ],
+          "hash": "rvw1:sha256:7ee6777ee020ad02439296007c4b7254fdaf433f6367951bccae4df34dd8f174",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T14:11:30Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 55,
+              "message": "Obligations derived from inherent-impl-only methods resolve their evaluate/check declaration to the TypeEntry text alone: the new derivation targets CatalogueSectionKey::Types (inherent.rs:55), and obligation_declaration_text_from_loaded/entry_declaration_text (test_obligation/mod.rs:158-178, 251-264) special-case only TraitImpl, so the verifier pair for an inherent-only method contains no signature/docs/spec_refs of the obligated method — only the `## Obligation item` name suffix. Consequently the fulfillment/waiver cache keys (evaluate plan.rs:433, check.rs:655, results_status.rs:299) hash the unchanged TypeEntry text: editing the inherent method's declaration changes the derive-side obligation decl_hash (inherent.rs:61, marking the obligations artifact stale) but never invalidates cached verdicts, which continue to pass the check gate as fresh. This breaks the invariant established for trait impls by trait_impl_pair_declaration_text (\"an implementation's cache key changes with either side of the pair\") and is asymmetric with TypeEntry-declared methods, whose edits do rotate the key. Fix likely belongs in the shared declaration resolution (test_obligation/mod.rs, outside this scope's file list) by freezing the inherent impl declaration into the pair for inherent-derived method obligations.",
+              "severity": "P1"
+            },
+            {
+              "category": "cache-staleness",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 445,
+              "message": "Cached verdicts produced before this fix are never invalidated: the `## Obligation item` suffix is deliberately outside the cache key (briefing checklist 3), and fulfillment_verifier_fingerprint()/waiver counterpart hash only the static prompt preamble (infrastructure/test_obligation/fulfillment_verifier.rs:74-78), which this diff does not change. Any fulfillment/waiver verdict cached earlier in this track — produced by the pre-fix prompt exhibiting exactly the P0 sibling-method confusion on shared anchors — still matches on (edge_id, obligation_id, key, fingerprint) and is reused via the cache-hit branch without re-verification, so the P0 fix does not take effect retroactively for already-cached pairs. Remediation is operational rather than a usecase code change: a one-time invalidation of this track's fulfillment/waiver cache documents, or a preamble revision that rotates the verifier fingerprint.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:cb0c2bcff8ccc837bd205d33f1c6a41440f27b8ca76eb5e280e856b96ef4e1bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T14:25:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4278ed90123469da194f1896a4f8e83bec40a84e549d50b5100527c87c2902e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }

@@ -18,9 +18,9 @@ use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, MethodDeclaration, MethodName, ModulePath,
-    StructKind, StructShape, TraitEntry, TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2,
-    TypeName, TypeRef,
+    CatalogueDocument, CrateName, DeletionRecord, InherentImplDeclV2, MethodDeclaration,
+    MethodName, ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2,
+    TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecSectionKind,
@@ -1636,6 +1636,51 @@ fn test_obligation_declaration_text_with_relative_catalogue_identity_matches_anc
 
     assert!(declaration.contains("ValueObject"));
     assert!(!declaration.contains("Entity"));
+}
+
+#[test]
+fn test_obligation_declaration_text_freezes_inherent_impl_for_inherent_only_method() {
+    let mut catalogue = money_catalogue();
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Money").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![MethodDeclaration::new(
+            MethodName::new("compute").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
+            None,
+        )],
+    });
+    let entry_key = entry_key();
+    let obligation = TestObligation::new(
+        TestObligationId::new(
+            entry_key.clone(),
+            TestObligationKind::LogicResult,
+            TestObligationItemIdentifier::try_new("method:compute".to_owned()).unwrap(),
+        ),
+        CatalogueEntryRef::new(
+            "domain-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            entry_key,
+        ),
+        TargetEntryRoleKind::DataRole(DataRole::value_object()),
+        TestObligationBrief::try_new("cover compute".to_owned()).unwrap(),
+        DeclarationHash::new(ContentHash::from_bytes([0u8; 32])),
+        vec![anchor()],
+    );
+
+    let declaration = obligation_declaration_text(&[catalogue], &obligation).unwrap();
+
+    assert!(declaration.contains("inherent_impl:"));
+    assert!(declaration.contains("compute"));
 }
 
 #[test]
