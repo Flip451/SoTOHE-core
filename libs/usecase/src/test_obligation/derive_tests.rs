@@ -937,21 +937,21 @@ fn test_method_action_does_not_inherit_parent_and_defaults_to_add() {
 }
 
 #[test]
-fn test_add_method_on_reference_trait_is_derived() {
+fn test_add_method_on_reference_trait_is_rejected() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Reference,
         vec![method_with_action("load", ItemAction::Add, vec![spec_ref("IN-01")])],
         vec![spec_ref("IN-01")],
     );
-    let (interactor, sink) =
+    let (interactor, _) =
         interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
 
-    interactor.execute(&command(vec![path])).unwrap();
-    let saved = sink.saved.lock().unwrap().clone().unwrap();
-    let items: Vec<&str> =
-        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
-    assert_eq!(items, vec!["trait_method:load"]);
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
 }
 
 #[test]
@@ -973,7 +973,7 @@ fn test_add_method_on_reference_trait_rejects_absent_anchor() {
 }
 
 #[test]
-fn test_reference_trait_does_not_emit_parent_level_axes() {
+fn test_reference_trait_with_method_spec_refs_is_rejected() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Reference,
@@ -984,13 +984,13 @@ fn test_reference_trait_does_not_emit_parent_level_axes() {
         rule(TestObligationKind::Contract, TestObligationPerAxis::TraitMethod, None),
         rule(TestObligationKind::Result, TestObligationPerAxis::Entry, None),
     ]);
-    let (interactor, sink) = interactor(rules, catalogue, &path);
+    let (interactor, _) = interactor(rules, catalogue, &path);
 
-    interactor.execute(&command(vec![path])).unwrap();
-    let saved = sink.saved.lock().unwrap().clone().unwrap();
-    let items: Vec<&str> =
-        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
-    assert_eq!(items, vec!["trait_method:load"]);
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
 }
 
 #[test]
@@ -1014,7 +1014,7 @@ fn test_method_axes_only_does_not_emit_minimum_fillers() {
 }
 
 #[test]
-fn test_add_method_on_reference_type_is_derived() {
+fn test_add_method_on_reference_type_is_rejected() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = catalogue_with_type(
         "Compute",
@@ -1028,14 +1028,13 @@ fn test_add_method_on_reference_type_is_derived() {
         rule(TestObligationKind::LogicResult, TestObligationPerAxis::Method, None),
         rule(TestObligationKind::Result, TestObligationPerAxis::Entry, None),
     ]);
-    let (interactor, sink) = interactor(rules, catalogue, &path);
+    let (interactor, _) = interactor(rules, catalogue, &path);
 
-    interactor.execute(&command(vec![path])).unwrap();
-    let saved = sink.saved.lock().unwrap().clone().unwrap();
-    let items: Vec<&str> =
-        saved.obligations().iter().map(|o| o.id().item_identifier().as_str()).collect();
-    assert_eq!(items, vec!["method:compute"]);
-    assert_eq!(saved.obligations()[0].spec_refs()[0].element_id(), "IN-13");
+    let result = interactor.execute(&command(vec![path]));
+    assert!(matches!(
+        result,
+        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
+    ));
 }
 
 #[test]

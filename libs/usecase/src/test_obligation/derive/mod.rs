@@ -23,7 +23,7 @@ use domain::tddd::test_obligation::ids::{
 };
 use domain::tddd::test_obligation::obligations::{
     ObligationsDocument, TestObligation, validate_add_modify_methods_have_spec_refs,
-    validate_method_anchor_coverage,
+    validate_method_anchor_coverage, validate_parent_forbids_method_spec_refs,
 };
 use domain::tddd::test_obligation::ports::{
     ObligationsArtifactPort, TestObligationRulesLoaderPort,
@@ -226,12 +226,21 @@ fn validate_named_catalogue_add_modify_methods(
 ) -> Result<(), DiagnosticMessage> {
     for entry in catalogue.traits().values() {
         validate_add_modify_methods_have_spec_refs(entry.methods())?;
+        validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
     }
     for entry in catalogue.types().values() {
         validate_add_modify_methods_have_spec_refs(entry.methods())?;
+        validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
     }
     for inherent in catalogue.inherent_impls() {
         validate_add_modify_methods_have_spec_refs(&inherent.methods)?;
+        let Some(owner) = catalogue.types().get(&inherent.type_name) else {
+            return Err(diag(&format!(
+                "inherent_impl type_name '{}' is not in the named catalogue",
+                inherent.type_name.as_str(),
+            )));
+        };
+        validate_parent_forbids_method_spec_refs(owner.action(), &inherent.methods)?;
     }
     Ok(())
 }

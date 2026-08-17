@@ -31,6 +31,10 @@
     ],
     "T11": [
       { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" }
+    ],
+    "T14": [
+      { "layer": "domain", "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs" },
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" }
     ]
   }
 }

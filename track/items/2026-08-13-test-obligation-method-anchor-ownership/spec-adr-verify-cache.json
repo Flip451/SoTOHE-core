@@ -157,7 +157,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。... 単一 method で entry に anchor がある場合は、その全てを method に明記する。",
+        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。同じ anchor を複数 method が担当してもよい。この条件を満たさない catalogue は構造検証で棄却する。単一 method で entry に anchor がある場合は、その全てを method に明記する。",
         "kind": "pass"
       }
     },
@@ -398,6 +398,52 @@
           "element_id": "IN-14",
           "section": "in_scope",
           "text_label": "コマンドが指名する catalogue で、add または modify の method に非空の spec_refs を要求し、兄弟 method による代替を認めない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "1e4ad89f78639a8890860ec1fff01de05bc4b2d82f0f7bf4fd81f385cf19d28c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しい schema（method `action`、Add/Modify の非空 `spec_refs`）は、この決定を実装した作業およびそれ以降の作業が書く catalogue にだけ課す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "38c63b1cdc7c791d7b79df4199799779a2af086bc969ff7065cf987f2d2b8ea7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs は空でなければならない。非空なら構造検証で拒否する。親は TraitEntry.action、TypeEntry.action、または inherent_impl が所属する同一指名 catalogue 内 TypeEntry.action であり、type_name が未解決なら fail-closed とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7bf779e73e58cb9944ab4939104664e48763cc37f065dd4bd10d446df70d8db3",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "親が `reference` / `delete` のとき、子 `MethodDeclaration` の `spec_refs` は空でなければならない。非空なら棄却する。\n\n親とは次の immediate container の `action` である:\n\n- `TraitEntry.methods` → その `TraitEntry.action`\n- `TypeEntry.methods` → その `TypeEntry.action`\n- `inherent_impls[].methods` → コマンドが指名する同一 catalogue 内の所属 `TypeEntry.action`（`type_name` で解決。見つからなければ fail-closed）",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "38c63b1cdc7c791d7b79df4199799779a2af086bc969ff7065cf987f2d2b8ea7",
+      "claim_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs は空でなければならない。非空なら構造検証で拒否する。親は TraitEntry.action、TypeEntry.action、または inherent_impl が所属する同一指名 catalogue 内 TypeEntry.action であり、type_name が未解決なら fail-closed とする。"
         },
         "kind": "spec_element"
       },
@@ -755,7 +801,7 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "新しい schema（method `action`、Add/Modify の非空 `spec_refs`）は、この決定を実装した作業およびそれ以降の作業が書く catalogue にだけ課す。\nコマンドが指名しない既存 catalogue を直したり、失敗させたりしない。",
+        "citation": "「コマンドが指名しない既存 catalogue を直したり、失敗させたりしない。」",
         "kind": "pass"
       }
     },
@@ -1032,6 +1078,75 @@
       },
       "verdict": {
         "citation": "新しい schema（method `action`、Add/Modify の非空 `spec_refs`）は、この決定を実装した作業およびそれ以降の作業が書く catalogue にだけ課す。\nコマンドが指名しない既存 catalogue を直したり、失敗させたりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d8051ea1b2e2a70a0f4f3a73705132f5b92694167a9341efbb62e34e43b01cf5",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs が非空なら構造検証で拒否される。add または modify の method は非空 spec_refs を要求されるため、親が reference または delete のとき add または modify の method は宣言できない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7bf779e73e58cb9944ab4939104664e48763cc37f065dd4bd10d446df70d8db3",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "親が `reference` / `delete` のとき、子 `MethodDeclaration` の `spec_refs` は空でなければならない。非空なら棄却する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d8051ea1b2e2a70a0f4f3a73705132f5b92694167a9341efbb62e34e43b01cf5",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs が非空なら構造検証で拒否される。add または modify の method は非空 spec_refs を要求されるため、親が reference または delete のとき add または modify の method は宣言できない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "1e4ad89f78639a8890860ec1fff01de05bc4b2d82f0f7bf4fd81f385cf19d28c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D3 が適用対象とする catalogue では、Add/Modify method の `spec_refs` を非空とし、空なら棄却する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d8051ea1b2e2a70a0f4f3a73705132f5b92694167a9341efbb62e34e43b01cf5",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs が非空なら構造検証で拒否される。add または modify の method は非空 spec_refs を要求されるため、親が reference または delete のとき add または modify の method は宣言できない。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "1e4ad89f78639a8890860ec1fff01de05bc4b2d82f0f7bf4fd81f385cf19d28c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D3",
+          "file_path": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "新しい schema（method `action`、Add/Modify の非空 `spec_refs`）は、この決定を実装した作業およびそれ以降の作業が書く catalogue にだけ課す。",
         "kind": "pass"
       }
     }

@@ -79,6 +79,34 @@
         "kind": "function_role",
         "role": "FreeFunction"
       }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+      "declaration_hash": "62b8f545991bd25024575ec33b3b748d63ab56fb6dfaf98a0ac48616c15d217e",
+      "id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-15",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-16",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
     }
   ],
   "track_id": "2026-08-13-test-obligation-method-anchor-ownership"

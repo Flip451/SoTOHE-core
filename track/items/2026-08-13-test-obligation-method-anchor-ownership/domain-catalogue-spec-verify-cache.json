@@ -188,7 +188,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "citation": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
         "kind": "pass"
       }
     },
@@ -308,7 +308,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。",
         "kind": "pass"
       }
     },
@@ -524,7 +524,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。",
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
         "kind": "pass"
       }
     },
@@ -813,6 +813,54 @@
       },
       "verdict": {
         "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "09afa0a22b9379f8cbe2b7b2501052e4cc228ca68c9994a51edfa1cbc5f12edb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "38c63b1cdc7c791d7b79df4199799779a2af086bc969ff7065cf987f2d2b8ea7",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-15",
+          "section": "in_scope",
+          "text_label": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs は空でなければならない。非空なら構造検証で拒否する。親は TraitEntry.action、TypeEntry.action、または inherent_impl が所属する同一指名 catalogue 内 TypeEntry.action であり、type_name が未解決なら fail-closed とする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "親が reference または delete のとき子 MethodDeclaration の spec_refs は空でなければならない。非空なら構造検証で拒否する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "09afa0a22b9379f8cbe2b7b2501052e4cc228ca68c9994a51edfa1cbc5f12edb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "d8051ea1b2e2a70a0f4f3a73705132f5b92694167a9341efbb62e34e43b01cf5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-16",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs が非空なら構造検証で拒否される。add または modify の method は非空 spec_refs を要求されるため、親が reference または delete のとき add または modify の method は宣言できない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs が非空なら構造検証で拒否される。",
         "kind": "pass"
       }
     }

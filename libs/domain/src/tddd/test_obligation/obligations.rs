@@ -23,20 +23,22 @@ use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
 
 /// Validates method-level spec_refs against a trait's entry-level catalogue.
 ///
-/// Every method-level reference must belong to the entry-level set, including
-/// methods on a Reference/Delete parent. The union of Add/Modify method
-/// references must cover that set only when the parent itself is Add/Modify.
-/// A single Add/Modify method on such a parent with a non-empty entry-level
-/// set must declare the complete set. Reference/Delete method refs never
-/// satisfy coverage.
+/// A Reference/Delete parent rejects every method that declares any spec_refs,
+/// so those methods never reach containment or coverage. After that gate, every
+/// remaining method-level reference must belong to the entry-level set. The
+/// union of Add/Modify method references must cover that set only when the
+/// parent itself is Add/Modify. A single Add/Modify method on such a parent
+/// with a non-empty entry-level set must declare the complete set.
+/// Reference/Delete method refs never satisfy coverage.
 ///
 /// # Errors
 ///
-/// Returns a [`DiagnosticMessage`] when a method cites an absent anchor or the
-/// method union does not cover the entry-level catalogue of an Add/Modify
-/// parent.
+/// Returns a [`DiagnosticMessage`] when a method on a Reference/Delete parent
+/// declares spec_refs, a method cites an absent anchor, or the method union
+/// does not cover the entry-level catalogue of an Add/Modify parent.
 pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), DiagnosticMessage> {
     validate_add_modify_methods_have_spec_refs(entry.methods())?;
+    validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
     for method in entry.methods() {
         for method_ref in method.spec_refs() {
             if !contains_spec_ref(entry.spec_refs(), method_ref) {
@@ -101,6 +103,33 @@ pub fn validate_add_modify_methods_have_spec_refs(
         {
             return Err(coverage_diag(&format!(
                 "add/modify method '{}' must declare non-empty spec_refs",
+                method.name().as_str(),
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Rejects non-empty method `spec_refs` when the parent is Reference or Delete.
+///
+/// Combined with [`validate_add_modify_methods_have_spec_refs`], this makes
+/// Add/Modify methods undeclarable on those parents.
+///
+/// # Errors
+///
+/// Returns a [`DiagnosticMessage`] when a method on a Reference/Delete parent
+/// declares any `spec_refs`.
+pub fn validate_parent_forbids_method_spec_refs(
+    parent: ItemAction,
+    methods: &[MethodDeclaration],
+) -> Result<(), DiagnosticMessage> {
+    if !matches!(parent, ItemAction::Reference | ItemAction::Delete) {
+        return Ok(());
+    }
+    for method in methods {
+        if !method.spec_refs().is_empty() {
+            return Err(coverage_diag(&format!(
+                "method '{}' on a reference/delete parent must not declare spec_refs",
                 method.name().as_str(),
             )));
         }
@@ -893,6 +922,50 @@ mod tests {
                 method("load", ItemAction::Add, vec![]),
             ])
             .is_err()
+        );
+    }
+
+    #[test]
+    fn test_reference_parent_rejects_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Reference,
+                &[method("load", ItemAction::Reference, vec![spec_ref("IN-01")])],
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_delete_parent_rejects_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Delete,
+                &[method("load", ItemAction::Delete, vec![spec_ref("IN-01")])],
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_reference_parent_accepts_empty_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Reference,
+                &[method("load", ItemAction::Reference, vec![])],
+            )
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_add_parent_still_allows_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Add,
+                &[method("load", ItemAction::Add, vec![spec_ref("IN-14")])],
+            )
+            .is_ok()
         );
     }
 }

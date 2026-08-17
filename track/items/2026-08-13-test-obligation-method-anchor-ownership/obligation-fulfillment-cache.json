@@ -994,6 +994,98 @@
       "bound_tests": [
         {
           "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_reference_parent_rejects_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_delete_parent_rejects_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_reference_parent_accepts_empty_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_add_parent_still_allows_method_spec_refs"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-15",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs"
+      },
+      "key": {
+        "anchor_text_hash": "1833ad9fb5411fbe5c75c20bc65034e6b886c8f933bd064f8e7cddf9adfeeb79",
+        "bound_tests_set_hash": "a12c7e424cfd50ffc1537a87b08a811c93fc8f5e187027f9f6d5d226774b07b3",
+        "declaration_hash": "62b8f545991bd25024575ec33b3b748d63ab56fb6dfaf98a0ac48616c15d217e"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "validate_parent_forbids_method_spec_refs(\n                ItemAction::Reference,\n                &[method(\"load\", ItemAction::Reference, vec![spec_ref(\"IN-01\")])],\n            )\n            .is_err()",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_reference_parent_rejects_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_delete_parent_rejects_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_reference_parent_accepts_empty_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_add_parent_still_allows_method_spec_refs"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-16",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs"
+      },
+      "key": {
+        "anchor_text_hash": "59029b22beec61368476788a1b2e64f49c23529ba19584acb8cf699280601b24",
+        "bound_tests_set_hash": "a12c7e424cfd50ffc1537a87b08a811c93fc8f5e187027f9f6d5d226774b07b3",
+        "declaration_hash": "62b8f545991bd25024575ec33b3b748d63ab56fb6dfaf98a0ac48616c15d217e"
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "validate_parent_forbids_method_spec_refs(\n                ItemAction::Reference,\n                &[method(\"load\", ItemAction::Reference, vec![spec_ref(\"IN-01\")])],\n            )\n            .is_err()",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "domain",
           "module_path": "domain::tddd::catalogue_v2::methods::tests",
           "test_name": "test_method_declaration_new_preserves_distinct_method_spec_refs"
         },

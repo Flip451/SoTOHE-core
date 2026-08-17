@@ -140,7 +140,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。",
+        "citation": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
         "kind": "pass"
       }
     },
@@ -236,7 +236,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。",
+        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
         "kind": "pass"
       }
     },
@@ -361,7 +361,7 @@
       }
     },
     {
-      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
+      "claim_hash": "6acd058df93bd01a82c6fadec9bbec3d95f475625ac34d6cb403aff636f3306a",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -385,7 +385,7 @@
       }
     },
     {
-      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
+      "claim_hash": "6acd058df93bd01a82c6fadec9bbec3d95f475625ac34d6cb403aff636f3306a",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -409,7 +409,7 @@
       }
     },
     {
-      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
+      "claim_hash": "6acd058df93bd01a82c6fadec9bbec3d95f475625ac34d6cb403aff636f3306a",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -433,7 +433,7 @@
       }
     },
     {
-      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
+      "claim_hash": "6acd058df93bd01a82c6fadec9bbec3d95f475625ac34d6cb403aff636f3306a",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -457,7 +457,7 @@
       }
     },
     {
-      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
+      "claim_hash": "6acd058df93bd01a82c6fadec9bbec3d95f475625ac34d6cb403aff636f3306a",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",
@@ -481,7 +481,7 @@
       }
     },
     {
-      "claim_hash": "2f38a16fb52ae285afb501631204621523360341528964a9ffc04271fe07295f",
+      "claim_hash": "6acd058df93bd01a82c6fadec9bbec3d95f475625ac34d6cb403aff636f3306a",
       "claim_origin": {
         "data": {
           "entry_key": "PhaseCommandService",

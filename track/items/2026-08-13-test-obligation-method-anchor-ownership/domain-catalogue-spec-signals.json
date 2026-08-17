@@ -1,5 +1,5 @@
 {
-  "catalogue_declaration_hash": "8eccc692807af8f96a5a887eb96a5143049e5550bf3c2e8e6cb3969964c71556",
+  "catalogue_declaration_hash": "0da500edabd06ebad8c709268e577d04839260645047f861eace89bd4b06efc7",
   "schema_version": 1,
   "signals": [
     {
@@ -21,6 +21,11 @@
       "entry_hash": "4d8e5209a0fcccd1f0cca047a41998fb94185e961135b301a2dc5d8ad46ac07b",
       "signal": "blue",
       "type_name": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
+    },
+    {
+      "entry_hash": "09afa0a22b9379f8cbe2b7b2501052e4cc228ca68c9994a51edfa1cbc5f12edb",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs"
     }
   ]
 }

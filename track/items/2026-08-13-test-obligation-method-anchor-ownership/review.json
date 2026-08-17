@@ -166,6 +166,13 @@
           "hash": "rvw1:sha256:ca7dc44714212b100ee42917690b7d4d0387a0bd81ea3f8390a51bdaa05c3548",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T15:57:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6376424c8627e99c1fcad07a5030c9c352cc38252b3816beb1f2ea315cb1b082",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -450,6 +457,35 @@
           "at": "2026-08-17T12:27:40Z",
           "findings": [],
           "hash": "rvw1:sha256:6815486666da1899b9897e3cd19fe6a287986bee8855be2b7d99082a78df6393",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:11:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c2ce868b29d8015449143a372a4368c893de1c98795a11e0490bd71b29f57926",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:18:48Z",
+          "findings": [
+            {
+              "category": "doc-contract-contradiction",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 26,
+              "message": "validate_method_anchor_coverage の doc comment が本 diff の挙動変更と矛盾している。「Every method-level reference must belong to the entry-level set, including methods on a Reference/Delete parent」は Reference/Delete 親の method-level spec_refs が containment 検証の対象として合法に存在し得ることを示すが、行 40 で配線された validate_parent_forbids_method_spec_refs により、それらは containment 判定に到達する前に一律拒否される (entry-level set に含まれる anchor でも Err)。また # Errors 節 (行 33-37) はこの新しい拒否条件を列挙していない。doc を信頼する呼び出し側は「Reference/Delete 親の method が entry set 内の anchor を引くのは合法」と誤って予測する。summary 冒頭文の修正と # Errors への拒否条件追記が必要。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:1c09cc42e3ddda63738b073ef80dd5ae0ef7bb239145164845be74cab8be6345",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T17:24:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e65859314f9a34883d68304582940d3fa29a189e1e137b8c5daefda18297d5f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1504,6 +1540,20 @@
           "hash": "rvw1:sha256:fcda8653262cd2572643ee5cbe483e2f3d627e1b87ef216419be83f70c825097",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:05:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:617aa569b34f7bc99f5c050587093475f2b7c388275b849a4e7ac8910a28c15a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:10:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bad87cb7a4edc6f2378dc65e109c54bd45d01c41dbddce56b4bf371c8677a041",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2029,6 +2079,13 @@
           "hash": "rvw1:sha256:962be675a9c9a1944b1d315e2b5440a0df2b7a1029e6372490d505f3d219b3ae",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:31:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:586c478cfd7f1fc95a2f1cced91d172919047dc8b1c7afd0333a76d6271b53cb",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2255,6 +2312,35 @@
           "at": "2026-08-17T05:19:12Z",
           "findings": [],
           "hash": "rvw1:sha256:1ec99016af444c53bcb0012ad9e528ddef01604a54dbad0397c7f6c8fce0fd10",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T16:08:41Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 373,
+              "message": "IN-15 conflicts with CN-01/IN-02/AC-02 for a reference/delete parent that carries non-empty entry-level spec_refs: CN-01 unconditionally requires every entry-level anchor to be owned by at least one method (\"少なくとも一つの method に担当されなければならない\") and AC-02 rejects declarations whose methods do not cover the entry-level anchors, while IN-15 requires every child MethodDeclaration's spec_refs to be empty under such a parent. The shape is legitimate and reachable — 1720 D1 uses entry-level spec_refs as the trait-to-spec inventory independent of obligation derivation, and delete tombstones canonically record spec_refs (catalogue-schema.md:684). Before IN-15 the conflict was latent because add/modify child methods could own the anchors; this diff closes that escape, so the spec now imposes contradictory requirements (must assign vs. must not assign) on the same declaration with no stated precedence or action-scoping. The current validator resolves it by skipping the cover direction for non-Add/Modify parent entries (libs/domain/src/tddd/test_obligation/obligations.rs:53), a scoping stated nowhere in the spec — Phase 2/3 are forced to invent it. Clarify in CN-01/IN-02/AC-02 (or IN-15) whether the coverage direction applies only to add/modify parent entries, or otherwise define which rule governs reference/delete parents with non-empty entry-level spec_refs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7c2897c56da142533d8dd35a595ad24550b5daefa391c2d5359841c071c79534",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T16:17:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2265f415a8f82920fbe6a7408b9490c6d40f1ed037e859314888c48ece5891b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T16:30:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eecc1270a605e9c89085f72ff1263add15155af62688e624d7ac8a21f8ca0918",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2570,6 +2656,28 @@
           "at": "2026-08-17T09:15:18Z",
           "findings": [],
           "hash": "rvw1:sha256:ddcaeec2b91dc705c02b94b66ad87c0e101fa45061397f230bb9536c45263e67",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T16:49:43Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 78,
+              "message": "The `docs` field of the new entry `domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs` restates the IN-15 / AC-16 behaviour contract in prose instead of referencing it by anchor cite. \"Reject non-empty method spec_refs when the parent ItemAction is Reference or Delete\" reproduces AC-16's core contract, and \"the caller resolves the owning TypeEntry in the same named catalogue by type_name and fail-closes if missing, then passes that TypeEntry.action as parent\" reproduces IN-15's second sentence (parent-source resolution + fail-closed rule). This exceeds the short-noun-phrase exception of .harness/policies/no-upstream-restatement.md — sibling entries in the same file show the compliant form (e.g. \"Add the Add/Modify method spec_refs validator (IN-14, AC-03).\"). Shorten to change-target + operation + anchor cite, e.g. \"Add the parent-action method spec_refs validator; parent is caller-resolved (IN-15, AC-16).\"",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bfd90fd5831de41fb7c7e8145d22b5ce348337100a9c7535f5b4dad5c4fd7a75",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T16:55:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e830a4ddefbce0e7918111649dfef34074e83f7258841935bee4311b33603ff8",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3062,6 +3170,13 @@
           "at": "2026-08-17T14:25:53Z",
           "findings": [],
           "hash": "rvw1:sha256:c4278ed90123469da194f1896a4f8e83bec40a84e549d50b5100527c87c2902e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:12:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8f5d01a0f9d16621f275012b4ea9a86912aa5677123ee735f96060c3b064b97",
           "type": "final",
           "verdict": "zero_findings"
         }

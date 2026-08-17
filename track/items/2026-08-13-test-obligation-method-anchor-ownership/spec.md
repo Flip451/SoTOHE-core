@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
-version: "1.3"
-signals: { blue: 32, yellow: 0, red: 0 }
+version: "1.5"
+signals: { blue: 34, yellow: 0, red: 0 }
 ---
 
 # trait_method obligations own method-scoped anchors
@@ -24,6 +24,7 @@ signals: { blue: 32, yellow: 0, red: 0 }
 - [IN-12] `.harness/custom/review-prompts/harness-policy.md` から、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項だけを撤去し、他の deviation 記述や他 track の記録は変更しない。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D3] [tasks: T9]
 - [IN-13] TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。 [adr: knowledge/adr/2026-08-17-0340-method-declaration-action.md#D1] [tasks: T10]
 - [IN-14] コマンドが指名する catalogue で、add または modify の method に非空の spec_refs を要求し、兄弟 method による代替を認めない。 [adr: knowledge/adr/2026-08-17-0340-method-declaration-action.md#D2, knowledge/adr/2026-08-17-0340-method-declaration-action.md#D3] [tasks: T12, T11]
+- [IN-15] コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs は空でなければならない。非空なら構造検証で拒否する。親は TraitEntry.action、TypeEntry.action、または inherent_impl が所属する同一指名 catalogue 内 TypeEntry.action であり、type_name が未解決なら fail-closed とする。 [adr: knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md#D1, knowledge/adr/2026-08-17-0340-method-declaration-action.md#D3] [tasks: T14]
 
 ### Out of Scope
 - [OS-01] コマンドが指名しない既存 catalogue 全体を新 schema へ遡及的に書き換えたり不適合として失敗させたりすることは本 track の対象外とする。 [adr: knowledge/adr/2026-08-17-0340-method-declaration-action.md#D3] [tasks: T4, T11]
@@ -50,6 +51,7 @@ signals: { blue: 32, yellow: 0, red: 0 }
 - [ ] [AC-06] コマンドが指名する catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。 [adr: knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md#D1, knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md#D1, knowledge/adr/2026-08-17-0340-method-declaration-action.md#D3] [tasks: T1, T2]
 - [ ] [AC-14] TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。 [adr: knowledge/adr/2026-08-17-0340-method-declaration-action.md#D1] [tasks: T10, T13, T11]
 - [ ] [AC-15] method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。 [adr: knowledge/adr/2026-08-17-0340-method-declaration-action.md#D3] [tasks: T11]
+- [ ] [AC-16] コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs が非空なら構造検証で拒否される。add または modify の method は非空 spec_refs を要求されるため、親が reference または delete のとき add または modify の method は宣言できない。 [adr: knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md#D1, knowledge/adr/2026-08-17-0340-method-declaration-action.md#D2, knowledge/adr/2026-08-17-0340-method-declaration-action.md#D3] [tasks: T14]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#Rules
@@ -58,5 +60,5 @@ signals: { blue: 32, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 32  🟡 0  🔴 0
+🔵 34  🟡 0  🔴 0
 

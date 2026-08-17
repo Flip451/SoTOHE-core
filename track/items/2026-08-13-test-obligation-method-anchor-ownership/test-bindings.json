@@ -132,6 +132,36 @@
       ]
     },
     {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_reference_parent_rejects_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_delete_parent_rejects_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_reference_parent_accepts_empty_method_spec_refs"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_add_parent_still_allows_method_spec_refs"
+        }
+      ]
+    },
+    {
       "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "MethodDeclaration",

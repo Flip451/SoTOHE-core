@@ -3,10 +3,10 @@
 
 ## Summary
 
-GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11.
-GO-02 → T1, T2, T3, T10, T11.
+GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11, T14.
+GO-02 → T1, T2, T3, T10, T11, T14.
 
-## Tasks (13/13 resolved)
+## Tasks (13/14 resolved)
 
 ### method-declaration-staging — MethodDeclaration staging and cutover
 
@@ -40,3 +40,9 @@ GO-02 → T1, T2, T3, T10, T11.
 - [x] **T12**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and related domain tests. Operation: implement and test method spec_refs validation. Anchors: GO-01, IN-14, AC-03, CN-01. (`701256308832e5ddff442732ff7574cf814edf98`)
 - [x] **T13**: Targets: libs/domain/src/tddd/test_obligation/projection.rs and related domain tests. Operation: implement and test action-aware method-obligation projection. Anchors: AC-14. (`701256308832e5ddff442732ff7574cf814edf98`)
 - [x] **T11**: Targets: libs/usecase/src/test_obligation/derive.rs, its command-directed catalogue selection boundary, and related tests. Operation: implement and test the command-directed catalogue selection boundary. Anchors: GO-01, GO-02, IN-14, AC-03, AC-14, AC-15, CN-02, OS-01. (`701256308832e5ddff442732ff7574cf814edf98`)
+
+### parent-forbids-method-spec-refs — Parent-action method spec_refs validation
+
+> Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive/mod.rs. Operation: implement, wire, and test. Anchors: IN-15, AC-16.
+
+- [~] **T14**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs, related domain tests, and libs/usecase/src/test_obligation/derive/mod.rs. Operation: implement and test validate_parent_forbids_method_spec_refs and wire it into the named-catalogue validation path. Anchors: IN-15, AC-16.

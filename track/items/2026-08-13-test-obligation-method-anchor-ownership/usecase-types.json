@@ -38,17 +38,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), CommandConfigLoadError>",
-          "spec_refs": [
-            {
-              "anchor": "IN-09",
-              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-            },
-            {
-              "anchor": "AC-10",
-              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-            }
-          ]
+          "returns": "Result<(), CommandConfigLoadError>"
         },
         {
           "action": "reference",
@@ -62,17 +52,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<PhaseCommandExplanation, PhaseCommandExplainError>",
-          "spec_refs": [
-            {
-              "anchor": "IN-10",
-              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-            },
-            {
-              "anchor": "AC-11",
-              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-            }
-          ]
+          "returns": "Result<PhaseCommandExplanation, PhaseCommandExplainError>"
         },
         {
           "action": "reference",
@@ -86,17 +66,7 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<PhaseCommandEnterOutcome, PhaseCommandEnterError>",
-          "spec_refs": [
-            {
-              "anchor": "IN-11",
-              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-            },
-            {
-              "anchor": "AC-12",
-              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
-            }
-          ]
+          "returns": "Result<PhaseCommandEnterOutcome, PhaseCommandEnterError>"
         }
       ],
       "module_path": "phase_command",
