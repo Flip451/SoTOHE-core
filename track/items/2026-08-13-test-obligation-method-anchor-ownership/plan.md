@@ -6,7 +6,7 @@
 GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11, T14.
 GO-02 → T1, T2, T3, T10, T11, T14.
 
-## Tasks (13/14 resolved)
+## Tasks (14/14 resolved)
 
 ### method-declaration-staging — MethodDeclaration staging and cutover
 
@@ -45,4 +45,4 @@ GO-02 → T1, T2, T3, T10, T11, T14.
 
 > Targets: libs/domain/src/tddd/test_obligation/obligations.rs and libs/usecase/src/test_obligation/derive/mod.rs. Operation: implement, wire, and test. Anchors: IN-15, AC-16.
 
-- [~] **T14**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs, related domain tests, and libs/usecase/src/test_obligation/derive/mod.rs. Operation: implement and test validate_parent_forbids_method_spec_refs and wire it into the named-catalogue validation path. Anchors: IN-15, AC-16.
+- [x] **T14**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs, related domain tests, and libs/usecase/src/test_obligation/derive/mod.rs. Operation: implement and test validate_parent_forbids_method_spec_refs and wire it into the named-catalogue validation path. Anchors: IN-15, AC-16.

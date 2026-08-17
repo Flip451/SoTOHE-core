@@ -149,7 +149,7 @@
     {
       "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs, related domain tests, and libs/usecase/src/test_obligation/derive/mod.rs. Operation: implement and test validate_parent_forbids_method_spec_refs and wire it into the named-catalogue validation path. Anchors: IN-15, AC-16.",
       "id": "T14",
-      "status": "in_progress"
+      "status": "done"
     }
   ]
 }
