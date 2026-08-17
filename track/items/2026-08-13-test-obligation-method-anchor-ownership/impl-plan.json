@@ -113,6 +113,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "21e4faba31d390705e93f3d0bd94c224880c0af1",
       "description": "Targets: libs/domain/src/tddd/catalogue_v2/methods.rs; libs/infrastructure/src/tddd/catalogue_document_codec/ DTO, decode, encode, and codec tests; and every libs/domain, libs/usecase, and libs/infrastructure MethodDeclaration::new construction call site. Operation: extend the MethodDeclaration schema, update the JSON codec, migrate constructor arity, and add focused tests. Anchors: GO-02, IN-13, AC-14.",
       "id": "T10",
       "status": "done"
@@ -120,17 +121,17 @@
     {
       "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs and related domain tests. Operation: implement and test method spec_refs validation. Anchors: GO-01, IN-14, AC-03, CN-01.",
       "id": "T12",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Targets: libs/domain/src/tddd/test_obligation/projection.rs and related domain tests. Operation: implement and test action-aware method-obligation projection. Anchors: AC-14.",
       "id": "T13",
-      "status": "todo"
+      "status": "done"
     },
     {
       "description": "Targets: libs/usecase/src/test_obligation/derive.rs, its command-directed catalogue selection boundary, and related tests. Operation: implement and test the command-directed catalogue selection boundary. Anchors: GO-01, GO-02, IN-14, AC-03, AC-14, AC-15, CN-02, OS-01.",
       "id": "T11",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }
