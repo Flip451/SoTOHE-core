@@ -117,6 +117,22 @@
     {
       "for_type": "GitTrackCommitHashAdapter",
       "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Copy"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "SystemTrackBaselineCaptureAdapter",
+      "trait_ref": "Default"
     }
   ],
   "traits": {},

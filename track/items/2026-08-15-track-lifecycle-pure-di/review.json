@@ -100,6 +100,27 @@
           "hash": "rvw1:sha256:42761f0c3eb70150454c2e9912ce41a2ef8876a1a8b3df2d4d5e7fb520911864",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:06:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f50005a9ec29421df39181a1006630dae523ca18590a9cf53cdde33bd502f6e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:13:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f50005a9ec29421df39181a1006630dae523ca18590a9cf53cdde33bd502f6e8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:26:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:29df40733e03668d2bc63c52cfedf03afe6ac0ce82cfaf32f3da6478eabb3100",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -176,6 +197,20 @@
           "hash": "rvw1:sha256:3956a629a97ad9af93a75c104e3e9e4f0afda2434581ce55688d58bb8ff695bf",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:06:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:633ae77ba4a0628b85b0982f13fb5079425f8be4bf5e05f97e373bbde06e2e41",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:14:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:633ae77ba4a0628b85b0982f13fb5079425f8be4bf5e05f97e373bbde06e2e41",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -222,6 +257,20 @@
           "at": "2026-08-17T02:42:46Z",
           "findings": [],
           "hash": "rvw1:sha256:6557eb3579d8e061e66f941eee15f6d053a964c44f79961dcf0e04027210f303",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:07:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9dddba907d202ccb3f9206a15ff4b1a7ab5a91674e7e117ec26803cf5a27933",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:14:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9dddba907d202ccb3f9206a15ff4b1a7ab5a91674e7e117ec26803cf5a27933",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -686,6 +735,35 @@
           "hash": "rvw1:sha256:60a09dc251cce55623d12631293f0f5fdf88ebcb8482aca16fb7b4cc82f9ee44",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:56:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5a91d19dfdbc6e8f2803bcd26e4ddcfd6ad8940ec5778ccae7cd90a9e0781ee",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:13:48Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/impl-plan.json",
+              "line": 318,
+              "message": "T032 is still `todo` but bundles two independently verifiable behavior units: (1) migrating `TrackBranchStrategyPort` with `FsTrackBranchStrategyAdapter`, and (2) migrating `TrackSelectionPort` with `GitTrackSelectionAdapter`. Each has its own adapter-contract regression and can independently verify AC-03/CN-01. Split them into separate ordered tasks before implementation begins.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a5a91d19dfdbc6e8f2803bcd26e4ddcfd6ad8940ec5778ccae7cd90a9e0781ee",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T04:25:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5a91d19dfdbc6e8f2803bcd26e4ddcfd6ad8940ec5778ccae7cd90a9e0781ee",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -995,6 +1073,78 @@
           "hash": "rvw1:sha256:10be56be501e91f8e9c102959cc9328fa7ae28619ea62441130432396eab9991",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:07:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a5aaf8cec0b85312041049b79cd9898e14afb64606f001a1694076ac0e2cee66",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:14:12Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_capture.rs",
+              "line": 31,
+              "message": "The adapter reads `architecture-rules.json` before `BaselineCaptureInteractor` runs its root symlink guard. `TrackWorkspaceRoot` only rejects `..`, while `FsTdddLayerBindingsAdapter::load` assumes the supplied root is trusted; a symlinked workspace root is therefore followed before being rejected. Validate the trusted root before all preflight I/O, following the fail-closed trusted-root pattern.",
+              "severity": "P0"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_capture.rs",
+              "line": 34,
+              "message": "The returned layer outcomes come from a pre-execution snapshot, while `run` reloads the bindings and independently checks each baseline. Concurrent replacement of `architecture-rules.json` or creation/deletion of a baseline can therefore return the wrong layer or report `Captured`/`AlreadyExists` contrary to what the operation did. The executing capture path must return the actual per-layer outcomes or operate from one guarded snapshot.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_capture.rs",
+              "line": 41,
+              "message": "The selected `RustdocBaselineCaptureAdapter` writes CLI-formatted `[OK] baseline-capture ...` messages directly to stdout. Consequently this port is not presentation-free, despite returning structured layer results, and non-CLI callers receive unsolicited output. Keep the adapter stack silent and render outcomes in the primary adapter.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-coverage",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_capture.rs",
+              "line": 161,
+              "message": "The tests only exercise the idempotent `AlreadyExists` success and a missing-config error. The primary missing-baseline path—which invokes rustdoc, writes the file, and returns `Captured`—has no test, leaving the new public adapter's main happy path unverified.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a5aaf8cec0b85312041049b79cd9898e14afb64606f001a1694076ac0e2cee66",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T04:23:15Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_capture.rs",
+              "line": 37,
+              "message": "The result is synthesized from state observed before the actual capture. `run` reloads the bindings and the rustdoc adapter independently decides whether to write or skip each baseline. For example, two concurrent captures can both observe an absent file, then one invocation can skip the file written by the other while still returning `Captured`; concurrent deletion can similarly produce `AlreadyExists` after this invocation writes the file. Configuration replacement can also make the returned layer list differ from the layers actually processed. Return the actual per-layer outcomes from the executing capture path instead of reconstructing them from this preflight snapshot.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/baseline_capture.rs",
+              "line": 47,
+              "message": "This wiring makes `TrackBaselineCapturePort::execute` invoke `RustdocBaselineCaptureAdapter`, whose success paths call `println!` with CLI-formatted `[OK] baseline-capture ...` messages. The port therefore has stdout presentation side effects even though it returns structured layer results, violating the briefing's presentation-free boundary. Make the capture adapter silent and render `TrackBaselineCaptureResult` in the primary adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f7b6c2b35594964a50680bad740a7faf0faf7232f91a87452fd1adb6070dd443",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T04:26:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f7b6c2b35594964a50680bad740a7faf0faf7232f91a87452fd1adb6070dd443",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1127,6 +1277,20 @@
           "at": "2026-08-17T02:25:10Z",
           "findings": [],
           "hash": "rvw1:sha256:a9c62ed0d3f8e63bdf45170beb182e79e8c93222e4e254bccfd0d18fc20d019f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:57:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7638a5c0c8cd47783e3aefe19bc6dc5b5902f5009fa6115adf935bdc9ec709a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:16:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7638a5c0c8cd47783e3aefe19bc6dc5b5902f5009fa6115adf935bdc9ec709a",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1686,6 +1850,20 @@
           "hash": "rvw1:sha256:57365e052a746f2e90e144b3f2580780c1f436e113310fe0afb8deb2558b8421",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:07:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcabd5087aeef66df76d728b5931f557e253eaf70f1daf1f922c2c4938e590d5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:14:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcabd5087aeef66df76d728b5931f557e253eaf70f1daf1f922c2c4938e590d5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1854,6 +2032,20 @@
           "at": "2026-08-17T02:09:38Z",
           "findings": [],
           "hash": "rvw1:sha256:11c0da03c4ee568f21a183e269977f1a843ef4c1c359fe9ce9ab61a4fb6b189b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:07:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:88230806b195b98e244ea06a7560d8fff7a15249e7b0f7f06d2fabc013de1ba6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T04:14:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:88230806b195b98e244ea06a7560d8fff7a15249e7b0f7f06d2fabc013de1ba6",
           "type": "final",
           "verdict": "zero_findings"
         }

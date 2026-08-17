@@ -1,8 +1,8 @@
 {
   "baseline_hash": "1550ed8a0b5532def664d5ecb2192e494789123f7fcc93ebb669d041b46dbb94",
-  "declaration_hash": "adf29c56d4096b79299e273debf41e58da5e4c53fabd4315a8fde6028ef07be7",
-  "generated_at": "2026-08-17T02:46:51Z",
-  "head_commit": "05298cd6ed086a66f945e83e36267ef533549304",
+  "declaration_hash": "9187a2b71cc6718de2b1087c5e3bd50a4fd5864a53e238db50313ad9f2100c77",
+  "generated_at": "2026-08-17T04:29:32Z",
+  "head_commit": "a051be92848a54dc9361630a4128108e3f88d92a",
   "schema_version": 4,
   "signals": [
     {
@@ -134,53 +134,73 @@
       "type_name": "TrackArchiveService"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineCaptureCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackBaselineCaptureError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackBaselineCaptureService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackBaselineCaptureInteractor"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineCaptureLayerResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineCapturePort"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineCaptureResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBaselineCaptureService"
     },
     {
@@ -582,41 +602,56 @@
       "type_name": "TrackDirectoryPath"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackInitCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackInitError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackInitService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackInitInteractor"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackInitResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackInitService"
     },
     {

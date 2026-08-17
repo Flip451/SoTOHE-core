@@ -1,5 +1,7 @@
 //! Shared TDDD value objects used by Track command contexts.
 
+pub mod baseline_capture;
+
 use std::path::{Path, PathBuf};
 
 use domain::SpecElementId;

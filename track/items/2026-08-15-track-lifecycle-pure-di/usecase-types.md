@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TrackBaselineCaptureLayerResult | enum | add | Captured, AlreadyExists | 🟡 | 🔵 |
+| TrackBaselineCaptureLayerResult | enum | add | Captured, AlreadyExists | 🔵 | 🔵 |
 | TrackCatalogueLintActiveResult | enum | add | Checked, Skipped | 🟡 | 🔵 |
 | TrackLayerFilter | enum | add | All, Selected | 🔵 | 🔵 |
 | TrackLayerSelection | enum | add | All, One | 🔵 | 🔵 |
@@ -50,7 +50,7 @@
 |------|------|--------|---------|--------|----------|
 | TrackAddTaskError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackArchiveError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
-| TrackBaselineCaptureError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackBaselineCaptureError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackBaselineGraphError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackBranchCreateError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackBranchSwitchError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
@@ -59,7 +59,7 @@
 | TrackCatalogueSpecSignalsError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackClearOverrideError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackContractMapError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
-| TrackInitError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackInitError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackLintError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackNextTaskError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackResolutionCompatError | error_type | add | Unavailable | 🔵 | 🔵 |
@@ -79,7 +79,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TrackBaselineCapturePort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackBaselineCaptureCommand) -> Result<TrackBaselineCaptureResult, TrackBaselineCaptureError> | 🟡 | 🔵 |
+| TrackBaselineCapturePort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackBaselineCaptureCommand) -> Result<TrackBaselineCaptureResult, TrackBaselineCaptureError> | 🔵 | 🔵 |
 | TrackBaselineGraphPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackBaselineGraphCommand) -> Result<TrackBaselineGraphResult, TrackBaselineGraphError> | 🟡 | 🔵 |
 | TrackBranchStrategyPort | secondary_port | add | fn global_for_items(&self, items_dir: &TrackItemsDirectory) -> Result<domain::BranchStrategySnapshot, DiagnosticText>, fn snapshot_for_track(&self, workspace_root: &TrackWorkspaceRoot, track_id: &domain::TrackId) -> Result<domain::BranchStrategySnapshot, DiagnosticText> | 🔵 | 🔵 |
 | TrackCatalogueImplSignalsPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackCatalogueImplSignalsCommand) -> Result<TrackCatalogueImplSignalsResult, TrackCatalogueImplSignalsError> | 🟡 | 🔵 |
@@ -108,7 +108,7 @@
 |------|------|--------|---------|--------|----------|
 | TrackAddTaskService | application_service | add | fn execute(&self, command: TrackAddTaskCommand) -> Result<TrackAddTaskResult, TrackAddTaskError> | 🟡 | 🔵 |
 | TrackArchiveService | application_service | add | fn execute(&self, command: TrackArchiveCommand) -> Result<TrackArchiveResult, TrackArchiveError> | 🟡 | 🔵 |
-| TrackBaselineCaptureService | application_service | add | fn execute(&self, command: TrackBaselineCaptureCommand) -> Result<TrackBaselineCaptureResult, TrackBaselineCaptureError> | 🟡 | 🔵 |
+| TrackBaselineCaptureService | application_service | add | fn execute(&self, command: TrackBaselineCaptureCommand) -> Result<TrackBaselineCaptureResult, TrackBaselineCaptureError> | 🔵 | 🔵 |
 | TrackBaselineGraphService | application_service | add | fn execute(&self, command: TrackBaselineGraphCommand) -> Result<TrackBaselineGraphResult, TrackBaselineGraphError> | 🟡 | 🔵 |
 | TrackBranchCreateService | application_service | add | fn execute(&self, command: TrackBranchCreateCommand) -> Result<TrackBranchCreateResult, TrackBranchCreateError> | 🟡 | 🔵 |
 | TrackBranchSwitchService | application_service | add | fn execute(&self, command: TrackBranchSwitchCommand) -> Result<TrackBranchSwitchResult, TrackBranchSwitchError> | 🟡 | 🔵 |
@@ -117,7 +117,7 @@
 | TrackCatalogueSpecSignalsService | application_service | add | fn execute(&self, command: TrackCatalogueSpecSignalsCommand) -> Result<TrackCatalogueSpecSignalsResult, TrackCatalogueSpecSignalsError> | 🟡 | 🔵 |
 | TrackClearOverrideService | application_service | add | fn execute(&self, command: TrackClearOverrideCommand) -> Result<TrackClearOverrideResult, TrackClearOverrideError> | 🟡 | 🔵 |
 | TrackContractMapService | application_service | add | fn execute(&self, command: TrackContractMapCommand) -> Result<TrackContractMapResult, TrackContractMapError> | 🟡 | 🔵 |
-| TrackInitService | application_service | add | fn execute(&self, command: TrackInitCommand) -> Result<TrackInitResult, TrackInitError> | 🟡 | 🔵 |
+| TrackInitService | application_service | add | fn execute(&self, command: TrackInitCommand) -> Result<TrackInitResult, TrackInitError> | 🔵 | 🔵 |
 | TrackLintService | application_service | add | fn execute(&self, command: TrackLintCommand) -> Result<TrackLintResult, TrackLintError> | 🟡 | 🔵 |
 | TrackNextTaskService | application_service | add | fn execute(&self, command: TrackNextTaskCommand) -> Result<TrackNextTaskResult, TrackNextTaskError> | 🟡 | 🔵 |
 | TrackResolutionService | application_service | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🔵 | 🔵 |
@@ -140,7 +140,7 @@
 | TaskQueryInteractor | interactor | modify | — | 🔵 | 🔵 |
 | TrackAddTaskInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackArchiveInteractor | interactor | add | — | 🟡 | 🔵 |
-| TrackBaselineCaptureInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackBaselineCaptureInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackBaselineGraphInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackBranchCreateInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackBranchSwitchInteractor | interactor | add | — | 🟡 | 🔵 |
@@ -149,7 +149,7 @@
 | TrackCatalogueSpecSignalsInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackClearOverrideInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackContractMapInteractor | interactor | add | — | 🟡 | 🔵 |
-| TrackInitInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackInitInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackLintInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackNextTaskInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackResolutionInteractor | interactor | add | — | 🔵 | 🔵 |
@@ -171,7 +171,7 @@
 |------|------|--------|---------|--------|----------|
 | TrackAddTaskResult | dto | add | — | 🟡 | 🔵 |
 | TrackArchiveResult | dto | add | — | 🟡 | 🔵 |
-| TrackBaselineCaptureResult | dto | add | — | 🟡 | 🔵 |
+| TrackBaselineCaptureResult | dto | add | — | 🔵 | 🔵 |
 | TrackBaselineGraphResult | dto | add | — | 🟡 | 🔵 |
 | TrackBranchCreateResult | dto | add | — | 🟡 | 🔵 |
 | TrackBranchSwitchResult | dto | add | — | 🟡 | 🔵 |
@@ -181,7 +181,7 @@
 | TrackCatalogueSpecSignalsResult | dto | add | — | 🟡 | 🔵 |
 | TrackClearOverrideResult | dto | add | — | 🟡 | 🔵 |
 | TrackContractMapResult | dto | add | — | 🟡 | 🔵 |
-| TrackInitResult | dto | add | — | 🟡 | 🔵 |
+| TrackInitResult | dto | add | — | 🔵 | 🔵 |
 | TrackLintResult | dto | add | — | 🟡 | 🔵 |
 | TrackSetCommitHashResult | dto | add | — | 🟡 | 🔵 |
 | TrackSetOverrideResult | dto | add | — | 🟡 | 🔵 |
@@ -195,7 +195,7 @@
 |------|------|--------|---------|--------|----------|
 | TrackAddTaskCommand | command | add | — | 🟡 | 🔵 |
 | TrackArchiveCommand | command | add | — | 🟡 | 🔵 |
-| TrackBaselineCaptureCommand | command | add | — | 🟡 | 🔵 |
+| TrackBaselineCaptureCommand | command | add | — | 🔵 | 🔵 |
 | TrackBaselineGraphCommand | command | add | — | 🟡 | 🔵 |
 | TrackBranchCreateCommand | command | add | — | 🟡 | 🔵 |
 | TrackBranchSwitchCommand | command | add | — | 🟡 | 🔵 |
@@ -204,7 +204,7 @@
 | TrackCatalogueSpecSignalsCommand | command | add | — | 🟡 | 🔵 |
 | TrackClearOverrideCommand | command | add | — | 🔵 | 🔵 |
 | TrackContractMapCommand | command | add | — | 🟡 | 🔵 |
-| TrackInitCommand | command | add | — | 🟡 | 🔵 |
+| TrackInitCommand | command | add | — | 🔵 | 🔵 |
 | TrackLintCommand | command | add | — | 🟡 | 🔵 |
 | TrackNextTaskCommand | command | add | — | 🔵 | 🔵 |
 | TrackResolveCommand | command | add | — | 🟡 | 🔵 |

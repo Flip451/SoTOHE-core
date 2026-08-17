@@ -9,7 +9,7 @@
 | FsTrackViewsAdapter | secondary_adapter | add | impl TrackViewsPort, impl Default | 🔵 | 🔵 |
 | GitTrackCommitHashAdapter | secondary_adapter | add | impl TrackCommitHashPort, impl Default | 🔵 | 🔵 |
 | GitTrackSelectionAdapter | secondary_adapter | add | impl TrackSelectionPort | 🔵 | 🔵 |
-| SystemTrackBaselineCaptureAdapter | secondary_adapter | add | impl TrackBaselineCapturePort | 🟡 | 🔵 |
+| SystemTrackBaselineCaptureAdapter | secondary_adapter | add | impl TrackBaselineCapturePort, impl Clone, impl Copy, impl Debug, impl Default | 🔵 | 🔵 |
 | SystemTrackBaselineGraphAdapter | secondary_adapter | add | impl TrackBaselineGraphPort | 🟡 | 🔵 |
 | SystemTrackCatalogueImplSignalsAdapter | secondary_adapter | add | impl TrackCatalogueImplSignalsPort | 🟡 | 🔵 |
 | SystemTrackCatalogueLintActiveAdapter | secondary_adapter | add | impl TrackCatalogueLintActivePort | 🟡 | 🔵 |

@@ -543,6 +543,8 @@ impl TrackCompositionRoot {
 mod tests {
     use std::path::{Path, PathBuf};
 
+    use cli_driver::track::TrackInput;
+
     use super::{resolve_project_root, resolve_track_id_for_write};
     use crate::review_v2::process_guards::{CwdGuard, GitRunner};
 
@@ -640,9 +642,12 @@ mod tests {
 
         assert!(!items_dir.exists(), "fixture must start without track/items");
 
-        let outcome = crate::track::TrackCompositionRoot::new()
-            .track_init(items_dir.clone(), "new-track".to_owned(), "New Track".to_owned())
-            .unwrap();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Init {
+                items_dir: items_dir.clone(),
+                track_id: "new-track".to_owned(),
+                description: "New Track".to_owned(),
+            });
 
         assert_eq!(outcome.exit_code, 0);
         assert!(
@@ -677,9 +682,11 @@ mod tests {
             ("2026-07-01-earlier-track", "Earlier Track"),
             ("2026-07-31-later-track", "Later Track"),
         ] {
-            let outcome = composition
-                .track_init(items_dir.clone(), track_id.to_owned(), title.to_owned())
-                .unwrap();
+            let outcome = composition.track_driver().handle(TrackInput::Init {
+                items_dir: items_dir.clone(),
+                track_id: track_id.to_owned(),
+                description: title.to_owned(),
+            });
             assert_eq!(outcome.exit_code, 0);
             assert!(
                 items_dir.join(track_id).join("metadata.json").is_file(),
@@ -722,9 +729,12 @@ mod tests {
         .unwrap();
 
         let track_id = "legacy-suffix-track-2026-07-31";
-        let outcome = crate::track::TrackCompositionRoot::new()
-            .track_init(items_dir.clone(), track_id.to_owned(), "Legacy Suffix Track".to_owned())
-            .unwrap();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Init {
+                items_dir: items_dir.clone(),
+                track_id: track_id.to_owned(),
+                description: "Legacy Suffix Track".to_owned(),
+            });
 
         assert_eq!(outcome.exit_code, 0);
         assert!(

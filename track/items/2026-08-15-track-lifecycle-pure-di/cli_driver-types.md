@@ -21,7 +21,7 @@
 | TrackResolutionDiagnostic | dto | add | — | 🔵 | 🔵 |
 | TrackSourceWorkspaceInput | dto | add | — | 🟡 | 🔵 |
 | TrackSpecAnchorInput | dto | add | — | 🟡 | 🔵 |
-| TrackTdddBaselineCaptureInput | dto | add | — | 🟡 | 🔵 |
+| TrackTdddBaselineCaptureInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddBaselineGraphInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddCatalogueImplSignalsInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddCatalogueLintActiveInput | dto | add | — | 🟡 | 🔵 |

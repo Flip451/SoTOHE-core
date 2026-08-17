@@ -14,6 +14,7 @@ pub mod resolution_compat;
 pub mod tddd;
 pub mod track_add_task;
 pub mod track_clear_override;
+pub mod track_init;
 pub mod track_next_task;
 pub mod track_set_override;
 pub mod track_task_counts;

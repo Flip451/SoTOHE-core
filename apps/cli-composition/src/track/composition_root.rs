@@ -39,6 +39,11 @@ impl TrackCompositionRoot {
         build_track_driver()
     }
 
+    /// Build the focused TDDD baseline-capture driver.
+    pub fn track_tddd_driver(&self) -> cli_driver::track_tddd::TrackTdddDriver {
+        build_track_tddd_driver()
+    }
+
     /// Build the compatibility resolution driver used by foreign command
     /// contexts while the legacy resolution wrappers remain in place.
     pub fn track_resolution_driver(&self) -> cli_driver::track_resolution::TrackResolutionDriver {
@@ -59,6 +64,12 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
 
     use super::service_impl::TrackServiceImpl;
 
+    let track_init_service =
+        Arc::new(usecase::track_lifecycle::track_init::TrackInitInteractor::new(
+            Arc::new(infrastructure::track::FsTrackMetadataAdapter::new()),
+            Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -80,5 +91,25 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         Arc::new(infrastructure::base_merge::FsBaseMergeGitAdapter::new()),
         base_merge_cleanup,
     ));
-    cli_driver::track::TrackDriver::new(service, fixpoint_resolve_service, base_merge_service)
+    cli_driver::track::TrackDriver::new(
+        track_init_service,
+        service,
+        fixpoint_resolve_service,
+        base_merge_service,
+    )
+}
+
+pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriver {
+    use std::sync::Arc;
+
+    let operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::baseline_capture::SystemTrackBaselineCaptureAdapter,
+    );
+    let resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let service = Arc::new(
+        usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCaptureInteractor::new(
+            operation, resolver,
+        ),
+    );
+    cli_driver::track_tddd::TrackTdddDriver::new(service)
 }

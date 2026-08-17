@@ -1,8 +1,8 @@
 {
   "baseline_hash": "a62b806bbba22eb27eaaaf3e08c4b2db31c67a44f8ea36fde1269079b30f3c13",
-  "declaration_hash": "ca18909cf891c84f999061c7b31b075b1b9c3a396ada154bdd71534bb3e766d8",
-  "generated_at": "2026-08-17T02:46:54Z",
-  "head_commit": "05298cd6ed086a66f945e83e36267ef533549304",
+  "declaration_hash": "e03293018e7d01332f050a3fb07a44c4ca3d5f30914acb16e254228e8957ab0e",
+  "generated_at": "2026-08-17T04:29:36Z",
+  "head_commit": "a051be92848a54dc9361630a4128108e3f88d92a",
   "schema_version": 4,
   "signals": [
     {
@@ -54,12 +54,16 @@
       "type_name": "GitTrackSelectionAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Default",
         "usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "SystemTrackBaselineCaptureAdapter"
     },
     {

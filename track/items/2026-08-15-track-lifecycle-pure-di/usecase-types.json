@@ -2052,6 +2052,106 @@
     {
       "for_type": "TrackWrittenFileCount",
       "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TrackInitCommand",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackInitCommand",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackInitCommand",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackInitError",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackInitError",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackInitError",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackInitResult",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackInitResult",
+      "trait_ref": "Copy"
+    },
+    {
+      "for_type": "TrackInitResult",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackInitResult",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackInitResult",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureCommand",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackBaselineCaptureCommand",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureCommand",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureError",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackBaselineCaptureError",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureError",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureLayerResult",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackBaselineCaptureLayerResult",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackBaselineCaptureLayerResult",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureLayerResult",
+      "trait_ref": "Eq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureResult",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "TrackBaselineCaptureResult",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "TrackBaselineCaptureResult",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "TrackBaselineCaptureResult",
+      "trait_ref": "Eq"
     }
   ],
   "traits": {
@@ -6372,16 +6472,16 @@
         "kind": "struct",
         "shape": {
           "fields": [
-          {
-            "name": "track_id",
-            "ty": "domain::TrackId"
-          },
-          {
-            "name": "rendered_layers",
-            "ty": "TrackRenderedLayerCount"
-          },
-          {
-            "name": "catalogue_entries",
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "rendered_layers",
+              "ty": "TrackRenderedLayerCount"
+            },
+            {
+              "name": "catalogue_entries",
               "ty": "TrackCatalogueEntryCount"
             },
             {

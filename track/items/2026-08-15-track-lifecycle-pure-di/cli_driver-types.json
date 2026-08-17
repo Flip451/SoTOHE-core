@@ -382,6 +382,62 @@
     {
       "for_type": "TrackWorkspaceRootInput",
       "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackLayerInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackLayerInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackLayerInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackLayerInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackLayerInput",
+      "trait_ref": "core::convert::TryFrom<String>"
+    },
+    {
+      "for_type": "TrackSourceWorkspaceInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TrackSourceWorkspaceInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackSourceWorkspaceInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackSourceWorkspaceInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackSourceWorkspaceInput",
+      "trait_ref": "core::convert::TryFrom<std::path::PathBuf>"
+    },
+    {
+      "for_type": "TrackTdddBaselineCaptureInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackTdddBaselineCaptureInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackTdddBaselineCaptureInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackWorkspaceRootInput",
+      "trait_ref": "core::convert::TryFrom<std::path::PathBuf>"
     }
   ],
   "traits": {},
@@ -464,8 +520,8 @@
               "name": "track_set_commit_hash",
               "ty": "std::sync::Arc<dyn usecase::TrackSetCommitHashService>"
             },
-          {
-            "name": "fixpoint_resolve_service",
+            {
+              "name": "fixpoint_resolve_service",
               "ty": "std::sync::Arc<dyn usecase::FixpointResolveDriverService>"
             },
             {

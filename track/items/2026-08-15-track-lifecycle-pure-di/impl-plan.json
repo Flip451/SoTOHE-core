@@ -89,7 +89,7 @@
       ],
       "description": "Implement the `TrackInit*` boundary in `libs/usecase/src/track_lifecycle/track_init.rs`; wire the `init` handler in `apps/cli/src/commands/track/` through `apps/cli-driver/src/track.rs` and `apps/cli-composition/src/track/ops.rs`, with CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T002",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -210,7 +210,7 @@
       ],
       "description": "Implement the `TrackBaselineCapture*` boundary in `libs/usecase/src/track_lifecycle/tddd/baseline_capture.rs`; wire `apps/cli/src/commands/track/tddd/baseline.rs` through its driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T017",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -285,6 +285,7 @@
       "status": "todo"
     },
     {
+      "commit_hash": "a051be92848a54dc9361630a4128108e3f88d92a",
       "depends_on": [
         "T001"
       ],
@@ -293,6 +294,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "a051be92848a54dc9361630a4128108e3f88d92a",
       "depends_on": [
         "T027"
       ],
@@ -301,6 +303,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "a051be92848a54dc9361630a4128108e3f88d92a",
       "depends_on": [
         "T027"
       ],

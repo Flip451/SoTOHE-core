@@ -10,6 +10,8 @@ use usecase::base_merge::{BaseMergeCommand, BaseMergeOutcome, BaseMergeService};
 use usecase::fixpoint_resolve_driver::{
     FixpointResolveDriverInput, FixpointResolveDriverOutcome, FixpointResolveDriverService,
 };
+use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
+use usecase::track_lifecycle::{TrackItemsDirectory, TrackLifecycleIdInput};
 use usecase::track_service::{TrackCommandOutput, TrackService};
 
 use crate::render::CommandOutcome;
@@ -227,8 +229,10 @@ fn render_base_merge_result(
 
 /// Primary adapter driver for the `track` command family.
 ///
-/// Holds an injected [`TrackService`]; exposes `handle(input) -> CommandOutcome`.
+/// Holds the incremental Init service and the compatibility track service;
+/// exposes `handle(input) -> CommandOutcome`.
 pub struct TrackDriver {
+    track_init_service: Arc<dyn TrackInitService>,
     service: Arc<dyn TrackService>,
     fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
     base_merge_service: Arc<dyn BaseMergeService>,
@@ -237,11 +241,12 @@ pub struct TrackDriver {
 impl TrackDriver {
     /// Create a new `TrackDriver` with the given services.
     pub fn new(
+        track_init_service: Arc<dyn TrackInitService>,
         service: Arc<dyn TrackService>,
         fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
         base_merge_service: Arc<dyn BaseMergeService>,
     ) -> Self {
-        Self { service, fixpoint_resolve_service, base_merge_service }
+        Self { track_init_service, service, fixpoint_resolve_service, base_merge_service }
     }
 
     /// Handle a guarded base-to-track merge through the application service.
@@ -256,9 +261,12 @@ impl TrackDriver {
     /// Handle a track command.
     pub fn handle(&self, input: TrackInput) -> CommandOutcome {
         match input {
-            TrackInput::Init { items_dir, track_id, description } => {
-                service_output_to_outcome(self.service.init(items_dir, track_id, description))
-            }
+            TrackInput::Init { items_dir, track_id, description } => render_track_init_outcome(
+                &*self.track_init_service,
+                items_dir,
+                track_id,
+                description,
+            ),
             TrackInput::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
                 service_output_to_outcome(self.service.transition(
                     items_dir,
@@ -335,6 +343,34 @@ impl TrackDriver {
     }
 }
 
+fn render_track_init_outcome(
+    service: &dyn TrackInitService,
+    items_dir: PathBuf,
+    track_id: String,
+    title: String,
+) -> CommandOutcome {
+    let items_dir = match TrackItemsDirectory::try_new(items_dir) {
+        Ok(items_dir) => items_dir,
+        Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+    };
+    let track_id = match TrackLifecycleIdInput::try_new(track_id) {
+        Ok(track_id) => track_id,
+        Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+    };
+    let command = match TrackInitCommand::try_new(items_dir, track_id, title) {
+        Ok(command) => command,
+        Err(error) => return track_init_error_to_outcome(error),
+    };
+    service
+        .execute(command)
+        .map(|_| CommandOutcome::success(None))
+        .unwrap_or_else(track_init_error_to_outcome)
+}
+
+fn track_init_error_to_outcome(error: TrackInitError) -> CommandOutcome {
+    CommandOutcome::failure(Some(error.to_string()))
+}
+
 // ---------------------------------------------------------------------------
 // Render helpers (previously duplicated from cli_composition; now unused in
 // cli_driver since delegation happens via TrackService)
@@ -390,6 +426,39 @@ mod tests {
     };
 
     struct UnusedTrackService;
+
+    struct UnusedTrackInitService;
+
+    impl TrackInitService for UnusedTrackInitService {
+        fn execute(
+            &self,
+            _: TrackInitCommand,
+        ) -> Result<usecase::track_lifecycle::track_init::TrackInitResult, TrackInitError> {
+            unreachable!()
+        }
+    }
+
+    struct RecordingTrackInitService {
+        calls: Mutex<Vec<(PathBuf, String, String)>>,
+        result: Result<usecase::track_lifecycle::track_init::TrackInitResult, TrackInitError>,
+    }
+
+    impl TrackInitService for RecordingTrackInitService {
+        fn execute(
+            &self,
+            command: TrackInitCommand,
+        ) -> Result<usecase::track_lifecycle::track_init::TrackInitResult, TrackInitError> {
+            self.calls.lock().unwrap().push((
+                command.items_dir.as_path().to_path_buf(),
+                command.track_id.to_string(),
+                command.title.to_string(),
+            ));
+            match &self.result {
+                Ok(_) => Ok(usecase::track_lifecycle::track_init::TrackInitResult),
+                Err(error) => Err(error.clone()),
+            }
+        }
+    }
 
     impl TrackService for UnusedTrackService {
         fn init(&self, _: PathBuf, _: String, _: String) -> TrackCommandOutput {
@@ -495,10 +564,62 @@ mod tests {
 
     fn base_merge_driver<T: BaseMergeService + 'static>(service: Arc<T>) -> TrackDriver {
         TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             service,
         )
+    }
+
+    #[test]
+    fn test_track_driver_init_valid_input_routes_to_track_init_service() {
+        let service = Arc::new(RecordingTrackInitService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(usecase::track_lifecycle::track_init::TrackInitResult),
+        });
+        let driver = TrackDriver::new(
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::Init {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "new-track".to_owned(),
+            description: "New Track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(
+            service.calls.lock().unwrap().as_slice(),
+            &[(PathBuf::from("track/items"), "new-track".to_owned(), "New Track".to_owned(),)]
+        );
+    }
+
+    #[test]
+    fn test_track_driver_init_invalid_track_id_returns_failure_without_service_call() {
+        let service = Arc::new(RecordingTrackInitService {
+            calls: Mutex::new(Vec::new()),
+            result: Ok(usecase::track_lifecycle::track_init::TrackInitResult),
+        });
+        let driver = TrackDriver::new(
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::Init {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "../escape".to_owned(),
+            description: "New Track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert!(outcome.stderr.unwrap().contains("invalid track id"));
+        assert!(service.calls.lock().unwrap().is_empty());
     }
 
     fn base_merge_direction() -> BaseMergeDirection {
