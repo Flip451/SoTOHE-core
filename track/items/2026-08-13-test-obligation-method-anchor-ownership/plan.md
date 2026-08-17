@@ -6,7 +6,7 @@
 GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11.
 GO-02 → T1, T2, T3, T10, T11.
 
-## Tasks (9/13 resolved)
+## Tasks (10/13 resolved)
 
 ### method-declaration-staging — MethodDeclaration staging and cutover
 
@@ -36,7 +36,7 @@ GO-02 → T1, T2, T3, T10, T11.
 
 > Targets: MethodDeclaration schema/codec and all construction call sites, then domain validation, action-aware anchor projection, and command-directed selection in libs/usecase/src/test_obligation/. Operation: make the schema/codec, validation, projection, and command-scoping units separately implementable and testable in that order. Anchors: GO-01, GO-02, IN-13, IN-14, AC-03, AC-14, AC-15, CN-01, CN-02, OS-01.
 
-- [~] **T10**: Targets: libs/domain/src/tddd/catalogue_v2/methods.rs; libs/infrastructure/src/tddd/catalogue_document_codec/ DTO, decode, encode, and codec tests; and every libs/domain, libs/usecase, and libs/infrastructure MethodDeclaration::new construction call site. Operation: extend the MethodDeclaration schema, update the JSON codec, migrate constructor arity, and add focused tests. Anchors: GO-02, IN-13, AC-14.
+- [x] **T10**: Targets: libs/domain/src/tddd/catalogue_v2/methods.rs; libs/infrastructure/src/tddd/catalogue_document_codec/ DTO, decode, encode, and codec tests; and every libs/domain, libs/usecase, and libs/infrastructure MethodDeclaration::new construction call site. Operation: extend the MethodDeclaration schema, update the JSON codec, migrate constructor arity, and add focused tests. Anchors: GO-02, IN-13, AC-14.
 - [ ] **T12**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and related domain tests. Operation: implement and test method spec_refs validation. Anchors: GO-01, IN-14, AC-03, CN-01.
 - [ ] **T13**: Targets: libs/domain/src/tddd/test_obligation/projection.rs and related domain tests. Operation: implement and test action-aware method-obligation projection. Anchors: AC-14.
 - [ ] **T11**: Targets: libs/usecase/src/test_obligation/derive.rs, its command-directed catalogue selection boundary, and related tests. Operation: implement and test the command-directed catalogue selection boundary. Anchors: GO-01, GO-02, IN-14, AC-03, AC-14, AC-15, CN-02, OS-01.

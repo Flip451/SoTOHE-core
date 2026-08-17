@@ -115,7 +115,7 @@
     {
       "description": "Targets: libs/domain/src/tddd/catalogue_v2/methods.rs; libs/infrastructure/src/tddd/catalogue_document_codec/ DTO, decode, encode, and codec tests; and every libs/domain, libs/usecase, and libs/infrastructure MethodDeclaration::new construction call site. Operation: extend the MethodDeclaration schema, update the JSON codec, migrate constructor arity, and add focused tests. Anchors: GO-02, IN-13, AC-14.",
       "id": "T10",
-      "status": "in_progress"
+      "status": "done"
     },
     {
       "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs and related domain tests. Operation: implement and test method spec_refs validation. Anchors: GO-01, IN-14, AC-03, CN-01.",
