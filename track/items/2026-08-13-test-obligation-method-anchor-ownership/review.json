@@ -255,6 +255,20 @@
           "hash": "rvw1:sha256:fc55f389ab8ba2ae99140de96088f75169479a92a0e90fb1567c9bd84ee50e42",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:56:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:793b397bc353bdf5e355f1be79fe7f3e37d7fae0f831ede0acd3c4e2f639870d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:57:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:793b397bc353bdf5e355f1be79fe7f3e37d7fae0f831ede0acd3c4e2f639870d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1609,6 +1623,35 @@
           "hash": "rvw1:sha256:5131de87232e282e40c783e4f8a03fd241680c8d078dba9e78a7d2392f729ae7",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:56:29Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 310,
+              "message": "`domain::TestObligation` の `docs` が「anchorless obligations are not fulfillment targets」と上流 spec の挙動契約を散文で再説明しています。`docs` は変更対象・操作・anchor cite に限定し、挙動の説明は IN-01 / AC-03 への参照に委ねるべきです。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b984be12fe73cfe98d47cf8b73df76b271ace1f11d5786942dc3d156a28a5f63",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T00:01:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd4ed684b5d3e64705edd58c528027d67e31e518a97d4c45e964027d2623dbd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:04:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd4ed684b5d3e64705edd58c528027d67e31e518a97d4c45e964027d2623dbd",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1740,6 +1783,78 @@
           "at": "2026-08-16T16:53:39Z",
           "findings": [],
           "hash": "rvw1:sha256:e5713ed649c30cf8b6b680aff1a31f14a4f9fc405f46dec379eab00f1ae59ae2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:45:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:47:45Z",
+          "findings": [
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 154,
+              "message": "The D1 rule “an obligation is a fulfillment target iff it owns anchors” is domain policy, but this filter derives it directly from `TestObligation::spec_refs()` in the usecase layer; `results_status.rs` now repeats the same decision and `check.rs` contains another copy. This duplication is what allowed these surfaces to diverge. Put the predicate on the domain `TestObligation` type and have the usecase orchestrators call that domain decision.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T23:56:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1a60635ea3bef6e2805a1d78a62201f49194faafd0da6e9e1ad08af2ea08ceb1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:58:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1a60635ea3bef6e2805a1d78a62201f49194faafd0da6e9e1ad08af2ea08ceb1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:05:42Z",
+          "findings": [
+            {
+              "category": "business logic leak",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 154,
+              "message": "The skeleton reimplements the domain ownership rule with `!obligation.spec_refs().is_empty()` instead of using `TestObligation::owns_anchors()`. This duplicates a domain decision in the usecase layer and can drift from the domain invariant; use the domain method here.",
+              "severity": "P1"
+            },
+            {
+              "category": "business logic leak",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 153,
+              "message": "The results path independently decides anchor ownership via `edges.is_empty()` instead of `TestObligation::owns_anchors()`. This duplicates the domain decision in the usecase layer and violates the briefing's required domain-owned predicate; use the domain method here.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T00:06:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:07:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
           "type": "final",
           "verdict": "zero_findings"
         }

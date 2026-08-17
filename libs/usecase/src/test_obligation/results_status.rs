@@ -150,6 +150,11 @@ fn collect_obligation_findings(
         })
         .collect::<Vec<_>>();
     let fulfilled = fulfillment_tests(bindings, obligation.id());
+    if edges.is_empty() {
+        // D1: owning no anchors is not a fulfillment gap. A fulfillment
+        // record is a structural orphan handled by `check`, not `missing`.
+        return Ok(());
+    }
     let any_voluntary = edges.iter().any(|edge| voluntary_tests(bindings, edge).is_some());
     let any_waived = edges.iter().any(|edge| waived_reason(bindings, edge).is_some());
     if fulfilled.is_none() && !any_voluntary && !any_waived {
