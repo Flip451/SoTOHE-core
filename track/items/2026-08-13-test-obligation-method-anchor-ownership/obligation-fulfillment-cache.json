@@ -97,8 +97,8 @@
       },
       "key": {
         "anchor_text_hash": "0a49bc9283855ca603f7d1214a9bff74d333125886ce74815c9db21e94b14431",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -208,8 +208,8 @@
       },
       "key": {
         "anchor_text_hash": "39da3a70fa9e4a3a1d57c6e84de3616db3167c49c21648bc8346a87a67d770b5",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -217,7 +217,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")]),\n        ],\n        vec![spec_ref(\"IN-01\")],",
+        "citation": "method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")]),",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -319,8 +319,8 @@
       },
       "key": {
         "anchor_text_hash": "81f02889fb07e1dab0862bfd501b6984a335e39ce06b3a21f0664845e66740a4",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -328,7 +328,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "`let entry = TypeEntry::new(\n        ItemAction::Reference,\n        ...\n        vec![omitted_add],\n        ...\n    );\n    ...\n    assert!(matches!(\n        result,\n        Err(...::InvalidCatalogueState(_))\n    ));` and `methods: vec![method_with_action(\"compute\", ItemAction::Add, vec![])]` for both the type method and inherent implementation cases.",
+        "citation": "`vec![method_with_action(\"load\", ItemAction::Add, vec![])]` with `ItemAction::Modify` and `ItemAction::Reference` parent actions, plus the omitted-action cases using `MethodDeclaration::associated_function(...)` under `ItemAction::Reference`, each asserting `InvalidCatalogueState`; and the analogous `TypeEntry` and `InherentImplDeclV2` method cases.",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -430,8 +430,8 @@
       },
       "key": {
         "anchor_text_hash": "eafd7380087aa4d7fccf2ae27e4113236f18aa4933e1e6f0f482d3ac269921c9",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -439,7 +439,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "interactor.execute(&command(vec![path])).unwrap();",
+        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![\n            method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")]),\n        ],\n        vec![spec_ref(\"IN-01\")],\n    );\n...\ninteractor.execute(&command(vec![path])).unwrap();\nassert!(sink.saved.lock().unwrap().is_some());\n\nlet catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![\n            method_with_spec_refs(\"load\", vec![spec_ref(\"IN-01\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")]),\n        ],\n        vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")],\n    );\n...\ninteractor.execute(&command(vec![path])).unwrap();\nassert!(sink.saved.lock().unwrap().is_some());\n\nlet catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![method_with_spec_refs(\"load\", vec![spec_ref(\"IN-01\")])],\n        vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")],\n    );\n...\ninteractor.execute(&command(vec![path])).unwrap();\nassert!(sink.saved.lock().unwrap().is_some());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -541,8 +541,8 @@
       },
       "key": {
         "anchor_text_hash": "1cce3afc010abcbc677f3de8d786ca8f1a016a360f36760804cd18fd156ea556",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -550,7 +550,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![method_with_spec_refs(\"load\", vec![])],\n        vec![],\n    );\n...\nassert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
+        "citation": "interactor.execute(&command(vec![path])).unwrap();\n    let saved = sink.saved.lock().unwrap().clone().unwrap();\n    assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n\nlet result = interactor.execute(&command(vec![path]));\n    assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -652,8 +652,8 @@
       },
       "key": {
         "anchor_text_hash": "fa949adf768b1eadbf5ea7f662cc79acc56f0763875036ebc08a9ed3337e151c",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -661,7 +661,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let omitted_add = MethodDeclaration::associated_function(\n        MethodName::new(\"compute\").unwrap(),\n        vec![],\n        TypeRef::new(\"()\").unwrap(),\n    );\n    let entry = TypeEntry::new(\n        ItemAction::Reference,",
+        "citation": "method_with_action(\"save\", ItemAction::Reference, vec![])\nmethod_with_action(\"save\", ItemAction::Delete, vec![])\nlet omitted_add = MethodDeclaration::associated_function(\n    MethodName::new(\"compute\").unwrap(),\n    vec![],\n    TypeRef::new(\"()\").unwrap(),\n);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -763,8 +763,8 @@
       },
       "key": {
         "anchor_text_hash": "361a5115dabe0ddbdbc5bb2fe6cc25142d06d9ad9546075225f8290c5f24ea1e",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -772,7 +772,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "interactor.execute(&command(vec![valid_path])).unwrap();\n\nassert!(sink.saved.lock().unwrap().is_some());\nassert!(unused_snapshot.traits().values().next().unwrap().methods()[0].spec_refs().is_empty());",
+        "citation": "interactor.execute(&command(vec![valid_path.clone()])).unwrap();\n\n    assert!(sink.saved.lock().unwrap().is_some());\n    let loaded = catalogues.loads.lock().unwrap().clone();\n    assert!(loaded.contains(&valid_path));\n    assert!(!loaded.contains(&unused_invalid_path));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -874,8 +874,8 @@
       },
       "key": {
         "anchor_text_hash": "288db0cb689028066f79ec809a57019b87682cc23375253086c6aa1d282cdf5f",
-        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
-        "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
+        "bound_tests_set_hash": "fd37976af0878dbfb75bd522eaaec099b7b691c4def0215c7170ee775271b4d2",
+        "declaration_hash": "6c66401caa104955568235ca99e3c8c653f5e42f482272f0d51905915dc211e2"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
@@ -883,7 +883,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "vec![method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]), method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")])],\n        vec![spec_ref(\"IN-01\")],\n    );\n...\ninteractor.execute(&command(vec![path])).unwrap();",
+        "citation": "vec![method_with_spec_refs(\"load\", vec![spec_ref(\"IN-01\")])], vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")], ... interactor.execute(&command(vec![path])).unwrap(); ... vec![\"IN-01\"]",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -926,7 +926,7 @@
       "key": {
         "anchor_text_hash": "e738eb8b0dfd872ed75884cad7d8e97256d61841e12dc20f1e7ed6874ae895ab",
         "bound_tests_set_hash": "e45ca7acb43d2b642ba2e686c2f08a1511b4e7baca3dd22364afe6b53dd6d5b6",
-        "declaration_hash": "f16ac9ab78ae4e45557af18af903242cb2dbf5cdb1549a94369bb8b8052565c5"
+        "declaration_hash": "19ee2bdffe99b420dd24dabd341b81da6d5d219e1c2f5c18cf35df7e052f1b90"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
@@ -934,7 +934,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "validate_add_modify_methods_have_spec_refs(&[method(\"load\", ItemAction::Add, vec![],)]).is_err(); validate_add_modify_methods_have_spec_refs(&[method(\"load\", ItemAction::Modify, vec![],)]).is_err(); validate_add_modify_methods_have_spec_refs(&[method(\"load\", ItemAction::Add, vec![spec_ref(\"IN-14\")],)]).is_ok(); validate_add_modify_methods_have_spec_refs(&[method(\"save\", ItemAction::Add, vec![spec_ref(\"IN-14\")]), method(\"load\", ItemAction::Add, vec![])]).is_err()",
+        "citation": "assert!(\n    validate_add_modify_methods_have_spec_refs(&[method(\"load\", ItemAction::Add, vec![],)])\n        .is_err()\n);\nassert!(\n    validate_add_modify_methods_have_spec_refs(&[method(\n        \"load\",\n        ItemAction::Modify,\n        vec![],\n    )])\n    .is_err()\n);\nassert!(\n    validate_add_modify_methods_have_spec_refs(&[\n        method(\"save\", ItemAction::Add, vec![spec_ref(\"IN-14\")]),\n        method(\"load\", ItemAction::Add, vec![]),\n    ])\n    .is_err()\n);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -977,7 +977,7 @@
       "key": {
         "anchor_text_hash": "1cce3afc010abcbc677f3de8d786ca8f1a016a360f36760804cd18fd156ea556",
         "bound_tests_set_hash": "e45ca7acb43d2b642ba2e686c2f08a1511b4e7baca3dd22364afe6b53dd6d5b6",
-        "declaration_hash": "f16ac9ab78ae4e45557af18af903242cb2dbf5cdb1549a94369bb8b8052565c5"
+        "declaration_hash": "19ee2bdffe99b420dd24dabd341b81da6d5d219e1c2f5c18cf35df7e052f1b90"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
@@ -985,7 +985,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n    validate_add_modify_methods_have_spec_refs(&[method(\"load\", ItemAction::Add, vec![],)])\n        .is_err()\n);\nassert!(\n    validate_add_modify_methods_have_spec_refs(&[method(\n        \"load\",\n        ItemAction::Modify,\n        vec![],\n    )])\n    .is_err()\n);",
+        "citation": "assert!(\n            validate_add_modify_methods_have_spec_refs(&[method(\"load\", ItemAction::Add, vec![],)])\n                .is_err()\n        );\n        assert!(\n            validate_add_modify_methods_have_spec_refs(&[method(\n                \"load\",\n                ItemAction::Modify,\n                vec![],\n            )])\n            .is_err()\n        );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1023,7 +1023,7 @@
       "key": {
         "anchor_text_hash": "1833ad9fb5411fbe5c75c20bc65034e6b886c8f933bd064f8e7cddf9adfeeb79",
         "bound_tests_set_hash": "a12c7e424cfd50ffc1537a87b08a811c93fc8f5e187027f9f6d5d226774b07b3",
-        "declaration_hash": "62b8f545991bd25024575ec33b3b748d63ab56fb6dfaf98a0ac48616c15d217e"
+        "declaration_hash": "71e3cf3d053644893b9b90676123a49fd49cdb01e3d256c30d4e1ff823e07908"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
@@ -1069,7 +1069,7 @@
       "key": {
         "anchor_text_hash": "59029b22beec61368476788a1b2e64f49c23529ba19584acb8cf699280601b24",
         "bound_tests_set_hash": "a12c7e424cfd50ffc1537a87b08a811c93fc8f5e187027f9f6d5d226774b07b3",
-        "declaration_hash": "62b8f545991bd25024575ec33b3b748d63ab56fb6dfaf98a0ac48616c15d217e"
+        "declaration_hash": "71e3cf3d053644893b9b90676123a49fd49cdb01e3d256c30d4e1ff823e07908"
       },
       "obligation_id": {
         "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
@@ -1077,7 +1077,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "validate_parent_forbids_method_spec_refs(\n                ItemAction::Reference,\n                &[method(\"load\", ItemAction::Reference, vec![spec_ref(\"IN-01\")])],\n            )\n            .is_err()",
+        "citation": "validate_parent_forbids_method_spec_refs(\n                ItemAction::Reference,\n                &[method(\"load\", ItemAction::Reference, vec![spec_ref(\"IN-01\")])],\n            )\n            .is_err()\n\nvalidate_parent_forbids_method_spec_refs(\n                ItemAction::Delete,\n                &[method(\"load\", ItemAction::Delete, vec![spec_ref(\"IN-01\")])],\n            )\n            .is_err()",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1105,7 +1105,7 @@
       "key": {
         "anchor_text_hash": "0e3eaf0e3ecd65b29b40728647fbb963fc9035ece2c1a6d3a16ae52e5bfe4d9f",
         "bound_tests_set_hash": "0d553cf5581d1ef3d220c17054482888f086bc40988455ad0bec75b749a6f091",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "2885598943c1e6cf721255d6b2b18f698b070a17424f455e34321a82e07ce6ce"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1151,7 +1151,7 @@
       "key": {
         "anchor_text_hash": "046ad6ac2e8c9a14d9ea4621743357bb112cb2dcaea15b81ee4b3da5d174e0df",
         "bound_tests_set_hash": "fe5644f69e3ba8e40f4c2cb8204c61d488a175d34dc5c6c71b6c4df3b9a04aa7",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "55dc908ac8d3ee6e667458537007ed666801bbfc44fb0fd4c9544f91a0875132"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1159,7 +1159,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );",
+        "citation": "assert!(\n            violations.is_empty(),\n            \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n        );\n\n// A zero-violation result alone would also pass if the linter skipped\n// MethodDeclaration entirely.  Run the same rules against a deliberately\n// invalid entry and require each selected rule to report its sentinel.",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1187,7 +1187,7 @@
       "key": {
         "anchor_text_hash": "0a49bc9283855ca603f7d1214a9bff74d333125886ce74815c9db21e94b14431",
         "bound_tests_set_hash": "0d553cf5581d1ef3d220c17054482888f086bc40988455ad0bec75b749a6f091",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "1795a5b266ea84195ae219d92f814daba488dd27e3da2a75603a955216cebe27"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1228,7 +1228,7 @@
       "key": {
         "anchor_text_hash": "39da3a70fa9e4a3a1d57c6e84de3616db3167c49c21648bc8346a87a67d770b5",
         "bound_tests_set_hash": "48cbde21f56bd3d796c3bddf4cf4cb5d597c37ac8e473cc15ae76bb9f37a4f1f",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "4e1d2ae90e83f6c5a252190f60256f222032d10ca33742b8499dd3cfa0aef3a4"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1274,7 +1274,7 @@
       "key": {
         "anchor_text_hash": "916544594cdcb8499beb90c5b60ca517fb1f49290fe18a4835fe2c95bc06cd2c",
         "bound_tests_set_hash": "fe5644f69e3ba8e40f4c2cb8204c61d488a175d34dc5c6c71b6c4df3b9a04aa7",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "57520995e661df72738c261009bac509c72e1940664c655ecf6353376e1b9ede"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1320,7 +1320,7 @@
       "key": {
         "anchor_text_hash": "81f02889fb07e1dab0862bfd501b6984a335e39ce06b3a21f0664845e66740a4",
         "bound_tests_set_hash": "87bb30b227b34745cf63b2d56a466843384cdf920405055c1730c2255755bf44",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "0072b4ffb0681921207228b62fbd8e2634ad3eae73e8e42f4464e54d84219566"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1328,7 +1328,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(decl.action(), ItemAction::Add); assert_eq!(decl.action(), ItemAction::Modify); assert_ne!(decl.action(), ItemAction::Add); assert_eq!(method.action(), ItemAction::Add); assert_eq!(entry.action(), ItemAction::Modify); assert_eq!(entry.methods()[0].action(), ItemAction::Reference);",
+        "citation": "assert_eq!(decl.action(), ItemAction::Add); ... assert_eq!(decl.action(), ItemAction::Modify); assert_ne!(decl.action(), ItemAction::Add); ... assert_eq!(method.action(), ItemAction::Add); ... assert_eq!(entry.action(), ItemAction::Modify); assert_eq!(entry.methods()[0].action(), ItemAction::Reference);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1356,7 +1356,7 @@
       "key": {
         "anchor_text_hash": "d772673c0e95a8b2efc808aae2cc8299e99f6fd81c21269186ecb7f9355530be",
         "bound_tests_set_hash": "0d553cf5581d1ef3d220c17054482888f086bc40988455ad0bec75b749a6f091",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "7ca5067c53e4a948fd3dd173089fe967ab278396859275df1d64a2b01cbc95ab"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1397,7 +1397,7 @@
       "key": {
         "anchor_text_hash": "eafd7380087aa4d7fccf2ae27e4113236f18aa4933e1e6f0f482d3ac269921c9",
         "bound_tests_set_hash": "48cbde21f56bd3d796c3bddf4cf4cb5d597c37ac8e473cc15ae76bb9f37a4f1f",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "69d236db519ce93b0a619d3739ca569645dddf6e772e3b25f6004b9816ff9996"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1405,7 +1405,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "interactor.execute(&command(vec![path])).unwrap();\n    assert!(sink.saved.lock().unwrap().is_some());",
+        "citation": "`method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")])` … `vec![spec_ref(\"IN-01\")]` … `interactor.execute(&command(vec![path])).unwrap();`",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1438,7 +1438,7 @@
       "key": {
         "anchor_text_hash": "1cce3afc010abcbc677f3de8d786ca8f1a016a360f36760804cd18fd156ea556",
         "bound_tests_set_hash": "d90715d337f1d8b9c2fa8cc5a342d987cbb18932bd78772f509a57de63323054",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "371b3420be0a86b664c7d9ff753312edbc4ee3a8824d36574fa44e78d097d3e7"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1446,7 +1446,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Modify,\n        vec![method_with_action(\"load\", ItemAction::Modify, vec![])],\n        vec![spec_ref(\"IN-01\")],\n    );\n    let (interactor, _) =\n        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);\n\n    let result = interactor.execute(&command(vec![path]));\n    assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
+        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![method_with_spec_refs(\"load\", vec![spec_ref(\"IN-01\")]),\n            method_with_spec_refs(\"save\", vec![]),\n        ],\n        vec![spec_ref(\"IN-01\")],\n    );\n    ...\n    assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1474,7 +1474,7 @@
       "key": {
         "anchor_text_hash": "e54630aef739290f38b18d8c0bc68f976f5c776b0d271ee4d7bd28e7fc8094b4",
         "bound_tests_set_hash": "26a20f5327466669379ee33b45fe2445d263e7b919f072dbe8a9120773e26a30",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "a60e51e30d82cf67bc01f59b45949508d9d44fd216fc587710fa9f7e4c1fb9ae"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1520,7 +1520,7 @@
       "key": {
         "anchor_text_hash": "288db0cb689028066f79ec809a57019b87682cc23375253086c6aa1d282cdf5f",
         "bound_tests_set_hash": "763692d531a54f5429b8c1745867b2129ab8a981262df2c96537eca02c92ac97",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "5da09a23dcc539e2b82c0c10afabd9b4747b3eac0c22659282ae59639add3341"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1550,8 +1550,8 @@
       },
       "key": {
         "anchor_text_hash": "06a0a6bf014a667a2d9f327f6171044100fbf7833f92a248903c3f52b6dc09e0",
-        "bound_tests_set_hash": "a7504aeb369edae046fba2761dcf6ad2082767dbe091f1c57814a0b7f0bb5b0e",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "bound_tests_set_hash": "baff63b147ef52286f160c9b1b4f170eb035d27907140ade58cfb62d3bb5e43c",
+        "declaration_hash": "d961103c4905cbb5d72e4880606256f31780b6c2a3b2555117133d3d7970c68d"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1559,7 +1559,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "interactor.execute(&command(vec![valid_path])).unwrap();\n\nassert!(unused_snapshot.traits().values().next().unwrap().methods()[0].spec_refs().is_empty());",
+        "citation": "interactor.execute(&command(vec![valid_path.clone()])).unwrap();\n\n    assert!(sink.saved.lock().unwrap().is_some());\n    let loaded = catalogues.loads.lock().unwrap().clone();\n    assert!(loaded.contains(&valid_path));\n    assert!(!loaded.contains(&unused_invalid_path));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1597,7 +1597,7 @@
       "key": {
         "anchor_text_hash": "957690d37030c733e58d9011fb9f09f2abcc358a63dc4b22221d01095bb381a6",
         "bound_tests_set_hash": "fe5644f69e3ba8e40f4c2cb8204c61d488a175d34dc5c6c71b6c4df3b9a04aa7",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "449998b825c85c82485a4991f197528ecb191eb13a5032ac316e1b2ff9a52eb1"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1605,7 +1605,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(decl.name(), &name);\n        assert_eq!(decl.receiver(), receiver);\n        assert_eq!(decl.params(), params.as_slice());\n        assert_eq!(decl.returns(), &returns);\n        assert!(decl.is_async());\n        assert!(decl.has_default_impl());\n        assert_eq!(decl.generics(), generics.as_slice());\n        assert_eq!(decl.where_predicates(), where_predicates.as_slice());\n        assert_eq!(decl.spec_refs(), &[spec_ref]);\n        assert_eq!(decl.action(), ItemAction::Add);\n        assert_eq!(decl.docs(), Some(&docs));",
+        "citation": "assert_eq!(decl.name(), &name); assert_eq!(decl.receiver(), receiver); assert_eq!(decl.params(), params.as_slice()); assert_eq!(decl.returns(), &returns); assert!(decl.is_async()); assert!(decl.has_default_impl()); assert_eq!(decl.generics(), generics.as_slice()); assert_eq!(decl.where_predicates(), where_predicates.as_slice()); assert_eq!(decl.spec_refs(), &[spec_ref]); assert_eq!(decl.action(), ItemAction::Add); assert_eq!(decl.docs(), Some(&docs));\n\nassert!(\n    violations.is_empty(),\n    \"active MethodDeclaration catalogue entry must pass its applicable lint rules: {violations:?}\"\n);",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1648,7 +1648,7 @@
       "key": {
         "anchor_text_hash": "fa949adf768b1eadbf5ea7f662cc79acc56f0763875036ebc08a9ed3337e151c",
         "bound_tests_set_hash": "159b34ad9444c8af90d025695c9727524b8000cb6dfa7742c54eacedebb213c1",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "declaration_hash": "f5d8302d50315d6b31dd7eb76429930abbdc62fec5bd12abb0c94362170edcda"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1693,8 +1693,8 @@
       },
       "key": {
         "anchor_text_hash": "361a5115dabe0ddbdbc5bb2fe6cc25142d06d9ad9546075225f8290c5f24ea1e",
-        "bound_tests_set_hash": "b4ba7587afaf34db74653cce2c895a5dc8847a1a8d097e52c308f64ba1264ff0",
-        "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
+        "bound_tests_set_hash": "fd87775bdf1819d87b8ba49a05693e18e08a6a775218034319a29d2f4a59304a",
+        "declaration_hash": "4f37689354465b602453fb576ea31f84b1e54e07c31605a4e24e9379cb9cc3fa"
       },
       "obligation_id": {
         "entry_key": "MethodDeclaration",
@@ -1702,7 +1702,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "interactor.execute(&command(vec![valid_path])).unwrap();\n\nassert!(sink.saved.lock().unwrap().is_some());\nassert!(unused_snapshot.traits().values().next().unwrap().methods()[0].spec_refs().is_empty());",
+        "citation": "interactor.execute(&command(vec![valid_path.clone()])).unwrap();\n\nassert!(sink.saved.lock().unwrap().is_some());\nlet loaded = catalogues.loads.lock().unwrap().clone();\nassert!(loaded.contains(&valid_path));\nassert!(!loaded.contains(&unused_invalid_path));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

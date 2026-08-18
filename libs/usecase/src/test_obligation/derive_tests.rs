@@ -64,10 +64,18 @@ impl TestObligationRulesLoaderPort for StubRules {
 
 struct StubCatalogue {
     docs: HashMap<PathBuf, CatalogueDocument>,
+    loads: Mutex<Vec<PathBuf>>,
+}
+
+impl StubCatalogue {
+    fn new(docs: HashMap<PathBuf, CatalogueDocument>) -> Self {
+        Self { docs, loads: Mutex::new(Vec::new()) }
+    }
 }
 
 impl CatalogueDocumentLoaderPort for StubCatalogue {
     fn load(&self, path: &Path) -> Result<CatalogueDocument, CatalogueDocumentLoaderError> {
+        self.loads.lock().unwrap().push(path.to_path_buf());
         self.docs
             .get(path)
             .cloned()
@@ -516,7 +524,7 @@ fn interactor_with_catalogues_and_status(
         Arc::new(StubRules { doc: rules }),
         Arc::clone(&obligations) as Arc<dyn ObligationsArtifactPort + Send + Sync>,
         Arc::new(StubSpec),
-        Arc::new(StubCatalogue { docs }),
+        Arc::new(StubCatalogue::new(docs)),
         Arc::new(StubTrackStatus { result: track_status }),
         PathBuf::from("track/items"),
         RoleObligationItemsProjector::new(),
@@ -1298,16 +1306,26 @@ fn test_derive_validates_only_catalogues_supplied_on_the_command() {
         vec![method_with_spec_refs("load", vec![])],
         vec![spec_ref("IN-01")],
     );
-    let unused_snapshot = unused_invalid.clone();
-    let (interactor, sink) = interactor_with_catalogues(
-        rules_doc_with_secondary_port_contract_rules(),
-        vec![(valid_path.clone(), valid), (unused_invalid_path, unused_invalid)],
+    let docs =
+        HashMap::from([(valid_path.clone(), valid), (unused_invalid_path.clone(), unused_invalid)]);
+    let catalogues = Arc::new(StubCatalogue::new(docs));
+    let sink = Arc::new(RecordingObligations::default());
+    let interactor = DeriveTestObligationsInteractor::new(
+        Arc::new(StubRules { doc: rules_doc_with_secondary_port_contract_rules() }),
+        Arc::clone(&sink) as Arc<dyn ObligationsArtifactPort + Send + Sync>,
+        Arc::new(StubSpec),
+        Arc::clone(&catalogues) as Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
+        Arc::new(StubTrackStatus { result: Ok(TrackStatus::InProgress) }),
+        PathBuf::from("track/items"),
+        RoleObligationItemsProjector::new(),
     );
 
-    interactor.execute(&command(vec![valid_path])).unwrap();
+    interactor.execute(&command(vec![valid_path.clone()])).unwrap();
 
     assert!(sink.saved.lock().unwrap().is_some());
-    assert!(unused_snapshot.traits().values().next().unwrap().methods()[0].spec_refs().is_empty());
+    let loaded = catalogues.loads.lock().unwrap().clone();
+    assert!(loaded.contains(&valid_path));
+    assert!(!loaded.contains(&unused_invalid_path));
 }
 
 fn obligations_artifact_port_catalogue(docs: Option<DocString>) -> CatalogueDocument {

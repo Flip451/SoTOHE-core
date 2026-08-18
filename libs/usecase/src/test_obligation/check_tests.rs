@@ -1222,10 +1222,17 @@ fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfill
 fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
     let catalogue = money_catalogue();
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
+    let synthetic = TestObligationId::new(
+        entry_key(),
+        TestObligationKind::Logic,
+        TestObligationItemIdentifier::try_new("voluntary:IN-05".to_owned()).unwrap(),
+    );
     let declaration = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(&catalogue), &obligation())
-            .unwrap()
-            .as_bytes(),
+        declaration_with_obligation_item(
+            &obligation_declaration_text(std::slice::from_ref(&catalogue), &obligation()).unwrap(),
+            synthetic.item_identifier().as_str(),
+        )
+        .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = cache_entry(
@@ -1258,9 +1265,11 @@ fn fresh_fulfillment_cache_for_catalogue(
 ) -> ObligationFulfillmentCacheDocument {
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(catalogue), obligation)
-            .unwrap()
-            .as_bytes(),
+        declaration_with_obligation_item(
+            &obligation_declaration_text(std::slice::from_ref(catalogue), obligation).unwrap(),
+            obligation.id().item_identifier().as_str(),
+        )
+        .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = cache_entry(

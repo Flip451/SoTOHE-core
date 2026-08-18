@@ -3468,6 +3468,35 @@
           "hash": "rvw1:sha256:4d414613028d1159b0287aa83d00b9ebdfc52aaf32a6c31f152f41c101cffc14",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T05:24:32Z",
+          "findings": [
+            {
+              "category": "dead-code",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 628,
+              "message": "resolve_edge の第 3 戻り値 DeclarationHash が本 diff で全呼び出し元から未使用になった (plan_voluntary_record / plan_waiver_record とも _declaration_hash で破棄)。hasher port の計算結果が常に捨てられるうえ、これは本変更が排除した parent-only 宣言ハッシュそのものの計算であり、残すと誤再利用の危険がある。タプル第 3 要素と plan.rs:628 の計算を削除すべき。",
+              "severity": "low"
+            },
+            {
+              "category": "test-coverage",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 1318,
+              "message": "AC-15 derive テストの post-execute reload アサーションは fail し得ない: StubCatalogue は不変 HashMap から clone を返すだけで、DeriveTestObligationsInteractor は catalogue 書き込み port を持たないため、execute 後の load は常にコンストラクタ入力を返す。pre-execute clone への旧アサーションと識別力が同一で、design intent の強化になっていない。「unread」を検証するには stub に load 呼び出し記録を持たせ、未選択パスが一度も load されないことをアサートする形が必要。",
+              "severity": "low"
+            }
+          ],
+          "hash": "rvw1:sha256:7d6f232689cd2ed6a6e3b331c5d69fe215938cb558554390b9cd89ecd243d54c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T05:35:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cadee06d2858c8aeda5ad46915c419c3b9fe740aa0a893d80aef8cf384dd9514",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }

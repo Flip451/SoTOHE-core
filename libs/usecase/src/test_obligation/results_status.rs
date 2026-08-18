@@ -184,7 +184,11 @@ fn collect_obligation_findings(
                 &edge,
                 obligation.id(),
                 tests,
-                obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                declaration_with_obligation_item(
+                    &obligation_declaration_text_from_loaded(catalogues, obligation)
+                        .unwrap_or_default(),
+                    obligation.id().item_identifier().as_str(),
+                ),
                 &target,
                 spec_texts,
                 fulfillment,
@@ -197,7 +201,11 @@ fn collect_obligation_findings(
                 &edge,
                 obligation.id(),
                 tests,
-                obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                declaration_with_obligation_item(
+                    &obligation_declaration_text_from_loaded(catalogues, obligation)
+                        .unwrap_or_default(),
+                    obligation.id().item_identifier().as_str(),
+                ),
                 &target,
                 spec_texts,
                 fulfillment,
@@ -248,7 +256,7 @@ fn collect_direct_edge_findings(
             edge,
             &synthetic_id,
             tests,
-            declaration,
+            declaration_with_obligation_item(&declaration, synthetic_id.item_identifier().as_str()),
             &target,
             spec_texts,
             fulfillment,

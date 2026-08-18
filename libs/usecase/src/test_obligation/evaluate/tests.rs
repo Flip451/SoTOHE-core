@@ -1242,6 +1242,10 @@ fn cached_fulfillment_doc_with_fingerprint(
     let declaration =
         crate::test_obligation::obligation_declaration_text(&[money_catalogue()], &obligation)
             .unwrap();
+    let declaration = crate::test_obligation::declaration_with_obligation_item(
+        &declaration,
+        obligation.id().item_identifier().as_str(),
+    );
     let key = ObligationFulfillmentCacheKey::new(
         BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes())),
         DeclarationHash::new(sum_hash(declaration.as_bytes())),
@@ -2553,6 +2557,43 @@ fn test_matching_waiver_cache_reuses_frozen_verdict() {
     assert_eq!(*h.waiver_driver.calls.lock().unwrap(), 0);
     let saved = h.waiver_cache.saved.lock().unwrap().clone().unwrap();
     assert!(matches!(saved.entries()[0].verdict(), WaiverVerdict::Waived { .. }));
+}
+
+#[test]
+fn test_parent_only_fulfillment_declaration_hash_reverifies() {
+    let obligation = obligation();
+    let declaration =
+        crate::test_obligation::obligation_declaration_text(&[money_catalogue()], &obligation)
+            .unwrap();
+    let parent_only_key = ObligationFulfillmentCacheKey::new(
+        BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes())),
+        DeclarationHash::new(sum_hash(declaration.as_bytes())),
+        AnchorTextHash::new(sum_hash(anchor_text().as_bytes())),
+    );
+    let cache = ObligationFulfillmentCacheDocument::new(
+        track(),
+        vec![cache_entry(
+            edge(),
+            obligation.id().clone(),
+            parent_only_key,
+            fulfilled(),
+            Some(fulfillment_verifier_fingerprint()),
+        )],
+    );
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        Some(cache),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
 }
 
 #[test]

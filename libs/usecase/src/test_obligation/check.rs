@@ -432,8 +432,10 @@ impl CheckTestObligationsInteractor {
         fulfillment: &ObligationFulfillmentCacheDocument,
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
-        let declaration =
-            obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default();
+        let declaration = declaration_with_obligation_item(
+            &obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+            obligation.id().item_identifier().as_str(),
+        );
         self.resolve_fulfillment_cache_entry(
             edge,
             obligation.id(),
@@ -458,8 +460,11 @@ impl CheckTestObligationsInteractor {
         gate: &mut GateState,
     ) -> Result<(), ObligationCheckError> {
         let obligation_id = synthetic_voluntary_obligation_id(edge);
-        let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
-            .unwrap_or_default();
+        let declaration = declaration_with_obligation_item(
+            &find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
+                .unwrap_or_default(),
+            obligation_id.item_identifier().as_str(),
+        );
         self.resolve_fulfillment_cache_entry(
             edge,
             &obligation_id,
