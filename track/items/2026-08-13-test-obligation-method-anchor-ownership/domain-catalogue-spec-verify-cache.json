@@ -58,17 +58,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "1cbf339f3ebdf7164e9d769eba4268ece1691d0b5eb1645f0f9b37cad01608c8",
+      "evidence_hash": "2b72188662f9d3d786e41f289e9f04ea2845b75e9d048ecc159db30f2d4f7079",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
+        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。",
         "kind": "pass"
       }
     },
@@ -82,17 +82,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "9ccf91b78a331c4d73b570dace51140c4c9983d0eacfd5452e4ee33910105705",
+      "evidence_hash": "1efc798acf8c39ca1f329cbea4a3258431daa421c1bbeda74d5f0aa166f5d958",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。"
+          "text_label": "method の spec_refs は entry-level spec_refs からの割り当て部分集合ではなく、method 義務が所有する独立集合である。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。",
+        "citation": "method の spec_refs は entry-level spec_refs からの割り当て部分集合ではなく、method 義務が所有する独立集合である。",
         "kind": "pass"
       }
     },
@@ -178,17 +178,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "1826cfa96cebaa06e93da60bb3a8c422eaf92cc1f93956edfde090ae683b3ee1",
+      "evidence_hash": "c87c7201f9b6308a285a10700ed1dd24ea5468d88d02b3e40c2f73cfe52d5985",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+          "text_label": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "citation": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。",
         "kind": "pass"
       }
     },
@@ -298,17 +298,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "61971870ffefb373af766d432f9abd5f06785f2e0d4e0b3437893a2a15bb5255",
+      "evidence_hash": "b2dc8b4fc2994f21d936ec65cd108a5df52165f72233aa68b0f370e4fc3ef4bb",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+          "text_label": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。",
+        "citation": "method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。",
         "kind": "pass"
       }
     },
@@ -394,17 +394,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "1cbf339f3ebdf7164e9d769eba4268ece1691d0b5eb1645f0f9b37cad01608c8",
+      "evidence_hash": "2b72188662f9d3d786e41f289e9f04ea2845b75e9d048ecc159db30f2d4f7079",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
+        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。",
         "kind": "pass"
       }
     },
@@ -490,17 +490,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "e973a2869e033384001c38c49ebab0a1f1513fd85ac0974195e7adda0d61bbfa",
+      "evidence_hash": "682bd48e464aeb05f00e444ec2a3bac25a3a01cc8c42fd958bd0de4d5b60fa79",
       "evidence_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。"
+          "text_label": "trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とする。その義務が所有しない anchor（別 method が所有する anchor、およびどの method も所有しない entry-only の anchor）は要求しない。複数 method が所有する共有 anchor は、その義務自身が所有する限り対象に含む。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。",
+        "citation": "その義務が所有する anchor だけを対象とする。",
         "kind": "pass"
       }
     },
@@ -514,17 +514,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "61971870ffefb373af766d432f9abd5f06785f2e0d4e0b3437893a2a15bb5255",
+      "evidence_hash": "b2dc8b4fc2994f21d936ec65cd108a5df52165f72233aa68b0f370e4fc3ef4bb",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+          "text_label": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "citation": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。",
         "kind": "pass"
       }
     },
@@ -562,17 +562,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "0657a077f14f9790cca6399257bc76833ec40d2d6dad9b4bc5d3ddf46b11c612",
+      "evidence_hash": "6a29e31a4756768780f0e2ed518c175921e80144d9d31a7fafb2b742497d13ed",
       "evidence_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。"
+          "text_label": "fulfillment の method-scoped 検証は、各 trait_method 義務が所有する anchor だけを対象とする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。",
+        "citation": "fulfillment の method-scoped 検証は、各 trait_method 義務が所有する anchor だけを対象とする。",
         "kind": "pass"
       }
     },
@@ -634,17 +634,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "1cbf339f3ebdf7164e9d769eba4268ece1691d0b5eb1645f0f9b37cad01608c8",
+      "evidence_hash": "2b72188662f9d3d786e41f289e9f04ea2845b75e9d048ecc159db30f2d4f7079",
       "evidence_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。",
+        "citation": "trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。",
         "kind": "pass"
       }
     },
@@ -658,17 +658,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "9ccf91b78a331c4d73b570dace51140c4c9983d0eacfd5452e4ee33910105705",
+      "evidence_hash": "1efc798acf8c39ca1f329cbea4a3258431daa421c1bbeda74d5f0aa166f5d958",
       "evidence_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。"
+          "text_label": "method の spec_refs は entry-level spec_refs からの割り当て部分集合ではなく、method 義務が所有する独立集合である。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。",
+        "citation": "method の spec_refs は entry-level spec_refs からの割り当て部分集合ではなく、method 義務が所有する独立集合である。",
         "kind": "pass"
       }
     },
@@ -706,17 +706,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "1826cfa96cebaa06e93da60bb3a8c422eaf92cc1f93956edfde090ae683b3ee1",
+      "evidence_hash": "c87c7201f9b6308a285a10700ed1dd24ea5468d88d02b3e40c2f73cfe52d5985",
       "evidence_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+          "text_label": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。",
+        "citation": "包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。",
         "kind": "pass"
       }
     },
@@ -802,17 +802,17 @@
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "61971870ffefb373af766d432f9abd5f06785f2e0d4e0b3437893a2a15bb5255",
+      "evidence_hash": "b2dc8b4fc2994f21d936ec65cd108a5df52165f72233aa68b0f370e4fc3ef4bb",
       "evidence_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+          "text_label": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。",
+        "citation": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。",
         "kind": "pass"
       }
     },

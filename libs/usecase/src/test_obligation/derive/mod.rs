@@ -23,7 +23,7 @@ use domain::tddd::test_obligation::ids::{
 };
 use domain::tddd::test_obligation::obligations::{
     ObligationsDocument, TestObligation, validate_add_modify_methods_have_spec_refs,
-    validate_method_anchor_coverage, validate_parent_forbids_method_spec_refs,
+    validate_parent_forbids_method_spec_refs,
 };
 use domain::tddd::test_obligation::ports::{
     ObligationsArtifactPort, TestObligationRulesLoaderPort,
@@ -142,11 +142,12 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
             catalogues.push((path.clone(), doc));
         }
 
-        // D1 coverage is a write-side gate on the catalogues named on this
-        // command. The shared projection below is also used by read-only
-        // `check`, which must not retroactively reject enrolled catalogues.
+        // Write-side named-catalogue checks (Add/Modify spec_refs and
+        // Reference/Delete parent bans). The shared projection below is also
+        // used by read-only `check`, which must not retroactively reject
+        // enrolled catalogues.
         for (_, catalogue) in &catalogues {
-            validate_derivable_method_anchor_coverage(catalogue)
+            validate_named_catalogue_methods(catalogue)
                 .map_err(ObligationDeriveError::InvalidCatalogueState)?;
         }
 
@@ -166,8 +167,8 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
 ///
 /// Both the write-side derive command and the read-only check gate use this
 /// projection, so their definition of the expected artifact cannot diverge.
-/// Method-anchor coverage is intentionally not applied here: `check` re-derives
-/// to compare stored obligations, and D1 does not reject existing catalogues.
+/// Named-catalogue method checks are applied only on the write-side derive
+/// path so `check` can re-derive without rejecting enrolled catalogues.
 pub(crate) fn derive_obligations_document(
     track_id: domain::TrackId,
     rules: &TestObligationRulesDocument,
@@ -209,19 +210,9 @@ fn is_method_axis(axis: &TestObligationPerAxis) -> bool {
     matches!(axis, TestObligationPerAxis::Method | TestObligationPerAxis::TraitMethod)
 }
 
-/// Write-side D1 coverage for every named-catalogue trait, including
-/// Reference/Delete parents that still emit Add/Modify method axes.
-fn validate_derivable_method_anchor_coverage(
-    catalogue: &CatalogueDocument,
-) -> Result<(), DiagnosticMessage> {
-    validate_named_catalogue_add_modify_methods(catalogue)?;
-    for entry in catalogue.traits().values() {
-        validate_method_anchor_coverage(entry)?;
-    }
-    Ok(())
-}
-
-fn validate_named_catalogue_add_modify_methods(
+/// Write-side Add/Modify and parent-action checks for named-catalogue traits,
+/// types, and inherent impls.
+fn validate_named_catalogue_methods(
     catalogue: &CatalogueDocument,
 ) -> Result<(), DiagnosticMessage> {
     for entry in catalogue.traits().values() {

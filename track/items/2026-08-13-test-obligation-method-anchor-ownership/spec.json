@@ -18,15 +18,23 @@
       "adr_refs": [
         {
           "anchor": "D1",
-          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
         },
         {
           "anchor": "D3",
           "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md"
         }
       ],
       "id": "AC-02",
-      "text": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+      "text": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
     },
     {
       "adr_refs": [
@@ -47,10 +55,14 @@
         {
           "anchor": "D2",
           "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
         }
       ],
       "id": "AC-04",
-      "text": "D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。"
+      "text": "trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とする。その義務が所有しない anchor（別 method が所有する anchor、およびどの method も所有しない entry-only の anchor）は要求しない。複数 method が所有する共有 anchor は、その義務自身が所有する限り対象に含む。"
     },
     {
       "adr_refs": [
@@ -154,11 +166,11 @@
       "adr_refs": [
         {
           "anchor": "D1",
-          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
         }
       ],
       "id": "CN-01",
-      "text": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+      "text": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。"
     },
     {
       "adr_refs": [
@@ -178,7 +190,7 @@
         }
       ],
       "id": "CN-03",
-      "text": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。"
+      "text": "fulfillment の method-scoped 検証は、各 trait_method 義務が所有する anchor だけを対象とする。"
     },
     {
       "adr_refs": [
@@ -254,17 +266,17 @@
           }
         ],
         "id": "IN-01",
-        "text": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+        "text": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。"
       },
       {
         "adr_refs": [
           {
             "anchor": "D1",
-            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+            "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
           }
         ],
         "id": "IN-02",
-        "text": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。"
+        "text": "method の spec_refs は entry-level spec_refs からの割り当て部分集合ではなく、method 義務が所有する独立集合である。"
       },
       {
         "adr_refs": [
@@ -407,12 +419,12 @@
       {
         "adr_refs": [
           {
-            "anchor": "D2",
-            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
           }
         ],
         "id": "OS-04",
-        "text": "D1 の coverage 検証を通さずに、fulfillment 検証から未担当の entry-level anchor を除外することは本 track の対象外とする。"
+        "text": "entry-level spec_refs が作る check totality の cite edge を捨てること、または method 義務へ割り当てないことを理由に entry 参照の可視性を消すことは本 track の対象外とする。"
       },
       {
         "adr_refs": [
@@ -432,5 +444,5 @@
     "yellow": 0
   },
   "title": "trait_method obligations own method-scoped anchors",
-  "version": "1.5"
+  "version": "1.7"
 }

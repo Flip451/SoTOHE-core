@@ -811,7 +811,7 @@ fn test_trait_method_without_spec_refs_is_rejected_for_add_method() {
 }
 
 #[test]
-fn test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state() {
+fn test_trait_method_anchor_outside_entry_is_accepted() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Add,
@@ -821,19 +821,15 @@ fn test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state
         ],
         vec![spec_ref("IN-01")],
     );
-    let (interactor, _) =
+    let (interactor, sink) =
         interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
 
-    let result = interactor.execute(&command(vec![path]));
-
-    assert!(matches!(
-        result,
-        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
-    ));
+    interactor.execute(&command(vec![path])).unwrap();
+    assert!(sink.saved.lock().unwrap().is_some());
 }
 
 #[test]
-fn test_trait_method_anchor_union_must_cover_entry_catalogue() {
+fn test_trait_method_anchor_union_need_not_cover_entry_catalogue() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Add,
@@ -843,46 +839,30 @@ fn test_trait_method_anchor_union_must_cover_entry_catalogue() {
         ],
         vec![spec_ref("IN-01"), spec_ref("AC-01")],
     );
-    let (interactor, _) =
+    let (interactor, sink) =
         interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
 
-    let result = interactor.execute(&command(vec![path]));
-
-    assert!(matches!(
-        result,
-        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))
-    ));
+    interactor.execute(&command(vec![path])).unwrap();
+    assert!(sink.saved.lock().unwrap().is_some());
 }
 
 #[test]
-fn test_single_method_non_empty_entry_requires_full_method_anchor_declaration() {
-    let cases: Vec<Vec<SpecRef>> = vec![vec![], vec![spec_ref("IN-01")]];
+fn test_single_method_partial_entry_refs_are_accepted() {
+    let path = PathBuf::from("domain-types.json");
+    let catalogue = secondary_port_catalogue(
+        ItemAction::Add,
+        vec![method_with_spec_refs("load", vec![spec_ref("IN-01")])],
+        vec![spec_ref("IN-01"), spec_ref("AC-01")],
+    );
+    let (interactor, sink) =
+        interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
 
-    for method_refs in cases {
-        let path = PathBuf::from("domain-types.json");
-        let catalogue = secondary_port_catalogue(
-            ItemAction::Add,
-            vec![method_with_spec_refs("load", method_refs)],
-            vec![spec_ref("IN-01"), spec_ref("AC-01")],
-        );
-        let (interactor, _) =
-            interactor(rules_doc_with_secondary_port_contract_rules(), catalogue, &path);
-
-        let result = interactor.execute(&command(vec![path]));
-
-        assert!(matches!(
-            result,
-            Err(
-                domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(
-                    _
-                )
-            )
-        ));
-    }
+    interactor.execute(&command(vec![path])).unwrap();
+    assert!(sink.saved.lock().unwrap().is_some());
 }
 
 #[test]
-fn test_derive_rejects_incomplete_coverage_for_modify_trait() {
+fn test_modify_parent_empty_add_method_spec_refs_is_rejected() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Modify,
@@ -955,7 +935,7 @@ fn test_add_method_on_reference_trait_is_rejected() {
 }
 
 #[test]
-fn test_add_method_on_reference_trait_rejects_absent_anchor() {
+fn test_reference_parent_forbids_method_spec_refs_regardless_of_anchor() {
     let path = PathBuf::from("domain-types.json");
     let catalogue = secondary_port_catalogue(
         ItemAction::Reference,
@@ -1287,7 +1267,7 @@ fn test_single_method_empty_entry_rejects_add_method_without_spec_refs() {
 }
 
 #[test]
-fn test_derive_skips_coverage_for_reference_and_delete_traits() {
+fn test_reference_and_delete_methods_without_spec_refs_are_accepted() {
     for action in [ItemAction::Reference, ItemAction::Delete] {
         let path = PathBuf::from("domain-types.json");
         let catalogue = secondary_port_catalogue(

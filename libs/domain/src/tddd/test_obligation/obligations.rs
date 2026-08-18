@@ -9,7 +9,6 @@
 //! CN-11 / AC-03).
 
 use crate::TrackId;
-use crate::plan_ref::SpecRef;
 use crate::tddd::catalogue_v2::roles::ItemAction;
 use crate::tddd::catalogue_v2::{MethodDeclaration, TraitEntry};
 use crate::tddd::semantic_verify::CatalogueEntryRef;
@@ -21,70 +20,17 @@ use crate::tddd::test_obligation::ids::{
 };
 use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
 
-/// Validates method-level spec_refs against a trait's entry-level catalogue.
-///
-/// A Reference/Delete parent rejects every method that declares any spec_refs,
-/// so those methods never reach containment or coverage. After that gate, every
-/// remaining method-level reference must belong to the entry-level set. The
-/// union of Add/Modify method references must cover that set only when the
-/// parent itself is Add/Modify. A single Add/Modify method on such a parent
-/// with a non-empty entry-level set must declare the complete set.
-/// Reference/Delete method refs never satisfy coverage.
+/// Validates Add/Modify non-empty `spec_refs` and the parent-action combination
+/// on a trait. Entry-level refs are not an inventory: method refs need not be a
+/// subset of them and need not cover them.
 ///
 /// # Errors
 ///
-/// Returns a [`DiagnosticMessage`] when a method on a Reference/Delete parent
-/// declares spec_refs, a method cites an absent anchor, or the method union
-/// does not cover the entry-level catalogue of an Add/Modify parent.
+/// Returns a [`DiagnosticMessage`] when an Add/Modify method has empty
+/// `spec_refs`, or a method on a Reference/Delete parent declares any.
 pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), DiagnosticMessage> {
     validate_add_modify_methods_have_spec_refs(entry.methods())?;
     validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
-    for method in entry.methods() {
-        for method_ref in method.spec_refs() {
-            if !contains_spec_ref(entry.spec_refs(), method_ref) {
-                return Err(coverage_diag(&format!(
-                    "method '{}' declares spec anchor '{}#{}' absent from the trait entry-level spec_refs",
-                    method.name().as_str(),
-                    method_ref.file.display(),
-                    method_ref.anchor.as_ref(),
-                )));
-            }
-        }
-    }
-
-    if !matches!(entry.action(), ItemAction::Add | ItemAction::Modify) {
-        return Ok(());
-    }
-
-    if entry.methods().len() == 1
-        && !entry.spec_refs().is_empty()
-        && let Some(method) = entry.methods().first()
-        && matches!(method.action(), ItemAction::Add | ItemAction::Modify)
-        && let Some(unassigned) = entry
-            .spec_refs()
-            .iter()
-            .find(|entry_ref| !contains_spec_ref(method.spec_refs(), entry_ref))
-    {
-        return Err(coverage_diag(&format!(
-            "single-method trait must declare entry-level spec anchor '{}#{}' on its method",
-            unassigned.file.display(),
-            unassigned.anchor.as_ref(),
-        )));
-    }
-
-    if let Some(unassigned) = entry.spec_refs().iter().find(|entry_ref| {
-        !entry.methods().iter().any(|method| {
-            matches!(method.action(), ItemAction::Add | ItemAction::Modify)
-                && contains_spec_ref(method.spec_refs(), entry_ref)
-        })
-    }) {
-        return Err(coverage_diag(&format!(
-            "trait entry spec anchor '{}#{}' is not assigned to any add/modify method",
-            unassigned.file.display(),
-            unassigned.anchor.as_ref(),
-        )));
-    }
-
     Ok(())
 }
 
@@ -135,10 +81,6 @@ pub fn validate_parent_forbids_method_spec_refs(
         }
     }
     Ok(())
-}
-
-fn contains_spec_ref(refs: &[SpecRef], target: &SpecRef) -> bool {
-    refs.iter().any(|candidate| candidate.file == target.file && candidate.anchor == target.anchor)
 }
 
 fn coverage_diag(detail: &str) -> DiagnosticMessage {
@@ -444,6 +386,7 @@ fn stale_obligations_detail(
 mod tests {
     use super::*;
     use crate::ContentHash;
+    use crate::plan_ref::SpecRef;
     use crate::tddd::catalogue_v2::roles::DataRole;
     use crate::tddd::semantic_verify::{CatalogueEntryKey, CatalogueSectionKey};
     use crate::tddd::test_obligation::ids::TestObligationItemIdentifier;
@@ -841,7 +784,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_method_on_reference_parent_cannot_declare_absent_anchor() {
+    fn test_add_method_with_spec_refs_on_reference_parent_is_rejected() {
         let entry = crate::tddd::catalogue_v2::TraitEntry::new(
             ItemAction::Reference,
             crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
@@ -860,7 +803,7 @@ mod tests {
     }
 
     #[test]
-    fn test_reference_method_cannot_cover_entry_anchors_alone() {
+    fn test_reference_method_need_not_cover_entry_anchors() {
         let entry = crate::tddd::catalogue_v2::TraitEntry::new(
             ItemAction::Add,
             crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
@@ -875,7 +818,48 @@ mod tests {
             vec![spec_ref("IN-01")],
             vec![],
         );
-        assert!(validate_method_anchor_coverage(&entry).is_err());
+        assert!(validate_method_anchor_coverage(&entry).is_ok());
+    }
+
+    #[test]
+    fn test_method_refs_outside_entry_set_are_accepted() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Add,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![method("load", ItemAction::Add, vec![spec_ref("IN-02")])],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_ok());
+    }
+
+    #[test]
+    fn test_method_refs_that_do_not_cover_entry_set_are_accepted() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Add,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![
+                method("load", ItemAction::Add, vec![spec_ref("IN-01")]),
+                method("save", ItemAction::Add, vec![spec_ref("IN-01")]),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01"), spec_ref("AC-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_ok());
     }
 
     #[test]

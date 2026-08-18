@@ -116,12 +116,12 @@
       }
     },
     {
-      "claim_hash": "1cbf339f3ebdf7164e9d769eba4268ece1691d0b5eb1645f0f9b37cad01608c8",
+      "claim_hash": "2b72188662f9d3d786e41f289e9f04ea2845b75e9d048ecc159db30f2d4f7079",
       "claim_origin": {
         "data": {
           "element_id": "IN-01",
           "section": "in_scope",
-          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の担当分だけを所有するようにする。"
+          "text_label": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。"
         },
         "kind": "spec_element"
       },
@@ -134,30 +134,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "MethodDeclaration に、仕様要素への構造化参照の配列 `spec_refs` を追加する。schema 上は任意だが、以下の検証規則によって必須になる場合がある。entry-level spec_refs は全 anchor の総目録、各 method の spec_refs はその中の担当分とする。trait_method 義務は、その method の spec_refs だけを所有する。entry-level spec_refs は trait 全体と仕様を結ぶために使い、義務へはコピーしない。",
+        "citation": "MethodDeclaration に、仕様要素への構造化参照の配列 `spec_refs` を追加する。schema 上は任意だが、以下の検証規則によって必須になる場合がある。entry-level spec_refs は全 anchor の総目録、各 method の spec_refs はその中の担当分とする。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "9ccf91b78a331c4d73b570dace51140c4c9983d0eacfd5452e4ee33910105705",
+      "claim_hash": "1efc798acf8c39ca1f329cbea4a3258431daa421c1bbeda74d5f0aa166f5d958",
       "claim_origin": {
         "data": {
           "element_id": "IN-02",
           "section": "in_scope",
-          "text_label": "method-level の担当 anchor が entry-level の目録の部分集合であり、全 method の担当分が目録全体を覆うことを、単一 method の明示規則を含めて構造検証する。"
+          "text_label": "method の spec_refs は entry-level spec_refs からの割り当て部分集合ではなく、method 義務が所有する独立集合である。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
+      "evidence_hash": "a9ab5408e4e31d57d5563cd940308e9f138d67821db2cc25f78b57d1cc273345",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
-          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          "file_path": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。同じ anchor を複数 method が担当してもよい。この条件を満たさない catalogue は構造検証で棄却する。単一 method で entry に anchor がある場合は、その全てを method に明記する。",
+        "citation": "method `spec_refs` は method 義務が所有する独立集合（1720 D2）",
         "kind": "pass"
       }
     },
@@ -530,25 +530,25 @@
       }
     },
     {
-      "claim_hash": "fd5941999f005e324664cad3954c3941a01f6274d3f0bb7872fe7d39e634c3b0",
+      "claim_hash": "6f36d4ef800c398595ab470b285c59acb09dc335e6b9a721fac575cfdd19fbee",
       "claim_origin": {
         "data": {
           "element_id": "OS-04",
           "section": "out_of_scope",
-          "text_label": "D1 の coverage 検証を通さずに、fulfillment 検証から未担当の entry-level anchor を除外することは本 track の対象外とする。"
+          "text_label": "entry-level spec_refs が作る check totality の cite edge を捨てること、または method 義務へ割り当てないことを理由に entry 参照の可視性を消すことは本 track の対象外とする。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
+      "evidence_hash": "a9ab5408e4e31d57d5563cd940308e9f138d67821db2cc25f78b57d1cc273345",
       "evidence_origin": {
         "data": {
-          "decision_id": "D2",
-          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "D1 の割り当て検証を通過した後、fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。",
+        "citation": "entry-level `spec_refs` は entry 自身の仕様への grounding（義務へはコピーしない）",
         "kind": "pass"
       }
     },
@@ -576,25 +576,25 @@
       }
     },
     {
-      "claim_hash": "61971870ffefb373af766d432f9abd5f06785f2e0d4e0b3437893a2a15bb5255",
+      "claim_hash": "b2dc8b4fc2994f21d936ec65cd108a5df52165f72233aa68b0f370e4fc3ef4bb",
       "claim_origin": {
         "data": {
           "element_id": "CN-01",
           "section": "constraint",
-          "text_label": "entry-level spec anchors は trait と仕様を結ぶ完全な目録として維持し、method-level の担当宣言はその部分集合でなければならない。anchor は複数 method が担当してよいが、少なくとも一つの method に担当されなければならない。"
+          "text_label": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
+      "evidence_hash": "a9ab5408e4e31d57d5563cd940308e9f138d67821db2cc25f78b57d1cc273345",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
-          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          "file_path": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "entry-level spec_refs は全 anchor の総目録、各 method の spec_refs はその中の担当分とする。",
+        "citation": "entry-level `spec_refs` は entry 自身の仕様への grounding（義務へはコピーしない）\n- method `spec_refs` は method 義務が所有する独立集合（1720 D2）",
         "kind": "pass"
       }
     },
@@ -622,12 +622,12 @@
       }
     },
     {
-      "claim_hash": "0657a077f14f9790cca6399257bc76833ec40d2d6dad9b4bc5d3ddf46b11c612",
+      "claim_hash": "6a29e31a4756768780f0e2ed518c175921e80144d9d31a7fafb2b742497d13ed",
       "claim_origin": {
         "data": {
           "element_id": "CN-03",
           "section": "constraint",
-          "text_label": "fulfillment の method-scoped 検証は、D1 の coverage 検証後にのみ行い、entry-level anchor の未担当による検証漏れを許さない。"
+          "text_label": "fulfillment の method-scoped 検証は、各 trait_method 義務が所有する anchor だけを対象とする。"
         },
         "kind": "spec_element"
       },
@@ -760,35 +760,58 @@
       }
     },
     {
-      "claim_hash": "1826cfa96cebaa06e93da60bb3a8c422eaf92cc1f93956edfde090ae683b3ee1",
+      "claim_hash": "c87c7201f9b6308a285a10700ed1dd24ea5468d88d02b3e40c2f73cfe52d5985",
       "claim_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+          "text_label": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
         },
         "kind": "spec_element"
       },
-      "evidence_hash": "987b96c7a74ffe934e833b607e030e4c7a9e839343b37e24e27ca91e87b1565b",
+      "evidence_hash": "a9ab5408e4e31d57d5563cd940308e9f138d67821db2cc25f78b57d1cc273345",
       "evidence_origin": {
         "data": {
           "decision_id": "D1",
-          "file_path": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          "file_path": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
         },
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "method-level spec_refs は entry-level spec_refs の一部でなければならず、全 method の分を合わせると entry-level spec_refs の全てを覆わなければならない。同じ anchor を複数 method が担当してもよい。この条件を満たさない catalogue は構造検証で棄却する。単一 method で entry に anchor がある場合は、その全てを method に明記する。",
+        "citation": "「これらに反する catalogue の構造的棄却」\n\n残す:\n\n- 0340 D1 / D2 / D3（独立 `action`、Add / Modify の非空 `spec_refs`、指名 catalogue のみ）\n- 0040 D1（親が `reference` / `delete` なら子 `spec_refs` は空）",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "1826cfa96cebaa06e93da60bb3a8c422eaf92cc1f93956edfde090ae683b3ee1",
+      "claim_hash": "c87c7201f9b6308a285a10700ed1dd24ea5468d88d02b3e40c2f73cfe52d5985",
       "claim_origin": {
         "data": {
           "element_id": "AC-02",
           "section": "acceptance_criteria",
-          "text_label": "コマンドが指名する catalogue で、method が entry-level に存在しない anchor を担当する宣言、または全 method の担当分で entry-level anchor を覆わない宣言は構造検証で拒否される。entry-level anchor を持つ単一 method trait の未宣言または部分宣言も拒否される。"
+          "text_label": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "1e4ad89f78639a8890860ec1fff01de05bc4b2d82f0f7bf4fd81f385cf19d28c",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D2",
+          "file_path": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "D3 が適用対象とする catalogue では、Add/Modify method の `spec_refs` を非空とし、空なら棄却する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c87c7201f9b6308a285a10700ed1dd24ea5468d88d02b3e40c2f73cfe52d5985",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
         },
         "kind": "spec_element"
       },
@@ -801,7 +824,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "「コマンドが指名しない既存 catalogue を直したり、失敗させたりしない。」",
+        "citation": "後方互換は要求しない。\n新しい schema（method `action`、Add/Modify の非空 `spec_refs`）は、この決定を実装した作業およびそれ以降の作業が書く catalogue にだけ課す。\nコマンドが指名しない既存 catalogue を直したり、失敗させたりしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c87c7201f9b6308a285a10700ed1dd24ea5468d88d02b3e40c2f73cfe52d5985",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "7bf779e73e58cb9944ab4939104664e48763cc37f065dd4bd10d446df70d8db3",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "親が `reference` / `delete` のとき、子 `MethodDeclaration` の `spec_refs` は空でなければならない。非空なら棄却する。",
         "kind": "pass"
       }
     },
@@ -852,12 +898,12 @@
       }
     },
     {
-      "claim_hash": "e973a2869e033384001c38c49ebab0a1f1513fd85ac0974195e7adda0d61bbfa",
+      "claim_hash": "682bd48e464aeb05f00e444ec2a3bac25a3a01cc8c42fd958bd0de4d5b60fa79",
       "claim_origin": {
         "data": {
           "element_id": "AC-04",
           "section": "acceptance_criteria",
-          "text_label": "D1 の割り当て検証が通った trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とし、その義務が所有しない anchor（別 method だけが担当する anchor）を要求しない。別 method も担当する共有 anchor は、その義務自身が担当する限り対象に含む。"
+          "text_label": "trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とする。その義務が所有しない anchor（別 method が所有する anchor、およびどの method も所有しない entry-only の anchor）は要求しない。複数 method が所有する共有 anchor は、その義務自身が所有する限り対象に含む。"
         },
         "kind": "spec_element"
       },
@@ -870,7 +916,30 @@
         "kind": "adr_decision"
       },
       "verdict": {
-        "citation": "D1 の割り当て検証を通過した後、fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。",
+        "citation": "「fulfillment と指示書は、その義務が所有する anchor だけを扱う。他の anchor は、それを担当する method 義務が検証する。」",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "682bd48e464aeb05f00e444ec2a3bac25a3a01cc8c42fd958bd0de4d5b60fa79",
+      "claim_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とする。その義務が所有しない anchor（別 method が所有する anchor、およびどの method も所有しない entry-only の anchor）は要求しない。複数 method が所有する共有 anchor は、その義務自身が所有する限り対象に含む。"
+        },
+        "kind": "spec_element"
+      },
+      "evidence_hash": "a9ab5408e4e31d57d5563cd940308e9f138d67821db2cc25f78b57d1cc273345",
+      "evidence_origin": {
+        "data": {
+          "decision_id": "D1",
+          "file_path": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
+        },
+        "kind": "adr_decision"
+      },
+      "verdict": {
+        "citation": "method `spec_refs` は method 義務が所有する独立集合（1720 D2）",
         "kind": "pass"
       }
     },

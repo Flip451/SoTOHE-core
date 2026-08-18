@@ -495,6 +495,28 @@
           "hash": "rvw1:sha256:9e65859314f9a34883d68304582940d3fa29a189e1e137b8c5daefda18297d5f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:50:55Z",
+          "findings": [
+            {
+              "category": "stale-test-name",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 787,
+              "message": "Test name `test_add_method_on_reference_parent_cannot_declare_absent_anchor` still asserts the removed inventory-containment rule (\"absent anchor\" rejection). The entry now fails solely because the Reference parent forbids any method spec_refs (`validate_parent_forbids_method_spec_refs`); the cited anchor IN-99 being absent from the entry-level set plays no role in the outcome (the test would still err with IN-99 included). The sibling test was renamed for exactly this staleness (`test_reference_method_cannot_cover_entry_anchors_alone` → `test_reference_method_need_not_cover_entry_anchors`), but this one was missed, so the suite factually contradicts the track's design intent that containment is removed. Rename to reflect the parent-forbids path, e.g. `test_add_method_with_spec_refs_on_reference_parent_is_rejected`.",
+              "severity": "low"
+            }
+          ],
+          "hash": "rvw1:sha256:e9e987ff34b56da38656a6fc5385b571a9c5b1f35de38ff264fdb2601cf37f79",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T01:57:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5c0c238918e2a74742359030c2ea9f54d8aecd0538ce8b341b8ffc1f60bbb06b",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1568,6 +1590,20 @@
           "hash": "rvw1:sha256:2376b16efcb8c7802cffa518d47e7ed6791dd5ac6fad427cd3ca3f7b828c04ee",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:42:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5364bab2941f39919580c5810dc8a3302e67512af63d96ecf9addb1ac75d09e6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:51:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66c1fe09b7c8a928345d1b9aa34abea2ceb92ac234d6169c9d59af1282b97576",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2100,6 +2136,13 @@
           "hash": "rvw1:sha256:586c478cfd7f1fc95a2f1cced91d172919047dc8b1c7afd0333a76d6271b53cb",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:50:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c2736e3930be4b0f7c9952764ac2efd6777f08d9eaaf3d1df35b855fda76b55d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2355,6 +2398,35 @@
           "at": "2026-08-17T16:30:06Z",
           "findings": [],
           "hash": "rvw1:sha256:eecc1270a605e9c89085f72ff1263add15155af62688e624d7ac8a21f8ca0918",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:18:35Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 29,
+              "message": "AC-02 の「構造検証で拒否しない」が無限定の全称主張になっており、同一 spec 内の拒否規則と同一 fixture 上で矛盾する。fixture「指名 catalogue、entry-level spec_refs 非空の単一 method trait、action 省略（AC-14 により add）、spec_refs 未宣言」は AC-02 では『拒否しない』、AC-03 / IN-14 では『拒否される』。同様に、親 entry が reference / delete の子 method が entry-level に無い anchor を非空 spec_refs に持つ fixture は AC-02 第 1 節では『拒否しない』、AC-16 / IN-15 では『拒否される』。引用元 0055 D1 は総目録根拠（包含・被覆・全量写し）による構造的棄却のみを撤回し 0340 D2 / 0040 D1 を明示的に残しているため、AC-02 の非拒否主張は撤回根拠に限定して記述される必要がある。",
+              "severity": "major"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 53,
+              "message": "AC-04 の前提「D1 の割り当て検証が通った trait_method 義務について」が、本改訂で撤回され spec 内でも未定義になった検証ゲートを参照している。引用先 1720 D2 の文脈で「D1 の割り当て検証」は包含・被覆・全量写しの構造検証を指すが、0055 D1 がそれと構造的棄却を撤回し、spec 側でそれを定義していた旧 IN-02 / AC-02 も独立集合宣言に書き換え済みのため、現行契約にこの前提を定義する要素が存在しない。CN-03 からは coverage 前置ゲートが除去されたのに AC-04 には同等の前置条件が残存し、下流 phase は fulfillment に先立つ割り当て検証の意味を発明せざるを得ない。付随して括弧書き「（別 method だけが担当する anchor）」も被覆モデル前提の言い換えであり、0055 後に存在しうる『どの method も所有しない entry-only anchor』を含まない不完全な定義になっている。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:96c4a5b47a9c78fafe7d894009fbdab301ce985f5f3dafec22d9aa682d946e8c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T01:23:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:363c1c2c36cef3e0f3bd0885ea6883b5873b720eae32a573378ea9720cd17759",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3235,6 +3307,56 @@
           "at": "2026-08-18T00:20:10Z",
           "findings": [],
           "hash": "rvw1:sha256:e5f59cc1f6323642afa0a7d37754e777c0656fec398c7f1618acbb295a39eb92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:55:15Z",
+          "findings": [
+            {
+              "category": "stale-comment",
+              "file": "libs/usecase/src/test_obligation/derive/mod.rs",
+              "line": 145,
+              "message": "Derive call-site comment still describes the validation as \"D1 coverage is a write-side gate\" (lines 145-147), and the derive_obligations_document doc (lines 169-170) still justifies itself with \"Method-anchor coverage is intentionally not applied here … D1 does not reject existing catalogues\" — both cite the 1720-D1 inventory/coverage semantics retracted by ADR 2026-08-18-0055 D1. The briefing's design intent explicitly states the derive call-site comment no longer calls this D1 coverage, but the diff only rewrote the fn doc at line 212; the intended edit is missing.",
+              "severity": "medium"
+            },
+            {
+              "category": "redundant-orchestration",
+              "file": "libs/usecase/src/test_obligation/derive/mod.rs",
+              "line": 217,
+              "message": "The trait loop in validate_derivable_method_anchor_coverage (lines 217-219) is now fully redundant: after the domain narrowing, validate_method_anchor_coverage performs exactly the two checks (validate_add_modify_methods_have_spec_refs + validate_parent_forbids_method_spec_refs) that validate_named_catalogue_add_modify_methods already applied to every trait entry, so the wrapper is behaviorally identical to validate_named_catalogue_add_modify_methods alone. When collapsing it, also fix the new one-line doc at line 212, which claims trait-only scope while types and inherent-impl methods are checked too.",
+              "severity": "low"
+            },
+            {
+              "category": "misleading-test-name",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 865,
+              "message": "test_derive_rejects_incomplete_coverage_for_modify_trait names the retracted non-cover rejection as its contract, contradicting the new test_trait_method_anchor_union_need_not_cover_entry_catalogue; the rejection it actually exercises is the empty-spec_refs Add-default method on a Modify parent (0340 D2). Rename to state the real rejection reason.",
+              "severity": "low"
+            },
+            {
+              "category": "misleading-test-name",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 938,
+              "message": "test_add_method_on_reference_trait_rejects_absent_anchor names the retracted outside-entry (absent-anchor) rejection, contradicting test_trait_method_anchor_outside_entry_is_accepted; the rejection now comes from 0040 D1 (Reference parent forbids method spec_refs), making the test behaviorally identical to test_add_method_on_reference_trait_is_rejected (line 920) except for the anchor string. Rename or fold into the duplicate.",
+              "severity": "low"
+            },
+            {
+              "category": "misleading-test-name",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 1270,
+              "message": "test_derive_skips_coverage_for_reference_and_delete_traits still names \"coverage\" as something skipped for Reference/Delete parents, implying coverage validation still exists for Add/Modify parents — retracted by ADR 0055. Mildest of the stale-name sweep misses; rename to describe the accepted ref-free Reference/Delete method shape.",
+              "severity": "low"
+            }
+          ],
+          "hash": "rvw1:sha256:ad276c13f13b02082f096d9073e56b33715d18d20677f0cfae3419b833548421",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T02:03:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c55281d0f9ac305f338df00bb1eac99d40f812bff4e2e4c8a124519b1972bd04",
           "type": "final",
           "verdict": "zero_findings"
         }

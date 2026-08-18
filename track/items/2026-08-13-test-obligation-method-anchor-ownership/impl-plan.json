@@ -59,10 +59,22 @@
           "T14"
         ],
         "title": "Parent-action method spec_refs validation"
+      },
+      {
+        "description": [
+          "Targets: libs/domain/src/tddd/test_obligation/obligations.rs, libs/usecase/src/test_obligation/derive_tests.rs, libs/usecase/src/test_obligation/derive/mod.rs, and track/items/2026-08-13-test-obligation-method-anchor-ownership/obligation-fulfillment-cache.json. Operation: remove inventory enforcement, update and add tests, and refresh the obligation cache. Anchors: AC-02, IN-02, CN-01, CN-03, AC-04, OS-04."
+        ],
+        "id": "entry-spec-refs-not-inventory",
+        "task_ids": [
+          "T15",
+          "T16",
+          "T17"
+        ],
+        "title": "Entry spec_refs not inventory"
       }
     ],
     "summary": [
-      "GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11, T14.",
+      "GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11, T14, T15, T16, T17.",
       "GO-02 → T1, T2, T3, T10, T11, T14."
     ]
   },
@@ -147,9 +159,32 @@
       "status": "done"
     },
     {
+      "commit_hash": "4a0d8475",
       "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs, related domain tests, and libs/usecase/src/test_obligation/derive/mod.rs. Operation: implement and test validate_parent_forbids_method_spec_refs and wire it into the named-catalogue validation path. Anchors: IN-15, AC-16.",
       "id": "T14",
       "status": "done"
+    },
+    {
+      "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs and its domain tests. Operation: remove inventory enforcement from validate_method_anchor_coverage; keep the 0340 D2 and 0040 D1 validator calls; update inventory-reject tests and add accept tests for method refs outside the entry set and for non-covering method refs. Anchors: AC-02, IN-02, CN-01.",
+      "id": "T15",
+      "status": "in_progress"
+    },
+    {
+      "depends_on": [
+        "T15"
+      ],
+      "description": "Targets: libs/usecase/src/test_obligation/derive_tests.rs and libs/usecase/src/test_obligation/derive/mod.rs. Operation: update inventory-reject tests, add accept tests for a named catalogue whose method refs are outside the entry set or do not cover the entry set, and drop inventory restatement at the derive call site. Anchors: AC-02, IN-02, CN-01.",
+      "id": "T16",
+      "status": "todo"
+    },
+    {
+      "depends_on": [
+        "T15",
+        "T16"
+      ],
+      "description": "Targets: track/items/2026-08-13-test-obligation-method-anchor-ownership/obligation-fulfillment-cache.json. Operation: re-evaluate and refresh the obligation cache. Anchors: AC-02, AC-04, CN-03, OS-04.",
+      "id": "T17",
+      "status": "todo"
     }
   ]
 }

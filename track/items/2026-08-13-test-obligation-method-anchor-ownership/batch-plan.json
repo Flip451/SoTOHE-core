@@ -15,7 +15,10 @@
     { "task_id": "T12", "scope_estimates": [{ "scope": "domain", "production_lines": 80, "test_lines": 140 }] },
     { "task_id": "T13", "scope_estimates": [{ "scope": "domain", "production_lines": 80, "test_lines": 60 }] },
     { "task_id": "T11", "scope_estimates": [{ "scope": "usecase", "production_lines": 140, "test_lines": 120 }] },
-    { "task_id": "T14", "scope_estimates": [{ "scope": "domain", "production_lines": 35, "test_lines": 60 }, { "scope": "usecase", "production_lines": 30, "test_lines": 40 }] }
+    { "task_id": "T14", "scope_estimates": [{ "scope": "domain", "production_lines": 35, "test_lines": 60 }, { "scope": "usecase", "production_lines": 30, "test_lines": 40 }] },
+    { "task_id": "T15", "scope_estimates": [{ "scope": "domain", "production_lines": 40, "test_lines": 80 }] },
+    { "task_id": "T16", "scope_estimates": [{ "scope": "usecase", "production_lines": 20, "test_lines": 100 }] },
+    { "task_id": "T17", "scope_estimates": [{ "scope": "other", "production_lines": 10, "test_lines": 0 }] }
   ],
   "batches": [
     { "id": "B-01", "task_ids": ["T1", "T2"] },
@@ -27,6 +30,7 @@
     { "id": "B-07", "task_ids": ["T8", "T9"] },
     { "id": "B-08", "task_ids": ["T10"] },
     { "id": "B-09", "task_ids": ["T12", "T13", "T11"] },
-    { "id": "B-10", "task_ids": ["T14"] }
+    { "id": "B-10", "task_ids": ["T14"] },
+    { "id": "B-11", "task_ids": ["T15", "T16", "T17"] }
   ]
 }

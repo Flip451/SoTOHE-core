@@ -5,17 +5,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -96,8 +96,8 @@
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
       },
       "key": {
-        "anchor_text_hash": "fd1d058263a2425b2ce5327bc38e8a4d01569dbc5721ad1198d1b20ad898b6d9",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "anchor_text_hash": "0a49bc9283855ca603f7d1214a9bff74d333125886ce74815c9db21e94b14431",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -116,17 +116,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -207,8 +207,8 @@
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
       },
       "key": {
-        "anchor_text_hash": "6a263f6ab00d46dff9b91e3501e0a8e2357b1226a03cc9cca5d00770880a7b51",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "anchor_text_hash": "39da3a70fa9e4a3a1d57c6e84de3616db3167c49c21648bc8346a87a67d770b5",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -217,7 +217,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));\n\ninteractor.execute(&command(vec![path])).unwrap();\n\nassert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );",
+        "citation": "method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")]),\n        ],\n        vec![spec_ref(\"IN-01\")],",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -227,17 +227,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -319,7 +319,7 @@
       },
       "key": {
         "anchor_text_hash": "81f02889fb07e1dab0862bfd501b6984a335e39ce06b3a21f0664845e66740a4",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -328,7 +328,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let method =\n            &doc.traits().get(&TraitName::new(\"LegacyPort\").unwrap()).unwrap().methods()[0];\n        assert_eq!(method.action(), ItemAction::Add); ... let omitted_add = MethodDeclaration::associated_function(\n        MethodName::new(\"compute\").unwrap(),\n        vec![],\n        TypeRef::new(\"()\").unwrap(),\n    ); ... let mut catalogue =\n        catalogue_with_type(\"Compute\", value_object_entry(ItemAction::Reference, vec![]));\n    catalogue.push_inherent_impl(InherentImplDeclV2 {\n        type_name: TypeName::new(\"Compute\").unwrap(),\n        impl_generics: vec![],\n        impl_where_predicates: vec![],\n        methods: vec![MethodDeclaration::associated_function(\n            MethodName::new(\"compute\").unwrap(),\n            vec![],\n            TypeRef::new(\"()\").unwrap(),\n        )],\n    });",
+        "citation": "`let entry = TypeEntry::new(\n        ItemAction::Reference,\n        ...\n        vec![omitted_add],\n        ...\n    );\n    ...\n    assert!(matches!(\n        result,\n        Err(...::InvalidCatalogueState(_))\n    ));` and `methods: vec![method_with_action(\"compute\", ItemAction::Add, vec![])]` for both the type method and inherent implementation cases.",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -338,17 +338,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -429,8 +429,8 @@
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
       },
       "key": {
-        "anchor_text_hash": "95035b9b0ff93c111b7283997c3525d9b7fa1bc69547d35266e9a3bd001ba391",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "anchor_text_hash": "eafd7380087aa4d7fccf2ae27e4113236f18aa4933e1e6f0f482d3ac269921c9",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -439,7 +439,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![\n            method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")]),\n        ],\n        vec![spec_ref(\"IN-01\")],\n    );\n...\nassert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
+        "citation": "interactor.execute(&command(vec![path])).unwrap();",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -449,17 +449,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -541,7 +541,7 @@
       },
       "key": {
         "anchor_text_hash": "1cce3afc010abcbc677f3de8d786ca8f1a016a360f36760804cd18fd156ea556",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -550,7 +550,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let cases: Vec<Vec<SpecRef>> = vec![vec![], vec![spec_ref(\"IN-01\")]]; ... assert!(matches!( result, Err( domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState( _) ) )); ... let catalogue = secondary_port_catalogue( ItemAction::Modify, vec![method_with_action(\"load\", ItemAction::Modify, vec![])], vec![spec_ref(\"IN-01\")], ); ... assert!(matches!( result, Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_)) ));",
+        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![method_with_spec_refs(\"load\", vec![])],\n        vec![],\n    );\n...\nassert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -560,17 +560,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -652,7 +652,7 @@
       },
       "key": {
         "anchor_text_hash": "fa949adf768b1eadbf5ea7f662cc79acc56f0763875036ebc08a9ed3337e151c",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -661,7 +661,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let omitted_add = MethodDeclaration::associated_function(\n    MethodName::new(\"compute\").unwrap(),\n    vec![],\n    TypeRef::new(\"()\").unwrap(),\n); ... assert!(matches!(\n    result,\n    Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n));",
+        "citation": "let omitted_add = MethodDeclaration::associated_function(\n        MethodName::new(\"compute\").unwrap(),\n        vec![],\n        TypeRef::new(\"()\").unwrap(),\n    );\n    let entry = TypeEntry::new(\n        ItemAction::Reference,",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -671,17 +671,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -763,7 +763,7 @@
       },
       "key": {
         "anchor_text_hash": "361a5115dabe0ddbdbc5bb2fe6cc25142d06d9ad9546075225f8290c5f24ea1e",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -772,7 +772,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "interactor.execute(&command(vec![valid_path])).unwrap();\n\n    assert!(sink.saved.lock().unwrap().is_some());\n    assert!(unused_snapshot.traits().values().next().unwrap().methods()[0].spec_refs().is_empty());",
+        "citation": "interactor.execute(&command(vec![valid_path])).unwrap();\n\nassert!(sink.saved.lock().unwrap().is_some());\nassert!(unused_snapshot.traits().values().next().unwrap().methods()[0].spec_refs().is_empty());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -782,17 +782,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -873,8 +873,8 @@
         "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
       },
       "key": {
-        "anchor_text_hash": "0334106b1c8ae37e2900444b351c0535147885c7f5325d7874274fdabf1d2121",
-        "bound_tests_set_hash": "5e4006a5be58f043272eddafe9e6925ef1070b402684c6ac350e5e3ae2144342",
+        "anchor_text_hash": "288db0cb689028066f79ec809a57019b87682cc23375253086c6aa1d282cdf5f",
+        "bound_tests_set_hash": "b0fb25de79cd81fbb07a0d3670260141fd573a3ff74788b6d04c71c2a36458d3",
         "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b"
       },
       "obligation_id": {
@@ -883,7 +883,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let catalogue = secondary_port_catalogue(\n        ItemAction::Add,\n        vec![\n            method_with_spec_refs(\"load\", vec![spec_ref(\"IN-01\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")]),\n        ],\n        vec![spec_ref(\"IN-01\"), spec_ref(\"AC-01\")],\n    );\n...\nassert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\nassert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "citation": "vec![method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]), method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")])],\n        vec![spec_ref(\"IN-01\")],\n    );\n...\ninteractor.execute(&command(vec![path])).unwrap();",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1185,7 +1185,7 @@
         "entry_key": "MethodDeclaration"
       },
       "key": {
-        "anchor_text_hash": "fd1d058263a2425b2ce5327bc38e8a4d01569dbc5721ad1198d1b20ad898b6d9",
+        "anchor_text_hash": "0a49bc9283855ca603f7d1214a9bff74d333125886ce74815c9db21e94b14431",
         "bound_tests_set_hash": "0d553cf5581d1ef3d220c17054482888f086bc40988455ad0bec75b749a6f091",
         "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
       },
@@ -1195,7 +1195,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());\n\n        assert!(declaration.spec_refs().is_empty());",
+        "citation": "assert_eq!(load.spec_refs(), &[load_ref]);\n        assert_eq!(save.spec_refs(), &[save_ref]);\n        assert_ne!(load.spec_refs(), save.spec_refs());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1205,17 +1205,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         }
       ],
       "edge_id": {
@@ -1226,8 +1226,8 @@
         "entry_key": "MethodDeclaration"
       },
       "key": {
-        "anchor_text_hash": "6a263f6ab00d46dff9b91e3501e0a8e2357b1226a03cc9cca5d00770880a7b51",
-        "bound_tests_set_hash": "1ffe6d6f7640356af7711895b8995db8312f9861837b06cccc200a744cebf78f",
+        "anchor_text_hash": "39da3a70fa9e4a3a1d57c6e84de3616db3167c49c21648bc8346a87a67d770b5",
+        "bound_tests_set_hash": "48cbde21f56bd3d796c3bddf4cf4cb5d597c37ac8e473cc15ae76bb9f37a4f1f",
         "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
       },
       "obligation_id": {
@@ -1236,7 +1236,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
+        "citation": "method_with_spec_refs(\"load\", vec![spec_ref(\"IN-02\")]),\n            method_with_spec_refs(\"save\", vec![spec_ref(\"IN-01\")]),\n        ],\n        vec![spec_ref(\"IN-01\")],",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1374,17 +1374,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         }
       ],
       "edge_id": {
@@ -1395,8 +1395,8 @@
         "entry_key": "MethodDeclaration"
       },
       "key": {
-        "anchor_text_hash": "95035b9b0ff93c111b7283997c3525d9b7fa1bc69547d35266e9a3bd001ba391",
-        "bound_tests_set_hash": "1ffe6d6f7640356af7711895b8995db8312f9861837b06cccc200a744cebf78f",
+        "anchor_text_hash": "eafd7380087aa4d7fccf2ae27e4113236f18aa4933e1e6f0f482d3ac269921c9",
+        "bound_tests_set_hash": "48cbde21f56bd3d796c3bddf4cf4cb5d597c37ac8e473cc15ae76bb9f37a4f1f",
         "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
       },
       "obligation_id": {
@@ -1405,7 +1405,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));",
+        "citation": "interactor.execute(&command(vec![path])).unwrap();\n    assert!(sink.saved.lock().unwrap().is_some());",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
@@ -1492,7 +1492,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
@@ -1502,12 +1502,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         }
       ],
       "edge_id": {
@@ -1518,8 +1518,8 @@
         "entry_key": "MethodDeclaration"
       },
       "key": {
-        "anchor_text_hash": "0334106b1c8ae37e2900444b351c0535147885c7f5325d7874274fdabf1d2121",
-        "bound_tests_set_hash": "270faa6bd5939d58a86cf44a956729a30d91e75188826fc7745b8544ca228d48",
+        "anchor_text_hash": "288db0cb689028066f79ec809a57019b87682cc23375253086c6aa1d282cdf5f",
+        "bound_tests_set_hash": "763692d531a54f5429b8c1745867b2129ab8a981262df2c96537eca02c92ac97",
         "declaration_hash": "c303505b114aa34a263206c36288fbdbe803216010d28ad49c7d3d395785f556"
       },
       "obligation_id": {
@@ -1528,7 +1528,7 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(\n        result,\n        Err(domain::tddd::test_obligation::errors::ObligationDeriveError::InvalidCatalogueState(_))\n    ));\n\n    assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n    assert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
+        "citation": "assert_eq!(\n        load.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\"]\n    );\n    assert_eq!(\n        save.spec_refs().iter().map(TestObligationAnchorId::element_id).collect::<Vec<_>>(),\n        vec![\"IN-01\", \"AC-01\"]\n    );",
         "kind": "fulfilled"
       },
       "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"

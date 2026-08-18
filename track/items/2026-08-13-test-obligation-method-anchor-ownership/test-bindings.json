@@ -12,17 +12,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         },
         {
           "layer": "usecase",
@@ -250,17 +250,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         }
       ]
     },
@@ -363,17 +363,17 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         }
       ]
     },
@@ -439,7 +439,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_outside_entry_is_rejected_as_invalid_catalogue_state"
+          "test_name": "test_trait_method_anchor_outside_entry_is_accepted"
         },
         {
           "layer": "usecase",
@@ -449,12 +449,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_trait_method_anchor_union_must_cover_entry_catalogue"
+          "test_name": "test_trait_method_anchor_union_need_not_cover_entry_catalogue"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::test_obligation::derive_tests",
-          "test_name": "test_single_method_non_empty_entry_requires_full_method_anchor_declaration"
+          "test_name": "test_single_method_partial_entry_refs_are_accepted"
         }
       ]
     },
