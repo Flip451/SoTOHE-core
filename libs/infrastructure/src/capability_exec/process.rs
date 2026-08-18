@@ -895,6 +895,23 @@ mod tests {
     }
 
     #[test]
+    fn test_grok_session_id_from_earlier_event_is_preserved()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("grok".to_owned())?;
+        let stdout = concat!(
+            "{\"type\":\"start\",\"sessionId\":\"early-session\"}\n",
+            "{\"structured_output\":{\"status\":\"ok\"}}\n",
+        );
+        let collected = collect_provider_output(Cursor::new(stdout.as_bytes()), &provider)?;
+        assert_eq!(collected.session_id.as_deref(), Some("early-session"));
+        assert_eq!(
+            collected.final_message.as_deref(),
+            Some(br#"{"structured_output":{"status":"ok"}}"#.as_slice()),
+        );
+        Ok(())
+    }
+
+    #[test]
     fn test_grok_pretty_printed_camel_case_structured_output_is_collected()
     -> Result<(), Box<dyn std::error::Error>> {
         let provider = ProviderName::try_new("grok".to_owned())?;
