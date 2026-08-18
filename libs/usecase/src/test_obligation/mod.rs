@@ -417,28 +417,28 @@ pub(crate) fn catalogue_artifact_path(path: &Path) -> String {
 ///
 /// Method refs are an independent owned set (0055 D1). An Add/Modify method
 /// may cite an AC/CN its parent entry does not cite; those ids still count.
-/// Delete methods, like Delete entries, do not contribute citations.
+/// Reference and Delete entries and methods do not contribute citations
+/// (0359 D13: they are outside the edge universe).
 #[must_use]
 pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> {
     use crate::catalogue_traversal::iter_catalogue_entries;
-    use domain::tddd::catalogue_v2::roles::ItemAction;
 
     let mut ids = Vec::new();
     for catalogue in catalogues {
         for entry in iter_catalogue_entries(catalogue) {
-            if matches!(entry.action, ItemAction::Delete) {
+            if !cited_action(entry.action) {
                 continue;
             }
             push_cited_anchor_ids(&mut ids, entry.spec_refs);
         }
         for entry in catalogue.types().values() {
-            if matches!(entry.action(), ItemAction::Delete) {
+            if !cited_action(entry.action()) {
                 continue;
             }
             push_method_cited_anchor_ids(&mut ids, entry.methods());
         }
         for entry in catalogue.traits().values() {
-            if matches!(entry.action(), ItemAction::Delete) {
+            if !cited_action(entry.action()) {
                 continue;
             }
             push_method_cited_anchor_ids(&mut ids, entry.methods());
@@ -447,13 +447,18 @@ pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> 
             let Some(owner) = catalogue.types().get(&inherent.type_name) else {
                 continue;
             };
-            if matches!(owner.action(), ItemAction::Delete) {
+            if !cited_action(owner.action()) {
                 continue;
             }
             push_method_cited_anchor_ids(&mut ids, &inherent.methods);
         }
     }
     ids
+}
+
+fn cited_action(action: domain::tddd::catalogue_v2::roles::ItemAction) -> bool {
+    use domain::tddd::catalogue_v2::roles::ItemAction;
+    matches!(action, ItemAction::Add | ItemAction::Modify)
 }
 
 fn push_cited_anchor_ids(ids: &mut Vec<String>, spec_refs: &[domain::SpecRef]) {
@@ -472,7 +477,7 @@ fn push_method_cited_anchor_ids(
     use domain::tddd::catalogue_v2::roles::ItemAction;
 
     for method in methods {
-        if matches!(method.action(), ItemAction::Delete) {
+        if matches!(method.action(), ItemAction::Delete | ItemAction::Reference) {
             continue;
         }
         push_cited_anchor_ids(ids, method.spec_refs());

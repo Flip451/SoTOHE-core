@@ -3410,6 +3410,28 @@
           "hash": "rvw1:sha256:b0eba85551863008d313d43163682dcb5b4c38fc1dba97c2e110591ed0b91b90",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T03:57:57Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 429,
+              "message": "cited_anchor_ids の entry ループが ItemAction::Delete のみを skip し、Reference entry の entry-level spec_refs を cited 集合に含めている。ADR 0359 D13 (Reference は edge 宇宙の外) および同モジュールの edge 会計 (check_support.rs:151-154 active_ref_action は Add/Modify entry のみ active ref edge を所有) と矛盾し、Reference entry だけが cite する AC/CN は edge ゼロ (verdict が一切要求されない) のまま uncited AC/CN 警報 (IN-16 の edge-zero 警報) が抑止される — 今回修正した Codex P0 (Reference method refs) と同一欠陥クラスの entry-level 残存。現 track の実カタログで AC-04 / AC-10 / AC-11 / AC-12 / CN-03 が Reference entry (例: usecase-types.json の PhaseCommandService) の entry-level spec_refs からのみ cite されており、この 5 anchor は現在 edge を持たず警報も出ない live な silent-drop 状態。修正方向は entry ループでの Delete | Reference skip (active_ref_action と同一述語の再利用)。適用時は上記 5 anchor の uncited finding が顕在化し、カタログ再 grounding (Phase 2 差し戻し) が連鎖し得る。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:0fe84b27524212807a89e4c5edd46a569ac24f167a6aead16aa3677469b8760a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T04:09:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d414613028d1159b0287aa83d00b9ebdfc52aaf32a6c31f152f41c101cffc14",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }

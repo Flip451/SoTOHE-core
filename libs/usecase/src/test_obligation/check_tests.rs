@@ -1606,6 +1606,60 @@ fn test_cited_anchor_ids_includes_method_only_refs() {
 }
 
 #[test]
+fn test_cited_anchor_ids_skips_reference_method_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![MethodDeclaration::new(
+                MethodName::new("shape").unwrap(),
+                None,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                false,
+                vec![],
+                vec![],
+                vec![SpecRef::new(
+                    PathBuf::from("spec.json"),
+                    SpecElementId::try_new("AC-98").unwrap(),
+                )],
+                ItemAction::Reference,
+                None,
+            )],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(!cited.contains(&"AC-98".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_skips_reference_entry_refs() {
+    let catalogue = money_catalogue_in_layer("domain", "domain", ItemAction::Reference);
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(!cited.contains(&"IN-05".to_owned()));
+}
+
+#[test]
 fn test_cited_anchor_ids_skips_delete_method_refs() {
     let mut catalogue = CatalogueDocument::new(
         5,
