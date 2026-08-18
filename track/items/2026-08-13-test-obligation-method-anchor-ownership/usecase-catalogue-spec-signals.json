@@ -1,0 +1,21 @@
+{
+  "catalogue_declaration_hash": "2347ebb20daf692c271e12dfd04ecebb8a285e885382079757c7674457e553b0",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "6274c4cbb41df788857bcf5636aad51f66cb35692f6143309ec55078e41251c0",
+      "signal": "blue",
+      "type_name": "DeriveTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "d4917027731187bb0a0b9eb56f65811547a4af5867450fa84a1a32a6fe1b1ac6",
+      "signal": "blue",
+      "type_name": "EvaluateTestObligationsInteractor"
+    },
+    {
+      "entry_hash": "6acd058df93bd01a82c6fadec9bbec3d95f475625ac34d6cb403aff636f3306a",
+      "signal": "blue",
+      "type_name": "PhaseCommandService"
+    }
+  ]
+}

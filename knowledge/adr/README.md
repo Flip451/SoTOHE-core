@@ -143,6 +143,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型配置是正における CLI 契約の維持](2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md) | Proposed | 2026-07-25 |
 | [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
 | [role × 層マトリクスを機構で強制し ValueObject の層勾配を是正する](2026-07-25-0538-role-layer-matrix-enforcement.md) | Proposed | 2026-07-25 |
+| [trait_method 義務の anchor 所有権を method 単位にする（テスト義務ゲート ADR の refinement）](2026-08-13-1720-test-obligation-method-anchor-ownership.md) | Proposed | 2026-08-13 |
+| [MethodDeclaration に action を導入し、義務対象 method を明示する](2026-08-17-0340-method-declaration-action.md) | Proposed | 2026-08-17 |
+| [親が reference / delete のとき子 Method の spec_refs を禁止する](2026-08-18-0040-parent-forbids-method-spec-refs.md) | Proposed | 2026-08-18 |
+| [entry-level spec_refs から総目録の役割を外す](2026-08-18-0055-entry-spec-refs-not-inventory.md) | Proposed | 2026-08-18 |
 
 ### トラック・ワークフロー
 

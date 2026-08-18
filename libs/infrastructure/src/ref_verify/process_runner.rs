@@ -183,7 +183,6 @@ fn run_ref_verifier_agent(
 /// settings expose them as defaults.
 const CLAUDE_REF_VERIFIER_STATIC_ARGS: &[&str] = &[
     "-p",
-    "--bare",
     "--permission-mode",
     "dontAsk",
     "--tools",
@@ -702,6 +701,10 @@ mod tests {
         let args =
             build_claude_ref_verifier_args("claude-opus-4-8", ReasoningEffort::Max, "the prompt");
         let strs: Vec<&str> = args.iter().filter_map(|s| s.to_str()).collect();
+        assert!(
+            !strs.contains(&"--bare"),
+            "--bare must not be passed; it rejects OAuth and blocks host-logged-in verify"
+        );
         assert!(strs.contains(&"--disallowedTools"));
         for tool in ["Read", "Grep", "Glob", "Bash", "Edit", "Write"] {
             assert!(strs.contains(&tool), "expected disallowed tool '{tool}'");

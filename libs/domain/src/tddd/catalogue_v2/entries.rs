@@ -668,6 +668,11 @@ mod tests {
             vec![],
             TypeRef::new("str").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         let field_ty = TypeRef::new("String").unwrap();
@@ -794,6 +799,11 @@ mod tests {
             )],
             TypeRef::new("Result<(), DomainError>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         let entry = TraitEntry::new(
@@ -1310,6 +1320,11 @@ mod tests {
             vec![],
             TypeRef::new("str").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         let method_b = MethodDeclaration::new(
@@ -1318,6 +1333,11 @@ mod tests {
             vec![],
             TypeRef::new("Result<(), DomainError>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
 

@@ -29,8 +29,9 @@ use super::status_lanes::{
     tally_findings, target_for_direct_edge, target_for_obligation, targets_for_scope,
 };
 use super::{
-    LoadedCatalogueDocument, diag, find_declaration_text_from_loaded,
-    obligation_declaration_text_from_loaded, sha256_content_hash,
+    LoadedCatalogueDocument, declaration_with_obligation_item, diag,
+    find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
+    sha256_content_hash,
 };
 
 /// Computes the informational missing / stale / verdict-absent totals without
@@ -150,6 +151,11 @@ fn collect_obligation_findings(
         })
         .collect::<Vec<_>>();
     let fulfilled = fulfillment_tests(bindings, obligation.id());
+    if edges.is_empty() {
+        // D1: owning no anchors is not a fulfillment gap. A fulfillment
+        // record is a structural orphan handled by `check`, not `missing`.
+        return Ok(());
+    }
     let any_voluntary = edges.iter().any(|edge| voluntary_tests(bindings, edge).is_some());
     let any_waived = edges.iter().any(|edge| waived_reason(bindings, edge).is_some());
     if fulfilled.is_none() && !any_voluntary && !any_waived {
@@ -160,8 +166,13 @@ fn collect_obligation_findings(
         if let Some(reason) = waived_reason(bindings, &edge) {
             inspect_waiver(
                 &edge,
+                obligation.id(),
                 &reason,
-                obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                declaration_with_obligation_item(
+                    &obligation_declaration_text_from_loaded(catalogues, obligation)
+                        .unwrap_or_default(),
+                    obligation.id().item_identifier().as_str(),
+                ),
                 &target,
                 spec_texts,
                 waiver,
@@ -173,7 +184,11 @@ fn collect_obligation_findings(
                 &edge,
                 obligation.id(),
                 tests,
-                obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                declaration_with_obligation_item(
+                    &obligation_declaration_text_from_loaded(catalogues, obligation)
+                        .unwrap_or_default(),
+                    obligation.id().item_identifier().as_str(),
+                ),
                 &target,
                 spec_texts,
                 fulfillment,
@@ -186,7 +201,11 @@ fn collect_obligation_findings(
                 &edge,
                 obligation.id(),
                 tests,
-                obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+                declaration_with_obligation_item(
+                    &obligation_declaration_text_from_loaded(catalogues, obligation)
+                        .unwrap_or_default(),
+                    obligation.id().item_identifier().as_str(),
+                ),
                 &target,
                 spec_texts,
                 fulfillment,
@@ -219,11 +238,13 @@ fn collect_direct_edge_findings(
     })?;
     let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
         .unwrap_or_default();
+    let synthetic_id = synthetic_voluntary_obligation_id(edge);
     if let Some(reason) = waived_reason(bindings, edge) {
         inspect_waiver(
             edge,
+            &synthetic_id,
             &reason,
-            declaration,
+            declaration_with_obligation_item(&declaration, synthetic_id.item_identifier().as_str()),
             &target,
             spec_texts,
             waiver,
@@ -233,9 +254,9 @@ fn collect_direct_edge_findings(
     } else if let Some(tests) = voluntary_tests(bindings, edge) {
         inspect_fulfillment(
             edge,
-            &synthetic_voluntary_obligation_id(edge),
+            &synthetic_id,
             tests,
-            declaration,
+            declaration_with_obligation_item(&declaration, synthetic_id.item_identifier().as_str()),
             &target,
             spec_texts,
             fulfillment,
@@ -304,6 +325,7 @@ fn inspect_fulfillment(
 #[allow(clippy::too_many_arguments)]
 fn inspect_waiver(
     edge: &TestObligationEdgeId,
+    obligation_id: &TestObligationId,
     reason: &WaivedReason,
     declaration: String,
     target: &StatusLaneTarget,
@@ -312,7 +334,11 @@ fn inspect_waiver(
     verifier_fingerprint: &VerifierPromptFingerprint,
     findings: &mut Vec<StatusLaneFinding>,
 ) {
-    let Some(entry) = cache.entries().iter().find(|entry| entry.edge_id() == edge) else {
+    let Some(entry) = cache
+        .entries()
+        .iter()
+        .find(|entry| entry.edge_id() == edge && entry.obligation_id() == Some(obligation_id))
+    else {
         findings.push(verdict_absent(target.clone()));
         return;
     };

@@ -716,6 +716,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Approved").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -806,6 +811,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("str").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         let m2 = MethodDeclaration::new(
@@ -814,6 +824,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("bool").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -1812,6 +1827,11 @@ include_function_roles = []
             vec![ParamDeclaration::new(ParamName::new("w").unwrap(), TypeRef::new("W").unwrap())],
             TypeRef::new("L").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -1963,6 +1983,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Result<ContractMapContent, ContractMapRendererError>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -2052,6 +2077,11 @@ include_function_roles = []
                 )],
                 TypeRef::new("()").unwrap(),
                 false,
+                false,
+                vec![],
+                vec![],
+                vec![],
+                ItemAction::Add,
                 None,
             );
             doc.insert_type(
@@ -2118,6 +2148,11 @@ include_function_roles = []
             ],
             TypeRef::new("Result<(), String>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -2186,6 +2221,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Self").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -2383,6 +2423,11 @@ include_function_roles = []
             )],
             TypeRef::new("Arc<dyn DeclaredPort>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_trait(
@@ -2531,6 +2576,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Arc<dyn std::fmt::Debug>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_trait(

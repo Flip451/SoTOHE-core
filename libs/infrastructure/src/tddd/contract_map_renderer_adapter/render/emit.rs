@@ -512,7 +512,7 @@ pub(super) fn emit_method_nodes<'a>(
     self_node_id: Option<&str>,
 ) -> Result<(), ContractMapRendererError> {
     for method in methods {
-        let method_name_str = method.name.as_str();
+        let method_name_str = method.name().as_str();
         let method_node_id = format!("{entry_sg_id}_{}", sanitize(method_name_str));
 
         // Method node shape from [node.Method].
@@ -535,7 +535,7 @@ pub(super) fn emit_method_nodes<'a>(
         // `edge_arrow_label` is deferred until we know an edge will be emitted
         // (fail-closed per CN-02 — missing [edge.method_param] only errors when
         // the key would actually be used).
-        for param in &method.params {
+        for param in method.params() {
             let target_ids = resolve_method_type_refs(
                 param.ty.as_str(),
                 node_index,
@@ -557,7 +557,7 @@ pub(super) fn emit_method_nodes<'a>(
         // (fail-closed per CN-02 — missing [edge.method_returns] / [edge.transition]
         // only errors when the key would actually be used).
         let returns_targets = resolve_method_type_refs(
-            method.returns.as_str(),
+            method.returns().as_str(),
             node_index,
             trait_index,
             current_crate,

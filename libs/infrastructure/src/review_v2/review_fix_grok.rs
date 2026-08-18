@@ -16,8 +16,8 @@ use usecase::review_v2::run_review_fix::{
 };
 
 use crate::capability_exec::grok::{build_grok_args, resolve_grok_capability_definition};
-use crate::capability_exec::process::run_command_with_bounded_output;
-use crate::grok_common::{GrokOutputEnvelope, GrokSandbox};
+use crate::capability_exec::process::run_grok_direct_command;
+use crate::grok_common::{GrokOutputEnvelope, GrokSandbox, GrokStreamedStdout};
 use crate::provider_session::FsProviderSessionCacheAdapter;
 
 fn parse_sentinel(output: &str) -> Option<&'static str> {
@@ -126,37 +126,36 @@ fn launch(
     let args = build_grok_args(model.as_str(), effort, sandbox, resume_id, prompt);
     let mut command = Command::new("grok");
     command.args(&args).current_dir(cwd);
-    let output = run_command_with_bounded_output(
+    let (status, collected) = run_grok_direct_command(
         &mut command,
         GROK_REVIEW_FIX_OUTPUT_LIMIT,
         GROK_REVIEW_FIX_TIMEOUT,
         "grok review-fix",
     )
     .map_err(|error| ReviewFixRunnerError::SpawnFailed(diagnostic(error.to_string())))?;
-    parse_output(&output.stdout, output.status.success())
+    parse_output(&collected, status.success())
 }
 
-fn parse_output(stdout: &[u8], exit_ok: bool) -> Result<LaunchOutput, ReviewFixRunnerError> {
-    if stdout.is_empty() {
+fn parse_output(
+    collected: &GrokStreamedStdout,
+    exit_ok: bool,
+) -> Result<LaunchOutput, ReviewFixRunnerError> {
+    let Some(envelope_bytes) = collected.envelope_bytes.as_deref() else {
         return Ok(LaunchOutput {
             exit_ok,
             result: None,
             failure_reason: Some(
                 "Grok review-fix returned no structured-output envelope".to_owned(),
             ),
-            session_id: None,
+            session_id: collected.session_id.clone(),
         });
-    }
-    let value: serde_json::Value = serde_json::from_slice(stdout).map_err(|error| {
+    };
+    let value: serde_json::Value = serde_json::from_slice(envelope_bytes).map_err(|error| {
         ReviewFixRunnerError::Unexpected(diagnostic(format!(
             "cannot decode Grok review-fix envelope: {error}"
         )))
     })?;
-    let session_id = value
-        .get("sessionId")
-        .or_else(|| value.get("session_id"))
-        .and_then(serde_json::Value::as_str)
-        .map(str::to_owned);
+    let session_id = collected.session_id.clone();
     let envelope: GrokOutputEnvelope = serde_json::from_value(value).map_err(|error| {
         ReviewFixRunnerError::Unexpected(diagnostic(format!(
             "cannot decode Grok review-fix envelope: {error}"

@@ -13,8 +13,8 @@ use usecase::provider_session::{
 };
 
 use crate::capability_exec::grok::{build_grok_args, resolve_grok_capability_definition};
-use crate::capability_exec::process::run_command_with_bounded_output;
-use crate::grok_common::{GrokOutputEnvelope, GrokSandbox};
+use crate::capability_exec::process::run_grok_direct_command;
+use crate::grok_common::{GrokOutputEnvelope, GrokSandbox, GrokStreamedStdout};
 use crate::provider_session::FsProviderSessionCacheAdapter;
 
 use super::{dry_fix_sentinel_to_exit_code, parse_dry_fix_sentinel};
@@ -98,33 +98,31 @@ fn launch_grok(
     let args = build_grok_args(model, effort, sandbox, resume_id, prompt);
     let mut command = Command::new("grok");
     command.args(&args).current_dir(cwd);
-    let output = run_command_with_bounded_output(
+    let (status, collected) = run_grok_direct_command(
         &mut command,
         GROK_DRY_FIX_OUTPUT_LIMIT,
         GROK_DRY_FIX_TIMEOUT,
         "grok dry-fix",
     )
     .map_err(|error| format!("failed to spawn grok dry-fix: {error}"))?;
-    let exit_ok = output.status.success();
-    parse_launch_output(&output.stdout, exit_ok)
+    parse_launch_output(&collected, status.success())
 }
 
-fn parse_launch_output(stdout: &[u8], exit_ok: bool) -> Result<GrokLaunchOutput, String> {
-    if stdout.is_empty() {
+fn parse_launch_output(
+    collected: &GrokStreamedStdout,
+    exit_ok: bool,
+) -> Result<GrokLaunchOutput, String> {
+    let Some(envelope_bytes) = collected.envelope_bytes.as_deref() else {
         return Ok(GrokLaunchOutput {
             exit_ok,
             result: None,
             failure_reason: Some("Grok dry-fix returned no structured-output envelope".to_owned()),
-            session_id: None,
+            session_id: collected.session_id.clone(),
         });
-    }
-    let value: serde_json::Value = serde_json::from_slice(stdout)
+    };
+    let value: serde_json::Value = serde_json::from_slice(envelope_bytes)
         .map_err(|error| format!("cannot decode Grok dry-fix envelope: {error}"))?;
-    let session_id = value
-        .get("sessionId")
-        .or_else(|| value.get("session_id"))
-        .and_then(serde_json::Value::as_str)
-        .map(str::to_owned);
+    let session_id = collected.session_id.clone();
     let envelope: GrokOutputEnvelope = serde_json::from_value(value)
         .map_err(|error| format!("cannot decode Grok dry-fix envelope: {error}"))?;
     match envelope {
