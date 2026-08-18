@@ -146,6 +146,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [trait_method 義務の anchor 所有権を method 単位にする（テスト義務ゲート ADR の refinement）](2026-08-13-1720-test-obligation-method-anchor-ownership.md) | Proposed | 2026-08-13 |
 | [MethodDeclaration に action を導入し、義務対象 method を明示する](2026-08-17-0340-method-declaration-action.md) | Proposed | 2026-08-17 |
 | [親が reference / delete のとき子 Method の spec_refs を禁止する](2026-08-18-0040-parent-forbids-method-spec-refs.md) | Proposed | 2026-08-18 |
+| [entry-level spec_refs から総目録の役割を外す](2026-08-18-0055-entry-spec-refs-not-inventory.md) | Proposed | 2026-08-18 |
 
 ### トラック・ワークフロー
 
