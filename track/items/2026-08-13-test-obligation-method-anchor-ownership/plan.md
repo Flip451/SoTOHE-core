@@ -6,7 +6,7 @@
 GO-01 → T1, T2, T3, T4, T5, T6, T7, T8, T9, T12, T13, T11, T14, T15, T16, T17.
 GO-02 → T1, T2, T3, T10, T11, T14.
 
-## Tasks (14/17 resolved)
+## Tasks (17/17 resolved)
 
 ### method-declaration-staging — MethodDeclaration staging and cutover
 
@@ -51,6 +51,6 @@ GO-02 → T1, T2, T3, T10, T11, T14.
 
 > Targets: libs/domain/src/tddd/test_obligation/obligations.rs, libs/usecase/src/test_obligation/derive_tests.rs, libs/usecase/src/test_obligation/derive/mod.rs, and track/items/2026-08-13-test-obligation-method-anchor-ownership/obligation-fulfillment-cache.json. Operation: remove inventory enforcement, update and add tests, and refresh the obligation cache. Anchors: AC-02, IN-02, CN-01, CN-03, AC-04, OS-04.
 
-- [~] **T15**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and its domain tests. Operation: remove inventory enforcement from validate_method_anchor_coverage; keep the 0340 D2 and 0040 D1 validator calls; update inventory-reject tests and add accept tests for method refs outside the entry set and for non-covering method refs. Anchors: AC-02, IN-02, CN-01.
-- [ ] **T16**: Targets: libs/usecase/src/test_obligation/derive_tests.rs and libs/usecase/src/test_obligation/derive/mod.rs. Operation: update inventory-reject tests, add accept tests for a named catalogue whose method refs are outside the entry set or do not cover the entry set, and drop inventory restatement at the derive call site. Anchors: AC-02, IN-02, CN-01.
-- [ ] **T17**: Targets: track/items/2026-08-13-test-obligation-method-anchor-ownership/obligation-fulfillment-cache.json. Operation: re-evaluate and refresh the obligation cache. Anchors: AC-02, AC-04, CN-03, OS-04.
+- [x] **T15**: Targets: libs/domain/src/tddd/test_obligation/obligations.rs and its domain tests. Operation: remove inventory enforcement from validate_method_anchor_coverage; keep the 0340 D2 and 0040 D1 validator calls; update inventory-reject tests and add accept tests for method refs outside the entry set and for non-covering method refs. Anchors: AC-02, IN-02, CN-01. (`849629e2`)
+- [x] **T16**: Targets: libs/usecase/src/test_obligation/derive_tests.rs and libs/usecase/src/test_obligation/derive/mod.rs. Operation: update inventory-reject tests, add accept tests for a named catalogue whose method refs are outside the entry set or do not cover the entry set, and drop inventory restatement at the derive call site. Anchors: AC-02, IN-02, CN-01. (`849629e2`)
+- [x] **T17**: Targets: track/items/2026-08-13-test-obligation-method-anchor-ownership/obligation-fulfillment-cache.json. Operation: re-evaluate and refresh the obligation cache. Anchors: AC-02, AC-04, CN-03, OS-04. (`849629e2`)

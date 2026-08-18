@@ -165,26 +165,29 @@
       "status": "done"
     },
     {
+      "commit_hash": "849629e2",
       "description": "Targets: libs/domain/src/tddd/test_obligation/obligations.rs and its domain tests. Operation: remove inventory enforcement from validate_method_anchor_coverage; keep the 0340 D2 and 0040 D1 validator calls; update inventory-reject tests and add accept tests for method refs outside the entry set and for non-covering method refs. Anchors: AC-02, IN-02, CN-01.",
       "id": "T15",
-      "status": "in_progress"
+      "status": "done"
     },
     {
+      "commit_hash": "849629e2",
       "depends_on": [
         "T15"
       ],
       "description": "Targets: libs/usecase/src/test_obligation/derive_tests.rs and libs/usecase/src/test_obligation/derive/mod.rs. Operation: update inventory-reject tests, add accept tests for a named catalogue whose method refs are outside the entry set or do not cover the entry set, and drop inventory restatement at the derive call site. Anchors: AC-02, IN-02, CN-01.",
       "id": "T16",
-      "status": "todo"
+      "status": "done"
     },
     {
+      "commit_hash": "849629e2",
       "depends_on": [
         "T15",
         "T16"
       ],
       "description": "Targets: track/items/2026-08-13-test-obligation-method-anchor-ownership/obligation-fulfillment-cache.json. Operation: re-evaluate and refresh the obligation cache. Anchors: AC-02, AC-04, CN-03, OS-04.",
       "id": "T17",
-      "status": "todo"
+      "status": "done"
     }
   ]
 }
