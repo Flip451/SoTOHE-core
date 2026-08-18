@@ -1,7 +1,12 @@
 //! Shared types for the Grok provider adapter.
 
+use std::io::{BufRead, BufReader, Read};
+
 use serde::{Deserialize, Deserializer};
 use usecase::capability_exec::CapabilityFailureDetail;
+
+/// Per-event retention for Grok NDJSON while draining a verbose stdout stream.
+const MAX_GROK_STREAM_EVENT_BYTES: usize = 256 * 1024;
 
 const MISSING_STRUCTURED_OUTPUT: &str = "structured output is missing from the Grok envelope";
 
@@ -201,6 +206,134 @@ fn is_grok_stream_result_or_failure(line: &str) -> bool {
     structured_output_value(&value).is_some()
         || value.get("failure_reason").is_some_and(|reason| !reason.is_null())
         || value.get("type").and_then(serde_json::Value::as_str) == Some("error")
+}
+
+/// Session metadata and the last structured-result or failure envelope retained
+/// while draining Grok stdout. Cumulative volume is not a failure.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct GrokStreamedStdout {
+    pub(crate) session_id: Option<String>,
+    pub(crate) envelope_bytes: Option<Vec<u8>>,
+}
+
+/// Drains Grok stdout while keeping only session metadata and a bounded final
+/// envelope candidate. Earlier tool/text events are not retained.
+///
+/// # Errors
+///
+/// Returns an I/O error when reading the pipe fails.
+pub(crate) fn collect_grok_stdout_stream<R: Read>(
+    pipe: R,
+) -> Result<GrokStreamedStdout, std::io::Error> {
+    let mut reader = BufReader::new(pipe);
+    let mut session_id = None;
+    let mut envelope_bytes = None;
+    let mut document = Vec::new();
+    let mut event = Vec::new();
+    let mut discarding_event = false;
+    let mut document_overflow = false;
+
+    loop {
+        let buffer = reader.fill_buf()?;
+        if buffer.is_empty() {
+            break;
+        }
+        let newline = buffer.iter().position(|byte| *byte == b'\n');
+        let event_bytes = newline.unwrap_or(buffer.len());
+        let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
+        if !discarding_event {
+            let remaining = MAX_GROK_STREAM_EVENT_BYTES.saturating_sub(event.len());
+            if event_bytes <= remaining {
+                if let Some(part) = buffer.get(..event_bytes) {
+                    event.extend_from_slice(part);
+                }
+            } else {
+                discarding_event = true;
+            }
+        }
+        reader.consume(consumed);
+        if newline.is_some() {
+            admit_grok_stream_event(
+                &event,
+                discarding_event,
+                &mut session_id,
+                &mut envelope_bytes,
+                &mut document,
+                &mut document_overflow,
+            );
+            event.clear();
+            discarding_event = false;
+        }
+    }
+    admit_grok_stream_event(
+        &event,
+        discarding_event,
+        &mut session_id,
+        &mut envelope_bytes,
+        &mut document,
+        &mut document_overflow,
+    );
+    if envelope_bytes.is_none() && !document_overflow {
+        if session_id.is_none() {
+            session_id = extract_grok_session_id(&document);
+        }
+        envelope_bytes = pretty_printed_grok_envelope(&document);
+    }
+    Ok(GrokStreamedStdout { session_id, envelope_bytes })
+}
+
+fn admit_grok_stream_event(
+    event: &[u8],
+    discarding_event: bool,
+    session_id: &mut Option<String>,
+    envelope_bytes: &mut Option<Vec<u8>>,
+    document: &mut Vec<u8>,
+    document_overflow: &mut bool,
+) {
+    if discarding_event {
+        *document_overflow = true;
+        return;
+    }
+    if event.is_empty() {
+        return;
+    }
+    if session_id.is_none() {
+        *session_id = extract_grok_session_id(event);
+    }
+    if let Ok(line) = std::str::from_utf8(event) {
+        let line = line.trim();
+        if is_grok_stream_result_or_failure(line) {
+            *envelope_bytes = Some(line.as_bytes().to_vec());
+            return;
+        }
+    }
+    if envelope_bytes.is_some() || *document_overflow {
+        return;
+    }
+    let extra = if document.is_empty() { 0 } else { 1 };
+    if document.len().saturating_add(extra).saturating_add(event.len())
+        > MAX_GROK_STREAM_EVENT_BYTES
+    {
+        *document_overflow = true;
+        document.clear();
+        return;
+    }
+    if extra == 1 {
+        document.push(b'\n');
+    }
+    document.extend_from_slice(event);
+}
+
+fn pretty_printed_grok_envelope(event: &[u8]) -> Option<Vec<u8>> {
+    let text = std::str::from_utf8(event).ok()?;
+    let trimmed = text.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    serde_json::from_str::<serde_json::Value>(trimmed)
+        .ok()
+        .filter(serde_json::Value::is_object)
+        .map(|_| trimmed.as_bytes().to_vec())
 }
 
 fn missing_structured_output_failure() -> CapabilityFailureDetail {
@@ -536,6 +669,39 @@ mod tests {
                 failure_reason: CapabilityFailureDetail::new(MISSING_STRUCTURED_OUTPUT),
             }),
         );
+        Ok(())
+    }
+
+    #[test]
+    fn test_collect_grok_stdout_stream_keeps_early_session_and_late_envelope()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut stdout = b"{\"type\":\"start\",\"sessionId\":\"early-session\"}\n".to_vec();
+        stdout.extend(std::iter::repeat_n(b'x', MAX_GROK_STREAM_EVENT_BYTES.saturating_add(64)));
+        stdout.extend_from_slice(b"\n{\"structured_output\":{\"result\":\"ok\"}}\n");
+
+        let collected = collect_grok_stdout_stream(stdout.as_slice())?;
+        assert_eq!(collected.session_id.as_deref(), Some("early-session"));
+        assert_eq!(
+            collected.envelope_bytes.as_deref(),
+            Some(br#"{"structured_output":{"result":"ok"}}"#.as_slice()),
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_collect_grok_stdout_stream_keeps_pretty_printed_envelope()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let stdout = br#"{
+  "sessionId": "pretty-session",
+  "structuredOutput": {
+    "result": "OK"
+  }
+}"#;
+        let collected = collect_grok_stdout_stream(stdout.as_slice())?;
+        assert_eq!(collected.session_id.as_deref(), Some("pretty-session"));
+        let envelope: GrokOutputEnvelope =
+            serde_json::from_slice(collected.envelope_bytes.as_deref().ok_or("envelope")?)?;
+        assert_eq!(envelope.into_structured_output()?, serde_json::json!({"result": "OK"}));
         Ok(())
     }
 }

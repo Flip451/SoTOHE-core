@@ -1808,6 +1808,35 @@
           "hash": "rvw1:sha256:e733ed388d3bd0d08fd8f1c3d550534f1077f84258199e3c5b92b23cc104a2c5",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T04:48:15Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "レビュー対象ファイル、briefing、scope-specific severity policy、CURRENT diff を読み込めませんでした。read-only sandbox の shell 実行が `bwrap: No permissions to create new namespace` で失敗したため、信頼できるレビュー verdict を生成できません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ddbd07dd78c75539648f7825d720ba770b63a4def0c40dc9f087e4128abaf2a9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T04:53:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddbd07dd78c75539648f7825d720ba770b63a4def0c40dc9f087e4128abaf2a9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T05:00:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3706747d3aa76e50477e73ee30bddadb9445f6b5da55a8052e205eb99ace96a",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },

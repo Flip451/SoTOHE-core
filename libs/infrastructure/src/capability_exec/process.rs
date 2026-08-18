@@ -71,6 +71,73 @@ pub(crate) fn run_command_with_bounded_output(
     Ok(BoundedCommandOutput { status, stdout: stdout.bytes, stderr: stderr.bytes })
 }
 
+/// Runs a Grok direct-launch subprocess, draining both pipes to completion.
+///
+/// Stdout is stream-parsed for session metadata and a bounded final envelope
+/// candidate. Cumulative stdout or stderr volume is not a failure.
+pub(crate) fn run_grok_direct_command(
+    command: &mut Command,
+    stderr_maximum_bytes: usize,
+    timeout: Duration,
+    label: &str,
+) -> Result<(std::process::ExitStatus, crate::grok_common::GrokStreamedStdout), std::io::Error> {
+    command.stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
+    configure_process_group(command);
+    let mut child = command.spawn()?;
+    let process_id = child.id();
+    let stdout = child.stdout.take().ok_or_else(|| {
+        Error::new(ErrorKind::BrokenPipe, format!("{label} subprocess stdout was not captured"))
+    })?;
+    let stderr = child.stderr.take().ok_or_else(|| {
+        Error::new(ErrorKind::BrokenPipe, format!("{label} subprocess stderr was not captured"))
+    })?;
+    let stdout_reader = spawn_grok_stdout_reader(stdout);
+    let stderr_reader = spawn_bounded_pipe_reader(stderr, stderr_maximum_bytes);
+    let status = wait_for_bounded_command(&mut child, process_id, timeout, label)?;
+    let stdout = receive_grok_stdout(stdout_reader, process_id, label)?;
+    let _stderr = receive_bounded_pipe(stderr_reader, process_id, label, "stderr")?;
+    Ok((status, stdout))
+}
+
+fn spawn_grok_stdout_reader(
+    pipe: impl Read + Send + 'static,
+) -> Receiver<Result<crate::grok_common::GrokStreamedStdout, std::io::Error>> {
+    let (sender, receiver) = mpsc::sync_channel(1);
+    thread::spawn(move || {
+        let _ = sender.send(crate::grok_common::collect_grok_stdout_stream(pipe));
+    });
+    receiver
+}
+
+fn receive_grok_stdout(
+    receiver: Receiver<Result<crate::grok_common::GrokStreamedStdout, std::io::Error>>,
+    process_id: u32,
+    label: &str,
+) -> Result<crate::grok_common::GrokStreamedStdout, std::io::Error> {
+    match receiver.recv_timeout(BOUNDED_COMMAND_DRAIN_TIMEOUT) {
+        Ok(Ok(output)) => Ok(output),
+        Ok(Err(error)) => {
+            Err(Error::new(error.kind(), format!("cannot read {label} stdout: {error}")))
+        }
+        Err(RecvTimeoutError::Timeout) => {
+            let termination_detail = terminate_bounded_process_group(process_id)
+                .err()
+                .map(|error| format!("; process-tree termination also failed: {error}"))
+                .unwrap_or_default();
+            Err(Error::new(
+                ErrorKind::TimedOut,
+                format!(
+                    "{label} stdout reader did not close within {} seconds after the subprocess exited{termination_detail}",
+                    BOUNDED_COMMAND_DRAIN_TIMEOUT.as_secs()
+                ),
+            ))
+        }
+        Err(RecvTimeoutError::Disconnected) => {
+            Err(Error::other(format!("{label} stdout reader thread disconnected")))
+        }
+    }
+}
+
 fn spawn_bounded_pipe_reader(
     pipe: impl Read + Send + 'static,
     maximum_bytes: usize,
