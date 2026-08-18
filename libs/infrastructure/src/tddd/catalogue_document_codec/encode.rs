@@ -360,27 +360,29 @@ fn method_decl_to_dto_with_outer_generics(
     m: &MethodDeclaration,
     outer_generic_names: &[&str],
 ) -> Result<MethodDeclarationDto, CatalogueDocumentCodecError> {
-    validate_generic_params_for_encode(m.name.as_str(), &m.generics, outer_generic_names)?;
+    validate_generic_params_for_encode(m.name().as_str(), m.generics(), outer_generic_names)?;
     let generic_names = outer_generic_names
         .iter()
         .copied()
-        .chain(m.generics.iter().map(|generic| generic.name.as_str()))
+        .chain(m.generics().iter().map(|generic| generic.name.as_str()))
         .collect::<Vec<_>>();
     let where_predicates = m
-        .where_predicates
+        .where_predicates()
         .iter()
         .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
         .collect::<Result<_, _>>()?;
     Ok(MethodDeclarationDto {
-        name: m.name.as_str().to_owned(),
-        receiver: m.receiver.map(|r| r.to_string()),
-        params: m.params.iter().map(param_decl_to_dto).collect(),
-        returns: m.returns.as_str().to_owned(),
-        is_async: m.is_async,
-        has_default_impl: m.has_default_impl,
-        generics: method_generic_params_to_dtos(&m.generics),
+        name: m.name().as_str().to_owned(),
+        receiver: m.receiver().map(|r| r.to_string()),
+        params: m.params().iter().map(param_decl_to_dto).collect(),
+        returns: m.returns().as_str().to_owned(),
+        is_async: m.is_async(),
+        has_default_impl: m.has_default_impl(),
+        generics: method_generic_params_to_dtos(m.generics()),
         where_predicates,
-        docs: m.docs.clone(),
+        docs: m.docs().map(|docs| docs.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(m.spec_refs()),
+        action: m.action().to_string(),
     })
 }
 

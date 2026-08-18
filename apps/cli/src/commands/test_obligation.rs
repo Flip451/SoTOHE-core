@@ -312,22 +312,28 @@ mod tests {
     }
 
     const OBLIGATION_TRACK_ID: &str = "test-obligation-fulfillment-gate-2026-07-07";
+    /// Active-track derive fixture. Completed-track catalogues are not a derive input.
+    const DERIVE_TRACK_ID: &str = "2026-08-13-test-obligation-method-anchor-ownership";
 
     fn source_root() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
     }
 
-    fn source_track_dir() -> PathBuf {
-        source_root().join("track/items").join(OBLIGATION_TRACK_ID)
+    fn source_track_dir_for(track_id: &str) -> PathBuf {
+        source_root().join("track/items").join(track_id)
     }
 
-    fn copy_track_fixture_file(workspace_root: &Path, name: &str) {
-        let target = workspace_root.join("track/items").join(OBLIGATION_TRACK_ID).join(name);
+    fn copy_track_fixture_file_for(workspace_root: &Path, track_id: &str, name: &str) {
+        let target = workspace_root.join("track/items").join(track_id).join(name);
         fs::create_dir_all(target.parent().unwrap()).unwrap();
-        fs::copy(source_track_dir().join(name), target).unwrap();
+        fs::copy(source_track_dir_for(track_id).join(name), target).unwrap();
     }
 
     fn fixture_workspace(track_files: &[&str]) -> tempfile::TempDir {
+        fixture_workspace_for(OBLIGATION_TRACK_ID, track_files)
+    }
+
+    fn fixture_workspace_for(track_id: &str, track_files: &[&str]) -> tempfile::TempDir {
         let temp_root = source_root().canonicalize().unwrap().join("tmp");
         fs::create_dir_all(&temp_root).unwrap();
         let temp = tempfile::Builder::new()
@@ -340,19 +346,18 @@ mod tests {
         fs::copy(source_root().join(".harness/config/test-obligation-rules.json"), config_path)
             .unwrap();
         for name in track_files {
-            copy_track_fixture_file(&workspace_root, name);
+            copy_track_fixture_file_for(&workspace_root, track_id, name);
         }
         temp
     }
 
-    fn materialize_active_track_metadata(workspace_root: &Path) {
-        let metadata_path =
-            workspace_root.join("track/items").join(OBLIGATION_TRACK_ID).join("metadata.json");
+    fn materialize_active_track_metadata_for(workspace_root: &Path, track_id: &str) {
+        let metadata_path = workspace_root.join("track/items").join(track_id).join("metadata.json");
         fs::create_dir_all(metadata_path.parent().unwrap()).unwrap();
         let metadata = serde_json::json!({
             "schema_version": 6,
-            "id": OBLIGATION_TRACK_ID,
-            "branch": format!("track/{OBLIGATION_TRACK_ID}"),
+            "id": track_id,
+            "branch": format!("track/{track_id}"),
             "title": "CLI test-obligation fixture",
             "created_at": "2026-08-01T00:00:00Z",
             "updated_at": "2026-08-01T00:00:00Z",
@@ -638,23 +643,26 @@ mod tests {
 
     #[test]
     fn test_execute_derive_valid_track_materializes_obligations() {
-        let temp = fixture_workspace(&[
-            "spec.json",
-            "domain-types.json",
-            "usecase-types.json",
-            "infrastructure-types.json",
-            "cli_composition-types.json",
-            "cli_driver-types.json",
-            "cli-types.json",
-        ]);
+        let temp = fixture_workspace_for(
+            DERIVE_TRACK_ID,
+            &[
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli_composition-types.json",
+                "cli_driver-types.json",
+                "cli-types.json",
+            ],
+        );
         let workspace_root = temp.path().join("workspace");
-        materialize_active_track_metadata(&workspace_root);
+        materialize_active_track_metadata_for(&workspace_root, DERIVE_TRACK_ID);
         let expected_artifact =
-            workspace_root.join("track/items").join(OBLIGATION_TRACK_ID).join("obligations.json");
+            workspace_root.join("track/items").join(DERIVE_TRACK_ID).join("obligations.json");
 
         let exit = execute_derive_with(
-            &TestObligationDeriveArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },
-            || Ok((fixture_root(&workspace_root), format!("track/{OBLIGATION_TRACK_ID}"))),
+            &TestObligationDeriveArgs { track_id: Some(DERIVE_TRACK_ID.to_owned()) },
+            || Ok((fixture_root(&workspace_root), format!("track/{DERIVE_TRACK_ID}"))),
             |root, input| driver_outcome_to_exit(root.derive_handler().handle(input)),
         );
 
@@ -664,28 +672,31 @@ mod tests {
 
     #[test]
     fn test_derive_then_check_real_catalogues_does_not_report_stale_obligations() {
-        let temp = fixture_workspace(&[
-            "spec.json",
-            "domain-types.json",
-            "usecase-types.json",
-            "infrastructure-types.json",
-            "cli_composition-types.json",
-            "cli_driver-types.json",
-            "cli-types.json",
-            "test-bindings.json",
-        ]);
+        let temp = fixture_workspace_for(
+            DERIVE_TRACK_ID,
+            &[
+                "spec.json",
+                "domain-types.json",
+                "usecase-types.json",
+                "infrastructure-types.json",
+                "cli_composition-types.json",
+                "cli_driver-types.json",
+                "cli-types.json",
+                "test-bindings.json",
+            ],
+        );
         let workspace_root = temp.path().join("workspace");
-        materialize_active_track_metadata(&workspace_root);
+        materialize_active_track_metadata_for(&workspace_root, DERIVE_TRACK_ID);
 
         let derive_exit = execute_derive_with(
-            &TestObligationDeriveArgs { track_id: Some(OBLIGATION_TRACK_ID.to_owned()) },
-            || Ok((fixture_root(&workspace_root), format!("track/{OBLIGATION_TRACK_ID}"))),
+            &TestObligationDeriveArgs { track_id: Some(DERIVE_TRACK_ID.to_owned()) },
+            || Ok((fixture_root(&workspace_root), format!("track/{DERIVE_TRACK_ID}"))),
             |root, input| driver_outcome_to_exit(root.derive_handler().handle(input)),
         );
         assert_eq!(derive_exit, ExitCode::SUCCESS);
 
         let check_input = TestObligationCheckInput::try_from_raw(
-            Some(OBLIGATION_TRACK_ID.to_owned()),
+            Some(DERIVE_TRACK_ID.to_owned()),
             BRANCH_NOT_READ.to_owned(),
         )
         .unwrap();

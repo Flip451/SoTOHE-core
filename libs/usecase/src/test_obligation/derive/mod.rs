@@ -1,13 +1,9 @@
 //! `bin/sotp test-obligation derive` — deterministic obligation projection.
 //!
-//! [`DeriveTestObligationsInteractor`] projects `(catalogue, spec, rules) →
-//! obligations` (IN-07 / CN-06). Obligations are generated for `Add` / `Modify`
-//! entries only (`Reference` is outside the edge universe, `Delete` yields zero —
-//! CN-11 / AC-17). Each role resolves to a decision-table section whose per-axis
-//! rules are interpreted by an exhaustive Rust `match` (CN-10 / CN-16), and
-//! `trait_impls` rules resolve a `trait_ref` to its catalogue `TraitEntry`'s
-//! `ContractRole` (external traits → explicit zero — IN-17 / AC-16). Obligation
-//! identity is `(entry key, kind, item identifier)` only (CN-01 / AC-03).
+//! Add/Modify entries emit full role axes; Reference/Delete entries emit only
+//! Add/Modify method axes (IN-13 / AC-14). Trait_impls resolve `trait_ref` to
+//! a catalogue `TraitEntry` role (external → zero). Identity is
+//! `(entry key, kind, item identifier)`.
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -17,7 +13,7 @@ use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
     CatalogueDocumentLoaderPort, TrackStatusReaderPort,
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
-use domain::tddd::catalogue_v2::{CatalogueDocument, TraitRefScope};
+use domain::tddd::catalogue_v2::{CatalogueDocument, MethodDeclaration, TraitRefScope};
 use domain::tddd::semantic_verify::{CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::errors::{ObligationDeriveError, TrackStatusReadFailureKind};
 use domain::tddd::test_obligation::hashes::DeclarationHash;
@@ -25,7 +21,10 @@ use domain::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationId,
     TestObligationItemIdentifier,
 };
-use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
+use domain::tddd::test_obligation::obligations::{
+    ObligationsDocument, TestObligation, validate_add_modify_methods_have_spec_refs,
+    validate_parent_forbids_method_spec_refs,
+};
 use domain::tddd::test_obligation::ports::{
     ObligationsArtifactPort, TestObligationRulesLoaderPort,
 };
@@ -43,6 +42,8 @@ use super::{
     TestObligationCatalogueCommandInput, catalogue_artifact_path, diag, is_active_branch,
     sha256_content_hash,
 };
+
+mod inherent;
 
 /// Command input for [`DeriveTestObligationsApplicationService`] (IN-07).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -65,8 +66,9 @@ pub trait DeriveTestObligationsApplicationService {
     /// # Errors
     ///
     /// Returns [`ObligationDeriveError`] when the branch is not the active track
-    /// branch, the rules / spec / catalogue cannot be loaded, or the derived
-    /// artifact cannot be written.
+    /// branch, the rules / spec / catalogue cannot be loaded, a derivable
+    /// `TraitEntry` fails method-anchor coverage, or the derived artifact
+    /// cannot be written.
     fn execute(&self, cmd: &DeriveTestObligationsCommand) -> Result<(), ObligationDeriveError>;
 }
 
@@ -140,6 +142,15 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
             catalogues.push((path.clone(), doc));
         }
 
+        // Write-side named-catalogue checks (Add/Modify spec_refs and
+        // Reference/Delete parent bans). The shared projection below is also
+        // used by read-only `check`, which must not retroactively reject
+        // enrolled catalogues.
+        for (_, catalogue) in &catalogues {
+            validate_named_catalogue_methods(catalogue)
+                .map_err(ObligationDeriveError::InvalidCatalogueState)?;
+        }
+
         let document = derive_obligations_document(
             input.track_id().clone(),
             &rules,
@@ -156,6 +167,8 @@ impl DeriveTestObligationsApplicationService for DeriveTestObligationsInteractor
 ///
 /// Both the write-side derive command and the read-only check gate use this
 /// projection, so their definition of the expected artifact cannot diverge.
+/// Named-catalogue method checks are applied only on the write-side derive
+/// path so `check` can re-derive without rejecting enrolled catalogues.
 pub(crate) fn derive_obligations_document(
     track_id: domain::TrackId,
     rules: &TestObligationRulesDocument,
@@ -177,16 +190,50 @@ pub(crate) fn derive_obligations_document(
             &trait_roles,
             &mut obligations,
         )?;
+        inherent::derive_inherent_impl_obligations(
+            rules,
+            projector,
+            catalogue,
+            &file_path,
+            &mut obligations,
+        )?;
     }
     Ok(ObligationsDocument::new(track_id, obligations))
 }
 
-/// Whether an entry's change action participates in obligation derivation.
-///
-/// Only `Add` / `Modify` do (CN-11 / AC-17): `Reference` is outside the edge
-/// universe and `Delete` yields zero obligations.
-fn is_derivable(action: ItemAction) -> bool {
+/// Whether a parent entry emits its full role axes (Add / Modify).
+pub(super) fn is_derivable(action: ItemAction) -> bool {
     matches!(action, ItemAction::Add | ItemAction::Modify)
+}
+
+fn is_method_axis(axis: &TestObligationPerAxis) -> bool {
+    matches!(axis, TestObligationPerAxis::Method | TestObligationPerAxis::TraitMethod)
+}
+
+/// Write-side Add/Modify and parent-action checks for named-catalogue traits,
+/// types, and inherent impls.
+fn validate_named_catalogue_methods(
+    catalogue: &CatalogueDocument,
+) -> Result<(), DiagnosticMessage> {
+    for entry in catalogue.traits().values() {
+        validate_add_modify_methods_have_spec_refs(entry.methods())?;
+        validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
+    }
+    for entry in catalogue.types().values() {
+        validate_add_modify_methods_have_spec_refs(entry.methods())?;
+        validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
+    }
+    for inherent in catalogue.inherent_impls() {
+        validate_add_modify_methods_have_spec_refs(&inherent.methods)?;
+        let Some(owner) = catalogue.types().get(&inherent.type_name) else {
+            return Err(diag(&format!(
+                "inherent_impl type_name '{}' is not in the named catalogue",
+                inherent.type_name.as_str(),
+            )));
+        };
+        validate_parent_forbids_method_spec_refs(owner.action(), &inherent.methods)?;
+    }
+    Ok(())
 }
 
 /// Trait metadata needed to derive obligations for matching `trait_impl`s.
@@ -248,9 +295,7 @@ fn derive_type_obligations(
     out: &mut Vec<TestObligation>,
 ) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.types() {
-        if !is_derivable(entry.action()) {
-            continue;
-        }
+        let method_axes_only = !is_derivable(entry.action());
         let entry_key = catalogue_key(name.as_str())?;
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
@@ -269,11 +314,13 @@ fn derive_type_obligations(
                 &role_kind,
                 &decl_hash,
                 &anchors,
+                entry.methods(),
                 out,
+                method_axes_only,
                 |axis| projector.data_role_items(entry, axis),
             )?;
         }
-        if projector.type_has_typestate(entry) {
+        if !method_axes_only && projector.type_has_typestate(entry) {
             if let Some(pattern_rules) = find_pattern_rules(rules) {
                 emit_rules(
                     pattern_rules,
@@ -282,7 +329,9 @@ fn derive_type_obligations(
                     &role_kind,
                     &decl_hash,
                     &anchors,
+                    entry.methods(),
                     out,
+                    false,
                     |axis| projector.typestate_items(entry, axis),
                 )?;
             }
@@ -300,9 +349,7 @@ fn derive_trait_obligations(
     out: &mut Vec<TestObligation>,
 ) -> Result<(), DiagnosticMessage> {
     for (name, entry) in catalogue.traits() {
-        if !is_derivable(entry.action()) {
-            continue;
-        }
+        let method_axes_only = !is_derivable(entry.action());
         let entry_key = catalogue_key(name.as_str())?;
         let target = CatalogueEntryRef::new(
             file_path.to_owned(),
@@ -321,7 +368,9 @@ fn derive_trait_obligations(
                 &role_kind,
                 &decl_hash,
                 &anchors,
+                entry.methods(),
                 out,
+                method_axes_only,
                 |axis| projector.contract_role_items(entry, axis),
             )?;
         }
@@ -360,7 +409,9 @@ fn derive_function_obligations(
                 &role_kind,
                 &decl_hash,
                 &anchors,
+                &[],
                 out,
+                false,
                 |axis| projector.function_role_items(axis),
             )?;
         }
@@ -416,6 +467,8 @@ fn derive_trait_impl_obligations(
                 &role_kind,
                 &decl_hash,
                 &trait_entry.anchors,
+                &[],
+                true,
                 out,
                 item_ids,
             )?;
@@ -424,23 +477,26 @@ fn derive_trait_impl_obligations(
     Ok(())
 }
 
-/// Emits obligations for each rule in `role_rules`, enumerating per-axis items
-/// via `items` and applying each rule's minimum floor.
 #[allow(clippy::too_many_arguments)]
-fn emit_rules<F>(
+pub(super) fn emit_rules<F>(
     role_rules: &RoleObligationRules,
     entry_key: &CatalogueEntryKey,
     target: &CatalogueEntryRef,
     role_kind: &TargetEntryRoleKind,
     decl_hash: &DeclarationHash,
     anchors: &[TestObligationAnchorId],
+    methods: &[MethodDeclaration],
     out: &mut Vec<TestObligation>,
+    method_axes_only: bool,
     items: F,
 ) -> Result<(), DiagnosticMessage>
 where
     F: Fn(&TestObligationPerAxis) -> Vec<TestObligationItemIdentifier>,
 {
     for rule in role_rules.obligations() {
+        if method_axes_only && !is_method_axis(rule.per_axis()) {
+            continue;
+        }
         emit_rule_items(
             rule,
             entry_key,
@@ -448,6 +504,8 @@ where
             role_kind,
             decl_hash,
             anchors,
+            methods,
+            !method_axes_only,
             out,
             items(rule.per_axis()),
         )?;
@@ -455,7 +513,6 @@ where
     Ok(())
 }
 
-/// Emits one rule's obligations after applying the rule's minimum floor.
 #[allow(clippy::too_many_arguments)]
 fn emit_rule_items(
     rule: &TestObligationRule,
@@ -464,25 +521,41 @@ fn emit_rule_items(
     role_kind: &TargetEntryRoleKind,
     decl_hash: &DeclarationHash,
     anchors: &[TestObligationAnchorId],
+    methods: &[MethodDeclaration],
+    apply_minimum: bool,
     out: &mut Vec<TestObligation>,
     mut item_ids: Vec<TestObligationItemIdentifier>,
 ) -> Result<(), DiagnosticMessage> {
-    if let Some(minimum) = rule.minimum() {
-        while item_ids.len() < minimum.as_usize() {
-            let filler = TestObligationItemIdentifier::try_new(format!("min#{}", item_ids.len()))
-                .map_err(|_| diag("empty min filler"))?;
-            item_ids.push(filler);
+    if apply_minimum {
+        if let Some(minimum) = rule.minimum() {
+            while item_ids.len() < minimum.as_usize() {
+                let filler =
+                    TestObligationItemIdentifier::try_new(format!("min#{}", item_ids.len()))
+                        .map_err(|_| diag("empty min filler"))?;
+                item_ids.push(filler);
+            }
         }
     }
     for item in item_ids {
-        let obligation =
-            build_obligation(entry_key, target, role_kind, rule.kind(), &item, decl_hash, anchors)?;
+        let item_anchors = if is_method_axis(rule.per_axis()) {
+            method_anchors_for_item(methods, &item, anchors)?
+        } else {
+            anchors.to_vec()
+        };
+        let obligation = build_obligation(
+            entry_key,
+            target,
+            role_kind,
+            rule.kind(),
+            &item,
+            decl_hash,
+            &item_anchors,
+        )?;
         out.push(obligation);
     }
     Ok(())
 }
 
-/// Builds one [`TestObligation`] from its identity + evidence components.
 fn build_obligation(
     entry_key: &CatalogueEntryKey,
     target: &CatalogueEntryRef,
@@ -510,18 +583,29 @@ fn build_obligation(
     ))
 }
 
-/// Computes the declaration hash from a `Debug`-canonicalised entry.
-fn declaration_hash<T: std::fmt::Debug>(entry: &T) -> DeclarationHash {
+pub(super) fn declaration_hash<T: std::fmt::Debug>(entry: &T) -> DeclarationHash {
     DeclarationHash::new(sha256_content_hash(format!("{entry:?}").as_bytes()))
 }
 
-/// Validates a catalogue entry key.
-fn catalogue_key(key: &str) -> Result<CatalogueEntryKey, DiagnosticMessage> {
+pub(super) fn catalogue_key(key: &str) -> Result<CatalogueEntryKey, DiagnosticMessage> {
     CatalogueEntryKey::try_new(key.to_owned()).map_err(|_| diag("empty catalogue entry key"))
 }
 
-/// Converts catalogue `spec_refs` to obligation anchor ids.
-fn anchors_from_spec_refs(
+fn method_anchors_for_item(
+    methods: &[MethodDeclaration],
+    item: &TestObligationItemIdentifier,
+    entry_anchors: &[TestObligationAnchorId],
+) -> Result<Vec<TestObligationAnchorId>, DiagnosticMessage> {
+    let Some((_, method_name)) = item.as_str().rsplit_once(':') else {
+        return Ok(entry_anchors.to_vec());
+    };
+    match methods.iter().find(|method| method.name().as_str() == method_name) {
+        Some(method) => anchors_from_spec_refs(method.spec_refs()),
+        None => Ok(entry_anchors.to_vec()),
+    }
+}
+
+pub(super) fn anchors_from_spec_refs(
     refs: &[SpecRef],
 ) -> Result<Vec<TestObligationAnchorId>, DiagnosticMessage> {
     let mut anchors = Vec::with_capacity(refs.len());
@@ -536,8 +620,7 @@ fn anchors_from_spec_refs(
     Ok(anchors)
 }
 
-/// Finds the rules declared for `role` in the `DataRole` section.
-fn find_data_role_rules<'a>(
+pub(super) fn find_data_role_rules<'a>(
     rules: &'a TestObligationRulesDocument,
     role: &DataRole,
 ) -> Option<&'a RoleObligationRules> {
@@ -548,7 +631,6 @@ fn find_data_role_rules<'a>(
         .map(|(_, rules)| rules)
 }
 
-/// Finds the rules declared for `role` in the `ContractRole` section.
 fn find_contract_role_rules<'a>(
     rules: &'a TestObligationRulesDocument,
     role: &ContractRole,
@@ -560,7 +642,6 @@ fn find_contract_role_rules<'a>(
         .map(|(_, rules)| rules)
 }
 
-/// Finds the rules declared for `role` in the `FunctionRole` section.
 fn find_function_role_rules(
     rules: &TestObligationRulesDocument,
     role: FunctionRole,
@@ -568,7 +649,6 @@ fn find_function_role_rules(
     rules.function_roles().iter().find(|(r, _)| *r == role).map(|(_, rules)| rules)
 }
 
-/// Finds the rules declared for the typestate pattern section.
 fn find_pattern_rules(rules: &TestObligationRulesDocument) -> Option<&RoleObligationRules> {
     rules
         .patterns()
@@ -577,7 +657,6 @@ fn find_pattern_rules(rules: &TestObligationRulesDocument) -> Option<&RoleObliga
         .map(|(_, rules)| rules)
 }
 
-/// Finds the rules declared for `role` in the `trait_impls` section.
 fn find_trait_impl_rules<'a>(
     rules: &'a TestObligationRulesDocument,
     role: &ContractRole,
@@ -586,9 +665,9 @@ fn find_trait_impl_rules<'a>(
         .trait_impls()
         .iter()
         .find(|(r, _)| r.variant_name() == role.variant_name())
-        .map(|(_, rules)| rules)
+        .map(|(_, r)| r)
 }
 
 #[cfg(test)]
-#[path = "derive_tests.rs"]
+#[path = "../derive_tests.rs"]
 mod tests;

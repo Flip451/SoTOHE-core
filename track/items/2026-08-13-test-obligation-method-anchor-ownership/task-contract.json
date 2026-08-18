@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-13-test-obligation-method-anchor-ownership",
+  "entries": {
+    "T4": [
+      { "layer": "domain", "entry_key": "TestObligation" },
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" },
+      { "layer": "domain", "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage" }
+    ],
+    "T5": [
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" }
+    ],
+    "T6": [
+      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+    ],
+    "T7": [
+      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+    ],
+    "T8": [
+      { "layer": "usecase", "entry_key": "PhaseCommandService" }
+    ],
+    "T10": [
+      { "layer": "domain", "entry_key": "MethodDeclaration" }
+    ],
+    "T12": [
+      { "layer": "domain", "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage" },
+      { "layer": "domain", "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs" }
+    ],
+    "T13": [
+      { "layer": "domain", "entry_key": "TestObligation" }
+    ],
+    "T11": [
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" }
+    ],
+    "T14": [
+      { "layer": "domain", "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs" },
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" }
+    ],
+    "T15": [
+      { "layer": "domain", "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage" }
+    ],
+    "T16": [
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" }
+    ],
+    "T17": [
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" }
+    ]
+  }
+}

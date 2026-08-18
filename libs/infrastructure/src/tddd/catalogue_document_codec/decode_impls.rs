@@ -204,11 +204,23 @@ pub(super) fn method_decl_from_dto_with_outer_generics(
     let where_predicates =
         where_predicates_from_dtos_with_generics(entry_name, dto.where_predicates, &generic_names)?;
 
-    let mut decl = MethodDeclaration::new(name, receiver, params, returns, dto.is_async, dto.docs);
-    decl.has_default_impl = dto.has_default_impl;
-    decl.generics = generics;
-    decl.where_predicates = where_predicates;
-    Ok(decl)
+    let spec_refs = spec_refs_from_dtos(&dto.spec_refs)
+        .map_err(|e| err(format!("invalid {}: {}", e.field, e.reason)))?;
+    let action = ItemAction::from_str(&dto.action)
+        .map_err(|e| err(format!("invalid method action '{}': {e}", dto.action)))?;
+    Ok(MethodDeclaration::new(
+        name,
+        receiver,
+        params,
+        returns,
+        dto.is_async,
+        dto.has_default_impl,
+        generics,
+        where_predicates,
+        spec_refs,
+        action,
+        dto.docs.map(DocString::new),
+    ))
 }
 
 pub(super) fn param_decl_from_dto(
@@ -252,7 +264,7 @@ pub(super) fn validate_trait_item_names(
 
     let mut value_names = HashSet::new();
     for method in methods {
-        let item_name = method.name.as_str();
+        let item_name = method.name().as_str();
         if !value_names.insert(item_name.to_owned()) {
             return Err(err(format!("duplicate trait value item name '{item_name}'")));
         }
@@ -357,6 +369,7 @@ pub(super) fn function_entry_from_dto(
 #[cfg(test)]
 mod tests {
     use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl};
+    use domain::tddd::catalogue_v2::roles::ItemAction;
     use domain::tddd::catalogue_v2::{
         AssocConstName, MethodDeclaration, MethodName, TypeName, TypeRef,
     };
@@ -370,6 +383,11 @@ mod tests {
             vec![],
             TypeRef::new("()").map_err(|e| e.to_string())?,
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         ))
     }

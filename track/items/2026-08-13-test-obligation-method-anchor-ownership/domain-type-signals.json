@@ -1,0 +1,39 @@
+{
+  "baseline_hash": "e4ea494e5bf1b30d35bfc006cb618f83624ac08531c087070086a312f306c890",
+  "declaration_hash": "0da500edabd06ebad8c709268e577d04839260645047f861eace89bd4b06efc7",
+  "generated_at": "2026-08-18T05:51:55Z",
+  "head_commit": "ce3496c2fba2fbf7c1f8e14e267e9e7d46705aa0",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "MethodDeclaration"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "TestObligation"
+    }
+  ]
+}

@@ -1,0 +1,448 @@
+{
+  "acceptance_criteria": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "AC-01",
+      "text": "コマンドが指名する catalogue の複数 method trait は、entry-level の全 spec anchor を各 method の担当分として宣言でき、trait_method 義務が各 method 自身の担当 anchor だけを所有する。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md"
+        }
+      ],
+      "id": "AC-02",
+      "text": "コマンドが指名する catalogue では、包含（method の spec_refs が entry-level spec_refs の部分集合であること）、被覆（全 method の spec_refs の和が entry-level spec_refs を覆うこと）、および単一 method が entry-level の全 anchor を写すことを根拠に、構造検証で拒否しない。Add/Modify method の非空 spec_refs 要求、および親が reference または delete のとき子 spec_refs を空とする要求による拒否は、この非拒否の対象外とする。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "AC-03",
+      "text": "コマンドが指名する catalogue では、action が add または modify の method は非空の spec_refs を持たなければならず、空または未宣言なら構造検証で拒否される。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
+        }
+      ],
+      "id": "AC-04",
+      "text": "trait_method 義務について、fulfillment 検証と生成される verifier instruction はその義務が所有する anchor だけを対象とする。その義務が所有しない anchor（別 method が所有する anchor、およびどの method も所有しない entry-only の anchor）は要求しない。複数 method が所有する共有 anchor は、その義務自身が所有する限り対象に含む。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-10",
+      "text": "PhaseCommandService の validate は validate 自身が担当する spec anchor に method-scoped に再 grounding され、validate の trait_method 義務の fulfillment は explain または enter の test を cross-populate せずに検証できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-11",
+      "text": "PhaseCommandService の explain は explain 自身が担当する spec anchor に method-scoped に再 grounding され、explain の trait_method 義務の fulfillment は validate または enter の test を cross-populate せずに検証できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-12",
+      "text": "PhaseCommandService の enter は enter 自身が担当する spec anchor に method-scoped に再 grounding され、enter の trait_method 義務の fulfillment は validate または explain の test を cross-populate せずに検証できる。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "AC-13",
+      "text": "`.harness/custom/review-prompts/harness-policy.md` に、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項が残らない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "AC-06",
+      "text": "コマンドが指名する catalogue が MethodDeclaration を D1 のために宣言するとき、その宣言は public-field と primitive-reference に関する適用中の catalogue lint 要件を満たす。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "AC-14",
+      "text": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の各 MethodDeclaration は独立した action を持ち、add・modify・reference・delete の義務ゲート上の意味で扱われる。action を省略した method は add とし、親 entry の action は継承しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "AC-15",
+      "text": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ要求する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "AC-16",
+      "text": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs が非空なら構造検証で拒否される。add または modify の method は非空 spec_refs を要求されるため、親が reference または delete のとき add または modify の method は宣言できない。"
+    }
+  ],
+  "constraints": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
+        }
+      ],
+      "id": "CN-01",
+      "text": "entry-level spec_refs は entry 自身の仕様への grounding であり、全 anchor の完全な目録ではない。method の spec_refs は独立した所有集合であり、entry-level spec_refs の部分集合であることや、その和で entry-level spec_refs を覆うことは要求しない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "CN-02",
+      "text": "method action と Add/Modify の非空 spec_refs を含む新 schema は、コマンドが path で指名する catalogue にだけ適用する。コマンドが指名しない catalogue は書き換えず、不適合として失敗させない。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "CN-03",
+      "text": "fulfillment の method-scoped 検証は、各 trait_method 義務が所有する anchor だけを対象とする。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "CN-05",
+      "text": "MethodDeclaration の lint-compliance remediation は、D1 の method-level spec_refs をコマンドが指名する catalogue で宣言・評価できる状態にするため、既存宣言の name、receiver、params、returns、async/default-implementation status、generics、where predicates、docs という観測可能な method contract information を保持したまま、宣言された entry に適用される catalogue lint 規則へ適合させる。"
+    }
+  ],
+  "goal": [
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        {
+          "anchor": "D2",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        }
+      ],
+      "id": "GO-01",
+      "text": "trait_method ごとの test-obligation が自 method の仕様 anchor だけを所有・検証できるようにし、複数 method の ApplicationService trait を method-relevant な fulfillment で test-obligation gate に通せるようにする。"
+    },
+    {
+      "adr_refs": [
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+        },
+        {
+          "anchor": "D1",
+          "file": "knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md"
+        },
+        {
+          "anchor": "D3",
+          "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+        }
+      ],
+      "id": "GO-02",
+      "text": "D1 の method-level spec_refs をコマンドが指名する catalogue で宣言・構造検証できるよう、対象となる MethodDeclaration の宣言を、宣言された entry に適用される catalogue lint 規則に適合する状態にする。"
+    }
+  ],
+  "related_conventions": [
+    {
+      "anchor": "Rules",
+      "file": "knowledge/conventions/coding-principles.md"
+    },
+    {
+      "anchor": "Rule",
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md"
+    }
+  ],
+  "schema_version": 2,
+  "scope": {
+    "in_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-01",
+        "text": "trait method ごとの spec anchor 担当を catalogue で宣言できるようにし、trait_method 義務が entry-level の全 anchor を一律に継承せず、自 method の spec_refs だけを所有するようにする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
+          }
+        ],
+        "id": "IN-02",
+        "text": "method の spec_refs は entry-level spec_refs からの割り当て部分集合ではなく、method 義務が所有する独立集合である。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-03",
+        "text": "fulfillment 検証と verifier instruction を、各 trait_method 義務が所有する anchor に限定する。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          },
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md"
+          },
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+          }
+        ],
+        "id": "IN-05",
+        "text": "D1 のためにコマンドが指名する catalogue へ宣言する MethodDeclaration を、宣言された entry に適用される catalogue lint 規則へ適合させる。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-09",
+        "text": "PhaseCommandService の validate を、validate 自身が担当する spec anchor へ method-scoped に再 grounding し、validate の fulfillment を validate 自身の test で実証できる binding に戻す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-10",
+        "text": "PhaseCommandService の explain を、explain 自身が担当する spec anchor へ method-scoped に再 grounding し、explain の fulfillment を explain 自身の test で実証できる binding に戻す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-11",
+        "text": "PhaseCommandService の enter を、enter 自身が担当する spec anchor へ method-scoped に再 grounding し、enter の fulfillment を enter 自身の test で実証できる binding に戻す。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "IN-12",
+        "text": "`.harness/custom/review-prompts/harness-policy.md` から、track `scope-conditional-pre-review-gates-2026-07-31` に限定された PhaseCommandService の cross-populated fulfillment を受容する conditional Known Accepted Deviations 条項だけを撤去し、他の deviation 記述や他 track の記録は変更しない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+          }
+        ],
+        "id": "IN-13",
+        "text": "TraitEntry.methods、TypeEntry.methods、inherent_impls[].methods の MethodDeclaration に独立した action を導入し、action 省略を add として扱い、親 entry action を継承しない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D2",
+            "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+          },
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+          }
+        ],
+        "id": "IN-14",
+        "text": "コマンドが指名する catalogue で、add または modify の method に非空の spec_refs を要求し、兄弟 method による代替を認めない。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-0040-parent-forbids-method-spec-refs.md"
+          },
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+          }
+        ],
+        "id": "IN-15",
+        "text": "コマンドが指名する catalogue で、親が reference または delete のとき子 MethodDeclaration の spec_refs は空でなければならない。非空なら構造検証で拒否する。親は TraitEntry.action、TypeEntry.action、または inherent_impl が所属する同一指名 catalogue 内 TypeEntry.action であり、type_name が未解決なら fail-closed とする。"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "adr_refs": [
+          {
+            "anchor": "D3",
+            "file": "knowledge/adr/2026-08-17-0340-method-declaration-action.md"
+          }
+        ],
+        "id": "OS-01",
+        "text": "コマンドが指名しない既存 catalogue 全体を新 schema へ遡及的に書き換えたり不適合として失敗させたりすることは本 track の対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "OS-02",
+        "text": "cross-populated fulfillment を entry 単位の正規形として恒久化すること、または merged track にある歴史的な cross-populated binding record を書き換えることは本 track の対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "OS-03",
+        "text": "trait_method 義務を廃止して型単位の粗い義務へ置き換えることは本 track の対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-18-0055-entry-spec-refs-not-inventory.md"
+          }
+        ],
+        "id": "OS-04",
+        "text": "entry-level spec_refs が作る check totality の cite edge を捨てること、または method 義務へ割り当てないことを理由に entry 参照の可視性を消すことは本 track の対象外とする。"
+      },
+      {
+        "adr_refs": [
+          {
+            "anchor": "D1",
+            "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md"
+          }
+        ],
+        "id": "OS-05",
+        "text": "MethodDeclaration 以外の legacy catalogue entry を一律に remediation すること、または宣言済み entry への lint 適用を免除する一般方針を導入することは本 track の対象外とする。"
+      }
+    ]
+  },
+  "signals": {
+    "blue": 34,
+    "red": 0,
+    "yellow": 0
+  },
+  "title": "trait_method obligations own method-scoped anchors",
+  "version": "1.7"
+}

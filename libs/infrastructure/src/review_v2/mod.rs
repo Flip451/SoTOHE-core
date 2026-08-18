@@ -3,6 +3,7 @@
 //! Implements usecase and domain port traits using git CLI and filesystem I/O.
 
 pub mod check_zero_findings;
+mod claude_process;
 pub mod claude_reviewer;
 mod codex_process;
 pub mod codex_reviewer;

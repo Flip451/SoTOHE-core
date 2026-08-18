@@ -1,0 +1,24 @@
+{
+  "kind": {
+    "kind": "struct",
+    "shape": {
+      "fields": [],
+      "has_stripped_fields": true,
+      "kind": "plain"
+    }
+  },
+  "methods": [
+    {
+      "name": "new",
+      "params": [
+        { "name": "name", "ty": "MethodName" },
+        { "name": "spec_refs", "ty": "Vec<SpecRef>" },
+        { "name": "docs", "ty": "Option<DocString>" }
+      ],
+      "returns": "Self"
+    },
+    { "name": "name", "params": [], "returns": "&MethodName" },
+    { "name": "spec_refs", "params": [], "returns": "&[SpecRef]" },
+    { "name": "docs", "params": [], "returns": "Option<&DocString>" }
+  ]
+}
