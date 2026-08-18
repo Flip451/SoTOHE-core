@@ -1,0 +1,85 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-18T15:57:19Z",
+          "findings": [
+            {
+              "category": null,
+              "file": null,
+              "line": null,
+              "message": "Review blocked: the sandbox rejected all local shell reads, and the target ADR plus briefing are not available on the accessible GitHub refs. I could not validly inspect the current diff or ADR content.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:e7f63aee34ac0d85292285f82109caa34a889588ff6329d953babb1c03e84dd2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T16:00:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7f63aee34ac0d85292285f82109caa34a889588ff6329d953babb1c03e84dd2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:15:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7f63aee34ac0d85292285f82109caa34a889588ff6329d953babb1c03e84dd2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T23:32:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b1d25f21e2b61db9b67877523d9dee985c996c86bcaa58fdbef6c708fe9fee29",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T23:38:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b1d25f21e2b61db9b67877523d9dee985c996c86bcaa58fdbef6c708fe9fee29",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-18T16:05:04Z",
+          "findings": [
+            {
+              "category": "tooling",
+              "file": ".harness/config/agent-profiles.json",
+              "line": null,
+              "message": "レビューを完了できませんでした。読み取り専用シェルがサンドボックス初期化エラーでブロックされ、briefing、scope-specific policy、対象ファイル、差分を読み込めませんでした。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8d90443793ca9f45b85629764af999c08028144b9478b912de894444102150f0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T16:08:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d90443793ca9f45b85629764af999c08028144b9478b912de894444102150f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:29:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d90443793ca9f45b85629764af999c08028144b9478b912de894444102150f0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}
