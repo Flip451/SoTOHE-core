@@ -220,143 +220,35 @@ impl TrackCompositionRoot {
         workspace_root: PathBuf,
         layer: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::tddd::fs_catalogue_spec_signals_store::FsCatalogueSpecSignalsStore;
-        use infrastructure::verify::tddd_layers::{LoadTdddLayersError, load_tddd_layers};
-        use usecase::TrackId;
-
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
-
-        // Validate track_id format (CN-01 / AC-03). Must happen before any filesystem access.
-        TrackId::try_new(&resolved_id).map_err(|e| {
-            CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {e}"))
-        })?;
-
-        // Security: verify the items_dir root itself is not a symlink.
-        match items_dir.symlink_metadata() {
-            Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(CompositionError::WiringFailed(format!(
-                    "symlink guard: refusing to follow symlink at items_dir: {}",
-                    items_dir.display()
-                )));
-            }
-            Ok(_) => {}
-            Err(e) => {
-                return Err(CompositionError::Infrastructure(format!(
-                    "symlink guard: cannot stat items_dir {}: {e}",
-                    items_dir.display()
-                )));
-            }
-        }
-
-        // Security: verify the track directory itself is not a symlink.
-        let track_dir = items_dir.join(&resolved_id);
-        match track_dir.symlink_metadata() {
-            Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(CompositionError::WiringFailed(format!(
-                    "symlink guard: refusing to follow symlink at track directory: {}",
-                    track_dir.display()
-                )));
-            }
-            Ok(_) => {}
-            Err(e) => {
-                return Err(CompositionError::Infrastructure(format!(
-                    "symlink guard: cannot stat track directory {}: {e}",
-                    track_dir.display()
-                )));
-            }
-        }
-
-        // Resolve layers (fail-closed).
-        let rules_path = workspace_root.join("architecture-rules.json");
-        let bindings = load_tddd_layers(&rules_path, &workspace_root).map_err(|e| match e {
-            LoadTdddLayersError::Io { path, source } => {
-                CompositionError::ConfigLoad(format!("{}: {source}", path.display()))
-            }
-            LoadTdddLayersError::Parse(err) => {
-                CompositionError::ConfigLoad(format!("{}: {err}", rules_path.display()))
-            }
-        })?;
-
-        let bindings = if let Some(filter) = layer.as_deref() {
-            let Some(binding) = bindings.iter().find(|b| b.layer_id() == filter) else {
-                return Err(CompositionError::WiringFailed(format!(
-                    "layer '{filter}' is not tddd.enabled in architecture-rules.json"
-                )));
-            };
-            vec![binding.clone()]
-        } else {
-            bindings
+        use cli_driver::adr_baseline::TrackIdInput;
+        use cli_driver::track_tddd::{
+            TrackItemsDirectoryInput, TrackLayerInput, TrackTdddCatalogueSpecSignalsInput,
+            TrackWorkspaceRootInput,
         };
 
-        if bindings.is_empty() {
-            return Err(CompositionError::WiringFailed(
-                "no tddd.enabled layers found in architecture-rules.json; nothing to evaluate"
-                    .to_owned(),
-            ));
+        let track_id =
+            track_id.map(|value| value.parse::<TrackIdInput>()).transpose().map_err(|error| {
+                CompositionError::WiringFailed(format!("invalid track id: {error}"))
+            })?;
+        let items_dir = TrackItemsDirectoryInput::try_new(items_dir)
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let workspace_root = TrackWorkspaceRootInput::try_from(workspace_root)
+            .map_err(CompositionError::WiringFailed)?;
+        let layer = layer
+            .map(TrackLayerInput::try_from)
+            .transpose()
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+
+        let outcome = self.track_tddd_driver().handle_catalogue_spec_signals(
+            TrackTdddCatalogueSpecSignalsInput { track_id, items_dir, workspace_root, layer },
+        );
+        if outcome.exit_code == 0 {
+            Ok(outcome)
+        } else {
+            Err(CompositionError::Usecase(
+                outcome.stderr.unwrap_or_else(|| "track catalogue-spec-signals failed".to_owned()),
+            ))
         }
-
-        let writer = FsCatalogueSpecSignalsStore::new(items_dir.clone());
-
-        for binding in &bindings {
-            if !binding.catalogue_spec_signal_enabled() {
-                continue;
-            }
-
-            // Absent catalogue file for a layer must be silently skipped
-            // (AC-01/AC-02). The `sotp signal calc-impl-catalog` step already skips
-            // absent catalogues unconditionally; this step does the same so that
-            // the full `track-active-gate` chain (type-signals → catalogue-spec-signals
-            // → views sync) succeeds at Phase 0/1 before any catalogue exists.
-            // When a catalogue IS present it is evaluated normally: a red signal
-            // still blocks (AC-03/CN-02 — no fail-open on present catalogues).
-            let catalogue_path = track_dir.join(binding.catalogue_file());
-            match catalogue_path.symlink_metadata() {
-                Ok(meta) if meta.file_type().is_file() => {
-                    // Catalogue present and is a regular file — proceed to refresh.
-                }
-                Ok(_) => {
-                    // Non-file entry (symlink, directory, etc.) — let refresh_one_layer
-                    // handle it so the caller sees the same error as CI.
-                }
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                    // Catalogue absent — remove any stale signals file so that the
-                    // later `signal check-catalog-spec` does not find a signals
-                    // file without its backing catalogue (which would be an error).
-                    // If the signals file is also absent that is fine — nothing to do.
-                    let stale_signals_path = track_dir
-                        .join(format!("{}-catalogue-spec-signals.json", binding.layer_id()));
-                    match std::fs::remove_file(&stale_signals_path) {
-                        Ok(()) => {}
-                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-                        Err(e) => {
-                            return Err(CompositionError::Infrastructure(format!(
-                                "failed to remove stale signals file '{}': {e}",
-                                stale_signals_path.display(),
-                            )));
-                        }
-                    }
-                    continue;
-                }
-                Err(e) => {
-                    return Err(CompositionError::Infrastructure(format!(
-                        "cannot stat catalogue '{}' for layer '{}': {e}",
-                        catalogue_path.display(),
-                        binding.layer_id(),
-                    )));
-                }
-            }
-
-            infrastructure::tddd::catalogue_spec_signals_refresher::refresh_one_layer(
-                &items_dir,
-                &track_dir,
-                &resolved_id,
-                binding,
-                &writer,
-            )
-            .map_err(CompositionError::Infrastructure)?;
-        }
-
-        Ok(CommandOutcome::success(None))
     }
 
     /// Emit canonical SHA-256 hashes for spec.json elements.

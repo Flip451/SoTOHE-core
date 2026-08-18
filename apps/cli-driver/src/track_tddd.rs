@@ -14,6 +14,10 @@ use usecase::track_lifecycle::tddd::catalogue_impl_signals::{
     TrackCatalogueImplSignalsCommand, TrackCatalogueImplSignalsError,
     TrackCatalogueImplSignalsService,
 };
+use usecase::track_lifecycle::tddd::catalogue_spec_signals::{
+    TrackCatalogueSpecSignalsCommand, TrackCatalogueSpecSignalsError,
+    TrackCatalogueSpecSignalsService,
+};
 use usecase::track_lifecycle::{
     TrackItemsDirectory, TrackLayerFilter, TrackLayerSelection, TrackLifecycleIdInput,
     TrackSelection, TrackSourceWorkspace, TrackWorkspaceRoot,
@@ -195,11 +199,24 @@ pub struct TrackTdddCatalogueImplSignalsInput {
     pub layer: Option<TrackLayerInput>,
 }
 
+/// Typed primary-adapter input for catalogue-spec signals.
+pub struct TrackTdddCatalogueSpecSignalsInput {
+    /// Optional explicit track id; omitted values select the active track.
+    pub track_id: Option<TrackIdInput>,
+    /// Directory containing the track items.
+    pub items_dir: TrackItemsDirectoryInput,
+    /// Workspace containing the track artifacts and catalogue configuration.
+    pub workspace_root: TrackWorkspaceRootInput,
+    /// Optional layer filter.
+    pub layer: Option<TrackLayerInput>,
+}
+
 /// Primary adapter for the Track TDDD command family.
 pub struct TrackTdddDriver {
     baseline_capture: Arc<dyn TrackBaselineCaptureService>,
     baseline_graph: Arc<dyn TrackBaselineGraphService>,
     catalogue_impl_signals: Arc<dyn TrackCatalogueImplSignalsService>,
+    catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
 }
 
 impl TrackTdddDriver {
@@ -209,8 +226,9 @@ impl TrackTdddDriver {
         baseline_capture: Arc<dyn TrackBaselineCaptureService>,
         baseline_graph: Arc<dyn TrackBaselineGraphService>,
         catalogue_impl_signals: Arc<dyn TrackCatalogueImplSignalsService>,
+        catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
     ) -> Self {
-        Self { baseline_capture, baseline_graph, catalogue_impl_signals }
+        Self { baseline_capture, baseline_graph, catalogue_impl_signals, catalogue_spec_signals }
     }
 
     /// Executes the baseline-capture input boundary.
@@ -250,6 +268,21 @@ impl TrackTdddDriver {
             .execute(command)
             .map(render_catalogue_impl_signals_result)
             .unwrap_or_else(catalogue_impl_signals_error_to_outcome)
+    }
+
+    /// Executes the catalogue-spec signal input boundary.
+    pub fn handle_catalogue_spec_signals(
+        &self,
+        input: TrackTdddCatalogueSpecSignalsInput,
+    ) -> CommandOutcome {
+        let command = match catalogue_spec_signals_input_to_command(input) {
+            Ok(command) => command,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        self.catalogue_spec_signals
+            .execute(command)
+            .map(|_| CommandOutcome::success(None))
+            .unwrap_or_else(catalogue_spec_signals_error_to_outcome)
     }
 }
 
@@ -324,6 +357,24 @@ fn catalogue_impl_signals_input_to_command(
     Ok(TrackCatalogueImplSignalsCommand { track, workspace_root, layer })
 }
 
+fn catalogue_spec_signals_input_to_command(
+    input: TrackTdddCatalogueSpecSignalsInput,
+) -> Result<TrackCatalogueSpecSignalsCommand, String> {
+    let track = input
+        .track_id
+        .map(|track_id| TrackLifecycleIdInput::try_new(track_id.to_string()))
+        .transpose()
+        .map_err(|error| error.to_string())
+        .map(TrackSelection::from_input)?;
+    let items_dir = input.items_dir.into_usecase().map_err(|error| error.to_string())?;
+    let workspace_root = input.workspace_root.into_usecase()?;
+    let layer = input
+        .layer
+        .map(|layer| TrackLayerSelection::One(layer.into_usecase()))
+        .unwrap_or(TrackLayerSelection::All);
+    Ok(TrackCatalogueSpecSignalsCommand { track, items_dir, workspace_root, layer })
+}
+
 fn render_catalogue_impl_signals_result(
     result: usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsResult,
 ) -> CommandOutcome {
@@ -368,6 +419,12 @@ fn render_catalogue_impl_signals_result(
 
 fn catalogue_impl_signals_error_to_outcome(
     error: TrackCatalogueImplSignalsError,
+) -> CommandOutcome {
+    CommandOutcome::failure(Some(error.to_string()))
+}
+
+fn catalogue_spec_signals_error_to_outcome(
+    error: TrackCatalogueSpecSignalsError,
 ) -> CommandOutcome {
     CommandOutcome::failure(Some(error.to_string()))
 }
@@ -424,6 +481,20 @@ mod tests {
         }
     }
 
+    struct UnusedCatalogueSpecSignalsService;
+
+    impl TrackCatalogueSpecSignalsService for UnusedCatalogueSpecSignalsService {
+        fn execute(
+            &self,
+            _: TrackCatalogueSpecSignalsCommand,
+        ) -> Result<
+            usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsResult,
+            TrackCatalogueSpecSignalsError,
+        > {
+            unreachable!()
+        }
+    }
+
     struct RecordingCatalogueImplSignalsService {
         commands: Mutex<Vec<TrackCatalogueImplSignalsCommand>>,
         error: Option<String>,
@@ -449,6 +520,33 @@ mod tests {
                         )],
                     }],
                 }),
+            }
+        }
+    }
+
+    struct RecordingCatalogueSpecSignalsService {
+        commands: Mutex<Vec<TrackCatalogueSpecSignalsCommand>>,
+        error: Option<String>,
+    }
+
+    impl TrackCatalogueSpecSignalsService for RecordingCatalogueSpecSignalsService {
+        fn execute(
+            &self,
+            command: TrackCatalogueSpecSignalsCommand,
+        ) -> Result<
+            usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsResult,
+            TrackCatalogueSpecSignalsError,
+        > {
+            self.commands.lock().expect("command lock is available").push(command);
+            match &self.error {
+                Some(error) => Err(TrackCatalogueSpecSignalsError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+                None => Ok(
+                    usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsResult {
+                        layers: vec![],
+                    },
+                ),
             }
         }
     }
@@ -522,6 +620,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -558,6 +657,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
 
         let input = TrackTdddBaselineCaptureInput {
@@ -584,6 +684,7 @@ mod tests {
             service,
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -643,6 +744,7 @@ mod tests {
             }),
             service.clone(),
             Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -684,6 +786,7 @@ mod tests {
             }),
             service.clone(),
             Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
         let input = TrackTdddBaselineGraphInput {
             track_id: None,
@@ -711,6 +814,7 @@ mod tests {
             }),
             service,
             Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -740,6 +844,7 @@ mod tests {
             }),
             Arc::new(UnusedBaselineGraphService),
             service.clone(),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
@@ -787,6 +892,7 @@ mod tests {
             }),
             Arc::new(UnusedBaselineGraphService),
             service.clone(),
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
         let input = TrackTdddCatalogueImplSignalsInput {
             track_id: None,
@@ -813,11 +919,105 @@ mod tests {
             }),
             Arc::new(UnusedBaselineGraphService),
             service,
+            Arc::new(UnusedCatalogueSpecSignalsService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
 
         assert_eq!(outcome.stderr.as_deref(), Some("signals failed"));
+        assert_eq!(outcome.exit_code, 1);
+    }
+
+    fn catalogue_spec_signals_input() -> TrackTdddCatalogueSpecSignalsInput {
+        TrackTdddCatalogueSpecSignalsInput {
+            track_id: Some("signals-track".parse().expect("track id is valid")),
+            items_dir: TrackItemsDirectoryInput::try_new(PathBuf::from("workspace/track/items"))
+                .expect("items directory is valid"),
+            workspace_root: workspace_root(),
+            layer: Some(TrackLayerInput::try_from("usecase".to_owned()).expect("layer is valid")),
+        }
+    }
+
+    #[test]
+    fn test_track_tddd_driver_valid_catalogue_spec_signals_input_returns_empty_success() {
+        let service = Arc::new(RecordingCatalogueSpecSignalsService {
+            commands: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackTdddDriver::new(
+            Arc::new(RecordingService {
+                commands: Mutex::new(Vec::new()),
+                result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
+            }),
+            Arc::new(UnusedBaselineGraphService),
+            Arc::new(UnusedCatalogueImplSignalsService),
+            service.clone(),
+        );
+
+        let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None);
+        let commands = service.commands.lock().expect("command lock is available");
+        assert_eq!(commands.len(), 1);
+        let command = commands.first().expect("one command is recorded");
+        assert!(matches!(
+            &command.track,
+            TrackSelection::Explicit(track_id) if track_id.as_ref() == "signals-track"
+        ));
+        assert_eq!(command.items_dir.as_path(), std::path::Path::new("workspace/track/items"));
+        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert!(matches!(&command.layer, TrackLayerSelection::One(_)));
+    }
+
+    #[test]
+    fn test_track_tddd_driver_invalid_catalogue_spec_signals_items_returns_failure_without_service_call()
+     {
+        let service = Arc::new(RecordingCatalogueSpecSignalsService {
+            commands: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackTdddDriver::new(
+            Arc::new(RecordingService {
+                commands: Mutex::new(Vec::new()),
+                result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
+            }),
+            Arc::new(UnusedBaselineGraphService),
+            Arc::new(UnusedCatalogueImplSignalsService),
+            service.clone(),
+        );
+        let input = TrackTdddCatalogueSpecSignalsInput {
+            track_id: None,
+            items_dir: TrackItemsDirectoryInput { value: PathBuf::from("../escape") },
+            workspace_root: workspace_root(),
+            layer: None,
+        };
+
+        let outcome = driver.handle_catalogue_spec_signals(input);
+
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.commands.lock().expect("command lock is available").is_empty());
+    }
+
+    #[test]
+    fn test_track_tddd_driver_catalogue_spec_signals_service_error_maps_to_failure_outcome() {
+        let service = Arc::new(RecordingCatalogueSpecSignalsService {
+            commands: Mutex::new(Vec::new()),
+            error: Some("catalogue spec signals failed".to_owned()),
+        });
+        let driver = TrackTdddDriver::new(
+            Arc::new(RecordingService {
+                commands: Mutex::new(Vec::new()),
+                result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
+            }),
+            Arc::new(UnusedBaselineGraphService),
+            Arc::new(UnusedCatalogueImplSignalsService),
+            service,
+        );
+
+        let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
+
+        assert_eq!(outcome.stderr.as_deref(), Some("catalogue spec signals failed"));
         assert_eq!(outcome.exit_code, 1);
     }
 }

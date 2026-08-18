@@ -10345,7 +10345,7 @@
       }
     },
     {
-      "claim_hash": "890d5451eb578ba3c6110efa2b31ff4886143c58199089e5433a6bd372e2be7f",
+      "claim_hash": "c583503d3d2ec531a613e140e7ab50130098386c60ebece4a61c67c6add25a88",
       "claim_origin": {
         "data": {
           "entry_key": "TrackAddTaskService",
@@ -10369,7 +10369,7 @@
       }
     },
     {
-      "claim_hash": "890d5451eb578ba3c6110efa2b31ff4886143c58199089e5433a6bd372e2be7f",
+      "claim_hash": "c583503d3d2ec531a613e140e7ab50130098386c60ebece4a61c67c6add25a88",
       "claim_origin": {
         "data": {
           "entry_key": "TrackAddTaskService",
@@ -10393,7 +10393,7 @@
       }
     },
     {
-      "claim_hash": "890d5451eb578ba3c6110efa2b31ff4886143c58199089e5433a6bd372e2be7f",
+      "claim_hash": "c583503d3d2ec531a613e140e7ab50130098386c60ebece4a61c67c6add25a88",
       "claim_origin": {
         "data": {
           "entry_key": "TrackAddTaskService",
@@ -10417,7 +10417,7 @@
       }
     },
     {
-      "claim_hash": "890d5451eb578ba3c6110efa2b31ff4886143c58199089e5433a6bd372e2be7f",
+      "claim_hash": "c583503d3d2ec531a613e140e7ab50130098386c60ebece4a61c67c6add25a88",
       "claim_origin": {
         "data": {
           "entry_key": "TrackAddTaskService",
@@ -10436,12 +10436,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "242cf931caf04541d2ad24f76fd252ba84bde13db103ea7d56955034778989da",
+      "claim_hash": "c2a7dce76fac9fd16589fbe2ca4c7935d737ffc4ea5f3f7f6acf56bd1e0c946a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackArchiveService",
@@ -10465,7 +10465,7 @@
       }
     },
     {
-      "claim_hash": "242cf931caf04541d2ad24f76fd252ba84bde13db103ea7d56955034778989da",
+      "claim_hash": "c2a7dce76fac9fd16589fbe2ca4c7935d737ffc4ea5f3f7f6acf56bd1e0c946a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackArchiveService",
@@ -10489,7 +10489,7 @@
       }
     },
     {
-      "claim_hash": "242cf931caf04541d2ad24f76fd252ba84bde13db103ea7d56955034778989da",
+      "claim_hash": "c2a7dce76fac9fd16589fbe2ca4c7935d737ffc4ea5f3f7f6acf56bd1e0c946a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackArchiveService",
@@ -10513,7 +10513,7 @@
       }
     },
     {
-      "claim_hash": "242cf931caf04541d2ad24f76fd252ba84bde13db103ea7d56955034778989da",
+      "claim_hash": "c2a7dce76fac9fd16589fbe2ca4c7935d737ffc4ea5f3f7f6acf56bd1e0c946a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackArchiveService",
@@ -10532,12 +10532,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "8ed3bd4ee617ecd210e18ae3d0ce7230a0f8aa9400223ff77f56fe8b98138668",
+      "claim_hash": "348b7218138c1b053e515f15c8132c01e6ee29be3d6b2129735226b909334d8d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineCapturePort",
@@ -10561,7 +10561,7 @@
       }
     },
     {
-      "claim_hash": "8ed3bd4ee617ecd210e18ae3d0ce7230a0f8aa9400223ff77f56fe8b98138668",
+      "claim_hash": "348b7218138c1b053e515f15c8132c01e6ee29be3d6b2129735226b909334d8d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineCapturePort",
@@ -10585,7 +10585,7 @@
       }
     },
     {
-      "claim_hash": "f6e42ecde0eb20456cf5dcf2cf100e89e1dac40cf63f9615dada620a0cfbcbee",
+      "claim_hash": "75c47776629bd0141177a3c96c5404aba2360c9944b46310e50b21e56bb5a837",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineCaptureService",
@@ -10604,12 +10604,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず",
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "f6e42ecde0eb20456cf5dcf2cf100e89e1dac40cf63f9615dada620a0cfbcbee",
+      "claim_hash": "75c47776629bd0141177a3c96c5404aba2360c9944b46310e50b21e56bb5a837",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineCaptureService",
@@ -10633,7 +10633,7 @@
       }
     },
     {
-      "claim_hash": "f6e42ecde0eb20456cf5dcf2cf100e89e1dac40cf63f9615dada620a0cfbcbee",
+      "claim_hash": "75c47776629bd0141177a3c96c5404aba2360c9944b46310e50b21e56bb5a837",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineCaptureService",
@@ -10657,7 +10657,7 @@
       }
     },
     {
-      "claim_hash": "f6e42ecde0eb20456cf5dcf2cf100e89e1dac40cf63f9615dada620a0cfbcbee",
+      "claim_hash": "75c47776629bd0141177a3c96c5404aba2360c9944b46310e50b21e56bb5a837",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineCaptureService",
@@ -10676,12 +10676,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "1cb1f50f44224f7deb207e2f7eb0ce6348b85db7bc26488b801f2a32592907ab",
+      "claim_hash": "7d720fe2de548a052105dea8ddbda3333fb021d53522f97cec08e6a71336b74a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineGraphPort",
@@ -10700,12 +10700,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "1cb1f50f44224f7deb207e2f7eb0ce6348b85db7bc26488b801f2a32592907ab",
+      "claim_hash": "7d720fe2de548a052105dea8ddbda3333fb021d53522f97cec08e6a71336b74a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineGraphPort",
@@ -10729,7 +10729,7 @@
       }
     },
     {
-      "claim_hash": "d2d8a6ef0b0994a0ec550b6462ccc01a519d4e7eb52a18f5aa4ce2cdb806b60e",
+      "claim_hash": "c43bf4933ed4bb093a539c364c4def762a1c085f8313fb43dfc60ee63a8be93a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineGraphService",
@@ -10753,7 +10753,7 @@
       }
     },
     {
-      "claim_hash": "d2d8a6ef0b0994a0ec550b6462ccc01a519d4e7eb52a18f5aa4ce2cdb806b60e",
+      "claim_hash": "c43bf4933ed4bb093a539c364c4def762a1c085f8313fb43dfc60ee63a8be93a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineGraphService",
@@ -10777,7 +10777,7 @@
       }
     },
     {
-      "claim_hash": "d2d8a6ef0b0994a0ec550b6462ccc01a519d4e7eb52a18f5aa4ce2cdb806b60e",
+      "claim_hash": "c43bf4933ed4bb093a539c364c4def762a1c085f8313fb43dfc60ee63a8be93a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineGraphService",
@@ -10796,12 +10796,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "d2d8a6ef0b0994a0ec550b6462ccc01a519d4e7eb52a18f5aa4ce2cdb806b60e",
+      "claim_hash": "c43bf4933ed4bb093a539c364c4def762a1c085f8313fb43dfc60ee63a8be93a",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBaselineGraphService",
@@ -10820,12 +10820,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "ca8bc2645786dcc8ebd5a90c7ea1de1855889e690eb11bbcae9a36e42fcd9476",
+      "claim_hash": "7542c3aa3de75c8a98f62243ea4605bf5ea32418d1b82f4a2d1e3fdecc6045ad",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchCreateService",
@@ -10849,7 +10849,7 @@
       }
     },
     {
-      "claim_hash": "ca8bc2645786dcc8ebd5a90c7ea1de1855889e690eb11bbcae9a36e42fcd9476",
+      "claim_hash": "7542c3aa3de75c8a98f62243ea4605bf5ea32418d1b82f4a2d1e3fdecc6045ad",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchCreateService",
@@ -10873,7 +10873,7 @@
       }
     },
     {
-      "claim_hash": "ca8bc2645786dcc8ebd5a90c7ea1de1855889e690eb11bbcae9a36e42fcd9476",
+      "claim_hash": "7542c3aa3de75c8a98f62243ea4605bf5ea32418d1b82f4a2d1e3fdecc6045ad",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchCreateService",
@@ -10897,7 +10897,7 @@
       }
     },
     {
-      "claim_hash": "ca8bc2645786dcc8ebd5a90c7ea1de1855889e690eb11bbcae9a36e42fcd9476",
+      "claim_hash": "7542c3aa3de75c8a98f62243ea4605bf5ea32418d1b82f4a2d1e3fdecc6045ad",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchCreateService",
@@ -10916,12 +10916,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "6d2e9b22e692d1eab190093a58cada97a2e128cd828bdc3824511169a9bd30d2",
+      "claim_hash": "21bd7afa683d183502b8cbb24c462dc50325f77a10a4e550c5960c5c927f3407",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchStrategyPort",
@@ -10945,7 +10945,7 @@
       }
     },
     {
-      "claim_hash": "6d2e9b22e692d1eab190093a58cada97a2e128cd828bdc3824511169a9bd30d2",
+      "claim_hash": "21bd7afa683d183502b8cbb24c462dc50325f77a10a4e550c5960c5c927f3407",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchStrategyPort",
@@ -10969,7 +10969,7 @@
       }
     },
     {
-      "claim_hash": "53f1ad6416d446ed31d7e964169b59ccf66c8b3fa75b0f54275dc92c627bd6e6",
+      "claim_hash": "1072919d757e5936760a61e4a65f6f83851430c301465bad68e7c18d753cb2ca",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchSwitchService",
@@ -10993,7 +10993,7 @@
       }
     },
     {
-      "claim_hash": "53f1ad6416d446ed31d7e964169b59ccf66c8b3fa75b0f54275dc92c627bd6e6",
+      "claim_hash": "1072919d757e5936760a61e4a65f6f83851430c301465bad68e7c18d753cb2ca",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchSwitchService",
@@ -11017,7 +11017,7 @@
       }
     },
     {
-      "claim_hash": "53f1ad6416d446ed31d7e964169b59ccf66c8b3fa75b0f54275dc92c627bd6e6",
+      "claim_hash": "1072919d757e5936760a61e4a65f6f83851430c301465bad68e7c18d753cb2ca",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchSwitchService",
@@ -11041,7 +11041,7 @@
       }
     },
     {
-      "claim_hash": "53f1ad6416d446ed31d7e964169b59ccf66c8b3fa75b0f54275dc92c627bd6e6",
+      "claim_hash": "1072919d757e5936760a61e4a65f6f83851430c301465bad68e7c18d753cb2ca",
       "claim_origin": {
         "data": {
           "entry_key": "TrackBranchSwitchService",
@@ -11065,7 +11065,7 @@
       }
     },
     {
-      "claim_hash": "839bd45c964b1afbb0c754dac97e6e2d2a401a4a98cbb1cf05a0c269935f046e",
+      "claim_hash": "4d0368aba4f89bbac98ad86e6a12c4ce32b246c4531660e0e6d25726f5d0cae6",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueImplSignalsPort",
@@ -11089,7 +11089,7 @@
       }
     },
     {
-      "claim_hash": "839bd45c964b1afbb0c754dac97e6e2d2a401a4a98cbb1cf05a0c269935f046e",
+      "claim_hash": "4d0368aba4f89bbac98ad86e6a12c4ce32b246c4531660e0e6d25726f5d0cae6",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueImplSignalsPort",
@@ -11113,7 +11113,7 @@
       }
     },
     {
-      "claim_hash": "cf8f87c21d195a1bd83c2349d588a631fa384aad0e8a7dd32bd0f04f22f73152",
+      "claim_hash": "1d722792299bf04d6a6e2d7cd8bbff8ad37f349e7d2cc76d1d79662955a1e3a7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueImplSignalsService",
@@ -11132,12 +11132,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず",
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "cf8f87c21d195a1bd83c2349d588a631fa384aad0e8a7dd32bd0f04f22f73152",
+      "claim_hash": "1d722792299bf04d6a6e2d7cd8bbff8ad37f349e7d2cc76d1d79662955a1e3a7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueImplSignalsService",
@@ -11161,7 +11161,7 @@
       }
     },
     {
-      "claim_hash": "cf8f87c21d195a1bd83c2349d588a631fa384aad0e8a7dd32bd0f04f22f73152",
+      "claim_hash": "1d722792299bf04d6a6e2d7cd8bbff8ad37f349e7d2cc76d1d79662955a1e3a7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueImplSignalsService",
@@ -11185,7 +11185,7 @@
       }
     },
     {
-      "claim_hash": "cf8f87c21d195a1bd83c2349d588a631fa384aad0e8a7dd32bd0f04f22f73152",
+      "claim_hash": "1d722792299bf04d6a6e2d7cd8bbff8ad37f349e7d2cc76d1d79662955a1e3a7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueImplSignalsService",
@@ -11204,12 +11204,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2ecb37695a27908fa7f59accad42b887ec2b8064288c3a0e4effb5cd2ffda493",
+      "claim_hash": "5111c581deaaa00d9cb55d6b76ff36050e4ddd61387d1aec1243727a02459b98",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueLintActivePort",
@@ -11233,7 +11233,7 @@
       }
     },
     {
-      "claim_hash": "2ecb37695a27908fa7f59accad42b887ec2b8064288c3a0e4effb5cd2ffda493",
+      "claim_hash": "5111c581deaaa00d9cb55d6b76ff36050e4ddd61387d1aec1243727a02459b98",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueLintActivePort",
@@ -11257,7 +11257,7 @@
       }
     },
     {
-      "claim_hash": "e4948974a50ce3c3479f15f31f5a250a96ced278bd8abe8e8a98e881f83873d7",
+      "claim_hash": "1bfc375b81a61043c64e5794e6143f4c545e61feb6d9778acfd23ab5d60f2b7e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueLintActiveService",
@@ -11281,7 +11281,7 @@
       }
     },
     {
-      "claim_hash": "e4948974a50ce3c3479f15f31f5a250a96ced278bd8abe8e8a98e881f83873d7",
+      "claim_hash": "1bfc375b81a61043c64e5794e6143f4c545e61feb6d9778acfd23ab5d60f2b7e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueLintActiveService",
@@ -11305,7 +11305,7 @@
       }
     },
     {
-      "claim_hash": "e4948974a50ce3c3479f15f31f5a250a96ced278bd8abe8e8a98e881f83873d7",
+      "claim_hash": "1bfc375b81a61043c64e5794e6143f4c545e61feb6d9778acfd23ab5d60f2b7e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueLintActiveService",
@@ -11329,7 +11329,7 @@
       }
     },
     {
-      "claim_hash": "e4948974a50ce3c3479f15f31f5a250a96ced278bd8abe8e8a98e881f83873d7",
+      "claim_hash": "1bfc375b81a61043c64e5794e6143f4c545e61feb6d9778acfd23ab5d60f2b7e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueLintActiveService",
@@ -11353,7 +11353,7 @@
       }
     },
     {
-      "claim_hash": "6402ecfd7a16489dabc03a19a2197ffaa2590aed221131708a395ac4c8ef571b",
+      "claim_hash": "57d8eacdb91eb5ab4a49eaa976acea18c9b658c8d31912f84205cb2ca9a36a0b",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueSpecSignalsPort",
@@ -11377,7 +11377,7 @@
       }
     },
     {
-      "claim_hash": "6402ecfd7a16489dabc03a19a2197ffaa2590aed221131708a395ac4c8ef571b",
+      "claim_hash": "57d8eacdb91eb5ab4a49eaa976acea18c9b658c8d31912f84205cb2ca9a36a0b",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueSpecSignalsPort",
@@ -11401,7 +11401,7 @@
       }
     },
     {
-      "claim_hash": "e91a7695e0d7653e7c4fbea97151cad07fc532ec162d7eef1182e8cae0d8e70a",
+      "claim_hash": "a55b2cd670749e6fd808fd59d71c716b819c4a9928b04de1fc2e94c85432c181",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueSpecSignalsService",
@@ -11420,12 +11420,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず",
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "e91a7695e0d7653e7c4fbea97151cad07fc532ec162d7eef1182e8cae0d8e70a",
+      "claim_hash": "a55b2cd670749e6fd808fd59d71c716b819c4a9928b04de1fc2e94c85432c181",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueSpecSignalsService",
@@ -11449,7 +11449,7 @@
       }
     },
     {
-      "claim_hash": "e91a7695e0d7653e7c4fbea97151cad07fc532ec162d7eef1182e8cae0d8e70a",
+      "claim_hash": "a55b2cd670749e6fd808fd59d71c716b819c4a9928b04de1fc2e94c85432c181",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueSpecSignalsService",
@@ -11473,7 +11473,7 @@
       }
     },
     {
-      "claim_hash": "e91a7695e0d7653e7c4fbea97151cad07fc532ec162d7eef1182e8cae0d8e70a",
+      "claim_hash": "a55b2cd670749e6fd808fd59d71c716b819c4a9928b04de1fc2e94c85432c181",
       "claim_origin": {
         "data": {
           "entry_key": "TrackCatalogueSpecSignalsService",
@@ -11492,12 +11492,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b677dd52bc37ccb1e4b3c59e0bc86913898a3b2ea85e68625cb8544790f66e72",
+      "claim_hash": "7c0f5fe21ed0e4d5beff257f5216a42a23ae3be9fe4814ee6fcdeee486b8ada7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackClearOverrideService",
@@ -11516,12 +11516,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず",
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b677dd52bc37ccb1e4b3c59e0bc86913898a3b2ea85e68625cb8544790f66e72",
+      "claim_hash": "7c0f5fe21ed0e4d5beff257f5216a42a23ae3be9fe4814ee6fcdeee486b8ada7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackClearOverrideService",
@@ -11545,7 +11545,7 @@
       }
     },
     {
-      "claim_hash": "b677dd52bc37ccb1e4b3c59e0bc86913898a3b2ea85e68625cb8544790f66e72",
+      "claim_hash": "7c0f5fe21ed0e4d5beff257f5216a42a23ae3be9fe4814ee6fcdeee486b8ada7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackClearOverrideService",
@@ -11569,10 +11569,202 @@
       }
     },
     {
-      "claim_hash": "b677dd52bc37ccb1e4b3c59e0bc86913898a3b2ea85e68625cb8544790f66e72",
+      "claim_hash": "7c0f5fe21ed0e4d5beff257f5216a42a23ae3be9fe4814ee6fcdeee486b8ada7",
       "claim_origin": {
         "data": {
           "entry_key": "TrackClearOverrideService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6e85e13c4d00ca80a8e36e9ce1db5a6c7f84d428da7ee93dffa93504a0cab15b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommitHashPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "6e85e13c4d00ca80a8e36e9ce1db5a6c7f84d428da7ee93dffa93504a0cab15b",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackCommitHashPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "977d342f47b1ef5ed02635fa0aa0a0ffd454ed158b07ea393627d7a346e9183b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "88fe83550c1f2fc135ce244287f6fb23a3343e97f0991173d557bbfc213c2c9a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackContractMapPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "88fe83550c1f2fc135ce244287f6fb23a3343e97f0991173d557bbfc213c2c9a",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackContractMapPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0914969377a96cbc312d3fa2f4edf136657462a4371940065ccd55c1c46ab589",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackContractMapService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0914969377a96cbc312d3fa2f4edf136657462a4371940065ccd55c1c46ab589",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackContractMapService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0914969377a96cbc312d3fa2f4edf136657462a4371940065ccd55c1c46ab589",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackContractMapService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0914969377a96cbc312d3fa2f4edf136657462a4371940065ccd55c1c46ab589",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackContractMapService",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
           "section_key": "traits"
         },
@@ -11593,199 +11785,7 @@
       }
     },
     {
-      "claim_hash": "72f839766cda6ca515413f33092cd5fd40c37c2b1ce1c011733d92dffd1df8d9",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackCommitHashPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "72f839766cda6ca515413f33092cd5fd40c37c2b1ce1c011733d92dffd1df8d9",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackCommitHashPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "977d342f47b1ef5ed02635fa0aa0a0ffd454ed158b07ea393627d7a346e9183b",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-05",
-          "section": "acceptance_criteria",
-          "text_label": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "519026f439a6393acc37c91038ed1f6c2b0cff594b793994a4da27536bc16897",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackContractMapPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "519026f439a6393acc37c91038ed1f6c2b0cff594b793994a4da27536bc16897",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackContractMapPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-01",
-          "section": "constraint",
-          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "98a766e6f706eb431ced1e821b6e128bf671ed81e242cf6a835e7cbde577b626",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackContractMapService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "98a766e6f706eb431ced1e821b6e128bf671ed81e242cf6a835e7cbde577b626",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackContractMapService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "98a766e6f706eb431ced1e821b6e128bf671ed81e242cf6a835e7cbde577b626",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackContractMapService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "98a766e6f706eb431ced1e821b6e128bf671ed81e242cf6a835e7cbde577b626",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackContractMapService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "092e9b426c2e1b186901512503dba95de8d103505eccca23577aff59258b7dcc",
+      "claim_hash": "ebe61b50512a502d729bb29d32af28c275b6d9607eb71cfa923d3a0d9021fc7c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackInitService",
@@ -11809,7 +11809,7 @@
       }
     },
     {
-      "claim_hash": "092e9b426c2e1b186901512503dba95de8d103505eccca23577aff59258b7dcc",
+      "claim_hash": "ebe61b50512a502d729bb29d32af28c275b6d9607eb71cfa923d3a0d9021fc7c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackInitService",
@@ -11833,7 +11833,7 @@
       }
     },
     {
-      "claim_hash": "092e9b426c2e1b186901512503dba95de8d103505eccca23577aff59258b7dcc",
+      "claim_hash": "ebe61b50512a502d729bb29d32af28c275b6d9607eb71cfa923d3a0d9021fc7c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackInitService",
@@ -11857,7 +11857,7 @@
       }
     },
     {
-      "claim_hash": "092e9b426c2e1b186901512503dba95de8d103505eccca23577aff59258b7dcc",
+      "claim_hash": "ebe61b50512a502d729bb29d32af28c275b6d9607eb71cfa923d3a0d9021fc7c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackInitService",
@@ -11876,12 +11876,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "575f7b8e5e21958b3c61b5c99c458741b0089ffb8d9901c5557e21cd0bd0964e",
+      "claim_hash": "f6512bec672e7ad39caec9bd0ddeaddf6a0cdf47f9497f1f417eac04c981ab23",
       "claim_origin": {
         "data": {
           "entry_key": "TrackLintPort",
@@ -11905,7 +11905,7 @@
       }
     },
     {
-      "claim_hash": "575f7b8e5e21958b3c61b5c99c458741b0089ffb8d9901c5557e21cd0bd0964e",
+      "claim_hash": "f6512bec672e7ad39caec9bd0ddeaddf6a0cdf47f9497f1f417eac04c981ab23",
       "claim_origin": {
         "data": {
           "entry_key": "TrackLintPort",
@@ -11929,7 +11929,7 @@
       }
     },
     {
-      "claim_hash": "a3e858de5044a63c99030f0012ba5f4753b1df8a543db7c401ee9ac883968a5d",
+      "claim_hash": "97efe610d360eb982482d6a665857558c213e9f7df640326f7dd6e64ae21ee6d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackLintService",
@@ -11953,7 +11953,7 @@
       }
     },
     {
-      "claim_hash": "a3e858de5044a63c99030f0012ba5f4753b1df8a543db7c401ee9ac883968a5d",
+      "claim_hash": "97efe610d360eb982482d6a665857558c213e9f7df640326f7dd6e64ae21ee6d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackLintService",
@@ -11977,7 +11977,7 @@
       }
     },
     {
-      "claim_hash": "a3e858de5044a63c99030f0012ba5f4753b1df8a543db7c401ee9ac883968a5d",
+      "claim_hash": "97efe610d360eb982482d6a665857558c213e9f7df640326f7dd6e64ae21ee6d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackLintService",
@@ -12001,7 +12001,7 @@
       }
     },
     {
-      "claim_hash": "a3e858de5044a63c99030f0012ba5f4753b1df8a543db7c401ee9ac883968a5d",
+      "claim_hash": "97efe610d360eb982482d6a665857558c213e9f7df640326f7dd6e64ae21ee6d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackLintService",
@@ -12020,12 +12020,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2efc1fa745ba3a705a587eecdee0d1beaa518b98d521659c0819fc698e6db7b9",
+      "claim_hash": "121c91c900155840961e9e4b26255e5a7a57648e751fd850627bba92a475158e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackMetadataPort",
@@ -12049,7 +12049,7 @@
       }
     },
     {
-      "claim_hash": "2efc1fa745ba3a705a587eecdee0d1beaa518b98d521659c0819fc698e6db7b9",
+      "claim_hash": "121c91c900155840961e9e4b26255e5a7a57648e751fd850627bba92a475158e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackMetadataPort",
@@ -12073,7 +12073,7 @@
       }
     },
     {
-      "claim_hash": "fbededb0561c786f4a0d1987051265191a7e07e94f35a8223f12622333bc7d6f",
+      "claim_hash": "89b0a86b9490c38a5ac5f86e30c59b39acdf57a0d2c9c2544e355f22cbdccb05",
       "claim_origin": {
         "data": {
           "entry_key": "TrackNextTaskQueryPort",
@@ -12097,7 +12097,7 @@
       }
     },
     {
-      "claim_hash": "fbededb0561c786f4a0d1987051265191a7e07e94f35a8223f12622333bc7d6f",
+      "claim_hash": "89b0a86b9490c38a5ac5f86e30c59b39acdf57a0d2c9c2544e355f22cbdccb05",
       "claim_origin": {
         "data": {
           "entry_key": "TrackNextTaskQueryPort",
@@ -12121,7 +12121,7 @@
       }
     },
     {
-      "claim_hash": "608e659b184efd23d8ae8b734178dc9ef790b43adbe78e48c17804c138fc49b1",
+      "claim_hash": "06a3a249afb5d69d836275d2210106949a0b52e94b40180ea6ce780d4c2f688d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackNextTaskService",
@@ -12140,12 +12140,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり",
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "608e659b184efd23d8ae8b734178dc9ef790b43adbe78e48c17804c138fc49b1",
+      "claim_hash": "06a3a249afb5d69d836275d2210106949a0b52e94b40180ea6ce780d4c2f688d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackNextTaskService",
@@ -12169,7 +12169,7 @@
       }
     },
     {
-      "claim_hash": "608e659b184efd23d8ae8b734178dc9ef790b43adbe78e48c17804c138fc49b1",
+      "claim_hash": "06a3a249afb5d69d836275d2210106949a0b52e94b40180ea6ce780d4c2f688d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackNextTaskService",
@@ -12193,7 +12193,7 @@
       }
     },
     {
-      "claim_hash": "608e659b184efd23d8ae8b734178dc9ef790b43adbe78e48c17804c138fc49b1",
+      "claim_hash": "06a3a249afb5d69d836275d2210106949a0b52e94b40180ea6ce780d4c2f688d",
       "claim_origin": {
         "data": {
           "entry_key": "TrackNextTaskService",
@@ -12212,12 +12212,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b302b65aaab5519dab0058ffc8009fd0cb1c89cb91df2f2516783cda9c1f4596",
+      "claim_hash": "f783488823da7c19a2f67f363955bf9769db40ec1e48f562ef5f56d4ea6d3ed4",
       "claim_origin": {
         "data": {
           "entry_key": "TrackOverrideClearPort",
@@ -12236,12 +12236,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b302b65aaab5519dab0058ffc8009fd0cb1c89cb91df2f2516783cda9c1f4596",
+      "claim_hash": "f783488823da7c19a2f67f363955bf9769db40ec1e48f562ef5f56d4ea6d3ed4",
       "claim_origin": {
         "data": {
           "entry_key": "TrackOverrideClearPort",
@@ -12265,7 +12265,7 @@
       }
     },
     {
-      "claim_hash": "996b32ca7e8ea5e6bcb374038a2823f311d75c974a67de7be99ce6eadcbf4c7c",
+      "claim_hash": "f47245d6848b678537f94a34ac1b1ccb12cc4f2d4992eaf611e73fa0bcb05e2e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackOverrideSetPort",
@@ -12289,7 +12289,7 @@
       }
     },
     {
-      "claim_hash": "996b32ca7e8ea5e6bcb374038a2823f311d75c974a67de7be99ce6eadcbf4c7c",
+      "claim_hash": "f47245d6848b678537f94a34ac1b1ccb12cc4f2d4992eaf611e73fa0bcb05e2e",
       "claim_origin": {
         "data": {
           "entry_key": "TrackOverrideSetPort",
@@ -12313,7 +12313,7 @@
       }
     },
     {
-      "claim_hash": "46656e8a281d48aa527d1fb7840759efc3bf90b8f9afb11482f2fbf09f38adf8",
+      "claim_hash": "8a1b3365b604822fa09a039cd9393fb89c942c2d57069aea659deea583a6d037",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolutionPort",
@@ -12337,7 +12337,7 @@
       }
     },
     {
-      "claim_hash": "46656e8a281d48aa527d1fb7840759efc3bf90b8f9afb11482f2fbf09f38adf8",
+      "claim_hash": "8a1b3365b604822fa09a039cd9393fb89c942c2d57069aea659deea583a6d037",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolutionPort",
@@ -12361,7 +12361,7 @@
       }
     },
     {
-      "claim_hash": "86658ae51246f01bdb6d1ba10bc2510a6e8d1ba48f9a3a9627563e8dcd0a0f09",
+      "claim_hash": "7fe7a8c35841c7cfc572780b2d36f035d4734b7b81add56b77ea25c264f670c8",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolutionService",
@@ -12380,12 +12380,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "旧 TrackCompositionRoot resolution helper を利用する call site を更新し、同等の解決機能を維持する。",
+        "citation": "同等の解決機能を維持する。この更新は Track context の公開面を純 DI に収束させるための互換適応",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "86658ae51246f01bdb6d1ba10bc2510a6e8d1ba48f9a3a9627563e8dcd0a0f09",
+      "claim_hash": "7fe7a8c35841c7cfc572780b2d36f035d4734b7b81add56b77ea25c264f670c8",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolutionService",
@@ -12409,7 +12409,7 @@
       }
     },
     {
-      "claim_hash": "7369e459ffecb79a121c7b1a36d02ea1ff8f43cdc1cc5358667022705902f76e",
+      "claim_hash": "76750c47b9c931453d45bd36b667a5786e9a23d323ac96ca44b72d2711ac48b4",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolveService",
@@ -12433,7 +12433,7 @@
       }
     },
     {
-      "claim_hash": "7369e459ffecb79a121c7b1a36d02ea1ff8f43cdc1cc5358667022705902f76e",
+      "claim_hash": "76750c47b9c931453d45bd36b667a5786e9a23d323ac96ca44b72d2711ac48b4",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolveService",
@@ -12457,7 +12457,7 @@
       }
     },
     {
-      "claim_hash": "7369e459ffecb79a121c7b1a36d02ea1ff8f43cdc1cc5358667022705902f76e",
+      "claim_hash": "76750c47b9c931453d45bd36b667a5786e9a23d323ac96ca44b72d2711ac48b4",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolveService",
@@ -12481,7 +12481,7 @@
       }
     },
     {
-      "claim_hash": "7369e459ffecb79a121c7b1a36d02ea1ff8f43cdc1cc5358667022705902f76e",
+      "claim_hash": "76750c47b9c931453d45bd36b667a5786e9a23d323ac96ca44b72d2711ac48b4",
       "claim_origin": {
         "data": {
           "entry_key": "TrackResolveService",
@@ -12500,12 +12500,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "b14e190a8a64b5e8e304a73acd7919cb5acb1ef0e7e6e5de820f44b6bde11ae4",
+      "claim_hash": "f7787ab4b0c1e41b0480248a874ca16b2ba19e88a07e3371bca9cc3161c624e0",
       "claim_origin": {
         "data": {
           "entry_key": "TrackSelectionPort",
@@ -12529,7 +12529,7 @@
       }
     },
     {
-      "claim_hash": "b14e190a8a64b5e8e304a73acd7919cb5acb1ef0e7e6e5de820f44b6bde11ae4",
+      "claim_hash": "f7787ab4b0c1e41b0480248a874ca16b2ba19e88a07e3371bca9cc3161c624e0",
       "claim_origin": {
         "data": {
           "entry_key": "TrackSelectionPort",
@@ -12553,7 +12553,7 @@
       }
     },
     {
-      "claim_hash": "3a560129ae875b45280c1d80f154128d848385893b58f9d3a48b5becf2d5887c",
+      "claim_hash": "6520390fa92ad57753ccbf065ebed9c980ba631ec33a524ee8fbbded0d36a608",
       "claim_origin": {
         "data": {
           "entry_key": "TrackSetCommitHashService",
@@ -12577,7 +12577,7 @@
       }
     },
     {
-      "claim_hash": "3a560129ae875b45280c1d80f154128d848385893b58f9d3a48b5becf2d5887c",
+      "claim_hash": "6520390fa92ad57753ccbf065ebed9c980ba631ec33a524ee8fbbded0d36a608",
       "claim_origin": {
         "data": {
           "entry_key": "TrackSetCommitHashService",
@@ -12601,7 +12601,7 @@
       }
     },
     {
-      "claim_hash": "3a560129ae875b45280c1d80f154128d848385893b58f9d3a48b5becf2d5887c",
+      "claim_hash": "6520390fa92ad57753ccbf065ebed9c980ba631ec33a524ee8fbbded0d36a608",
       "claim_origin": {
         "data": {
           "entry_key": "TrackSetCommitHashService",
@@ -12625,970 +12625,10 @@
       }
     },
     {
-      "claim_hash": "3a560129ae875b45280c1d80f154128d848385893b58f9d3a48b5becf2d5887c",
+      "claim_hash": "6520390fa92ad57753ccbf065ebed9c980ba631ec33a524ee8fbbded0d36a608",
       "claim_origin": {
         "data": {
           "entry_key": "TrackSetCommitHashService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "981a5861fe07fcbf04d7819aabd4a507636cac9a18574279c321a6cec65829c7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSetOverrideService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "981a5861fe07fcbf04d7819aabd4a507636cac9a18574279c321a6cec65829c7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSetOverrideService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "981a5861fe07fcbf04d7819aabd4a507636cac9a18574279c321a6cec65829c7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSetOverrideService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "981a5861fe07fcbf04d7819aabd4a507636cac9a18574279c321a6cec65829c7",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSetOverrideService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "821d15f736f8b610f5de46c5e65d3a1f1cd911cd5b7ec6c2ed0b0e414f371d64",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSpecElementHashPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "821d15f736f8b610f5de46c5e65d3a1f1cd911cd5b7ec6c2ed0b0e414f371d64",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSpecElementHashPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-01",
-          "section": "constraint",
-          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6d72537176e6ffa288c40c4af37021f677bebd56a1ecdef50f689ca4523a5035",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSpecElementHashService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6d72537176e6ffa288c40c4af37021f677bebd56a1ecdef50f689ca4523a5035",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSpecElementHashService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6d72537176e6ffa288c40c4af37021f677bebd56a1ecdef50f689ca4523a5035",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSpecElementHashService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6d72537176e6ffa288c40c4af37021f677bebd56a1ecdef50f689ca4523a5035",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSpecElementHashService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6ba1cc4fa5bd9ac656fee332ce4dc909eac072249ae646a3307e03bcd660def8",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSwitchBaseService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6ba1cc4fa5bd9ac656fee332ce4dc909eac072249ae646a3307e03bcd660def8",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSwitchBaseService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6ba1cc4fa5bd9ac656fee332ce4dc909eac072249ae646a3307e03bcd660def8",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSwitchBaseService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6ba1cc4fa5bd9ac656fee332ce4dc909eac072249ae646a3307e03bcd660def8",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackSwitchBaseService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "95f5242fbb7466c84f34f6baf4ef240c5695882aba52cdf52089c36e114853cf",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskAddPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "95f5242fbb7466c84f34f6baf4ef240c5695882aba52cdf52089c36e114853cf",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskAddPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-01",
-          "section": "constraint",
-          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "c28d0c0cb2471c531400a58b838e6a4809a70c3ec3a1028515658cd4377dcc57",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskCountsQueryPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "c28d0c0cb2471c531400a58b838e6a4809a70c3ec3a1028515658cd4377dcc57",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskCountsQueryPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-01",
-          "section": "constraint",
-          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "196ec1c68785aea7bff775bd84f6821622e8e6e64fba6f8925983a3c9c5e8cae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskCountsService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "196ec1c68785aea7bff775bd84f6821622e8e6e64fba6f8925983a3c9c5e8cae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskCountsService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "196ec1c68785aea7bff775bd84f6821622e8e6e64fba6f8925983a3c9c5e8cae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskCountsService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "196ec1c68785aea7bff775bd84f6821622e8e6e64fba6f8925983a3c9c5e8cae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskCountsService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "0f0e6c7eedb3c88370b3c6f079c492afb50f56ac7dc1bb227b1f9142861fee89",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskTransitionPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "0f0e6c7eedb3c88370b3c6f079c492afb50f56ac7dc1bb227b1f9142861fee89",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTaskTransitionPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-01",
-          "section": "constraint",
-          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6cbaa6cedb60be0b9ff9c57248226a5161206e9989a42eb24f6b667c64a19b16",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTransitionService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6cbaa6cedb60be0b9ff9c57248226a5161206e9989a42eb24f6b667c64a19b16",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTransitionService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6cbaa6cedb60be0b9ff9c57248226a5161206e9989a42eb24f6b667c64a19b16",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTransitionService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "6cbaa6cedb60be0b9ff9c57248226a5161206e9989a42eb24f6b667c64a19b16",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTransitionService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "1f4bf89b7dc9637c2c37b187f7b5ea1f233277ccf94a53d41e60e68f11333ee3",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeGraphPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "1f4bf89b7dc9637c2c37b187f7b5ea1f233277ccf94a53d41e60e68f11333ee3",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeGraphPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-01",
-          "section": "constraint",
-          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "257f5632d366c14f50d284f71abd4659d9f9c80059bfda783fe937c1ec7598ae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeGraphService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "257f5632d366c14f50d284f71abd4659d9f9c80059bfda783fe937c1ec7598ae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeGraphService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "257f5632d366c14f50d284f71abd4659d9f9c80059bfda783fe937c1ec7598ae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeGraphService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "257f5632d366c14f50d284f71abd4659d9f9c80059bfda783fe937c1ec7598ae",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeGraphService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-03",
-          "section": "constraint",
-          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "9a6e733df4c5ffcb56845154b427a9a8d7ba82c97d6a6e0e7b9ac0f9c7619291",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeSignalsPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "9a6e733df4c5ffcb56845154b427a9a8d7ba82c97d6a6e0e7b9ac0f9c7619291",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeSignalsPort",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
-      "evidence_origin": {
-        "data": {
-          "element_id": "CN-01",
-          "section": "constraint",
-          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "a901762c216831a8e80b49be2d692c76eaa2557ba91adf82cfbc0baf41efc8ad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeSignalsService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-02",
-          "section": "acceptance_criteria",
-          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "a901762c216831a8e80b49be2d692c76eaa2557ba91adf82cfbc0baf41efc8ad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeSignalsService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-03",
-          "section": "acceptance_criteria",
-          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "a901762c216831a8e80b49be2d692c76eaa2557ba91adf82cfbc0baf41efc8ad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeSignalsService",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
-          "section_key": "traits"
-        },
-        "kind": "catalogue_entry"
-      },
-      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
-      "evidence_origin": {
-        "data": {
-          "element_id": "AC-04",
-          "section": "acceptance_criteria",
-          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
-        },
-        "kind": "spec_element"
-      },
-      "verdict": {
-        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
-        "kind": "pass"
-      }
-    },
-    {
-      "claim_hash": "a901762c216831a8e80b49be2d692c76eaa2557ba91adf82cfbc0baf41efc8ad",
-      "claim_origin": {
-        "data": {
-          "entry_key": "TrackTypeSignalsService",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
           "section_key": "traits"
         },
@@ -13609,10 +12649,34 @@
       }
     },
     {
-      "claim_hash": "e1c60ccff4bf74e4ba20bb0f8282bc73edcbf8d7c5fb61947d48321cc90a8f27",
+      "claim_hash": "e4d4775c58ca5fd5197507328ee022638b369d733e5c98dff194daaa5bdf8024",
       "claim_origin": {
         "data": {
-          "entry_key": "TrackViewsPort",
+          "entry_key": "TrackSetOverrideService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e4d4775c58ca5fd5197507328ee022638b369d733e5c98dff194daaa5bdf8024",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSetOverrideService",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
           "section_key": "traits"
         },
@@ -13633,34 +12697,394 @@
       }
     },
     {
-      "claim_hash": "e1c60ccff4bf74e4ba20bb0f8282bc73edcbf8d7c5fb61947d48321cc90a8f27",
+      "claim_hash": "e4d4775c58ca5fd5197507328ee022638b369d733e5c98dff194daaa5bdf8024",
       "claim_origin": {
         "data": {
-          "entry_key": "TrackViewsPort",
+          "entry_key": "TrackSetOverrideService",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
           "section_key": "traits"
         },
         "kind": "catalogue_entry"
       },
-      "evidence_hash": "09e22855ceacedfae2db0e8d5fec836a89b3e143cf7ae6c3988062452b07de27",
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
       "evidence_origin": {
         "data": {
-          "element_id": "IN-02",
-          "section": "in_scope",
-          "text_label": "対象 execution path から composition root 上の command execution logic、CommandOutcome generation、直接 I/O、および usecase から composition root への逆委譲を除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
         },
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。",
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "2cc9caa0c9cc011c3c05d6e42e1be0c76f170189ce2877b84ce73c1fe3e6ea54",
+      "claim_hash": "e4d4775c58ca5fd5197507328ee022638b369d733e5c98dff194daaa5bdf8024",
       "claim_origin": {
         "data": {
-          "entry_key": "TrackViewsSyncService",
+          "entry_key": "TrackSetOverrideService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b65348a3e575e245398ca6579a11f28e7667f2d9cab7140e26c3d0db357b8f78",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecElementHashPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "b65348a3e575e245398ca6579a11f28e7667f2d9cab7140e26c3d0db357b8f78",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecElementHashPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "47f6c1ea87f89e867294ff8e215c96c80272fdb7658d51334f106078d4ab2e53",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecElementHashService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "47f6c1ea87f89e867294ff8e215c96c80272fdb7658d51334f106078d4ab2e53",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecElementHashService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "47f6c1ea87f89e867294ff8e215c96c80272fdb7658d51334f106078d4ab2e53",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecElementHashService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "47f6c1ea87f89e867294ff8e215c96c80272fdb7658d51334f106078d4ab2e53",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSpecElementHashService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "89bba1386e6153947438d933e8b5d8898ae6788606344d18d423fbbfe390e219",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSwitchBaseService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "89bba1386e6153947438d933e8b5d8898ae6788606344d18d423fbbfe390e219",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSwitchBaseService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "89bba1386e6153947438d933e8b5d8898ae6788606344d18d423fbbfe390e219",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSwitchBaseService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "89bba1386e6153947438d933e8b5d8898ae6788606344d18d423fbbfe390e219",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackSwitchBaseService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0b071fc97bdc41a4289ae90e2756e21d02a46cd6f5d3b67f2ed60c6ecb39cb4d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskAddPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0b071fc97bdc41a4289ae90e2756e21d02a46cd6f5d3b67f2ed60c6ecb39cb4d",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskAddPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3a08bfdab23eebab8f8ae3afcf46a1d50077ced08d49ba4ad6464b478ec2be70",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskCountsQueryPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3a08bfdab23eebab8f8ae3afcf46a1d50077ced08d49ba4ad6464b478ec2be70",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskCountsQueryPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "549c6bfab16167df819348e10497feb6de21e42b042054a3e0a7e7c6bd26892e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskCountsService",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
           "section_key": "traits"
         },
@@ -13681,7 +13105,583 @@
       }
     },
     {
-      "claim_hash": "2cc9caa0c9cc011c3c05d6e42e1be0c76f170189ce2877b84ce73c1fe3e6ea54",
+      "claim_hash": "549c6bfab16167df819348e10497feb6de21e42b042054a3e0a7e7c6bd26892e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskCountsService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "549c6bfab16167df819348e10497feb6de21e42b042054a3e0a7e7c6bd26892e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskCountsService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "549c6bfab16167df819348e10497feb6de21e42b042054a3e0a7e7c6bd26892e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskCountsService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1230c0f326f87ad6d31024baac3fd8b25ff54aaadefa9cd2bb2f3be13b264a37",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskTransitionPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1230c0f326f87ad6d31024baac3fd8b25ff54aaadefa9cd2bb2f3be13b264a37",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTaskTransitionPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8e442731a7126e25d2965678dcdffb4cb7faa545c2a82fc4faef6c52c3972e9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTransitionService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8e442731a7126e25d2965678dcdffb4cb7faa545c2a82fc4faef6c52c3972e9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTransitionService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8e442731a7126e25d2965678dcdffb4cb7faa545c2a82fc4faef6c52c3972e9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTransitionService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "e8e442731a7126e25d2965678dcdffb4cb7faa545c2a82fc4faef6c52c3972e9",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTransitionService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d023b2eee46e97b1eb182d544a53f7bb0c8c5fa7f4f77a48716f129b26b70b42",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d023b2eee46e97b1eb182d544a53f7bb0c8c5fa7f4f77a48716f129b26b70b42",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7ac746c0836bea3173fbfb400c5685c2eafb882ef40de982b914141c9084f565",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7ac746c0836bea3173fbfb400c5685c2eafb882ef40de982b914141c9084f565",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7ac746c0836bea3173fbfb400c5685c2eafb882ef40de982b914141c9084f565",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7ac746c0836bea3173fbfb400c5685c2eafb882ef40de982b914141c9084f565",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeGraphService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d7b194f1b9b6fbf5ba9ab2c1134f4e061bd75550870bb48049432cd8a23d8eb3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeSignalsPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d7b194f1b9b6fbf5ba9ab2c1134f4e061bd75550870bb48049432cd8a23d8eb3",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeSignalsPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e8067e01a4865d59f26a325658a5ca07dfe761c95df113ed0c360e7b3f58367",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeSignalsService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e8067e01a4865d59f26a325658a5ca07dfe761c95df113ed0c360e7b3f58367",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeSignalsService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e8067e01a4865d59f26a325658a5ca07dfe761c95df113ed0c360e7b3f58367",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeSignalsService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c001c1475e12140ad26ce337eea80f107580673ff1f4238184c08144951d976d",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "2e8067e01a4865d59f26a325658a5ca07dfe761c95df113ed0c360e7b3f58367",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackTypeSignalsService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "c826c4a8e9fdc22109e9cf5812e866c37a0ae99edb66572124c10e073ce4be8c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "faa3e238706b95ca398dd09717b03d5e1ecc774ae87f6b70119a5c1262ebe944",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackViewsPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "76ea20de9ab1484187ac80b260b56f89bce94cc0e75ac5b0c2121a5ef877782c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "faa3e238706b95ca398dd09717b03d5e1ecc774ae87f6b70119a5c1262ebe944",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackViewsPort",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "09e22855ceacedfae2db0e8d5fec836a89b3e143cf7ae6c3988062452b07de27",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "対象 execution path から composition root 上の command execution logic、CommandOutcome generation、直接 I/O、および usecase から composition root への逆委譲を除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 execution path から composition root 上の command execution logic、CommandOutcome generation、直接 I/O、および usecase から composition root への逆委譲を除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f256b489cbc86766de6abac7e66bdb993bd0b874c9b6443fea868fbfec8a96f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "TrackViewsSyncService",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9c51867be9adf79be9632dd872f6df898b6a9db939c3c8c3731d1ef5d9b14192",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "7f256b489cbc86766de6abac7e66bdb993bd0b874c9b6443fea868fbfec8a96f",
       "claim_origin": {
         "data": {
           "entry_key": "TrackViewsSyncService",
@@ -13705,7 +13705,7 @@
       }
     },
     {
-      "claim_hash": "2cc9caa0c9cc011c3c05d6e42e1be0c76f170189ce2877b84ce73c1fe3e6ea54",
+      "claim_hash": "7f256b489cbc86766de6abac7e66bdb993bd0b874c9b6443fea868fbfec8a96f",
       "claim_origin": {
         "data": {
           "entry_key": "TrackViewsSyncService",
@@ -13729,7 +13729,7 @@
       }
     },
     {
-      "claim_hash": "2cc9caa0c9cc011c3c05d6e42e1be0c76f170189ce2877b84ce73c1fe3e6ea54",
+      "claim_hash": "7f256b489cbc86766de6abac7e66bdb993bd0b874c9b6443fea868fbfec8a96f",
       "claim_origin": {
         "data": {
           "entry_key": "TrackViewsSyncService",
@@ -13753,7 +13753,7 @@
       }
     },
     {
-      "claim_hash": "3ed67f2af6daf044a8cba20c505764e266d4db8dc1d178b0f8b7799beb5b3d53",
+      "claim_hash": "557dc7d25b3669c46f5d04581f6eb69f6d49b719a1699fbed51b36ed3666e5d0",
       "claim_origin": {
         "data": {
           "entry_key": "TrackViewsValidateService",
@@ -13777,7 +13777,7 @@
       }
     },
     {
-      "claim_hash": "3ed67f2af6daf044a8cba20c505764e266d4db8dc1d178b0f8b7799beb5b3d53",
+      "claim_hash": "557dc7d25b3669c46f5d04581f6eb69f6d49b719a1699fbed51b36ed3666e5d0",
       "claim_origin": {
         "data": {
           "entry_key": "TrackViewsValidateService",
@@ -13801,7 +13801,7 @@
       }
     },
     {
-      "claim_hash": "3ed67f2af6daf044a8cba20c505764e266d4db8dc1d178b0f8b7799beb5b3d53",
+      "claim_hash": "557dc7d25b3669c46f5d04581f6eb69f6d49b719a1699fbed51b36ed3666e5d0",
       "claim_origin": {
         "data": {
           "entry_key": "TrackViewsValidateService",
@@ -13825,7 +13825,7 @@
       }
     },
     {
-      "claim_hash": "3ed67f2af6daf044a8cba20c505764e266d4db8dc1d178b0f8b7799beb5b3d53",
+      "claim_hash": "557dc7d25b3669c46f5d04581f6eb69f6d49b719a1699fbed51b36ed3666e5d0",
       "claim_origin": {
         "data": {
           "entry_key": "TrackViewsValidateService",
@@ -13844,7 +13844,7 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
         "kind": "pass"
       }
     }

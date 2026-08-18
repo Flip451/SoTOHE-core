@@ -16,6 +16,9 @@ use usecase::track_lifecycle::track_archive::{
 use usecase::track_lifecycle::track_branch_create::{
     TrackBranchCreateCommand, TrackBranchCreateError, TrackBranchCreateService,
 };
+use usecase::track_lifecycle::track_branch_switch::{
+    TrackBranchSwitchCommand, TrackBranchSwitchError, TrackBranchSwitchService,
+};
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
 use usecase::track_lifecycle::{TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput};
 use usecase::track_service::{TrackCommandOutput, TrackService};
@@ -241,6 +244,7 @@ pub struct TrackDriver {
     track_init_service: Arc<dyn TrackInitService>,
     track_archive_service: Arc<dyn TrackArchiveService>,
     track_branch_create_service: Arc<dyn TrackBranchCreateService>,
+    track_branch_switch_service: Arc<dyn TrackBranchSwitchService>,
     service: Arc<dyn TrackService>,
     fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
     base_merge_service: Arc<dyn BaseMergeService>,
@@ -252,6 +256,7 @@ impl TrackDriver {
         track_init_service: Arc<dyn TrackInitService>,
         track_archive_service: Arc<dyn TrackArchiveService>,
         track_branch_create_service: Arc<dyn TrackBranchCreateService>,
+        track_branch_switch_service: Arc<dyn TrackBranchSwitchService>,
         service: Arc<dyn TrackService>,
         fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
         base_merge_service: Arc<dyn BaseMergeService>,
@@ -260,6 +265,7 @@ impl TrackDriver {
             track_init_service,
             track_archive_service,
             track_branch_create_service,
+            track_branch_switch_service,
             service,
             fixpoint_resolve_service,
             base_merge_service,
@@ -292,6 +298,11 @@ impl TrackDriver {
                 items_dir,
                 track_id,
             ),
+            TrackInput::BranchSwitch { items_dir, track_id } => render_track_branch_switch_outcome(
+                &*self.track_branch_switch_service,
+                items_dir,
+                track_id,
+            ),
             TrackInput::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
                 service_output_to_outcome(self.service.transition(
                     items_dir,
@@ -303,9 +314,6 @@ impl TrackDriver {
             }
             TrackInput::Resolve { items_dir, track_id } => {
                 service_output_to_outcome(self.service.resolve(items_dir, track_id))
-            }
-            TrackInput::BranchSwitch { items_dir, track_id } => {
-                service_output_to_outcome(self.service.branch_switch(items_dir, track_id))
             }
             TrackInput::ViewsValidate { project_root } => {
                 service_output_to_outcome(self.service.views_validate(project_root))
@@ -470,6 +478,51 @@ fn track_branch_create_invalid_items_dir(items_dir: &std::path::Path) -> Command
     )))
 }
 
+fn render_track_branch_switch_outcome(
+    service: &dyn TrackBranchSwitchService,
+    items_dir: PathBuf,
+    track_id: String,
+) -> CommandOutcome {
+    let track_id = match TrackLifecycleIdInput::try_new(track_id) {
+        Ok(track_id) => track_id,
+        Err(error) => return track_branch_switch_invalid_track_id(error),
+    };
+
+    let items_dir_for_error = items_dir.clone();
+    let items_dir = match TrackItemsDirectory::try_new(items_dir) {
+        Ok(items_dir) => items_dir,
+        Err(_) => return track_branch_switch_invalid_items_dir(&items_dir_for_error),
+    };
+    let command = TrackBranchSwitchCommand::new(items_dir, track_id);
+    service
+        .execute(command)
+        .map(|result| {
+            CommandOutcome::success(Some(format!("[OK] Switched to branch: {}", result.branch)))
+        })
+        .unwrap_or_else(track_branch_switch_error_to_outcome)
+}
+
+fn track_branch_switch_error_to_outcome(error: TrackBranchSwitchError) -> CommandOutcome {
+    track_branch_switch_failure(error)
+}
+
+fn track_branch_switch_failure(error: impl std::fmt::Display) -> CommandOutcome {
+    CommandOutcome::failure(Some(format!("[ERROR] {error}")))
+}
+
+fn track_branch_switch_invalid_track_id(error: impl std::fmt::Display) -> CommandOutcome {
+    let error = error.to_string();
+    let legacy_error = error.strip_prefix("invalid track id: ").unwrap_or(&error);
+    track_branch_switch_failure(legacy_error)
+}
+
+fn track_branch_switch_invalid_items_dir(items_dir: &std::path::Path) -> CommandOutcome {
+    CommandOutcome::failure(Some(format!(
+        "[ERROR] --items-dir must point to '<project-root>/track/items'; got {}",
+        items_dir.display()
+    )))
+}
+
 // ---------------------------------------------------------------------------
 // Render helpers (previously duplicated from cli_composition; now unused in
 // cli_driver since delegation happens via TrackService)
@@ -532,6 +585,8 @@ mod tests {
 
     struct UnusedTrackBranchCreateService;
 
+    struct UnusedTrackBranchSwitchService;
+
     impl TrackInitService for UnusedTrackInitService {
         fn execute(
             &self,
@@ -560,6 +615,49 @@ mod tests {
             TrackBranchCreateError,
         > {
             unreachable!()
+        }
+    }
+
+    impl TrackBranchSwitchService for UnusedTrackBranchSwitchService {
+        fn execute(
+            &self,
+            _: TrackBranchSwitchCommand,
+        ) -> Result<
+            usecase::track_lifecycle::track_branch_switch::TrackBranchSwitchResult,
+            TrackBranchSwitchError,
+        > {
+            unreachable!()
+        }
+    }
+
+    struct RecordingTrackBranchSwitchService {
+        calls: Mutex<Vec<(PathBuf, String)>>,
+        error: Option<String>,
+    }
+
+    impl TrackBranchSwitchService for RecordingTrackBranchSwitchService {
+        fn execute(
+            &self,
+            command: TrackBranchSwitchCommand,
+        ) -> Result<
+            usecase::track_lifecycle::track_branch_switch::TrackBranchSwitchResult,
+            TrackBranchSwitchError,
+        > {
+            self.calls
+                .lock()
+                .unwrap()
+                .push((command.items_dir.as_path().to_path_buf(), command.track_id.to_string()));
+            match &self.error {
+                Some(error) => Err(TrackBranchSwitchError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+                None => {
+                    Ok(usecase::track_lifecycle::track_branch_switch::TrackBranchSwitchResult {
+                        branch: TrackBranch::try_new(format!("track/{}", command.track_id))
+                            .expect("switched branch is valid"),
+                    })
+                }
+            }
         }
     }
 
@@ -757,6 +855,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackArchiveService),
             Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             service,
@@ -773,6 +872,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackArchiveService),
             Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -802,6 +902,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackArchiveService),
             Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -828,6 +929,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackArchiveService),
             service.clone(),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -855,6 +957,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             service.clone(),
             Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -889,6 +992,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             service.clone(),
             Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -914,6 +1018,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             service.clone(),
             Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -939,6 +1044,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             service,
             Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -963,6 +1069,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackArchiveService),
             service.clone(),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -991,6 +1098,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackArchiveService),
             service.clone(),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -1017,6 +1125,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackArchiveService),
             service.clone(),
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -1042,6 +1151,7 @@ mod tests {
             Arc::new(UnusedTrackInitService),
             Arc::new(UnusedTrackArchiveService),
             service,
+            Arc::new(UnusedTrackBranchSwitchService),
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
@@ -1053,6 +1163,89 @@ mod tests {
         });
 
         assert_eq!(outcome.stderr.as_deref(), Some("[ERROR] branch creation failed"));
+        assert_eq!(outcome.exit_code, 1);
+    }
+
+    #[test]
+    fn test_track_driver_branch_switch_valid_input_routes_to_branch_switch_service() {
+        let service = Arc::new(RecordingTrackBranchSwitchService {
+            calls: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchSwitch {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "switch-track".to_owned(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("[OK] Switched to branch: track/switch-track"));
+        assert_eq!(
+            service.calls.lock().unwrap().as_slice(),
+            &[(PathBuf::from("track/items"), "switch-track".to_owned())]
+        );
+    }
+
+    #[test]
+    fn test_track_driver_branch_switch_invalid_track_id_preserves_legacy_diagnostic() {
+        let service = Arc::new(RecordingTrackBranchSwitchService {
+            calls: Mutex::new(Vec::new()),
+            error: None,
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            service.clone(),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchSwitch {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "../escape".to_owned(),
+        });
+
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some("[ERROR] track id '../escape' must be a lowercase slug")
+        );
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_branch_switch_service_error_maps_to_prefixed_failure() {
+        let service = Arc::new(RecordingTrackBranchSwitchService {
+            calls: Mutex::new(Vec::new()),
+            error: Some("branch switch failed".to_owned()),
+        });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            service,
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+        );
+
+        let outcome = driver.handle(TrackInput::BranchSwitch {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "switch-track".to_owned(),
+        });
+
+        assert_eq!(outcome.stderr.as_deref(), Some("[ERROR] branch switch failed"));
         assert_eq!(outcome.exit_code, 1);
     }
 

@@ -14,7 +14,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, TrackResolutionDiagnostic>"
+          "returns": "Result<Self, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackWorkspaceRootInput"
@@ -31,7 +41,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, TrackResolutionDiagnostic>"
+          "returns": "Result<Self, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -39,7 +59,17 @@
           "name": "workspace_root",
           "params": [],
           "receiver": "&self",
-          "returns": "TrackWorkspaceRootInput"
+          "returns": "TrackWorkspaceRootInput",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackItemsDirectoryInput"
@@ -56,7 +86,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, TrackResolutionDiagnostic>"
+          "returns": "Result<Self, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSourceWorkspaceInput"
@@ -73,7 +113,17 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, TrackResolutionDiagnostic>"
+          "returns": "Result<Self, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackLayerInput"
@@ -90,7 +140,17 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, TrackResolutionDiagnostic>"
+          "returns": "Result<Self, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackLayersInput"
@@ -107,7 +167,17 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, TrackResolutionDiagnostic>"
+          "returns": "Result<Self, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSpecAnchorInput"
@@ -124,7 +194,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, TrackResolutionDiagnostic>"
+          "returns": "Result<Self, TrackResolutionDiagnostic>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackLintRulesFileInput"
@@ -177,7 +257,17 @@
               "ty": "std::sync::Arc<dyn usecase::TrackCatalogueLintActiveService>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -190,7 +280,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "CommandOutcome"
+          "returns": "CommandOutcome",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTdddDriver"
@@ -203,7 +307,17 @@
           "name": "message",
           "params": [],
           "receiver": "&self",
-          "returns": "&str"
+          "returns": "&str",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackResolutionDiagnostic"
@@ -220,7 +334,17 @@
               "ty": "std::sync::Arc<dyn usecase::TrackResolutionService>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -233,7 +357,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "TrackResolutionOutcome"
+          "returns": "TrackResolutionOutcome",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackResolutionDriver"
@@ -250,7 +384,17 @@
               "ty": "usize"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTypeGraphClusterDepthInput"
@@ -569,7 +713,18 @@
               "ty": "std::sync::Arc<dyn usecase::BaseMergeService>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "action": "modify",
+          "spec_refs": [
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -582,7 +737,8 @@
             }
           ],
           "receiver": "&self",
-          "returns": "CommandOutcome"
+          "returns": "CommandOutcome",
+          "action": "reference"
         },
         {
           "has_default_impl": false,
@@ -595,7 +751,22 @@
             }
           ],
           "receiver": "&self",
-          "returns": "CommandOutcome"
+          "returns": "CommandOutcome",
+          "action": "modify",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -608,7 +779,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "CommandOutcome"
+          "returns": "CommandOutcome",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track",

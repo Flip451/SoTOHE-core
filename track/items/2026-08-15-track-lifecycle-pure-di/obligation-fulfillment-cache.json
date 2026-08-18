@@ -23,7 +23,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "6c1ff2764a34fcb0fd1c812109898caa66d63b4d0117889e05ce623d700ab840",
-        "declaration_hash": "2bd2343d835bc359e47e55d6ef1c65d5ece8d67a46bc22ac31cd5bd3e3b6009d"
+        "declaration_hash": "51bdc05449f8ff75745367d5ed1890ef1ef86f9125d635a9848f6bf34ec46a65"
       },
       "obligation_id": {
         "entry_key": "TrackArchiveInteractor",
@@ -31,10 +31,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let result = interactor.execute(command()).expect(\"archive succeeds\");\n\n        assert_eq!(result.track_id.as_ref(), \"archive-track\");\n        assert_eq!(result.source.as_path(), Path::new(\"/workspace/track/items/archive-track\"));\n        assert_eq!(\n            result.destination.as_path(),\n            Path::new(\"/workspace/track/archive/archive-track\")\n        );\n\n        let error = interactor.execute(command()).expect_err(\"missing source must fail\");",
+        "citation": "let result = interactor.execute(command()).expect(\"archive succeeds\");\n\n        assert_eq!(result.track_id.as_ref(), \"archive-track\");\n        assert_eq!(result.source.as_path(), Path::new(\"/workspace/track/items/archive-track\"));\n        assert_eq!(\n            result.destination.as_path(),\n            Path::new(\"/workspace/track/archive/archive-track\")\n        );\n\n        let error = interactor.execute(command()).expect_err(\"missing source must fail\");\n\n        assert!(error.to_string().contains(\"track directory not found\"));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -64,7 +64,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "16d83a19ceed555e04d58f27e72ba3fce21c7e37ba15341474e65983459df90b",
-        "declaration_hash": "1ffd539bbf21810f65e59f03a2b940bb78cce0e3b90aaaa4797a718acabb3f4f"
+        "declaration_hash": "625e78852120d3e91cd34b3d054135f7d0ee53f31ae28aff99eb3726030d6a5b"
       },
       "obligation_id": {
         "entry_key": "TrackBaselineGraphInteractor",
@@ -72,10 +72,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let result = interactor.execute(command()).expect(\"baseline graph succeeds\");\n\n        assert_eq!(result.track_id.as_ref(), \"graph-track\");\n        assert_eq!(result.rendered_layers.value(), 1);\n        assert_eq!(result.written_files.value(), 2); ... let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");",
+        "citation": "let result = interactor.execute(command()).expect(\"baseline graph succeeds\");\n\n        assert_eq!(result.track_id.as_ref(), \"graph-track\");\n        assert_eq!(result.rendered_layers.value(), 1);\n        assert_eq!(result.written_files.value(), 2);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -100,7 +100,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "6c1ff2764a34fcb0fd1c812109898caa66d63b4d0117889e05ce623d700ab840",
-        "declaration_hash": "860a6ba3d246d841791edd1dc527f64e9ebf842fa28e3c4e4d3d1a7e57566fd6"
+        "declaration_hash": "a1b0a99c06b294e6eb864e2fefa058b9cfb0eb42180dca2188c008b4767e40cf"
       },
       "obligation_id": {
         "entry_key": "TrackArchiveService",
@@ -108,10 +108,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let result = interactor.execute(command()).expect(\"archive succeeds\");\n\n        assert_eq!(result.track_id.as_ref(), \"archive-track\");\n        assert_eq!(result.source.as_path(), Path::new(\"/workspace/track/items/archive-track\"));\n        assert_eq!(\n            result.destination.as_path(),\n            Path::new(\"/workspace/track/archive/archive-track\")\n        );\n\n        let error = interactor.execute(command()).expect_err(\"missing source must fail\");",
+        "citation": "assert_eq!(result.track_id.as_ref(), \"archive-track\");\n        assert_eq!(result.source.as_path(), Path::new(\"/workspace/track/items/archive-track\"));\n        assert_eq!(\n            result.destination.as_path(),\n            Path::new(\"/workspace/track/archive/archive-track\")\n        );\n\n        let interactor = TrackArchiveInteractor::new(Arc::new(git), Arc::new(fs));\n        let error = interactor.execute(command()).expect_err(\"missing source must fail\");",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -141,7 +141,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "16d83a19ceed555e04d58f27e72ba3fce21c7e37ba15341474e65983459df90b",
-        "declaration_hash": "4211b5325b3d807c6d4bec71d65e788e44d24bf5f1fc78fe1aed4d8459a8984e"
+        "declaration_hash": "05c2f9f6ec6bd8176cd6c4f72fc88f66913656d1a47e4c91d9a060c78d961155"
       },
       "obligation_id": {
         "entry_key": "TrackBaselineGraphService",
@@ -149,10 +149,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(result.track_id.as_ref(), \"graph-track\");\n        assert_eq!(result.rendered_layers.value(), 1);\n        assert_eq!(result.written_files.value(), 2);\n\n        let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");",
+        "citation": "let result = interactor.execute(command()).expect(\"baseline graph succeeds\");\n\n        assert_eq!(result.track_id.as_ref(), \"graph-track\");\n        assert_eq!(result.rendered_layers.value(), 1);\n        assert_eq!(result.written_files.value(), 2);\n\n        let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -176,8 +176,8 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "4668ac24f7f578a9c084003f7a1948dbe7b6ca549a1869ee9431923b48b60ee2",
-        "declaration_hash": "d908faff1e745bbff45a69f486544e70a6cd162624c5b9f35149ddf89a9801ad"
+        "bound_tests_set_hash": "866c7ef759fe539dbe14b684593b9d42435e0627697eb37d7055afe8d93aedf5",
+        "declaration_hash": "2c68b4cffca3ff1a48a61cae3e6466a260fab157f0d34fad7bc9259ea5e31051"
       },
       "obligation_id": {
         "entry_key": "TrackArchiveError",
@@ -188,7 +188,7 @@
         "citation": "let error = interactor.execute(command()).expect_err(\"missing source must fail\");\n\n        assert!(error.to_string().contains(\"track directory not found\"));\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"archive failed\"));\n        assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -217,8 +217,8 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "fa55bdde979ec698c457a13b2efd0d19453841c4bd02e11a2ab0922c133043e1",
-        "declaration_hash": "ba727123e13d740055542600b206d313de5dbe7190940e1c8bad04db284470e7"
+        "bound_tests_set_hash": "23133135f25b137d97feb5849634d74d194a0a0519c69f7fb12031447ce7a25b",
+        "declaration_hash": "29d49b2efe8ed59d1ecdff49d5633154002c7bd5a39e0811591444c8cd9e08f2"
       },
       "obligation_id": {
         "entry_key": "TrackBaselineGraphError",
@@ -226,10 +226,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");",
+        "citation": "let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"graph failed\"));\n        assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -254,7 +254,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "cf7a6e9e1b00684d3438b97c17b70045d9499498aa4608eb3079afc79cdb8315",
-        "declaration_hash": "7418f47b124d244756f1c964ea669a26cd8ae9be6cb7c98db10e691a77055f8e"
+        "declaration_hash": "55add4b7797db45ac969ae604a178823ac60738426abdb3f2e7fad0ed2105c61"
       },
       "obligation_id": {
         "entry_key": "TrackBaselineCaptureInteractor",
@@ -265,7 +265,7 @@
         "citation": "let result = interactor.execute(command()).expect(\"capture succeeds\");\n\n        assert!(matches!(\n            result.layers.as_slice(),\n            [TrackBaselineCaptureLayerResult::Captured { layer }] if layer.as_ref() == \"usecase\"\n        ));\n\n        let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -300,7 +300,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "7e4197c442ec578fbd3e1b1fc790dbdbdf465a26b5fc7947c24b5d92cd1cc915",
-        "declaration_hash": "a6a4e58a804528a96857493d7c61fe3681de167099cefd8a6071f8a6f1d97844"
+        "declaration_hash": "b6fa0a9dc3b36d88366b3598af0f9c497f945af4212118df740eb3ed5e5cf998"
       },
       "obligation_id": {
         "entry_key": "TrackInitInteractor",
@@ -308,174 +308,194 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "interactor.execute(command(\"New Track\")).expect(\"initialization succeeds\");",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
-          "test_name": "test_track_baseline_capture_interactor_resolves_selection_and_forwards_command"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
-          "test_name": "test_track_baseline_capture_interactor_resolver_failure_maps_to_execution_error"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-02",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackBaselineCaptureService"
-      },
-      "key": {
-        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
-        "bound_tests_set_hash": "cf7a6e9e1b00684d3438b97c17b70045d9499498aa4608eb3079afc79cdb8315",
-        "declaration_hash": "e5b4837be74b3f310807c43bc740dc39b34e9933f59ba2ab50ec3a693b472684"
-      },
-      "obligation_id": {
-        "entry_key": "TrackBaselineCaptureService",
-        "item_identifier": "trait_method:execute",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "assert_eq!(operation.calls.lock().expect(\"operation lock is available\").len(), 1);",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
-          "test_name": "test_track_baseline_capture_interactor_resolves_selection_and_forwards_command"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
-          "test_name": "test_track_baseline_capture_interactor_resolver_failure_maps_to_execution_error"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackBaselineCaptureService"
-      },
-      "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "cf7a6e9e1b00684d3438b97c17b70045d9499498aa4608eb3079afc79cdb8315",
-        "declaration_hash": "e5b4837be74b3f310807c43bc740dc39b34e9933f59ba2ab50ec3a693b472684"
-      },
-      "obligation_id": {
-        "entry_key": "TrackBaselineCaptureService",
-        "item_identifier": "trait_method:execute",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "assert!(matches!(\n            result.layers.as_slice(),\n            [TrackBaselineCaptureLayerResult::Captured { layer }] if layer.as_ref() == \"usecase\"\n        ));\n\n        assert_eq!(error.to_string(), \"branch unavailable\");",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_valid_command_saves_metadata_and_syncs_track_views"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_metadata_failure_maps_to_execution_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_branch_strategy_failure_maps_to_execution_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_view_failure_maps_to_execution_error"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-02",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackInitService"
-      },
-      "key": {
-        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
-        "bound_tests_set_hash": "7e4197c442ec578fbd3e1b1fc790dbdbdf465a26b5fc7947c24b5d92cd1cc915",
-        "declaration_hash": "08b2aabc3391a64890f90ae0930ffcb728bbccb48962e0cbe2f12c10f20266fc"
-      },
-      "obligation_id": {
-        "entry_key": "TrackInitService",
-        "item_identifier": "trait_method:execute",
-        "obligation_kind": "result"
-      },
-      "verdict": {
-        "citation": "interactor.execute(command(\"New Track\")).expect(\"initialization succeeds\");",
-        "kind": "fulfilled"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "bound_tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_valid_command_saves_metadata_and_syncs_track_views"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_metadata_failure_maps_to_execution_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_branch_strategy_failure_maps_to_execution_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::track_lifecycle::track_init::tests",
-          "test_name": "test_track_init_interactor_view_failure_maps_to_execution_error"
-        }
-      ],
-      "edge_id": {
-        "anchor_id": {
-          "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        "entry_key": "TrackInitService"
-      },
-      "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "7e4197c442ec578fbd3e1b1fc790dbdbdf465a26b5fc7947c24b5d92cd1cc915",
-        "declaration_hash": "08b2aabc3391a64890f90ae0930ffcb728bbccb48962e0cbe2f12c10f20266fc"
-      },
-      "obligation_id": {
-        "entry_key": "TrackInitService",
-        "item_identifier": "trait_method:execute",
-        "obligation_kind": "result"
-      },
-      "verdict": {
         "citation": "let error = interactor.execute(command(\"New Track\")).expect_err(\"save must fail\");",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
+          "test_name": "test_track_baseline_capture_interactor_resolves_selection_and_forwards_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
+          "test_name": "test_track_baseline_capture_interactor_resolver_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_tddd::tests",
+          "test_name": "test_track_tddd_driver_valid_baseline_capture_input_returns_success"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBaselineCaptureService"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "bound_tests_set_hash": "ca59ffdad0c95fd6d66cb81347b735711822da1d36b058290be043d468057ae4",
+        "declaration_hash": "7ebf7aca9c029c4e5ebf96ba0bb0887316826cfca256d425f037e2c1a5c0cf8f"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBaselineCaptureService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let driver = TrackTdddDriver::new(\n            service.clone(),\n            Arc::new(UnusedBaselineGraphService),\n            Arc::new(UnusedCatalogueImplSignalsService),\n            Arc::new(UnusedCatalogueSpecSignalsService),\n        );\n\n        let outcome = driver.handle(TrackTdddBaselineCaptureInput {\n...\n        assert_eq!(commands.len(), 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
+          "test_name": "test_track_baseline_capture_interactor_resolves_selection_and_forwards_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::baseline_capture::tests",
+          "test_name": "test_track_baseline_capture_interactor_resolver_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_tddd::tests",
+          "test_name": "test_track_tddd_driver_valid_baseline_capture_input_returns_success"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBaselineCaptureService"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "ca59ffdad0c95fd6d66cb81347b735711822da1d36b058290be043d468057ae4",
+        "declaration_hash": "7ebf7aca9c029c4e5ebf96ba0bb0887316826cfca256d425f037e2c1a5c0cf8f"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBaselineCaptureService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let result = interactor.execute(command()).expect(\"capture succeeds\");\n\n        assert!(matches!(\n            result.layers.as_slice(),\n            [TrackBaselineCaptureLayerResult::Captured { layer }] if layer.as_ref() == \"usecase\"\n        ));\n\n        let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");\n\n        assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout, None);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_valid_command_saves_metadata_and_syncs_track_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_metadata_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_branch_strategy_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_view_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_init_valid_input_routes_to_track_init_service"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackInitService"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "bound_tests_set_hash": "371610f8d13ddcdb5ff78b0b9a6e5f925626a057b35328fde475ca2ec64d7992",
+        "declaration_hash": "1cf53e284fa122254d5a992e564412a71358a149e2a505fe67cbf2709de3e97a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackInitService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let outcome = driver.handle(TrackInput::Init {\n            items_dir: PathBuf::from(\"track/items\"),\n            track_id: \"new-track\".to_owned(),\n            description: \"New Track\".to_owned(),\n        });\n\n        assert_eq!(\n            service.calls.lock().unwrap().as_slice(),\n            &[(PathBuf::from(\"track/items\"), \"new-track\".to_owned(), \"New Track\".to_owned(),)]\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_valid_command_saves_metadata_and_syncs_track_views"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_metadata_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_branch_strategy_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_init::tests",
+          "test_name": "test_track_init_interactor_view_failure_maps_to_execution_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_init_valid_input_routes_to_track_init_service"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackInitService"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "371610f8d13ddcdb5ff78b0b9a6e5f925626a057b35328fde475ca2ec64d7992",
+        "declaration_hash": "1cf53e284fa122254d5a992e564412a71358a149e2a505fe67cbf2709de3e97a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackInitService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let outcome = driver.handle(TrackInput::Init {\n            items_dir: PathBuf::from(\"track/items\"),\n            track_id: \"new-track\".to_owned(),\n            description: \"New Track\".to_owned(),\n        });\n\n        assert_eq!(outcome.exit_code, 0);\n        assert_eq!(outcome.stdout, None);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -504,8 +524,8 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "0ab074d2f9ffb4a1c0a5f0c6a3666a2d3d6bff509c538523dd8fd86e5c7379b6",
-        "declaration_hash": "45e2712655e120daaea001e5a525b515e8356876c85fc448c3330b8f1ecbbc55"
+        "bound_tests_set_hash": "c5b9c4b24ac3f2a56f2eaac61f14e36e6ebc22c2e600cf37d4962ca527b470e1",
+        "declaration_hash": "7bfcd333acb037772abb4b2144e44c8ed735fe0e10eaf74550124e68b7231501"
       },
       "obligation_id": {
         "entry_key": "TrackBaselineCaptureError",
@@ -513,10 +533,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(outcome.stderr.as_deref(), Some(\"capture failed\"));\n        assert_eq!(outcome.exit_code, 1);",
+        "citation": "let error = interactor.execute(command()).expect_err(\"resolver must fail\");\n\n        assert_eq!(error.to_string(), \"branch unavailable\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"capture failed\"));\n        assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -540,8 +560,8 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "8296da9bc34896dff6fc5892b4be9104c324f372f8ca53e3c185e789de96405c",
-        "declaration_hash": "8e225de478b861cb88ddfab397096f8d0e36c40a1ef24882bd5ad47a6009c593"
+        "bound_tests_set_hash": "62eeae55b51da0abd8069762a04ad05b24839f59abc8ca008757f6715a0f9668",
+        "declaration_hash": "d490833e4f99602c170647c2556588751ad024b021e35ee207ab179c6c57f45e"
       },
       "obligation_id": {
         "entry_key": "TrackTdddBaselineCaptureInput",
@@ -549,10 +569,126 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let outcome = driver.handle(TrackTdddBaselineCaptureInput {\n            track_id: Some(track_id()),\n            workspace_root: workspace_root(),\n            source_workspace: None,\n            layer: Some(TrackLayerInput::try_from(\"usecase\".to_owned()).expect(\"layer is valid\")),\n        });\n\n        assert_eq!(commands.len(), 1);",
+        "citation": "assert_eq!(outcome.exit_code, 1);\n        assert!(service.commands.lock().expect(\"command lock is available\").is_empty());",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_branch_strategy_global_config_returns_snapshot"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBranchStrategyPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "bound_tests_set_hash": "5382ff50d258c13dfcb8730aa19939e604bbdf2cb0be356d6d2b60086948cbd4",
+        "declaration_hash": "3fbbd7f444d634cd04ad371ad91756c58962e6373a9465b586e3982ca13efba1"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBranchStrategyPort",
+        "item_identifier": "trait_method:global_for_items",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test verifies only that global configuration is loaded and decoded; it does not verify the required one-way driver → usecase interactor → port path or absence of compatibility-shim/ServiceImpl runtime delegation."
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_branch_strategy_snapshot_for_track_returns_saved_snapshot"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBranchStrategyPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "bound_tests_set_hash": "2fbb817a2c5a09d1b644ecbb5851b1f3f33d6417ef746dd2749895aadfe5dfe2",
+        "declaration_hash": "071163e6d745836a53d9843df8ffc58a6c800de0e5bb61387cfc2bdd4746ab5f"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBranchStrategyPort",
+        "item_identifier": "trait_method:snapshot_for_track",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "category": "substitution",
+        "kind": "fail",
+        "reason": "The test only verifies that a saved snapshot is loaded; it does not verify the required one-way driver → interactor → port path or absence of compatibility-shim/ServiceImpl runtime delegation."
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_mismatched_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_persists_current_head_for_matching_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_maps_persistence_io_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_track_directory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_git_track_commit_hash_adapter_rejects_symlinked_commit_hash"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackCommitHashPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "bound_tests_set_hash": "23d9c0af7a85b313c6c81b752107f2c35b34cceaf2c8f96346af25461fe8d362",
+        "declaration_hash": "54e170c917b39dc9f5a6474d2597b475d45eb6686619cbf4673f562504aeb59b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCommitHashPort",
+        "item_identifier": "trait_method:persist_current_for_track",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The tests exercise branch mismatch, persistence, I/O failure, and symlink cases, but do not verify the required absence of compatibility shims, intermediate ServiceImpl runtime references/calls/reverse delegation, or the driver→interactor→port one-way route."
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -592,7 +728,7 @@
       "key": {
         "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
         "bound_tests_set_hash": "23d9c0af7a85b313c6c81b752107f2c35b34cceaf2c8f96346af25461fe8d362",
-        "declaration_hash": "ced53992b25e77e11194522df1f4afdd6f3e4c0ffe3026f547899aa454904b24"
+        "declaration_hash": "54e170c917b39dc9f5a6474d2597b475d45eb6686619cbf4673f562504aeb59b"
       },
       "obligation_id": {
         "entry_key": "TrackCommitHashPort",
@@ -603,7 +739,7 @@
         "citation": "assert_eq!(\n            fs::read_to_string(track_dir.join(\".commit_hash\")).expect(\"commit hash is persisted\"),\n            expected\n        );",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -615,15 +751,15 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-05",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         "entry_key": "TrackMetadataPort"
       },
       "key": {
-        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
         "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9"
+        "declaration_hash": "a68d3ef2f629fd2e322608bc8851df6075d8bea7af137d8a6c961f54054121e5"
       },
       "obligation_id": {
         "entry_key": "TrackMetadataPort",
@@ -631,10 +767,11 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\n        let loaded = adapter\n            .find(&typed_items, metadata.id())\n            .expect(\"metadata loads\")\n            .expect(\"saved metadata exists\");\n\n        assert_eq!(loaded, metadata);",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The round-trip persistence assertion verifies that save and find preserve metadata, but does not verify that the execution path has no compatibility shim, ServiceImpl runtime reference/call/reverse delegation, or that it follows the required one-way driver → interactor → port route."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -654,7 +791,39 @@
       "key": {
         "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
         "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9"
+        "declaration_hash": "a68d3ef2f629fd2e322608bc8851df6075d8bea7af137d8a6c961f54054121e5"
+      },
+      "obligation_id": {
+        "entry_key": "TrackMetadataPort",
+        "item_identifier": "trait_method:save",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test verifies only direct adapter save/find round-trip persistence; it does not exercise any Track lifecycle command context or establish CLI argument, stdout, stderr, and exit-code parity at its call site."
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackMetadataPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
+        "declaration_hash": "d91ec0fea76fc98551a15416a289e0f565d0003078f9b4ae1cb10085f99f9148"
       },
       "obligation_id": {
         "entry_key": "TrackMetadataPort",
@@ -662,10 +831,43 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\n        let loaded = adapter\n            .find(&typed_items, metadata.id())\n            .expect(\"metadata loads\")\n            .expect(\"saved metadata exists\");\n\n        assert_eq!(loaded, metadata);",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test verifies filesystem save/find round-trip equality, not the absence of compatibility shims, ServiceImpl runtime references/calls/reverse delegation, or the required one-way driver → interactor → port path."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_metadata_save_then_find_returns_same_metadata"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackMetadataPort"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
+        "declaration_hash": "d91ec0fea76fc98551a15416a289e0f565d0003078f9b4ae1cb10085f99f9148"
+      },
+      "obligation_id": {
+        "entry_key": "TrackMetadataPort",
+        "item_identifier": "trait_method:find",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test verifies only an adapter save/find round trip; it does not exercise the cited command-context or legacy-resolution call sites, nor assert preservation of their CLI arguments, stdout, stderr, or exit codes."
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -682,15 +884,15 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         "entry_key": "TrackSelectionPort"
       },
       "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
         "bound_tests_set_hash": "4215aedfb6a353cb3a74ff2d04fe6bfdac480627b18ffa4a9c161b6443d23bd8",
-        "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a"
+        "declaration_hash": "e8fa901d84738968f5005dec9696fc8e56df0440301165edd9cc8267ba39c625"
       },
       "obligation_id": {
         "entry_key": "TrackSelectionPort",
@@ -698,10 +900,11 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "let resolved =\n            adapter.resolve_required(&items_dir, &selection).expect(\"explicit selection resolves\");\n        assert_eq!(resolved, track_id);",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The tests only verify explicit selection resolution and a write-guard mismatch; they do not verify that this execution path has no compatibility shim, ServiceImpl runtime reference/call, or reverse delegation."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -713,15 +916,15 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         "entry_key": "TrackSelectionPort"
       },
       "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
         "bound_tests_set_hash": "5957784a78ce75ab5370034523f42838ad7f94cc473a9748c34b348b34e2cfcd",
-        "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a"
+        "declaration_hash": "f24eb735f3f8331f10f1dd8b2205eb435f1e7fcd4149e24b547d0e6046c55b26"
       },
       "obligation_id": {
         "entry_key": "TrackSelectionPort",
@@ -729,10 +932,11 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "let resolved =\n            GitTrackSelectionAdapter.resolve_active(&workspace).expect(\"active branch resolves\");\n\n        assert_eq!(resolved, TrackId::try_new(\"active-track\").expect(\"track id is valid\"));",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test verifies active-branch resolution only; it does not verify the required absence of compatibility shims, ServiceImpl runtime references/calls, or reverse delegation on this execution path."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -754,15 +958,15 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         "entry_key": "TrackSelectionPort"
       },
       "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
         "bound_tests_set_hash": "c37b63e57eac3f07db2fdc7773075f9fa3ea5482ca0ad3c70eaf8521c51e14a0",
-        "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a"
+        "declaration_hash": "0d69245b3cffee5df5ac733560c3235c6f115e956fdb8388403b4b7a9b087a79"
       },
       "obligation_id": {
         "entry_key": "TrackSelectionPort",
@@ -770,10 +974,11 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "let scope = adapter\n            .resolve_views_scope(&workspace, &TrackSelection::Explicit(track_id.clone()))\n            .expect(\"explicit view scope resolves\");\n        assert_eq!(scope, TrackViewsScope::Track(track_id));\n\n        let error = GitTrackSelectionAdapter\n            .resolve_views_scope(&workspace, &TrackSelection::Explicit(track_id))\n            .expect_err(\"explicit view scope must enforce the write guard\");",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The tests verify view-scope selection and write-guard outcomes, but do not verify that this execution path has no compatibility shim or intermediate ServiceImpl runtime reference/call/reverse delegation, nor the promised one-way driver → interactor → port path."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -785,15 +990,15 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         "entry_key": "TrackViewsPort"
       },
       "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
         "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
-        "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231"
+        "declaration_hash": "d600d916ed3a499cf91a27ac45ef8e303c5caf565281af3e204a2bbf000185f3"
       },
       "obligation_id": {
         "entry_key": "TrackViewsPort",
@@ -801,10 +1006,11 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");\n\n        assert!(rendered.iter().any(|path| path.as_path().ends_with(\"registry.md\")));",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test only verifies that an empty workspace validates and registry synchronization produces registry.md; it does not verify validate's execution path has no compatibility shim, ServiceImpl runtime reference/call, or reverse delegation."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -816,15 +1022,15 @@
       ],
       "edge_id": {
         "anchor_id": {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         "entry_key": "TrackViewsPort"
       },
       "key": {
-        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
         "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
-        "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231"
+        "declaration_hash": "f838160a99a2152ae5e7c81f5a8a497987ce757fcdeebbb5443b5216af1de53b"
       },
       "obligation_id": {
         "entry_key": "TrackViewsPort",
@@ -832,10 +1038,43 @@
         "obligation_kind": "contract"
       },
       "verdict": {
-        "citation": "adapter.validate(&workspace).expect(\"empty workspace validates\");\n        let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test verifies that `sync` renders `registry.md`, but does not verify the promised absence of compatibility shims, ServiceImpl runtime references/calls/reverse delegation, or the required driver → interactor → port direction."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track::lifecycle_adapter_tests",
+          "test_name": "test_fs_track_views_validate_and_sync_registry_scope"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsPort"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
+        "declaration_hash": "f838160a99a2152ae5e7c81f5a8a497987ce757fcdeebbb5443b5216af1de53b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:sync",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test exercises FsTrackViewsAdapter::sync directly and only asserts registry.md rendering/persistence; it does not verify unchanged CLI argument handling, stdout, stderr, exit codes, or target command-context call sites."
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -855,7 +1094,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "0d9eee1a4903c351361b45f9bf8a1238bcfc9067ef1b54f8bf807b5e91b27555"
+        "declaration_hash": "9577681ffc483b7abe033255451665f7b291f5504c8b6b1639d0f40f4ea7b122"
       },
       "obligation_id": {
         "entry_key": "FsTrackMetadataAdapter",
@@ -863,10 +1102,11 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\n        let loaded = adapter\n            .find(&typed_items, metadata.id())\n            .expect(\"metadata loads\")\n            .expect(\"saved metadata exists\");\n\n        assert_eq!(loaded, metadata);",
-        "kind": "fulfilled"
+        "category": "substitution",
+        "kind": "fail",
+        "reason": "The round-trip assertion verifies filesystem metadata persistence, not the cited boundary promise about presentation-free use-case results and primary-adapter ownership of stdout/stderr formatting and exit-code mapping."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -886,7 +1126,7 @@
       "key": {
         "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
         "bound_tests_set_hash": "5c5ddd5397ce3347111062950a84674cf2c990e85f0dfd9f1b9c72674e3f5833",
-        "declaration_hash": "0d9eee1a4903c351361b45f9bf8a1238bcfc9067ef1b54f8bf807b5e91b27555"
+        "declaration_hash": "9577681ffc483b7abe033255451665f7b291f5504c8b6b1639d0f40f4ea7b122"
       },
       "obligation_id": {
         "entry_key": "FsTrackMetadataAdapter",
@@ -894,10 +1134,11 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "adapter.save(&typed_items, metadata.clone()).expect(\"metadata saves\");\nlet loaded = adapter\n    .find(&typed_items, metadata.id())\n    .expect(\"metadata loads\")\n    .expect(\"saved metadata exists\");\n\nassert_eq!(loaded, metadata);",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test only round-trips metadata through FsTrackMetadataAdapter::save/find; it does not exercise any Track lifecycle command context or verify CLI argument handling, stdout, stderr, exit code, or pre-refactor equivalence promised by the anchor."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -917,7 +1158,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
-        "declaration_hash": "b2b218697164671dec46fd8527bcb6216dfd1dc702212eedb31d234a1345861d"
+        "declaration_hash": "43583f8ad72e14fbaae4b93f4119ad9849ff730dbc04afd39e3ec125c0ded75b"
       },
       "obligation_id": {
         "entry_key": "FsTrackViewsAdapter",
@@ -925,10 +1166,11 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let workspace =\n            TrackWorkspaceRoot::try_new(root.path().to_path_buf()).expect(\"workspace is valid\");\n        let adapter = FsTrackViewsAdapter::new();\n\n        adapter.validate(&workspace).expect(\"empty workspace validates\");\n        let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");\n\n        assert!(rendered.iter().any(|path| path.as_path().ends_with(\"registry.md\")));",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test exercises filesystem validation and registry rendering but does not verify that the boundary returns a presentation-free result/error or that stdout/stderr formatting and exit-code mapping are absent from this secondary adapter and handled by a primary adapter."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -948,7 +1190,7 @@
       "key": {
         "anchor_text_hash": "22e9c22c20d125932654c6bf0a066855786926b5e0c3dd18a6773bce2c0d3e54",
         "bound_tests_set_hash": "ddb0b1d01341bbdb0e5da2a1804b3146a59d14d084f92c4a44ba2733a0477b26",
-        "declaration_hash": "b2b218697164671dec46fd8527bcb6216dfd1dc702212eedb31d234a1345861d"
+        "declaration_hash": "43583f8ad72e14fbaae4b93f4119ad9849ff730dbc04afd39e3ec125c0ded75b"
       },
       "obligation_id": {
         "entry_key": "FsTrackViewsAdapter",
@@ -956,10 +1198,11 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "adapter.validate(&workspace).expect(\"empty workspace validates\");\n        let rendered = adapter\n            .sync(&workspace, &TrackViewsScope::RegistryOnly)\n            .expect(\"registry scope synchronizes\");",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The test verifies filesystem output from direct adapter calls, but does not verify removal of command-execution logic/direct I/O from the execution path or the required one-way driver → usecase interactor → port flow."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1004,7 +1247,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "7add1876c39fa8018ba8364ea2635b185cd39f4a360aced34b44f068ea3f64a9",
-        "declaration_hash": "8338bb2caa08c45c75d15540cdb9e7b6255fcb3574e9cbdc49c2eea17f5f04f5"
+        "declaration_hash": "30178237290eea1565462dcf4e6152d6b84969055df0c4e7c11e4cfddd81d992"
       },
       "obligation_id": {
         "entry_key": "GitTrackCommitHashAdapter",
@@ -1012,10 +1255,10 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": ".persist_current_for_track(&track_id)\n                    .expect(\"matching branch persists the current HEAD\");",
+        "citation": "let persisted = GitTrackCommitHashAdapter::new()\n                    .persist_current_for_track(&track_id)\n                    .expect(\"matching branch persists the current HEAD\");\n\n                assert_eq!(persisted.as_ref(), expected);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1060,7 +1303,7 @@
       "key": {
         "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
         "bound_tests_set_hash": "7add1876c39fa8018ba8364ea2635b185cd39f4a360aced34b44f068ea3f64a9",
-        "declaration_hash": "8338bb2caa08c45c75d15540cdb9e7b6255fcb3574e9cbdc49c2eea17f5f04f5"
+        "declaration_hash": "30178237290eea1565462dcf4e6152d6b84969055df0c4e7c11e4cfddd81d992"
       },
       "obligation_id": {
         "entry_key": "GitTrackCommitHashAdapter",
@@ -1068,10 +1311,11 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let persisted = GitTrackCommitHashAdapter::new()\n                    .persist_current_for_track(&track_id)\n                    .expect(\"matching branch persists the current HEAD\");\n\n                assert_eq!(persisted.as_ref(), expected);\n                assert_eq!(\n                    fs::read_to_string(track_dir.join(\".commit_hash\"))\n                        .expect(\"commit hash is persisted\"),\n                    expected\n                );",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The tests exercise GitTrackCommitHashAdapter persistence and error cases only; they do not execute the affected Track lifecycle command contexts or an old resolution-helper call site to compare CLI arguments, stdout, stderr, exit codes, and persistence results before versus after the structural change."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1116,7 +1360,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "ed6cec41241f130977b7005110a339f68f1d2f69cb1bb88041dae045c2bdacb4",
-        "declaration_hash": "0db096f3c04875db471777353189de59cea42401cf180efcc064c483598078e5"
+        "declaration_hash": "a9288257265ea6141e467d8c1817d68b8e7e80c6bb790a9b7bc1d1def5f73d98"
       },
       "obligation_id": {
         "entry_key": "GitTrackSelectionAdapter",
@@ -1124,10 +1368,10 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(resolved, track_id);",
+        "citation": "let resolved =\n            adapter.resolve_required(&items_dir, &selection).expect(\"explicit selection resolves\");\n        assert_eq!(resolved, track_id);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1152,7 +1396,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "259e6d3428aa3ffeab7ddda7808ed6fa033c0f40c3e83ddec3475391ee9bf3a4",
-        "declaration_hash": "1b38c0aeaa03290c0ca9fb943fd736c6fb8ccf791a67fedab0b6a3e798443479"
+        "declaration_hash": "f2a5f2ed2635c03795cabad7d58b83948137caeeb3e2dc3aa4382eb5abbd34a9"
       },
       "obligation_id": {
         "entry_key": "FsTrackBranchStrategyAdapter",
@@ -1160,10 +1404,11 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let snapshot = FsTrackBranchStrategyAdapter\n            .global_for_items(&typed_items)\n            .expect(\"global strategy loads\");\n\n        assert_eq!(snapshot.base_branch(), \"main\");\n        assert_eq!(snapshot.merge_target(), \"main\");\n        assert_eq!(snapshot.merge_method(), MergeMethod::Squash);",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The tests exercise direct filesystem adapter loading and snapshot equality, but do not verify the cited boundary promise that validated input yields a presentation-free Result/error with stdout/stderr formatting and exit-code mapping left to a primary adapter."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1188,7 +1433,7 @@
       "key": {
         "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
         "bound_tests_set_hash": "259e6d3428aa3ffeab7ddda7808ed6fa033c0f40c3e83ddec3475391ee9bf3a4",
-        "declaration_hash": "1b38c0aeaa03290c0ca9fb943fd736c6fb8ccf791a67fedab0b6a3e798443479"
+        "declaration_hash": "f2a5f2ed2635c03795cabad7d58b83948137caeeb3e2dc3aa4382eb5abbd34a9"
       },
       "obligation_id": {
         "entry_key": "FsTrackBranchStrategyAdapter",
@@ -1196,10 +1441,11 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "assert_eq!(snapshot.base_branch(), \"main\");\n        assert_eq!(snapshot.merge_target(), \"main\");\n        assert_eq!(snapshot.merge_method(), MergeMethod::Squash);",
-        "kind": "fulfilled"
+        "category": "central_unverified",
+        "kind": "fail",
+        "reason": "The tests only assert that global configuration and a saved per-track snapshot load correctly; they do not verify unchanged CLI arguments, stdout, stderr, exit codes, or persisted outcomes at the relevant command call sites."
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1207,6 +1453,36 @@
           "layer": "usecase",
           "module_path": "usecase::track_lifecycle::resolution_compat::tests",
           "test_name": "test_track_resolution_interactor_forwards_command_and_result"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_resolvers_and_dispatch_preserve_pure_di_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_v2_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_auto_resolution_preserves_active_track_id"
         }
       ],
       "edge_id": {
@@ -1218,8 +1494,8 @@
       },
       "key": {
         "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
-        "bound_tests_set_hash": "df61ef7af3adc8587d3093f5628c91280fe700030d85e5339b288e04421f6729",
-        "declaration_hash": "07aef29fe916d84eab14898822277c9a7e013e753420794c7442cb312b683922"
+        "bound_tests_set_hash": "0d3aa5928aea1aa3f80ba68e66b8a7cf6af702460d356c320160060e4d7947ff",
+        "declaration_hash": "5757a0065bf0512fbbc290afe37c3e2fcae7c05a987436d5e9f35aab97313dc7"
       },
       "obligation_id": {
         "entry_key": "TrackResolutionInteractor",
@@ -1227,10 +1503,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(result, Ok(TrackResolutionResult::Inactive));\n        assert_eq!(port.commands.lock().unwrap().len(), 1);",
+        "citation": "assert!(write_resolver_source.contains(\"TrackResolutionInput::WriteFromItems\")); assert!(read_resolver_source.contains(\"TrackResolutionInput::ReadFromItems\")); ... assert!(!resolver_source.contains(\"track_resolve_id\")); ... assert!(resolver_source.contains(\"track_resolution_driver\")); ... assert!(resolver_source.contains(\"TrackResolutionInput::DetectActive\")); assert!(!resolver_source.contains(\"track_resolve_id\"));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1238,6 +1514,112 @@
           "layer": "usecase",
           "module_path": "usecase::track_lifecycle::resolution_compat::tests",
           "test_name": "test_track_resolution_interactor_forwards_command_and_result"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_track_resolution_port_execute_preserves_read_resolution_for_active_branch"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_system_track_resolution_adapter_read_resolves_track_branch"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_resolvers_and_dispatch_preserve_pure_di_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_v2_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "review_run_codex_returns_branch_error_not_discovery_error_for_non_track_branch"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_auto_resolution_preserves_active_track_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionPort"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "bound_tests_set_hash": "600154a0652424a0b9e5829391b7eeb5c906a70fce6aa96635dc3a0b2896910e",
+        "declaration_hash": "5760eddc14fa43d9b18d187b264da2420763e6c3482225ead47440c01f35a1f8"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "assert!(write_resolver_source.contains(\"track_resolution_driver\"));\n        assert!(read_resolver_source.contains(\"track_resolution_driver\"));\n        assert!(!resolver_source.contains(\"track_resolve_id\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::resolution_compat::tests",
+          "test_name": "test_track_resolution_interactor_forwards_command_and_result"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_resolvers_and_dispatch_preserve_pure_di_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_v2_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_auto_resolution_preserves_active_track_id"
         }
       ],
       "edge_id": {
@@ -1249,8 +1631,8 @@
       },
       "key": {
         "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
-        "bound_tests_set_hash": "df61ef7af3adc8587d3093f5628c91280fe700030d85e5339b288e04421f6729",
-        "declaration_hash": "7d5c02d69cb6c40cc04117f30f6a439d1666f2f836d7850e33690061be5930a1"
+        "bound_tests_set_hash": "0d3aa5928aea1aa3f80ba68e66b8a7cf6af702460d356c320160060e4d7947ff",
+        "declaration_hash": "948d32575e081bdcbd2e64035b3d7f7b24e0dbe7be913090abc07effced83a11"
       },
       "obligation_id": {
         "entry_key": "TrackResolutionService",
@@ -1258,10 +1640,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "assert_eq!(result, Ok(TrackResolutionResult::Inactive));\n        assert_eq!(port.commands.lock().unwrap().len(), 1);",
+        "citation": "assert!(resolver_source.contains(\"track_resolution_driver\"));\nassert!(resolver_source.contains(\"TrackResolutionOutcome\"));\nassert!(!resolver_source.contains(\"track_resolve_id\"));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1316,7 +1698,7 @@
       "key": {
         "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
         "bound_tests_set_hash": "d1eb4b5bf19361ab594e0a851ebc42ec7140ff2141630e806dcd0d4f270364d0",
-        "declaration_hash": "392c272acb2252239f8113ed3a535caa60e1ae19b62b26dcd1492e94281c756e"
+        "declaration_hash": "004a74bb4daa531c0fea538919ea3ae9fb9022f8b6c5aa8acfc51cd7b853fe17"
       },
       "obligation_id": {
         "entry_key": "SystemTrackResolutionAdapter",
@@ -1324,10 +1706,10 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "let result = SystemTrackResolutionAdapter.execute(TrackResolutionCommand::ReadFromItems {\n    track: TrackSelection::Active,\n    items_dir: items(root.path()),\n});\n\nassert_eq!(\n    result,\n    Ok(TrackResolutionResult::Resolved(TrackId::try_new(\"compat-track\").unwrap()))\n);",
+        "citation": "assert_eq!(\n            result,\n            Ok(TrackResolutionResult::Resolved(TrackId::try_new(\"compat-track\").unwrap()))\n        );",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1355,6 +1737,36 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::track_resolution::tests",
           "test_name": "test_track_resolution_driver_maps_inactive_result"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_resolvers_and_dispatch_preserve_pure_di_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_v2_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_auto_resolution_preserves_active_track_id"
         }
       ],
       "edge_id": {
@@ -1366,8 +1778,8 @@
       },
       "key": {
         "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
-        "bound_tests_set_hash": "7281df04e8163753db48c9fe407e0df7fe9e8bb84fe11fbc340a70946251c0d0",
-        "declaration_hash": "1ec6bfe109033d3ad93e29c9b083b84760611a9118691540895d420c1172ec9d"
+        "bound_tests_set_hash": "299b9057b1884eb25708ee1f60dc3c1f3c550161e6d15df8ad3df132122fb57d",
+        "declaration_hash": "7f9abfc842e7d4cfafcb4107e3d8a82c7e04f8518034a0c96e95f654d4e6ba96"
       },
       "obligation_id": {
         "entry_key": "TrackResolutionResult",
@@ -1375,10 +1787,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert_eq!(result, Ok(TrackResolutionResult::Resolved(TrackId::try_new(\"compat-track\").unwrap())))",
+        "citation": "assert!(write_resolver_source.contains(\"track_resolution_driver\"));\n        assert!(read_resolver_source.contains(\"track_resolution_driver\"));\n        assert!(!resolver_source.contains(\"track_resolve_id\"));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1401,6 +1813,36 @@
           "layer": "cli_driver",
           "module_path": "cli_driver::track_resolution::tests",
           "test_name": "test_track_resolution_input_variants_route_matching_commands"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_resolvers_and_dispatch_preserve_pure_di_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_v2_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_auto_resolution_preserves_active_track_id"
         }
       ],
       "edge_id": {
@@ -1412,8 +1854,8 @@
       },
       "key": {
         "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
-        "bound_tests_set_hash": "bce2742f68bc44fbebe0fc851e3334f097340fba7e8f8250e8a4c246f804ab0b",
-        "declaration_hash": "40900bc422a1e783d56e4b1c46106f57cd23a4c309dbc3b30be8b001abb6f900"
+        "bound_tests_set_hash": "276a9956f1364aad8e963fc8167af883422241a589013a802f0f7a3c02d9c592",
+        "declaration_hash": "be004a574fd732b28b087627cfef06394526f8c16bd2acff19cb2fe46668f868"
       },
       "obligation_id": {
         "entry_key": "TrackResolutionDriver",
@@ -1421,10 +1863,81 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "assert!(matches!(commands.first(), Some(TrackResolutionCommand::ReadFromItems { .. })));\n        assert!(matches!(commands.get(1), Some(TrackResolutionCommand::ReadFromRoot { .. })));\n        assert!(matches!(commands.get(2), Some(TrackResolutionCommand::WriteFromItems { .. })));\n        assert!(matches!(commands.get(3), Some(TrackResolutionCommand::WriteFromRoot { .. })));\n        assert!(matches!(commands.get(4), Some(TrackResolutionCommand::DetectActive { .. })));",
+        "citation": "assert!(write_resolver_source.contains(\"TrackResolutionInput::WriteFromItems\")); assert!(read_resolver_source.contains(\"TrackResolutionInput::ReadFromItems\")); for resolver_source in [write_resolver_source, read_resolver_source] { assert!(resolver_source.contains(\"track_resolution_driver\")); assert!(!resolver_source.contains(\"track_resolve_id\")); } ... assert!(resolver_source.contains(\"track_resolution_driver\")); assert!(resolver_source.contains(\"TrackResolutionOutcome\")); assert!(!resolver_source.contains(\"track_resolve_id\")); ... assert!(resolver_source.contains(\"track_resolution_driver\")); assert!(resolver_source.contains(\"TrackResolutionInput::DetectActive\")); assert!(!resolver_source.contains(\"track_resolve_id\"));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_resolved_result"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_inactive_result"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_resolution::tests",
+          "test_name": "test_track_resolution_driver_maps_service_error"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_resolvers_and_dispatch_preserve_pure_di_path"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::adr_baseline::tests",
+          "test_name": "test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "test_review_v2_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::review_v2::tests",
+          "test_name": "resolve_track_id_from_branch_relative_items_dir_works_from_subdirectory"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_resolution_call_site_uses_track_resolution_driver"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::task_contract::tests",
+          "test_name": "test_task_contract_auto_resolution_preserves_active_track_id"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolutionOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "7f17d779b5989e2c64f624ee43e564dc1e80aa48bc53ec51ee0e441eadc1c070",
+        "bound_tests_set_hash": "7a43c2fc89b5eeac0dbfcd61df4636bf238939cfe49fcc5985ea7e0f6912cb6e",
+        "declaration_hash": "137d604063cb4a57a0e2b8a85aedd8eac3052845ff7be9ab5ac93ec1fe9bb53b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolutionOutcome",
+        "item_identifier": "voluntary:IN-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(write_resolver_source.contains(\"TrackResolutionInput::WriteFromItems\")); assert!(read_resolver_source.contains(\"TrackResolutionInput::ReadFromItems\")); assert!(resolver_source.contains(\"track_resolution_driver\")); assert!(!resolver_source.contains(\"track_resolve_id\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1454,7 +1967,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "cc7ced75df80b9a157d5208ffdcd098233d758c62cd97cb667b46b3257dd7ad5",
-        "declaration_hash": "0ad947cb77f84a95356c3b3b605c5b1a96c089e11fa18ea50f1d57032a06c4bd"
+        "declaration_hash": "03ec7ca876b8c76d1de26e32e130bf7f2c9b6640f5a710a6b03ce4432c82f58b"
       },
       "obligation_id": {
         "entry_key": "TrackBranchCreateInteractor",
@@ -1462,10 +1975,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let result = interactor.execute(command()).expect(\"branch creation succeeds\");\n\nassert_eq!(result.branch.as_ref(), \"track/new-track\");\n\nlet error = interactor.execute(command()).expect_err(\"strategy failure must propagate\");",
+        "citation": "let result = interactor.execute(command()).expect(\"branch creation succeeds\");\n\n        assert_eq!(result.branch.as_ref(), \"track/new-track\");\n\n        let error = interactor.execute(command()).expect_err(\"strategy failure must propagate\");\n\n        assert_eq!(error.to_string(), \"branch strategy unavailable\");\n\n        let error = interactor.execute(command()).expect_err(\"git failure must propagate\");\n\n        assert!(matches!(\n            error,\n            TrackBranchCreateError::ExecutionFailed(diagnostic)\n                if diagnostic.as_str() == \"git workflow unavailable: git unavailable\"\n        ));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1495,7 +2008,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "cc7ced75df80b9a157d5208ffdcd098233d758c62cd97cb667b46b3257dd7ad5",
-        "declaration_hash": "cc2d25ed6e49f246ebcfe5923bd191248ca4bc48197addafedcaee873a0c34b0"
+        "declaration_hash": "51279e777d8dc1b95777d09cf8e20e0be78c6dfbb8d7efe078540aa3c341705a"
       },
       "obligation_id": {
         "entry_key": "TrackBranchCreateService",
@@ -1503,10 +2016,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "let result = interactor.execute(command()).expect(\"branch creation succeeds\");\n\n        assert_eq!(result.branch.as_ref(), \"track/new-track\");\n\n        let error = interactor.execute(command()).expect_err(\"strategy failure must propagate\");\n\n        assert_eq!(error.to_string(), \"branch strategy unavailable\");",
+        "citation": "let result = interactor.execute(command()).expect(\"branch creation succeeds\");\n\nassert_eq!(result.branch.as_ref(), \"track/new-track\");\n\nlet error = interactor.execute(command()).expect_err(\"strategy failure must propagate\");\n\nassert_eq!(error.to_string(), \"branch strategy unavailable\");",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1541,7 +2054,7 @@
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
         "bound_tests_set_hash": "0f10900c72982a63425c5270012482bedcb727b2a73c2bff5e383eb759abc53b",
-        "declaration_hash": "dda2fda71efc39037ba637ee0437bd0d3cf64d8e006dc0d8721c4e85e7fbab4e"
+        "declaration_hash": "f923a5f78a706b7cc47b13f209503cc0f4e9bcbf846b4de9b54fa9e816b48b5c"
       },
       "obligation_id": {
         "entry_key": "TrackCatalogueImplSignalsInteractor",
@@ -1549,10 +2062,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "interactor.execute(command(TrackSelection::Active)).expect(\"active evaluation succeeds\");",
+        "citation": "interactor.execute(command(TrackSelection::Explicit(\n            TrackId::try_new(\"explicit-track\").expect(\"track id is valid\"),\n        )))\n        .expect(\"explicit evaluation succeeds\");",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1575,6 +2088,16 @@
           "layer": "usecase",
           "module_path": "usecase::track_lifecycle::tddd::catalogue_impl_signals::tests",
           "test_name": "test_track_catalogue_impl_signals_interactor_operation_failure_returns_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_tddd::tests",
+          "test_name": "test_track_tddd_driver_valid_catalogue_impl_signals_input_returns_markdown_report"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_impl_signals::tests",
+          "test_name": "test_track_catalogue_impl_signals_interactor_success_returns_structured_result"
         }
       ],
       "edge_id": {
@@ -1586,8 +2109,8 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "0f10900c72982a63425c5270012482bedcb727b2a73c2bff5e383eb759abc53b",
-        "declaration_hash": "65771517414d7bd50d154e1780d6292faa2fb5c182dbf5d86e1584cd0bb1747c"
+        "bound_tests_set_hash": "9cd7e689e929b338aa4814772d397096df3a8ad7ca6418ba9aaf962a6d8a4518",
+        "declaration_hash": "a81580d3a3ad1cd2b37eaf5062b1a1d7b04ba9a3751c31590f002212bd4f0654"
       },
       "obligation_id": {
         "entry_key": "TrackCatalogueImplSignalsService",
@@ -1595,10 +2118,10 @@
         "obligation_kind": "result"
       },
       "verdict": {
-        "citation": "interactor.execute(command(TrackSelection::Active)).expect(\"active evaluation succeeds\");\n\n        let error = match interactor.execute(command(TrackSelection::Active)) {\n            Ok(_) => panic!(\"active resolution must fail\"),\n            Err(error) => error,\n        };",
+        "citation": "let result = interactor\n            .execute(command(TrackSelection::Explicit(\n                TrackId::try_new(\"explicit-track\").expect(\"track id is valid\"),\n            )))\n            .expect(\"successful evaluation returns a result\");\n\n        assert!(result.layers.is_empty());\n\n        assert_eq!(outcome.exit_code, 0);\n        let stdout = outcome.stdout.expect(\"catalogue report is printed\");\n        assert!(stdout.contains(\"## Layer: `usecase`\"));",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1622,8 +2145,8 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "6f2686bd4fe71e481dbdbe0ccdb4e81f441d275252ce906cfec5997751f9c6a7",
-        "declaration_hash": "7e3e6f9adaee46ef525011bdffc3ef8b65da15aecfab07cfb17228f97dd6296d"
+        "bound_tests_set_hash": "9c9879706c9a8f38aea4ec10a71b41f0c1cc234236d7822ebe59ba9686c56fbe",
+        "declaration_hash": "c88fc23cc3685536f3fe451ae4b92b04f77fac57ac872fbda363205271be8aae"
       },
       "obligation_id": {
         "entry_key": "TrackBranchCreateError",
@@ -1631,10 +2154,10 @@
         "obligation_kind": "logic"
       },
       "verdict": {
-        "citation": "let error = interactor.execute(command()).expect_err(\"git failure must propagate\");\n\n        assert!(matches!(\n            error,\n            TrackBranchCreateError::ExecutionFailed(diagnostic)\n                if diagnostic.as_str() == \"git workflow unavailable: git unavailable\"\n        ));",
+        "citation": "let error = interactor.execute(command()).expect_err(\"git failure must propagate\");\n\n        assert!(matches!(\n            error,\n            TrackBranchCreateError::ExecutionFailed(diagnostic)\n                if diagnostic.as_str() == \"git workflow unavailable: git unavailable\"\n        ));\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"[ERROR] branch creation failed\"));\n        assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     },
     {
       "bound_tests": [
@@ -1658,8 +2181,8 @@
       },
       "key": {
         "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
-        "bound_tests_set_hash": "d0d33b1fe8425ff93d309010557e29fe190860465008cfaee19c88a6c968117d",
-        "declaration_hash": "8d601b81a475a612ff2b29377bfae7f0b4ef5eb683c9b33e7c8e7647b02f95f4"
+        "bound_tests_set_hash": "337e7c104e599d2eea0d31c499cd2f3e0b9e906c7f6abe3190d0530ffc5747bc",
+        "declaration_hash": "0d666650842299f6c565ad3b95e62b759798e47771359e46607525fa17830a6d"
       },
       "obligation_id": {
         "entry_key": "TrackCatalogueImplSignalsError",
@@ -1670,7 +2193,243 @@
         "citation": "Err(error) => error,\n        };\n\n        assert_eq!(error.to_string(), \"catalogue evaluation failed\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"signals failed\"));\n        assert_eq!(outcome.exit_code, 1);",
         "kind": "fulfilled"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_branch_switch::tests",
+          "test_name": "test_track_branch_switch_interactor_existing_branch_returns_typed_branch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_branch_switch::tests",
+          "test_name": "test_track_branch_switch_interactor_missing_branch_returns_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_branch_switch::tests",
+          "test_name": "test_track_branch_switch_interactor_git_failure_returns_execution_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBranchSwitchInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "998a4c3fe5c2237df1de3d532412fd95221b08f84ddf78614fbf6e9e85d97626",
+        "declaration_hash": "782642ffd7957d2c8d5a06ea190415a761c0167bc278361a0f670c2c1a79b24b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBranchSwitchInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let result = interactor.execute(command()).expect(\"branch switch succeeds\");\n\n        assert_eq!(result.branch.as_ref(), \"track/switch-track\");\n\n        let error = match interactor.execute(command()) {\n            Ok(_) => panic!(\"missing branch must fail\"),\n            Err(error) => error,\n        };",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_branch_switch::tests",
+          "test_name": "test_track_branch_switch_interactor_existing_branch_returns_typed_branch"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_branch_switch::tests",
+          "test_name": "test_track_branch_switch_interactor_missing_branch_returns_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_branch_switch::tests",
+          "test_name": "test_track_branch_switch_interactor_git_failure_returns_execution_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBranchSwitchService"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "998a4c3fe5c2237df1de3d532412fd95221b08f84ddf78614fbf6e9e85d97626",
+        "declaration_hash": "696cdc192d959a59f96f25472795c8ef58eaa23b4deb9bc64f0f8f0fe823844a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBranchSwitchService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "let result = interactor.execute(command()).expect(\"branch switch succeeds\");\n\n        assert_eq!(result.branch.as_ref(), \"track/switch-track\");\n\n        let error = match interactor.execute(command()) {\n            Ok(_) => panic!(\"missing branch must fail\"),\n            Err(error) => error,\n        };",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_spec_signals::tests",
+          "test_name": "test_track_catalogue_spec_signals_interactor_resolves_selection_and_forwards_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_spec_signals::tests",
+          "test_name": "test_track_catalogue_spec_signals_interactor_resolver_failure_returns_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_spec_signals::tests",
+          "test_name": "test_track_catalogue_spec_signals_interactor_operation_failure_returns_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackCatalogueSpecSignalsInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "15f7d57832680145eb1610f2b926d9fc359d08ccdded86023c49da6abb8609d2",
+        "declaration_hash": "4b5b2f19b08fa63b1dc3d04f7a152150e53a88d6477808a97fc389647d4f9125"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCatalogueSpecSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "interactor\n            .execute(command(TrackSelection::Explicit(\n                TrackId::try_new(\"signals-track\").expect(\"track id is valid\"),\n            )))\n            .map(|_| ())\n            .expect(\"catalogue-spec refresh succeeds\");\n...\nlet error = match interactor.execute(command(TrackSelection::Active)) {\n    Ok(_) => panic!(\"selection failure must propagate\"),\n    Err(error) => error,\n};",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_spec_signals::tests",
+          "test_name": "test_track_catalogue_spec_signals_interactor_resolves_selection_and_forwards_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_spec_signals::tests",
+          "test_name": "test_track_catalogue_spec_signals_interactor_resolver_failure_returns_execution_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_spec_signals::tests",
+          "test_name": "test_track_catalogue_spec_signals_interactor_operation_failure_returns_error"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackCatalogueSpecSignalsService"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "15f7d57832680145eb1610f2b926d9fc359d08ccdded86023c49da6abb8609d2",
+        "declaration_hash": "3985c35bf6efa5e4ecea66a204a4b6fc5271c2711b795b5a0536605d7988c654"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCatalogueSpecSignalsService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "interactor\n            .execute(command(TrackSelection::Explicit(\n                TrackId::try_new(\"signals-track\").expect(\"track id is valid\"),\n            )))\n            .map(|_| ())\n            .expect(\"catalogue-spec refresh succeeds\");\n\n        let error = match interactor.execute(command(TrackSelection::Active)) {\n            Ok(_) => panic!(\"selection failure must propagate\"),\n            Err(error) => error,\n        };",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::track_branch_switch::tests",
+          "test_name": "test_track_branch_switch_interactor_git_failure_returns_execution_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track::tests",
+          "test_name": "test_track_driver_branch_switch_service_error_maps_to_prefixed_failure"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBranchSwitchError"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "bf1cd0ad3427f1ccddc42cc9d587be244d7a169dfa418b8ec5729509942899a0",
+        "declaration_hash": "238642d3132b553b5d8ab09ecaefa823e26aecf9dd0abffa1af711c25061f2f2"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBranchSwitchError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let error = match interactor.execute(command()) {\n            Ok(_) => panic!(\"git failure must propagate\"),\n            Err(error) => error,\n        };\n\n        assert_eq!(error.to_string(), \"git workflow unavailable: git unavailable\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"[ERROR] branch switch failed\"));\n        assert_eq!(outcome.exit_code, 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::track_lifecycle::tddd::catalogue_spec_signals::tests",
+          "test_name": "test_track_catalogue_spec_signals_interactor_operation_failure_returns_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::track_tddd::tests",
+          "test_name": "test_track_tddd_driver_catalogue_spec_signals_service_error_maps_to_failure_outcome"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackCatalogueSpecSignalsError"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "bound_tests_set_hash": "a5d3edc85600e6380c689b68383a2554d3671ca0d8fb9e19af3a0faba3ec1dc9",
+        "declaration_hash": "98e85bf154c47b36481a85bf28b8d4a63a2d7348705bd9dcc50a56349abc9afc"
+      },
+      "obligation_id": {
+        "entry_key": "TrackCatalogueSpecSignalsError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Err(error) => error;\n        };\n\n        assert_eq!(error.to_string(), \"catalogue refresh failed\");\n\n        assert_eq!(outcome.stderr.as_deref(), Some(\"catalogue spec signals failed\"));\n        assert_eq!(outcome.exit_code, 1);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
     }
   ],
   "track_id": "2026-08-15-track-lifecycle-pure-di"

@@ -235,6 +235,23 @@ mod tests {
     }
 
     #[test]
+    fn test_track_resolution_port_execute_preserves_read_resolution_for_active_branch() {
+        let root = repository("track/port-contract-track");
+        let workspace_root = TrackWorkspaceRoot::try_new(root.path().to_path_buf()).unwrap();
+        let port: &dyn TrackResolutionPort = &SystemTrackResolutionAdapter;
+
+        let result = port.execute(TrackResolutionCommand::ReadFromRoot {
+            track: TrackSelection::Active,
+            workspace_root,
+        });
+
+        assert_eq!(
+            result,
+            Ok(TrackResolutionResult::Resolved(TrackId::try_new("port-contract-track").unwrap()))
+        );
+    }
+
+    #[test]
     fn test_system_track_resolution_adapter_detect_active_on_main_returns_inactive() {
         let root = repository("main");
         let workspace_root = TrackWorkspaceRoot::try_new(root.path().to_path_buf()).unwrap();

@@ -1,8 +1,8 @@
 {
-  "baseline_hash": "1550ed8a0b5532def664d5ecb2192e494789123f7fcc93ebb669d041b46dbb94",
-  "declaration_hash": "4b2f2ede64f782471982050bd6eca1d7d54acecaa0fcd1f60d6a67111d285e8f",
-  "generated_at": "2026-08-17T09:43:24Z",
-  "head_commit": "636d7c0bfcb890f0395e7b32b4734b8b7397136a",
+  "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
+  "declaration_hash": "26ed9da2ff07951afa1e8f9f8b0baaba31bfed6ba4dfb17d8f8d85218d50770d",
+  "generated_at": "2026-08-18T12:14:58Z",
+  "head_commit": "3399b3a4d1ea2fd2189b10635afcb96284edd055",
   "schema_version": 4,
   "signals": [
     {
@@ -331,41 +331,41 @@
       "type_name": "TrackBranchStrategyPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBranchSwitchCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackBranchSwitchError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackBranchSwitchService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackBranchSwitchInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBranchSwitchResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackBranchSwitchService"
     },
     {
@@ -501,47 +501,47 @@
       "type_name": "TrackCataloguePath"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueSpecSignalsCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackCatalogueSpecSignalsError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackCatalogueSpecSignalsService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackCatalogueSpecSignalsInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueSpecSignalsPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueSpecSignalsResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackCatalogueSpecSignalsService"
     },
     {

@@ -29,7 +29,8 @@
           "params": [],
           "returns": "Self",
           "is_async": false,
-          "has_default_impl": false
+          "has_default_impl": false,
+          "action": "reference"
         },
         {
           "name": "track_driver",
@@ -37,7 +38,18 @@
           "returns": "cli_driver::track::TrackDriver",
           "is_async": false,
           "has_default_impl": false,
-          "receiver": "&self"
+          "receiver": "&self",
+          "action": "modify",
+          "spec_refs": [
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "name": "track_tddd_driver",
@@ -45,7 +57,17 @@
           "returns": "cli_driver::track_tddd::TrackTdddDriver",
           "is_async": false,
           "has_default_impl": false,
-          "receiver": "&self"
+          "receiver": "&self",
+          "spec_refs": [
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "name": "track_resolution_driver",
@@ -53,7 +75,17 @@
           "returns": "cli_driver::track_resolution::TrackResolutionDriver",
           "is_async": false,
           "has_default_impl": false,
-          "receiver": "&self"
+          "receiver": "&self",
+          "spec_refs": [
+            {
+              "anchor": "AC-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track::composition_root",

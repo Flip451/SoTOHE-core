@@ -1,7 +1,7 @@
 {
   "entries": [
     {
-      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_hash": "54391758a0e7576187a439978509728e983261be71cc15029a4706ffb9d7807c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -25,7 +25,7 @@
       }
     },
     {
-      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_hash": "54391758a0e7576187a439978509728e983261be71cc15029a4706ffb9d7807c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -44,12 +44,12 @@
         "kind": "spec_element"
       },
       "verdict": {
-        "citation": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+        "citation": "同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
         "kind": "pass"
       }
     },
     {
-      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_hash": "54391758a0e7576187a439978509728e983261be71cc15029a4706ffb9d7807c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -73,7 +73,7 @@
       }
     },
     {
-      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_hash": "54391758a0e7576187a439978509728e983261be71cc15029a4706ffb9d7807c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",
@@ -97,7 +97,7 @@
       }
     },
     {
-      "claim_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "claim_hash": "54391758a0e7576187a439978509728e983261be71cc15029a4706ffb9d7807c",
       "claim_origin": {
         "data": {
           "entry_key": "TrackDriver",

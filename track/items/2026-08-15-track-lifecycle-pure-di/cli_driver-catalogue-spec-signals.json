@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "c690f4bacdf06b62335bdf311894e6d93ed17d583ca2c3243101a779db0cf326",
+  "catalogue_declaration_hash": "c67873117dadadfc21928de3321deb7fda0cfefabd627d9993b2261ae567b032",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "d2b644cc2dd3b2fbd9e0b82c4793b0da4f830eae21352e3b21cc7e176d9549b8",
+      "entry_hash": "54391758a0e7576187a439978509728e983261be71cc15029a4706ffb9d7807c",
       "signal": "blue",
       "type_name": "TrackDriver"
     },

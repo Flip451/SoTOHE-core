@@ -1,9 +1,9 @@
 {
-  "catalogue_declaration_hash": "76ed14175faeb33b9314c7e833a19e9b52529a0c770a05f48b6316fea148c66e",
+  "catalogue_declaration_hash": "702102780574fd33ba517972ef4d9e52e08d11688e8b8cfc51e7deb2568064eb",
   "schema_version": 1,
   "signals": [
     {
-      "entry_hash": "ea9945c548f2ffaa73df450904913d2530255317c02b1e428288ef1ec60d8fb4",
+      "entry_hash": "be12051a8dbf893c33fb48a1f8764805624bcfb9e078a666f493610bfa168c1f",
       "signal": "blue",
       "type_name": "TrackCompositionRoot"
     }

@@ -366,6 +366,13 @@
           "hash": "rvw1:sha256:39ec9a211cef5c87e71693d0ef1b19394711a5db2c7575c6c0941499d2eba6b6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T11:54:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b051957f7a09cf6d8f2582fe592b91beb025e0e8b2fffee7652b5384bc06a4ef",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -482,6 +489,93 @@
           "at": "2026-08-17T08:19:37Z",
           "findings": [],
           "hash": "rvw1:sha256:1661466d7689afb4d8f1b6af2ea84a126c90aca06e7669169f56117e5837a7b5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T09:05:22Z",
+          "findings": [
+            {
+              "category": "environment",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: the read-only shell failed before executing any repository command because the sandbox could not create its required namespace. The briefing, scope severity policy, current diff, and scoped files could not be read.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b04974baa78678d79660579e0ea5b855b5ca73db09cff83c5318e2b1147da9d3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:08:46Z",
+          "findings": [
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 74,
+              "message": "`track_type_signals` is an application-flow entry point, not pure DI: it constructs `TypeSignalsInteractor` and calls `.run(...)` before returning `CommandOutcome`. The composition boundary should return a wired driver/service and let `apps/cli` invoke it.",
+              "severity": "P1"
+            },
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 146,
+              "message": "`track_baseline_graph` and `track_contract_map` execute application flow inside `cli_composition` (`.execute(...)` and `driver.handle(...)`) and also assemble user-facing output. These operations belong behind the `cli_driver` handoff, not in composition-root methods.",
+              "severity": "P1"
+            },
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 326,
+              "message": "The remaining public TDDD methods likewise perform application work directly (`refresh_one_layer`, hash computation, interactor `.run(...)`, lint execution, and catalogue-signal `.run(...)`) instead of only constructing and returning wired collaborators. This violates the scope's pure-DI composition boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b04974baa78678d79660579e0ea5b855b5ca73db09cff83c5318e2b1147da9d3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:10:42Z",
+          "findings": [
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 74,
+              "message": "`track_type_signals` executes application flow by calling `TypeSignalsInteractor::run` from the composition layer. Composition methods must only construct and return wired collaborators; the CLI/driver layer must invoke the use case.",
+              "severity": "P1"
+            },
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 145,
+              "message": "`track_baseline_graph` and `track_contract_map` invoke `.execute(...)`/`.handle(...)` and construct user-facing output inside `cli_composition`, leaking application flow and rendering responsibilities across the composition boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 326,
+              "message": "The remaining public TDDD methods also execute interactors or infrastructure workflows directly (`refresh_one_layer`, hash computation, lint execution, and interactor `.run(...)`) instead of exposing pure-DI handoffs. This violates the scope's composition-root role.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b04974baa78678d79660579e0ea5b855b5ca73db09cff83c5318e2b1147da9d3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:16:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b04974baa78678d79660579e0ea5b855b5ca73db09cff83c5318e2b1147da9d3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T11:56:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:38e4dac4abb60176115c76141acc0fc76c73ec535da85e3f4271b30f0ad77c6b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -728,6 +822,91 @@
           "at": "2026-08-17T08:55:56Z",
           "findings": [],
           "hash": "rvw1:sha256:19c5e79c781ac1a0fa165d7b8282a4b1a732e17bbc99484b81f6447784ecf16d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T09:04:59Z",
+          "findings": [
+            {
+              "category": "environment",
+              "file": null,
+              "line": null,
+              "message": "レビューを完了できませんでした。作業ツリーを読むためのシェルがサンドボックスの namespace 作成失敗（bwrap: No permissions to create new namespace）で起動せず、指定された briefing、scope 固有プロンプト、現在の diff、対象ファイルを検査できませんでした。したがってコード上の findings は判定不能です。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:24952217b3fd051f1693dfbaafe481fc0b37d33412c9cc96450b76d034f57b73",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:18:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:24952217b3fd051f1693dfbaafe481fc0b37d33412c9cc96450b76d034f57b73",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-18T09:03:22Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": ".harness/config/agent-profiles.json",
+              "line": null,
+              "message": "Review could not be completed: the required briefing, severity policy, target file, and current diff were inaccessible because the read-only shell was blocked by the runtime sandbox (`bwrap: No permissions to create new namespace`).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d0862624e239e8d6e85811718901845ef6393e306406ac9433a7dc4f26e60b83",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:06:21Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": ".harness/config/agent-profiles.json",
+              "line": null,
+              "message": "Review could not be completed: the read-only shell failed to start because the sandbox could not create its namespace, so the required policy, briefing, current file, and diff were not inspectable.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:d0862624e239e8d6e85811718901845ef6393e306406ac9433a7dc4f26e60b83",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:17:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0862624e239e8d6e85811718901845ef6393e306406ac9433a7dc4f26e60b83",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T11:56:35Z",
+          "findings": [
+            {
+              "category": "capability-routing-mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 31,
+              "message": "Reassigning spec-designer / impl-planner / type-designer / adr-editor / rollback-diagnoser / adr-diagnoser / researcher to provider claude with reasoning_effort medium breaks the documented mirror contract with their native Claude adapters: .claude/agents/{spec-designer,impl-planner,type-designer,adr-editor,rollback-diagnoser,adr-diagnoser,researcher}.md all declare `effort: high` frontmatter that is contracted to mirror the profile value (per each adapter's \"Mirrors the `<capability>` capability in `.harness/config/agent-profiles.json`\" and dry-fix-lead.md's \"No `effort:` is declared ... there is no profile value for it to mirror\"). Because the change also makes the Claude-root × Claude-provider delegate-in-host route the operative dispatch path, and its payload carries only capability/briefing/discipline (libs/usecase/src/capability_exec.rs DelegateInHost) so frontmatter governs effort in-host, the SSoT-declared `medium` does not execute on the primary route (frontmatter `high` does), while the claude subprocess route injects `--effort medium` from the profile (libs/infrastructure/src/capability_exec/claude.rs) — the two dispatch routes now run the same capability at different efforts. Four of these (type-designer, adr-editor, rollback-diagnoser, adr-diagnoser) matched their adapters (high/high) before this diff and are newly de-synchronized by it; review-fix-lead (medium/medium) and all adapter model values (claude-opus-5) remain consistent. Fix by synchronizing the seven adapter frontmatter `effort:` values to `medium` (per the declared design intent) or revising the profile values to match the adapters.",
+              "severity": "major"
+            }
+          ],
+          "hash": "rvw1:sha256:ce28457d19370d334eabc103b85fca60bb48881d788f36342858b618a6f840d8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T12:13:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1747444c1949d649d9424b2d175b0fda64edeb223dffc8b523add74ef2bbdbea",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1247,6 +1426,28 @@
           "at": "2026-08-17T08:16:33Z",
           "findings": [],
           "hash": "rvw1:sha256:3534c718bd409bdc4201263da88c6a75790fa6322b7c65b5c801c7189c9ead30",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T09:05:11Z",
+          "findings": [
+            {
+              "category": "process",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: the required local read operations are blocked by the sandbox (`bwrap: No permissions to create new namespace`). The briefing, severity policy, current diff, and impl-plan file could not be inspected, so no valid code finding can be adjudicated.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e8fd96991ed96445f1dc5d2119a22387e54ee8d22909774565cfce723f513d10",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:16:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e8fd96991ed96445f1dc5d2119a22387e54ee8d22909774565cfce723f513d10",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1776,6 +1977,57 @@
           "hash": "rvw1:sha256:4276647e28626fac8988aa444688a92285080738b18597c464479a2882347d50",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T09:04:41Z",
+          "findings": [
+            {
+              "category": "review_blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューを完了できませんでした。briefing、severity policy、対象ファイルおよび現在の diff の読み取りを試みましたが、読み取り専用シェルが環境の namespace 制約（bwrap: No permissions to create new namespace）で起動前に拒否されました。したがって、コード上の finding を安全に判定できません。",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:ebe8777a66e56a19e1c3adbacab82a6ef85b3ec9ea2c628d0795abac5bedc4f0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:18:04Z",
+          "findings": [
+            {
+              "category": "symlink-not-rejected-at-boundary",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_spec_signals.rs",
+              "line": 154,
+              "message": "`read_signal_counts` reads `<layer_id>-catalogue-spec-signals.json` via `fs::read_to_string` without applying `reject_symlinks_below`. The accessor it uses, `TdddLayerBinding::catalogue_spec_signal_file()`, explicitly documents the caller contract (libs/infrastructure/src/verify/tddd_layers.rs:112-113: \"Callers apply the `reject_symlinks_below` guard before reading\"), and the existing reader of the same file guards before reading (libs/infrastructure/src/verify/catalogue_spec_signals.rs:271). Practical exposure is limited to a TOCTOU window because the store just wrote the file through its own guard + atomic rename, but the crate convention requires real-file semantics at every read boundary. Fix: call `reject_symlinks_below(&path, items_dir)` before the read.",
+              "severity": "medium"
+            },
+            {
+              "category": "fail-open-unknown-variant-counting",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_spec_signals.rs",
+              "line": 175,
+              "message": "The `ConfidenceSignal` match in `read_signal_counts` uses `_ => {}`, silently dropping unrecognized variants from the counts, while the precedent for the same data (`count_signals` in libs/infrastructure/src/tddd/catalogue_spec_signals_refresher.rs:233) counts unknown variants as red (`_ => red += 1`, fail-closed). `ConfidenceSignal` is `#[non_exhaustive]`, so the wildcard arm is mandatory across crates; today it is unreachable (the codec only produces Blue/Yellow/Red), but if a variant is ever added, the adapter's counts would silently under-report while the refresher's stdout totals count it as red — two different totals for the same document. Align with the precedent: `_ => red = red.saturating_add(1)`.",
+              "severity": "low"
+            }
+          ],
+          "hash": "rvw1:sha256:ebe8777a66e56a19e1c3adbacab82a6ef85b3ec9ea2c628d0795abac5bedc4f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:29:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3a1e5a92c13ea2faceeddfc9d9707a6721c152ae33a086ab419ebe2a9f5bfaa",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T11:56:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:841b83b626c21be5b63ba46ac1fd456f16ab61c32a0399aaf90bfb70e1d14de6",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1987,6 +2239,93 @@
           "at": "2026-08-17T09:05:36Z",
           "findings": [],
           "hash": "rvw1:sha256:22a08870de4a14111554533bcb6e23d2125c500cd2d03bc15f72613c4b74ffdc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T09:02:25Z",
+          "findings": [
+            {
+              "category": "tooling",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": null,
+              "message": "Review could not be completed because the sandbox rejected all repository-read commands before execution (`bwrap: No permissions to create new namespace`). The required briefing, current diff, and scoped file were not inspectable.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:97d83fb9acd0ce1e049f4980029a2368460ecc9378dd3b090cb2127066f49e6d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:20:48Z",
+          "findings": [
+            {
+              "category": "obligation-model-conformance",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 272,
+              "message": "TrackCatalogueSpecSignalsInteractor × AC-03 waiver duplicates an obligation-carrying edge: the same entry's result-obligation fulfillment (line 239) already discharges the AC-03 edge. B5 precedent (TrackCatalogueImplSignalsInteractor) and the same-batch TrackBranchSwitchInteractor both omit an AC-03 waiver and let the verified result fulfillment discharge the edge (obligation-fulfillment-cache holds AC-03-anchored 'fulfilled' rows for BranchSwitch but none for SpecSignals Interactor/Service, showing the waiver preempted fulfillment verification). The waiver reason itself defers to 'its derived result obligation', contradicting the waiver semantics of 'no edge-local behavior exists to bind'. Interactor × AC-03 is also outside the briefing's accepted-deviation set (AC-02/AC-04/CN-01/CN-03 only). Duplicate discharge records on an obligation-carrying edge are the known permanent-Stale shape of the obligation gate. Fix: delete this waiver record.",
+              "severity": "major"
+            },
+            {
+              "category": "obligation-model-conformance",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 280,
+              "message": "TrackCatalogueSpecSignalsService × AC-03 waiver has the same defect: it double-discharges the obligation-carrying AC-03 edge already covered by the TrackCatalogueSpecSignalsService trait_method:execute result fulfillment (line 242), diverges from the B5 ImplSignals and same-batch BranchSwitchService treatment (no AC-03 waiver; fulfillment verified at the AC-03 anchor in obligation-fulfillment-cache), self-contradicts by stating the behavior 'is owned by its derived result obligation', and falls outside the briefing's accepted Interactor/Service × AC-02/AC-04/CN-01/CN-03 deviation set. Fix: delete this waiver record.",
+              "severity": "major"
+            },
+            {
+              "category": "formatting",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 253,
+              "message": "Whitespace-only line inside the records array (between the TrackBranchSwitchInteractor AC-02 and AC-04 waivers). Still valid JSON, but this machine-consumed SoT file is strictly one record per line; the blank line is residue from a removed AC-03 waiver draft. Fix: remove the line.",
+              "severity": "minor"
+            },
+            {
+              "category": "formatting",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 261,
+              "message": "Whitespace-only line inside the records array (between the TrackBranchSwitchService AC-02 and AC-04 waivers), same residue defect as line 253. Fix: remove the line.",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:97d83fb9acd0ce1e049f4980029a2368460ecc9378dd3b090cb2127066f49e6d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:30:22Z",
+          "findings": [
+            {
+              "category": "self-contained-waiver",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 137,
+              "message": "The TrackResolutionInput × CN-01 waiver reason violates the self-containment rule and has gone stale: it cites test_track_resolution_input_variants_preserve_cli_args_exit_and_persistence by name (checklist: waiver reasons must not mention other tests) and claims the command-level observables are 'bound on TrackResolutionDriver x CN-01', but that edge is itself a waiver (line 135), and the cited test is not bound on any edge in this file. The cross-reference rotted when TrackResolutionDriver × CN-01 was converted from a voluntary_binding to a waiver during the 2026-08-17 fix loop. This is a pre-existing committed record from the TrackResolution batch, not part of the B6 increment. Fix: rewrite the reason to be edge-local and self-contained (no test names, no cross-edge binding claims), or have the orchestrator record this edge in the briefing's Known Accepted Deviations.",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:d2c3fefaa6fbccdfb589b608f1cf8075c8eca4ba25bcc2575bb8c3f877061508",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T09:37:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7166dcb573bb0c43dc8904e7a57cbb916695c2d0ced4984dbd68f41dd81d419d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T09:40:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7166dcb573bb0c43dc8904e7a57cbb916695c2d0ced4984dbd68f41dd81d419d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T11:57:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:215996be80408d07b758be76e0b8e0f9dd25c3de2ee5111cb1ffa47d75c3f0f9",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2595,6 +2934,13 @@
           "hash": "rvw1:sha256:9d818ad59713863aee79721b273e32bf7e4231e0e68b1715ce38cdc671ed3f1a",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T12:02:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dbdf009d39ed892964a037cffa2ef2b26b67bb7352b4d52a394c7770f84fabfe",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2850,6 +3196,20 @@
           "at": "2026-08-17T08:54:54Z",
           "findings": [],
           "hash": "rvw1:sha256:289328b45814c7831bb7754d8d0efb5b211ce70d91fba83da85aab86dded97a2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T09:17:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a59ed3c3df992229b8b3a9bc3422b4a2b2223a6ebf375ad30de3268b001e574f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T11:54:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bdb1254446b81e70e0bd4106480b53928dca4f83dfb0a4e192eb8fc20e9490bc",
           "type": "final",
           "verdict": "zero_findings"
         }

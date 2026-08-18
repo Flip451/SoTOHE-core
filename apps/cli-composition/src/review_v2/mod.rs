@@ -3564,6 +3564,19 @@ exit 0
     }
 
     #[test]
+    fn test_review_v2_resolution_call_site_uses_track_resolution_driver() {
+        let source = include_str!("helpers.rs");
+        let resolver_source = source
+            .split("fn resolve_with_resolution_driver")
+            .nth(1)
+            .expect("review-v2 resolution helper must exist");
+
+        assert!(resolver_source.contains("track_resolution_driver"));
+        assert!(resolver_source.contains("TrackResolutionOutcome"));
+        assert!(!resolver_source.contains("track_resolve_id"));
+    }
+
+    #[test]
     fn validate_all_paths_accepts_clean_relative_paths() {
         let result = super::helpers::validate_all_paths(&[
             "src/lib.rs".to_owned(),

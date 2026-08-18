@@ -102,6 +102,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "572a2e5b4afd2c30923aa72ce6bb8d97aef9bb65",
       "depends_on": [
         "T001"
       ],
@@ -115,7 +116,7 @@
       ],
       "description": "Implement the `TrackBranchSwitch*` boundary in `libs/usecase/src/track_lifecycle/track_branch_switch.rs`; update the branch-switch path in `apps/cli/src/commands/track/branch_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T005",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -225,6 +226,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "572a2e5b4afd2c30923aa72ce6bb8d97aef9bb65",
       "depends_on": [
         "T001"
       ],
@@ -238,7 +240,7 @@
       ],
       "description": "Implement the `TrackCatalogueSpecSignals*` boundary in `libs/usecase/src/track_lifecycle/tddd/catalogue_spec_signals.rs`; wire the catalogue-spec-signals handler in `apps/cli/src/commands/track/tddd/`, driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T020",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

@@ -1,8 +1,8 @@
 {
-  "baseline_hash": "a62b806bbba22eb27eaaaf3e08c4b2db31c67a44f8ea36fde1269079b30f3c13",
-  "declaration_hash": "e03293018e7d01332f050a3fb07a44c4ca3d5f30914acb16e254228e8957ab0e",
-  "generated_at": "2026-08-17T09:43:28Z",
-  "head_commit": "636d7c0bfcb890f0395e7b32b4734b8b7397136a",
+  "baseline_hash": "922aefbfd35307cd343f42b28ff9230e7c71b8823593c3554950f93e8d97fd02",
+  "declaration_hash": "cdc5689c8b527be0647b6df57e174cfa60f5f1299f08328dfa70cea82bcb7fe7",
+  "generated_at": "2026-08-18T12:15:01Z",
+  "head_commit": "3399b3a4d1ea2fd2189b10635afcb96284edd055",
   "schema_version": 4,
   "signals": [
     {
@@ -94,12 +94,12 @@
       "type_name": "SystemTrackCatalogueLintActiveAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
+      "found_items": [
         "usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "SystemTrackCatalogueSpecSignalsAdapter"
     },
     {

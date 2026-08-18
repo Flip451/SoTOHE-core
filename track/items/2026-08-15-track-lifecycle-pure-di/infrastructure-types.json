@@ -9,7 +9,17 @@
           "is_async": false,
           "name": "new",
           "params": [],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "FsTrackMetadataAdapter"
@@ -21,7 +31,17 @@
           "is_async": false,
           "name": "new",
           "params": [],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "FsTrackViewsAdapter"
@@ -33,7 +53,17 @@
           "is_async": false,
           "name": "new",
           "params": [],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "GitTrackCommitHashAdapter"

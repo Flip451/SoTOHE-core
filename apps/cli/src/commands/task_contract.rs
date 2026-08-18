@@ -410,6 +410,25 @@ mod tests {
     }
 
     #[test]
+    fn test_task_contract_resolution_call_site_uses_track_resolution_driver() {
+        let production_source = include_str!("task_contract.rs")
+            .split("#[cfg(test)]")
+            .next()
+            .expect("production task-contract source must exist");
+        let resolver_source = production_source
+            .split("fn detect_active_track_from_branch_cwd()")
+            .nth(1)
+            .expect("task-contract active-track resolver must exist")
+            .split("\n}\n")
+            .next()
+            .expect("task-contract active-track resolver body must exist");
+
+        assert!(resolver_source.contains("track_resolution_driver"));
+        assert!(resolver_source.contains("TrackResolutionInput::DetectActive"));
+        assert!(!resolver_source.contains("track_resolve_id"));
+    }
+
+    #[test]
     fn test_track_resolution_input_detect_active_preserves_task_contract_exit() {
         use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
 

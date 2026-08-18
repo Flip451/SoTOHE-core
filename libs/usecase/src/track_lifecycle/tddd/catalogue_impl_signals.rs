@@ -204,6 +204,25 @@ mod tests {
     }
 
     #[test]
+    fn test_track_catalogue_impl_signals_interactor_success_returns_structured_result() {
+        let interactor = TrackCatalogueImplSignalsInteractor::new(
+            Arc::new(RecordingOperation { calls: Mutex::new(Vec::new()), error: None }),
+            Arc::new(RecordingResolver {
+                active: Ok(TrackId::try_new("active-track").expect("track id is valid")),
+                active_calls: Mutex::new(0),
+            }),
+        );
+
+        let result = interactor
+            .execute(command(TrackSelection::Explicit(
+                TrackId::try_new("explicit-track").expect("track id is valid"),
+            )))
+            .expect("successful evaluation returns a result");
+
+        assert!(result.layers.is_empty());
+    }
+
+    #[test]
     fn test_track_catalogue_impl_signals_interactor_active_selection_resolves_and_forwards() {
         let resolver = Arc::new(RecordingResolver {
             active: Ok(TrackId::try_new("active-track").expect("track id is valid")),

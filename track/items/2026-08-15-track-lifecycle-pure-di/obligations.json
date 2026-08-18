@@ -954,7 +954,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackAddTaskService",
-      "declaration_hash": "9019b20f21823d11490b24cbee87eae804c6789e9e65564417f49f423051cb24",
+      "declaration_hash": "b486e14c9f4d8f186b66eecb5dba8c18bc0e435e3143ba42144729cdf103b909",
       "id": {
         "entry_key": "TrackAddTaskService",
         "item_identifier": "trait_method:execute",
@@ -967,10 +967,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -990,7 +986,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackArchiveService",
-      "declaration_hash": "860a6ba3d246d841791edd1dc527f64e9ebf842fa28e3c4e4d3d1a7e57566fd6",
+      "declaration_hash": "4e7cc75c9cc5a81529c5f813f3a07047a373c93f803324da931c92f7e12cb682",
       "id": {
         "entry_key": "TrackArchiveService",
         "item_identifier": "trait_method:execute",
@@ -1003,10 +999,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1026,7 +1018,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackBaselineCapturePort",
-      "declaration_hash": "10380e2219ea9eaf6ab606213ee6604f087eef80659a71540686204034f3ebb5",
+      "declaration_hash": "f9ae490d045d141263f63f123497865359c5f5629c3e6a99e153ea62f077a158",
       "id": {
         "entry_key": "TrackBaselineCapturePort",
         "item_identifier": "trait_method:execute",
@@ -1054,7 +1046,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackBaselineCaptureService",
-      "declaration_hash": "e5b4837be74b3f310807c43bc740dc39b34e9933f59ba2ab50ec3a693b472684",
+      "declaration_hash": "71f08b6a29dd3876bfa19f3effea76844044a556065ddeaa967f4f7f5bc4171e",
       "id": {
         "entry_key": "TrackBaselineCaptureService",
         "item_identifier": "trait_method:execute",
@@ -1067,10 +1059,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1090,7 +1078,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackBaselineGraphPort",
-      "declaration_hash": "b54620a1863ddf4fd74cdaa2fafe477f2ddc05470e34104e6fa3628231fcb9f1",
+      "declaration_hash": "1080bf7d5acd4981d062ad106939fa63d44f79b36b34c8839f7e02695b8035e8",
       "id": {
         "entry_key": "TrackBaselineGraphPort",
         "item_identifier": "trait_method:execute",
@@ -1118,7 +1106,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackBaselineGraphService",
-      "declaration_hash": "4211b5325b3d807c6d4bec71d65e788e44d24bf5f1fc78fe1aed4d8459a8984e",
+      "declaration_hash": "3b7a341857244012e6cbde4bdb61a70161caa956928365611fd798dcd67280bf",
       "id": {
         "entry_key": "TrackBaselineGraphService",
         "item_identifier": "trait_method:execute",
@@ -1131,10 +1119,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1154,7 +1138,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackBranchCreateService",
-      "declaration_hash": "cc2d25ed6e49f246ebcfe5923bd191248ca4bc48197addafedcaee873a0c34b0",
+      "declaration_hash": "9e52c319a9e8a73ae418a701c58da00fb30429575f293abc73c0a5e2caa6d008",
       "id": {
         "entry_key": "TrackBranchCreateService",
         "item_identifier": "trait_method:execute",
@@ -1167,10 +1151,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1190,7 +1170,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:global_for_items' of TrackBranchStrategyPort",
-      "declaration_hash": "2d0db993d0b01a02f0312d750fc5eb3ff49ace70684b64ffd4c458b56ad2a6cb",
+      "declaration_hash": "bd312d1480c130dc443ba840e61aef88749d166d26d6f5351d401b107277a049",
       "id": {
         "entry_key": "TrackBranchStrategyPort",
         "item_identifier": "trait_method:global_for_items",
@@ -1198,7 +1178,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1218,7 +1198,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:snapshot_for_track' of TrackBranchStrategyPort",
-      "declaration_hash": "2d0db993d0b01a02f0312d750fc5eb3ff49ace70684b64ffd4c458b56ad2a6cb",
+      "declaration_hash": "bd312d1480c130dc443ba840e61aef88749d166d26d6f5351d401b107277a049",
       "id": {
         "entry_key": "TrackBranchStrategyPort",
         "item_identifier": "trait_method:snapshot_for_track",
@@ -1226,7 +1206,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1246,7 +1226,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackBranchSwitchService",
-      "declaration_hash": "7175194ec61cf3ce5c77498e95d1b56a5b120e57430fb05462b3a4293785b051",
+      "declaration_hash": "4f8f7494edf56920f964591ce6c085fc1d37e99f63361d3cc5646fcab6b21c0c",
       "id": {
         "entry_key": "TrackBranchSwitchService",
         "item_identifier": "trait_method:execute",
@@ -1259,10 +1239,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1282,7 +1258,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackCatalogueImplSignalsPort",
-      "declaration_hash": "3456c4a56ac008acb51ba71a0edefa7fd99565561b4aaa50154e86c1d0539299",
+      "declaration_hash": "899163f5ced41be5c800a0f449911abaec336dea04d5e5756594eb3ca9d0d046",
       "id": {
         "entry_key": "TrackCatalogueImplSignalsPort",
         "item_identifier": "trait_method:execute",
@@ -1310,7 +1286,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackCatalogueImplSignalsService",
-      "declaration_hash": "65771517414d7bd50d154e1780d6292faa2fb5c182dbf5d86e1584cd0bb1747c",
+      "declaration_hash": "b78fccf94db9bf6e91bf30ac8f186e48bae1d651c442fc345fbec8ec183ec1f9",
       "id": {
         "entry_key": "TrackCatalogueImplSignalsService",
         "item_identifier": "trait_method:execute",
@@ -1323,10 +1299,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1346,7 +1318,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackCatalogueLintActivePort",
-      "declaration_hash": "f7203030a2660a4a3e282aa32843ce88c4f01dbdd2c34844c99670427e472817",
+      "declaration_hash": "af966be8765e70502e8422c701569ec41806cd59689c6ba47e14984511934732",
       "id": {
         "entry_key": "TrackCatalogueLintActivePort",
         "item_identifier": "trait_method:execute",
@@ -1374,7 +1346,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackCatalogueLintActiveService",
-      "declaration_hash": "19d141ed7a6e985e8ce738f2c812a24e747336d0e7e65fde45a1be3714f7a282",
+      "declaration_hash": "04e778908b0d6a815da4c3eaf07f31f1f63d2990f22f573b15ec0b79ef4703e4",
       "id": {
         "entry_key": "TrackCatalogueLintActiveService",
         "item_identifier": "trait_method:execute",
@@ -1387,10 +1359,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1410,7 +1378,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackCatalogueSpecSignalsPort",
-      "declaration_hash": "741e84fb1248643ae8af3be4f78bc4e2d8f67bbe593d6799cd3d9b67010fb391",
+      "declaration_hash": "09f8e82a8bee6f8ffe4eb208a311d047e19412d4e22fd9d1eff67b436d0b9aaf",
       "id": {
         "entry_key": "TrackCatalogueSpecSignalsPort",
         "item_identifier": "trait_method:execute",
@@ -1438,7 +1406,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackCatalogueSpecSignalsService",
-      "declaration_hash": "1e4992aed94ed525ef417c6a358aa0473ca404260151bf9ebe64066435612129",
+      "declaration_hash": "631254b41953c693a41acf9e10765df8aac7c5c1d3593d3aaa5e3ab8f8947845",
       "id": {
         "entry_key": "TrackCatalogueSpecSignalsService",
         "item_identifier": "trait_method:execute",
@@ -1451,10 +1419,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1474,7 +1438,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackClearOverrideService",
-      "declaration_hash": "a7030935fd1fd4e4cb1f08da9e070e1b7c184d0af175b60bbe324434041923cb",
+      "declaration_hash": "df835817445e8846f8d9017bcb038c48864d5057d9aba87b8c5f099e9aa231d0",
       "id": {
         "entry_key": "TrackClearOverrideService",
         "item_identifier": "trait_method:execute",
@@ -1487,10 +1451,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1510,7 +1470,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:persist_current_for_track' of TrackCommitHashPort",
-      "declaration_hash": "ced53992b25e77e11194522df1f4afdd6f3e4c0ffe3026f547899aa454904b24",
+      "declaration_hash": "649e91f0a1cf899662a3fdde105e07bdd2e65d867bc0b2905346a77f41a31189",
       "id": {
         "entry_key": "TrackCommitHashPort",
         "item_identifier": "trait_method:persist_current_for_track",
@@ -1518,7 +1478,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1538,7 +1498,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackContractMapPort",
-      "declaration_hash": "ad077b04034482b0e873fc6dd1aff9a4a89801e7de3cb0cbe2c4bbe8e514e624",
+      "declaration_hash": "d84ad1a0bd2c00466bdd8b2ed33d74f4ecc4c4b86219b7a271e2fe1b6f5666f7",
       "id": {
         "entry_key": "TrackContractMapPort",
         "item_identifier": "trait_method:execute",
@@ -1566,7 +1526,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackContractMapService",
-      "declaration_hash": "2f3e42e2ca88bbb9bed9496d49a1f44ef3626e726c7ccda2e126afd6bf09e6fb",
+      "declaration_hash": "2091791a71958a143df4636026828098be223f59226d7904c05be6fdaa924be4",
       "id": {
         "entry_key": "TrackContractMapService",
         "item_identifier": "trait_method:execute",
@@ -1579,10 +1539,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1602,7 +1558,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackInitService",
-      "declaration_hash": "08b2aabc3391a64890f90ae0930ffcb728bbccb48962e0cbe2f12c10f20266fc",
+      "declaration_hash": "01470078315ed111102f69b2d52fc2d72c2692df8d6e4084f627506db7ba9fcf",
       "id": {
         "entry_key": "TrackInitService",
         "item_identifier": "trait_method:execute",
@@ -1615,10 +1571,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1638,7 +1590,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackLintPort",
-      "declaration_hash": "2468543e809dcd69d01e7b83313aba2897889fec6813b1341dad6403b77e35f3",
+      "declaration_hash": "c6629ba43414b9d7a7eeb7a43581447d62457d1e1841f25d636c10f93570b395",
       "id": {
         "entry_key": "TrackLintPort",
         "item_identifier": "trait_method:execute",
@@ -1666,7 +1618,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackLintService",
-      "declaration_hash": "bf217f81041f7db953106fc95411b483aa2edc165b16d3b803889b1f6a0eb9fc",
+      "declaration_hash": "0999b09a3dc6a58b5484297de273d174adcee529e67eef5cd526f35387bc091f",
       "id": {
         "entry_key": "TrackLintService",
         "item_identifier": "trait_method:execute",
@@ -1679,10 +1631,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1702,7 +1650,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:save' of TrackMetadataPort",
-      "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9",
+      "declaration_hash": "50bd0c8e47278be422c1707b02b37b218e3ba378a6ca707bfe177c1efdce5651",
       "id": {
         "entry_key": "TrackMetadataPort",
         "item_identifier": "trait_method:save",
@@ -1710,7 +1658,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1730,7 +1678,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:find' of TrackMetadataPort",
-      "declaration_hash": "c19f5c16f718424bd4404627490596682923769d5757490e4bf22fc0276a31d9",
+      "declaration_hash": "50bd0c8e47278be422c1707b02b37b218e3ba378a6ca707bfe177c1efdce5651",
       "id": {
         "entry_key": "TrackMetadataPort",
         "item_identifier": "trait_method:find",
@@ -1738,11 +1686,11 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
-          "element_id": "AC-05",
+          "element_id": "CN-01",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         }
       ],
@@ -1758,7 +1706,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:next_task' of TrackNextTaskQueryPort",
-      "declaration_hash": "a07356f70c081c6bb190ecfea824c89ce6d9262f44279c7751de4c385c8801ca",
+      "declaration_hash": "50fc00d020f822f9a2434f1442b7ad95bc1d58da4bedc1f35a2698a110e4cacd",
       "id": {
         "entry_key": "TrackNextTaskQueryPort",
         "item_identifier": "trait_method:next_task",
@@ -1786,7 +1734,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackNextTaskService",
-      "declaration_hash": "d86c6ba56f285f933b255886e8d74a07aa397b18a4e7d572759f759bf2020e59",
+      "declaration_hash": "3f9c515eaf7e336a6189689e65e8651abf8024d70a68939d20423ae4211a1882",
       "id": {
         "entry_key": "TrackNextTaskService",
         "item_identifier": "trait_method:execute",
@@ -1799,10 +1747,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1822,7 +1766,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:clear_override' of TrackOverrideClearPort",
-      "declaration_hash": "6a32b4f9edbf55a4215a7ee88386090abc1f9d3b0e781e43322e91de0cafc33d",
+      "declaration_hash": "02d3ea8113fb071789f4388f0ede906d829964ac68df39d4d2c2f91f88967998",
       "id": {
         "entry_key": "TrackOverrideClearPort",
         "item_identifier": "trait_method:clear_override",
@@ -1834,7 +1778,7 @@
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
-          "element_id": "CN-01",
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         }
       ],
@@ -1850,7 +1794,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:set_override' of TrackOverrideSetPort",
-      "declaration_hash": "870343f64144121d59473a80ccadbe311c148192b82702eae9cee3d7991dc68b",
+      "declaration_hash": "1a9bc4f92c3028d77ebd2771dabf91c1a4002f515f76f4fff29ce8a867e40b7d",
       "id": {
         "entry_key": "TrackOverrideSetPort",
         "item_identifier": "trait_method:set_override",
@@ -1862,7 +1806,7 @@
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
-          "element_id": "CN-01",
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         }
       ],
@@ -1878,7 +1822,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackResolutionPort",
-      "declaration_hash": "c3413b431cb0773d676fe4ec4dc194a8d6ec60a6f849a7ec2051a61d790e65ad",
+      "declaration_hash": "d8c7dfae441238482d31ed3b54700623b55e2b4b451ebb9de389261e304d7cff",
       "id": {
         "entry_key": "TrackResolutionPort",
         "item_identifier": "trait_method:execute",
@@ -1906,7 +1850,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackResolutionService",
-      "declaration_hash": "7d5c02d69cb6c40cc04117f30f6a439d1666f2f836d7850e33690061be5930a1",
+      "declaration_hash": "9fbf4fad22007ab9ca6e3a51c86730f877d0168fdf1f177c9e564ceb5c79e1a0",
       "id": {
         "entry_key": "TrackResolutionService",
         "item_identifier": "trait_method:execute",
@@ -1934,7 +1878,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackResolveService",
-      "declaration_hash": "510200446e1c4f0e6bc57f53b4ef763e5e5c01cdd352b4e024517602263eb3ab",
+      "declaration_hash": "e84584b9375147903918d3635e454ae034abc6e35ddb7bbb9214d08f904a4a20",
       "id": {
         "entry_key": "TrackResolveService",
         "item_identifier": "trait_method:execute",
@@ -1947,10 +1891,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1970,7 +1910,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:resolve_required' of TrackSelectionPort",
-      "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a",
+      "declaration_hash": "8554f4a99d797abb8bec5de17bbb1708e0aaedb75acc88df58f9028bfe646f8c",
       "id": {
         "entry_key": "TrackSelectionPort",
         "item_identifier": "trait_method:resolve_required",
@@ -1978,7 +1918,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -1998,7 +1938,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:resolve_active' of TrackSelectionPort",
-      "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a",
+      "declaration_hash": "8554f4a99d797abb8bec5de17bbb1708e0aaedb75acc88df58f9028bfe646f8c",
       "id": {
         "entry_key": "TrackSelectionPort",
         "item_identifier": "trait_method:resolve_active",
@@ -2006,7 +1946,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2026,7 +1966,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:resolve_views_scope' of TrackSelectionPort",
-      "declaration_hash": "481916ad5f29c5edf35a6db6b5cd45d2e1606bdd7ff22576a25c8d0eb9ff6d9a",
+      "declaration_hash": "8554f4a99d797abb8bec5de17bbb1708e0aaedb75acc88df58f9028bfe646f8c",
       "id": {
         "entry_key": "TrackSelectionPort",
         "item_identifier": "trait_method:resolve_views_scope",
@@ -2034,7 +1974,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2054,7 +1994,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackSetCommitHashService",
-      "declaration_hash": "fe222c31c2e7db365fa3b19089e3aa1633eee01bcae42b9aed11b482995a27b4",
+      "declaration_hash": "4bbdbdddf9a9dd0b9e7ff7b770914bedb6b854cf42fcb8e2ce9f661f54974542",
       "id": {
         "entry_key": "TrackSetCommitHashService",
         "item_identifier": "trait_method:execute",
@@ -2067,10 +2007,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2090,7 +2026,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackSetOverrideService",
-      "declaration_hash": "0463dd016e8dff1cf831acee0e19cd049c899ab60d8c4eecddf79fba3ecd1982",
+      "declaration_hash": "f03b4c89ce6418507d7aa15e0968bcde6cc23aa9c7830e76d8abe21aaef54c7e",
       "id": {
         "entry_key": "TrackSetOverrideService",
         "item_identifier": "trait_method:execute",
@@ -2103,10 +2039,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2126,7 +2058,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackSpecElementHashPort",
-      "declaration_hash": "0ed7d8fa3b669f1eb30c943df94d57111a635cc75418b85efa07d8c530f45ea2",
+      "declaration_hash": "71592873fe3ae2ffbfa40bf55177d7ebd42abf78c51d2a64fc09d79bf4c3a471",
       "id": {
         "entry_key": "TrackSpecElementHashPort",
         "item_identifier": "trait_method:execute",
@@ -2154,7 +2086,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackSpecElementHashService",
-      "declaration_hash": "ffce69f2868c22ea1b253f19df9d88250c67f33ea8c02c9a580d424cdfdc20d8",
+      "declaration_hash": "5c33a3d7520fe827988bb4528179f4a70908990135a527170dc4e64aedacfeca",
       "id": {
         "entry_key": "TrackSpecElementHashService",
         "item_identifier": "trait_method:execute",
@@ -2167,10 +2099,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2190,7 +2118,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackSwitchBaseService",
-      "declaration_hash": "79a91cabf975866fe38489887d1953d0d8f20b4fe9cf34755d50b0894eb8701a",
+      "declaration_hash": "d5e1969296d704da20eca32661e63ded6b993bb435c2208e8df0864b7a8e5694",
       "id": {
         "entry_key": "TrackSwitchBaseService",
         "item_identifier": "trait_method:execute",
@@ -2203,10 +2131,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2226,7 +2150,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:add_task' of TrackTaskAddPort",
-      "declaration_hash": "582cccbc10a15bbb7600cbb49a2415a9843219572bd88319252899b267da0274",
+      "declaration_hash": "d6fb1cb32edecaf8cba34cecbe8061c7cfb2a367238c0d01f62f48a5a4c5fa60",
       "id": {
         "entry_key": "TrackTaskAddPort",
         "item_identifier": "trait_method:add_task",
@@ -2238,7 +2162,7 @@
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
-          "element_id": "CN-01",
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         }
       ],
@@ -2254,7 +2178,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:task_counts' of TrackTaskCountsQueryPort",
-      "declaration_hash": "5afced5bdaf7077fdf120991f8f10ba8ba04ee161eafa4aebc54b09fbc54ff69",
+      "declaration_hash": "493254aac942665739d12ff1ace034043b4b1db615075e3da383d9199ad0b3e3",
       "id": {
         "entry_key": "TrackTaskCountsQueryPort",
         "item_identifier": "trait_method:task_counts",
@@ -2282,7 +2206,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackTaskCountsService",
-      "declaration_hash": "8c4653d77d770e88a29b589defacb531cbcaf5f05d157984ec106788ee4cd742",
+      "declaration_hash": "5183a08d1b7feff11d7bc4bffdeb829c11d1f9287c89f0ba751ca5d0614b2907",
       "id": {
         "entry_key": "TrackTaskCountsService",
         "item_identifier": "trait_method:execute",
@@ -2295,10 +2219,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2318,7 +2238,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:transition_task' of TrackTaskTransitionPort",
-      "declaration_hash": "95f7f8911b9c4c9df857bfa00be028314075ef3a2a573a762df399f320407858",
+      "declaration_hash": "0c816e6591a05dbe5f79580b1de147bf4e3c041d39be1f03bada15ad4d020c41",
       "id": {
         "entry_key": "TrackTaskTransitionPort",
         "item_identifier": "trait_method:transition_task",
@@ -2330,7 +2250,7 @@
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
-          "element_id": "CN-01",
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         }
       ],
@@ -2346,7 +2266,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackTransitionService",
-      "declaration_hash": "d250906398a0981afb366925dc2ad9e53e1592bd7ecf31ad6a7c4229972909fa",
+      "declaration_hash": "6a6689ddb9e63117b556224bcd6101c11daa047de354c37f852211244fe7dcc7",
       "id": {
         "entry_key": "TrackTransitionService",
         "item_identifier": "trait_method:execute",
@@ -2359,10 +2279,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2382,7 +2298,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackTypeGraphPort",
-      "declaration_hash": "6f6ab54bf32b014805e966461d889713a3ec9271552c396a6d39739541c061ce",
+      "declaration_hash": "a7f4668c91c2642d8c1248b45bc2d35cc1a2874a5730fda00a86455e1348af97",
       "id": {
         "entry_key": "TrackTypeGraphPort",
         "item_identifier": "trait_method:execute",
@@ -2410,7 +2326,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackTypeGraphService",
-      "declaration_hash": "d189f5d5a1c0de936da819883d1d6cef613aac67ad34aeb5c37b0715007fe9b2",
+      "declaration_hash": "2660edb4c722438dfac273ef44591e6b67872212af2704ebeaba7bf1577723c6",
       "id": {
         "entry_key": "TrackTypeGraphService",
         "item_identifier": "trait_method:execute",
@@ -2423,10 +2339,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2446,7 +2358,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:execute' of TrackTypeSignalsPort",
-      "declaration_hash": "e1533312346e2b0fd4a733be45b652c1f08deb1b779c52c21854e406c4da5747",
+      "declaration_hash": "e52f96c47c9cf399a5b2cb045249c2848036a5f8f3de01437e8bc73e717207a7",
       "id": {
         "entry_key": "TrackTypeSignalsPort",
         "item_identifier": "trait_method:execute",
@@ -2474,7 +2386,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackTypeSignalsService",
-      "declaration_hash": "64e2f986c3805e9e319188ce3e5da3232814fe15d6ef3dd1f2688334123df58b",
+      "declaration_hash": "19f167c342238f410381d73c8d1602758f57a0b05021d962091d541e86ff4083",
       "id": {
         "entry_key": "TrackTypeSignalsService",
         "item_identifier": "trait_method:execute",
@@ -2487,10 +2399,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2510,7 +2418,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:validate' of TrackViewsPort",
-      "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231",
+      "declaration_hash": "faa6bae821cc7a27f4270e9c412be43770409dc821c20168b9604724a8c8f8e0",
       "id": {
         "entry_key": "TrackViewsPort",
         "item_identifier": "trait_method:validate",
@@ -2518,7 +2426,7 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2538,7 +2446,7 @@
     },
     {
       "brief": "Author a contract test covering 'trait_method:sync' of TrackViewsPort",
-      "declaration_hash": "cfed636aaec0f5f2def331898f0eea86aed68302175334f3921a58afe1015231",
+      "declaration_hash": "faa6bae821cc7a27f4270e9c412be43770409dc821c20168b9604724a8c8f8e0",
       "id": {
         "entry_key": "TrackViewsPort",
         "item_identifier": "trait_method:sync",
@@ -2546,11 +2454,15 @@
       },
       "spec_refs": [
         {
-          "element_id": "AC-03",
+          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
           "element_id": "IN-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "AC-05",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         }
       ],
@@ -2566,7 +2478,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackViewsSyncService",
-      "declaration_hash": "27e4f3173a31ecf1079d0207a6e5cf85e297978bb4faeb21ce4f1fca81def8bb",
+      "declaration_hash": "6bb2713d06d4d3635e58f9291931883a1b17d2c102dde7da8f1b7c2fa802ead2",
       "id": {
         "entry_key": "TrackViewsSyncService",
         "item_identifier": "trait_method:execute",
@@ -2579,10 +2491,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2602,7 +2510,7 @@
     },
     {
       "brief": "Author a result test covering 'trait_method:execute' of TrackViewsValidateService",
-      "declaration_hash": "9b7934f23bb23f50a456d66e321abbff59f3e125a4a3f479a4a96609d45a1462",
+      "declaration_hash": "5c40b908cbaa1c2f1cbf05708d509cfe95998ea139e7c4b512f4c6bd8c96f4d8",
       "id": {
         "entry_key": "TrackViewsValidateService",
         "item_identifier": "trait_method:execute",
@@ -2615,10 +2523,6 @@
         },
         {
           "element_id": "AC-03",
-          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "element_id": "AC-04",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
         {
@@ -2638,7 +2542,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskTransitionPort' of TaskOperationInteractor",
-      "declaration_hash": "a6ad770a003aa30d3225f22e5ae210151043780899889f595c05ca7577af36aa",
+      "declaration_hash": "5d85aa213b18d3c6aba864fc8ec54dd353449e8f61889be47fd57ce8741fdedb",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackTaskTransitionPort",
@@ -2666,7 +2570,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskAddPort' of TaskOperationInteractor",
-      "declaration_hash": "9b1c44c563009ced0ba6a28f78c29137d38809c76dc64fbd20bbea48d601f4c2",
+      "declaration_hash": "3d4fc204e858c084f3240624d8bcad811422ac28055b98e37b9670c50948d030",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackTaskAddPort",
@@ -2694,7 +2598,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackOverrideSetPort' of TaskOperationInteractor",
-      "declaration_hash": "94f889f213b90f01b328eb508980b51ec08213ed9a515df495af109ef3dc2109",
+      "declaration_hash": "758f283b665e3bc2829521d1c0a90a7897739c1d6d4fe7d96135327b82146559",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackOverrideSetPort",
@@ -2722,7 +2626,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackOverrideClearPort' of TaskOperationInteractor",
-      "declaration_hash": "89c32581fbddc36467a6b9e597e753aeacdd65e799115dd598bf2998922c8c7a",
+      "declaration_hash": "9d2a1b6d06060a733306b82a73ee58ae325d902249a0ac25e972ffcd568d2701",
       "id": {
         "entry_key": "TaskOperationInteractor",
         "item_identifier": "trait_impl:TrackOverrideClearPort",
@@ -2750,7 +2654,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackNextTaskQueryPort' of TaskQueryInteractor",
-      "declaration_hash": "fdcc6301b23d7b3bb9e2f0733b7553ed6005b3b5035bc6b69e1f0193b006bde5",
+      "declaration_hash": "781e29eb06c665bf07ca2124421be19b75b82bfe1f4398391985024a74136793",
       "id": {
         "entry_key": "TaskQueryInteractor",
         "item_identifier": "trait_impl:TrackNextTaskQueryPort",
@@ -2778,7 +2682,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:TrackTaskCountsQueryPort' of TaskQueryInteractor",
-      "declaration_hash": "52ae972a0cd19805b389780928686b5e440c484f7f8413ed5a6b18553ec3fbc9",
+      "declaration_hash": "cd66cd0579601a1b9b203765174f74607e9067ee7a231faf640b8f25c4d1bc53",
       "id": {
         "entry_key": "TaskQueryInteractor",
         "item_identifier": "trait_impl:TrackTaskCountsQueryPort",
@@ -2806,7 +2710,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackMetadataPort' of FsTrackMetadataAdapter",
-      "declaration_hash": "0d9eee1a4903c351361b45f9bf8a1238bcfc9067ef1b54f8bf807b5e91b27555",
+      "declaration_hash": "521b83411ecc515dda51c125a00427cc5e009c9ed85fbe6b9a7a5ef878c74649",
       "id": {
         "entry_key": "FsTrackMetadataAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::TrackMetadataPort",
@@ -2834,7 +2738,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackViewsPort' of FsTrackViewsAdapter",
-      "declaration_hash": "b2b218697164671dec46fd8527bcb6216dfd1dc702212eedb31d234a1345861d",
+      "declaration_hash": "6f311a0dbd429555479197ccf7e1b4356561088ecec4b7f586b3f8d04bfb7c3c",
       "id": {
         "entry_key": "FsTrackViewsAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::TrackViewsPort",
@@ -2862,7 +2766,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackCommitHashPort' of GitTrackCommitHashAdapter",
-      "declaration_hash": "8338bb2caa08c45c75d15540cdb9e7b6255fcb3574e9cbdc49c2eea17f5f04f5",
+      "declaration_hash": "6b2270da4e65c9b189ec090d35d6335ce74f0e95e42fbe3ab8aa62dce6cfc93b",
       "id": {
         "entry_key": "GitTrackCommitHashAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::TrackCommitHashPort",
@@ -2890,7 +2794,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackSelectionPort' of GitTrackSelectionAdapter",
-      "declaration_hash": "0db096f3c04875db471777353189de59cea42401cf180efcc064c483598078e5",
+      "declaration_hash": "ec4e8f7956fb336f88a442afd6719f2625daf0eba73e1d7cb327efed31ec1918",
       "id": {
         "entry_key": "GitTrackSelectionAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::TrackSelectionPort",
@@ -2918,7 +2822,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::TrackBranchStrategyPort' of FsTrackBranchStrategyAdapter",
-      "declaration_hash": "1b38c0aeaa03290c0ca9fb943fd736c6fb8ccf791a67fedab0b6a3e798443479",
+      "declaration_hash": "f32c53252bcec7c5fde19291dba8de86c5eb05a4f4ee8185ec43c32148c0c2d6",
       "id": {
         "entry_key": "FsTrackBranchStrategyAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::TrackBranchStrategyPort",
@@ -2946,7 +2850,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort' of SystemTrackTypeSignalsAdapter",
-      "declaration_hash": "22986fb5fe0b1e53f1bd18e59dfa9389f4370a0ced7a89624ecd86b64c75c06c",
+      "declaration_hash": "5c821e628d060adaf8436aec6a72064356da101c6e4759ed15aa072915ca6318",
       "id": {
         "entry_key": "SystemTrackTypeSignalsAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsPort",
@@ -2974,7 +2878,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort' of SystemTrackBaselineGraphAdapter",
-      "declaration_hash": "72a5b9320dad772a172ba4169c2ae3402d170bdc754c77af153f6b973d387de6",
+      "declaration_hash": "45ca7afb8d7384f29e48b3eedf78c593b65138c611e7d69c87a578b978cfc99f",
       "id": {
         "entry_key": "SystemTrackBaselineGraphAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphPort",
@@ -3002,7 +2906,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort' of SystemTrackContractMapAdapter",
-      "declaration_hash": "ac48416d5f3b75eee99f4490385569dd8d4871056eb679ad2f17f0bbad035e1c",
+      "declaration_hash": "925eb571e30f90e8f11d4417c08d171cd12597f8dae169957b71eeaef4a6503a",
       "id": {
         "entry_key": "SystemTrackContractMapAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort",
@@ -3030,7 +2934,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort' of SystemTrackCatalogueSpecSignalsAdapter",
-      "declaration_hash": "3feed57bb569b64225a7ba5a10e5389966fb4175dfeb63ff3a487cba562c4c1a",
+      "declaration_hash": "60316f1656c2fea9d50bbf0af84fe0c462fd86115682ffd5a2580f6431544db6",
       "id": {
         "entry_key": "SystemTrackCatalogueSpecSignalsAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsPort",
@@ -3058,7 +2962,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort' of SystemTrackSpecElementHashAdapter",
-      "declaration_hash": "656641cd77ab8c40a4f9a696737bfcd5a239f9f0befeca469a857717006b9157",
+      "declaration_hash": "f7415f9ba296d43e0fa537b2ae615fcecd21446fc6de2dc39bc28e05416d401c",
       "id": {
         "entry_key": "SystemTrackSpecElementHashAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort",
@@ -3086,7 +2990,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort' of SystemTrackBaselineCaptureAdapter",
-      "declaration_hash": "71633f33f91124a01e17b111e5b9e194570bde39d30bbcd40e20e3e1331ae580",
+      "declaration_hash": "782dfb8110b4fe6334e990b3978392e8932494254af8cd3a521116b54559c071",
       "id": {
         "entry_key": "SystemTrackBaselineCaptureAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::baseline_capture::TrackBaselineCapturePort",
@@ -3114,7 +3018,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::lint::TrackLintPort' of SystemTrackLintAdapter",
-      "declaration_hash": "528d828e52209f5748d11607588c794d2cf2e89d070fa77f637b35ca746d72b3",
+      "declaration_hash": "d140617ae195c89e702a61941546d5a859cb59d6c5aba1ab808be66adaf33bfa",
       "id": {
         "entry_key": "SystemTrackLintAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::lint::TrackLintPort",
@@ -3142,7 +3046,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort' of SystemTrackCatalogueImplSignalsAdapter",
-      "declaration_hash": "c8298a0831d752f355ccb18736eafb236ca1d66bae17267b1bd1d4b11420a4bf",
+      "declaration_hash": "cae238fda1b07b35a26c8b469e14de35d1dae5536a866649841f1f4bebe23f0c",
       "id": {
         "entry_key": "SystemTrackCatalogueImplSignalsAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsPort",
@@ -3170,7 +3074,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort' of SystemTrackCatalogueLintActiveAdapter",
-      "declaration_hash": "36277b0eddd3a1af4ae616022cce6377861b3d516e7df7c772ddd7c1368deea0",
+      "declaration_hash": "b493cb9e21d18212d517468c8a7a9e16db8ee41ffec4611aca4c7f608a04c5aa",
       "id": {
         "entry_key": "SystemTrackCatalogueLintActiveAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort",
@@ -3198,7 +3102,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::resolution_compat::TrackResolutionPort' of SystemTrackResolutionAdapter",
-      "declaration_hash": "392c272acb2252239f8113ed3a535caa60e1ae19b62b26dcd1492e94281c756e",
+      "declaration_hash": "f18b3ea75e2ac0910b8e1a2f17b7de279b06202ffeb6699df38378650bb44216",
       "id": {
         "entry_key": "SystemTrackResolutionAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::resolution_compat::TrackResolutionPort",
@@ -3226,7 +3130,7 @@
     },
     {
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort' of SystemTrackTypeGraphAdapter",
-      "declaration_hash": "300f33140711c55f69309ea2f220ee43a67fe07374817fff11e02628ed7300ba",
+      "declaration_hash": "7adf246e7b44e5c15a05dd8f1e589ba02e606c7c72b402d3237d6c7842a7ed55",
       "id": {
         "entry_key": "SystemTrackTypeGraphAdapter",
         "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::type_graph::TrackTypeGraphPort",

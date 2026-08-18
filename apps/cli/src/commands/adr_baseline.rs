@@ -362,8 +362,10 @@ mod tests {
         assert!(write_resolver_source.contains("TrackResolutionInput::WriteFromItems"));
         assert!(read_resolver_source.contains("TrackResolutionInput::ReadFromItems"));
         for resolver_source in [write_resolver_source, read_resolver_source] {
+            assert!(resolver_source.contains("track_resolution_driver"));
             assert!(resolver_source.contains("TrackItemsDirectoryInput::try_new"));
             assert!(resolver_source.contains("CliError::Message(error.message().to_owned())"));
+            assert!(!resolver_source.contains("track_resolve_id"));
             for forbidden_runtime_path in [
                 "AdrBaselineCompositionRoot",
                 "CommandOutcome",

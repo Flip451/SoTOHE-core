@@ -14,7 +14,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -22,7 +32,17 @@
           "name": "as_path",
           "params": [],
           "receiver": "&self",
-          "returns": "&std::path::Path"
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackItemsDirectory"
@@ -39,7 +59,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -47,7 +77,17 @@
           "name": "as_path",
           "params": [],
           "receiver": "&self",
-          "returns": "&std::path::Path"
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackWorkspaceRoot"
@@ -64,7 +104,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -72,7 +122,17 @@
           "name": "as_path",
           "params": [],
           "receiver": "&self",
-          "returns": "&std::path::Path"
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "RenderedViewPath"
@@ -89,7 +149,17 @@
               "ty": "u64"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -97,7 +167,17 @@
           "name": "value",
           "params": [],
           "receiver": "&self",
-          "returns": "u64"
+          "returns": "u64",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TaskCount"
@@ -114,7 +194,17 @@
               "ty": "u8"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -122,7 +212,17 @@
           "name": "value",
           "params": [],
           "receiver": "&self",
-          "returns": "u8"
+          "returns": "u8",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "ProcessExitCode"
@@ -147,7 +247,17 @@
               "ty": "Arc<dyn TrackViewsPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackInitInteractor"
@@ -172,7 +282,17 @@
               "ty": "Arc<dyn TrackViewsPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTransitionInteractor"
@@ -189,7 +309,17 @@
               "ty": "Arc<dyn GitPrimitivePort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackBranchSwitchInteractor"
@@ -210,7 +340,17 @@
               "ty": "Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackResolveInteractor"
@@ -227,7 +367,17 @@
               "ty": "Arc<dyn TrackViewsPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackViewsValidateInteractor"
@@ -248,7 +398,17 @@
               "ty": "Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackViewsSyncInteractor"
@@ -273,7 +433,17 @@
               "ty": "Arc<dyn TrackViewsPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackAddTaskInteractor"
@@ -298,7 +468,17 @@
               "ty": "Arc<dyn TrackViewsPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSetOverrideInteractor"
@@ -323,7 +503,17 @@
               "ty": "Arc<dyn TrackViewsPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackClearOverrideInteractor"
@@ -344,7 +534,17 @@
               "ty": "Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackNextTaskInteractor"
@@ -365,7 +565,17 @@
               "ty": "Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTaskCountsInteractor"
@@ -386,7 +596,17 @@
               "ty": "Arc<dyn TrackArchiveFsPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackArchiveInteractor"
@@ -411,7 +631,17 @@
               "ty": "Arc<dyn TrackBranchStrategyPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackBranchCreateInteractor"
@@ -436,7 +666,17 @@
               "ty": "Arc<dyn TrackBranchStrategyPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSwitchBaseInteractor"
@@ -453,7 +693,17 @@
               "ty": "Arc<dyn TrackCommitHashPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSetCommitHashInteractor"
@@ -470,7 +720,17 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -478,7 +738,17 @@
           "name": "as_str",
           "params": [],
           "receiver": "&self",
-          "returns": "&str"
+          "returns": "&str",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackLifecycleIdInput"
@@ -499,7 +769,17 @@
               "ty": "Option<String>"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTaskTransition"
@@ -516,7 +796,17 @@
               "ty": "Option<TrackLifecycleIdInput>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSelection"
@@ -541,7 +831,17 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, TrackInitError>"
+          "returns": "Result<Self, TrackInitError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackInitCommand"
@@ -570,7 +870,17 @@
               "ty": "TrackTaskTransition"
             }
           ],
-          "returns": "Result<Self, TrackTransitionError>"
+          "returns": "Result<Self, TrackTransitionError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTransitionCommand"
@@ -603,7 +913,17 @@
               "ty": "Option<String>"
             }
           ],
-          "returns": "Result<Self, TrackAddTaskError>"
+          "returns": "Result<Self, TrackAddTaskError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackAddTaskCommand"
@@ -632,7 +952,17 @@
               "ty": "String"
             }
           ],
-          "returns": "Result<Self, TrackSetOverrideError>"
+          "returns": "Result<Self, TrackSetOverrideError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSetOverrideCommand"
@@ -653,7 +983,17 @@
               "ty": "TrackLifecycleIdInput"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackBranchCreateCommand"
@@ -674,7 +1014,17 @@
               "ty": "TrackLifecycleIdInput"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackBranchSwitchCommand"
@@ -695,7 +1045,17 @@
               "ty": "TrackLifecycleIdInput"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackArchiveCommand"
@@ -712,7 +1072,17 @@
               "ty": "TrackLifecycleIdInput"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSetCommitHashCommand"
@@ -729,7 +1099,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -737,7 +1117,17 @@
           "name": "as_path",
           "params": [],
           "receiver": "&self",
-          "returns": "&std::path::Path"
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackDirectoryPath"
@@ -754,7 +1144,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -762,7 +1162,17 @@
           "name": "as_path",
           "params": [],
           "receiver": "&self",
-          "returns": "&std::path::Path"
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSourceWorkspace"
@@ -779,7 +1189,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -787,7 +1207,17 @@
           "name": "as_path",
           "params": [],
           "receiver": "&self",
-          "returns": "&std::path::Path"
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackLintRulesFile"
@@ -804,7 +1234,17 @@
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, DiagnosticText>"
+          "returns": "Result<Self, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -812,7 +1252,17 @@
           "name": "as_path",
           "params": [],
           "receiver": "&self",
-          "returns": "&std::path::Path"
+          "returns": "&std::path::Path",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackCataloguePath"
@@ -829,7 +1279,17 @@
               "ty": "usize"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -837,7 +1297,17 @@
           "name": "value",
           "params": [],
           "receiver": "&self",
-          "returns": "usize"
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackRenderedLayerCount"
@@ -854,7 +1324,17 @@
               "ty": "usize"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -862,7 +1342,17 @@
           "name": "value",
           "params": [],
           "receiver": "&self",
-          "returns": "usize"
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackWrittenFileCount"
@@ -879,7 +1369,17 @@
               "ty": "usize"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -887,7 +1387,17 @@
           "name": "value",
           "params": [],
           "receiver": "&self",
-          "returns": "usize"
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackCatalogueEntryCount"
@@ -908,7 +1418,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTypeSignalsInteractor"
@@ -929,7 +1449,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackBaselineGraphInteractor"
@@ -950,7 +1480,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackContractMapInteractor"
@@ -971,7 +1511,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackCatalogueSpecSignalsInteractor"
@@ -992,7 +1542,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackSpecElementHashInteractor"
@@ -1013,7 +1573,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackBaselineCaptureInteractor"
@@ -1034,7 +1604,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackLintInteractor"
@@ -1055,7 +1635,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackCatalogueImplSignalsInteractor"
@@ -1076,7 +1666,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackCatalogueLintActiveInteractor"
@@ -1093,7 +1693,17 @@
               "ty": "std::sync::Arc<dyn TrackResolutionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackResolutionInteractor"
@@ -1110,7 +1720,17 @@
               "ty": "usize"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -1118,7 +1738,17 @@
           "name": "value",
           "params": [],
           "receiver": "&self",
-          "returns": "usize"
+          "returns": "usize",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTypeGraphClusterDepth"
@@ -1139,7 +1769,17 @@
               "ty": "std::sync::Arc<dyn TrackSelectionPort>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "type_name": "TrackTypeGraphInteractor"
@@ -1167,7 +1807,8 @@
               "ty": "Arc<S>"
             }
           ],
-          "returns": "Self"
+          "returns": "Self",
+          "action": "reference"
         }
       ],
       "type_name": "TaskQueryInteractor"
@@ -2307,7 +2948,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackAddTaskResult, TrackAddTaskError>"
+          "returns": "Result<TrackAddTaskResult, TrackAddTaskError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_add_task",
@@ -2353,7 +3008,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackArchiveResult, TrackArchiveError>"
+          "returns": "Result<TrackArchiveResult, TrackArchiveError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_archive",
@@ -2403,7 +3072,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackBaselineCaptureResult, TrackBaselineCaptureError>"
+          "returns": "Result<TrackBaselineCaptureResult, TrackBaselineCaptureError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::baseline_capture",
@@ -2441,7 +3120,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackBaselineCaptureResult, TrackBaselineCaptureError>"
+          "returns": "Result<TrackBaselineCaptureResult, TrackBaselineCaptureError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::baseline_capture",
@@ -2491,7 +3184,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackBaselineGraphResult, TrackBaselineGraphError>"
+          "returns": "Result<TrackBaselineGraphResult, TrackBaselineGraphError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::baseline_graph",
@@ -2529,7 +3232,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackBaselineGraphResult, TrackBaselineGraphError>"
+          "returns": "Result<TrackBaselineGraphResult, TrackBaselineGraphError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::baseline_graph",
@@ -2575,7 +3292,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackBranchCreateResult, TrackBranchCreateError>"
+          "returns": "Result<TrackBranchCreateResult, TrackBranchCreateError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_branch_create",
@@ -2621,7 +3352,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::BranchStrategySnapshot, DiagnosticText>"
+          "returns": "Result<domain::BranchStrategySnapshot, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -2638,7 +3379,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::BranchStrategySnapshot, DiagnosticText>"
+          "returns": "Result<domain::BranchStrategySnapshot, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle",
@@ -2676,7 +3427,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackBranchSwitchResult, TrackBranchSwitchError>"
+          "returns": "Result<TrackBranchSwitchResult, TrackBranchSwitchError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_branch_switch",
@@ -2726,7 +3491,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackCatalogueImplSignalsResult, TrackCatalogueImplSignalsError>"
+          "returns": "Result<TrackCatalogueImplSignalsResult, TrackCatalogueImplSignalsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::catalogue_impl_signals",
@@ -2764,7 +3539,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackCatalogueImplSignalsResult, TrackCatalogueImplSignalsError>"
+          "returns": "Result<TrackCatalogueImplSignalsResult, TrackCatalogueImplSignalsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::catalogue_impl_signals",
@@ -2814,7 +3603,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackCatalogueLintActiveResult, TrackCatalogueLintActiveError>"
+          "returns": "Result<TrackCatalogueLintActiveResult, TrackCatalogueLintActiveError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::catalogue_lint_active",
@@ -2852,7 +3651,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackCatalogueLintActiveResult, TrackCatalogueLintActiveError>"
+          "returns": "Result<TrackCatalogueLintActiveResult, TrackCatalogueLintActiveError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::catalogue_lint_active",
@@ -2902,7 +3715,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackCatalogueSpecSignalsResult, TrackCatalogueSpecSignalsError>"
+          "returns": "Result<TrackCatalogueSpecSignalsResult, TrackCatalogueSpecSignalsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::catalogue_spec_signals",
@@ -2940,7 +3763,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackCatalogueSpecSignalsResult, TrackCatalogueSpecSignalsError>"
+          "returns": "Result<TrackCatalogueSpecSignalsResult, TrackCatalogueSpecSignalsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::catalogue_spec_signals",
@@ -2986,7 +3823,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackClearOverrideResult, TrackClearOverrideError>"
+          "returns": "Result<TrackClearOverrideResult, TrackClearOverrideError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_clear_override",
@@ -3032,7 +3883,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::CommitHash, DiagnosticText>"
+          "returns": "Result<domain::CommitHash, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle",
@@ -3074,7 +3935,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackContractMapResult, TrackContractMapError>"
+          "returns": "Result<TrackContractMapResult, TrackContractMapError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::contract_map",
@@ -3112,7 +3983,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackContractMapResult, TrackContractMapError>"
+          "returns": "Result<TrackContractMapResult, TrackContractMapError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::contract_map",
@@ -3158,7 +4043,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackInitResult, TrackInitError>"
+          "returns": "Result<TrackInitResult, TrackInitError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_init",
@@ -3208,7 +4107,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackLintResult, TrackLintError>"
+          "returns": "Result<TrackLintResult, TrackLintError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::lint",
@@ -3246,7 +4155,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackLintResult, TrackLintError>"
+          "returns": "Result<TrackLintResult, TrackLintError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::lint",
@@ -3296,7 +4219,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticText>"
+          "returns": "Result<(), DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -3313,7 +4246,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<Option<domain::TrackMetadata>, DiagnosticText>"
+          "returns": "Result<Option<domain::TrackMetadata>, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle",
@@ -3355,7 +4298,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<Option<NextTaskOutput>, TrackNextTaskError>"
+          "returns": "Result<Option<NextTaskOutput>, TrackNextTaskError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_next_task",
@@ -3393,7 +4346,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackNextTaskResult, TrackNextTaskError>"
+          "returns": "Result<TrackNextTaskResult, TrackNextTaskError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_next_task",
@@ -3443,7 +4410,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_clear_override",
@@ -3493,7 +4470,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_set_override",
@@ -3531,7 +4518,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackResolutionResult, TrackResolutionCompatError>"
+          "returns": "Result<TrackResolutionResult, TrackResolutionCompatError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::resolution_compat",
@@ -3569,7 +4566,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackResolutionResult, TrackResolutionCompatError>"
+          "returns": "Result<TrackResolutionResult, TrackResolutionCompatError>",
+          "spec_refs": [
+            {
+              "anchor": "IN-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::resolution_compat",
@@ -3607,7 +4614,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackResolveResult, TrackResolveError>"
+          "returns": "Result<TrackResolveResult, TrackResolveError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_resolve",
@@ -3657,7 +4678,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::TrackId, DiagnosticText>"
+          "returns": "Result<domain::TrackId, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -3670,7 +4701,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<domain::TrackId, DiagnosticText>"
+          "returns": "Result<domain::TrackId, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -3687,7 +4728,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackViewsScope, DiagnosticText>"
+          "returns": "Result<TrackViewsScope, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle",
@@ -3725,7 +4776,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackSetCommitHashResult, TrackSetCommitHashError>"
+          "returns": "Result<TrackSetCommitHashResult, TrackSetCommitHashError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_set_commit_hash",
@@ -3771,7 +4836,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackSetOverrideResult, TrackSetOverrideError>"
+          "returns": "Result<TrackSetOverrideResult, TrackSetOverrideError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_set_override",
@@ -3821,7 +4900,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackSpecElementHashResult, TrackSpecElementHashError>"
+          "returns": "Result<TrackSpecElementHashResult, TrackSpecElementHashError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::spec_element_hash",
@@ -3859,7 +4948,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackSpecElementHashResult, TrackSpecElementHashError>"
+          "returns": "Result<TrackSpecElementHashResult, TrackSpecElementHashError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::spec_element_hash",
@@ -3905,7 +5008,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackSwitchBaseResult, TrackSwitchBaseError>"
+          "returns": "Result<TrackSwitchBaseResult, TrackSwitchBaseError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_switch_base",
@@ -3967,7 +5084,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TaskOperationOutput, TaskOperationError>"
+          "returns": "Result<TaskOperationOutput, TaskOperationError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_add_task",
@@ -4009,7 +5136,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TaskCountsOutput, TrackTaskCountsError>"
+          "returns": "Result<TaskCountsOutput, TrackTaskCountsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_task_counts",
@@ -4047,7 +5184,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackTaskCountsResult, TrackTaskCountsError>"
+          "returns": "Result<TrackTaskCountsResult, TrackTaskCountsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_task_counts",
@@ -4105,7 +5256,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TaskTransitionOutcome, TaskOperationError>"
+          "returns": "Result<TaskTransitionOutcome, TaskOperationError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_transition",
@@ -4143,7 +5304,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackTransitionResult, TrackTransitionError>"
+          "returns": "Result<TrackTransitionResult, TrackTransitionError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_transition",
@@ -4193,7 +5368,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackTypeGraphResult, TrackTypeGraphError>"
+          "returns": "Result<TrackTypeGraphResult, TrackTypeGraphError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::type_graph",
@@ -4231,7 +5416,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackTypeGraphResult, TrackTypeGraphError>"
+          "returns": "Result<TrackTypeGraphResult, TrackTypeGraphError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::type_graph",
@@ -4281,7 +5480,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackTypeSignalsResult, TrackTypeSignalsError>"
+          "returns": "Result<TrackTypeSignalsResult, TrackTypeSignalsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-01",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::type_signals",
@@ -4319,7 +5528,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackTypeSignalsResult, TrackTypeSignalsError>"
+          "returns": "Result<TrackTypeSignalsResult, TrackTypeSignalsError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::tddd::type_signals",
@@ -4365,7 +5588,17 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), DiagnosticText>"
+          "returns": "Result<(), DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         },
         {
           "has_default_impl": false,
@@ -4382,7 +5615,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<Vec<RenderedViewPath>, DiagnosticText>"
+          "returns": "Result<Vec<RenderedViewPath>, DiagnosticText>",
+          "spec_refs": [
+            {
+              "anchor": "AC-04",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "IN-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-05",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle",
@@ -4420,7 +5667,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackViewsSyncResult, TrackViewsSyncError>"
+          "returns": "Result<TrackViewsSyncResult, TrackViewsSyncError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_views_sync",
@@ -4466,7 +5727,21 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<TrackViewsValidateResult, TrackViewsValidateError>"
+          "returns": "Result<TrackViewsValidateResult, TrackViewsValidateError>",
+          "spec_refs": [
+            {
+              "anchor": "AC-02",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
         }
       ],
       "module_path": "track_lifecycle::track_views_validate",

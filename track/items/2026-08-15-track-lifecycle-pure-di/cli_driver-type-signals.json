@@ -1,8 +1,8 @@
 {
-  "baseline_hash": "41113f2dbbd1778473992d003e8ee985df3cd929d6c50cfadab2e4d61ba762bd",
-  "declaration_hash": "c690f4bacdf06b62335bdf311894e6d93ed17d583ca2c3243101a779db0cf326",
-  "generated_at": "2026-08-17T09:43:29Z",
-  "head_commit": "636d7c0bfcb890f0395e7b32b4734b8b7397136a",
+  "baseline_hash": "f80a049a51ead3f8c296d234a9293ee6422ea2945e5aa12f45cbcd7aeac48346",
+  "declaration_hash": "c67873117dadadfc21928de3321deb7fda0cfefabd627d9993b2261ae567b032",
+  "generated_at": "2026-08-18T12:15:02Z",
+  "head_commit": "3399b3a4d1ea2fd2189b10635afcb96284edd055",
   "schema_version": 4,
   "signals": [
     {
@@ -158,9 +158,9 @@
       "type_name": "TrackTdddCatalogueLintActiveInput"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTdddCatalogueSpecSignalsInput"
     },
     {
