@@ -128,6 +128,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD chain ③ の `cargo rustdoc` 呼び出しに `--document-hidden-items` を追加する](2026-06-27-0440-tddd-rustdoc-document-hidden-items.md) | Proposed | 2026-06-27 |
 | [TDDD chain ③ の rustdoc 抽出を track 単位の feature 宣言に基づかせる](2026-07-27-0039-tddd-track-scoped-feature-declaration.md) | Proposed | 2026-07-27 |
 | [catalogue の適用範囲を実装の追加・変更に一致させる](2026-07-28-1024-catalogue-scope-is-implementation-delta.md) | Proposed | 2026-07-28 |
+| [sotp 生成 JSON のキー順を決定的にする](2026-07-29-0839-deterministic-json-serialization.md) | Proposed | 2026-07-29 |
+| [信号機 Yellow/Red 内訳を横断列挙する signal report コマンドを追加する](2026-07-29-0839-signal-report-command.md) | Proposed | 2026-07-29 |
+| [全 sotp コマンドに tracing 計装を入れ横断分析可能にする](2026-07-29-0839-sotp-tracing-instrumentation.md) | Proposed | 2026-07-29 |
 | [signal report の発生単位データ取得方針](2026-07-31-2134-signal-report-occurrence-source.md) | Proposed | 2026-07-31 |
 | [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 | [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
@@ -140,6 +143,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型配置是正における CLI 契約の維持](2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md) | Proposed | 2026-07-25 |
 | [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
 | [role × 層マトリクスを機構で強制し ValueObject の層勾配を是正する](2026-07-25-0538-role-layer-matrix-enforcement.md) | Proposed | 2026-07-25 |
+| [trait_method 義務の anchor 所有権を method 単位にする（テスト義務ゲート ADR の refinement）](2026-08-13-1720-test-obligation-method-anchor-ownership.md) | Proposed | 2026-08-13 |
+| [MethodDeclaration に action を導入し、義務対象 method を明示する](2026-08-17-0340-method-declaration-action.md) | Proposed | 2026-08-17 |
+| [親が reference / delete のとき子 Method の spec_refs を禁止する](2026-08-18-0040-parent-forbids-method-spec-refs.md) | Proposed | 2026-08-18 |
+| [entry-level spec_refs から総目録の役割を外す](2026-08-18-0055-entry-spec-refs-not-inventory.md) | Proposed | 2026-08-18 |
 
 ### トラック・ワークフロー
 
@@ -161,6 +168,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [feature バッチ消化への既定反転 — per-layer 並列レビューを始動させる](2026-06-22-1327-feature-batch-default-inversion.md) | Accepted | 2026-06-22 |
 | [impl 段階の構造的不整合検出時のフェーズ遷移診断スキル](2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md) | Proposed | 2026-06-26 |
 | [タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用](2026-06-27-0852-pre-review-task-contract-conformance-gate.md) | Accepted | 2026-06-27 |
+| [phase command と pre-review gate を operator-owned argv 配列で宣言する](2026-08-02-0806-operator-owned-phase-command-config.md) | Proposed | 2026-08-02 |
+| [phase enter を canonical writer entry とし収束 check command を公開する](2026-08-04-0001-phase-enter-adoption-and-check-commands.md) | Proposed | 2026-08-04 |
 | [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
 | [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
 | [SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite](2026-07-22-0400-sot-reentry-sequencing.md) | Proposed | 2026-07-22 |
@@ -173,6 +182,11 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [`batch-plan.json` の scope 名を review scope 設定に照合し、未知名を fail-closed で拒否する](2026-07-30-0951-batch-plan-scope-name-config-validation.md) | Accepted | 2026-07-30 |
 | [`batch-plan.json` の宣言対象を未 settle タスクに限定する](2026-07-30-1022-batch-plan-declaration-domain-unsettled-tasks.md) | Accepted | 2026-07-30 |
 | [per-task commit hash の記録時に repository 実在と HEAD 到達可能性を要求する](2026-07-30-2101-per-task-commit-hash-record-time-validation.md) | Accepted | 2026-07-30 |
+| [base merge 後の baseline 再取得と同期記録を定める](2026-08-02-0715-base-merge-cleanup-state.md) | Accepted | 2026-08-02 |
+| [type-signals cache は clean な同一 HEAD commit でのみ再利用する](2026-08-05-1035-type-signals-authority-availability-boundary.md) | Proposed | 2026-08-05 |
+| [guarded stash pop は同じ push が作成した stash commit と対にする](2026-08-11-0910-guarded-stash-pop-pairing.md) | Proposed | 2026-08-11 |
+| [check-zero-findings は空 scope を pass させる](2026-08-13-1736-check-zero-findings-empty-scope-pass.md) | Proposed | 2026-08-13 |
+| [子プロセスの診断出力は末尾リングで保持し、出力量で kill しない](2026-08-14-1048-child-output-ring-capture.md) | Proposed | 2026-08-14 |
 
 ### ADR 運用
 
@@ -186,6 +200,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加](2026-07-18-0340-adr2pr-baseline-diff-comment.md) | Proposed | 2026-07-18 |
 | [入力決定と pipeline 産決定の二箱分離](2026-07-19-0616-two-box-decision-separation.md) | Proposed | 2026-07-19 |
 | [Phase 0 承認後に修正が入った場合は承認前へ戻して再収束する](2026-07-25-0716-phase0-post-approval-reconvergence-lane.md) | Proposed | 2026-07-25 |
+| [ADR 起草とレビューに開集合検査を追加する](2026-08-13-1756-adr-open-set-depth-check.md) | Proposed | 2026-08-13 |
 
 ### ドキュメント運用
 
@@ -247,6 +262,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
 | [Codex 正規入口の整備](2026-07-22-1149-codex-merge-done-adr-entrypoints.md) | Proposed | 2026-07-22 |
 | [reasoning effort に max 段を追加し、限定レーンを Luna Max へ移行する](2026-08-02-0151-codex-reasoning-effort-max.md) | Proposed | 2026-08-02 |
+| [capability routing を中華系プロバイダーへ拡張可能にする](2026-08-02-0151-multi-provider-capability-routing.md) | Proposed | 2026-08-02 |
+| [capability exec の省略 host は profile 解決 subprocess に限定する](2026-08-03-1010-capability-exec-omitted-host-dispatch.md) | Proposed | 2026-08-03 |
+| [grok を第三の provider binding として追加する](2026-08-14-1225-grok-provider-binding.md) | Proposed | 2026-08-14 |
 
 ### テスト・CI ツーリング
 
@@ -261,6 +279,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 | [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
 | [ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化](2026-07-20-1608-disk-footprint-and-dry-feature-gating.md) | Proposed | 2026-07-20 |
+| [ワークフロー副産物によるディスク衛生の修繕 — scope diff の untracked ディレクトリ計測失敗と template export テストの /tmp scaffold リーク](2026-08-02-0643-workflow-byproduct-disk-hygiene.md) | Proposed | 2026-08-02 |
+| [template export 統合テストの source fixture 隔離配置](2026-08-14-0442-template-export-test-source-fixture-placement.md) | Proposed | 2026-08-14 |
 
 ### DRY / リファクタ
 
@@ -282,3 +302,6 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止](2026-07-02-1600-review-load-batch-findings-no-restatement.md) | — | 2026-07-02 |
 | [レビュー指示書のカテゴリ閉列挙を半開形式へ改める](2026-07-23-0109-review-briefing-open-category-format.md) | Proposed | 2026-07-23 |
 | [機械導出される義務成果物を review 運用成果物として扱う](2026-07-25-0715-derived-obligation-artifact-review-scope.md) | Proposed | 2026-07-25 |
+| [`sotp review results` の scope selector と列挙範囲を一致させる](2026-08-10-0814-review-results-scope-selection.md) | Proposed | 2026-08-10 |
+| [review-fix コマンド群の delivery boundary と briefing の信頼境界](2026-08-11-1857-review-fix-delivery-boundary.md) | Deprecated | 2026-08-11 |
+| [review-yield を計測する](2026-08-14-0428-review-yield-measurement.md) | Proposed | 2026-08-14 |

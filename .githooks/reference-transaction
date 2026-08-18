@@ -1,2 +1,17 @@
 #!/bin/sh
-exec "$(git rev-parse --show-toplevel)/bin/sotp" hook dispatch git-ref-update "$@"
+# Resolve bin/sotp from the MAIN worktree. Ephemeral linked worktrees
+# (e.g. the guarded base-merge cleanup worktree) do not contain the
+# gitignored binary, and no single git query covers every layout
+# (--show-toplevel is the current worktree; --git-common-dir has no
+# ".git" suffix under `git init --separate-git-dir`; `git worktree list`
+# reports the gitdir as the first entry in that layout). Try each
+# candidate in order and fail closed if none holds the binary.
+top=$(git rev-parse --path-format=absolute --show-toplevel 2>/dev/null)
+[ -n "$top" ] && [ -x "$top/bin/sotp" ] && exec "$top/bin/sotp" hook dispatch git-ref-update "$@"
+common=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+main="${common%/.git}"
+[ -n "$main" ] && [ -x "$main/bin/sotp" ] && exec "$main/bin/sotp" hook dispatch git-ref-update "$@"
+wt=$(git worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')
+[ -n "$wt" ] && [ -x "$wt/bin/sotp" ] && exec "$wt/bin/sotp" hook dispatch git-ref-update "$@"
+echo "reference-transaction hook: bin/sotp not found from any worktree candidate" >&2
+exit 1

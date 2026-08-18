@@ -102,12 +102,168 @@ impl TemplateCompositionRoot {
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::path::{Path, PathBuf};
+    use std::sync::Arc;
 
     use cli_driver::template_conventions::ConventionShippingCheckInput;
-    use cli_driver::template_export::{TemplateExportInput, TemplateInput};
+    use cli_driver::template_export::{TemplateDriver, TemplateExportInput, TemplateInput};
+    use domain::FreeText;
+    use infrastructure::template_export::{
+        FsTemplateBoundaryManifestAdapter, FsTemplateExportAdapter,
+    };
     use tempfile::TempDir;
+    use usecase::template_export::{
+        SelfBinaryTransplantError, SelfBinaryTransplantPort, TemplateBoundaryManifestPort,
+        TemplateExportInteractor, TemplateExportPort, TemplateExportService,
+    };
 
     use super::{TemplateCompositionRoot, machine_home_directory};
+
+    /// Test-only transplant adapter. The production adapter deliberately keeps
+    /// its copy semantics; these in-process tests use a hard link so the test
+    /// binary is never materialized again under the scaffold.
+    #[derive(Debug)]
+    struct HardLinkSelfBinaryTransplantAdapter {
+        source: PathBuf,
+    }
+
+    impl HardLinkSelfBinaryTransplantAdapter {
+        fn new(source: PathBuf) -> Self {
+            Self { source }
+        }
+    }
+
+    fn hard_link_or_copy(source: &Path, destination: &Path) -> Result<(), std::io::Error> {
+        match std::fs::hard_link(source, destination) {
+            Ok(()) => Ok(()),
+            // Cargo normally keeps the test binary and target temp directory on
+            // one filesystem. Keep the test runnable for an externally mounted
+            // target directory by falling back only for EXDEV.
+            Err(error) if error.kind() == std::io::ErrorKind::CrossesDevices => {
+                std::fs::copy(source, destination).map(|_| ())
+            }
+            Err(error) => Err(error),
+        }
+    }
+
+    impl SelfBinaryTransplantPort for HardLinkSelfBinaryTransplantAdapter {
+        fn transplant(&self, destination: &Path) -> Result<(), SelfBinaryTransplantError> {
+            if let Some(parent) = destination.parent()
+                && !parent.as_os_str().is_empty()
+            {
+                std::fs::create_dir_all(parent).map_err(|error| {
+                    SelfBinaryTransplantError::DestinationWriteFailure {
+                        path: destination.to_path_buf(),
+                        reason: FreeText::new(error.to_string()),
+                    }
+                })?;
+            }
+
+            hard_link_or_copy(&self.source, destination).map_err(|error| {
+                SelfBinaryTransplantError::DestinationWriteFailure {
+                    path: destination.to_path_buf(),
+                    reason: FreeText::new(error.to_string()),
+                }
+            })
+        }
+    }
+
+    fn test_template_export_driver() -> TemplateDriver {
+        let manifest_port: Arc<dyn TemplateBoundaryManifestPort> =
+            Arc::new(FsTemplateBoundaryManifestAdapter::new());
+        let export_port: Arc<dyn TemplateExportPort> =
+            Arc::new(FsTemplateExportAdapter::new(machine_home_directory()));
+        let transplant_port: Arc<dyn SelfBinaryTransplantPort> =
+            Arc::new(HardLinkSelfBinaryTransplantAdapter::new(std::env::current_exe().unwrap()));
+        let service: Arc<dyn TemplateExportService> =
+            Arc::new(TemplateExportInteractor::new(manifest_port, export_port, transplant_port));
+        TemplateDriver::new(service)
+    }
+
+    fn template_export_temp_parent(
+        cargo_target_tmpdir: Option<PathBuf>,
+        cargo_target_dir: Option<PathBuf>,
+        workspace_root: &Path,
+    ) -> PathBuf {
+        // Unit tests do not receive CARGO_TARGET_TMPDIR from Cargo. Fall back
+        // to the configured target tree first so an interrupted run leaves its
+        // leftovers where `cargo clean` of that tree can still collect them.
+        cargo_target_tmpdir
+            .filter(|path| !path.as_os_str().is_empty())
+            .or_else(|| {
+                cargo_target_dir
+                    .filter(|path| !path.as_os_str().is_empty())
+                    .map(|target_dir| target_dir.join("tmp"))
+            })
+            .unwrap_or_else(|| workspace_root.join("target/tmp"))
+    }
+
+    fn template_export_tempdir() -> TempDir {
+        let workspace_root = crate::test_support::repo_root_for_tests();
+        let parent = template_export_temp_parent(
+            std::env::var_os("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+            std::env::var_os("CARGO_TARGET_DIR").map(PathBuf::from),
+            &workspace_root,
+        );
+        std::fs::create_dir_all(&parent).unwrap_or_else(|error| {
+            panic!("cannot create template-export temporary parent {}: {error}", parent.display())
+        });
+        TempDir::new_in(&parent).unwrap_or_else(|error| {
+            panic!(
+                "cannot create template-export temporary directory in {}: {error}",
+                parent.display()
+            )
+        })
+    }
+
+    #[test]
+    fn test_template_export_temp_parent_prefers_cargo_target_tmpdir() {
+        let configured = PathBuf::from("/cargo/target/tmp");
+
+        assert_eq!(
+            template_export_temp_parent(
+                Some(configured.clone()),
+                Some(PathBuf::from("/elsewhere/target")),
+                Path::new("/workspace")
+            ),
+            configured
+        );
+    }
+
+    #[test]
+    fn test_template_export_temp_parent_derives_fallback_from_cargo_target_dir() {
+        assert_eq!(
+            template_export_temp_parent(
+                None,
+                Some(PathBuf::from("/external/target")),
+                Path::new("/workspace")
+            ),
+            PathBuf::from("/external/target/tmp")
+        );
+        assert_eq!(
+            template_export_temp_parent(
+                Some(PathBuf::new()),
+                Some(PathBuf::from("/external/target")),
+                Path::new("/workspace")
+            ),
+            PathBuf::from("/external/target/tmp")
+        );
+    }
+
+    #[test]
+    fn test_template_export_temp_parent_falls_back_to_workspace_target_tmp() {
+        assert_eq!(
+            template_export_temp_parent(None, None, Path::new("/workspace")),
+            PathBuf::from("/workspace/target/tmp")
+        );
+        assert_eq!(
+            template_export_temp_parent(Some(PathBuf::new()), None, Path::new("/workspace")),
+            PathBuf::from("/workspace/target/tmp")
+        );
+        assert_eq!(
+            template_export_temp_parent(None, Some(PathBuf::new()), Path::new("/workspace")),
+            PathBuf::from("/workspace/target/tmp")
+        );
+    }
 
     #[test]
     fn test_machine_home_directory_home_set_returns_home() {
@@ -341,30 +497,29 @@ mod tests {
         std::fs::write(path, content).unwrap();
     }
 
-    /// End-to-end composition-root smoke test (ADR 2026-07-08-0541 D1, spec
-    /// AC-01, AC-02, AC-09, AC-10): running the wired stack against a
-    /// tempdir-backed workspace fixture must produce `<output_dir>/bin/sotp`
-    /// byte-identical to the running binary and (on unix) executable. Verifies
-    /// that the composition root injects `FsSelfBinaryTransplantAdapter` and
-    /// that the transplant step runs after the export succeeds. The `--help`
-    /// exit-0 check is covered by the Makefile smoke gate; running the test
-    /// binary with `--help` would not necessarily behave like `sotp --help`.
+    /// End-to-end test-side export regression (ADR D5, spec AC-06): the
+    /// hard-link transplant must produce `<output_dir>/bin/sotp` that is
+    /// byte-identical to the running test binary without copying its contents.
+    /// The production composition-root wiring remains covered by the wiring
+    /// test above and continues to select the copy-based adapter.
     #[test]
     fn export_transplants_running_binary_into_bin_sotp() {
-        let dir = TempDir::new().unwrap();
-        let root_dir = dir.path();
+        let dir = template_export_tempdir();
+        let parent_dir = dir.path();
+        let source_root = parent_dir.join("source");
         // Minimal workspace tree: an included subtree, an overlay-classified
         // file with an overlay counterpart, and an excluded directory.
-        write_file(root_dir, "workspace/libs/domain/src/lib.rs", "// domain\n");
-        write_file(root_dir, "workspace/Makefile.toml", "# real\n");
-        write_file(root_dir, "workspace/vendor/blob.bin", "excluded\n");
-        write_file(root_dir, "overlay/Makefile.toml", "# template\n");
+        write_file(&source_root, "libs/domain/src/lib.rs", "// domain\n");
+        write_file(&source_root, "Makefile.toml", "# real\n");
+        write_file(&source_root, "vendor/blob.bin", "excluded\n");
+        write_file(parent_dir, "overlay/Makefile.toml", "# template\n");
         write_file(
-            root_dir,
+            &source_root,
             "boundary.json",
             r#"{
   "schema_version": 1,
   "entries": [
+    { "pattern": "boundary.json", "classification": "include" },
     { "pattern": "libs/domain", "classification": "include" },
     { "pattern": "Makefile.toml", "classification": "overlay" },
     { "pattern": "vendor", "classification": "exclude" }
@@ -372,16 +527,15 @@ mod tests {
 }"#,
         );
 
-        let output_dir = root_dir.join("out");
-        let composition_root = TemplateCompositionRoot::new();
+        let output_dir = parent_dir.join("scaffold");
         let input = TemplateInput::Export(TemplateExportInput {
-            workspace_root: root_dir.join("workspace"),
-            manifest_path: root_dir.join("boundary.json"),
-            overlay_dir: root_dir.join("overlay"),
+            workspace_root: source_root.clone(),
+            manifest_path: source_root.join("boundary.json"),
+            overlay_dir: parent_dir.join("overlay"),
             output_dir: output_dir.clone(),
         });
 
-        let outcome = composition_root.template_driver().handle(input);
+        let outcome = test_template_export_driver().handle(input);
         assert_eq!(outcome.exit_code, 0, "successful export must exit 0: {outcome:?}");
 
         // AC-01: `bin/sotp` exists and is byte-identical to the running binary.
@@ -393,6 +547,24 @@ mod tests {
             std::fs::read(&transplanted).unwrap(),
             "bin/sotp must be byte-identical to the running binary",
         );
+
+        // AC-06: both paths must identify the same inode when the source and
+        // target are on the normal shared target filesystem. The adapter's
+        // EXDEV fallback is intentionally allowed when those roots differ.
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt as _;
+
+            let source_metadata = std::fs::metadata(&source).unwrap();
+            let transplanted_metadata = std::fs::metadata(&transplanted).unwrap();
+            if source_metadata.dev() == transplanted_metadata.dev() {
+                assert_eq!(
+                    source_metadata.ino(),
+                    transplanted_metadata.ino(),
+                    "test transplant must be a hard link, not a second file",
+                );
+            }
+        }
 
         // AC-01 unix arm: executable permission preserved.
         #[cfg(unix)]

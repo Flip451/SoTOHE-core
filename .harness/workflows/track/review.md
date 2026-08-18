@@ -180,14 +180,18 @@ list (`bin/sotp review files --scope <scope>`); a fix that needs another scope's
 stop as `blocked_cross_scope`.
 
 Shared operational artifacts (signal snapshots, rendered views) are CLI-owned deterministic
-regenerations, not fixer-owned edits: the wrapper refreshes them at each invocation, and the
-commit gate re-runs the full verification serially before any commit. Dispatch-level
-synchronization of those refreshes and per-fixer build isolation are intentionally outside
-this workflow's scope.
+regenerations, not fixer-owned edits. A fixer runs `cargo make track-views-sync` when its next
+round needs fresh rendered views; this explicit route regenerates views only, while the commit
+gate re-runs the full verification serially before any commit. Dispatch-level synchronization of
+those refreshes and per-fixer build isolation are intentionally outside this workflow's scope.
 
-The `cargo make track-local-review-fix` wrapper runs an inline `signal calc-impl-catalog`
-refresh + pre-review task-contract check, then delegates to `bin/sotp review fix-local`. The
-CLI resolves `capabilities.review-fix-lead.provider` from `.harness/config/agent-profiles.json`
+The `cargo make track-local-review-fix` wrapper delegates directly to
+`bin/sotp review fix-local`; it carries no unconditional gate dependency. Pre-review gating is
+scope-conditional: each reviewer invocation inside the fix loop goes through
+`bin/sotp review local`, which resolves the scope and dispatches the operator-owned command
+sequence declared for that scope in `.harness/config/pre-review-gates.json` (scopes with an
+empty command vector are genuinely gate-free). The CLI resolves
+`capabilities.review-fix-lead.provider` from `.harness/config/agent-profiles.json`
 and dispatches to the appropriate runner. The workflow carries no provider conditional.
 
 The `review-fix-lead` capability self-resolves its modification boundary via

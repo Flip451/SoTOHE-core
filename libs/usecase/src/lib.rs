@@ -12,6 +12,7 @@ pub use domain::{NonEmptyString, Timestamp, TrackId, ValidationError};
 
 pub mod adr_baseline;
 pub mod arch;
+pub mod base_merge;
 pub mod baseline_capture;
 pub mod baseline_graph_workflow;
 pub mod batch_plan;
@@ -42,17 +43,22 @@ pub mod export_schema;
 pub mod file;
 pub mod fixpoint_resolve;
 pub mod fixpoint_resolve_driver;
+pub mod git_stash;
 pub mod git_workflow;
 pub mod guard;
 pub mod hook;
 pub mod hook_dispatch;
 pub mod merge_gate;
+pub mod operator_command;
+pub mod phase_command;
 pub mod pr;
 pub mod pr_review;
 pub mod pr_review_polling;
 pub mod pr_workflow;
 pub mod pre_commit_type_signals;
+pub mod pre_review_command;
 pub mod pre_review_gate;
+pub mod program_runner;
 pub mod provider_session;
 pub mod ref_verify;
 pub mod review_v2;
@@ -87,7 +93,8 @@ pub use branch_strategy::BranchStrategyPort;
 pub use telemetry::{
     ArchivedTrackTelemetryCommand, ArchivedTrackTelemetryError, ArchivedTrackTelemetryInteractor,
     ArchivedTrackTelemetryPort, ArchivedTrackTelemetryService, TelemetryAggregateService,
-    TelemetryEmitDynamicPort, TelemetryReportPort,
+    TelemetryArchivedService, TelemetryEmitDynamicPort, TelemetryEmitService, TelemetryReportPort,
+    TelemetryReportService,
 };
 
 use std::sync::Arc;

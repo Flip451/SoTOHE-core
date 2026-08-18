@@ -148,6 +148,13 @@ pub(crate) fn sha256_content_hash(bytes: &[u8]) -> ContentHash {
     ContentHash::from_bytes(out)
 }
 
+/// Appends the obligation item so evaluate, check, and results hash the same
+/// waiver declaration the verifier judged.
+#[must_use]
+pub(crate) fn declaration_with_obligation_item(declaration: &str, item_identifier: &str) -> String {
+    format!("{declaration}\n## Obligation item\n{item_identifier}")
+}
+
 /// Canonical declaration text for the catalogue entry named `key` in the
 /// `section_key` section, if present.
 ///
@@ -239,10 +246,8 @@ pub(crate) fn obligation_declaration_text(
     catalogues: &[CatalogueDocument],
     obligation: &TestObligation,
 ) -> Option<String> {
-    if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
-        return trait_impl_declaration_text(catalogues, obligation);
-    }
-    target_entry_declaration_text(catalogues, obligation.target_entry())
+    let all: Vec<&CatalogueDocument> = catalogues.iter().collect();
+    declaration_for_obligation_in(all.iter().copied(), &all, obligation)
 }
 
 /// Resolves the declaration text for a derived obligation from its recorded
@@ -252,23 +257,51 @@ pub(crate) fn obligation_declaration_text_from_loaded(
     catalogues: &[LoadedCatalogueDocument],
     obligation: &TestObligation,
 ) -> Option<String> {
-    let matching = catalogues
+    let matching: Vec<&CatalogueDocument> = catalogues
         .iter()
         .filter(|catalogue| catalogue.matches_file_path(&obligation.target_entry().file_path))
-        .map(LoadedCatalogueDocument::document);
-    if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
-        let all = catalogues.iter().map(LoadedCatalogueDocument::document).collect::<Vec<_>>();
-        return trait_impl_declaration_text_in(matching, &all, obligation);
-    }
-    target_entry_declaration_text_in(matching, obligation.target_entry())
+        .map(LoadedCatalogueDocument::document)
+        .collect();
+    let all: Vec<&CatalogueDocument> =
+        catalogues.iter().map(LoadedCatalogueDocument::document).collect();
+    declaration_for_obligation_in(matching, &all, obligation)
 }
 
-#[cfg(test)]
-fn target_entry_declaration_text(
-    catalogues: &[CatalogueDocument],
-    target: &CatalogueEntryRef,
+fn declaration_for_obligation_in<'a>(
+    catalogues: impl IntoIterator<Item = &'a CatalogueDocument>,
+    all_catalogues: &[&CatalogueDocument],
+    obligation: &TestObligation,
 ) -> Option<String> {
-    target_entry_declaration_text_in(catalogues.iter(), target)
+    let catalogues: Vec<&CatalogueDocument> = catalogues.into_iter().collect();
+    if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
+        return trait_impl_declaration_text_in(catalogues, all_catalogues, obligation);
+    }
+    let type_text =
+        target_entry_declaration_text_in(catalogues.iter().copied(), obligation.target_entry())?;
+    let Some(method_name) = obligation.id().item_identifier().as_str().strip_prefix("method:")
+    else {
+        return Some(type_text);
+    };
+    if obligation.target_entry().section_key != CatalogueSectionKey::Types {
+        return Some(type_text);
+    }
+    let type_name = obligation.target_entry().entry_key.as_str();
+    for catalogue in catalogues {
+        if let Some((_, entry)) =
+            catalogue.types().iter().find(|(name, _)| name.as_str() == type_name)
+            && entry.methods().iter().any(|method| method.name().as_str() == method_name)
+        {
+            return Some(type_text);
+        }
+        for inherent in catalogue.inherent_impls() {
+            if inherent.type_name.as_str() == type_name
+                && inherent.methods.iter().any(|method| method.name().as_str() == method_name)
+            {
+                return Some(format!("type: {type_text}\ninherent_impl: {inherent:?}"));
+            }
+        }
+    }
+    Some(type_text)
 }
 
 fn target_entry_declaration_text_in<'a>(
@@ -283,15 +316,6 @@ fn target_entry_declaration_text_in<'a>(
         }
     }
     None
-}
-
-#[cfg(test)]
-fn trait_impl_declaration_text(
-    catalogues: &[CatalogueDocument],
-    obligation: &TestObligation,
-) -> Option<String> {
-    let all = catalogues.iter().collect::<Vec<_>>();
-    trait_impl_declaration_text_in(catalogues.iter(), &all, obligation)
 }
 
 fn trait_impl_declaration_text_in<'a>(
@@ -388,26 +412,85 @@ pub(crate) fn catalogue_artifact_path(path: &Path) -> String {
         .join("/")
 }
 
-/// Collects the spec-anchor element ids cited by every catalogue entry across
-/// all layers (the "cited set" for the uncited `AC` / `CN` finding — IN-16).
+/// Collects the spec-anchor element ids cited by every catalogue entry and
+/// its methods (the "cited set" for the uncited `AC` / `CN` finding — IN-16).
+///
+/// Method refs are an independent owned set (0055 D1). An Add/Modify method
+/// may cite an AC/CN its parent entry does not cite; those ids still count.
+/// Reference and Delete entries and methods do not contribute citations
+/// (0359 D13: they are outside the edge universe).
 #[must_use]
 pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> {
     use crate::catalogue_traversal::iter_catalogue_entries;
-    use domain::tddd::catalogue_v2::roles::ItemAction;
 
     let mut ids = Vec::new();
     for catalogue in catalogues {
         for entry in iter_catalogue_entries(catalogue) {
-            if matches!(entry.action, ItemAction::Delete) {
+            if !cited_action(entry.action) {
                 continue;
             }
-            for spec_ref in entry.spec_refs {
-                let id = spec_ref.anchor.as_ref().to_owned();
-                if !ids.contains(&id) {
-                    ids.push(id);
-                }
+            push_cited_anchor_ids(&mut ids, entry.spec_refs);
+        }
+        for entry in catalogue.types().values() {
+            if !cited_action(entry.action()) {
+                continue;
             }
+            push_method_cited_anchor_ids(&mut ids, entry.methods());
+        }
+        for entry in catalogue.traits().values() {
+            if !cited_action(entry.action()) {
+                continue;
+            }
+            push_method_cited_anchor_ids(&mut ids, entry.methods());
+        }
+        for inherent in catalogue.inherent_impls() {
+            let Some(owner) = catalogue.types().get(&inherent.type_name) else {
+                continue;
+            };
+            if !cited_action(owner.action()) {
+                continue;
+            }
+            push_method_cited_anchor_ids(&mut ids, &inherent.methods);
         }
     }
     ids
+}
+
+fn cited_action(action: domain::tddd::catalogue_v2::roles::ItemAction) -> bool {
+    use domain::tddd::catalogue_v2::roles::ItemAction;
+    matches!(action, ItemAction::Add | ItemAction::Modify)
+}
+
+fn push_cited_anchor_ids(ids: &mut Vec<String>, spec_refs: &[domain::SpecRef]) {
+    for spec_ref in spec_refs {
+        let id = spec_ref.anchor.as_ref().to_owned();
+        if !ids.contains(&id) {
+            ids.push(id);
+        }
+    }
+}
+
+fn push_method_cited_anchor_ids(
+    ids: &mut Vec<String>,
+    methods: &[domain::tddd::catalogue_v2::MethodDeclaration],
+) {
+    use domain::tddd::catalogue_v2::roles::ItemAction;
+
+    for method in methods {
+        if matches!(method.action(), ItemAction::Delete | ItemAction::Reference) {
+            continue;
+        }
+        push_cited_anchor_ids(ids, method.spec_refs());
+    }
+}
+
+#[cfg(test)]
+mod declaration_item_tests {
+    #[test]
+    fn test_declaration_with_obligation_item_appends_identifier() {
+        assert_eq!(
+            super::declaration_with_obligation_item("TypeEntry { .. }", "method:load"),
+            "TypeEntry { .. }\n## Obligation item\nmethod:load"
+        );
+    }
 }

@@ -16,7 +16,7 @@
 //! §D5.3.
 
 use std::collections::{BTreeMap, HashMap};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use domain::AdrVerifyReport;
@@ -34,18 +34,19 @@ use usecase::verify_adr_signals::{
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 
-use crate::git_cli::show::{BlobResult, fetch_blob_safe};
+use super::merge_gate_freshness::{
+    read_branch_evaluation_commit, read_branch_signal_blob_id, signal_artifact_changed_in_tip,
+    signal_file_name_for,
+};
+pub use super::merge_gate_reader::GitShowTrackBlobReader;
+use crate::git_cli::isolation::isolated_bounded_git_output;
+use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind_isolated};
 
-/// Adapter that reads track documents from the local git repository via
-/// `git show origin/<branch>:<path>`.
-///
-/// Construct with `GitShowTrackBlobReader::new(repo_root)`. The adapter
-/// is stateless apart from the repo root path, so a single instance can
-/// be shared across multiple usecase calls (e.g. merge_gate +
-/// task_completion from the same `pr.rs::wait_and_merge` invocation).
-pub struct GitShowTrackBlobReader {
-    repo_root: PathBuf,
-}
+const MAX_ARCHITECTURE_RULES_BYTES: usize = 4 * 1024 * 1024;
+const MAX_SPEC_BYTES: usize = 16 * 1024 * 1024;
+const MAX_CATALOGUE_BYTES: usize = 16 * 1024 * 1024;
+const MAX_IMPL_PLAN_BYTES: usize = 16 * 1024 * 1024;
+const MAX_SIGNAL_BYTES: usize = 16 * 1024 * 1024;
 
 impl GitShowTrackBlobReader {
     /// Creates a new adapter rooted at the given repository path.
@@ -65,15 +66,20 @@ impl GitShowTrackBlobReader {
     /// error variant is already the final port outcome to return (NotFound
     /// or FetchError). Callers use `match` / `?`-style to chain into JSON
     /// decode.
-    fn fetch_string<T>(&self, branch: &str, blob_path: &str) -> Result<String, BlobFetchResult<T>> {
-        match fetch_blob_safe(&self.repo_root, branch, blob_path) {
-            BlobResult::Found(bytes) => String::from_utf8(bytes).map_err(|e| {
+    fn fetch_string<T>(
+        &self,
+        branch: &str,
+        blob_path: &str,
+        maximum_bytes: usize,
+    ) -> Result<String, BlobFetchResult<T>> {
+        match fetch_branch_blob_limited(&self.repo_root, branch, blob_path, maximum_bytes) {
+            Ok(Some(bytes)) => String::from_utf8(bytes).map_err(|e| {
                 BlobFetchResult::FetchError(format!(
                     "{blob_path}: non-UTF-8 bytes in blob contents: {e}"
                 ))
             }),
-            BlobResult::NotFound => Err(BlobFetchResult::NotFound),
-            BlobResult::CommandFailed(msg) => Err(BlobFetchResult::FetchError(msg)),
+            Ok(None) => Err(BlobFetchResult::NotFound),
+            Err(msg) => Err(BlobFetchResult::FetchError(msg)),
         }
     }
 
@@ -93,7 +99,11 @@ impl GitShowTrackBlobReader {
     /// filename lookup, so a generic error carrying those variants would
     /// force callers to handle impossible cases.
     fn resolve_catalogue_filename(&self, branch: &str, layer_id: &str) -> Result<String, String> {
-        let text = match self.fetch_string::<String>(branch, "architecture-rules.json") {
+        let text = match self.fetch_string::<String>(
+            branch,
+            "architecture-rules.json",
+            MAX_ARCHITECTURE_RULES_BYTES,
+        ) {
             Ok(s) => s,
             Err(BlobFetchResult::NotFound) => {
                 // Legacy fallback: no rules file on the branch → use the
@@ -124,27 +134,39 @@ impl GitShowTrackBlobReader {
     }
 }
 
-/// Derives the signal filename for a declaration filename by the same rule
-/// as `TdddLayerBinding::signal_file()` (infrastructure/verify/tddd_layers,
-/// T003): strip `.json`, drop a trailing `s` if present, append
-/// `-signals.json`. Mirrored here so the merge-gate adapter can compute the
-/// signal path without constructing a full `TdddLayerBinding` (which would
-/// require re-parsing `architecture-rules.json` after `resolve_catalogue_filename`
-/// already did so).
-fn signal_file_name_for(catalogue_filename: &str) -> String {
-    let stem = catalogue_filename.strip_suffix(".json").unwrap_or(catalogue_filename);
-    let signal_stem = if let Some(trimmed) = stem.strip_suffix('s') {
-        format!("{trimmed}-signals")
-    } else {
-        format!("{stem}-signals")
-    };
-    format!("{signal_stem}.json")
+pub(crate) fn fetch_branch_blob_limited(
+    repo_root: &Path,
+    branch: &str,
+    path: &str,
+    maximum_bytes: usize,
+) -> Result<Option<Vec<u8>>, String> {
+    match git_ls_tree_entry_kind_isolated(repo_root, branch, path)? {
+        TreeEntryKind::NotFound => Ok(None),
+        TreeEntryKind::Symlink => Err(format!("symlink is not allowed at {path}")),
+        TreeEntryKind::Submodule => Err(format!("submodule is not allowed at {path}")),
+        TreeEntryKind::Other(mode) => {
+            Err(format!("unexpected tree entry mode {mode:06o} at {path}"))
+        }
+        TreeEntryKind::RegularFile => {
+            let git_ref = format!("origin/{branch}:{path}");
+            let output = isolated_bounded_git_output(repo_root, &["show", &git_ref], maximum_bytes)
+                .map_err(|error| format!("failed to run bounded git show for {path}: {error}"))?;
+            if !output.status.success() {
+                return Err(format!(
+                    "git show failed for {path} (exit {}): {}",
+                    output.status.code().unwrap_or(-1),
+                    String::from_utf8_lossy(&output.stderr).trim()
+                ));
+            }
+            Ok(Some(output.stdout))
+        }
+    }
 }
 
 impl TrackBlobReader for GitShowTrackBlobReader {
     fn read_spec_document(&self, branch: &str, track_id: &str) -> BlobFetchResult<SpecDocument> {
         let path = Self::blob_path(track_id, "spec.json");
-        let text = match self.fetch_string::<SpecDocument>(branch, &path) {
+        let text = match self.fetch_string::<SpecDocument>(branch, &path, MAX_SPEC_BYTES) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -176,11 +198,12 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             Err(msg) => return BlobFetchResult::FetchError(msg),
         };
         let path = Self::blob_path(track_id, &filename);
-        let bytes = match fetch_blob_safe(&self.repo_root, branch, &path) {
-            BlobResult::Found(b) => b,
-            BlobResult::NotFound => return BlobFetchResult::NotFound,
-            BlobResult::CommandFailed(msg) => return BlobFetchResult::FetchError(msg),
-        };
+        let bytes =
+            match fetch_branch_blob_limited(&self.repo_root, branch, &path, MAX_CATALOGUE_BYTES) {
+                Ok(Some(bytes)) => bytes,
+                Ok(None) => return BlobFetchResult::NotFound,
+                Err(msg) => return BlobFetchResult::FetchError(msg),
+            };
         // Validate that the catalogue blob is well-formed before treating it as
         // present.  Without this guard, a malformed or non-UTF-8 `<layer>-types.json`
         // could pass Stage 2 as long as the committed type-signals file carries a
@@ -228,7 +251,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // binding list (legacy rules file, or a PR that disables every layer)
         // is returned verbatim — the usecase gate is the fail-closed authority
         // and will reject an empty set explicitly.
-        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
+        let text = match self.fetch_string::<Vec<String>>(
+            branch,
+            "architecture-rules.json",
+            MAX_ARCHITECTURE_RULES_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -252,7 +279,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // activation). The merge gate's Stage 3 loop uses this subset so that
         // a layer which flipped the flag to false after generating a signals
         // file is not accidentally re-evaluated on presence alone.
-        let text = match self.fetch_string::<Vec<String>>(branch, "architecture-rules.json") {
+        let text = match self.fetch_string::<Vec<String>>(
+            branch,
+            "architecture-rules.json",
+            MAX_ARCHITECTURE_RULES_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -275,7 +306,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
 
     fn read_impl_plan(&self, branch: &str, track_id: &str) -> BlobFetchResult<ImplPlanDocument> {
         let path = Self::blob_path(track_id, "impl-plan.json");
-        let text = match self.fetch_string::<ImplPlanDocument>(branch, &path) {
+        let text = match self.fetch_string::<ImplPlanDocument>(branch, &path, MAX_IMPL_PLAN_BYTES) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -312,7 +343,9 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         let path = Self::blob_path(track_id, &filename);
         let text = match self
             .fetch_string::<(CatalogueDocument, String, HashMap<String, ContentHash>)>(
-                branch, &path,
+                branch,
+                &path,
+                MAX_CATALOGUE_BYTES,
             ) {
             Ok(s) => s,
             Err(result) => return result,
@@ -373,7 +406,11 @@ impl TrackBlobReader for GitShowTrackBlobReader {
     ) -> BlobFetchResult<CatalogueSpecSignalsDocument> {
         let filename = format!("{layer_id}-catalogue-spec-signals.json");
         let path = Self::blob_path(track_id, &filename);
-        let text = match self.fetch_string::<CatalogueSpecSignalsDocument>(branch, &path) {
+        let text = match self.fetch_string::<CatalogueSpecSignalsDocument>(
+            branch,
+            &path,
+            MAX_SIGNAL_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -408,12 +445,44 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         };
         let signal_filename = signal_file_name_for(&catalogue_filename);
         let path = Self::blob_path(track_id, &signal_filename);
-        let text = match self.fetch_string::<TypeSignalsDocument>(branch, &path) {
+        let text = match self.fetch_string::<TypeSignalsDocument>(branch, &path, MAX_SIGNAL_BYTES) {
             Ok(s) => s,
             Err(result) => return result,
         };
+        let tip_object_id = match read_branch_signal_blob_id(&self.repo_root, branch, &path) {
+            Ok(object_id) => object_id,
+            Err(error) => return BlobFetchResult::FetchError(error),
+        };
         match crate::tddd::type_signals_codec::decode(&text) {
-            Ok(doc) => BlobFetchResult::Found(doc),
+            Ok(doc) => {
+                let evaluation_commit = match read_branch_evaluation_commit(&self.repo_root, branch)
+                {
+                    Ok(commit) => commit,
+                    Err(error) => return BlobFetchResult::FetchError(error),
+                };
+                if doc.cache_key().head_commit() != &evaluation_commit {
+                    return BlobFetchResult::FetchError(format!(
+                        "{path}: type-signals head_commit mismatch (recorded={}, evaluation={}) — re-run `sotp signal calc-impl-catalog` and commit the refreshed evaluation result",
+                        doc.cache_key().head_commit().as_ref(),
+                        evaluation_commit.as_ref()
+                    ));
+                }
+                let signal_changed = match signal_artifact_changed_in_tip(
+                    &self.repo_root,
+                    branch,
+                    &path,
+                    &tip_object_id,
+                ) {
+                    Ok(changed) => changed,
+                    Err(error) => return BlobFetchResult::FetchError(error),
+                };
+                if !signal_changed {
+                    return BlobFetchResult::FetchError(format!(
+                        "{path}: type-signals artifact was not regenerated in the tip commit — re-run `sotp signal calc-impl-catalog` and commit the refreshed evaluation result"
+                    ));
+                }
+                BlobFetchResult::Found(doc)
+            }
             Err(e) => {
                 BlobFetchResult::FetchError(format!("{path}: {signal_filename} decode error: {e}"))
             }
@@ -443,9 +512,9 @@ impl TrackBlobReader for GitShowTrackBlobReader {
     ///   stdout → no ADR directory committed → chain ⓪ is vacuously green).
     /// - `FetchError(msg)` on branch validation failure, git spawn / exit error,
     ///   non-UTF-8 blob content, or YAML front-matter parse failure.
-    fn read_adr_verify_report(&self, branch: String) -> BlobFetchResult<AdrVerifyReport> {
+    fn read_adr_verify_report(&self, branch: &str) -> BlobFetchResult<AdrVerifyReport> {
         // Validate the branch name before constructing any git-ref string (D4.2).
-        if let Err(err) = validate_branch_ref(&branch) {
+        if let Err(err) = validate_branch_ref(branch) {
             return BlobFetchResult::FetchError(format!("invalid branch ref: {err}"));
         }
 
@@ -457,9 +526,9 @@ impl TrackBlobReader for GitShowTrackBlobReader {
         // symlink and silently bypass chain ⓪. Fail-closed for non-tree modes
         // at every level; only the truly-absent case maps to NotFound (chain
         // ⓪ vacuously green for fresh tracks).
-        use crate::git_cli::show::{TreeEntryKind, git_ls_tree_entry_kind};
+        use crate::git_cli::show::TreeEntryKind;
         for ancestor in ["knowledge"] {
-            match git_ls_tree_entry_kind(&self.repo_root, &branch, ancestor) {
+            match git_ls_tree_entry_kind_isolated(&self.repo_root, branch, ancestor) {
                 Ok(TreeEntryKind::NotFound) => return BlobFetchResult::NotFound,
                 Ok(TreeEntryKind::Other(0o040_000)) => {}
                 Ok(TreeEntryKind::Symlink) => {
@@ -489,7 +558,7 @@ impl TrackBlobReader for GitShowTrackBlobReader {
                 }
             }
         }
-        match git_ls_tree_entry_kind(&self.repo_root, &branch, "knowledge/adr") {
+        match git_ls_tree_entry_kind_isolated(&self.repo_root, branch, "knowledge/adr") {
             Ok(TreeEntryKind::NotFound) => return BlobFetchResult::NotFound,
             Ok(TreeEntryKind::Symlink) => {
                 return BlobFetchResult::FetchError(format!(
@@ -523,8 +592,10 @@ impl TrackBlobReader for GitShowTrackBlobReader {
             }
         }
 
-        let adapter =
-            crate::adr_decision::GitBlobAdrFileAdapter::new(self.repo_root.clone(), branch.clone());
+        let adapter = crate::adr_decision::GitBlobAdrFileAdapter::new(
+            self.repo_root.clone(),
+            branch.to_owned(),
+        );
         let port: Arc<dyn AdrFilePort> = Arc::new(adapter);
 
         let paths = match port.list_adr_paths() {
@@ -601,7 +672,11 @@ impl SpecElementHashReader for GitShowTrackBlobReader {
         track_id: &str,
     ) -> BlobFetchResult<BTreeMap<SpecElementId, ContentHash>> {
         let path = Self::blob_path(track_id, "spec.json");
-        let text = match self.fetch_string::<BTreeMap<SpecElementId, ContentHash>>(branch, &path) {
+        let text = match self.fetch_string::<BTreeMap<SpecElementId, ContentHash>>(
+            branch,
+            &path,
+            MAX_SPEC_BYTES,
+        ) {
             Ok(s) => s,
             Err(result) => return result,
         };
@@ -648,6 +723,68 @@ mod tests {
             git(repo, &["add", "track"]);
         }
 
+        git(repo, &["commit", "--quiet", "-m", "initial"]);
+        git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
+        git(repo, &["fetch", "--quiet", "origin"]);
+        dir
+    }
+
+    fn git_output(root: &Path, args: &[&str]) -> String {
+        let output =
+            std::process::Command::new("git").args(args).current_dir(root).output().unwrap();
+        assert!(output.status.success(), "git {} failed", args.join(" "));
+        String::from_utf8(output.stdout).unwrap()
+    }
+
+    fn setup_repo_with_type_signals_at_evaluation_commit() -> tempfile::TempDir {
+        let dir = setup_repo_with_track("foo", &[]);
+        let evaluation_commit = git_output(dir.path(), &["rev-parse", "HEAD"]).trim().to_owned();
+        let track_dir = dir.path().join("track/items/foo");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        const ARCHITECTURE_RULES: &str = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": { "enabled": true }
+    }
+  ]
+}"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), ARCHITECTURE_RULES).unwrap();
+        std::fs::write(track_dir.join("domain-types.json"), DOMAIN_TYPES_V3_MINIMAL).unwrap();
+        let declaration_hash =
+            crate::tddd::type_signals_codec::declaration_hash(DOMAIN_TYPES_V3_MINIMAL.as_bytes());
+        let baseline_hash = crate::tddd::type_signals_codec::baseline_hash(b"baseline fixture\n");
+        let recorded_head = format!("\"head_commit\": \"{}\"", "0".repeat(40));
+        let signal = TYPE_SIGNALS_MINIMAL
+            .replace(
+                &format!("\"declaration_hash\": \"{}\"", "0".repeat(64)),
+                &format!("\"declaration_hash\": \"{}\"", declaration_hash.as_digest().as_str()),
+            )
+            .replace(
+                &format!("\"baseline_hash\": \"{}\"", "0".repeat(64)),
+                &format!("\"baseline_hash\": \"{}\"", baseline_hash.as_digest().as_str()),
+            )
+            .replace(&recorded_head, &format!("\"head_commit\": \"{evaluation_commit}\""));
+        std::fs::write(track_dir.join("domain-type-signals.json"), signal).unwrap();
+        git(dir.path(), &["add", "architecture-rules.json", "track"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "add type signals"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+        dir
+    }
+
+    /// Creates a temp git repo with a root-level `architecture-rules.json`
+    /// blob on `main`, then exposes that commit through the local `origin`
+    /// remote used by the adapter's `git show origin/<branch>:<path>` reads.
+    fn setup_repo_with_architecture_rules(rules: &str) -> tempfile::TempDir {
+        let dir = tempfile::tempdir().unwrap();
+        let repo = dir.path();
+        git(repo, &["init", "--quiet", "--initial-branch=main"]);
+        std::fs::write(repo.join("architecture-rules.json"), rules).unwrap();
+        git(repo, &["add", "architecture-rules.json"]);
         git(repo, &["commit", "--quiet", "-m", "initial"]);
         git(repo, &["remote", "add", "origin", repo.to_str().unwrap()]);
         git(repo, &["fetch", "--quiet", "origin"]);
@@ -836,6 +973,118 @@ mod tests {
                 BlobFetchResult::Found(_)
             ),
             "read_type_catalogue must not require the signal file (T022)"
+        );
+    }
+
+    #[test]
+    fn test_read_authoritative_inputs_bad_branch_fail_closed() {
+        let dir = setup_repo_with_track("foo", &[]);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        let branch = "does-not-exist";
+
+        assert!(matches!(reader.read_spec_document(branch, "foo"), BlobFetchResult::FetchError(_)));
+        assert!(matches!(
+            reader.read_type_catalogue(branch, "foo", "domain"),
+            BlobFetchResult::FetchError(_)
+        ));
+        assert!(matches!(reader.read_impl_plan(branch, "foo"), BlobFetchResult::FetchError(_)));
+        assert!(matches!(reader.read_enabled_layers(branch), BlobFetchResult::FetchError(_)));
+        assert!(matches!(
+            reader.read_catalogue_for_spec_ref_check(branch, "foo", "domain"),
+            BlobFetchResult::FetchError(_)
+        ));
+        assert!(matches!(
+            reader.read_catalogue_spec_signals_document(branch, "foo", "domain"),
+            BlobFetchResult::FetchError(_)
+        ));
+        assert!(matches!(
+            reader.read_catalogue_spec_signal_opted_in_layers(branch),
+            BlobFetchResult::FetchError(_)
+        ));
+        assert!(matches!(
+            reader.read_type_signals(branch, "foo", "domain"),
+            BlobFetchResult::FetchError(_)
+        ));
+        assert!(matches!(reader.read_adr_verify_report(branch), BlobFetchResult::FetchError(_)));
+    }
+
+    #[test]
+    fn test_read_enabled_layers_returns_tddd_enabled_layer_ids() {
+        const ARCHITECTURE_RULES: &str = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": { "enabled": true }
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": ["domain"],
+      "deny_reason": "",
+      "tddd": { "enabled": false }
+    },
+    {
+      "crate": "infrastructure",
+      "path": "libs/infrastructure",
+      "may_depend_on": ["domain", "usecase"],
+      "deny_reason": "",
+      "tddd": { "enabled": true }
+    }
+  ]
+}"#;
+        let dir = setup_repo_with_architecture_rules(ARCHITECTURE_RULES);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+
+        assert_eq!(
+            reader.read_enabled_layers("main"),
+            BlobFetchResult::Found(vec!["domain".to_owned(), "infrastructure".to_owned()])
+        );
+    }
+
+    #[test]
+    fn test_read_catalogue_spec_signal_opted_in_layers_returns_opted_in_layer_ids() {
+        const ARCHITECTURE_RULES: &str = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_spec_signal": { "enabled": true }
+      }
+    },
+    {
+      "crate": "usecase",
+      "path": "libs/usecase",
+      "may_depend_on": ["domain"],
+      "deny_reason": "",
+      "tddd": {
+        "enabled": true,
+        "catalogue_spec_signal": { "enabled": false }
+      }
+    },
+    {
+      "crate": "infrastructure",
+      "path": "libs/infrastructure",
+      "may_depend_on": ["domain", "usecase"],
+      "deny_reason": "",
+      "tddd": { "enabled": false }
+    }
+  ]
+}"#;
+        let dir = setup_repo_with_architecture_rules(ARCHITECTURE_RULES);
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+
+        assert_eq!(
+            reader.read_catalogue_spec_signal_opted_in_layers("main"),
+            BlobFetchResult::Found(vec!["domain".to_owned()])
         );
     }
 
@@ -1046,7 +1295,7 @@ decisions:
         let dir =
             setup_repo_with_adr_blobs(&[("2026-06-18-0001-test.md", ADR_ACCEPTED_FRONTMATTER)]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_adr_verify_report("main".to_owned()) {
+        match reader.read_adr_verify_report("main") {
             BlobFetchResult::Found(report) => {
                 assert_eq!(report.blue_count(), 1);
                 assert_eq!(report.yellow_count(), 0);
@@ -1063,7 +1312,7 @@ decisions:
         let dir = setup_repo_with_adr_blobs(&[]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         assert!(
-            matches!(reader.read_adr_verify_report("main".to_owned()), BlobFetchResult::NotFound),
+            matches!(reader.read_adr_verify_report("main"), BlobFetchResult::NotFound),
             "expected NotFound when no ADR files on branch"
         );
     }
@@ -1073,7 +1322,7 @@ decisions:
         // An ADR file with no front-matter → parse failure → FetchError.
         let dir = setup_repo_with_adr_blobs(&[("bad.md", ADR_BAD_FRONTMATTER)]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_adr_verify_report("main".to_owned()) {
+        match reader.read_adr_verify_report("main") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("adr scan failed"), "{msg}");
             }
@@ -1086,7 +1335,7 @@ decisions:
         // A branch name with embedded whitespace must be rejected before git is called.
         let dir = setup_repo_with_adr_blobs(&[]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
-        match reader.read_adr_verify_report("bad branch name".to_owned()) {
+        match reader.read_adr_verify_report("bad branch name") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(msg.contains("invalid branch ref"), "{msg}");
             }
@@ -1103,12 +1352,9 @@ decisions:
             setup_repo_with_adr_blobs(&[("2026-06-18-0001-test.md", ADR_ACCEPTED_FRONTMATTER)]);
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         // "main" succeeds
-        assert!(matches!(
-            reader.read_adr_verify_report("main".to_owned()),
-            BlobFetchResult::Found(_)
-        ));
+        assert!(matches!(reader.read_adr_verify_report("main"), BlobFetchResult::Found(_)));
         // non-existent branch → git ls-tree returns non-zero → FetchError
-        match reader.read_adr_verify_report("does-not-exist".to_owned()) {
+        match reader.read_adr_verify_report("does-not-exist") {
             BlobFetchResult::FetchError(_) => {}
             other => panic!("expected FetchError for non-existent branch, got {other:?}"),
         }
@@ -1137,7 +1383,7 @@ decisions:
         // git_ls_tree_dir rejects symlinks at the listing stage (fail-closed).
         // The whole listing fails, so read_adr_verify_report returns FetchError.
         let reader = GitShowTrackBlobReader::new(repo.to_path_buf());
-        match reader.read_adr_verify_report("main".to_owned()) {
+        match reader.read_adr_verify_report("main") {
             BlobFetchResult::FetchError(msg) => {
                 assert!(
                     msg.contains("symlink") || msg.contains("adr scan failed"),
@@ -1357,17 +1603,17 @@ decisions:
 
     // --- read_type_signals ---
 
-    /// A minimal valid `<layer>-type-signals.json` payload (schema_version 3).
+    /// A minimal valid `<layer>-type-signals.json` payload.
     ///
-    /// `declaration_hash` is all-zeroes — valid per the codec (any 64-char
-    /// lowercase hex string is accepted; freshness checking lives in the
-    /// caller, not the codec). Used by `read_type_signals` tests that only
-    /// need successful decoding.
+    /// The hashes are all-zeroes before the complete fixture helper binds them
+    /// to the catalogue bytes and evaluation commit. This keeps the fixture
+    /// readable while still exercising the branch-tip freshness checks.
     const TYPE_SIGNALS_MINIMAL: &str = r#"{
-  "schema_version": 3,
+  "schema_version": 4,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-  "implementation_input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "head_commit": "0000000000000000000000000000000000000000",
+  "baseline_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
@@ -1377,22 +1623,138 @@ decisions:
     fn test_read_type_signals_found_decodes_document() {
         // Happy path: signals file exists and decodes correctly.
         // `domain-types.json` → signal file name = `domain-type-signals.json`.
-        let dir = setup_repo_with_track(
-            "foo",
-            &[("domain-type-signals.json", TYPE_SIGNALS_MINIMAL.as_bytes())],
-        );
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
         let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
         match reader.read_type_signals("main", "foo", "domain") {
             BlobFetchResult::Found(doc) => {
                 assert_eq!(doc.signals().len(), 1);
                 assert_eq!(doc.signals()[0].type_name(), "TrackId");
                 assert_eq!(
-                    doc.declaration_hash().as_digest().as_str(),
-                    "0000000000000000000000000000000000000000000000000000000000000000"
+                    doc.cache_key().declaration_hash().as_digest().as_str(),
+                    crate::tddd::type_signals_codec::declaration_hash(
+                        DOMAIN_TYPES_V3_MINIMAL.as_bytes(),
+                    )
+                    .as_digest()
+                    .as_str()
+                );
+                assert_eq!(
+                    doc.cache_key().head_commit().as_ref(),
+                    git_output(dir.path(), &["rev-parse", "HEAD^1"]).trim()
                 );
             }
             other => panic!("expected Found, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn test_read_type_signals_rejects_old_document_after_implementation_only_commit() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        std::fs::write(dir.path().join("implementation-only.rs"), "changed\n").unwrap();
+        git(dir.path(), &["add", "implementation-only.rs"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "implementation-only change"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_signals("main", "foo", "domain") {
+            BlobFetchResult::FetchError(message) => {
+                assert!(message.contains("head_commit mismatch"), "{message}");
+                assert!(message.contains("sotp signal calc-impl-catalog"), "{message}");
+            }
+            other => panic!("expected stale head_commit rejection, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_type_signals_allows_all_in_one_commit() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        let signal_path = dir.path().join("track/items/foo/domain-type-signals.json");
+        let previous_signal = std::fs::read_to_string(&signal_path).unwrap();
+        let previous_evaluation =
+            git_output(dir.path(), &["rev-parse", "HEAD^1"]).trim().to_owned();
+        let current_evaluation = git_output(dir.path(), &["rev-parse", "HEAD"]).trim().to_owned();
+        let regenerated_signal = previous_signal
+            .replace(
+                &format!("\"head_commit\": \"{previous_evaluation}\""),
+                &format!("\"head_commit\": \"{current_evaluation}\""),
+            )
+            .replace("2026-04-18T12:00:00Z", "2026-04-19T12:00:00Z");
+        std::fs::write(&signal_path, regenerated_signal).unwrap();
+        std::fs::write(dir.path().join("implementation-only.rs"), "changed\n").unwrap();
+        git(
+            dir.path(),
+            &["add", "track/items/foo/domain-type-signals.json", "implementation-only.rs"],
+        );
+        git(dir.path(), &["commit", "--quiet", "-m", "implementation and signals"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        match reader.read_type_signals("main", "foo", "domain") {
+            BlobFetchResult::Found(doc) => {
+                assert_eq!(doc.signals().len(), 1);
+            }
+            other => panic!("expected all-in-one commit to pass, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn test_read_type_signals_not_found_when_deleted_at_tip() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        git(dir.path(), &["rm", "--quiet", "track/items/foo/domain-type-signals.json"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "delete signals"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let reader = GitShowTrackBlobReader::new(dir.path().to_path_buf());
+        assert!(matches!(
+            reader.read_type_signals("main", "foo", "domain"),
+            BlobFetchResult::NotFound
+        ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_signal_artifact_changed_in_tip_rejects_mode_only_change() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+        git(dir.path(), &["config", "core.filemode", "true"]);
+        let signal_path = dir.path().join("track/items/foo/domain-type-signals.json");
+        let mut permissions = std::fs::metadata(&signal_path).unwrap().permissions();
+        permissions.set_mode(permissions.mode() | 0o111);
+        std::fs::set_permissions(&signal_path, permissions).unwrap();
+        git(dir.path(), &["add", "track/items/foo/domain-type-signals.json"]);
+        git(dir.path(), &["commit", "--quiet", "-m", "mode-only signal change"]);
+        git(dir.path(), &["fetch", "--quiet", "origin"]);
+
+        let signal_path = "track/items/foo/domain-type-signals.json";
+        let tip_object_id = read_branch_signal_blob_id(dir.path(), "main", signal_path)
+            .expect("tip signal blob id must be readable");
+        assert!(
+            !signal_artifact_changed_in_tip(dir.path(), "main", signal_path, &tip_object_id,)
+                .expect("parent signal blob id must be readable")
+        );
+    }
+
+    #[test]
+    fn test_signal_artifact_changed_in_tip_is_limited_to_requested_path() {
+        let dir = setup_repo_with_type_signals_at_evaluation_commit();
+
+        assert!(
+            signal_artifact_changed_in_tip(
+                dir.path(),
+                "main",
+                "track/items/foo/domain-type-signals.json",
+                git_output(
+                    dir.path(),
+                    &[
+                        "rev-parse",
+                        "--verify",
+                        "origin/main:track/items/foo/domain-type-signals.json"
+                    ],
+                )
+                .trim(),
+            )
+            .expect("signal diff must be readable")
+        );
     }
 
     #[test]

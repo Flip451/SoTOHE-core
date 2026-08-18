@@ -1,0 +1,803 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u32"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "value",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        }
+      ],
+      "type_name": "ReviewFindingCount"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "std::num::NonZeroU64"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "ReviewExecutionCount"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u16"
+            }
+          ],
+          "returns": "Result<Self, ReviewYieldValueError>"
+        }
+      ],
+      "type_name": "ReviewDetectionRateBasisPoints"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::ids::TrackId"
+            },
+            {
+              "name": "scope",
+              "ty": "domain::review_v2::ScopeName"
+            },
+            {
+              "name": "provider",
+              "ty": "ProviderName"
+            },
+            {
+              "name": "model",
+              "ty": "ModelName"
+            },
+            {
+              "name": "reasoning_effort",
+              "ty": "ReasoningEffort"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::ids::TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::review_v2::ScopeName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "provider",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ProviderName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "model",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ModelName"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "reasoning_effort",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ReasoningEffort"
+        }
+      ],
+      "type_name": "ResolvedReviewerAssignment"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ReviewYieldValue",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewYieldValue",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewYieldValue",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewYieldValue",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewFindingCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewFindingCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewFindingCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "ReviewFindingCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewFindingCount",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewExecutionCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewExecutionCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewExecutionCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "ReviewExecutionCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewExecutionCount",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewExecutionCount",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ReviewDetectionRateBasisPoints",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewDetectionRateBasisPoints",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewDetectionRateBasisPoints",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "ReviewDetectionRateBasisPoints",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewDetectionRateBasisPoints",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewDetectionRateBasisPoints",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::convert::From<DiffGetError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::convert::From<ReviewHasherError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::convert::From<ReviewerError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCycleError",
+      "trait_ref": "core::convert::From<domain::review_v2::error::ReviewReaderError>"
+    },
+    {
+      "for_type": "ReviewYieldMetric",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewYieldMetric",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewYieldMetric",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewYieldMetric",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewYieldValueError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewYieldValueError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ReviewYieldValueError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TelemetryReportOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TelemetryReportOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ResolvedReviewerAssignment",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ResolvedReviewerAssignment",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ResolvedReviewerAssignment",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ResolvedReviewerAssignment",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "ResolvedReviewer": {
+      "action": "add",
+      "docs": "Secondary port exposing the assignment authority owned by a concrete review-running adapter.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolved_assignment",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ResolvedReviewerAssignment"
+        }
+      ],
+      "module_path": "review_v2::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Reviewer"
+      ]
+    },
+    "Reviewer": {
+      "action": "reference",
+      "docs": "Baseline reviewer port carried as the supertrait of ResolvedReviewer.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::Verdict, domain::review_v2::LogInfo), ReviewerError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fast_review",
+          "params": [
+            {
+              "name": "target",
+              "ty": "&domain::review_v2::ReviewTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(domain::review_v2::FastVerdict, domain::review_v2::LogInfo), ReviewerError>"
+        }
+      ],
+      "module_path": "review_v2::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "ResolvedReviewerAssignment": {
+      "action": "add",
+      "docs": "Application-bound, serde-free value grouping the validated identity of one resolved reviewer session.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "review_v2::ports",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "CO-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "ReviewCycleError": {
+      "action": "modify",
+      "docs": "Adds PostReviewDiff and PostReviewHash variants to ReviewCycleError.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UnknownScope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FileChangedDuringReview",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Diff",
+            "payload": {
+              "fields": [
+                "DiffGetError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PostReviewDiff",
+            "payload": {
+              "fields": [
+                "DiffGetError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Hash",
+            "payload": {
+              "fields": [
+                "ReviewHasherError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PostReviewHash",
+            "payload": {
+              "fields": [
+                "ReviewHasherError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Reviewer",
+            "payload": {
+              "fields": [
+                "ReviewerError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Reader",
+            "payload": {
+              "fields": [
+                "domain::review_v2::error::ReviewReaderError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ErrorType": {}
+      },
+    "spec_refs": [
+      {
+        "anchor": "IN-01",
+        "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+      }
+    ]
+    },
+    "ReviewDetectionRateBasisPoints": {
+      "action": "add",
+      "docs": "Application-telemetry value for a validated structured-review detection rate in basis points, preserving sub-percent proportions without reusing the domain calibration-specific DetectionRatePercent type.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::review_yield",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "ReviewExecutionCount": {
+      "action": "add",
+      "docs": "Application-telemetry review execution-count value type (IN-02, AC-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::review_yield",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "ReviewFindingCount": {
+      "action": "add",
+      "docs": "Application-telemetry value for the non-negative finding count of one completed structured local review round; existing skipped-line and command counts measure different concepts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::review_yield",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "ReviewYieldMetric": {
+      "action": "add",
+      "docs": "Application-layer read-model DTO for a typed review-yield dimension value (IN-02, AC-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "value",
+              "ty": "ReviewYieldValue"
+            },
+            {
+              "name": "execution_count",
+              "ty": "ReviewExecutionCount"
+            },
+            {
+              "name": "detection_rate",
+              "ty": "ReviewDetectionRateBasisPoints"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::review_yield",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "ReviewYieldValue": {
+      "action": "add",
+      "docs": "Application-reporting enum for structured-review grouping dimensions, reusing canonical scope, round-type, provider, model, and effort abstractions (IN-02, AC-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Scope",
+            "payload": {
+              "fields": [
+                "domain::review_v2::ScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RoundType",
+            "payload": {
+              "fields": [
+                "domain::review_v2::RoundType"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Provider",
+            "payload": {
+              "fields": [
+                "ProviderName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Model",
+            "payload": {
+              "fields": [
+                "ModelName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ReasoningEffort",
+            "payload": {
+              "fields": [
+                "ReasoningEffort"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry::review_yield",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "ReviewYieldValueError": {
+      "action": "add",
+      "docs": "Validation failure produced when a computed structured-review detection rate cannot be represented within zero through ten thousand basis points.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DetectionRateOutOfRange",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry::review_yield",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    },
+    "TelemetryReportOutput": {
+      "action": "modify",
+      "docs": "Application boundary read-model DTO extended with structured-review yield aggregates (IN-02, AC-02, CO-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_durations",
+              "ty": "Vec<TelemetryPhaseDuration>"
+            },
+            {
+              "name": "errors",
+              "ty": "Vec<TelemetryErrorEntry>"
+            },
+            {
+              "name": "hook_blocks",
+              "ty": "Vec<TelemetryHookBlockEntry>"
+            },
+            {
+              "name": "skipped_lines",
+              "ty": "TelemetrySkippedLineCount"
+            },
+            {
+              "name": "command_metrics",
+              "ty": "Vec<CommandExecutionMetric>"
+            },
+            {
+              "name": "review_yield_metrics",
+              "ty": "Vec<ReviewYieldMetric>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::report",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        },
+        {
+          "anchor": "CO-02",
+          "file": "track/items/2026-08-14-review-yield-measurement/spec.json"
+        }
+      ]
+    }
+  }
+}

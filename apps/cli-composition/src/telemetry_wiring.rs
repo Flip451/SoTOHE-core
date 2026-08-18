@@ -10,7 +10,6 @@
 //! - `emit_gate_eval`: fire-and-forget `TelemetryEvent::GateEval` emit (T005).
 //! - `emit_hook_block`: fire-and-forget `TelemetryEvent::HookBlock` emit (T005).
 //! - `emit_advisory_hook_fired`: fire-and-forget `TelemetryEvent::AdvisoryHookFired` emit (T005).
-//! - `emit_review_round`: fire-and-forget `TelemetryEvent::ReviewRound` emit (T006).
 //! - `emit_external_subprocess`: fire-and-forget `TelemetryEvent::ExternalSubprocess` emit (T006).
 //! - `now_timestamp`: ISO-8601 UTC timestamp helper.
 
@@ -18,6 +17,7 @@ use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::time::Instant;
 
+use domain::TrackId;
 use infrastructure::telemetry::{TelemetryConfig, TelemetryEvent, TelemetryWriter};
 
 // ---------------------------------------------------------------------------
@@ -81,8 +81,27 @@ pub(crate) fn resolve_telemetry_writer_for_track(
     items_dir: &Path,
     track_id: &str,
 ) -> Option<(TelemetryWriter, String)> {
+    let (config, anchored_items_dir) = resolve_telemetry_inputs_for_track(items_dir, track_id)?;
+    let writer_track_id = TrackId::try_new(track_id.to_owned()).ok()?;
+    let writer = TelemetryWriter::new(config, writer_track_id, anchored_items_dir);
+    Some((writer, track_id.to_owned()))
+}
+
+/// Resolves identity-free telemetry inputs for a reviewer recorder from an
+/// already-resolved command track context.
+///
+/// The returned configuration and anchored items directory contain no track
+/// identity. The recorder derives that identity from its wrapped reviewer.
+/// This helper only validates the command context and applies the telemetry
+/// kill switch before returning inputs.
+pub(crate) fn resolve_telemetry_inputs_for_track(
+    items_dir: &Path,
+    track_id: &str,
+) -> Option<(TelemetryConfig, PathBuf)> {
+    TrackId::try_new(track_id.to_owned()).ok()?;
     let anchored_items_dir = resolve_anchored_items_dir(items_dir)?;
-    resolve_telemetry_writer_inner(Some(track_id.to_owned()), &anchored_items_dir)
+    let config = TelemetryConfig::from_env();
+    config.is_enabled().then_some((config, anchored_items_dir))
 }
 
 /// Inner implementation of `resolve_telemetry_writer`, accepting a pre-resolved
@@ -105,7 +124,8 @@ pub(crate) fn resolve_telemetry_writer_inner(
     }
 
     // Construct the writer; no file is opened at this point (lazy init).
-    let writer = TelemetryWriter::new(config, track_id.clone(), items_dir.to_path_buf());
+    let writer_track_id = TrackId::try_new(track_id.clone()).ok()?;
+    let writer = TelemetryWriter::new(config, writer_track_id, items_dir.to_path_buf());
     Some((writer, track_id))
 }
 
@@ -261,45 +281,6 @@ pub fn emit_hook_block(writer: &TelemetryWriter, track_id: &str, hook_name: &str
     let _ = writer.write(event);
 }
 
-/// Emits a `TelemetryEvent::ReviewRound` event via fire-and-forget (T006 / AC-03).
-///
-/// Emitted after a review or dry round completes with the round result known.
-/// For dry rounds `round_type` should be `"dry"`.
-///
-/// # Arguments
-/// - `writer`: the writer constructed at startup.
-/// - `track_id`: the branch-bound track id.
-/// - `provider`: the provider name, e.g. `"codex"` or `"claude"`.
-/// - `model`: the model name used.
-/// - `round_type`: `"fast"`, `"final"`, or `"dry"`.
-/// - `findings_count`: number of findings / violations in the completed round.
-/// - `start`: the `Instant` captured before the round started.
-///
-/// Suppresses any `TelemetryWriteError` (CN-01 / diagnostic-only).
-pub fn emit_review_round(
-    writer: &TelemetryWriter,
-    track_id: &str,
-    provider: &str,
-    model: &str,
-    round_type: &str,
-    findings_count: u32,
-    start: Instant,
-) {
-    let duration_ms = start.elapsed().as_millis().try_into().unwrap_or(u64::MAX);
-    let event = TelemetryEvent::ReviewRound {
-        schema_version: 1,
-        track_id: track_id.to_string(),
-        provider: provider.to_string(),
-        model: model.to_string(),
-        round_type: round_type.to_string(),
-        duration_ms,
-        findings_count,
-        timestamp: now_timestamp(),
-    };
-    // Fire-and-forget: suppress errors per CN-01.
-    let _ = writer.write(event);
-}
-
 /// Emits a `TelemetryEvent::ExternalSubprocess` event via fire-and-forget
 /// (T006 / AC-03).
 ///
@@ -379,9 +360,7 @@ mod tests {
 
     use crate::review_v2::process_guards::{CwdGuard, GitRunner};
 
-    use super::{
-        emit_external_subprocess, emit_non_zero_exit, emit_review_round, emit_track_subcommand,
-    };
+    use super::{emit_external_subprocess, emit_non_zero_exit, emit_track_subcommand};
 
     fn temp_repo_on_track_branch(track_id: &str) -> TempDir {
         let repo = TempDir::new().unwrap();
@@ -557,7 +536,11 @@ mod tests {
                 cfg = Some(TelemetryConfig::from_env());
             },
         );
-        let writer = TelemetryWriter::new(cfg.unwrap(), track_id.clone(), tmp.path().to_path_buf());
+        let writer = TelemetryWriter::new(
+            cfg.unwrap(),
+            domain::TrackId::try_new(track_id.clone()).unwrap(),
+            tmp.path().to_path_buf(),
+        );
         (writer, track_id)
     }
 
@@ -687,68 +670,6 @@ mod tests {
     // -----------------------------------------------------------------------
     // emit_advisory_hook_fired: AdvisoryHookFired emitted for advisory hooks (AC-04)
     // -----------------------------------------------------------------------
-
-    // -----------------------------------------------------------------------
-    // emit_review_round: ReviewRound event with required fields (AC-03 / T006)
-    // -----------------------------------------------------------------------
-
-    #[test]
-    fn test_emit_review_round_writes_review_round_event_with_required_fields() {
-        // Safety: writer_in_tempdir mutates process environment via temp_env.
-        let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        let tmp = TempDir::new().unwrap();
-        let (writer, track_id) = writer_in_tempdir(&tmp);
-        let start = Instant::now();
-
-        emit_review_round(&writer, &track_id, "codex", "gpt-5.4-mini", "fast", 3, start);
-
-        let output_path = tmp.path().join("telemetry.jsonl");
-        assert!(output_path.exists(), "telemetry.jsonl must exist after emit_review_round");
-        let content = std::fs::read_to_string(&output_path).unwrap();
-        // Required fields per AC-03 / infrastructure-types.json
-        assert!(content.contains("ReviewRound"), "event_type must be ReviewRound; got: {content}");
-        assert!(
-            content.contains("\"provider\":\"codex\""),
-            "provider must be present; got: {content}"
-        );
-        assert!(
-            content.contains("\"model\":\"gpt-5.4-mini\""),
-            "model must be present; got: {content}"
-        );
-        assert!(
-            content.contains("\"round_type\":\"fast\""),
-            "round_type must be present; got: {content}"
-        );
-        assert!(
-            content.contains("\"findings_count\":3"),
-            "findings_count must be present; got: {content}"
-        );
-        assert!(content.contains("\"duration_ms\""), "duration_ms must be present; got: {content}");
-        assert!(content.contains("\"schema_version\":1"), "schema_version must be present (AC-09)");
-        assert!(content.contains(&track_id), "track_id must be present");
-        // Findings body must NOT be present (OS-04).
-        assert!(!content.contains("message"), "findings body must not be recorded (OS-04)");
-    }
-
-    #[test]
-    fn test_emit_review_round_dry_round_type_is_recorded() {
-        let _lock = crate::test_support::process_env_lock().lock().unwrap();
-        let tmp = TempDir::new().unwrap();
-        let (writer, track_id) = writer_in_tempdir(&tmp);
-        let start = Instant::now();
-
-        emit_review_round(&writer, &track_id, "codex", "gpt-5.4-mini", "dry", 0, start);
-
-        let content = std::fs::read_to_string(tmp.path().join("telemetry.jsonl")).unwrap();
-        assert!(
-            content.contains("\"round_type\":\"dry\""),
-            "dry round_type must be recorded; got: {content}"
-        );
-        assert!(
-            content.contains("\"findings_count\":0"),
-            "zero findings must be recorded; got: {content}"
-        );
-    }
 
     // -----------------------------------------------------------------------
     // emit_external_subprocess: ExternalSubprocess event (AC-03 / T006)

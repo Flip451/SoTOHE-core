@@ -1,0 +1,2036 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "context",
+              "ty": "std::sync::Arc<dyn BaseMergeContextPort>"
+            },
+            {
+              "name": "git",
+              "ty": "std::sync::Arc<dyn BaseMergeGitPort>"
+            },
+            {
+              "name": "cleanup",
+              "ty": "std::sync::Arc<dyn BaseMergeCleanupPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "BaseMergeInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "Arc<dyn GitStashPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "GitStashInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "BaseMergeCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BaseMergeCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BaseMergeCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BaseMergeOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BaseMergeOutcome",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "BaseMergeOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BaseMergeOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "BaseMergeError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BaseMergeError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BaseMergeInteractor",
+      "trait_ref": "BaseMergeService"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutionError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsInteractor",
+      "trait_ref": "TypeSignalsService"
+    },
+    {
+      "for_type": "BaseMergeContextError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeContextError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BaseMergeContextError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BaseMergeGitError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeGitError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BaseMergeGitError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BaseMergeCleanupRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeCleanupRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BaseMergeCleanupRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BaseMergeCleanupRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ViewsRegenerationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ViewsRegenerationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ViewsRegenerationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BaselineReplacementError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaselineReplacementError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "BaselineReplacementError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "PostMergeCleanupError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PostMergeCleanupError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "PostMergeCleanupError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "BaseMergeAttemptOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "BaseMergeAttemptOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "BaseMergeAttemptOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "BaseMergeAttemptOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "GitStashPushOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "GitStashPushError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitStashPushError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GitStashPushError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GitStashPopError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "GitStashPopError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "GitStashPopError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "GitStashInteractor",
+      "trait_ref": "GitStashService"
+    }
+  ],
+  "traits": {
+    "BaseMergeCleanupPort": {
+      "action": "add",
+      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12). Synchronous by design: sequential baseline and view stages over local filesystem and process boundaries.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "regenerate_views",
+          "params": [
+            {
+              "name": "request",
+              "ty": "&BaseMergeCleanupRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), ViewsRegenerationError>"
+        },
+        {
+          "docs": "[CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "replace_baselines",
+          "params": [
+            {
+              "name": "request",
+              "ty": "&BaseMergeCleanupRequest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), BaselineReplacementError>"
+        }
+      ],
+      "module_path": "base_merge",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "BaseMergeContextPort": {
+      "action": "add",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Loads the merge direction. Synchronous by design: local repository-context lookup.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_direction",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::branch_strategy::BaseMergeDirection, BaseMergeContextError>"
+        }
+      ],
+      "module_path": "base_merge",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "BaseMergeGitPort": {
+      "action": "add",
+      "docs": "Synchronous port by design. IN-01 / IN-02 / CN-01 / AC-01 / AC-02 / AC-03 / AC-04.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "IN-01 / CN-01 / AC-01 / AC-02 / AC-04.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "ensure_worktree_clean",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), BaseMergeGitError>"
+        },
+        {
+          "docs": "IN-01 / CN-01 / AC-01 / AC-02 / AC-04.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "merge_base",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "direction",
+              "ty": "&domain::branch_strategy::BaseMergeDirection"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<BaseMergeAttemptOutcome, BaseMergeGitError>"
+        }
+      ],
+      "module_path": "base_merge",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "BaseMergeService": {
+      "action": "add",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "BaseMergeCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<BaseMergeOutcome, BaseMergeError>"
+        }
+      ],
+      "module_path": "base_merge",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "GitStashPort": {
+      "action": "add",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13). Driven port for guarded stash push and paired pop infrastructure capabilities. Synchronous by design: guarded CLI git subprocess on the local repository.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<GitStashPushOutcome, GitStashPushError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pop",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<(), GitStashPopError>"
+        }
+      ],
+      "module_path": "git_stash",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "GitStashService": {
+      "action": "add",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13). Synchronous application boundary for guarded stash push and pop.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "push",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<GitStashPushOutcome, GitStashPushError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pop",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<(), GitStashPopError>"
+        }
+      ],
+      "module_path": "git_stash",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TrackBlobReader": {
+      "action": "modify",
+      "docs": "[GO-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#GO-02): committed-branch artifact reader for the strict merge gate. Synchronous by design: local git-blob reads through a process boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_spec_document",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::spec::SpecDocument>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_type_catalogue",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<(Vec<u8>, String)>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_impl_plan",
+          "params": [
+            {
+              "name": "branch",
+              "ty": "&str"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::ImplPlanDocument>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_enabled_layers",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<Vec<String>>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_catalogue_for_spec_ref_check",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            },
+            {
+              "name": "_track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "_layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<(domain::tddd::catalogue_v2::CatalogueDocument, String, std::collections::HashMap<String, domain::ContentHash>)>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_catalogue_spec_signals_document",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            },
+            {
+              "name": "_track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "_layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::CatalogueSpecSignalsDocument>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_catalogue_spec_signal_opted_in_layers",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<Vec<String>>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_type_signals",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            },
+            {
+              "name": "_track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "_layer_id",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::TypeSignalsDocument>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_adr_verify_report",
+          "params": [
+            {
+              "name": "_branch",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "BlobFetchResult<domain::AdrVerifyReport>"
+        }
+      ],
+      "module_path": "merge_gate",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsExecutorPort": {
+      "action": "reference",
+      "docs": "Baseline-identical driven port carried for executor-adapter edge exposure. Synchronous by design. IN-05 / CN-03.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate_layer",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "binding",
+              "ty": "&domain::tddd::catalogue_v2::TdddLayerBinding"
+            },
+            {
+              "name": "features",
+              "ty": "&[domain::tddd::CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TypeSignalsExecutionError>"
+        }
+      ],
+      "module_path": "type_signals::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "BaseMergeAttemptOutcome": {
+      "action": "add",
+      "docs": "[IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Clean",
+            "payload": {
+              "fields": [
+                {
+                  "name": "base_commit",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Conflicted",
+            "payload": {
+              "fields": [
+                {
+                  "name": "base_commit",
+                  "ty": "domain::CommitHash"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeCleanupRequest": {
+      "action": "add",
+      "docs": "Request DTO for base-merge cleanup.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "base_branch",
+              "ty": "domain::branch_strategy::BaseBranchName"
+            },
+            {
+              "name": "base_commit",
+              "ty": "domain::CommitHash"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeCommand": {
+      "action": "add",
+      "docs": "Application command carrying workspace_root; PathBuf is a technical filesystem anchor with no domain value semantics.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeContextError": {
+      "action": "add",
+      "docs": "Context-loading failures separated from git and cleanup failures.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Unavailable",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ActiveTrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "current",
+                  "ty": "domain::TrackBranch"
+                },
+                {
+                  "name": "expected",
+                  "ty": "domain::TrackBranch"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeError": {
+      "action": "add",
+      "docs": "IN-01 / IN-02 / CN-01 / CN-05 / CN-07 / AC-01 / AC-02 / AC-03 / AC-04 / AC-10 / AC-12. Conflict-cleanup failure payload: PostMergeCleanupError.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Context",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ActiveTrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "current",
+                  "ty": "domain::TrackBranch"
+                },
+                {
+                  "name": "expected",
+                  "ty": "domain::TrackBranch"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Git",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DirtyWorktree",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PostMergeCleanup",
+            "payload": {
+              "fields": [
+                "PostMergeCleanupError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ConflictedCleanupFailed",
+            "payload": {
+              "fields": [
+                "PostMergeCleanupError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeGitError": {
+      "action": "add",
+      "docs": "IN-01 / CN-01 / AC-01 / AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Execution",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DirtyWorktree",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeInteractor": {
+      "action": "add",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaseMergeOutcome": {
+      "action": "add",
+      "docs": "[IN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-01), [IN-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-02), [CN-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-01), [CN-05](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-05), [CN-07](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#CN-07), [AC-01](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-01), [AC-02](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-02), [AC-03](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-03), [AC-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-04), [AC-10](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-10), [AC-12](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Completed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Conflicted",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "BaselineReplacementError": {
+      "action": "add",
+      "docs": "Error type for baseline replacement failures.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Isolation",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Generation",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Validation",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Publish",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "GitStashInteractor": {
+      "action": "add",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13). R1 role constraints require this application boundary between the primary adapter and GitStashPort; the pass-through delegation is intentional.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "git_stash",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "GitStashPopError": {
+      "action": "add",
+      "docs": "[IN-04](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#IN-04), [AC-06](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-06), [AC-13](track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json#AC-13).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ForbiddenBranchRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NoPendingGuardedStash",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unavailable",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "StashIdentityMissing",
+            "payload": {
+              "fields": [
+                "domain::CommitHash"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_stash",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "GitStashPushError": {
+      "action": "add",
+      "docs": "IN-04 / AC-06 / AC-13.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ForbiddenBranchRefUpdate",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PendingGuardedStashExists",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Unavailable",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_stash",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "GitStashPushOutcome": {
+      "action": "add",
+      "docs": "IN-04 / AC-06 / AC-13.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Created",
+            "payload": {
+              "fields": [
+                "domain::CommitHash"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NothingToStash",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "git_stash",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "PostMergeCleanupError": {
+      "action": "add",
+      "docs": "Error type for post-merge cleanup.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Views",
+            "payload": {
+              "fields": [
+                "ViewsRegenerationError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Baseline",
+            "payload": {
+              "fields": [
+                "BaselineReplacementError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsError": {
+      "action": "modify",
+      "docs": "Application-service error variants for type-signal execution stages.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BranchTrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "domain::branch_strategy::TrackBranch"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "domain::ids::TrackId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FeatureDeclaration",
+            "payload": {
+              "fields": [
+                "TdddActualFeatureDeclarationPortError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "AuthoritativeInputFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "domain::ids::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EvaluationFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "domain::ids::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CacheWriteFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "domain::ids::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InconsistentRequest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_signals::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsExecutionError": {
+      "action": "modify",
+      "docs": "Executor-port error variants for authoritative input, evaluation, and cache-write stages.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "AuthoritativeInput",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Evaluation",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CacheWrite",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_signals::ports",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsInteractor": {
+      "action": "reference",
+      "docs": "Baseline-identical dependency-injected interactor public shape for TypeSignalsService.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "executor",
+              "ty": "Arc<dyn usecase::type_signals::TypeSignalsExecutorPort>"
+            },
+            {
+              "name": "feature_declaration",
+              "ty": "Arc<dyn usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "type_signals::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    },
+    "ViewsRegenerationError": {
+      "action": "add",
+      "docs": "Error type for derived-view regeneration.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Regeneration",
+            "payload": {
+              "fields": [
+                "DiagnosticText"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "base_merge",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/2026-07-31-base-merge-and-conflict-recovery/spec.json"
+        }
+      ]
+    }
+  }
+}

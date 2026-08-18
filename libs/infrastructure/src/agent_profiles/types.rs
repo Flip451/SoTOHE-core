@@ -6,7 +6,8 @@ use std::path::PathBuf;
 use domain::FreeText;
 use serde::{Deserialize, Deserializer};
 use usecase::capability_exec::{
-    CapabilityInputValidationError, ExecutionMode, ModelName, ProviderName, ReasoningEffort,
+    CapabilityInputValidationError, CapabilityProviderBinding, ExecutionMode, ModelName,
+    ModelProviderName, ProviderName, ReasoningEffort,
 };
 use usecase::dry_write_driver::CapabilityName;
 
@@ -145,24 +146,73 @@ pub(super) struct ProviderMetadataDto {
     pub(super) supported_reasoning_efforts: Vec<ReasoningEffortDto>,
 }
 
-/// Configuration for a single capability entry.
-#[derive(Debug, Clone, Deserialize)]
+/// Flat serde input for a single capability entry.
+#[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
+struct CapabilityConfigFields {
+    provider: ProviderNameDto,
+    model_provider: Option<ModelProviderNameDto>,
+    model: Option<ModelNameDto>,
+    fast_provider: Option<ProviderNameDto>,
+    fast_model: Option<ModelNameDto>,
+    /// Optional path to the prompt template for this capability.
+    prompt_template_path: Option<PathBuf>,
+    /// Explicit final/default reasoning effort for provider-CLI dispatch.
+    #[serde(rename = "reasoning_effort", alias = "final_reasoning_effort")]
+    effort: Option<ReasoningEffortDto>,
+    /// Explicit fast-round reasoning effort for reviewer-like capabilities.
+    #[serde(rename = "fast_reasoning_effort")]
+    fast_effort: Option<ReasoningEffortDto>,
+    /// Required dispatch category used by the generic capability-exec entrypoint.
+    execution_mode: ExecutionModeDto,
+}
+
+/// Configuration for a single capability entry.
+#[derive(Debug, Clone)]
 pub struct CapabilityConfigDto {
-    pub(super) provider: ProviderNameDto,
+    pub(super) provider_binding: CapabilityProviderBindingDto,
     pub(super) model: Option<ModelNameDto>,
     pub(super) fast_provider: Option<ProviderNameDto>,
     pub(super) fast_model: Option<ModelNameDto>,
     /// Optional path to the prompt template for this capability.
     pub(super) prompt_template_path: Option<PathBuf>,
     /// Explicit final/default reasoning effort for provider-CLI dispatch.
-    #[serde(rename = "reasoning_effort", alias = "final_reasoning_effort")]
     pub(super) effort: Option<ReasoningEffortDto>,
     /// Explicit fast-round reasoning effort for reviewer-like capabilities.
-    #[serde(rename = "fast_reasoning_effort")]
     pub(super) fast_effort: Option<ReasoningEffortDto>,
     /// Required dispatch category used by the generic capability-exec entrypoint.
     pub(super) execution_mode: ExecutionModeDto,
+}
+
+impl<'de> Deserialize<'de> for CapabilityConfigDto {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let fields = CapabilityConfigFields::deserialize(deserializer)?;
+        let provider_binding = match fields.model_provider {
+            Some(model_provider) => {
+                if fields.provider.0.as_str() != "codex" {
+                    return Err(serde::de::Error::custom(
+                        "model_provider is only valid when provider is 'codex'",
+                    ));
+                }
+                CapabilityProviderBindingDto::CodexCustom(model_provider)
+            }
+            None => CapabilityProviderBindingDto::Standard(fields.provider),
+        };
+
+        Ok(Self {
+            provider_binding,
+            model: fields.model,
+            fast_provider: fields.fast_provider,
+            fast_model: fields.fast_model,
+            prompt_template_path: fields.prompt_template_path,
+            effort: fields.effort,
+            fast_effort: fields.fast_effort,
+            execution_mode: fields.execution_mode,
+        })
+    }
 }
 
 /// Serde-boundary mirror of a generic capability dispatch execution category.
@@ -222,6 +272,59 @@ impl<'de> Deserialize<'de> for ProviderNameDto {
     {
         let value = String::deserialize(deserializer)?;
         Self::try_new(value).map_err(serde::de::Error::custom)
+    }
+}
+
+/// Serde-boundary mirror of a validated Codex custom model-provider identifier.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelProviderNameDto(ModelProviderName);
+
+impl ModelProviderNameDto {
+    /// Validates a custom model-provider identifier at the infrastructure boundary.
+    ///
+    /// # Errors
+    ///
+    /// Returns the usecase validation error when `value` is blank.
+    pub fn try_new(value: String) -> Result<Self, CapabilityInputValidationError> {
+        ModelProviderName::try_new(value).map(Self)
+    }
+
+    /// Converts this DTO into its validated usecase value.
+    #[must_use]
+    pub fn into_domain(self) -> ModelProviderName {
+        self.0
+    }
+}
+
+impl<'de> Deserialize<'de> for ModelProviderNameDto {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = String::deserialize(deserializer)?;
+        Self::try_new(value).map_err(serde::de::Error::custom)
+    }
+}
+
+/// Serde-boundary provider binding for a capability profile.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CapabilityProviderBindingDto {
+    /// Use the named provider adapter directly.
+    Standard(ProviderNameDto),
+    /// Use the Codex adapter with a named Codex custom model provider.
+    CodexCustom(ModelProviderNameDto),
+}
+
+impl CapabilityProviderBindingDto {
+    /// Converts this DTO into the validated usecase provider binding.
+    #[must_use]
+    pub fn into_domain(self) -> CapabilityProviderBinding {
+        match self {
+            Self::Standard(provider) => CapabilityProviderBinding::Standard(provider.into_domain()),
+            Self::CodexCustom(model_provider) => {
+                CapabilityProviderBinding::CodexCustom(model_provider.into_domain())
+            }
+        }
     }
 }
 

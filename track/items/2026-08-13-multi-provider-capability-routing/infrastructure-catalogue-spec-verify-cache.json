@@ -1,0 +1,462 @@
+{
+  "entries": [
+    {
+      "claim_hash": "ea169719133c0a14a8f33fdb953128d8a4be8a9a7cf8b5e2e594f36fd0744adc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AgentProfilesCapabilityAdapter",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "df99a7fb1940dc73a77041760b1d8995c3f8680c92b296c3e84755ff89a74595",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ea169719133c0a14a8f33fdb953128d8a4be8a9a7cf8b5e2e594f36fd0744adc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AgentProfilesCapabilityAdapter",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9948f940562ab05141afc7ca723258a6126c8d9dfe9e8636e2fffee94af2874f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "ea169719133c0a14a8f33fdb953128d8a4be8a9a7cf8b5e2e594f36fd0744adc",
+      "claim_origin": {
+        "data": {
+          "entry_key": "AgentProfilesCapabilityAdapter",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9184b0f8b9272798d457cb242b519187afd2c950cebaab582170cd381386152",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55c5eaf1a581d7feff48460a56701a14d80dfa1aac6f0c42a83281d5be8766d2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityConfigDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "df99a7fb1940dc73a77041760b1d8995c3f8680c92b296c3e84755ff89a74595",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55c5eaf1a581d7feff48460a56701a14d80dfa1aac6f0c42a83281d5be8766d2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityConfigDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9948f940562ab05141afc7ca723258a6126c8d9dfe9e8636e2fffee94af2874f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55c5eaf1a581d7feff48460a56701a14d80dfa1aac6f0c42a83281d5be8766d2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityConfigDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9184b0f8b9272798d457cb242b519187afd2c950cebaab582170cd381386152",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "55c5eaf1a581d7feff48460a56701a14d80dfa1aac6f0c42a83281d5be8766d2",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityConfigDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ee3b8db878f87dc93c1ef5a1efdfa29836b7fa3ab405bd38c31da494cd9b5b9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "51d9c6bfc0c3bc65692bdfc37d14a7eb094c3182e590af1c8ad56035c2c604bb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityProviderBindingDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "df99a7fb1940dc73a77041760b1d8995c3f8680c92b296c3e84755ff89a74595",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "51d9c6bfc0c3bc65692bdfc37d14a7eb094c3182e590af1c8ad56035c2c604bb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityProviderBindingDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7b2caf929323c4a7545355b94b9b069d1f4e1740b565bb6f85c024c43093dc34",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "model_provider を利用する profile でも sotp の provider 名を codex に維持し、既存の typed-pipeline provider gate を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider を利用する profile でも sotp の provider 名を codex に維持し、既存の typed-pipeline provider gate を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "51d9c6bfc0c3bc65692bdfc37d14a7eb094c3182e590af1c8ad56035c2c604bb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityProviderBindingDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9948f940562ab05141afc7ca723258a6126c8d9dfe9e8636e2fffee94af2874f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "51d9c6bfc0c3bc65692bdfc37d14a7eb094c3182e590af1c8ad56035c2c604bb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityProviderBindingDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9184b0f8b9272798d457cb242b519187afd2c950cebaab582170cd381386152",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "51d9c6bfc0c3bc65692bdfc37d14a7eb094c3182e590af1c8ad56035c2c604bb",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CapabilityProviderBindingDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ee3b8db878f87dc93c1ef5a1efdfa29836b7fa3ab405bd38c31da494cd9b5b9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "655c2bd2cdc2ffcb1aaeeab0d81675636f1b5b9e45e65ba8e3fd4262883d3994",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexCapabilityAdapter",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "df99a7fb1940dc73a77041760b1d8995c3f8680c92b296c3e84755ff89a74595",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "capability dispatch の Codex custom provider 選択へ渡す",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "655c2bd2cdc2ffcb1aaeeab0d81675636f1b5b9e45e65ba8e3fd4262883d3994",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexCapabilityAdapter",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9948f940562ab05141afc7ca723258a6126c8d9dfe9e8636e2fffee94af2874f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "655c2bd2cdc2ffcb1aaeeab0d81675636f1b5b9e45e65ba8e3fd4262883d3994",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexCapabilityAdapter",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9184b0f8b9272798d457cb242b519187afd2c950cebaab582170cd381386152",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider が未指定の profile は外部 custom provider を選択せず、指定の有無にかかわらず sotp の provider 名は codex のままで、既存の typed-pipeline provider gate が維持される。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "655c2bd2cdc2ffcb1aaeeab0d81675636f1b5b9e45e65ba8e3fd4262883d3994",
+      "claim_origin": {
+        "data": {
+          "entry_key": "CodexCapabilityAdapter",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ee3b8db878f87dc93c1ef5a1efdfa29836b7fa3ab405bd38c31da494cd9b5b9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a88c4b2898321f6126bb54f6cb94b9d22f680c602c503956c25b4e776bdf685c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ModelProviderNameDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "df99a7fb1940dc73a77041760b1d8995c3f8680c92b296c3e84755ff89a74595",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "capability profile schema に optional な model_provider を追加し、非空の指定を capability dispatch の Codex custom provider 選択へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a88c4b2898321f6126bb54f6cb94b9d22f680c602c503956c25b4e776bdf685c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ModelProviderNameDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "9948f940562ab05141afc7ca723258a6126c8d9dfe9e8636e2fffee94af2874f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "model_provider を指定した有効な capability profile は、空でない値だけを検証したうえで、capability dispatch 時に --config model_provider=\"<id>\" を Codex CLI へ渡す。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "a88c4b2898321f6126bb54f6cb94b9d22f680c602c503956c25b4e776bdf685c",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ModelProviderNameDto",
+          "file_path": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7ee3b8db878f87dc93c1ef5a1efdfa29836b7fa3ab405bd38c31da494cd9b5b9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "sotp は model_provider を Codex custom provider 名として解釈せず、非空性だけを検証する pass-through に限定する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}

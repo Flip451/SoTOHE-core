@@ -18,8 +18,9 @@ use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
 };
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, DeletionRecord, ModulePath, StructKind, StructShape, TraitEntry,
-    TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
+    CatalogueDocument, CrateName, DeletionRecord, InherentImplDeclV2, MethodDeclaration,
+    MethodName, ModulePath, SelfReceiver, StructKind, StructShape, TraitEntry, TraitImplDeclV2,
+    TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecSectionKind,
@@ -87,8 +88,9 @@ use crate::test_obligation::hasher::ContentHasherPort;
 use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use crate::test_obligation::results::TestObligationStatusLaneSummary;
 use crate::test_obligation::{
-    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, obligation_declaration_text,
-    obligation_declaration_text_from_loaded, sha256_content_hash,
+    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, declaration_with_obligation_item,
+    find_declaration_text, obligation_declaration_text, obligation_declaration_text_from_loaded,
+    sha256_content_hash,
 };
 use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 
@@ -523,6 +525,43 @@ fn empty_rules_doc() -> TestObligationRulesDocument {
     .unwrap()
 }
 
+fn secondary_port_trait_method_rules_doc() -> TestObligationRulesDocument {
+    let empty = || RoleObligationRules::new(vec![]);
+    let data_roles: Vec<(DataRole, RoleObligationRules)> =
+        DATA_ROLE_NAMES.iter().map(|name| (name.parse::<DataRole>().unwrap(), empty())).collect();
+    let contract_roles: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| {
+            let rules = if *name == "SecondaryPort" {
+                RoleObligationRules::new(vec![TestObligationRule::new(
+                    TestObligationKind::Contract,
+                    TestObligationPerAxis::TraitMethod,
+                    None,
+                    None,
+                )])
+            } else {
+                empty()
+            };
+            (name.parse::<ContractRole>().unwrap(), rules)
+        })
+        .collect();
+    let function_roles =
+        vec![(FunctionRole::FreeFunction, empty()), (FunctionRole::UseCaseFunction, empty())];
+    let patterns = vec![(TestObligationPatternKind::Typestate, empty())];
+    let trait_impls: Vec<(ContractRole, RoleObligationRules)> = CONTRACT_ROLE_NAMES
+        .iter()
+        .map(|name| (name.parse::<ContractRole>().unwrap(), empty()))
+        .collect();
+    TestObligationRulesDocument::try_new(
+        data_roles,
+        contract_roles,
+        function_roles,
+        patterns,
+        trait_impls,
+    )
+    .unwrap()
+}
+
 fn track() -> TrackId {
     TrackId::try_new("my-track").unwrap()
 }
@@ -554,6 +593,42 @@ fn task_contract_reader_with(task_ids: &[&str]) -> Arc<dyn TaskContractReaderPor
         entries.insert(TaskId::try_new((*task_id).to_owned()).unwrap(), vec![entry.clone()]);
     }
     Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap()))
+}
+
+fn test_port_task_contract_reader() -> Arc<dyn TaskContractReaderPort> {
+    let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+    let entry = ContractedEntryRef::new(
+        LayerId::try_new("domain").unwrap(),
+        CatalogueEntryKey::try_new("TestPort".to_owned()).unwrap(),
+    );
+    let mut entries = BTreeMap::new();
+    entries.insert(task_id, vec![entry]);
+    Arc::new(StubTaskContractReader(TaskContractDocument::new(track(), entries).unwrap()))
+}
+
+fn anchorless_port_interactor(
+    obligations: ObligationsDocument,
+    bindings: TestBindingsDocument,
+    rules: TestObligationRulesDocument,
+    catalogue: CatalogueDocument,
+) -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        Arc::new(StubRules { doc: rules }),
+        Arc::new(StubObligations(Some(obligations))),
+        Arc::new(StubBindings(Some(bindings))),
+        Arc::new(StubScanner),
+        Arc::new(StubFulfillmentCache(Some(ObligationFulfillmentCacheDocument::new(
+            track(),
+            Vec::new(),
+        )))),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(catalogue)),
+        test_port_task_contract_reader(),
+        impl_plan_reader(),
+    )
 }
 
 fn missing_binding_interactor_with_statuses(
@@ -876,14 +951,50 @@ fn money_catalogue_with_role(role: DataRole) -> CatalogueDocument {
     doc
 }
 
-fn trait_impl_catalogue() -> CatalogueDocument {
-    let mut catalogue = money_catalogue_with_role(DataRole::value_object());
+fn covering_method(name: &str, anchor: &str) -> MethodDeclaration {
+    MethodDeclaration::new(
+        MethodName::new(name).unwrap(),
+        None,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        false,
+        vec![],
+        vec![],
+        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new(anchor).unwrap())],
+        ItemAction::Add,
+        None,
+    )
+}
+
+fn method_without_spec_refs(name: &str) -> MethodDeclaration {
+    MethodDeclaration::new(
+        MethodName::new(name).unwrap(),
+        None,
+        vec![],
+        TypeRef::new("()").unwrap(),
+        false,
+        false,
+        vec![],
+        vec![],
+        vec![],
+        ItemAction::Add,
+        None,
+    )
+}
+
+fn incomplete_coverage_catalogue(action: ItemAction) -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
     catalogue.insert_trait(
-        TraitName::new("MyPort").unwrap(),
+        TraitName::new("TestPort").unwrap(),
         TraitEntry::new(
-            ItemAction::Reference,
+            action,
             ContractRole::SecondaryPort,
-            vec![],
+            vec![method_without_spec_refs("load")],
             vec![],
             vec![],
             vec![],
@@ -895,6 +1006,56 @@ fn trait_impl_catalogue() -> CatalogueDocument {
                 PathBuf::from("spec.json"),
                 SpecElementId::try_new("IN-05").unwrap(),
             )],
+            vec![],
+        ),
+    );
+    catalogue
+}
+
+fn anchorless_secondary_port_catalogue() -> CatalogueDocument {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![method_without_spec_refs("load")],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+    catalogue
+}
+
+fn trait_impl_catalogue() -> CatalogueDocument {
+    let mut catalogue = money_catalogue_with_role(DataRole::value_object());
+    let entry_refs =
+        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new("IN-05").unwrap())];
+    catalogue.insert_trait(
+        TraitName::new("MyPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Reference,
+            ContractRole::SecondaryPort,
+            vec![covering_method("load", "IN-05")],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            entry_refs,
             vec![],
         ),
     );
@@ -994,10 +1155,12 @@ fn shared_edge_waiver_rules_doc() -> TestObligationRulesDocument {
 }
 
 fn trait_entry(role: ContractRole) -> TraitEntry {
+    let entry_refs =
+        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new("IN-05").unwrap())];
     TraitEntry::new(
         ItemAction::Add,
         role,
-        vec![],
+        vec![covering_method("verify", "IN-05")],
         vec![],
         vec![],
         vec![],
@@ -1005,7 +1168,7 @@ fn trait_entry(role: ContractRole) -> TraitEntry {
         vec![],
         ModulePath::root(),
         None,
-        vec![SpecRef::new(PathBuf::from("spec.json"), SpecElementId::try_new("IN-05").unwrap())],
+        entry_refs,
         vec![],
     )
 }
@@ -1059,10 +1222,17 @@ fn fresh_fulfillment_cache_for(obligation: &TestObligation) -> ObligationFulfill
 fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
     let catalogue = money_catalogue();
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
+    let synthetic = TestObligationId::new(
+        entry_key(),
+        TestObligationKind::Logic,
+        TestObligationItemIdentifier::try_new("voluntary:IN-05".to_owned()).unwrap(),
+    );
     let declaration = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(&catalogue), &obligation())
-            .unwrap()
-            .as_bytes(),
+        declaration_with_obligation_item(
+            &obligation_declaration_text(std::slice::from_ref(&catalogue), &obligation()).unwrap(),
+            synthetic.item_identifier().as_str(),
+        )
+        .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = cache_entry(
@@ -1095,9 +1265,11 @@ fn fresh_fulfillment_cache_for_catalogue(
 ) -> ObligationFulfillmentCacheDocument {
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(catalogue), obligation)
-            .unwrap()
-            .as_bytes(),
+        declaration_with_obligation_item(
+            &obligation_declaration_text(std::slice::from_ref(catalogue), obligation).unwrap(),
+            obligation.id().item_identifier().as_str(),
+        )
+        .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = cache_entry(
@@ -1116,15 +1288,8 @@ fn fresh_fulfillment_cache_for_catalogue(
 /// synthetic voluntary obligation id for ownerless edges, so the frozen entry must
 /// carry that id for the (edge × obligation) resolution to match.
 fn fresh_direct_waiver_cache() -> WaiverCacheDocument {
-    let source = obligation();
     let reason = WaivedReason::try_new("covered elsewhere".to_owned()).unwrap();
     let reason_hash = WaivedReasonHash::new(sha256_content_hash(reason.as_str().as_bytes()));
-    let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(&money_catalogue()), &source)
-            .unwrap()
-            .as_bytes(),
-    ));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let synthetic = TestObligationId::new(
         edge().entry_key().clone(),
         TestObligationKind::Logic,
@@ -1134,6 +1299,12 @@ fn fresh_direct_waiver_cache() -> WaiverCacheDocument {
         ))
         .unwrap(),
     );
+    let declaration = declaration_with_obligation_item(
+        &find_declaration_text(std::slice::from_ref(&money_catalogue()), "Money").unwrap(),
+        synthetic.item_identifier().as_str(),
+    );
+    let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
+    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = WaiverCacheEntry::new(
         edge(),
         Some(synthetic),
@@ -1160,11 +1331,11 @@ fn fresh_waiver_cache_for_catalogue(
 ) -> WaiverCacheDocument {
     let reason = WaivedReason::try_new("covered elsewhere".to_owned()).unwrap();
     let reason_hash = WaivedReasonHash::new(sha256_content_hash(reason.as_str().as_bytes()));
-    let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(catalogue), obligation)
-            .unwrap()
-            .as_bytes(),
-    ));
+    let declaration = declaration_with_obligation_item(
+        &obligation_declaration_text(std::slice::from_ref(catalogue), obligation).unwrap(),
+        obligation.id().item_identifier().as_str(),
+    );
+    let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = WaiverCacheEntry::new(
         edge(),
@@ -1412,6 +1583,197 @@ fn test_materialized_scope_reports_uncited_findings() {
 }
 
 #[test]
+fn test_cited_anchor_ids_includes_method_only_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![covering_method("load", "AC-01")],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(cited.contains(&"AC-01".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_skips_reference_method_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![MethodDeclaration::new(
+                MethodName::new("shape").unwrap(),
+                None,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                false,
+                vec![],
+                vec![],
+                vec![SpecRef::new(
+                    PathBuf::from("spec.json"),
+                    SpecElementId::try_new("AC-98").unwrap(),
+                )],
+                ItemAction::Reference,
+                None,
+            )],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(!cited.contains(&"AC-98".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_skips_reference_entry_refs() {
+    let catalogue = money_catalogue_in_layer("domain", "domain", ItemAction::Reference);
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(!cited.contains(&"IN-05".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_skips_delete_method_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![MethodDeclaration::new(
+                MethodName::new("drop").unwrap(),
+                None,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                false,
+                vec![],
+                vec![],
+                vec![SpecRef::new(
+                    PathBuf::from("spec.json"),
+                    SpecElementId::try_new("AC-99").unwrap(),
+                )],
+                ItemAction::Delete,
+                None,
+            )],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(!cited.contains(&"AC-99".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_includes_type_entry_method_only_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_type(
+        TypeName::new("Compute").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::domain_service(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![covering_method("compute", "AC-02")],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(cited.contains(&"AC-02".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_includes_inherent_method_only_refs() {
+    let mut catalogue = money_catalogue();
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Money").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![covering_method("amount", "AC-03")],
+    });
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(cited.contains(&"AC-03".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_skips_inherent_methods_on_delete_owner() {
+    let mut catalogue = money_catalogue_in_layer("domain", "domain", ItemAction::Delete);
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Money").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![covering_method("amount", "AC-04")],
+    });
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(!cited.contains(&"IN-05".to_owned()));
+    assert!(!cited.contains(&"AC-04".to_owned()));
+}
+
+#[test]
 fn test_obligation_declaration_text_uses_target_section_for_same_key() {
     let mut catalogue = money_catalogue();
     catalogue
@@ -1474,6 +1836,51 @@ fn test_obligation_declaration_text_with_relative_catalogue_identity_matches_anc
 
     assert!(declaration.contains("ValueObject"));
     assert!(!declaration.contains("Entity"));
+}
+
+#[test]
+fn test_obligation_declaration_text_freezes_inherent_impl_for_inherent_only_method() {
+    let mut catalogue = money_catalogue();
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Money").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![MethodDeclaration::new(
+            MethodName::new("compute").unwrap(),
+            Some(SelfReceiver::SharedRef),
+            vec![],
+            TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
+            None,
+        )],
+    });
+    let entry_key = entry_key();
+    let obligation = TestObligation::new(
+        TestObligationId::new(
+            entry_key.clone(),
+            TestObligationKind::LogicResult,
+            TestObligationItemIdentifier::try_new("method:compute".to_owned()).unwrap(),
+        ),
+        CatalogueEntryRef::new(
+            "domain-types.json".to_owned(),
+            CatalogueSectionKey::Types,
+            entry_key,
+        ),
+        TargetEntryRoleKind::DataRole(DataRole::value_object()),
+        TestObligationBrief::try_new("cover compute".to_owned()).unwrap(),
+        DeclarationHash::new(ContentHash::from_bytes([0u8; 32])),
+        vec![anchor()],
+    );
+
+    let declaration = obligation_declaration_text(&[catalogue], &obligation).unwrap();
+
+    assert!(declaration.contains("inherent_impl:"));
+    assert!(declaration.contains("compute"));
 }
 
 #[test]
@@ -1595,6 +2002,78 @@ fn test_orphaned_waiver_binding_is_a_drift() {
         interactor_with_rules(Some(obligations), Some(bindings), None, None, empty_rules_doc())
             .execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));
+}
+
+#[test]
+fn test_fulfillment_on_obligation_that_owns_no_anchors_is_orphaned() {
+    // D1: a derived obligation with empty spec_refs is not a fulfillment target.
+    // Presence of a fulfillment record must not pass check while evaluate plans
+    // zero verifier actions.
+    let catalogue = anchorless_secondary_port_catalogue();
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    assert_eq!(obligations.obligations().len(), 1);
+    assert!(obligations.obligations()[0].spec_refs().is_empty());
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![fulfillment_binding_for(&obligations.obligations()[0])],
+    );
+
+    let result =
+        anchorless_port_interactor(obligations, bindings, rules, catalogue).execute(&command());
+
+    let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+        panic!("fulfillment on an anchorless obligation must be a structural drift");
+    };
+    assert_eq!(drifts.as_slice().len(), 1);
+    let rendered = format!("{drifts:?}");
+    assert!(rendered.contains("Orphaned"));
+    assert!(rendered.contains("owns no anchors"));
+}
+
+#[test]
+fn test_check_does_not_reject_historical_add_catalogue_as_invalid_state() {
+    // D1: read-only check re-derives without applying write-side coverage, so
+    // an enrolled Add catalogue that predates method-level refs is not
+    // InvalidCatalogueState.
+    let catalogue = incomplete_coverage_catalogue(ItemAction::Add);
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+
+    let result =
+        anchorless_port_interactor(obligations, bindings, rules, catalogue).execute(&command());
+
+    assert!(!matches!(result, Err(ObligationCheckError::InvalidCatalogueState(_))));
+}
+
+#[test]
+fn test_check_does_not_reject_reference_trait_incomplete_coverage() {
+    let catalogue = incomplete_coverage_catalogue(ItemAction::Reference);
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+
+    let result =
+        anchorless_port_interactor(obligations, bindings, rules, catalogue).execute(&command());
+
+    assert!(!matches!(result, Err(ObligationCheckError::InvalidCatalogueState(_))));
+}
+
+#[test]
+fn test_anchorless_obligation_without_fulfillment_is_not_missing() {
+    // D1: owning no anchors means there is nothing to fulfill; absence of a
+    // fulfillment record is not `missing`.
+    let catalogue = anchorless_secondary_port_catalogue();
+    let rules = secondary_port_trait_method_rules_doc();
+    let obligations = derived_obligations(rules.clone(), catalogue.clone());
+    let bindings = TestBindingsDocument::new(track(), vec![]);
+
+    let outcome = anchorless_port_interactor(obligations, bindings, rules, catalogue)
+        .execute(&command())
+        .unwrap();
+
+    assert!(outcome.resolved_edges().is_empty());
 }
 
 #[test]

@@ -1,6 +1,6 @@
 //! `TypeSignalsExecutorAdapter` — infrastructure adapter for `TypeSignalsExecutorPort`.
 //!
-//! Wraps [`crate::tddd::type_signals_evaluator::execute_type_signals_for_layer`]
+//! Wraps `crate::tddd::type_signals_evaluator::execute_type_signals_for_layer`
 //! and bridges the domain [`domain::tddd::catalogue_v2::TdddLayerBinding`] type
 //! (public fields) to the infra [`crate::verify::tddd_layers::TdddLayerBinding`]
 //! type (private getter methods).
@@ -10,14 +10,15 @@ use std::path::Path;
 use domain::TrackId;
 use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::TdddLayerBinding as DomainTdddLayerBinding;
+use usecase::git_workflow::DiagnosticText;
 use usecase::type_signals::{TypeSignalsExecutionError, TypeSignalsExecutorPort};
 
+use crate::tddd::type_signals_evaluator::{
+    EvaluateSignalsError, execute_type_signals_for_layer, reject_symlinked_type_signals_anchor,
+};
 #[cfg(feature = "test-helpers")]
 use crate::tddd::type_signals_evaluator::{
     RustdocLaunchObserver, execute_type_signals_for_layer_with_launch_observer,
-};
-use crate::tddd::type_signals_evaluator::{
-    execute_type_signals_for_layer, reject_symlinked_type_signals_anchor,
 };
 use crate::verify::tddd_layers::TdddLayerBinding as InfraTdddLayerBinding;
 
@@ -29,7 +30,7 @@ use crate::verify::tddd_layers::TdddLayerBinding as InfraTdddLayerBinding;
 ///
 /// Converts the domain [`DomainTdddLayerBinding`] (public fields) to the infra
 /// [`InfraTdddLayerBinding`] (private getters + `signal_file()` method) and
-/// delegates to [`execute_type_signals_for_layer`].
+/// delegates to the crate-private `execute_type_signals_for_layer` evaluator.
 ///
 /// Every catalogue input is evaluated conservatively. Missing or unverifiable
 /// inputs fail closed; multi-target catalogues return an error because they are
@@ -97,18 +98,32 @@ impl TypeSignalsExecutorAdapter {
         let rules_json = rules_value.to_string();
         // parse_tddd_layers returns at most one entry matching our layer.
         let mut parsed = parse_tddd_layers(&rules_json).map_err(|e| {
-            TypeSignalsExecutionError(format!(
+            TypeSignalsExecutionError::AuthoritativeInput(DiagnosticText::new(format!(
                 "synthetic rules JSON failed to parse (logic error in TypeSignalsExecutorAdapter): \
                  {e}"
-            ))
+            )))
         })?;
         parsed.pop().ok_or_else(|| {
-            TypeSignalsExecutionError(
+            TypeSignalsExecutionError::AuthoritativeInput(DiagnosticText::new(
                 "synthetic rules JSON produced no layers (logic error in \
                  TypeSignalsExecutorAdapter)"
                     .to_owned(),
-            )
+            ))
         })
+    }
+
+    fn map_evaluation_error(error: EvaluateSignalsError) -> TypeSignalsExecutionError {
+        match error {
+            EvaluateSignalsError::AuthoritativeInput(message) => {
+                TypeSignalsExecutionError::AuthoritativeInput(DiagnosticText::new(message.as_str()))
+            }
+            EvaluateSignalsError::Evaluation(message) => {
+                TypeSignalsExecutionError::Evaluation(DiagnosticText::new(message.as_str()))
+            }
+            EvaluateSignalsError::CacheWrite(message) => {
+                TypeSignalsExecutionError::CacheWrite(DiagnosticText::new(message.as_str()))
+            }
+        }
     }
 }
 
@@ -133,8 +148,9 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
         // early-exit paths.  This ensures a symlinked items_dir is rejected
         // regardless of catalogue presence or binding contents.  Mirrors the
         // identical check in `execute_type_signals_for_layer`.
-        reject_symlinked_type_signals_anchor(items_dir, "items_dir")
-            .map_err(TypeSignalsExecutionError)?;
+        reject_symlinked_type_signals_anchor(items_dir, "items_dir").map_err(|reason| {
+            TypeSignalsExecutionError::AuthoritativeInput(DiagnosticText::new(reason))
+        })?;
 
         // Perform input validation and binding conversion before any early-exit
         // paths so that malformed requests fail closed regardless of catalogue
@@ -149,9 +165,11 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
 
         // Reject empty targets: a binding with no targets is always malformed.
         if binding.targets.is_empty() {
-            return Err(TypeSignalsExecutionError(format!(
-                "layer '{}': schema_export.targets is empty — at least one target is required",
-                binding.layer_id,
+            return Err(TypeSignalsExecutionError::AuthoritativeInput(DiagnosticText::new(
+                format!(
+                    "layer '{}': schema_export.targets is empty — at least one target is required",
+                    binding.layer_id,
+                ),
             )));
         }
 
@@ -170,20 +188,27 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
         // wrong file.
         let derived_baseline = infra_binding.baseline_file();
         if derived_baseline != binding.baseline_file {
-            return Err(TypeSignalsExecutionError(format!(
-                "layer '{}': domain baseline_file '{}' differs from the infra-derived \
+            return Err(TypeSignalsExecutionError::AuthoritativeInput(DiagnosticText::new(
+                format!(
+                    "layer '{}': domain baseline_file '{}' differs from the infra-derived \
                  baseline_file '{}' (derived from catalogue_file '{}'); supply a standard \
                  baseline path or adjust catalogue_file",
-                binding.layer_id, binding.baseline_file, derived_baseline, binding.catalogue_file,
+                    binding.layer_id,
+                    binding.baseline_file,
+                    derived_baseline,
+                    binding.catalogue_file,
+                ),
             )));
         }
 
         // Multi-target bindings are not yet supported by the strict evaluator.
         if binding.targets.len() > 1 {
-            return Err(TypeSignalsExecutionError(format!(
-                "layer '{}' has {} schema_export.targets — multi-target not yet supported",
-                binding.layer_id,
-                binding.targets.len()
+            return Err(TypeSignalsExecutionError::AuthoritativeInput(DiagnosticText::new(
+                format!(
+                    "layer '{}' has {} schema_export.targets — multi-target not yet supported",
+                    binding.layer_id,
+                    binding.targets.len()
+                ),
             )));
         }
 
@@ -214,7 +239,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
             features,
         );
 
-        execution.map(|_exit| ()).map_err(|e| TypeSignalsExecutionError(e.0))
+        execution.map(|_exit| ()).map_err(Self::map_evaluation_error)
     }
 }
 
@@ -282,6 +307,9 @@ mod tests {
         let rustdoc_json = minimal_rustdoc_json();
         std::fs::write(&rustdoc_path, &rustdoc_json).unwrap();
         std::fs::write(track_dir.join("infrastructure-types-baseline.json"), rustdoc_json).unwrap();
+        crate::verify::test_support::git_init(root);
+        crate::verify::test_support::run_git(root, &["add", "."]);
+        crate::verify::test_support::run_git(root, &["commit", "--quiet", "-m", "fixture"]);
 
         (workspace, rustdoc_path)
     }
@@ -304,35 +332,75 @@ mod tests {
         assert_eq!(infra.targets(), &["domain"]);
     }
 
+    #[test]
+    fn test_map_evaluation_error_each_stage_preserves_execution_error_category() {
+        let cases = [
+            (
+                EvaluateSignalsError::AuthoritativeInput(domain::FreeText::new(
+                    "missing Cargo.lock",
+                )),
+                "AuthoritativeInput",
+            ),
+            (
+                EvaluateSignalsError::Evaluation(domain::FreeText::new("cannot create timestamp")),
+                "Evaluation",
+            ),
+            (
+                EvaluateSignalsError::CacheWrite(domain::FreeText::new(
+                    "cannot write type signals",
+                )),
+                "CacheWrite",
+            ),
+        ];
+
+        for (evaluator_error, expected_stage) in cases {
+            let execution_error = TypeSignalsExecutorAdapter::map_evaluation_error(evaluator_error);
+            assert!(
+                matches!(
+                    (expected_stage, &execution_error),
+                    ("AuthoritativeInput", TypeSignalsExecutionError::AuthoritativeInput(_))
+                        | ("Evaluation", TypeSignalsExecutionError::Evaluation(_))
+                        | ("CacheWrite", TypeSignalsExecutionError::CacheWrite(_))
+                ),
+                "expected {expected_stage} error stage, got {execution_error:?}"
+            );
+        }
+    }
+
     #[cfg(feature = "test-helpers")]
     #[test]
     fn test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc() {
-        if !nightly_toolchain_available() {
-            eprintln!("skipping feature-forwarding adapter test: nightly toolchain is unavailable");
-            return;
-        }
-        let (workspace, rustdoc_path) = setup_feature_aware_workspace();
-        let items_dir = workspace.path().join("track/items");
-        let declared_feature = CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap();
-        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
-        let adapter = TypeSignalsExecutorAdapter::with_rustdoc_launch_observer(observer.clone());
+        crate::tddd::type_signals_evaluator::with_process_environment_lock(|| {
+            if !nightly_toolchain_available() {
+                eprintln!(
+                    "skipping feature-forwarding adapter test: nightly toolchain is unavailable"
+                );
+                return;
+            }
+            let (workspace, rustdoc_path) = setup_feature_aware_workspace();
+            let items_dir = workspace.path().join("track/items");
+            let declared_feature = CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap();
+            let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+            let adapter =
+                TypeSignalsExecutorAdapter::with_rustdoc_launch_observer(observer.clone());
 
-        adapter
-            .evaluate_layer(
-                &items_dir,
-                &track_id(),
-                workspace.path(),
-                &domain_binding("infrastructure"),
-                std::slice::from_ref(&declared_feature),
-            )
-            .unwrap();
+            adapter
+                .evaluate_layer(
+                    &items_dir,
+                    &track_id(),
+                    workspace.path(),
+                    &domain_binding("infrastructure"),
+                    std::slice::from_ref(&declared_feature),
+                )
+                .unwrap();
 
-        assert_eq!(observer.launches_for("infrastructure"), 1);
-        assert_eq!(
-            observer.feature_selections_for("infrastructure"),
-            vec![vec!["semantic-dup".to_owned()]],
-            "the executor adapter must pass the declaration-derived feature selection to rustdoc"
-        );
+            assert_eq!(observer.launches_for("infrastructure"), 1);
+            assert_eq!(
+                observer.feature_selections_for("infrastructure"),
+                vec![vec!["semantic-dup".to_owned()]],
+                "the executor adapter must pass the declaration-derived feature selection to rustdoc"
+            );
+        });
     }
 
     #[test]
@@ -371,7 +439,7 @@ mod tests {
         );
 
         assert!(
-            matches!(&result, Err(error) if error.0.contains("resolves outside workspace_root")),
+            matches!(&result, Err(error) if error.to_string().contains("resolves outside workspace_root")),
             "items_dir outside the workspace must be rejected before reads: {result:?}"
         );
     }
@@ -397,7 +465,7 @@ mod tests {
         );
 
         assert!(
-            matches!(&result, Err(error) if error.0.contains("symlink guard rejected catalogue")),
+            matches!(&result, Err(error) if error.to_string().contains("symlink guard rejected catalogue")),
             "a symlinked catalogue must be rejected before read: {result:?}"
         );
     }

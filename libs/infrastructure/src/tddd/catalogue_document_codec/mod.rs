@@ -49,6 +49,7 @@ mod dto;
 mod dto_roles;
 mod dto_slots;
 mod encode;
+mod encode_validate;
 mod validate;
 
 use decode::dto_to_domain;
@@ -349,12 +350,14 @@ mod tests {
     use domain::tddd::LayerId;
     use domain::tddd::catalogue_v2::ItemAction;
     use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2};
-    use domain::tddd::catalogue_v2::entries::FunctionEntry;
+    use domain::tddd::catalogue_v2::entries::{FunctionEntry, TypeEntry};
     use domain::tddd::catalogue_v2::identifiers::{
-        CrateName, FunctionName, FunctionPath, ModulePath, TraitName, TypeName,
+        CrateName, FunctionName, FunctionPath, ModulePath, ParamName, TraitName, TypeName,
     };
     use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, FunctionRole};
-    use domain::tddd::catalogue_v2::{BoundOp, DeletionRecord, TypeRef, WherePredicateDecl};
+    use domain::tddd::catalogue_v2::{
+        BoundOp, DeletionRecord, MethodGenericParam, TypeRef, WherePredicateDecl,
+    };
 
     fn minimal_v5_json(crate_name: &str, layer: &str) -> String {
         format!(
@@ -662,6 +665,51 @@ mod tests {
     }
 
     #[test]
+    fn test_type_method_with_keyword_enclosing_generic_decodes() {
+        // rustdoc normalizes `r#type` to `type`, so a pre-existing non-alias
+        // entry legitimately records a keyword generic name. The non-keyword
+        // restriction applies only in alias validation (spec OUT-01 keeps
+        // non-alias generic declarations out of scope).
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Container": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "struct", "shape": { "kind": "unit" } },
+      "generics": [{ "name": "type", "bounds": [] }],
+      "methods": [
+        {
+          "name": "get",
+          "returns": "u8"
+        }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {
+    "domain::keyword_fn": {
+      "action": "add",
+      "role": "FreeFunction",
+      "generics": [{ "name": "type", "bounds": [] }],
+      "params": [],
+      "returns": "u8"
+    }
+  }
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        assert_eq!(entry.generics()[0].name.as_str(), "type");
+        let function = doc.functions().values().next().unwrap();
+        assert_eq!(function.generics()[0].name.as_str(), "type");
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "keyword generic name must round-trip for non-alias entries");
+    }
+
+    #[test]
     fn test_decode_type_entry_with_tuple_struct_kind() {
         let json = r#"{
   "schema_version": 5,
@@ -690,6 +738,777 @@ mod tests {
             },
             _ => panic!("expected Struct kind"),
         }
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_generic_declaration() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ResultAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Result<T, DomainError>",
+        "generics": [
+          { "name": "T", "bounds": ["Clone", "Send"] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        let TypeKindV2::TypeAlias { target, generics } = entry.kind() else {
+            panic!("expected TypeAlias kind");
+        };
+        assert_eq!(target.as_str(), "Result<T, DomainError>");
+        assert_eq!(generics.len(), 1);
+        assert_eq!(generics[0].name.as_str(), "T");
+        assert_eq!(
+            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),
+            vec!["Clone", "Send"]
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_rejects_arguments_on_generic_rooted_target() {
+        // `type A<T> = T<u8>` applies type arguments to the declared
+        // parameter, which rustc rejects with E0109; the generic-alias target
+        // routes through the closed lexical grammar and must fail at decode.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "T<u8>",
+        "generics": [
+          { "name": "T", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            error.to_string().contains("invalid type alias target"),
+            "expected a target validation error, got: {error}"
+        );
+
+        // `'_` is not permitted in a type-alias signature, including a
+        // generic alias target. It must fail through the public decode path.
+        let anonymous_lifetime = json.replace("\"T<u8>\"", "\"&'_ T\"");
+        let error = CatalogueDocumentCodec::decode(&anonymous_lifetime, "domain").unwrap_err();
+        assert!(
+            error.to_string().contains("invalid type alias target"),
+            "expected an anonymous-lifetime target validation error, got: {error}"
+        );
+
+        // Reserved lifetime names are rejected by rustc in alias signatures,
+        // even though `syn` parses them as a lifetime token.
+        for keyword_lifetime in ["&'self T", "&'r#self T", "&'r#static T"] {
+            let target = json.replace("\"T<u8>\"", &format!("\"{keyword_lifetime}\""));
+            let error = CatalogueDocumentCodec::decode(&target, "domain").unwrap_err();
+            assert!(
+                error.to_string().contains("invalid type alias target"),
+                "expected a keyword-lifetime target validation error for {keyword_lifetime}, got: {error}"
+            );
+        }
+
+        // A named lifetime in the target refers to a source-declared lifetime
+        // parameter the schema cannot express, so it stays decodable.
+        let lexical_lifetime = json.replace("\"T<u8>\"", "\"&'a T\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&lexical_lifetime, "domain").is_ok(),
+            "a named target lifetime must stay decodable (lexical lifetime convention)"
+        );
+
+        let unicode_lifetime = json.replace("\"T<u8>\"", "\"&'α T\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&unicode_lifetime, "domain").is_ok(),
+            "a Unicode named target lifetime must stay decodable (lexical lifetime convention)"
+        );
+
+        // Raw spellings never appear in rustdoc output (they normalize to the
+        // plain keyword form), so retaining them would guarantee a chain
+        // mismatch: the normalized spelling below is the one representation.
+        let raw_keyword_lifetime = json.replace("\"T<u8>\"", "\"&'r#async T\"");
+        let error = CatalogueDocumentCodec::decode(&raw_keyword_lifetime, "domain").unwrap_err();
+        assert!(
+            error.to_string().contains("invalid type alias target"),
+            "a raw target lifetime spelling must fail at decode, got: {error}"
+        );
+
+        let normalized_keyword_lifetime = json.replace("\"T<u8>\"", "\"&'async T\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&normalized_keyword_lifetime, "domain").is_ok(),
+            "a rustdoc-normalized keyword target lifetime must stay decodable"
+        );
+
+        // A generic projection on the parameter stays a valid target.
+        let json_projection = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ProjectionAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "T::Item",
+        "generics": [
+          { "name": "T", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        assert!(CatalogueDocumentCodec::decode(json_projection, "domain").is_ok());
+    }
+
+    #[test]
+    fn test_decode_type_alias_accepts_ordered_generic_declaration() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "PairAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Pair<T, U>",
+        "generics": [
+          { "name": "T", "bounds": ["Clone"] },
+          { "name": "U", "bounds": ["Send"] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        let TypeKindV2::TypeAlias { target, generics } = entry.kind() else {
+            panic!("expected TypeAlias kind");
+        };
+
+        assert_eq!(target.as_str(), "Pair<T, U>");
+        assert_eq!(
+            generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(),
+            vec!["T", "U"]
+        );
+        assert_eq!(
+            generics[0].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),
+            vec!["Clone"]
+        );
+        assert_eq!(
+            generics[1].bounds.iter().map(TypeRef::as_str).collect::<Vec<_>>(),
+            vec!["Send"]
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_without_generics_defaults_to_empty_and_encode_omits_field() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "ValueAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": { "kind": "type_alias", "target": "String" }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.types().values().next().unwrap();
+        assert!(matches!(
+            entry.kind(),
+            TypeKindV2::TypeAlias { generics, .. } if generics.is_empty()
+        ));
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(value["types"]["ValueAlias"]["kind"]["target"], "String");
+        assert!(value["types"]["ValueAlias"]["kind"].get("generics").is_none());
+    }
+
+    #[test]
+    fn test_encode_decode_type_alias_generic_declaration_round_trips() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BoxAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Result<T, U>",
+        "generics": [
+          { "name": "T", "bounds": ["Sized"] },
+          { "name": "U", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let round_tripped = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(round_tripped, doc);
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_keyword_generic_name_is_rejected() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "KeywordAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<type>",
+        "generics": [
+          { "name": "type", "bounds": ["Into<type>"] },
+          { "name": "U", "bounds": [] }
+        ]
+      },
+      "where_predicates": [
+        { "lhs": "type", "rhs": ["Into<type>"], "operator": "Bound" }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(matches!(
+            error,
+            CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "KeywordAlias" && reason.contains("generic param name")
+        ));
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_invalid_generic_name_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [{ "name": "not-valid", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_reserved_path_keyword_generic_name_returns_invalid_entry_error()
+    {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [{ "name": "self", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias"
+                    && reason.contains("not a plain non-keyword Rust identifier")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_rejects_unused_type_parameter() {
+        // Rustc refuses an alias whose declared type parameter never occurs
+        // in the target (E0091), even when it appears in bounds or where
+        // predicates — the codec must not admit an uncompilable contract.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "UnusedParamAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "String",
+        "generics": [{ "name": "T", "bounds": ["Clone"] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "UnusedParamAlias"
+                    && reason.contains("not used in the alias target")),
+            "unexpected error: {error:?}"
+        );
+
+        // A target that uses the parameter stays decodable.
+        let used = json.replace("\"String\"", "\"Vec<T>\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&used, "domain").is_ok(),
+            "a target using the declared parameter must stay decodable"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_rejects_duplicate_relaxed_bounds() {
+        // rustc E0203 permits at most one relaxed bound per parameter,
+        // whether the duplicates are inline, split into the where clause, or
+        // both — the codec must not admit a contract that cannot compile.
+        let inline_duplicates = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "RelaxedAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "*const T",
+        "generics": [{ "name": "T", "bounds": ["?Sized", "?Sized"] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(inline_duplicates, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
+        );
+
+        let split_duplicates = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "RelaxedAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "*const T",
+        "generics": [{ "name": "T", "bounds": ["?Sized"] }]
+      },
+      "where_predicates": [
+        { "lhs": "T", "rhs": ["?Sized"], "operator": "Bound" }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+        let error = CatalogueDocumentCodec::decode(split_duplicates, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
+        );
+
+        // The closed grammar accepts comments and whitespace as token-equivalent
+        // spellings. They must not let an otherwise duplicate `?Sized` evade
+        // the E0203 aggregation.
+        let lexical_variant_duplicates = split_duplicates.replace(
+            "\"lhs\": \"T\", \"rhs\": [\"?Sized\"]",
+            "\"lhs\": \" /* parameter */ T \", \"rhs\": [\"/* relaxed */ ?Sized\"]",
+        );
+        let error =
+            CatalogueDocumentCodec::decode(&lexical_variant_duplicates, "domain").unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
+        );
+
+        // A single relaxed bound stays valid.
+        let single = inline_duplicates.replace("\"?Sized\", \"?Sized\"", "\"?Sized\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&single, "domain").is_ok(),
+            "a single `?Sized` bound must stay decodable"
+        );
+
+        // `~const` requires the unstable `const_trait_impl` feature (and is
+        // not permitted on type aliases), so it fails at decode.
+        let maybe_const = single.replace("\"?Sized\"", "\"~const Clone\"");
+        assert!(
+            CatalogueDocumentCodec::decode(&maybe_const, "domain").is_err(),
+            "a `~const` alias bound must fail at decode (unstable const_trait_impl)"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_rejects_token_equivalent_duplicate_relaxed_bounds() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        doc.insert_type(
+            TypeName::new("RelaxedAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("*const T").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new("?Sized").unwrap()],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![WherePredicateDecl {
+                    lhs: TypeRef::new("/* parameter */ T").unwrap(),
+                    rhs: vec![TypeRef::new("/* relaxed */ ?Sized").unwrap()],
+                    operator: BoundOp::Bound,
+                }],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let error = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(error, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "RelaxedAlias" && reason.contains("more than one relaxed bound")),
+            "unexpected error: {error:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<_>",
+        "generics": [{ "name": "_", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("generic param name '_'") ),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_empty_generic_bound_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [{ "name": "T", "bounds": [""] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("invalid generic param bound")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_duplicate_generic_names_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BadAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {
+        "kind": "type_alias",
+        "target": "Box<T>",
+        "generics": [
+          { "name": "T", "bounds": [] },
+          { "name": "T", "bounds": [] }
+        ]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("duplicate generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_decode_type_alias_with_entry_and_kind_generics_returns_invalid_entry_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "AmbiguousAlias": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "generics": [{ "name": "T", "bounds": [] }],
+      "kind": {
+        "kind": "type_alias",
+        "target": "Vec<T>",
+        "generics": [{ "name": "T", "bounds": [] }]
+      }
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+        let err = CatalogueDocumentCodec::decode(json, "domain").unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "AmbiguousAlias" && reason.contains("both the entry and kind payload")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_duplicate_generic_names_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let duplicate = MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] };
+        doc.insert_type(
+            TypeName::new("BadAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<T>").unwrap(),
+                    generics: vec![duplicate.clone(), duplicate],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("duplicate generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_duplicate_legacy_generic_names_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let duplicate = MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] };
+        doc.insert_type(
+            TypeName::new("BadLegacyAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("Vec<T>").unwrap(), generics: vec![] },
+                vec![],
+                vec![duplicate.clone(), duplicate],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadLegacyAlias" && reason.contains("duplicate generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_wildcard_generic_name_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        let wildcard = MethodGenericParam { name: ParamName::new("_").unwrap(), bounds: vec![] };
+        doc.insert_type(
+            TypeName::new("BadAlias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<_>").unwrap(),
+                    generics: vec![wildcard],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAlias" && reason.contains("generic param name")),
+            "unexpected error: {err:?}"
+        );
+    }
+
+    #[test]
+    fn test_encode_type_alias_with_invalid_generic_bound_returns_invalid_entry_error() {
+        let mut doc = CatalogueDocument::new(
+            SCHEMA_VERSION,
+            CrateName::new("domain").unwrap(),
+            LayerId::try_new("domain").unwrap(),
+        );
+        doc.insert_type(
+            TypeName::new("BadAliasBound").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Vec<T>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![TypeRef::new("<T>").unwrap()],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let err = CatalogueDocumentCodec::encode(&doc).unwrap_err();
+        assert!(
+            matches!(err, CatalogueDocumentCodecError::InvalidEntry { ref entry_name, ref reason }
+                if entry_name == "BadAliasBound" && reason.contains("invalid generic param bound")),
+            "unexpected error: {err:?}"
+        );
     }
 
     #[test]
@@ -828,6 +1647,55 @@ mod tests {
         assert_eq!(entry.generics()[0].bounds[0].as_str(), "Clone");
         assert_eq!(entry.where_predicates()[0].lhs.as_str(), "T");
         assert_eq!(entry.where_predicates()[0].rhs[0].as_str(), "Send");
+    }
+
+    #[test]
+    fn test_trait_with_keyword_generic_in_context_decodes() {
+        // A keyword generic name (rustdoc-normalized `r#type`) in the declared
+        // context must not fail sibling bound / where / assoc validation for a
+        // non-alias entry: the context is not re-validated on the shared
+        // paths, only in alias validation (spec OUT-01).
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "KeywordTrait": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "generics": [{ "name": "type", "bounds": [] }, { "name": "T", "bounds": ["Clone"] }],
+      "supertrait_bounds": ["Parent"],
+      "methods": [
+        {
+          "name": "get",
+          "returns": "u8",
+          "where_predicates": [{ "lhs": "T", "rhs": ["Send"] }]
+        }
+      ],
+      "assoc_types": [
+        { "name": "Item", "bounds": ["Clone"], "default": "u8" }
+      ],
+      "assoc_consts": [
+        { "name": "VALUE", "ty": "u8" }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits().values().next().unwrap();
+        assert_eq!(entry.generics()[0].name.as_str(), "type");
+        assert_eq!(entry.generics()[1].bounds[0].as_str(), "Clone");
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "keyword generic context must round-trip for non-alias entries");
+        // The acceptance must survive the full DTO-to-evaluator flow: the
+        // structural encoder processes bounds / returns with the same context.
+        use domain::tddd::CatalogueToExtendedCratePort;
+        crate::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec::new()
+            .encode(doc2)
+            .expect("keyword generic context must survive the extended-crate encoding");
     }
 
     #[test]
@@ -1948,8 +2816,197 @@ mod tests {
         let trait_entry = doc.traits().values().next().unwrap();
         assert_eq!(trait_entry.methods().len(), 1);
         assert!(
-            trait_entry.methods()[0].has_default_impl,
+            trait_entry.methods()[0].has_default_impl(),
             "has_default_impl=true must round-trip through decode"
+        );
+    }
+
+    #[test]
+    fn test_method_level_spec_refs_round_trip_through_catalogue_codec() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "ApplicationService": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "spec_refs": [
+        { "file": "track/items/example/spec.json", "anchor": "AC-01" }
+      ],
+      "methods": [
+        {
+          "name": "save",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "spec_refs": [
+            { "file": "track/items/example/spec.json", "anchor": "AC-01" }
+          ]
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let method = &doc.traits().values().next().unwrap().methods()[0];
+        assert_eq!(method.spec_refs().len(), 1);
+        assert_eq!(method.spec_refs()[0].anchor.as_ref(), "AC-01");
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let encoded_json = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();
+        let method_json = &encoded_json["traits"]["ApplicationService"]["methods"][0];
+        assert_eq!(method_json["spec_refs"][0]["anchor"], "AC-01");
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, decoded);
+    }
+
+    #[test]
+    fn test_existing_catalogue_without_method_level_spec_refs_remains_compatible() {
+        // Existing catalogues predate method-level grounding. Their omitted
+        // method `spec_refs` must decode as empty and remain round-trippable.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "LegacyPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Value"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let entry = doc.traits().get(&TraitName::new("LegacyPort").unwrap()).unwrap();
+        assert!(entry.spec_refs().is_empty());
+        assert_eq!(entry.methods().len(), 1);
+        assert!(entry.methods()[0].spec_refs().is_empty());
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let encoded_json = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();
+        assert!(
+            encoded_json["traits"]["LegacyPort"]["methods"][0].get("spec_refs").is_none(),
+            "empty method-level spec_refs should remain omitted for compatibility"
+        );
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, decoded);
+        assert_eq!(entry.methods()[0].action(), ItemAction::Add);
+    }
+
+    #[test]
+    fn test_method_action_omitted_decodes_as_add() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "LegacyPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Value"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let method =
+            &doc.traits().get(&TraitName::new("LegacyPort").unwrap()).unwrap().methods()[0];
+        assert_eq!(method.action(), ItemAction::Add);
+    }
+
+    #[test]
+    fn test_method_action_round_trip_independent_of_entry_action() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "usecase",
+  "layer": "usecase",
+  "types": {},
+  "traits": {
+    "ApplicationService": {
+      "action": "modify",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "save",
+          "receiver": "&self",
+          "params": [],
+          "returns": "()",
+          "action": "reference"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
+        let entry = doc.traits().values().next().unwrap();
+        assert_eq!(entry.action(), ItemAction::Modify);
+        assert_eq!(entry.methods()[0].action(), ItemAction::Reference);
+
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let encoded_json = serde_json::from_str::<serde_json::Value>(&encoded).unwrap();
+        assert_eq!(encoded_json["traits"]["ApplicationService"]["action"], "modify");
+        assert_eq!(
+            encoded_json["traits"]["ApplicationService"]["methods"][0]["action"],
+            "reference"
+        );
+
+        let decoded = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
+        assert_eq!(doc, decoded);
+    }
+
+    #[test]
+    fn test_method_action_invalid_value_returns_decode_error() {
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "LegacyPort": {
+      "action": "add",
+      "role": { "SpecificationPort": {} },
+      "methods": [
+        {
+          "name": "value",
+          "receiver": "&self",
+          "params": [],
+          "returns": "Value",
+          "action": "archive"
+        }
+      ]
+    }
+  },
+  "functions": {}
+}"#;
+
+        let result = CatalogueDocumentCodec::decode(json, "domain");
+        assert!(
+            matches!(result, Err(CatalogueDocumentCodecError::InvalidEntry { .. })),
+            "invalid method action must fail closed: {result:?}"
         );
     }
 
@@ -1959,19 +3016,19 @@ mod tests {
             .unwrap();
         let trait_entry = doc.traits().values().next().unwrap();
         let required =
-            trait_entry.methods().iter().find(|m| m.name.as_str() == "required").unwrap();
-        assert!(!required.has_default_impl, "omitted has_default_impl must default to false");
+            trait_entry.methods().iter().find(|m| m.name().as_str() == "required").unwrap();
+        assert!(!required.has_default_impl(), "omitted has_default_impl must default to false");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
         assert_eq!(doc, doc2);
         let trait_entry = doc2.traits().values().next().unwrap();
         let required =
-            trait_entry.methods().iter().find(|m| m.name.as_str() == "required").unwrap();
+            trait_entry.methods().iter().find(|m| m.name().as_str() == "required").unwrap();
         let provided =
-            trait_entry.methods().iter().find(|m| m.name.as_str() == "provided").unwrap();
-        assert!(!required.has_default_impl);
-        assert!(provided.has_default_impl);
+            trait_entry.methods().iter().find(|m| m.name().as_str() == "provided").unwrap();
+        assert!(!required.has_default_impl());
+        assert!(provided.has_default_impl());
     }
 
     #[test]
@@ -2177,11 +3234,11 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let entry = doc.traits().values().next().unwrap();
         let method = &entry.methods()[0];
-        assert_eq!(method.where_predicates.len(), 1);
-        assert_eq!(method.where_predicates[0].lhs.as_str(), "T");
-        assert_eq!(method.where_predicates[0].rhs.len(), 2);
-        assert_eq!(method.where_predicates[0].rhs[0].as_str(), "Clone");
-        assert_eq!(method.where_predicates[0].rhs[1].as_str(), "Send");
+        assert_eq!(method.where_predicates().len(), 1);
+        assert_eq!(method.where_predicates()[0].lhs.as_str(), "T");
+        assert_eq!(method.where_predicates()[0].rhs.len(), 2);
+        assert_eq!(method.where_predicates()[0].rhs[0].as_str(), "Clone");
+        assert_eq!(method.where_predicates()[0].rhs[1].as_str(), "Send");
 
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "usecase").unwrap();
@@ -2257,8 +3314,8 @@ mod tests {
         use domain::tddd::catalogue_v2::methods::BoundOp;
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let method = &doc.traits().values().next().unwrap().methods()[0];
-        assert_eq!(method.where_predicates.len(), 1, "expected 1 where predicate");
-        let pred = &method.where_predicates[0];
+        assert_eq!(method.where_predicates().len(), 1, "expected 1 where predicate");
+        let pred = &method.where_predicates()[0];
         assert_eq!(pred.lhs.as_str(), "T", "legacy `type` field maps to `lhs`");
         assert_eq!(pred.rhs.len(), 2, "legacy `bounds` field maps to `rhs`");
         assert_eq!(pred.rhs[0].as_str(), "Clone");
@@ -2333,7 +3390,7 @@ mod tests {
         let doc = CatalogueDocumentCodec::decode(json, "usecase").unwrap();
         let method = &doc.traits().values().next().unwrap().methods()[0];
         assert!(
-            method.where_predicates.is_empty(),
+            method.where_predicates().is_empty(),
             "omitted where_predicates must default to empty Vec"
         );
     }
@@ -2576,7 +3633,7 @@ mod tests {
         assert_eq!(doc.inherent_impls().len(), 1);
         assert_eq!(doc.inherent_impls()[0].type_name.as_str(), "Email");
         assert_eq!(doc.inherent_impls()[0].methods.len(), 1);
-        assert_eq!(doc.inherent_impls()[0].methods[0].name.as_str(), "as_str");
+        assert_eq!(doc.inherent_impls()[0].methods[0].name().as_str(), "as_str");
     }
 
     #[test]
@@ -2627,8 +3684,8 @@ mod tests {
         assert_eq!(doc.inherent_impls().len(), 2, "two impl blocks must be decoded as two entries");
         assert_eq!(doc.inherent_impls()[0].type_name.as_str(), "Email");
         assert_eq!(doc.inherent_impls()[1].type_name.as_str(), "Email");
-        assert_eq!(doc.inherent_impls()[0].methods[0].name.as_str(), "as_str");
-        assert_eq!(doc.inherent_impls()[1].methods[0].name.as_str(), "validate");
+        assert_eq!(doc.inherent_impls()[0].methods[0].name().as_str(), "as_str");
+        assert_eq!(doc.inherent_impls()[1].methods[0].name().as_str(), "validate");
     }
 
     #[test]
@@ -2665,6 +3722,65 @@ mod tests {
         let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
         let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
         assert_eq!(doc, doc2, "round-trip must preserve inherent_impl with generics");
+    }
+
+    #[test]
+    fn test_trait_with_maybe_const_bound_is_rejected() {
+        // `~const` requires the unstable `const_trait_impl` feature, so no
+        // stable compiler-validated rustdoc output can carry it; the parent's
+        // syn-parse rejection is restored for non-alias entries too.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {
+    "MaybeConstTrait": {
+      "action": "add",
+      "role": { "SecondaryPort": {} },
+      "generics": [{ "name": "type", "bounds": [] }, { "name": "T", "bounds": ["~const Clone"] }],
+      "methods": []
+    }
+  },
+  "functions": {}
+}"#;
+        assert!(
+            CatalogueDocumentCodec::decode(json, "domain").is_err(),
+            "a `~const` bound must fail at decode (unstable const_trait_impl)"
+        );
+    }
+
+    #[test]
+    fn test_inherent_method_with_keyword_enclosing_generic_decodes() {
+        // Impl generics keep the parent's shape-only name validation for
+        // non-alias entries (spec OUT-01); only alias validation rejects
+        // keyword generic names.
+        let json = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {},
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "type_name": "Container",
+      "impl_generics": [{ "name": "type", "bounds": [] }],
+      "methods": [
+        {
+          "name": "get",
+          "returns": "u8"
+        }
+      ]
+    }
+  ]
+}"#;
+        let doc = CatalogueDocumentCodec::decode(json, "domain").unwrap();
+        let impl_block = &doc.inherent_impls()[0];
+        assert_eq!(impl_block.impl_generics[0].name.as_str(), "type");
+        let encoded = CatalogueDocumentCodec::encode(&doc).unwrap();
+        let doc2 = CatalogueDocumentCodec::decode(&encoded, "domain").unwrap();
+        assert_eq!(doc, doc2, "keyword impl generic must round-trip for non-alias entries");
     }
 
     #[test]

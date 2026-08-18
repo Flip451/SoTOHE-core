@@ -1,0 +1,512 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CapturedStreamOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapturedStreamOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapturedStreamOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapturedStreamOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapturedProgramOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramRunOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ProgramExecutionRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "delete",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "delete",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "delete",
+      "for_type": "ProgramOutputStream",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "FailedProgramExecutionRecord",
+      "trait_ref": "core::convert::AsRef<ProgramExecutionRecord>"
+    },
+    {
+      "action": "reference",
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SuccessfulProgramExecutionRecord",
+      "trait_ref": "core::convert::AsRef<ProgramExecutionRecord>"
+    }
+  ],
+  "traits": {
+    "ProgramRunnerPort": {
+      "action": "reference",
+      "docs": "Baseline-identical diagnostic execution port carried to expose the unchanged adapter edge while IN-02, CN-01, and AC-02 change the returned outcome structure and implementation behavior.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run",
+          "params": [
+            {
+              "name": "invocation",
+              "ty": "ProgramInvocation"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ProgramRunOutcome, ProgramRunnerError>"
+        }
+      ],
+      "module_path": "program_runner",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ReviewFixRunner": {
+      "action": "reference",
+      "docs": "Baseline-identical review-fix execution port, carried so the infrastructure adapter edge remains visible while diagnostic capture changes internally.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "run_fix",
+          "params": [
+            {
+              "name": "command",
+              "ty": "RunReviewFixCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<RunReviewFixOutput, ReviewFixRunnerError>"
+        }
+      ],
+      "module_path": "review_v2::run_review_fix",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CapturedProgramOutput": {
+      "action": "modify",
+      "docs": "Modified application-boundary output DTO entry; see IN-02, CN-01, and AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "CapturedStreamOutput"
+            },
+            {
+              "name": "stderr",
+              "ty": "CapturedStreamOutput"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    },
+    "CapturedStreamOutput": {
+      "action": "add",
+      "docs": "Added application-boundary diagnostic stream DTO; each Vec<u8> payload is opaque child-process output with no finer domain concept or text-validity invariant; see IN-02, CN-01, and AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Complete",
+            "payload": {
+              "fields": [
+                "Vec<u8>"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TruncatedTail",
+            "payload": {
+              "fields": [
+                "Vec<u8>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    },
+    "FailedProgramExecutionRecord": {
+      "action": "reference",
+      "docs": "Baseline-identical non-success execution-record wrapper carried with its complete AsRef and derive impl set for execution-record contract closure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    },
+    "ProgramExecutionRecord": {
+      "action": "reference",
+      "docs": "Baseline-identical execution-record DTO carried because its unchanged outcome field points to the separately modified ProgramRunOutcome contract.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "sequence_index",
+              "ty": "CommandSequenceIndex"
+            },
+            {
+              "name": "command",
+              "ty": "ConfiguredCommand"
+            },
+            {
+              "name": "invoked_argv",
+              "ty": "CommandArgv"
+            },
+            {
+              "name": "outcome",
+              "ty": "ProgramRunOutcome"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "classify",
+          "params": [],
+          "receiver": "self",
+          "returns": "ClassifiedProgramExecutionRecord"
+        }
+      ],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    },
+    "ProgramOutputStream": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "program_runner",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    },
+    "ProgramRunOutcome": {
+      "action": "modify",
+      "docs": "Modified program-run outcome DTO entry; see IN-02, CN-01, and AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Exited",
+            "payload": {
+              "fields": [
+                {
+                  "name": "exit_code",
+                  "ty": "ProgramExitCode"
+                },
+                {
+                  "name": "output",
+                  "ty": "CapturedProgramOutput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TimedOut",
+            "payload": {
+              "fields": [
+                {
+                  "name": "output",
+                  "ty": "CapturedProgramOutput"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    },
+    "SuccessfulProgramExecutionRecord": {
+      "action": "reference",
+      "docs": "Baseline-identical successful execution-record wrapper carried with its complete AsRef and derive impl set for execution-record contract closure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "program_runner",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        }
+      ]
+    }
+  }
+}

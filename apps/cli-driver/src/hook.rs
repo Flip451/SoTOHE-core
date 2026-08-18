@@ -5,10 +5,11 @@
 //! `HookDriver` holds injected use-case interactors and exposes
 //! `handle(input) -> CommandOutcome`.
 //!
-//! Stdin reading and Claude Code hook JSON envelope parsing are performed at
-//! this driver boundary (CN-02): the driver owns I/O and converts the raw
-//! envelope into [`usecase::hook_dispatch::HookDispatchCommand`] before calling
-//! the usecase layer.
+//! Stdin reading and provider hook JSON envelope parsing are performed at this
+//! driver boundary (CN-02): the driver owns I/O, normalizes Claude and Grok
+//! envelopes, and converts the result into
+//! [`usecase::hook_dispatch::HookDispatchCommand`] before calling the usecase
+//! layer.
 //!
 //! JSON parsing uses [`serde_json::Value`] directly (no derive macros) because
 //! `cli_driver` does not carry `serde` as a direct dependency. Only `serde_json`
@@ -97,6 +98,7 @@ fn is_git_process_hook(hook_name: &str) -> bool {
 enum HookParseError {
     InvalidJson(String),
     MissingField(String),
+    Unmappable(String),
 }
 
 impl std::fmt::Display for HookParseError {
@@ -104,11 +106,12 @@ impl std::fmt::Display for HookParseError {
         match self {
             Self::InvalidJson(msg) => write!(f, "{msg}"),
             Self::MissingField(msg) => write!(f, "{msg}"),
+            Self::Unmappable(msg) => write!(f, "{msg}"),
         }
     }
 }
 
-/// Parsed data from a Claude Code PreToolUse hook JSON envelope.
+/// Parsed and provider-normalized data from a PreToolUse hook JSON envelope.
 struct ParsedHookEnvelope {
     tool_name: String,
     command: Option<String>,
@@ -116,13 +119,34 @@ struct ParsedHookEnvelope {
     content: Option<String>,
 }
 
-/// Parse a Claude Code PreToolUse hook JSON envelope from `raw`.
+/// Parse a Claude Code or Grok PreToolUse hook JSON envelope from `raw`.
 ///
-/// Returns `Err(HookParseError)` when `tool_name` is missing or the JSON is invalid.
+/// Claude uses snake-case `tool_name` / `tool_input`; Grok uses camel-case
+/// `toolName` / `toolInput` and provider-specific tool identifiers. Grok input
+/// is normalized here to the tool names and fields consumed by the existing
+/// Claude-oriented hook handlers.
+///
+/// Returns `Err(HookParseError)` when the JSON is invalid, required fields are
+/// missing, or a Grok envelope cannot be mapped to the existing contract.
 fn parse_hook_envelope(raw: &str) -> Result<ParsedHookEnvelope, HookParseError> {
     let value: serde_json::Value = serde_json::from_str(raw)
         .map_err(|e| HookParseError::InvalidJson(format!("failed to parse hook JSON: {e}")))?;
 
+    match (value.get("tool_name"), value.get("toolName")) {
+        (Some(_), Some(_)) => Err(HookParseError::Unmappable(
+            "hook JSON contains both Claude 'tool_name' and Grok 'toolName' fields".to_owned(),
+        )),
+        (Some(_), None) => parse_claude_hook_envelope(&value),
+        (None, Some(_)) => parse_grok_hook_envelope(&value),
+        (None, None) => Err(HookParseError::MissingField(
+            "hook JSON missing required field 'tool_name'".to_owned(),
+        )),
+    }
+}
+
+fn parse_claude_hook_envelope(
+    value: &serde_json::Value,
+) -> Result<ParsedHookEnvelope, HookParseError> {
     let tool_name = value
         .get("tool_name")
         .and_then(|v| v.as_str())
@@ -142,6 +166,81 @@ fn parse_hook_envelope(raw: &str) -> Result<ParsedHookEnvelope, HookParseError> 
     let content = tool_input.and_then(|ti| ti.get("content")).and_then(flatten_content_text);
 
     Ok(ParsedHookEnvelope { tool_name, command, file_path, content })
+}
+
+/// Normalize a Grok hook envelope to the existing Claude hook-handler fields.
+///
+/// Grok's terminal tool is equivalent to Claude's `Bash` input. Its
+/// `search_replace` tool is represented by the existing `Write` contract so
+/// the test-file guard can inspect the target path and replacement content;
+/// an empty replacement therefore remains fail-closed for test files.
+fn parse_grok_hook_envelope(
+    value: &serde_json::Value,
+) -> Result<ParsedHookEnvelope, HookParseError> {
+    let tool_name =
+        value.get("toolName").and_then(|v| v.as_str()).filter(|name| !name.is_empty()).ok_or_else(
+            || {
+                HookParseError::MissingField(
+                    "Grok hook JSON missing required field 'toolName'".to_owned(),
+                )
+            },
+        )?;
+
+    let tool_input =
+        value.get("toolInput").and_then(|input| input.as_object()).ok_or_else(|| {
+            HookParseError::Unmappable(
+                "Grok hook JSON field 'toolInput' must be an object".to_owned(),
+            )
+        })?;
+
+    match tool_name {
+        "run_terminal_command" => {
+            let command = required_grok_string(tool_input, tool_name, "command", false)?;
+            Ok(ParsedHookEnvelope {
+                tool_name: "Bash".to_owned(),
+                command: Some(command),
+                file_path: None,
+                content: None,
+            })
+        }
+        "search_replace" => {
+            let file_path = required_grok_string(tool_input, tool_name, "file_path", false)?;
+            // Validate the complete search-replace shape even though the
+            // existing Write contract only needs the resulting content.
+            let _old_string = required_grok_string(tool_input, tool_name, "old_string", true)?;
+            let new_string = required_grok_string(tool_input, tool_name, "new_string", true)?;
+            Ok(ParsedHookEnvelope {
+                tool_name: "Write".to_owned(),
+                command: None,
+                file_path: Some(PathBuf::from(file_path)),
+                content: Some(new_string),
+            })
+        }
+        other => Err(HookParseError::Unmappable(format!(
+            "Grok hook tool '{other}' cannot be mapped to the Claude hook contract"
+        ))),
+    }
+}
+
+fn required_grok_string(
+    tool_input: &serde_json::Map<String, serde_json::Value>,
+    tool_name: &str,
+    field: &str,
+    allow_empty: bool,
+) -> Result<String, HookParseError> {
+    let value = tool_input.get(field).and_then(|value| value.as_str()).ok_or_else(|| {
+        HookParseError::Unmappable(format!(
+            "Grok hook tool '{tool_name}' requires string field 'toolInput.{field}'"
+        ))
+    })?;
+
+    if !allow_empty && value.is_empty() {
+        return Err(HookParseError::Unmappable(format!(
+            "Grok hook tool '{tool_name}' requires non-empty field 'toolInput.{field}'"
+        )));
+    }
+
+    Ok(value.to_owned())
 }
 
 /// Flatten a JSON content value (string, array of blocks, or object) into a plain string.
@@ -337,5 +436,121 @@ fn make_hook_error(is_post_tool_use: bool, message: &str) -> CommandOutcome {
     } else {
         // PreToolUse: exit 2 (fail-closed)
         CommandOutcome { stdout: None, stderr: Some(format!("error: {message}")), exit_code: 2 }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    use std::sync::Arc;
+
+    use usecase::hook_dispatch::{
+        HookDispatchCommand, HookDispatchError, HookDispatchService, HookVerdictOutput,
+    };
+
+    use super::{
+        HookDriver, HookInput, HookName, HookParseError, make_hook_error, parse_hook_envelope,
+    };
+
+    #[test]
+    fn test_parse_hook_envelope_grok_camel_case_terminal_input_maps_to_bash() {
+        let result = parse_hook_envelope(
+            r#"{"toolName":"run_terminal_command","toolInput":{"command":"git status"}}"#,
+        );
+
+        match result {
+            Ok(parsed) => {
+                assert_eq!(parsed.tool_name, "Bash");
+                assert_eq!(parsed.command.as_deref(), Some("git status"));
+                assert!(parsed.file_path.is_none());
+                assert!(parsed.content.is_none());
+            }
+            Err(error) => panic!("unexpected parse error: {error}"),
+        }
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_grok_search_replace_maps_to_write_contract() {
+        let result = parse_hook_envelope(
+            r#"{"toolName":"search_replace","toolInput":{"file_path":"tests/example.rs","old_string":"old","new_string":"new"}}"#,
+        );
+
+        match result {
+            Ok(parsed) => {
+                assert_eq!(parsed.tool_name, "Write");
+                assert!(parsed.command.is_none());
+                assert_eq!(
+                    parsed.file_path.as_deref().and_then(|path| path.to_str()),
+                    Some("tests/example.rs")
+                );
+                assert_eq!(parsed.content.as_deref(), Some("new"));
+            }
+            Err(error) => panic!("unexpected parse error: {error}"),
+        }
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_grok_unknown_tool_fails_closed() {
+        let result = parse_hook_envelope(
+            r#"{"toolName":"unknown_tool","toolInput":{"command":"git status"}}"#,
+        );
+
+        assert!(matches!(
+            result,
+            Err(HookParseError::Unmappable(message))
+                if message.contains("cannot be mapped")
+        ));
+    }
+
+    #[test]
+    fn test_parse_hook_envelope_grok_missing_input_fails_closed() {
+        let result = parse_hook_envelope(r#"{"toolName":"run_terminal_command"}"#);
+
+        assert!(matches!(
+            result,
+            Err(HookParseError::Unmappable(message))
+                if message.contains("toolInput")
+        ));
+    }
+
+    #[test]
+    fn test_hook_driver_non_git_arguments_returns_fail_closed_command_outcome() {
+        let driver = HookDriver::new(Arc::new(RecordingHookService));
+        let outcome = driver.handle(HookInput::Dispatch {
+            hook: HookName::BlockDirectGitOps,
+            git_hook_args: vec!["unexpected".to_owned()],
+        });
+
+        assert_eq!(outcome.exit_code, 2);
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some("extra hook arguments are only supported for git process hooks")
+        );
+        assert!(outcome.stdout.is_none());
+    }
+
+    #[test]
+    fn test_make_hook_error_unmappable_input_returns_fail_closed_command_outcome() {
+        let outcome = make_hook_error(false, "unmappable Grok hook input");
+
+        assert_eq!(outcome.exit_code, 2);
+        assert_eq!(outcome.stderr.as_deref(), Some("error: unmappable Grok hook input"));
+        assert!(outcome.stdout.is_none());
+    }
+
+    struct RecordingHookService;
+
+    impl HookDispatchService for RecordingHookService {
+        fn dispatch(
+            &self,
+            _hook_name: String,
+            _command: HookDispatchCommand,
+        ) -> Result<HookVerdictOutput, HookDispatchError> {
+            Err(HookDispatchError::UnknownHookName("test".to_owned()))
+        }
+
+        fn check_skill_compliance(&self, _prompt: &str) -> Option<String> {
+            None
+        }
     }
 }

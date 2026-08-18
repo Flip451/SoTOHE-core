@@ -73,6 +73,17 @@ Report findings ONLY for the following categories:
 - **scope leakage into ADR body**: the ADR claims to decide X but the body
   inadvertently constrains downstream Y (e.g., a decision about "review scope" silently
   prescribes a CI gate that belongs in a separate ADR).
+- **unresolved open-set commitment**: a `### Dn` decision whose text commits to
+  exact enumeration, complete tracking, or a universally quantified obligation
+  （「正確な列挙」「完全な追跡」「すべての X を Y する」型の意味論） without the
+  decision text or its Consequences recording which resolution was chosen:
+  (a) delegation to an existing authority (compiler, cargo, rustdoc, git, or a
+  domain type), (b) a conservative over-approximation, or (c) a strict
+  implementation with an acknowledged depth estimate. Such a phrase silently
+  expands into unbounded implementation depth and non-converging reviews; the
+  fix is recording one of the three resolutions, not deleting the decision.
+  A decision that merely quotes open-set phrasing to describe or reject it is
+  not reportable.
 
 ## What NOT to report
 

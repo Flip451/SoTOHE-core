@@ -13,16 +13,20 @@
 
 pub mod archived_track;
 pub mod config;
+pub mod context;
 pub mod report;
 pub mod report_adapter;
+pub mod review_yield;
 pub mod writer;
 
 pub use config::TelemetryConfig;
+pub use context::resolve_telemetry_track_id;
 pub use report::{
     PhaseDurationSummary, TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryReport,
-    TelemetryReportError, TelemetryReportOutput,
+    TelemetryReportError, TelemetryReportSnapshot,
 };
-pub use report_adapter::FsTelemetryReportAdapter;
+pub use report_adapter::{FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter};
+pub use review_yield::StructuredReviewRoundDto;
 pub use writer::TelemetryWriter;
 
 use serde::{Deserialize, Serialize};
@@ -36,17 +40,11 @@ use thiserror::Error;
 /// `track/items/<id>/logs/telemetry.jsonl`.
 ///
 /// Each variant carries the event-specific fields plus a per-line
-/// `schema_version` field (IN-08, CN-09).  All categorical `String` fields
-/// (`command`, `gate_name`, `provider`, `model`, `hook_name`, `error_chain`,
-/// `timestamp`, `verdict`, `round_type`) are free-form log labels or opaque
-/// values — not domain-constrained.
-///
-/// `round_type` carries `"fast"` or `"final"` as a lowercase string rather
-/// than an enum to keep the serde DTO self-contained at the JSONL boundary and
-/// avoid coupling to `agent_profiles::RoundType` which lacks serde derives.
-/// `track_id` is recorded as a plain `String` for the same DTO-boundary reason.
+/// `schema_version` field (IN-08, CN-09). Legacy event payloads retain their
+/// existing wire scalars. Structured review-round values are carried by the
+/// typed serde-boundary [`StructuredReviewRoundDto`].
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(tag = "event_type")]
+#[serde(tag = "event_type", deny_unknown_fields)]
 pub enum TelemetryEvent {
     /// A track operation subcommand completed (IN-03 / AC-02).
     TrackSubcommand {
@@ -82,23 +80,16 @@ pub enum TelemetryEvent {
         timestamp: String,
     },
 
-    /// A review or dry-check round completed (IN-03 / AC-03).
+    /// A structured local review round completed (IN-01 / AC-01 / AC-03).
     ReviewRound {
         /// Per-line schema version (CN-09 / AC-09).
         schema_version: u32,
         /// Track identifier.
         track_id: String,
-        /// Reviewer provider name, e.g. `"codex"` or `"claude"`.
-        provider: String,
-        /// Model identifier used for the round.
-        model: String,
-        /// `"fast"` or `"final"` as a lowercase string (catalogue-declared as
-        /// `String` to avoid coupling to `agent_profiles::RoundType`).
-        round_type: String,
+        /// Resolved structured-review scope and assignment values.
+        round: StructuredReviewRoundDto,
         /// Wall-clock duration in milliseconds.
         duration_ms: u64,
-        /// Number of findings emitted by the reviewer.
-        findings_count: u32,
         /// ISO-8601 timestamp of the event.
         timestamp: String,
     },
@@ -304,46 +295,85 @@ mod tests {
         );
     }
 
-    // --- TelemetryEvent::ReviewRound (round_type as String) ---
+    // --- TelemetryEvent::ReviewRound ---
 
-    fn assert_review_round_type_round_trips_as_string(
-        round_type: &str,
-        duration_ms: u64,
-        findings_count: u32,
-    ) {
+    fn sample_structured_review_round(findings_count: u32) -> StructuredReviewRoundDto {
+        let assignment = usecase::review_v2::ResolvedReviewerAssignment::new(
+            domain::TrackId::try_new("telemetry-test").unwrap(),
+            domain::review_v2::ScopeName::parse("application").unwrap(),
+            usecase::capability_exec::ProviderName::try_new("codex").unwrap(),
+            usecase::capability_exec::ModelName::try_new("gpt-5.4-mini").unwrap(),
+            usecase::capability_exec::ReasoningEffort::High,
+        );
+        StructuredReviewRoundDto::new(
+            &assignment,
+            domain::review_v2::RoundType::Final,
+            usecase::telemetry::review_yield::ReviewFindingCount::new(findings_count),
+        )
+    }
+
+    #[test]
+    fn test_review_round_serde_round_trip_persists_structured_assignment() {
         let event = TelemetryEvent::ReviewRound {
             schema_version: 1,
             track_id: "t".to_string(),
-            provider: "codex".to_string(),
-            model: "o4-mini".to_string(),
-            round_type: round_type.to_string(),
-            duration_ms,
-            findings_count,
+            round: sample_structured_review_round(2),
+            duration_ms: 3_000,
             timestamp: "2026-06-10T00:00:00Z".to_string(),
         };
 
-        let json = serde_json::to_string(&event).unwrap();
-        assert!(
-            json.contains(&format!("\"{round_type}\"")),
-            "round_type '{round_type}' must serialize as a string; got: {json}"
-        );
+        let value = serde_json::to_value(&event).unwrap();
+        assert_eq!(value.get("event_type").unwrap(), "ReviewRound");
+        assert_eq!(value.get("schema_version").unwrap(), 1);
+        assert_eq!(value.get("track_id").unwrap(), "t");
+        let round = value.get("round").unwrap();
+        assert_eq!(round.get("scope").unwrap(), "application");
+        assert_eq!(round.get("round_type").unwrap(), "final");
+        assert_eq!(round.get("provider").unwrap(), "codex");
+        assert_eq!(round.get("model").unwrap(), "gpt-5.4-mini");
+        assert_eq!(round.get("reasoning_effort").unwrap(), "high");
+        assert_eq!(round.get("findings_count").unwrap(), 2);
+        assert_eq!(value.get("duration_ms").unwrap(), 3_000);
 
-        let decoded: TelemetryEvent = serde_json::from_str(&json).unwrap();
-        if let TelemetryEvent::ReviewRound { round_type: decoded_round_type, .. } = decoded {
-            assert_eq!(decoded_round_type, round_type);
-        } else {
-            panic!("decoded to wrong variant");
+        let decoded: TelemetryEvent = serde_json::from_value(value).unwrap();
+        match decoded {
+            TelemetryEvent::ReviewRound { round, duration_ms, .. } => {
+                assert_eq!(round.scope().to_string(), "application");
+                assert_eq!(round.round_type(), domain::review_v2::RoundType::Final);
+                assert_eq!(round.provider().as_str(), "codex");
+                assert_eq!(round.model().as_str(), "gpt-5.4-mini");
+                assert_eq!(
+                    round.reasoning_effort(),
+                    usecase::capability_exec::ReasoningEffort::High
+                );
+                assert_eq!(round.findings_count().value(), 2);
+                assert_eq!(duration_ms, 3_000);
+            }
+            _ => panic!("decoded to wrong variant"),
         }
     }
 
     #[test]
-    fn test_review_round_round_type_fast_round_trips_as_string() {
-        assert_review_round_type_round_trips_as_string("fast", 3_000, 2);
-    }
+    fn test_review_round_deserialization_rejects_unknown_structured_field() {
+        let json = r#"{
+            "event_type":"ReviewRound",
+            "schema_version":1,
+            "track_id":"t",
+            "round":{
+                "scope":"application",
+                "round_type":"final",
+                "provider":"codex",
+                "model":"gpt-5.4-mini",
+                "reasoning_effort":"high",
+                "findings_count":0,
+                "unexpected":true
+            },
+            "duration_ms":4000,
+            "timestamp":"2026-06-10T00:00:00Z"
+        }"#;
 
-    #[test]
-    fn test_review_round_round_type_final_round_trips_as_string() {
-        assert_review_round_type_round_trips_as_string("final", 4_000, 0);
+        let result = serde_json::from_str::<TelemetryEvent>(json);
+        assert!(result.is_err(), "unknown structured fields must be rejected");
     }
 
     // --- TelemetryEvent: all other variants round-trip ---

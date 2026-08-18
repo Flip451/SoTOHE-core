@@ -1,0 +1,154 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ReviewCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityCompositionRoot": {
+      "action": "reference",
+    "docs": "Capability composition wiring point updated for this track; see the cited spec anchors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "discover",
+          "params": [],
+          "returns": "Result<Self, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capability_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::capability::CapabilityDriver"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    },
+    "ReviewCompositionRoot": {
+      "action": "reference",
+    "docs": "Review composition wiring point updated for this track; see the cited spec anchors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::review::ReviewDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_fix_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::review::ReviewFixDriver"
+        }
+      ],
+      "module_path": "review_v2::shim",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-grok-provider-binding/spec.json"
+        }
+      ]
+    }
+  }
+}

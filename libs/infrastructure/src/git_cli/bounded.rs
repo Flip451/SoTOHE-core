@@ -13,6 +13,7 @@ use std::time::{Duration, Instant};
 const BOUNDED_GIT_TIMEOUT: Duration = Duration::from_secs(10);
 const BOUNDED_GIT_POLL_INTERVAL: Duration = Duration::from_millis(10);
 const PROCESS_GROUP_KILL_TIMEOUT: Duration = Duration::from_secs(1);
+const PROCESS_GROUP_PROBE_OUTPUT_LIMIT: usize = 1024;
 
 /// Starts a command in a process group on Unix, so bounded cleanup can
 /// terminate it as a unit with descendants which inherited an output pipe.
@@ -210,7 +211,17 @@ pub(crate) fn terminate_bounded_git_child(child: &mut Child) -> std::io::Result<
     let reaping = reap_child_with_deadline(child, Instant::now());
     match (termination, reaping) {
         (Ok(()), Ok(())) => Ok(()),
-        (Err(error), Ok(())) | (Ok(()), Err(error)) => Err(error),
+        // A reaped leader whose group is already empty is fully cleaned up:
+        // group termination fails with "no such group" once every member is
+        // gone, so verify emptiness before treating the kill as a failure.
+        (Err(termination), Ok(())) => {
+            if process_group_is_empty(child)? {
+                Ok(())
+            } else {
+                Err(termination)
+            }
+        }
+        (Ok(()), Err(error)) => Err(error),
         (Err(termination), Err(reaping)) => Err(std::io::Error::new(
             termination.kind(),
             format!(
@@ -269,6 +280,47 @@ fn join_cleaned_readers<T>(error: std::io::Error, readers: Vec<PipeReader>) -> s
 fn configure_process_group(command: &mut Command) {
     use std::os::unix::process::CommandExt as _;
     command.process_group(0);
+}
+
+/// Probes whether the child's process group has no remaining members.
+///
+/// `kill -0` delivers no signal. Only its C-locale ESRCH diagnostic proves
+/// that the group is absent; permission and all other errors fail closed.
+#[cfg(unix)]
+fn process_group_is_empty(child: &Child) -> std::io::Result<bool> {
+    let process_group = format!("-{}", child.id());
+    let mut command = Command::new("/bin/kill");
+    command
+        .args(["-0", "--", process_group.as_str()])
+        .env("LC_ALL", "C")
+        .env("LANG", "C")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped());
+    let mut probe = command.spawn()?;
+    let stderr = probe
+        .stderr
+        .take()
+        .ok_or_else(|| std::io::Error::other("process-group probe stderr was not captured"))?;
+    let started = Instant::now();
+    let reader = spawn_bounded_pipe_reader(stderr, PROCESS_GROUP_PROBE_OUTPUT_LIMIT, started)?;
+    let status = wait_for_termination_command(probe)?;
+    let stderr = receive_bounded_pipe(&reader.receiver, started)?;
+    join_pipe_reader(reader)?;
+    if status.success() {
+        return Ok(false);
+    }
+    if stderr.ends_with(b": No such process\n") {
+        return Ok(true);
+    }
+    Err(std::io::Error::other("could not determine whether git process group remains"))
+}
+
+/// Non-unix builds have no process-group probe; report the group as non-empty
+/// so a failed group termination is never masked.
+#[cfg(not(unix))]
+fn process_group_is_empty(_child: &Child) -> std::io::Result<bool> {
+    Ok(false)
 }
 
 #[cfg(unix)]
@@ -466,9 +518,10 @@ mod tests {
             std::thread::sleep(std::time::Duration::from_millis(10));
         }
 
-        let error = terminate_bounded_git_child(&mut child)
-            .expect_err("the absent child-ID process group cannot be signalled");
-        assert_eq!(error.kind(), std::io::ErrorKind::Other);
+        terminate_bounded_git_child(&mut child).expect(
+            "an exited child with an already-empty process group is fully cleaned up: the \
+             failed group signal must not surface once the leader is reaped",
+        );
         assert!(
             !std::path::Path::new(&process_path).exists(),
             "cleanup must reap the exited direct child even when group termination failed"

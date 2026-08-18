@@ -2,19 +2,36 @@
 //!
 //! Implements usecase and domain port traits using git CLI and filesystem I/O.
 
+pub mod check_zero_findings;
+mod claude_process;
 pub mod claude_reviewer;
+mod codex_process;
 pub mod codex_reviewer;
 pub mod diff_getter;
+pub mod grok_reviewer;
 pub mod hasher;
 pub mod persistence;
+pub mod results;
+pub mod review_fix_adapter;
+pub(crate) mod review_fix_briefing;
+mod review_fix_grok;
 pub mod review_fix_runner;
+pub mod review_yield;
 pub mod scope_config_loader;
 mod session;
 
+pub use check_zero_findings::ReviewCheckZeroFindingsStateAdapter;
+pub(crate) use check_zero_findings::resolve_review_diff_base;
 pub use claude_reviewer::ClaudeReviewer;
 pub use codex_reviewer::CodexReviewer;
 pub use diff_getter::GitDiffGetter;
+pub(crate) use diff_getter::RootedGitDiffGetter;
+pub use grok_reviewer::GrokReviewer;
+pub(crate) use hasher::RootedSystemReviewHasher;
 pub use hasher::SystemReviewHasher;
 pub use persistence::{FsCommitHashStore, FsReviewStore};
+pub use results::{ResultsRoundAdapter, ResultsScopeAdapter, ResultsStateAdapter};
+pub use review_fix_adapter::{GitReviewFixTrackResolver, ReviewFixRunnerAdapter};
 pub use review_fix_runner::CodexReviewFixRunner;
+pub use review_yield::ReviewYieldRecordingReviewer;
 pub use scope_config_loader::load_v2_scope_config;

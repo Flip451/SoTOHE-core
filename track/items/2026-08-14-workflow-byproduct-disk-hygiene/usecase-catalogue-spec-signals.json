@@ -1,0 +1,11 @@
+{
+  "catalogue_declaration_hash": "93dedc6e94ed8b615bab2bcb30439d283b4d42214ab9327ac880a9e45a73b2b7",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "signal": "blue",
+      "type_name": "ScopeDiffMeasurePort"
+    }
+  ]
+}

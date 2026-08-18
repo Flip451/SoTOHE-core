@@ -1,0 +1,1369 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "usecase::operator_command::CommandDeclarationId"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_declaration_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&usecase::operator_command::CommandDeclarationId"
+        }
+      ],
+      "type_name": "PhaseIdArg"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn usecase::phase_command::PhaseCommandService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "PhaseCommandInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "PhaseCommandDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::ref_verify::RefVerifyAggregateService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "RefVerifyInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "RefVerifyDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "round",
+              "ty": "ReviewCheckRoundSelect"
+            }
+          ],
+          "returns": "Result<Self, usecase::review_v2::ReviewCheckZeroFindingsValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_query",
+          "params": [],
+          "receiver": "self",
+          "returns": "usecase::review_v2::ReviewCheckZeroFindingsQuery"
+        }
+      ],
+      "type_name": "ReviewCheckZeroFindingsInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "scope",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "all",
+              "ty": "bool"
+            },
+            {
+              "name": "limit",
+              "ty": "u32"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "no_hint",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<Self, usecase::review_v2::review_aux::ReviewScopeSelectionValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(Option<String>, std::path::PathBuf, usecase::review_v2::review_aux::ReviewScopeSelectionRequest, u32, String, bool)"
+        }
+      ],
+      "type_name": "ReviewResultsInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "scope",
+              "ty": "String"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "explicit_track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "model",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(String, std::path::PathBuf, Option<String>, std::path::PathBuf, String, Option<String>)"
+        }
+      ],
+      "type_name": "ReviewFixInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::run_review_fix::RunReviewFixService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewFixInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ReviewFixDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewService>"
+            },
+            {
+              "name": "results",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewResultsService>"
+            },
+            {
+              "name": "check_zero_findings",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewCheckZeroFindingsService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ReviewDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommandOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CommandOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseIdArg",
+      "trait_ref": "core::str::FromStr"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCommandDriver",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyCheckApprovedInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyCheckApprovedInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyChainSelect",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ReviewCheckRoundSelect",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ReviewCheckZeroFindingsInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewResultsInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewResultsInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ReviewFixInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ReviewFixInput",
+      "trait_ref": "core::clone::Clone"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityDriver": {
+      "action": "reference",
+      "docs": "Pre-existing capability primary adapter carried for revised input edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::capability_exec::CapabilityExecService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CapabilityExecDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecDriverInput": {
+      "action": "modify",
+      "docs": "Capability driver input with optional host field (IN-09, IN-10, AC-11, AC-12).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "Option<ProviderNameArg>"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePathArg"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<TimeoutSecondsArg>"
+            },
+            {
+              "name": "resume",
+              "ty": "CapabilityResumeArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CommandOutcome": {
+      "action": "reference",
+      "docs": "CLI render boundary carrying opaque stdout/stderr text and process exit status (IN-04, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "success",
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure",
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "render",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandDriver": {
+      "action": "add",
+      "docs": "Phase-command primary adapter rendering every service result into CommandOutcome (IN-04, AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCommandInput": {
+      "action": "add",
+      "docs": "Phase-command primary-adapter input with host-bearing Enter variant (IN-04, IN-11, AC-02, AC-03, AC-13).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Validate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "repository_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Explain",
+            "payload": {
+              "fields": [
+                {
+                  "name": "repository_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "phase_id",
+                  "ty": "PhaseIdArg"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Enter",
+            "payload": {
+              "fields": [
+                {
+                  "name": "repository_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "phase_id",
+                  "ty": "PhaseIdArg"
+                },
+                {
+                  "name": "host",
+                  "ty": "Option<ProviderNameArg>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseIdArg": {
+      "action": "add",
+      "docs": "CLI transport wrapper for a usecase-owned phase identifier (IN-04).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyChainSelect": {
+      "action": "reference",
+      "docs": "Shared ref-verify chain selector (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Chain1",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Chain2",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCheckApprovedInput": {
+      "action": "modify",
+      "docs": "Driver input for `ref-verify check-approved` (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "chain",
+              "ty": "RefVerifyChainSelect"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyDriver": {
+      "action": "reference",
+      "docs": "Primary ref-verify adapter injecting the aggregate application service and rendering typed inputs as command outcomes (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckRoundSelect": {
+      "action": "add",
+      "docs": "Clap-free driver-boundary mirror of `cli::commands::review::ReviewCheckRoundArg`; `cli::commands::review::execute_check_zero_findings` owns the exhaustive conversion (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Final",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCheckZeroFindingsInput": {
+      "action": "add",
+      "docs": "Check-zero-findings driver input (CN-08, CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewDriver": {
+      "action": "modify",
+      "docs": "Primary review adapter (CN-06, AC-16, IN-15, AC-18).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewService>"
+            },
+            {
+              "name": "results",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewResultsService>"
+            },
+            {
+              "name": "check_zero_findings",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::ReviewCheckZeroFindingsService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixDriver": {
+      "action": "modify",
+      "docs": "Review-fix primary adapter (CN-09, AC-19, IN-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::run_review_fix::RunReviewFixService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ReviewFixInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewFixInput": {
+      "action": "add",
+      "docs": "Raw CLI-spelling DTO for review-fix commands (IN-16, CN-09, AC-19).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            { "name": "scope", "ty": "String" },
+            { "name": "briefing_file", "ty": "std::path::PathBuf" },
+            { "name": "explicit_track_id", "ty": "Option<String>" },
+            { "name": "items_dir", "ty": "std::path::PathBuf" },
+            { "name": "round_type", "ty": "String" },
+            { "name": "model", "ty": "Option<String>" }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(String, std::path::PathBuf, Option<String>, std::path::PathBuf, String, Option<String>)"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewInput": {
+      "action": "modify",
+      "docs": "Review command-family driver input (CN-06, AC-16, IN-15, AC-18).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RunCodex",
+            "payload": {
+              "fields": [
+                "String",
+                "u64",
+                "Option<std::path::PathBuf>",
+                "Option<String>",
+                "Option<String>",
+                "String",
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RunClaude",
+            "payload": {
+              "fields": [
+                "String",
+                "u64",
+                "Option<std::path::PathBuf>",
+                "Option<String>",
+                "Option<String>",
+                "String",
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RunLocal",
+            "payload": {
+              "fields": [
+                "Option<String>",
+                "u64",
+                "Option<std::path::PathBuf>",
+                "Option<String>",
+                "Option<String>",
+                "String",
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "fields": [
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckZeroFindings",
+            "payload": {
+              "fields": [
+                "ReviewCheckZeroFindingsInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "fields": [
+                "ReviewResultsInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Classify",
+            "payload": {
+              "fields": [
+                "Vec<String>",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Files",
+            "payload": {
+              "fields": [
+                "String",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ValidateScope",
+            "payload": {
+              "fields": [
+                "String",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "GetBriefing",
+            "payload": {
+              "fields": [
+                "String",
+                "Option<String>",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PersistCommitHash",
+            "payload": {
+              "fields": [
+                "String",
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewResultsInput": {
+      "action": "add",
+      "docs": "Raw CLI-spelling DTO for review-results queries (IN-15, AC-18).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "scope",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "all",
+              "ty": "bool"
+            },
+            {
+              "name": "limit",
+              "ty": "u32"
+            },
+            {
+              "name": "round_type",
+              "ty": "String"
+            },
+            {
+              "name": "no_hint",
+              "ty": "bool"
+            }
+          ],
+          "returns": "Result<Self, usecase::review_v2::review_aux::ReviewScopeSelectionValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(Option<String>, std::path::PathBuf, usecase::review_v2::review_aux::ReviewScopeSelectionRequest, u32, String, bool)"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

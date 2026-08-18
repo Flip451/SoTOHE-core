@@ -5,6 +5,7 @@ pub mod fs_spec_file_loader;
 pub mod fs_store;
 pub mod fs_symlink_guard;
 pub mod gate_state;
+pub(crate) mod registry_lock;
 pub mod render;
 pub mod spec_element_hash;
 pub mod symlink_guard;

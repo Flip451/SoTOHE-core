@@ -1,0 +1,1709 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-14T04:55:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ff9a126339a5046851f7c131565ba548a68330bbdb58991b258730561433c221",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:58:15Z",
+          "findings": [
+            {
+              "category": "unresolved open-set commitment",
+              "file": "knowledge/adr/2026-08-14-0428-review-yield-measurement.md",
+              "line": 19,
+              "message": "D1 の「review 実行ごと」は全 review 実行の完全追跡を約束していますが、既存 authority への委譲、保守的な過近似、または深度見積もりを伴う厳密実装のいずれを採るか記録していません。対象入口が際限なく広がる open-set commitment です。いずれかの解決を選ぶ必要があるため hearing-required です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ff9a126339a5046851f7c131565ba548a68330bbdb58991b258730561433c221",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:23:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b5cf384017c2447d57af4e4620b7b5d6f2183cb274232736b27db962297d13",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:25:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:48b5cf384017c2447d57af4e4620b7b5d6f2183cb274232736b27db962297d13",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:28:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aa997438afbd391842c80d54984ecfae97c59f0358fef0c07e1eaaf0eb00bdbe",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:31:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:342b54eb565c768435801a2f397cff328416fa51d9674dd5b685b107a4da350b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:41:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:342b54eb565c768435801a2f397cff328416fa51d9674dd5b685b107a4da350b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:03:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:342b54eb565c768435801a2f397cff328416fa51d9674dd5b685b107a4da350b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:29:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:233c9389949e8ccdf384c8b6d8504bac8fe618e6eb7004183d7188d80e60823d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:29:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a0491ac731de5099536c22296bce03f9b909e6653d43638d1ca8b9b8dae6077b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:05:00Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 362,
+              "message": "`review_telemetry_for_outcome` returns telemetry with `findings_count = 0` for `CodexReviewOutcome::Skipped`, which represents an empty scope where no reviewer round ran. This unconditional emission therefore persists a `ReviewRound` for a non-executed round, inflating execution counts and depressing detection rates contrary to IN-01 and AC-03. Exclude `Skipped` outcomes from structured review-yield emission and add an empty-scope regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a0491ac731de5099536c22296bce03f9b909e6653d43638d1ca8b9b8dae6077b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:15:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62cae612d3c11fe35f0b04d21ab4ea730064efa2c59691a3567c0cf90885eeca",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:16:07Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 363,
+              "message": "`emit_subprocess` is also true for `CodexReviewOutcome::SubprocessFailed`, including timeouts, aborts, and illegal/unparseable verdicts where no structured result or finding count was produced. This branch therefore persists those failed attempts as completed `ReviewRound` records with zero findings, inflating execution counts and depressing detection rates. Emit yield telemetry only for completed rounds (or failures explicitly known to contain a successfully parsed verdict); retain `ExternalSubprocess` telemetry for the remaining failures and add a failure-path regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:62cae612d3c11fe35f0b04d21ab4ea730064efa2c59691a3567c0cf90885eeca",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:19:48Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 38,
+              "message": "`completed_review_round` rejects every `SubprocessFailed`, but that variant also represents failures after a valid structured verdict was produced, such as review-record persistence or rendering failures, and deliberately preserves the actual `findings_count`. Those executed rounds are now omitted from yield telemetry, violating IN-01's requirement to record every structured round. Distinguish failures with a parsed verdict from failures without one; emit `ReviewRound` for the former while retaining the invalid-verdict exclusion, and add a post-verdict-failure regression test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:865ce6b879d5b510645bf0737ead704fae271041e7a5013251b715dfc47ba1a6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:20:04Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 38,
+              "message": "`completed_review_round` rejects every `SubprocessFailed`, but that variant also represents post-verdict failures such as `write_verdict`/`write_fast_verdict` or rendering failures, where the reviewer produced a valid structured verdict and `findings_count` contains its actual count. Dropping those rounds violates IN-01 and biases yield metrics; distinguish failures with no parsed verdict from failures after a valid verdict, and emit `ReviewRound` for the latter. Add a regression covering a valid verdict followed by persistence failure.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:865ce6b879d5b510645bf0737ead704fae271041e7a5013251b715dfc47ba1a6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:25:13Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 50,
+              "message": "Using `findings_count > 0` as evidence that a verdict was parsed drops valid zero-finding rounds after other post-verdict failures. For example, `FileChangedDuringReview` and post-review hash failures preserve `Some(0)` from `FindingsCountReviewer`, but their error text matches neither special-case string, so this helper suppresses their `ReviewRound` while emitting otherwise-identical rounds with findings. That selectively removes zero-finding executions and inflates detection rates. Carry a typed `verdict_observed`/optional recorded count through the outcome instead of inferring it from the count and diagnostic text, and cover a zero-finding post-verdict failure.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3510ebfd44d9e73b2ef311ba5d5a020f7037c2e84afaf200a91f80fb53e58564",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:27:35Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 50,
+              "message": "Using `findings_count > 0` as evidence that a verdict was parsed drops valid zero-finding rounds after other post-verdict failures. For example, `FileChangedDuringReview` and post-review hash failures preserve an observed count of zero, but their error text matches neither special case here, so their `ReviewRound` is suppressed while otherwise-identical rounds with findings are emitted. This selectively removes zero-finding executions and inflates detection rates. Carry typed verdict-observation state through the outcome instead of inferring it from the count and error text.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3510ebfd44d9e73b2ef311ba5d5a020f7037c2e84afaf200a91f80fb53e58564",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:47:37Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 34,
+              "message": "`completed_review_round` makes the composition layer define which outcomes constitute a review-yield sample by interpreting `CodexReviewOutcome` and `VerdictObservation`. This is review-yield eligibility/axis semantics, not DI wiring. Have the use-case boundary return an optional typed completed-round fact and let composition only forward it.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 446,
+              "message": "The new verdict-observation calculation extends `FindingsCountReviewer`, a production adapter in `cli_composition` that implements the use-case `Reviewer` port. The scope policy explicitly forbids defining port adapters here, and this decorator now owns finding-count and observation semantics needed by telemetry. Move the decorator/recorder to the use-case or infrastructure layer and inject its typed result.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:413cbe4d5c81efcf1a5210fbedbde3ec3ff7c1cd0afcf26dc12979a15fd9bbea",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:48:31Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "apps/cli-composition/src/review_v2/shared.rs",
+              "line": 145,
+              "message": "`SubprocessFailed` stores `findings_count` and `verdict_observation` independently, so contradictory states such as a nonzero count with `NotObserved` are representable. Downstream code uses the observation flag to decide whether to emit while using the separate count as the measurement, making correctness depend on every constructor maintaining an undocumented cross-field invariant. Represent this as `Option<u32>` (where `Some(0)` is an observed zero-finding verdict) or an enum variant that carries the count.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 446,
+              "message": "The new verdict-observation logic further implements reviewer-result semantics inside `FindingsCountReviewer`, a composition-layer struct that implements the use-case `Reviewer` port and invokes `inner.review`/`fast_review`. The scope policy prohibits adapter implementations in `cli_composition`; move this decorator and its observation/count capture to infrastructure or model the result directly in the use case.",
+              "severity": "P1"
+            },
+            {
+              "category": "architecture",
+              "file": "apps/cli-composition/src/telemetry_wiring.rs",
+              "line": 303,
+              "message": "`ReviewCompositionRoot::emit_review_round` directly constructs a telemetry event and invokes `TelemetryWriter::write`, so this new composition-root method performs a side effect instead of only wiring collaborators. Move emission behind a driving/use-case adapter and have the composition root only construct and inject that adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:413cbe4d5c81efcf1a5210fbedbde3ec3ff7c1cd0afcf26dc12979a15fd9bbea",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T00:56:35Z",
+          "findings": [
+            {
+              "category": "telemetry correctness",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 74,
+              "message": "`dispatch_review_cycle` now records `review_started_at` before scope dispatch and reuses it as `subprocess_started_at`; consequently `ExternalSubprocess` telemetry includes scope/diff setup, verdict persistence, and rendering time rather than starting when the reviewer subprocess launches, producing incorrect duration/timestamp measurements. Capture the start at the reviewer boundary (as the removed recorder did).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5593832954484a0d703852f7e4aeb31cd0597afb8288b60da3be7ec3b7bf8dcd",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T01:05:25Z",
+          "findings": [
+            {
+              "category": "adapter defined here",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 99,
+              "message": "`ReviewerStartRecorder<R>` is a production decorator implementing the usecase `Reviewer` port inside `cli-composition`. This is an adapter implementation in the composition layer, violating the pure-DI boundary; move the timing decorator to infrastructure and only construct it here.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4d72b41cceb35cb1e6d87d76c6cb23bc66926aa5f2398355201c9bb01ff7c547",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T02:04:17Z",
+          "findings": [
+            {
+              "category": "telemetry correctness",
+              "file": "apps/cli-composition/src/review_v2/run.rs",
+              "line": 75,
+              "message": "`dispatch_review_cycle` sets `subprocess_started_at` before `cycle.review`/`cycle.fast_review`, so the `ExternalSubprocess` event still measures scope/diff setup and other pre-review work instead of beginning when the reviewer subprocess launches. The comment claims a first-invocation boundary, but no reviewer-start capture is wired; preserve the actual reviewer start timestamp from the infrastructure-owned recording adapter.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c7980f7a7d36401cd88dac6fd5d884c64e7cddfee89f2a9c518053dc67a8713",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T03:01:44Z",
+          "findings": [
+            {
+              "category": "telemetry correctness",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
+              "line": 118,
+              "message": "The new infrastructure-owned start reader is wired only through `review_run_local_ungated`; `review_run_codex` and `review_run_claude` still call the plain run helpers, so their `ExternalSubprocess` events fall back to `round_start`. Those events therefore continue to include pre-review setup instead of starting at reviewer invocation. Pass the reviewer-owned start reader through these provider-specific paths as well.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b5b28e3f339f38e10a7e3308e3e77d5acd83d28566d9ebb5f8adf0d2c0fcd9a3",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T03:56:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d94c56c1c635a6e0d4b49d712b0d7c44024f636707e03a7b7b7bab3a35b36fd7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:15:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d94c56c1c635a6e0d4b49d712b0d7c44024f636707e03a7b7b7bab3a35b36fd7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:18:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d94c56c1c635a6e0d4b49d712b0d7c44024f636707e03a7b7b7bab3a35b36fd7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:40:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5b83ae6f9fe09671fbc1a243c83cd1151dacdbccf7f75ca0cb87e1bff1b4ed59",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:44:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5b83ae6f9fe09671fbc1a243c83cd1151dacdbccf7f75ca0cb87e1bff1b4ed59",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:29:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46c6c81716620be03755d3ab67e78cf11321f2ad9a975452128d6cafabb16b13",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:38:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e90526d0b0107dc8630250e44b9768ca1301c0fcc0a1d7673452e44d661f8b5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:38:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5e90526d0b0107dc8630250e44b9768ca1301c0fcc0a1d7673452e44d661f8b5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:04:26Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "apps/cli-driver/src/telemetry.rs",
+              "line": 1163,
+              "message": "The test named as covering each accessible review-yield axis only exercises Provider, Model, and ReasoningEffort. Scope and RoundType have separate production rendering arms, so either can regress while IN-02/AC-02's any-axis behavior still passes. Add both variants and assert their rendered labels.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5e90526d0b0107dc8630250e44b9768ca1301c0fcc0a1d7673452e44d661f8b5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:15:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7188251a9f8a12aa7a2e9cc9c23c37f505c8a9be817ed7d75e7d916dee609d06",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:16:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7188251a9f8a12aa7a2e9cc9c23c37f505c8a9be817ed7d75e7d916dee609d06",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:29:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e55103b11cc55296bcbabf8373554c1fa5eaad3c2c2e402342c2feb82e2a4549",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-14T07:29:50Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 6,
+              "message": "T001 の説明は変更対象を「usecase telemetry modules」としか示さず、具体的なファイルまたはシンボルを特定していません。実行者が変更境界を発明する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 の説明は「structured local-review execution」「CLI telemetry surface」と抽象的に記述しており、apps/cli・cli-composition・cli-driver のどのファイル／シンボルを変更するか特定していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 の「record only structured local-review rounds」「read-only report metrics」「excluded entry points and review behavior are unchanged」は、IN-01、CO-02、AC-03 の挙動契約を下流の散文として再記述しています。変更対象＋操作＋anchor cite に限定してください。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 48,
+              "message": "S2 の「project them into the report snapshot without changing review execution」は、AC-02／CO-02／OUT-02 の挙動契約を plan section に再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 58,
+              "message": "S3 の「Record only structured local-review rounds」「existing read-only report surface」「excluded review and gate entry points」は、IN-01／IN-02／CO-02／AC-03 の上流契約を再記述しています。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/task-coverage.json",
+              "line": 35,
+              "message": "task-coverage.json は AC-01 を T001 に割り当てていますが、T001 の説明は集計モデルとレポート出力だけで、各 structured local review round の telemetry 記録・永続化を実装または検証しません。AC-01 のこの load-bearing 部分は T002/T003 側の作業として明示し、T001 の割当を再評価してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6cc639f13a4a312129b0d2a7836ea32fd9ad209ced0864cebe074dee2f859ec2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:35:00Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 の説明は「infrastructure structured-review-round DTO」「telemetry report snapshots」としか記述せず、具体的な対象ファイルまたはシンボルを示していません。実行者が変更境界を発明する必要があります。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 38,
+              "message": "S1 の「typed, read-only aggregation values」は CO-02 の挙動契約を plan section に再記述しています。`.harness/policies/no-upstream-restatement.md` に従い、変更対象・操作・anchor cite のみにしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/task-coverage.json",
+              "line": 4,
+              "message": "task-coverage.json は IN-01 を T001 に割り当てていますが、T001 は usecase の集計モデルとレポート DTO の実装のみで、structured local review round の telemetry 記録を実装・検証しません。IN-01 の割当は T002/T003 に限定すべきです。",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 は、AC-01 を満たす local-review telemetry wiring と、AC-02 を満たす report rendering を同一タスクに束ねています。両者は個別に検証可能な独立 behavior unit なので、実装開始前に recording（AC-01）と report surface（AC-02）へ分割してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c23de0ee990fd62073216a3f1e3b16454293b02cd74dd9ab8c8cb23d0b2bdab8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:37:28Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 21,
+              "message": "T003 bundles two independently verifiable behavior units: recording structured local-review telemetry (AC-01) and rendering/querying the read-only report surface (AC-02). Split these into separate pre-implementation tasks; the plan already identifies distinct wiring and renderer targets.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:71bcac79049c2303d930c9c731d73e83bd3acb4f6c0b9ec378b092710551b92d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:45:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0663a04f6d95abd1dc7192168099c2479692e7322d109f36e2fe02576b683f4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:56:19Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 omits a required projection target. `FsTelemetryReportAdapter::aggregate` in `libs/infrastructure/src/telemetry/report_adapter.rs` constructs `TelemetryReportOutput`, so it must transfer the new `review_yield_metrics` from `TelemetryReportSnapshot`; none of T001, T002, or T004 names that file/symbol and operation. Add this target to the task responsible for AC-02 so the executor does not have to invent ownership.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 bundles two independently verifiable behavior units: structured review-round persistence (`StructuredReviewRoundDto` and `TelemetryEvent`: IN-01/AC-01/AC-03/CO-01) and review-yield report projection (`TelemetryReportSnapshot`: IN-02/AC-02/CO-02). Split these todo units before implementation, partition their catalogue attributions, and declare the projection unit's dependency on the event/persistence unit as needed.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/batch-plan.json",
+              "line": 36,
+              "message": "T003 declares 110 production and 90 test lines in `cli_driver`, but its description names only `cli-composition` targets and explicitly places regressions in those modules; T004 separately owns the CLI-driver work. T003 therefore has no target or operation for its claimed `cli_driver` scope. Remove the stale estimate or name concrete, non-overlapping CLI-driver work.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d0663a04f6d95abd1dc7192168099c2479692e7322d109f36e2fe02576b683f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:01:58Z",
+          "findings": [
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 12,
+              "message": "T002 still bundles two independently verifiable behavior units: structured review-round persistence (`StructuredReviewRoundDto` and `TelemetryEvent`: IN-01/AC-01/AC-03/CO-01) and review-yield aggregation/projection (`TelemetryReportSnapshot` and `FsTelemetryReportAdapter::aggregate`: IN-02/AC-02/CO-02). Split these todo units before implementation, partition their catalogue attributions, and declare the projection unit's dependency on the persistence/event unit as needed.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/batch-plan.json",
+              "line": 36,
+              "message": "T003 declares 110 production and 90 test lines in `cli_driver`, but its description names only `cli-composition` targets and places its regressions in those modules; T004 separately owns the CLI-driver work. T003 therefore has no target or operation for its claimed `cli_driver` scope. Remove the stale estimate or name concrete, non-overlapping CLI-driver work.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6462298c3f60da5d54e537d4b778d7804b8f776ae8ac1ec2a74df57f624db8e9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:10:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69edf1366f5d88384599412183d2815c863564d544509b4ae66114dccc1b6e60",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:15:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:69edf1366f5d88384599412183d2815c863564d544509b4ae66114dccc1b6e60",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:07:02Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 64,
+              "message": "`spec.json` defines load-bearing goal `GO-01`, but `impl-plan.json` now has an empty `plan.summary`; the prior goal-to-task traceability was removed. Restore a summary entry covering the surviving tasks.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:895bda36a4d77ee788355b0585d8d84ab8696776b05397ec13a391acff2a1c90",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T11:08:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3c8c3ff616a9df7eb05b98dcbe93175a64bf2b262ec7b7f989b7990cba01491",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:31:09Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-14-review-yield-measurement/task-contract.json",
+              "line": 22,
+              "message": "`task-contract.json` attributes T004 to `cli_composition::telemetry_wiring::emit_review_round`, but `task-contract.json` is catalogue-entry attribution only and this source symbol is not a declared catalogue entry. Remove the source-only attribution; T004 should have no catalogue entries unless an actual catalogue entry is owned.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:60b3ccf842bc8e79af4412bfc3e00669fe02fe8da707804275ec90003529ad2e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:32:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3c8c3ff616a9df7eb05b98dcbe93175a64bf2b262ec7b7f989b7990cba01491",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:43:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3d03297fb70a8b8537a943f70f62f7e54edb7ea95e0480b7f8bf67fe1ee8d013",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:04:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3d03297fb70a8b8537a943f70f62f7e54edb7ea95e0480b7f8bf67fe1ee8d013",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T00:55:46Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 62,
+              "message": "T001 の説明は対象ファイルまたはシンボルを示さず、「Already-implemented usecase relocation」と完了状態だけを述べているため、実行可能な境界を定義していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 70,
+              "message": "T002 の説明は対象ファイルまたはシンボルを示さず、「Already-implemented infrastructure relocation」と完了状態だけを述べているため、実行可能な境界を定義していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 78,
+              "message": "T004 の説明は対象ファイルまたはシンボルを示さず、「Already-implemented composition relocation」と完了状態だけを述べているため、実行可能な境界を定義していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 86,
+              "message": "T005 の説明は対象ファイルまたはシンボルを示さず、「Already-implemented telemetry report rendering and command handling」と完了状態だけを述べているため、実行可能な境界を定義していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 91,
+              "message": "T006 の説明は対象ファイルまたはシンボルを示さず、test-obligation enrollment の一般的な操作だけを述べているため、実行可能な境界を定義していません。",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/task-coverage.json",
+              "line": 4,
+              "message": "T006 は既存 relocation の test-obligation enrollment のみを行い、テレメトリー機能を実装・検証しないにもかかわらず、IN-01、AC-01、AC-03、CO-01 の実装タスクとして task-coverage に割り当てられています。これはこれらの load-bearing spec 要素を満たせないタスクへの実質的な coverage mapping です。",
+              "severity": "P1"
+            },
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-14-review-yield-measurement/batch-plan.json",
+              "line": 45,
+              "message": "T006 は「completed relocation」と既存タスクの成果に依存するのに depends_on がなく、batch B1 でも T001/T002/T004/T005 より先に置かれています。実装順序上、T001/T002/T004/T005 の後に依存させる必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:29b7e09a0b52eb0f5d78aeebec24ed012782867ab610ed56c3c5fa7f244db001",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T01:01:57Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 97,
+              "message": "T006 names target files and operations but has no anchor cite (`AC-NN`, `IN-NN`, `CN-NN`, or spec element id), so its executable contract boundary remains underspecified.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1dc89d1195c0a15c30371f3b5222e5adc4f7d5208f374043e8438579252a61d2",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T01:03:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bbe5ddb7698b00e3d5c76e8b563f996674b51590fe1b998f81f4283a9faaf319",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T03:00:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:59c4f1ba434107a10d8053355cdb25db5dab4a857cd17787a026844c4d1896f9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T03:56:06Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 97,
+              "message": "T006 cites IN-01, AC-01, AC-03, and CO-01 even though it explicitly performs only test-obligation binding reconciliation without production/test-source changes, and `task-coverage.json` correctly does not map those elements to T006. These anchors misleadingly claim behavioral coverage that T006 cannot satisfy.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:59c4f1ba434107a10d8053355cdb25db5dab4a857cd17787a026844c4d1896f9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T03:57:25Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 97,
+              "message": "T006 names target files and operations but has no anchor cite (`AC-NN`, `IN-NN`, `CN-NN`, or spec element id), so its executable contract boundary is underspecified.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:407ba53485ab2e80683eac98984e9dcf1dd95044aea83eb178360b43dc2df400",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T03:59:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc72915b1574bc14ad3f6e9183d7b9caa9f15e8a9954b88f60ac308cdc06790a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:06:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dc72915b1574bc14ad3f6e9183d7b9caa9f15e8a9954b88f60ac308cdc06790a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:09:08Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 97,
+              "message": "T006 is explicitly a verification-only task with “no behavioral implementation or coverage claim,” and it appears in none of the IN/OUT/CO/AC mappings in task-coverage.json. GO-01 cannot supply task coverage because goals are intentionally excluded from that schema. This leaves a plan task mapping no coverable spec element; fold the binding reconciliation into the tasks whose obligations it services, or map it to an existing coverable element only if it genuinely fulfills that element.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dc72915b1574bc14ad3f6e9183d7b9caa9f15e8a9954b88f60ac308cdc06790a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T04:16:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3e44af30b5e60e3fc84b9cfabfbf2024af340762f81623f932906885b1756f1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:21:31Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 68,
+              "message": "T004 is mapped to AC-01 and AC-03, but its description only removes composition-side capture, decoration, and emission and contains no validation step. This composition boundary is load-bearing for proving the positive local-review route and excluded entry-point behavior; T002's infrastructure regressions cannot validate that routing. Add focused composition regressions to T004 with the existing AC-01/AC-03 anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-14-review-yield-measurement/impl-plan.json",
+              "line": 76,
+              "message": "T005 is mapped to AC-02, but its description changes the CLI command and renderer without any validation step. T001/T002 regressions cover the typed aggregation and infrastructure projection, not the final command/rendering boundary claimed by T005. Add focused command and renderer regressions to T005 with the AC-02 anchor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b3e44af30b5e60e3fc84b9cfabfbf2024af340762f81623f932906885b1756f1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T04:22:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:51f6bd306a98944d3680e17c5860f74d79147e1cf2a5513d498c01e2db619c7e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:59:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93ed474b727afd8745ce6e8cf7a514ee2c78b38b6063847a79f797259698ba28",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T06:03:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:93ed474b727afd8745ce6e8cf7a514ee2c78b38b6063847a79f797259698ba28",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:28:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7517c549480d64ea555dda3199107c2b32edf028981281c0974bef40d5d11695",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:57:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7517c549480d64ea555dda3199107c2b32edf028981281c0974bef40d5d11695",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:03:42Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/telemetry.rs",
+              "line": 218,
+              "message": "AC-03's dry-gate exclusion is not regression-tested at the actual emission boundary. Real dry tiers reach this helper with round types `fast`/`final`; the only new dry-related test instead rejects a synthetic `round_type: \"dry\"`, which the real path never uses. Restoring the previous `ReviewRound` write here would therefore violate AC-03 while all added tests still pass. Add a test using a real telemetry writer/adapter that asserts a dry tier retains `ExternalSubprocess` telemetry but emits no `ReviewRound`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7517c549480d64ea555dda3199107c2b32edf028981281c0974bef40d5d11695",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:15:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d841a1a9057f21aff7ef8e1a507cc48d07001bcb67c969851ae6e99cf5db347",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:15:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d841a1a9057f21aff7ef8e1a507cc48d07001bcb67c969851ae6e99cf5db347",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T00:56:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:de64a6f833978f4e6115c939f6c8511349f9392992ce755b083814931591c2f4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T02:05:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1fc77a2f1276d9d9c416aef5266c989c182da28182f6d2e5944d5e7e35c19eba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T03:00:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:015fe1e0f47e88615cc19e84a39108eb418f472c9b2dda377a32fff987c5a2a3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T03:55:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb970c0f02b20127f3bbb58d872cc346ce180b78d25d870edd460f1e7a68ebcf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:12:36Z",
+          "findings": [
+            {
+              "category": "architecture violation",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 241,
+              "message": "The added reviewer-assignment implementation pushes this module's production section to 703 lines (before the `#[cfg(test)]` block), exceeding the repository's 700-line maximum. Extract part of the adapter or its process/session helpers into a submodule.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eb970c0f02b20127f3bbb58d872cc346ce180b78d25d870edd460f1e7a68ebcf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T04:17:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:382fc5a61fb80187413f16dc75720e7fdf61b63a0b4002e2f231b53c7a50b0cb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:18:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:382fc5a61fb80187413f16dc75720e7fdf61b63a0b4002e2f231b53c7a50b0cb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:36:44Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/review_v2/codex_process.rs",
+              "line": 174,
+              "message": "`symlink_metadata` の確認後に通常の `File::open(path)` を使っているため、チェックと読み込みの間に output-last-message を symlink に差し替えられます。authoritative verdict が任意ファイルから読まれ、細工した verdict を受理する可能性があります。`initialize_output_last_message` と同様に no-follow open を使ってください。",
+              "severity": "P0"
+            },
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/review_v2/codex_process.rs",
+              "line": 285,
+              "message": "Codex の session log を `File::create(session_log_path)` で直接開いており、symlink の拒否や no-follow open がありません。runtime path の leaf を symlink に差し替えられると、レビュー実行時に任意のファイルを切り詰めて書き換えられます。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:ed826bfa1e1928c2922345f281388c6cdf4cf132caadf2a0b2dcfbc8e3520ead",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T04:42:49Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/review_v2/codex_reviewer.rs",
+              "line": 167,
+              "message": "`output_schema` は `runtime_path` で得たパスに対して通常の `std::fs::write` を行っており、symlink の拒否や no-follow open がありません。leaf または runtime parent を symlink に差し替えられると、レビュー実行時に output schema として任意のファイルを上書きできます。authoritative output/session log と同じ trusted runtime-artifact 防御を適用してください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:c860d782204f49c4af33e849b12d70bb206b4d19b997fa8f48002df8fe078c1d",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T04:46:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0cafcd92f989dc8a5f2a68d79b4cba7f2d1ca7175f9a6034f02c4c5546a0de1a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:51:06Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/review_v2/codex_process.rs",
+              "line": 305,
+              "message": "`initialize_output_last_message` bypasses the cross-platform no-follow opener. On Windows, the direct `OpenOptions::open` follows a symlink/reparse point substituted after the metadata check, so the subsequent `set_len(0)` can truncate the link target. Open the artifact through `open_no_follow` before validating and truncating the handle.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:0cafcd92f989dc8a5f2a68d79b4cba7f2d1ca7175f9a6034f02c4c5546a0de1a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T04:56:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45dd48c10d83b240fab463ea3d61072fc23f77ea6b792fa12acf5ff0bf541dae",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:41:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50d51d0ae4c982d25f0898b9a4acbdb48b8a6754346051b80a1ff982543c8d30",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:44:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50d51d0ae4c982d25f0898b9a4acbdb48b8a6754346051b80a1ff982543c8d30",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T05:48:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50d51d0ae4c982d25f0898b9a4acbdb48b8a6754346051b80a1ff982543c8d30",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:32:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c94166967286ea1c51db4569836211b08dd2a9eb601e411f28e5053739fbd518",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-14T07:30:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4167e0b04dfcd74bf33f55b6418158af3a0e60ce8ab11b4cf70878f1f7293eb7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:38:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4167e0b04dfcd74bf33f55b6418158af3a0e60ce8ab11b4cf70878f1f7293eb7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:07:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d284e4cb448151c0160500610c926fbae8f16a2a53a15ddf81a66faa47fa8fab",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:31:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d284e4cb448151c0160500610c926fbae8f16a2a53a15ddf81a66faa47fa8fab",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:44:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d284e4cb448151c0160500610c926fbae8f16a2a53a15ddf81a66faa47fa8fab",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:04:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d284e4cb448151c0160500610c926fbae8f16a2a53a15ddf81a66faa47fa8fab",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T00:55:22Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-14-review-yield-measurement/test-bindings.json",
+              "line": 444,
+              "message": "The `TelemetryEvent` binding for `AC-01` claims only a serde round-trip test, which verifies serialization/deserialization but not that a completed review round actually emits telemetry with the required scope, type, provider, model, reasoning effort, and finding count. The binding needs an emission/integration test covering the behavioral anchor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dff3bfd2195b908209bea3b72821855ef56aa30d7e550305fe369889eb404006",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T00:57:36Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-14-review-yield-measurement/test-bindings.json",
+              "line": 459,
+              "message": "The updated `TelemetryEvent`/`AC-01` binding adds `review_run_local_resolves_profile_happy_path_writes_verdict_and_telemetry`, but `bin/sotp test-obligation check` now fails with `TestChanged: bound test bodies changed since the verdict was frozen` for this edge. The binding cannot be accepted until the obligation verdict is re-evaluated/frozen against the current test body (or the binding is corrected).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d2cd5c303ec50c46c3243eaa648e00d1960b1ce0e3ad51ed077740cb6f5f8a4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T02:03:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d2cd5c303ec50c46c3243eaa648e00d1960b1ce0e3ad51ed077740cb6f5f8a4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:09:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:35639f14376554977ac572a1e2054e5dcc3d0c9ab3ed5e456ca9685f480a0ded",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:43:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcfe9d8d3c407e3463f4d91bc5f3b5dbdb5aba06c9fa59d45c6e48bfae00bad4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:46:55Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-14-review-yield-measurement/spec.json",
+              "line": 25,
+              "message": "AC-02 requires reporting a “detection rate” but never defines its numerator, denominator, or zero-execution behavior. Implementations could plausibly report rounds with at least one finding divided by executions, findings per execution, or another value, so the criterion cannot deterministically verify aggregation correctness and downstream phases must invent the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fcfe9d8d3c407e3463f4d91bc5f3b5dbdb5aba06c9fa59d45c6e48bfae00bad4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:51:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d44d40692932f6216f5df8a7c98250992771fdb4e447bd012af71d63bbe512e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T23:19:42Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-14-review-yield-measurement/spec.json",
+              "line": 49,
+              "message": "AC-04 requires a new decorator-construction rejection for mismatched track identities, but this behavior is not covered by either declared in-scope element (recording round telemetry or read-only aggregation) and is not specified by D1. It therefore adds an unscoped acceptance obligation to the behavioral contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ed2faa3b98418813ae7d358399fdb19cc555b83f53792afcfdc2098841c335eb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T23:24:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0b66a1db5dd68469035e260d68590d7a2e2273fd6f37bf7d8eca332f59daedb2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T23:29:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0550bb376cd9b5972a7e806a3ba4dbc9a1cbc10c94075f9fa171062f23d08f51",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T23:33:10Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-14-review-yield-measurement/spec.json",
+              "line": 48,
+              "message": "AC-04 requires a construction-time, cross-field track-identity rejection that is absent from both in-scope items, which only cover recording the specified review axes and read-only aggregation. D1 likewise defines the resolved reviewer assignment as provider/model/reasoning effort, not track identity. This acceptance criterion therefore expands the behavioral contract beyond the declared scope rather than merely proving IN-01 or IN-02.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0550bb376cd9b5972a7e806a3ba4dbc9a1cbc10c94075f9fa171062f23d08f51",
+          "type": "final",
+          "verdict": "findings_remain"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-14T06:20:01Z",
+          "findings": [
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 133,
+              "message": "`StructuredReviewRoundDto` の docs が、構造化 local review の対象範囲と DRY/PR/obligation/binary-gate 除外を散文で再記述しており、AC-03 の挙動契約を重複保持しています。`.harness/policies/no-upstream-restatement.md` に従い、変更対象と anchor cite のみにしてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 271,
+              "message": "`ReviewYieldMetric` の docs が、実行数・検出率を集計して driver に提示するという AC-02 の出力契約を再記述しています。上流契約を prose で複製せず、AC-02 の anchor cite に置き換えるべきです。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 312,
+              "message": "`ReviewYieldValue` の docs が、記録された軸による grouping という AC-02 の挙動契約を「exactly one」として再記述しています。これは upstream-restatement policy の対象です。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 169,
+              "message": "`TelemetryReportSnapshot` の docs が、空コレクションを「matching rounds がなく rate を計算できない」と解釈する AC-02 の契約を再記述しています。挙動本文は spec に残し、entry docs は対象変更と AC-02/CO-02 の cite に限定してください。",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 413,
+              "message": "`TelemetryReportOutput` の docs が、対象を structured local review に限定し、空の metrics が rate 不在を意味するという IN-02/AC-02 の契約を再記述しています。`.harness/policies/no-upstream-restatement.md` 違反です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7e9983a8d95a96ab6662881097858be90d029f20983387a8e9873672f642ff3c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:22:39Z",
+          "findings": [
+            {
+              "category": "declaration-completeness",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 93,
+              "message": "`StructuredReviewRoundDto` は `findings_count: ReviewFindingCount` を serde DTO として公開しますが、`ReviewFindingCount` には数値 accessor、`Display`、serde trait のいずれも宣言されていません。内部値も非公開のため、infrastructure 側が「finding count の数値」を Serialize する契約を実装できず、AC-01 の telemetry record が構築不能になります。`ReviewFindingCount` に境界用 accessor または明示的な serialization contract を追加してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4305db1c9b89e921d13b8e2df83ad2f7adfb92f8163fda1b98cbfeff3dc42e50",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:24:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:52e5fd4356d1ce51be322bb43a6922aa4783f82e94add613f37e9f0549fb0be4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:33:39Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 131,
+              "message": "`infrastructure::TelemetryEvent` needs a companion `action: modify` declaration. Its frozen-baseline `ReviewRound` variant is the event accepted by `TelemetryWriter::write` and parsed by telemetry reporting, but it lacks the required `scope` and `reasoning_effort` fields. Adding `StructuredReviewRoundDto` alone leaves IN-01/AC-01 disconnected from the persisted event surface, forcing an undeclared public API mutation or making the required axes unrecordable. Declare the enum's complete post-change shape, potentially embedding this DTO.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 223,
+              "message": "`usecase::ReviewExecutionCount.docs` restates AC-02's zero-match behavior and its rationale (`NonZeroU64 makes a zero-sample rate unrepresentable`) instead of identifying the type/shape and citing the upstream anchors. This creates a second prose owner for the behavior, contrary to `.harness/policies/no-upstream-restatement.md`; reduce it to the declared type choice plus IN-02/AC-02 references.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:52e5fd4356d1ce51be322bb43a6922aa4783f82e94add613f37e9f0549fb0be4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:41:01Z",
+          "findings": [
+            {
+              "category": "missing companion modify",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 131,
+              "message": "`infrastructure::StructuredReviewRoundDto` has no declared connection to the persisted telemetry event surface. The frozen baseline’s public `TelemetryEvent::ReviewRound` lacks the required `scope` and `reasoning_effort` fields, while `TelemetryWriter` accepts that enum. IN-01/AC-01 therefore require a companion `action: modify` entry declaring `TelemetryEvent`’s complete post-change shape; otherwise implementation must make an undeclared public API mutation or cannot persist all required axes.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 223,
+              "message": "`usecase::ReviewExecutionCount.docs` restates AC-02’s zero-match behavior and rationale in prose (`NonZeroU64 makes a zero-sample rate unrepresentable`). Per `.harness/policies/no-upstream-restatement.md`, identify the type/shape and cite IN-02/AC-02 without reproducing their behavioral contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:52e5fd4356d1ce51be322bb43a6922aa4783f82e94add613f37e9f0549fb0be4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:00:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b6597e9ab50910324a2dcd570fb95ebb5bd441d168a2beb060cc763db630e35",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:04:11Z",
+          "findings": [
+            {
+              "category": "action incoherent with diff",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 205,
+              "message": "`infrastructure::TelemetryEvent` declares all seven variants as tuple payloads, but the frozen baseline defines them as named struct variants. This contradicts the entry’s promise that unchanged legacy wire fields remain baseline-identical, removes field names from every variant, and changes the public/serde wire shape far beyond the intended `ReviewRound` update; internally tagged serde also requires struct-style payloads here. Preserve unchanged variants with `payload.kind: \"struct\"` and named fields, and declare the intended named post-change fields for `ReviewRound`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3b6597e9ab50910324a2dcd570fb95ebb5bd441d168a2beb060cc763db630e35",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:15:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4744237b6c622a1a3e820b423bbe8c58531a9b4577ee62bdade42c7affb7e46f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:19:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4744237b6c622a1a3e820b423bbe8c58531a9b4577ee62bdade42c7affb7e46f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:34:06Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-review-yield-measurement/cli_composition-types.json",
+              "line": 5,
+              "message": "`cli_composition::telemetry_wiring::emit_review_round` is declared with `action: delete`, but the function remains in the implementation and its signature is modified (including the new `StructuredReviewRoundDto` parameter). This entry should declare the complete post-change function shape with `action: modify`; the delete tombstone contradicts the actual diff and would mislead Phase 3 implementation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:33b0a1431f37db932ea687231375ebd78b64cd62f928429962f215f8b00bd045",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T11:37:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1e55dac546b19a736d092f26f08dc101fa3e168ab6c4854f22ba82d6b8fa83de",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:40:50Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/cli_composition-types.json",
+              "line": 6,
+              "message": "`cli_composition::telemetry_wiring::emit_review_round` restates the upstream exclusion contract (“the excluded dry round type is not representable”) in `docs`. Per `.harness/policies/no-upstream-restatement.md`, keep only the changed symbol/operation and anchor citations so AC-03/D3 remain the sole behavioral source of truth.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e55dac546b19a736d092f26f08dc101fa3e168ab6c4854f22ba82d6b8fa83de",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T11:42:15Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/cli_composition-types.json",
+              "line": 6,
+              "message": "`cli_composition::telemetry_wiring::emit_review_round` restates the upstream exclusion contract (“the excluded dry round type is not representable”) in `docs`. Per `.harness/policies/no-upstream-restatement.md`, retain only the changed symbol/operation and anchor citations so AC-03/D3 remain the sole behavioral source of truth.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1e55dac546b19a736d092f26f08dc101fa3e168ab6c4854f22ba82d6b8fa83de",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T11:58:01Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-review-yield-measurement/cli_composition-types.json",
+              "line": 5,
+              "message": "`cli_composition::telemetry_wiring::emit_review_round` is declared with `action: delete`, but the current implementation still defines and calls it, and the diff changes its signature to accept `StructuredReviewRoundDto`. The catalogue must declare the modified post-change function shape rather than a deletion tombstone.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7b1e04c5c85904c241aec22c55060a8ab4e0e60091be4dbcec93db0126556f85",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:17:31Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-review-yield-measurement/cli_composition-types.json",
+              "line": 5,
+              "message": "`cli_composition::telemetry_wiring::emit_review_round` is declared with `action: delete`, but the current implementation still defines and calls it, and the diff changes its signature to accept `StructuredReviewRoundDto`. The catalogue must declare the modified post-change function shape rather than a deletion tombstone.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7b1e04c5c85904c241aec22c55060a8ab4e0e60091be4dbcec93db0126556f85",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:17:34Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-14-review-yield-measurement/cli_composition-types.json",
+              "line": 5,
+              "message": "`cli_composition::telemetry_wiring::emit_review_round` is declared with `action: delete`, but the current implementation still defines and calls it, and the diff changes its signature to accept `StructuredReviewRoundDto`. The catalogue must declare the modified post-change function shape rather than a deletion tombstone.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7b1e04c5c85904c241aec22c55060a8ab4e0e60091be4dbcec93db0126556f85",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:21:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7b1e04c5c85904c241aec22c55060a8ab4e0e60091be4dbcec93db0126556f85",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:24:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7b1e04c5c85904c241aec22c55060a8ab4e0e60091be4dbcec93db0126556f85",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:14:56Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 212,
+              "message": "`infrastructure::ReviewYieldRecordingReviewer`'s `docs` field restates the upstream behavior contract and design rationale in prose: successful-verdict finding derivation, immediate emission, fixed round type, failure suppression, unrepresentable observation states, and cross-layer type reuse. Per `.harness/policies/no-upstream-restatement.md`, this entry should state the target/operation with anchors rather than duplicate the spec/ADR contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3f933c7ecd820db28f5668ccb4547a732c04b3e3f67f82df3776c0a442ec4000",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:17:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d6335684a1238e17584840d3745524c3c4bd4e47e5202ed2eea67de6b40f4ec1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:26:15Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 101,
+              "message": "`infrastructure::ReviewYieldRecordingReviewer::new` accepts `inner: R`, the telemetry writer, and `track_id`/`scope`/`provider`/`model`/`reasoning_effort` independently. Because the referenced `Reviewer` port exposes none of that identity, the decorator cannot verify that the supplied attribution describes the reviewer it delegates to—or that `track_id` matches the writer’s sink. A Claude-backed inner can therefore be recorded as Codex, making incorrect persisted attribution representable contrary to IN-01/AC-01/CO-01. Bind recording to one validated reviewer-session/assignment authority instead of duplicating these values.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d6335684a1238e17584840d3745524c3c4bd4e47e5202ed2eea67de6b40f4ec1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T18:43:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0e6dbeab748fbeb5024150c22493f65e9af1a0c5aaaaa17bf4d8effdefacb6d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T18:48:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d0e6dbeab748fbeb5024150c22493f65e9af1a0c5aaaaa17bf4d8effdefacb6d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T00:21:40Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/usecase-types.json",
+              "line": 431,
+              "message": "`usecase::ReviewCycleError`'s `docs` field restates upstream design rationale/behavior: adding distinct post-review diff/hash errors preserves the original inspection outcome while telemetry is recorded. Per `.harness/policies/no-upstream-restatement.md`, this should be reduced to the changed type/operation plus anchor citations rather than duplicating the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:563e24e5178a4e1a27e01b42ce94ccca8f5c4d3d8740c44b9ca2d569bea4736b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T00:35:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a8a6c497fb5fac78677c44683e74032b0e6afd6bc2ca5149b96ea46a59c9188",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T00:41:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a8a6c497fb5fac78677c44683e74032b0e6afd6bc2ca5149b96ea46a59c9188",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T00:41:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3a8a6c497fb5fac78677c44683e74032b0e6afd6bc2ca5149b96ea46a59c9188",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T01:34:39Z",
+          "findings": [
+            {
+              "category": "role / kind mismatch",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 515,
+              "message": "`infrastructure::ReviewerStartCapture` is declared as a `SecondaryAdapter`, but its declared semantics are an internal shared capture handle: it has no port implementation and only exposes local state (`new`, `started_at_or_now`). The `SecondaryAdapter` role contradicts the entry's own kind/semantics; this should use a role for an internal technical value/helper rather than an adapter role.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 502,
+              "message": "`infrastructure::ReviewerStartCapture`'s `docs` restates implementation rationale and behavior (shared first-invocation capture, clone-sharing semantics, and the relocation rationale), while `.harness/policies/no-upstream-restatement.md` requires an anchor-based target/operation description instead of prose duplication.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 526,
+              "message": "`infrastructure::ReviewerStartRecorder`'s `docs` restates the behavior and placement rationale (first invocation capture, unchanged delegation, construction/injection, and relocation), contrary to `.harness/policies/no-upstream-restatement.md`; the entry should reference the upstream contract by anchors rather than reproduce it.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_refs missing or off-topic",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 519,
+              "message": "`infrastructure::ReviewerStartCapture` is grounded only by `spec_refs[].anchor: AC-03`, but AC-03 specifies that the feature must not alter review/gate/inspection work or emit records for excluded entry points; it does not support introducing a first-invocation timing helper. The entry's own docs admit that no spec element requires this helper, making the cited anchor off-topic.",
+              "severity": "P1"
+            },
+            {
+              "category": "spec_refs missing or off-topic",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 549,
+              "message": "`infrastructure::ReviewerStartRecorder` is grounded only by `spec_refs[].anchor: AC-03`, but AC-03 does not require a decorator that captures reviewer start time; it only constrains excluded entry points and preservation of review behavior. The entry's docs explicitly state that no spec element requires start-time capture, so this citation is off-topic.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c71175dcac2900948626e3954c8ff304c9e84224bfdec38db1dd18a166ebf0c1",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T02:04:54Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-review-yield-measurement/infrastructure-types.json",
+              "line": 397,
+              "message": "`infrastructure::ReviewYieldRecordingReviewer`'s `docs` field restates the upstream behavior/design contract—deriving track identity from the wrapped reviewer, owning first-invocation timing capture, and requiring identity-free writer inputs. Per `.harness/policies/no-upstream-restatement.md`, the entry should describe the changed target/operation with anchor citations rather than reproduce the contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:56565e5f22e0fee16857967b943ce9e7a0020e9b70a5155b25fb24debd144733",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T03:00:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aa4c86a5e32b3c2bfd827218946dfe82b3c1a6ec6f65011a7e33828c3ecdb484",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T03:55:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45dd47cb6a855a9287ce81f4057bab337573f8f5e77bcef1ee8940d63c5a70cf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:02:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45dd47cb6a855a9287ce81f4057bab337573f8f5e77bcef1ee8940d63c5a70cf",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:28:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce3f7194a6d0d1e16f1db9b9c942a1f382c9fafbfb309f050bea64c85e8bd87",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:50:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce3f7194a6d0d1e16f1db9b9c942a1f382c9fafbfb309f050bea64c85e8bd87",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:03:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ce3f7194a6d0d1e16f1db9b9c942a1f382c9fafbfb309f050bea64c85e8bd87",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T00:56:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcabba6602abebd8e032fe4aba66e81acefb8c3885e9cb8b13029adb8819977f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T02:03:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcabba6602abebd8e032fe4aba66e81acefb8c3885e9cb8b13029adb8819977f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T03:00:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcabba6602abebd8e032fe4aba66e81acefb8c3885e9cb8b13029adb8819977f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T03:56:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b1eca54d3b798a39ebed5e6efc0620fafef19d5ef6f0424fc99d217c747a638c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:10:19Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "libs/usecase/src/review_v2/cycle.rs",
+              "line": 104,
+              "message": "The new post-review phase distinction is duplicated in `fast_review`, but the added regression tests exercise only `review()`. A future `?`/`From` regression on either fast-path lookup would classify a failure that occurred after reviewer execution as a pre-review `Diff`/`Hash` error, changing caller handling without a failing test. Add fast-review cases for both the second diff lookup and second hash calculation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b1eca54d3b798a39ebed5e6efc0620fafef19d5ef6f0424fc99d217c747a638c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-15T04:15:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:072457a98be5bfe891bae4d97edb125ff8d6d581057f6570d9d185adb3e474b6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T04:19:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:072457a98be5bfe891bae4d97edb125ff8d6d581057f6570d9d185adb3e474b6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-15T08:29:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3036d886fdc09d1f70af60db928950a55860ac2b75987944a7f319d9bba10c06",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

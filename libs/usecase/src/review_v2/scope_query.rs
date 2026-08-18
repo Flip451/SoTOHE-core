@@ -273,24 +273,9 @@ impl<D: DiffGetter> ScopeQueryService for ScopeQueryInteractor<D> {
     }
 
     fn files_by_string(&self, scope: String) -> Result<Vec<String>, ScopeQueryError> {
-        // Parse the scope name string into a domain ScopeName. Mirror the
-        // case-insensitive `other` matching used by the `review files`
-        // pre-validation path in `infrastructure::review_v2::cli_composition`,
-        // otherwise inputs like "Other" pass validation and then fail here
-        // with InvalidScopeName.
-        let scope_name = if scope.eq_ignore_ascii_case("other") {
-            ScopeName::Other
-        } else {
-            match MainScopeName::new(&scope) {
-                Ok(main) => ScopeName::Main(main),
-                Err(e) => {
-                    return Err(ScopeQueryError::InvalidScopeName {
-                        name: scope,
-                        reason: e.to_string(),
-                    });
-                }
-            }
-        };
+        let scope_name = ScopeName::parse(&scope).map_err(|error| {
+            ScopeQueryError::InvalidScopeName { name: scope, reason: error.to_string() }
+        })?;
 
         // Delegate to the typed files method and convert FilePath → String.
         let file_paths = self.files(scope_name)?;

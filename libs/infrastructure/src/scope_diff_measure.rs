@@ -6,7 +6,6 @@
 //! degrades from the recorded commit to the configured base branch (CN-05).
 
 use std::collections::{BTreeMap, HashSet};
-use std::io::{BufReader, Read};
 use std::path::Path;
 use std::process::Stdio;
 
@@ -30,52 +29,22 @@ use crate::track_artifact::{TrackArtifactReadError, read_track_artifact};
 const METADATA_FILE: &str = "metadata.json";
 const MAX_TRACK_METADATA_BYTES: u64 = 4 * 1024 * 1024;
 const MAX_GIT_OUTPUT_BYTES: u64 = 16 * 1024 * 1024;
-const MAX_UNTRACKED_FILE_BYTES: u64 = 16 * 1024 * 1024;
 const MAX_BINARY_TREE_PATHSPEC_BYTES: usize = 64 * 1024;
-/// Generated build, cache, and credential outputs excluded before collection.
-const IGNORED_NON_REVIEW_PATHS: [&str; 32] = [
-    ":(top,exclude)target/**",
-    ":(top,exclude)target-*/**",
-    ":(top,exclude)**/*.rs.bk",
-    ":(top,exclude).claude/logs/**",
-    ":(top,exclude).claude/worktrees/**",
-    ":(top,exclude).fastembed_cache/**",
-    ":(top,exclude)**/.fastembed_cache/**",
-    ":(top,exclude).semantic_index/**",
-    ":(top,exclude)**/.semantic_index/**",
-    ":(top,exclude).semantic_index.*",
-    ":(top,exclude)sotp-dry-index-*/**",
-    ":(top,exclude).env",
-    ":(top,exclude).env.*",
-    ":(top,exclude)**/*.pem",
-    ":(top,exclude)**/*.key",
-    ":(top,exclude)private/**",
-    ":(top,exclude)config/secrets/**",
-    ":(top,exclude)tmp/**",
-    ":(top,exclude).cache/**",
-    ":(top,exclude).harness/tools/**",
-    ":(top,exclude)bin/sotp",
-    ":(top,exclude).cargo-install/**",
-    ":(top,exclude)repomix-output.txt",
-    ":(top,exclude)repomix-output.xml",
-    ":(top,exclude)repomix-output.*/**",
-    ":(top,exclude).idea/**",
-    ":(top,exclude).vscode/**",
-    ":(top,exclude).locks/**",
-    ":(top,exclude)track/items/**/.commit_hash",
-    ":(top,exclude)track/items/**/.commit_hash.tmp",
-    ":(top,exclude)track/items/*/*-graph*/**",
-    ":(top,exclude)track/items/*/logs/**",
-];
+
+mod untracked;
+
+#[cfg(test)]
+use untracked::{MAX_UNTRACKED_FILE_BYTES, count_file_lines};
+use untracked::{
+    ScopeDiffExclusions, file_path_bytes, load_scope_diff_exclusions, retained_paths,
+    untracked_additions, untracked_paths,
+};
 
 fn measure_failed(message: impl Into<String>) -> ScopeDiffMeasureError {
     ScopeDiffMeasureError::MeasureFailed { message: FreeText::new(message.into()) }
 }
 
-/// Measures a track's actual per-scope diff through git.
-///
-/// Constructed with no arguments so composition roots stay zero-argument
-/// wiring accessors; the items directory arrives with each call.
+/// Measures a track's per-scope diff; each call supplies the items directory.
 #[derive(Debug, Default)]
 pub struct GitScopeDiffMeasurer;
 
@@ -114,6 +83,7 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
                 scope_config_classification(&error)
             ))
         })?;
+        let exclusions = load_scope_diff_exclusions(&root)?;
 
         // Run from the discovery anchor, with paths pinned to the full tree.
         // Disable rename, textconv, and external-diff configuration so numstat
@@ -134,27 +104,13 @@ impl ScopeDiffMeasurePort for GitScopeDiffMeasurer {
             ],
         )?;
         // Enumerate ordinary and ignored files separately. The ignored pass is
-        // needed for in-scope source files. Only the ignored pass excludes
-        // trusted non-review outputs: a visible file may be explicitly
-        // re-included by an ignore negation and must reach classification.
-        let visible_untracked = git_bytes(
-            &items_dir,
-            &["ls-files", "-z", "--others", "--exclude-standard", "--full-name", "--", ":/"],
-        )?;
-        let ignored_args = [
-            "ls-files",
-            "-z",
-            "--others",
-            "--ignored",
-            "--exclude-standard",
-            "--full-name",
-            "--",
-            ":/",
-        ]
-        .into_iter()
-        .chain(IGNORED_NON_REVIEW_PATHS)
-        .collect::<Vec<_>>();
-        let ignored_untracked = git_bytes(&items_dir, &ignored_args)?;
+        // needed for in-scope source files. Git evaluates the operator-owned
+        // exclusion pathspecs for both passes, so Git remains the sole matcher
+        // for pathspec semantics.
+        let visible_untracked =
+            git_bytes_owned(&items_dir, &visible_untracked_git_args(&exclusions))?;
+        let ignored_untracked =
+            git_bytes_owned(&items_dir, &ignored_untracked_git_args(&exclusions))?;
 
         let mut changed = binary_safe_numstat_additions(
             &root,
@@ -273,6 +229,26 @@ fn resolve_base(
 
 fn git_bytes(command_dir: &Path, args: &[&str]) -> Result<Vec<u8>, ScopeDiffMeasureError> {
     git_bytes_with_limit(command_dir, args, MAX_GIT_OUTPUT_BYTES as usize)
+}
+
+fn git_bytes_owned(command_dir: &Path, args: &[String]) -> Result<Vec<u8>, ScopeDiffMeasureError> {
+    let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+    git_bytes(command_dir, &refs)
+}
+
+fn ignored_untracked_git_args(exclusions: &ScopeDiffExclusions) -> Vec<String> {
+    let mut args =
+        vec!["ls-files".to_owned(), "-z".to_owned(), "--others".to_owned(), "--ignored".to_owned()];
+    args.extend(["--exclude-standard", "--full-name", "--", ":/"].into_iter().map(str::to_owned));
+    args.extend(exclusions.git_pathspecs().iter().cloned());
+    args
+}
+
+fn visible_untracked_git_args(exclusions: &ScopeDiffExclusions) -> Vec<String> {
+    let mut args = vec!["ls-files".to_owned(), "-z".to_owned(), "--others".to_owned()];
+    args.extend(["--exclude-standard", "--full-name", "--", ":/"].into_iter().map(str::to_owned));
+    args.extend(exclusions.git_pathspecs().iter().cloned());
+    args
 }
 
 fn git_bytes_with_limit(
@@ -510,23 +486,6 @@ fn parse_numstat_count(field: &[u8], record: &[u8]) -> Result<u32, ScopeDiffMeas
     })
 }
 
-/// Counts an untracked file's whole length as additions.
-fn untracked_paths(output: &[u8]) -> Result<Vec<FilePath>, ScopeDiffMeasureError> {
-    output
-        .split(|byte| *byte == b'\0')
-        .filter(|raw_path| !raw_path.is_empty())
-        .map(file_path_bytes)
-        .collect()
-}
-
-/// Keeps paths that [`ReviewScopeConfig::classify`] will include in a scope.
-/// This applies operational and other-track exclusions before any file I/O.
-fn retained_paths(scope_config: &ReviewScopeConfig, paths: Vec<FilePath>) -> Vec<FilePath> {
-    let included: HashSet<FilePath> =
-        scope_config.classify(&paths).into_values().flatten().collect();
-    paths.into_iter().filter(|path| included.contains(path)).collect()
-}
-
 /// Applies the same operational and other-track exclusions to tracked rows
 /// before a binary fallback can inspect their working-tree paths.
 fn retained_numstat_entries(
@@ -546,119 +505,6 @@ fn retained_numstat_entries(
             NumstatEntry::Counted(path, _) | NumstatEntry::Binary(path) => retained.contains(path),
         })
         .collect()
-}
-
-fn untracked_additions(
-    root: &Path,
-    paths: &[FilePath],
-) -> Result<Vec<(FilePath, u32)>, ScopeDiffMeasureError> {
-    let mut changed = Vec::new();
-    let mut remaining_bytes = MAX_UNTRACKED_FILE_BYTES;
-    for path in paths {
-        let absolute_path = root.join(path.as_str());
-        match reject_symlinks_below(&absolute_path, root) {
-            Ok(true) => {}
-            Ok(false) => continue,
-            Err(error) => {
-                return Err(measure_failed(format!(
-                    "refusing untracked path {}: {}",
-                    path.as_str(),
-                    io_classification(&error)
-                )));
-            }
-        }
-        let lines = count_file_lines(&absolute_path, path.as_str(), &mut remaining_bytes)?;
-        changed.push((path.clone(), lines));
-    }
-    Ok(changed)
-}
-
-/// Counts newline-delimited lines without requiring UTF-8 or whole-file buffering.
-///
-/// `relative` is the candidate's repository-relative path and is what every
-/// failure names: `path` is absolute and stays out of the reported message.
-fn count_file_lines(
-    path: &Path,
-    relative: &str,
-    remaining_bytes: &mut u64,
-) -> Result<u32, ScopeDiffMeasureError> {
-    let path_metadata = std::fs::symlink_metadata(path).map_err(|error| {
-        measure_failed(format!(
-            "read metadata for untracked file {relative}: {}",
-            io_classification(&error)
-        ))
-    })?;
-    if !path_metadata.file_type().is_file() {
-        return Err(measure_failed(format!("untracked file {relative} is not a regular file")));
-    }
-
-    let file = std::fs::File::open(path).map_err(|error| {
-        measure_failed(format!("read untracked file {relative}: {}", io_classification(&error)))
-    })?;
-    let metadata = file.metadata().map_err(|error| {
-        measure_failed(format!(
-            "read metadata for untracked file {relative}: {}",
-            io_classification(&error)
-        ))
-    })?;
-    if !metadata.is_file() || metadata.len() > *remaining_bytes {
-        return Err(measure_failed(format!(
-            "untracked file {relative} exceeds the remaining {remaining_bytes}-byte read budget"
-        )));
-    }
-
-    let budget = *remaining_bytes;
-    let mut reader = BufReader::new(file.take(budget.saturating_add(1)));
-    let mut buffer = [0_u8; 8 * 1024];
-    let mut bytes_seen = 0_u64;
-    let mut lines = 0_u32;
-    let mut saw_bytes = false;
-    let mut last_byte = 0_u8;
-
-    loop {
-        let bytes_read = reader.read(&mut buffer).map_err(|error| {
-            measure_failed(format!("read untracked file {relative}: {}", io_classification(&error)))
-        })?;
-        if bytes_read == 0 {
-            break;
-        }
-        bytes_seen = bytes_seen.saturating_add(bytes_read as u64);
-        if bytes_seen > budget {
-            return Err(measure_failed(format!(
-                "untracked file {relative} exceeds the remaining {budget}-byte read budget"
-            )));
-        }
-        let Some(chunk) = buffer.get(..bytes_read) else {
-            return Err(measure_failed(format!("short read from untracked file {relative}")));
-        };
-        saw_bytes = true;
-        if let Some(byte) = chunk.last() {
-            last_byte = *byte;
-        }
-        for byte in chunk {
-            if *byte == b'\n' {
-                lines = lines.saturating_add(1);
-            }
-        }
-    }
-
-    if saw_bytes && last_byte != b'\n' {
-        lines = lines.saturating_add(1);
-    }
-    *remaining_bytes = remaining_bytes.saturating_sub(bytes_seen);
-    Ok(lines)
-}
-
-fn file_path(raw: &str) -> Result<FilePath, ScopeDiffMeasureError> {
-    let normalized = raw.strip_prefix("./").unwrap_or(raw);
-    FilePath::new(normalized)
-        .map_err(|error| measure_failed(format!("invalid path '{normalized}': {error}")))
-}
-
-fn file_path_bytes(raw: &[u8]) -> Result<FilePath, ScopeDiffMeasureError> {
-    let raw = std::str::from_utf8(raw)
-        .map_err(|_| measure_failed("Git returned a non-UTF-8 repository path"))?;
-    file_path(raw)
 }
 
 /// Merges tracked and untracked contributions for a path before classification.
@@ -755,6 +601,21 @@ mod tests {
         std::fs::write(path, contents).unwrap();
     }
 
+    fn write_exclusions_config(root: &std::path::Path, contents: &str) {
+        write(root, ".harness/config/scope-diff-exclusions.json", contents);
+    }
+
+    fn embedded_git_repo(root: &std::path::Path, rel: &str) {
+        let embedded = root.join(rel);
+        std::fs::create_dir_all(&embedded).unwrap();
+        git(&embedded, &["init", "-b", "main"]);
+        git(&embedded, &["config", "user.email", "embedded@example.com"]);
+        git(&embedded, &["config", "user.name", "embedded"]);
+        write(&embedded, "lib.rs", "line\n");
+        git(&embedded, &["add", "lib.rs"]);
+        git(&embedded, &["commit", "-m", "embedded repository"]);
+    }
+
     /// A repository whose `main` holds the base commit and whose track branch
     /// carries one committed change to `libs/domain/src/committed.rs` (+3
     /// lines). Nothing is staged, unstaged or untracked yet.
@@ -771,6 +632,24 @@ mod tests {
             r#"{"version": 2, "groups": {"domain": {"patterns": ["libs/domain/**"]}},
                 "review_operational": ["track/items/<track-id>/review.json"],
                 "other_track": [], "default_diff_ceiling_lines": 500}"#,
+        );
+        write(
+            root,
+            ".harness/config/scope-diff-exclusions.json",
+            r#"{"schema_version":1,"exclusions":[
+                "target/**", "target-*/**", "**/*.rs.bk",
+                ".claude/logs/**", ".claude/worktrees/**",
+                ".fastembed_cache/**", "**/.fastembed_cache/**",
+                ".semantic_index/**", "**/.semantic_index/**", ".semantic_index.*",
+                ".cache", "sotp-dry-index-*/**", ".env", ".env.*",
+                "**/*.pem", "**/*.key", "private/**", "config/secrets/**",
+                "tmp/**", ".cache/**", "libs/**/tmp/**", "apps/**/tmp/**",
+                ".harness/tools/**", "bin/sotp", ".cargo-install/**",
+                "repomix-output.txt", "repomix-output.xml", "repomix-output.*/**",
+                ".idea/**", ".vscode/**", ".locks/**",
+                "track/items/**/.commit_hash", "track/items/**/.commit_hash.tmp",
+                "track/items/*/*-graph*/**", "track/items/*/logs/**"
+            ]}"#,
         );
         write(root, "libs/domain/src/committed.rs", &"line\n".repeat(10));
         write(root, "libs/domain/src/staged.rs", &"line\n".repeat(5));
@@ -803,7 +682,12 @@ mod tests {
     /// runs each test in its own process.
     static CWD_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
-    fn measure_in(root: &std::path::Path) -> Vec<domain::batch_plan::MeasuredScopeDiff> {
+    fn measure_result_in(
+        root: &std::path::Path,
+    ) -> Result<
+        Vec<domain::batch_plan::MeasuredScopeDiff>,
+        usecase::batch_plan::ScopeDiffMeasureError,
+    > {
         use usecase::batch_plan::ScopeDiffMeasurePort;
 
         let _guard = CWD_LOCK.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
@@ -816,7 +700,11 @@ mod tests {
         );
 
         std::env::set_current_dir(original).unwrap();
-        measured.unwrap()
+        measured
+    }
+
+    fn measure_in(root: &std::path::Path) -> Vec<domain::batch_plan::MeasuredScopeDiff> {
+        measure_result_in(root).unwrap()
     }
 
     fn domain_lines(measured: &[domain::batch_plan::MeasuredScopeDiff]) -> u32 {
@@ -953,6 +841,72 @@ mod tests {
     }
 
     #[test]
+    fn test_operator_owned_exclusions_filter_visible_and_ignored_untracked_paths() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ".gitignore", "libs/domain/tmp/ignored.rs\n");
+        write(root, "libs/domain/tmp/visible.rs", &"line\n".repeat(7));
+        write(root, "libs/domain/tmp/ignored.rs", &"line\n".repeat(11));
+        write(root, "libs/domain/src/visible.pem", &"line\n".repeat(13));
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "shipped recursive and non-recursive policies must apply to visible and ignored paths"
+        );
+
+        write_exclusions_config(
+            root,
+            r#"{"schema_version":1,"exclusions":[
+                "libs/**/tmp/**", "libs/domain/src/operator-owned/**", "**/*.pem"
+            ]}"#,
+        );
+        write(root, "libs/domain/src/operator-owned/generated.rs", &"line\n".repeat(13));
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a new operator pattern must work without a source-code change"
+        );
+    }
+
+    #[test]
+    fn test_missing_scope_diff_exclusions_config_fails_closed() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        std::fs::remove_file(root.join(".harness/config/scope-diff-exclusions.json")).unwrap();
+
+        let error = measure_result_in(root).expect_err("the mandatory config must be present");
+        assert!(
+            error.to_string().contains(".harness/config/scope-diff-exclusions.json"),
+            "the failure identifies the missing required config: {error}"
+        );
+    }
+
+    #[test]
+    fn test_malformed_empty_and_unsafe_scope_diff_exclusions_configs_fail_closed() {
+        let repo = fixture_repo();
+        let root = repo.path();
+
+        for contents in [
+            "not json",
+            r#"{"schema_version":1,"exclusions":[]}"#,
+            r#"{"schema_version":1,"exclusions":[""]}"#,
+            r#"{"schema_version":1,"exclusions":["/root"]}"#,
+            r#"{"schema_version":1,"exclusions":[":(exclude)target/**"]}"#,
+            r#"{"schema_version":1,"exclusions":["libs/../target/**"]}"#,
+        ] {
+            write_exclusions_config(root, contents);
+            let error = measure_result_in(root)
+                .expect_err("malformed, empty, and invalid policy must fail closed");
+            assert!(
+                error.to_string().contains("scope-diff-exclusions.json"),
+                "the failure identifies the required config: {error}"
+            );
+        }
+    }
+
+    #[test]
     fn test_an_ignored_untracked_in_scope_file_is_counted_as_additions() {
         let repo = fixture_repo();
         let root = repo.path().to_path_buf();
@@ -968,10 +922,13 @@ mod tests {
 
     #[test]
     fn test_an_ignore_negated_visible_file_is_kept_for_scope_classification() {
+        // The negated file must not match the fixture's committed operator
+        // exclusions: overwriting that tracked config here would add its own
+        // diff lines to the `other` scope and obscure the assertion.
         let repo = fixture_repo();
         let root = repo.path().to_path_buf();
-        write(&root, ".gitignore", ".env*\n!.env.example\n");
-        write(&root, ".env.example", &"line\n".repeat(5));
+        write(&root, ".gitignore", "notes-*.md\n!notes-keep.md\n");
+        write(&root, "notes-keep.md", &"line\n".repeat(5));
 
         let measured = measure_in(&root);
         assert_eq!(
@@ -981,6 +938,127 @@ mod tests {
                 .map(|diff| diff.lines().value()),
             Some(7),
             "a visible ignore negation must not be filtered as a generated output"
+        );
+    }
+
+    #[test]
+    fn test_explicit_operator_exclusion_overrides_visible_ignore_negation() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ".gitignore", ".env*\n!.env.example\n");
+        write(root, ".env.example", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":[".env.example"]}"#);
+
+        let with_excluded_file = measure_in(root);
+        std::fs::remove_file(root.join(".env.example")).unwrap();
+        let without_file = measure_in(root);
+        assert_eq!(
+            with_excluded_file
+                .iter()
+                .find(|diff| diff.scope().to_string() == "other")
+                .map(|diff| diff.lines().value()),
+            without_file
+                .iter()
+                .find(|diff| diff.scope().to_string() == "other")
+                .map(|diff| diff.lines().value()),
+            "an explicit operator exclusion must win over a Git ignore negation"
+        );
+    }
+
+    #[test]
+    fn test_slashless_exclusion_is_root_anchored_like_git_pathspec() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, "Cargo.toml", &"line\n".repeat(5));
+        write(root, "libs/domain/src/Cargo.toml", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":["Cargo.toml"]}"#);
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3 + 5,
+            "a slashless top pathspec must not exclude a nested same-name file"
+        );
+    }
+
+    #[test]
+    fn test_literal_directory_exclusion_is_evaluated_by_git_for_visible_descendants() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, "libs/domain/src/operator-owned/generated.rs", &"line\n".repeat(5));
+        write_exclusions_config(
+            root,
+            r#"{"schema_version":1,"exclusions":["libs/domain/src/operator-owned"]}"#,
+        );
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a literal directory pathspec must exclude its visible descendants"
+        );
+    }
+
+    #[test]
+    fn test_posix_character_class_exclusion_is_evaluated_by_git() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, "libs/domain/src/Cargo.toml", &"line\n".repeat(5));
+        write_exclusions_config(
+            root,
+            r#"{"schema_version":1,"exclusions":["libs/domain/src/[[:upper:]]argo.toml"]}"#,
+        );
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "Git POSIX character classes must control the exclusion"
+        );
+    }
+
+    #[test]
+    fn test_an_ignore_negated_visible_file_inside_recursive_exclusion_is_dropped() {
+        let repo = fixture_repo();
+        let root = repo.path().to_path_buf();
+        write(&root, ".gitignore", "libs/domain/tmp/*\n!libs/domain/tmp/large-output\n");
+        write(&root, "libs/domain/tmp/large-output", &"line\n".repeat(5));
+
+        assert_eq!(
+            domain_lines(&measure_in(&root)),
+            3,
+            "a visible ignore negation must not bypass a recursive operator exclusion"
+        );
+    }
+
+    #[test]
+    fn test_an_ignore_negated_visible_file_cannot_bypass_a_non_recursive_exclusion() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ".gitignore", "*.pem\n!libs/domain/src/review.pem\n");
+        write(root, "libs/domain/src/review.pem", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":["*.pem"]}"#);
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a visible ignore negation must not bypass a credential-file exclusion"
+        );
+    }
+
+    #[test]
+    fn test_an_ignore_negated_visible_descendant_cannot_bypass_a_slash_pattern() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(
+            root,
+            ".gitignore",
+            "libs/*\n!libs/domain/\n!libs/domain/src/\n!libs/domain/src/review.rs\n",
+        );
+        write(root, "libs/domain/src/review.rs", &"line\n".repeat(5));
+        write_exclusions_config(root, r#"{"schema_version":1,"exclusions":["libs/*"]}"#);
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "a visible descendant must not bypass a slash-containing operator exclusion"
         );
     }
 
@@ -1000,6 +1078,33 @@ mod tests {
             domain_lines(&measure_in(&root)),
             3,
             "ignored build output must not consume the untracked-file read budget"
+        );
+    }
+
+    #[test]
+    fn test_an_embedded_git_repository_under_ignored_cache_prefix_is_skipped() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        embedded_git_repo(root, ".cache/cargo/advisory-dbs/advisory-db-3157b0e258782691");
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "an embedded repository under an excluded cache prefix must not be measured"
+        );
+    }
+
+    #[test]
+    fn test_an_ignored_embedded_git_repository_under_reviewable_prefix_is_skipped() {
+        let repo = fixture_repo();
+        let root = repo.path();
+        write(root, ".gitignore", "libs/domain/src/embedded-repository/\n");
+        embedded_git_repo(root, "libs/domain/src/embedded-repository");
+
+        assert_eq!(
+            domain_lines(&measure_in(root)),
+            3,
+            "an ignored nested repository directory entry must not be counted"
         );
     }
 

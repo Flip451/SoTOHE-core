@@ -5,13 +5,14 @@
 //! dry-check-owned adapter with its own error type [`DryCheckCommitHashError`].
 //! Behavior mirrors `FsCommitHashStore::read()`.
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use domain::CommitHash;
 use thiserror::Error;
 
 use crate::git_cli::SystemGitRepo;
 use crate::track::symlink_guard::reject_symlinks_below;
+use crate::trusted_file::{RecordLocation, locate_record, read_bounded_regular_file};
 
 /// `merge-base --is-ancestor` answers with its exit code and prints nothing, so
 /// the retention limit only has to cover a diagnostic line.
@@ -89,7 +90,9 @@ impl FsDryCheckCommitHashStore {
         // depends on is established here rather than assumed: the symlink guard
         // walks the components between the record and the trusted root, which says
         // nothing about whether the record is under it at all.
-        match locate_record(&self.path, &self.trusted_root)? {
+        match locate_record(&self.path, &self.trusted_root)
+            .map_err(|error| guard_failure(&error, &path_str))?
+        {
             RecordLocation::Inside => {}
             // No directory to hold the record: the same absence a read would find.
             RecordLocation::NoParent => return Ok(None),
@@ -105,7 +108,10 @@ impl FsDryCheckCommitHashStore {
         reject_symlinks_below(&self.path, &self.trusted_root)
             .map_err(|e| guard_failure(&e, &path_str))?;
 
-        let Some(content) = read_bounded_record(&self.path, &path_str)? else {
+        let Some(content) =
+            read_bounded_regular_file(&self.path, &self.trusted_root, MAX_COMMIT_RECORD_BYTES)
+                .map_err(|error| bounded_record_failure(&error, &path_str))?
+        else {
             // File absent → Ok(None) (main-tip fallback).
             return Ok(None);
         };
@@ -155,103 +161,6 @@ impl FsDryCheckCommitHashStore {
     }
 }
 
-/// Where the record sits relative to the trusted root.
-///
-/// Three outcomes rather than a bool: an absent parent directory and a record
-/// outside the root are different answers, and collapsing them would either turn
-/// an ordinary absence into a refusal or a refusal into a silent fallback.
-#[derive(Debug, PartialEq, Eq)]
-enum RecordLocation {
-    /// Inside the trusted root, in a directory that exists.
-    Inside,
-    /// No directory exists to hold the record.
-    NoParent,
-    /// Resolves outside the trusted root.
-    Outside,
-}
-
-/// Resolves where `path` sits relative to `trusted_root`, following the crate's
-/// canonical-containment pattern.
-///
-/// Containment is judged on the record's parent directory: the record itself is
-/// often absent — that is the ordinary main-tip fallback — and canonicalising a
-/// path that does not exist fails regardless of where it would have been.
-///
-/// An existing parent is judged canonically, so a symlink that escapes the root is
-/// caught. A parent that does not exist is judged lexically instead: it resolves
-/// to nothing, but it still names a location, and only a location inside the root
-/// may be reported as an ordinary absence.
-///
-/// # Errors
-///
-/// Returns [`DryCheckCommitHashError::Io`] when either path exists but cannot be
-/// resolved, classified without naming what was being resolved.
-fn locate_record(
-    path: &Path,
-    trusted_root: &Path,
-) -> Result<RecordLocation, DryCheckCommitHashError> {
-    let canonical_root =
-        trusted_root.canonicalize().map_err(|error| DryCheckCommitHashError::Io {
-            path: trusted_root.display().to_string(),
-            detail: crate::sanitized_failure::io_classification(&error).to_owned(),
-        })?;
-    let Some(parent) = path.parent() else {
-        return Ok(RecordLocation::Outside);
-    };
-    let canonical_parent = match parent.canonicalize() {
-        Ok(canonical_parent) => canonical_parent,
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-            let absolute_parent = if parent.is_absolute() {
-                parent.to_path_buf()
-            } else {
-                canonical_root.join(parent)
-            };
-
-            // A `NotFound` proves only that the leaf is missing, not that the way
-            // to it is honest: an intermediate symlink out of the root, followed
-            // by a component that does not exist, would otherwise be judged on the
-            // spelling alone and pass as an ordinary absence. So the part that does
-            // exist is resolved and checked first — that is where a hop would be.
-            let Some(existing) = nearest_existing_ancestor(&absolute_parent)? else {
-                return Ok(RecordLocation::Outside);
-            };
-            if !existing.starts_with(&canonical_root) {
-                return Ok(RecordLocation::Outside);
-            }
-
-            // Canonicalising says where the chain ends up, not what it passed
-            // through: a symlink whose target stays inside the root resolves
-            // happily, and a dangling one reports `NotFound` as though nothing were
-            // there at all. Neither may be walked past on the way to reporting an
-            // ordinary absence, so the guard inspects the chain itself — it reads
-            // link metadata rather than following it.
-            reject_symlinks_below(&absolute_parent, &canonical_root)
-                .map_err(|e| guard_failure(&e, &absolute_parent.display().to_string()))?;
-
-            // With the real part proven inside and unlinked, the missing remainder
-            // is judged on where it says it points.
-            let stated = crate::lexical_path::lexical_normalize(&absolute_parent);
-            return Ok(if stated.starts_with(&canonical_root) {
-                RecordLocation::NoParent
-            } else {
-                RecordLocation::Outside
-            });
-        }
-        Err(error) => {
-            return Err(DryCheckCommitHashError::Io {
-                path: path.display().to_string(),
-                detail: crate::sanitized_failure::io_classification(&error).to_owned(),
-            });
-        }
-    };
-
-    if canonical_parent.starts_with(&canonical_root) {
-        Ok(RecordLocation::Inside)
-    } else {
-        Ok(RecordLocation::Outside)
-    }
-}
-
 /// The most a well-formed record can occupy.
 ///
 /// A commit hash is 40 hexadecimal characters and the file holds one, with at most
@@ -259,92 +168,15 @@ fn locate_record(
 /// stray whitespace still reads, while a file that could exhaust memory does not.
 const MAX_COMMIT_RECORD_BYTES: u64 = 256;
 
-/// Reads the record, refusing anything that is not a small regular file.
-///
-/// Returns `Ok(None)` when the record is absent, which is the ordinary main-tip
-/// fallback. The type check is what keeps a FIFO from blocking the gate for ever:
-/// opening one blocks until a writer arrives, so the file type is settled before
-/// anything is opened, and the read is bounded regardless.
-///
-/// # Errors
-///
-/// Returns [`DryCheckCommitHashError::Io`] for a non-regular file, a file above
-/// the cap, or a read that fails, classified without naming the path.
-fn read_bounded_record(
-    path: &Path,
-    path_str: &str,
-) -> Result<Option<String>, DryCheckCommitHashError> {
-    let metadata = match std::fs::symlink_metadata(path) {
-        Ok(metadata) => metadata,
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
-        Err(error) => {
-            return Err(DryCheckCommitHashError::Io {
-                path: path_str.to_owned(),
-                detail: crate::sanitized_failure::io_classification(&error).to_owned(),
-            });
-        }
+/// Preserves dry-check's operator-facing distinctions while the actual guarded
+/// read is shared with the review-state adapter.
+fn bounded_record_failure(error: &std::io::Error, path: &str) -> DryCheckCommitHashError {
+    let detail = match error.to_string().as_str() {
+        "not a regular file" => "not a regular file".to_owned(),
+        "larger than the configured bound" => "larger than a commit record can be".to_owned(),
+        _ => crate::sanitized_failure::io_classification(error).to_owned(),
     };
-    if !metadata.file_type().is_file() {
-        return Err(DryCheckCommitHashError::Io {
-            path: path_str.to_owned(),
-            detail: "not a regular file".to_owned(),
-        });
-    }
-    if metadata.len() > MAX_COMMIT_RECORD_BYTES {
-        return Err(DryCheckCommitHashError::Io {
-            path: path_str.to_owned(),
-            detail: "larger than a commit record can be".to_owned(),
-        });
-    }
-
-    // Bounded regardless of what the metadata said: the file may grow between the
-    // check and the read.
-    let file = std::fs::File::open(path).map_err(|error| DryCheckCommitHashError::Io {
-        path: path_str.to_owned(),
-        detail: crate::sanitized_failure::io_classification(&error).to_owned(),
-    })?;
-    use std::io::Read as _;
-    let mut content = String::new();
-    file.take(MAX_COMMIT_RECORD_BYTES.saturating_add(1)).read_to_string(&mut content).map_err(
-        |error| DryCheckCommitHashError::Io {
-            path: path_str.to_owned(),
-            detail: crate::sanitized_failure::io_classification(&error).to_owned(),
-        },
-    )?;
-    if content.len() as u64 > MAX_COMMIT_RECORD_BYTES {
-        return Err(DryCheckCommitHashError::Io {
-            path: path_str.to_owned(),
-            detail: "larger than a commit record can be".to_owned(),
-        });
-    }
-
-    Ok(Some(content))
-}
-
-/// Canonicalises the closest ancestor of `path` that exists.
-///
-/// Walks up until a component resolves, so the answer describes real filesystem
-/// structure rather than the spelling of a path that is not there. Returns `None`
-/// when nothing along the way exists at all, which no trusted root can contain.
-///
-/// # Errors
-///
-/// Returns [`DryCheckCommitHashError::Io`] when an ancestor exists but cannot be
-/// resolved, classified without naming it.
-fn nearest_existing_ancestor(path: &Path) -> Result<Option<PathBuf>, DryCheckCommitHashError> {
-    for ancestor in path.ancestors() {
-        match ancestor.canonicalize() {
-            Ok(canonical) => return Ok(Some(canonical)),
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
-            Err(error) => {
-                return Err(DryCheckCommitHashError::Io {
-                    path: path.display().to_string(),
-                    detail: crate::sanitized_failure::io_classification(&error).to_owned(),
-                });
-            }
-        }
-    }
-    Ok(None)
+    DryCheckCommitHashError::Io { path: path.to_owned(), detail }
 }
 
 /// Classifies a symlink-guard failure for the record at `path`.
@@ -372,6 +204,8 @@ fn guard_failure(error: &std::io::Error, path: &str) -> DryCheckCommitHashError 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
+    use std::path::Path;
+
     use super::*;
 
     fn store_in_dir(dir: &tempfile::TempDir, filename: &str) -> FsDryCheckCommitHashStore {
@@ -597,7 +431,10 @@ mod tests {
             let located = locate_record(&record, root.path());
 
             assert!(
-                matches!(located, Err(DryCheckCommitHashError::SymlinkDetected { .. })),
+                located
+                    .as_ref()
+                    .err()
+                    .is_some_and(crate::track::symlink_guard::is_symlink_rejection),
                 "{label} symlink ancestor must be refused, got: {located:?}"
             );
             // And the adapter refuses rather than falling back.

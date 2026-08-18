@@ -1,7 +1,7 @@
 ---
 name: adr-diagnoser
 model: claude-opus-5
-effort: xhigh
+effort: high
 tools:
   - Read
   - Grep

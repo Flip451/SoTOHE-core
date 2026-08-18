@@ -1,0 +1,95 @@
+{
+  "plan": {
+    "sections": [
+      {
+        "description": [
+          "Update the scope-diff config targets and adapter regressions. D1; IN-01; CN-01; AC-01; AC-02."
+        ],
+        "id": "S1",
+        "task_ids": [
+          "T001"
+        ],
+        "title": "Scope-diff configuration"
+      },
+      {
+        "description": [
+          "Update the scope-diff adapter filtering target and regressions. D2; IN-02; CN-02; AC-03."
+        ],
+        "id": "S2",
+        "task_ids": [
+          "T002"
+        ],
+        "title": "Untracked directory filtering"
+      },
+      {
+        "description": [
+          "Update integration and in-process scaffold test targets. D3; IN-03; CN-03; AC-04."
+        ],
+        "id": "S3",
+        "task_ids": [
+          "T003"
+        ],
+        "title": "Scaffold placement"
+      },
+      {
+        "description": [
+          "Update the host-first scaffold test target and regression coverage. D4; IN-04; AC-05."
+        ],
+        "id": "S4",
+        "task_ids": [
+          "T004"
+        ],
+        "title": "Host-first scaffold lifecycle"
+      },
+      {
+        "description": [
+          "Update template-export transplant regression targets. D5; IN-05; OS-01; CN-04; AC-06; AC-07."
+        ],
+        "id": "S5",
+        "task_ids": [
+          "T005"
+        ],
+        "title": "Template-export transplant"
+      }
+    ],
+    "summary": [
+      "GO-01 → T001, T002, T003, T004, T005."
+    ]
+  },
+  "schema_version": 2,
+  "tasks": [
+    {
+      "commit_hash": "956d32a3c1270d1d8b37dc4da41cda168e9e340a",
+      "description": "Update `libs/infrastructure/src/scope_diff_measure.rs`, the scope-diff config under `.harness/config/`, and focused adapter regression tests. D1; IN-01; CN-01; AC-01; AC-02.",
+      "id": "T001",
+      "status": "done"
+    },
+    {
+      "commit_hash": "f16505f927b2733f5afc166c23e4eb70671681b7",
+      "description": "Update `libs/infrastructure/src/scope_diff_measure.rs` and focused adapter regression tests for untracked entry filtering. D2; IN-02; CN-02; AC-03.",
+      "id": "T002",
+      "status": "done"
+    },
+    {
+      "commit_hash": "956d32a3c1270d1d8b37dc4da41cda168e9e340a",
+      "description": "Update scaffold setup in `apps/cli/tests/` and the in-process export regression in `apps/cli-composition/src/template_export/mod.rs`. D3; IN-03; CN-03; AC-04.",
+      "id": "T003",
+      "status": "done"
+    },
+    {
+      "commit_hash": "f16505f927b2733f5afc166c23e4eb70671681b7",
+      "description": "Update `apps/cli/tests/consumer_scaffold_host_first.rs` and its focused regression coverage. D4; IN-04; AC-05.",
+      "id": "T004",
+      "status": "done"
+    },
+    {
+      "commit_hash": "e4088bdc2547364b0c62bce5433da4b5c7e70e85",
+      "depends_on": [
+        "T003"
+      ],
+      "description": "Update template-export transplant regressions in `apps/cli/tests/` and `apps/cli-composition/src/template_export/mod.rs`. D5; IN-05; OS-01; CN-04; AC-06; AC-07.",
+      "id": "T005",
+      "status": "done"
+    }
+  ]
+}

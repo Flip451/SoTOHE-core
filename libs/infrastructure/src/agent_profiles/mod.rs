@@ -8,8 +8,9 @@ mod types;
 
 pub use profiles::AgentProfiles;
 pub use types::{
-    AgentProfilesError, CapabilityConfigDto, ExecutionModeDto, ModelNameDto, ProviderNameDto,
-    ReasoningEffortDto, ResolvedExecution, RoundType,
+    AgentProfilesError, CapabilityConfigDto, CapabilityProviderBindingDto, ExecutionModeDto,
+    ModelNameDto, ModelProviderNameDto, ProviderNameDto, ReasoningEffortDto, ResolvedExecution,
+    RoundType,
 };
 
 /// Default path for the agent profiles configuration file.

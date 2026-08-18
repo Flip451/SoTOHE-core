@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "phases": [
+    {
+      "id": "spec-design",
+      "writer": {
+        "argv": [
+          "bin/sotp",
+          "capability",
+          "exec",
+          "spec-designer",
+          "--briefing-file",
+          "tmp/spec-designer-briefing.md"
+        ],
+        "timeout_seconds": 3600
+      },
+      "pre_entry_commands": [
+        {
+          "argv": ["bin/sotp", "signal", "check-adr-user", "--gate", "commit"],
+          "timeout_seconds": 3600
+        },
+        {
+          "argv": [
+            "bin/sotp",
+            "review",
+            "check-zero-findings",
+            "--scope",
+            "adr",
+            "--round",
+            "final"
+          ],
+          "timeout_seconds": 3600
+        }
+      ]
+    },
+    {
+      "id": "type-design",
+      "writer": {
+        "argv": [
+          "bin/sotp",
+          "capability",
+          "exec",
+          "type-designer",
+          "--briefing-file",
+          "tmp/type-designer-briefing.md"
+        ],
+        "timeout_seconds": 3600
+      },
+      "pre_entry_commands": [
+        {
+          "argv": ["bin/sotp", "signal", "check-spec-adr", "--gate", "commit"],
+          "timeout_seconds": 3600
+        },
+        {
+          "argv": ["bin/sotp", "ref-verify", "check-approved", "--chain", "1"],
+          "timeout_seconds": 3600
+        },
+        {
+          "argv": [
+            "bin/sotp",
+            "review",
+            "check-zero-findings",
+            "--scope",
+            "spec",
+            "--round",
+            "final"
+          ],
+          "timeout_seconds": 3600
+        }
+      ]
+    },
+    {
+      "id": "impl-plan",
+      "writer": {
+        "argv": [
+          "bin/sotp",
+          "capability",
+          "exec",
+          "impl-planner",
+          "--briefing-file",
+          "tmp/impl-planner-briefing.md"
+        ],
+        "timeout_seconds": 3600
+      },
+      "pre_entry_commands": [
+        {
+          "argv": ["bin/sotp", "signal", "check-catalog-spec", "--gate", "commit"],
+          "timeout_seconds": 3600
+        },
+        {
+          "argv": ["bin/sotp", "ref-verify", "check-approved", "--chain", "2"],
+          "timeout_seconds": 3600
+        },
+        {
+          "argv": [
+            "bin/sotp",
+            "review",
+            "check-zero-findings",
+            "--scope",
+            "types",
+            "--round",
+            "final"
+          ],
+          "timeout_seconds": 3600
+        }
+      ]
+    }
+  ]
+}

@@ -145,9 +145,13 @@ impl TestBindingsSkeletonApplicationService for TestBindingsSkeletonInteractor {
             return Err(TestBindingsSkeletonError::ObligationsAbsent);
         };
 
+        // D1: an obligation that owns no anchors is not a fulfillment target.
+        // Emitting a draft fulfillment would make `check` report a structural
+        // orphan as soon as the implementer persisted the skeleton.
         let records = obligations
             .obligations()
             .iter()
+            .filter(|obligation| !obligation.spec_refs().is_empty())
             .map(|obligation| {
                 TestBindingsSkeletonRecord::new(
                     obligation.id().entry_key().as_str().to_owned(),
@@ -172,7 +176,8 @@ mod tests {
     };
     use domain::tddd::test_obligation::hashes::DeclarationHash;
     use domain::tddd::test_obligation::ids::{
-        DiagnosticMessage, TestObligationBrief, TestObligationId, TestObligationItemIdentifier,
+        DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationId,
+        TestObligationItemIdentifier,
     };
     use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
     use domain::tddd::test_obligation::vocab::{TargetEntryRoleKind, TestObligationKind};
@@ -197,6 +202,12 @@ mod tests {
     }
 
     fn obligation() -> TestObligation {
+        obligation_with_spec_refs(vec![
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-05".to_owned()).unwrap(),
+        ])
+    }
+
+    fn obligation_with_spec_refs(spec_refs: Vec<TestObligationAnchorId>) -> TestObligation {
         let id = TestObligationId::new(
             CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
             TestObligationKind::Boundary,
@@ -213,7 +224,7 @@ mod tests {
             TargetEntryRoleKind::DataRole(DataRole::value_object()),
             TestObligationBrief::try_new("cover empty-name rejection".to_owned()).unwrap(),
             DeclarationHash::new(ContentHash::from_bytes([1; 32])),
-            Vec::new(),
+            spec_refs,
         )
     }
 
@@ -231,6 +242,17 @@ mod tests {
         assert_eq!(record.entry_key(), "domain::User");
         assert_eq!(record.obligation_kind(), "boundary");
         assert_eq!(record.item_identifier(), "invariant:non_empty");
+    }
+
+    #[test]
+    fn test_skeleton_omits_obligations_that_own_no_anchors() {
+        let service = TestBindingsSkeletonInteractor::new(Arc::new(StubObligations(Some(
+            ObligationsDocument::new(track(), vec![obligation_with_spec_refs(Vec::new())]),
+        ))));
+
+        let outcome = service.execute(&TestBindingsSkeletonCommand::new(track())).unwrap();
+
+        assert!(outcome.records().is_empty());
     }
 
     #[test]

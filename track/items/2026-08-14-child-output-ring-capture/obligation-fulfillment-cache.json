@@ -1,0 +1,334 @@
+{
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "CapturedProgramOutput"
+      },
+      "key": {
+        "anchor_text_hash": "57b65cc182ecced4c54b9f9c94dbee8bac16d1340f5220441bb3cb5330c7983d",
+        "bound_tests_set_hash": "aca24f153120f560992665477a765b0e9b5c3f122451e3e5b9405154624fde7c",
+        "declaration_hash": "01ac0778da3f5f6beadb82427eabd2681dff5cbc05b4835abcc629ba12b98549"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedProgramOutput",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit_code.as_i32(), 0); ... assert!(bytes.ends_with(b\"stdout-tail-marker\")); ... assert_eq!(exit_code.as_i32(), 0); ... assert!(bytes.ends_with(b\"stderr-tail-marker\"));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "CapturedProgramOutput"
+      },
+      "key": {
+        "anchor_text_hash": "3b5cfe1446ce90cdde311fa989f978180d6344b6f795386fa493ebeea487468f",
+        "bound_tests_set_hash": "c7d542688ef8972e56bfcfcf1d5068367316efca5e1b4ffc2e6c2b58dfb86e67",
+        "declaration_hash": "01ac0778da3f5f6beadb82427eabd2681dff5cbc05b4835abcc629ba12b98549"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedProgramOutput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "CapturedStreamOutput::TruncatedTail(bytes) => {\n                        assert!(bytes.ends_with(b\"stdout-tail-marker\"));\n                    }\n                    other => panic!(\"expected truncated stdout tail, got {other:?}\"),\n                }\n            }\n            other => panic!(\"expected output overflow to remain a normal exit, got {other:?}\"),",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "CapturedProgramOutput"
+      },
+      "key": {
+        "anchor_text_hash": "dcf23216c8ad0b481f47f8fd1bef04c76092a5aed4feb7ff1479c0076f6b56d6",
+        "bound_tests_set_hash": "96e4d10d0154a7d2ff0f20d2935603d375faa15398ab67df392165db41e86fcc",
+        "declaration_hash": "01ac0778da3f5f6beadb82427eabd2681dff5cbc05b4835abcc629ba12b98549"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedProgramOutput",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "CapturedStreamOutput::TruncatedTail(bytes) => {\n                        assert!(bytes.ends_with(b\"stderr-tail-marker\"));\n                    }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "CapturedStreamOutput"
+      },
+      "key": {
+        "anchor_text_hash": "57b65cc182ecced4c54b9f9c94dbee8bac16d1340f5220441bb3cb5330c7983d",
+        "bound_tests_set_hash": "13918a7335b5ac8f3d6f15800b1400cc59ee035e9d143c32884f3d981687c95b",
+        "declaration_hash": "5f4f9b52cb8b5afe205e7554e7fd8c83a35aa7d26e39c84a229b4ff915a7b128"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedStreamOutput",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "match output.stderr {\n                    CapturedStreamOutput::TruncatedTail(bytes) => {\n                        assert!(bytes.ends_with(b\"stderr-tail-marker\"));\n                    }\n                    other => panic!(\"expected truncated stderr tail, got {other:?}\"),\n                }\n            }\n            other => panic!(\"expected stderr overflow to remain a normal exit, got {other:?}\"),\n        }\n        assert!(\n            started.elapsed() < Duration::from_secs(5),\n            \"stderr overflow must not make the finite command hit its deadline\"\n        );",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "CapturedStreamOutput"
+      },
+      "key": {
+        "anchor_text_hash": "3b5cfe1446ce90cdde311fa989f978180d6344b6f795386fa493ebeea487468f",
+        "bound_tests_set_hash": "c7d542688ef8972e56bfcfcf1d5068367316efca5e1b4ffc2e6c2b58dfb86e67",
+        "declaration_hash": "5f4f9b52cb8b5afe205e7554e7fd8c83a35aa7d26e39c84a229b4ff915a7b128"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedStreamOutput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "CapturedStreamOutput::TruncatedTail(bytes) => {\n                        assert!(bytes.ends_with(b\"stdout-tail-marker\"));\n                    }\n                    other => panic!(\"expected truncated stdout tail, got {other:?}\"),\n                }\n            }\n            other => panic!(\"expected output overflow to remain a normal exit, got {other:?}\"),",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_continues_after_stderr_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "CapturedStreamOutput"
+      },
+      "key": {
+        "anchor_text_hash": "dcf23216c8ad0b481f47f8fd1bef04c76092a5aed4feb7ff1479c0076f6b56d6",
+        "bound_tests_set_hash": "96e4d10d0154a7d2ff0f20d2935603d375faa15398ab67df392165db41e86fcc",
+        "declaration_hash": "5f4f9b52cb8b5afe205e7554e7fd8c83a35aa7d26e39c84a229b4ff915a7b128"
+      },
+      "obligation_id": {
+        "entry_key": "CapturedStreamOutput",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "CapturedStreamOutput::TruncatedTail(bytes) => {\n                        assert!(bytes.ends_with(b\"stdout-tail-marker\"));\n                    }\n...\nother => panic!(\"expected output overflow to remain a normal exit, got {other:?}\"),",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_with_truncated_output_returns_succeeded"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "ProgramRunOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "57b65cc182ecced4c54b9f9c94dbee8bac16d1340f5220441bb3cb5330c7983d",
+        "bound_tests_set_hash": "52da2ac98f081122540844012d1dd7e77783b92278ba3580965f6ed16f60be66",
+        "declaration_hash": "87c291203eaf069673ca237679e8be41e7391ec7be09dbcea25851ef6295ff91"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "item_identifier": "voluntary:IN-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(exit_code.as_i32(), 0);\n                match output.stdout {\n                    CapturedStreamOutput::TruncatedTail(bytes) => {\n                        assert!(bytes.ends_with(b\"stdout-tail-marker\"));\n                    }",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_terminates_timed_out_process"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_with_truncated_output_returns_succeeded"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "ProgramRunOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "3b5cfe1446ce90cdde311fa989f978180d6344b6f795386fa493ebeea487468f",
+        "bound_tests_set_hash": "04f70f7c7a9743b34af7662392e51733c1cc69f6dc1905fc7a957fff9e724522",
+        "declaration_hash": "87c291203eaf069673ca237679e8be41e7391ec7be09dbcea25851ef6295ff91"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert!(matches!(\n            ProcessProgramRunner::new().run(invocation(&[\"sleep\", \"2\"], 1)).unwrap(),\n            ProgramRunOutcome::TimedOut { .. }\n        ));\n\n        assert!(matches!(\n                    success.as_ref().outcome,\n                    ProgramRunOutcome::Exited {\n                        output: CapturedProgramOutput {\n                            stdout: CapturedStreamOutput::TruncatedTail(_),\n                            ..\n                        },\n                        ..\n                    }\n                ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_port_run_continues_after_stdout_capture_limit_and_retains_tail"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::program_runner::tests",
+          "test_name": "test_program_runner_marks_only_discarded_output_as_truncated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::program_runner::tests",
+          "test_name": "test_program_execution_record_classify_zero_exit_with_truncated_output_returns_succeeded"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/spec.json"
+        },
+        "entry_key": "ProgramRunOutcome"
+      },
+      "key": {
+        "anchor_text_hash": "dcf23216c8ad0b481f47f8fd1bef04c76092a5aed4feb7ff1479c0076f6b56d6",
+        "bound_tests_set_hash": "4ec1c94715c94baae5f78bb99d8532e949f75bb5b6db48b99c9a6094c49709b2",
+        "declaration_hash": "87c291203eaf069673ca237679e8be41e7391ec7be09dbcea25851ef6295ff91"
+      },
+      "obligation_id": {
+        "entry_key": "ProgramRunOutcome",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "other => panic!(\"expected output overflow to remain a normal exit, got {other:?}\")",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ],
+  "track_id": "2026-08-14-child-output-ring-capture"
+}

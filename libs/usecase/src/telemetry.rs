@@ -16,93 +16,18 @@ use thiserror::Error;
 
 use crate::git_workflow::GitPrimitivePort;
 
-// ── TelemetryReportPort ───────────────────────────────────────────────────────
+pub mod command_trace;
+pub mod report;
+pub mod review_yield;
 
-/// Report record for a single telemetry phase duration.
-#[derive(Debug, Clone)]
-pub struct TelemetryPhaseDuration {
-    /// Phase name (command label).
-    pub phase_name: String,
-    /// Total milliseconds.
-    pub total_ms: u64,
-    /// Number of events.
-    pub event_count: usize,
-}
-
-/// A single error entry from telemetry.
-#[derive(Debug, Clone)]
-pub struct TelemetryErrorEntry {
-    /// ISO-8601 timestamp.
-    pub timestamp: String,
-    /// Command label.
-    pub command: String,
-    /// Exit code.
-    pub exit_code: i32,
-    /// Error chain text.
-    pub error_chain: String,
-}
-
-/// A single hook block entry from telemetry.
-#[derive(Debug, Clone)]
-pub struct TelemetryHookBlockEntry {
-    /// ISO-8601 timestamp.
-    pub timestamp: String,
-    /// Hook name.
-    pub hook_name: String,
-}
-
-/// Aggregated telemetry output for a track.
-#[derive(Debug, Clone)]
-pub struct TelemetryReportOutput {
-    /// Phase duration summaries sorted by phase name.
-    pub phase_durations: Vec<TelemetryPhaseDuration>,
-    /// Error entries.
-    pub errors: Vec<TelemetryErrorEntry>,
-    /// Hook block entries.
-    pub hook_blocks: Vec<TelemetryHookBlockEntry>,
-    /// Count of skipped (unparseable) lines.
-    pub skipped_lines: usize,
-}
-
-/// Error type for [`TelemetryReportPort`].
-#[derive(Debug, thiserror::Error)]
-pub enum TelemetryReportError {
-    /// The specified track directory does not exist.
-    #[error("track not found: {0}")]
-    TrackNotFound(String),
-    /// The telemetry report could not be loaded.
-    #[error("telemetry report unavailable: {0}")]
-    ReportUnavailable(String),
-}
-
-/// Error type for [`TelemetryEmitDynamicPort`].
-#[derive(Debug, Error)]
-pub enum TelemetryEmitDynamicPortError {
-    /// Resolution or I/O failure when emitting the telemetry event.
-    #[error("emit unavailable: {0}")]
-    EmitUnavailable(String),
-}
-
-/// Secondary port for emitting archived-track telemetry with dynamic path resolution.
-///
-/// Unlike [`ArchivedTrackTelemetryPort`], this port accepts the full context at
-/// call time (including `items_dir` and `track_id`) so the driver does not need
-/// to know the repo root at construction time.
-pub trait TelemetryEmitDynamicPort: Send + Sync {
-    /// Emit a telemetry event for an archived-track subcommand.
-    ///
-    /// # Errors
-    /// Returns [`TelemetryEmitDynamicPortError::EmitUnavailable`] on resolution
-    /// or I/O failure.
-    fn emit_archived(
-        &self,
-        items_dir: &Path,
-        track_id: &str,
-        subcommand: String,
-        exit_code: i32,
-        duration_ms: u64,
-    ) -> Result<(), TelemetryEmitDynamicPortError>;
-}
+pub use report::{
+    TelemetryErrorEntry, TelemetryHookBlockEntry, TelemetryPhaseDuration, TelemetryReportError,
+    TelemetryReportOutput,
+};
+pub use review_yield::{
+    ReviewDetectionRateBasisPoints, ReviewExecutionCount, ReviewFindingCount, ReviewYieldMetric,
+    ReviewYieldValue, ReviewYieldValueError,
+};
 
 /// Secondary port for aggregating telemetry JSONL data for a track.
 ///
@@ -125,6 +50,37 @@ pub trait TelemetryReportPort: Send + Sync {
     ) -> Result<TelemetryReportOutput, TelemetryReportError>;
 }
 
+/// Error type for [`TelemetryEmitDynamicPort`].
+#[derive(Debug, Error)]
+pub enum TelemetryEmitDynamicPortError {
+    /// Resolution or I/O failure when emitting the telemetry event.
+    #[error("emit unavailable: {0}")]
+    EmitUnavailable(String),
+}
+
+/// Secondary port for emitting archived-track telemetry with dynamic path resolution.
+///
+/// Unlike [`ArchivedTrackTelemetryPort`], this port accepts the full context at
+/// call time (including `items_dir` and `track_id`) so the driver does not need
+/// to know the repo root at construction time.
+pub trait TelemetryEmitDynamicPort: Send + Sync {
+    /// Emit an active-track command completion into the existing telemetry
+    /// writer path. `source_track_id` is captured before command dispatch so
+    /// a command that changes branches cannot retarget the record.
+    /// This port is intentionally synchronous because filesystem adapters may
+    /// perform blocking I/O; failures are returned through the typed error.
+    ///
+    fn emit_active(
+        &self,
+        items_dir: &Path,
+        source_track_id: Option<&str>,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+        error_chain: Option<String>,
+    ) -> Result<(), TelemetryEmitDynamicPortError>;
+}
+
 // ── TelemetryAggregateService ─────────────────────────────────────────────────
 
 /// Error type for [`TelemetryAggregateService`].
@@ -139,34 +95,40 @@ pub enum TelemetryAggregateServiceError {
     EmitUnavailable(String),
 }
 
-/// Aggregate primary port for the `telemetry` command family.
-///
-/// `TelemetryDriver` holds exactly one `Arc<dyn TelemetryAggregateService>` and
-/// delegates each `TelemetryInput` variant to the corresponding method.
-/// The concrete implementation in `cli_composition` wires both sub-services
-/// internally, keeping the driver free of multi-service injection (D3/D4
-/// cli_driver policy).
-pub trait TelemetryAggregateService: Send + Sync {
+/// Report-facing primary port for the `telemetry` command family.
+pub trait TelemetryReportService: Send + Sync {
     /// Aggregate telemetry data for `track_id` and return the structured DTO.
-    ///
-    /// Presentation formatting (the final report string) is the responsibility
-    /// of the driver layer (`cli_driver::telemetry`); this method returns the
-    /// raw `TelemetryReportOutput` so the driver can render it.
-    ///
-    /// # Errors
-    /// Returns [`TelemetryAggregateServiceError::ReportUnavailable`] on
-    /// track-not-found or I/O failure.
+    /// This service is intentionally synchronous because report adapters may
+    /// perform blocking filesystem reads.
     fn report(
         &self,
         track_id: &str,
         items_dir: &Path,
     ) -> Result<TelemetryReportOutput, TelemetryAggregateServiceError>;
+}
 
+/// Active-track emission primary port for the `telemetry` command family.
+pub trait TelemetryEmitService: Send + Sync {
+    /// Emit a completion through the existing active-track telemetry writer.
+    /// Implementations preserve the fire-and-forget diagnostic policy.
+    /// The boundary remains synchronous because the adapter may perform
+    /// blocking filesystem I/O.
+    fn emit_completed(
+        &self,
+        items_dir: &Path,
+        source_track_id: Option<String>,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+        error_chain: Option<String>,
+    ) -> Result<(), TelemetryAggregateServiceError>;
+}
+
+/// Archived-track port for the existing archive workflow.
+pub trait TelemetryArchivedService: Send + Sync {
     /// Emit a telemetry event for a subcommand dispatched against an archived track.
-    ///
-    /// # Errors
-    /// Returns [`TelemetryAggregateServiceError::EmitUnavailable`] on resolution
-    /// or I/O failure.
+    /// This port is synchronous because its adapter may perform
+    /// blocking filesystem I/O.
     fn emit_archived(
         &self,
         items_dir: &Path,
@@ -175,6 +137,15 @@ pub trait TelemetryAggregateService: Send + Sync {
         exit_code: i32,
         duration_ms: u64,
     ) -> Result<(), TelemetryAggregateServiceError>;
+}
+
+/// Single driver-facing service surface composed from the report, active
+/// completion, and the existing archived-track port. Keeping this
+/// marker as the only injected trait preserves the cli_driver composition
+/// boundary while allowing each responsibility to carry its own SoT anchors.
+pub trait TelemetryAggregateService:
+    TelemetryReportService + TelemetryEmitService + TelemetryArchivedService + Send + Sync
+{
 }
 
 // ── Error ─────────────────────────────────────────────────────────────────────
@@ -339,16 +310,51 @@ impl TelemetryReportInteractor {
     }
 }
 
-/// UseCase interactor for the archived-track telemetry emit path. Holds the
-/// git-primitive port (repo-root resolution) and the archived-telemetry
-/// factory port. IN-10 / CN-03 / AC-09.
+/// UseCase interactor for active-track telemetry emission.
 pub struct TelemetryEmitInteractor {
+    active_emit: Arc<dyn TelemetryEmitDynamicPort>,
+}
+
+impl TelemetryEmitInteractor {
+    /// Inject the active-track emission port.
+    #[must_use]
+    pub fn new(active_emit: Arc<dyn TelemetryEmitDynamicPort>) -> Self {
+        Self { active_emit }
+    }
+
+    /// Emit an active-track command completion. The infrastructure adapter
+    /// owns branch-bound resolution, the existing telemetry writer, and the
+    /// fail-open write policy.
+    pub fn emit_completed(
+        &self,
+        items_dir: &Path,
+        source_track_id: Option<String>,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+        error_chain: Option<String>,
+    ) -> Result<(), TelemetryAggregateServiceError> {
+        self.active_emit
+            .emit_active(
+                items_dir,
+                source_track_id.as_deref(),
+                subcommand,
+                exit_code,
+                duration_ms,
+                error_chain,
+            )
+            .map_err(|e| TelemetryAggregateServiceError::EmitUnavailable(e.to_string()))
+    }
+}
+
+/// UseCase interactor for archived-track telemetry emission.
+pub struct TelemetryArchiveInteractor {
     git: Arc<dyn GitPrimitivePort>,
     archived_factory: Arc<dyn ArchivedTelemetryFactoryPort>,
 }
 
-impl TelemetryEmitInteractor {
-    /// Inject the git-primitive and archived-telemetry-factory ports.
+impl TelemetryArchiveInteractor {
+    /// Inject the repo-root and archived-event ports.
     #[must_use]
     pub fn new(
         git: Arc<dyn GitPrimitivePort>,
@@ -358,10 +364,6 @@ impl TelemetryEmitInteractor {
     }
 
     /// Emit an archived-track telemetry event.
-    ///
-    /// # Errors
-    /// Returns [`TelemetryAggregateServiceError::EmitUnavailable`] on malformed
-    /// `items_dir` / repo-root resolution failure / emit failure.
     pub fn emit_archived(
         &self,
         items_dir: &Path,
@@ -385,7 +387,10 @@ impl TelemetryEmitInteractor {
             ))
         })?;
 
-        // Telemetry directory for the archived track.
+        // The existing archived-track workflow owns its archive-local sink;
+        // preserve that path for callers of the archived service. The common
+        // command-completion path uses `emit_completed` and writes to the
+        // active `track/items/<track-id>/logs/telemetry.jsonl` sink instead.
         let telemetry_dir =
             repo_root.join("track").join("archive").join(track_id.as_ref()).join("logs");
 
@@ -402,21 +407,63 @@ impl TelemetryEmitInteractor {
     }
 }
 
+impl TelemetryEmitService for TelemetryEmitInteractor {
+    fn emit_completed(
+        &self,
+        items_dir: &Path,
+        source_track_id: Option<String>,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+        error_chain: Option<String>,
+    ) -> Result<(), TelemetryAggregateServiceError> {
+        self.emit_completed(
+            items_dir,
+            source_track_id,
+            subcommand,
+            exit_code,
+            duration_ms,
+            error_chain,
+        )
+    }
+}
+
+impl TelemetryArchivedService for TelemetryArchiveInteractor {
+    fn emit_archived(
+        &self,
+        items_dir: &Path,
+        track_id: &str,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+    ) -> Result<(), TelemetryAggregateServiceError> {
+        let track_id = domain::TrackId::try_new(track_id.to_owned()).map_err(|e| {
+            TelemetryAggregateServiceError::EmitUnavailable(format!("invalid track ID: {e}"))
+        })?;
+        self.emit_archived(items_dir, &track_id, subcommand, exit_code, duration_ms)
+    }
+}
+
 // ── TelemetryAggregateInteractor ────────────────────────────────────────────────
 
-/// Thin facade implementing [`TelemetryAggregateService`] over the two split
-/// interactors, preserving the single driver-facing service surface.
+/// Thin facade implementing [`TelemetryAggregateService`] over the focused
+/// report, active-emission, and archive interactors.
 /// IN-10 / CN-03 / AC-09.
 pub struct TelemetryAggregateInteractor {
     report: TelemetryReportInteractor,
-    emit: TelemetryEmitInteractor,
+    emit: Arc<TelemetryEmitInteractor>,
+    archived: Arc<TelemetryArchiveInteractor>,
 }
 
 impl TelemetryAggregateInteractor {
-    /// Compose the report and emit interactors behind the service facade.
+    /// Compose the report and focused emitters behind the service facade.
     #[must_use]
-    pub fn new(report: TelemetryReportInteractor, emit: TelemetryEmitInteractor) -> Self {
-        Self { report, emit }
+    pub fn new(
+        report: TelemetryReportInteractor,
+        emit: Arc<TelemetryEmitInteractor>,
+        archived: Arc<TelemetryArchiveInteractor>,
+    ) -> Self {
+        Self { report, emit, archived }
     }
 }
 
@@ -440,7 +487,7 @@ fn project_root_from_items_dir(items_dir: &Path) -> Option<PathBuf> {
     }
 }
 
-impl TelemetryAggregateService for TelemetryAggregateInteractor {
+impl TelemetryReportService for TelemetryAggregateInteractor {
     // The facade owns track-id validation: the baseline service trait keeps the
     // raw `&str` driver-facing surface, and the sub-interactors only accept the
     // validated `domain::TrackId` (IN-10 / CN-03 / AC-09).
@@ -454,7 +501,30 @@ impl TelemetryAggregateService for TelemetryAggregateInteractor {
         })?;
         self.report.report(&track_id, items_dir)
     }
+}
 
+impl TelemetryEmitService for TelemetryAggregateInteractor {
+    fn emit_completed(
+        &self,
+        items_dir: &Path,
+        source_track_id: Option<String>,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+        error_chain: Option<String>,
+    ) -> Result<(), TelemetryAggregateServiceError> {
+        self.emit.emit_completed(
+            items_dir,
+            source_track_id,
+            subcommand,
+            exit_code,
+            duration_ms,
+            error_chain,
+        )
+    }
+}
+
+impl TelemetryArchivedService for TelemetryAggregateInteractor {
     fn emit_archived(
         &self,
         items_dir: &Path,
@@ -466,9 +536,11 @@ impl TelemetryAggregateService for TelemetryAggregateInteractor {
         let track_id = domain::TrackId::try_new(track_id.to_owned()).map_err(|e| {
             TelemetryAggregateServiceError::EmitUnavailable(format!("invalid track ID: {e}"))
         })?;
-        self.emit.emit_archived(items_dir, &track_id, subcommand, exit_code, duration_ms)
+        self.archived.emit_archived(items_dir, &track_id, subcommand, exit_code, duration_ms)
     }
 }
+
+impl TelemetryAggregateService for TelemetryAggregateInteractor {}
 
 // ── Unit tests ────────────────────────────────────────────────────────────────
 
@@ -587,8 +659,9 @@ mod tests {
 // ── TelemetryAggregateInteractor tests ──────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 mod aggregate_interactor_tests {
+    use std::num::NonZeroU64;
     use std::path::{Path, PathBuf};
     use std::sync::{Arc, Mutex};
 
@@ -598,21 +671,32 @@ mod aggregate_interactor_tests {
 
     use super::{
         ArchivedTelemetryFactoryPort, ArchivedTrackTelemetryError, ArchivedTrackTelemetryPort,
-        TelemetryAggregateService, TelemetryAggregateServiceError, TelemetryErrorEntry,
+        TelemetryAggregateServiceError, TelemetryArchivedService, TelemetryEmitDynamicPort,
+        TelemetryEmitDynamicPortError, TelemetryEmitService, TelemetryErrorEntry,
         TelemetryHookBlockEntry, TelemetryPhaseDuration, TelemetryReportError,
-        TelemetryReportOutput, TelemetryReportPort,
+        TelemetryReportOutput, TelemetryReportPort, TelemetryReportService,
+        command_trace::TelemetrySkippedLineCount,
+    };
+    use crate::capability_exec::{ModelName, ProviderName, ReasoningEffort};
+    use crate::telemetry::command_trace::{
+        CommandDurationMillis, CommandExecutionCount, CommandExecutionMetric, SotpCommandIdentity,
+    };
+    use crate::telemetry::review_yield::{
+        ReviewDetectionRateBasisPoints, ReviewExecutionCount, ReviewFindingCount,
+        ReviewYieldMetric, ReviewYieldValue, ReviewYieldValueError,
     };
 
     /// Minimal [`GitPrimitivePort`] stub: only `resolve_repo_root` is meaningful;
     /// every other primitive returns a benign default. `repo_root == None` makes
     /// `resolve_repo_root` fail (to exercise the emit error path).
+    #[derive(Default)]
     struct StubGit {
         repo_root: Option<PathBuf>,
     }
 
     impl GitPrimitivePort for StubGit {
         fn current_branch(&self, _pr: Option<&Path>) -> Result<Option<String>, GitWorkflowError> {
-            Ok(None)
+            Ok(Some("track/feature-2026-07-04".to_owned()))
         }
         fn sync_current_branch(&self, _pr: Option<&Path>) -> Result<(), GitWorkflowError> {
             Ok(())
@@ -750,6 +834,51 @@ mod aggregate_interactor_tests {
         }
     }
 
+    #[derive(Default)]
+    struct RecordingActivePort {
+        calls: Mutex<Vec<ActiveEmission>>,
+        attempts: Mutex<usize>,
+        fail: bool,
+    }
+
+    #[derive(Debug, Eq, PartialEq)]
+    struct ActiveEmission {
+        items_dir: PathBuf,
+        source_track_id: Option<String>,
+        subcommand: String,
+        exit_code: i32,
+        duration_ms: u64,
+        error_chain: Option<String>,
+    }
+
+    impl TelemetryEmitDynamicPort for RecordingActivePort {
+        fn emit_active(
+            &self,
+            items_dir: &Path,
+            source_track_id: Option<&str>,
+            subcommand: String,
+            exit_code: i32,
+            duration_ms: u64,
+            error_chain: Option<String>,
+        ) -> Result<(), TelemetryEmitDynamicPortError> {
+            *self.attempts.lock().unwrap() += 1;
+            if self.fail {
+                return Err(TelemetryEmitDynamicPortError::EmitUnavailable(
+                    "active telemetry unavailable".to_owned(),
+                ));
+            }
+            self.calls.lock().unwrap().push(ActiveEmission {
+                items_dir: items_dir.to_owned(),
+                source_track_id: source_track_id.map(str::to_owned),
+                subcommand,
+                exit_code,
+                duration_ms,
+                error_chain,
+            });
+            Ok(())
+        }
+    }
+
     /// Factory stub: records the `telemetry_dir` it was asked to build and hands
     /// back a shared [`RecordingArchivedPort`].
     struct StubFactory {
@@ -769,8 +898,25 @@ mod aggregate_interactor_tests {
             phase_durations: Vec::<TelemetryPhaseDuration>::new(),
             errors: Vec::<TelemetryErrorEntry>::new(),
             hook_blocks: Vec::<TelemetryHookBlockEntry>::new(),
-            skipped_lines: 0,
+            skipped_lines: TelemetrySkippedLineCount::from(0),
+            command_metrics: Vec::new(),
+            review_yield_metrics: Vec::new(),
         }
+    }
+
+    fn build_aggregate(
+        git: Arc<dyn super::GitPrimitivePort>,
+        report: Arc<dyn super::TelemetryReportPort>,
+        factory: Arc<dyn super::ArchivedTelemetryFactoryPort>,
+        active: Arc<dyn super::TelemetryEmitDynamicPort>,
+    ) -> super::TelemetryAggregateInteractor {
+        let emit = Arc::new(super::TelemetryEmitInteractor::new(active));
+        let archived = Arc::new(super::TelemetryArchiveInteractor::new(Arc::clone(&git), factory));
+        super::TelemetryAggregateInteractor::new(
+            super::TelemetryReportInteractor::new(report),
+            emit,
+            archived,
+        )
     }
 
     fn facade(
@@ -778,10 +924,16 @@ mod aggregate_interactor_tests {
         report: Arc<dyn super::TelemetryReportPort>,
         factory: Arc<dyn super::ArchivedTelemetryFactoryPort>,
     ) -> super::TelemetryAggregateInteractor {
-        super::TelemetryAggregateInteractor::new(
-            super::TelemetryReportInteractor::new(report),
-            super::TelemetryEmitInteractor::new(git, factory),
-        )
+        build_aggregate(git, report, factory, Arc::new(RecordingActivePort::default()))
+    }
+
+    fn facade_with_active(
+        git: Arc<dyn super::GitPrimitivePort>,
+        report: Arc<dyn super::TelemetryReportPort>,
+        factory: Arc<dyn super::ArchivedTelemetryFactoryPort>,
+        active: Arc<dyn super::TelemetryEmitDynamicPort>,
+    ) -> super::TelemetryAggregateInteractor {
+        build_aggregate(git, report, factory, active)
     }
 
     #[test]
@@ -795,7 +947,124 @@ mod aggregate_interactor_tests {
         let interactor = facade(git, report, factory);
 
         let out = interactor.report("t", Path::new("track/items")).unwrap();
-        assert_eq!(out.skipped_lines, 0);
+        assert_eq!(*out.skipped_lines.as_ref(), 0);
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_interactor_report_typed_metrics_preserves_values()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let metric = CommandExecutionMetric::new(
+            SotpCommandIdentity::try_new("telemetry".to_owned())?,
+            CommandExecutionCount::from(4),
+            CommandExecutionCount::from(1),
+            CommandDurationMillis::from(240),
+        )?;
+        let output = TelemetryReportOutput {
+            phase_durations: Vec::new(),
+            errors: Vec::new(),
+            hook_blocks: Vec::new(),
+            skipped_lines: TelemetrySkippedLineCount::from(2),
+            command_metrics: vec![metric],
+            review_yield_metrics: Vec::new(),
+        };
+        let git = Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) });
+        let report = Arc::new(StubReport { result: Mutex::new(Some(Ok(output))) });
+        let factory = Arc::new(StubFactory {
+            built_dir: Mutex::new(None),
+            port: Arc::new(RecordingArchivedPort::default()),
+        });
+        let interactor = facade(git, report, factory);
+
+        let output = interactor.report("t", Path::new("track/items"))?;
+
+        assert_eq!(*output.skipped_lines.as_ref(), 2);
+        assert_eq!(output.command_metrics.len(), 1);
+        assert_eq!(
+            output.command_metrics.first().map(|metric| metric.command().as_str()),
+            Some("telemetry")
+        );
+        assert_eq!(
+            output.command_metrics.first().map(|metric| *metric.executions().as_ref()),
+            Some(4)
+        );
+        assert_eq!(
+            output.command_metrics.first().map(|metric| *metric.total_duration().as_ref()),
+            Some(240)
+        );
+        assert_eq!(
+            output.command_metrics.first().map(|metric| metric.failure_rate().value()),
+            Some(2_500)
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_review_yield_value_objects_preserve_valid_counts_and_rate()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let findings = ReviewFindingCount::new(2);
+        let executions = ReviewExecutionCount::new(
+            NonZeroU64::new(3).expect("the test execution count must be non-zero"),
+        );
+        let detection_rate = ReviewDetectionRateBasisPoints::try_new(6_666)?;
+
+        assert_eq!(findings.value(), 2);
+        assert_eq!(executions.to_string(), "3");
+        assert_eq!(detection_rate.to_string(), "6666");
+        Ok(())
+    }
+
+    #[test]
+    fn test_review_yield_value_covers_each_recorded_axis() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let values = [
+            ReviewYieldValue::Scope(domain::review_v2::ScopeName::parse("architecture")?),
+            ReviewYieldValue::RoundType(domain::review_v2::RoundType::Final),
+            ReviewYieldValue::Provider(ProviderName::try_new("codex".to_owned())?),
+            ReviewYieldValue::Model(ModelName::try_new("gpt-5".to_owned())?),
+            ReviewYieldValue::ReasoningEffort(ReasoningEffort::High),
+        ];
+
+        assert_eq!(values.len(), 5);
+        Ok(())
+    }
+
+    #[test]
+    fn test_review_yield_detection_rate_rejects_out_of_range_value() {
+        let result = ReviewDetectionRateBasisPoints::try_new(10_001);
+
+        assert!(matches!(result, Err(ReviewYieldValueError::DetectionRateOutOfRange)));
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_interactor_report_preserves_review_yield_metrics()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let metric = ReviewYieldMetric {
+            value: ReviewYieldValue::Provider(ProviderName::try_new("codex".to_owned())?),
+            execution_count: ReviewExecutionCount::new(
+                NonZeroU64::new(3).expect("the test execution count must be non-zero"),
+            ),
+            detection_rate: ReviewDetectionRateBasisPoints::try_new(3_333)?,
+        };
+        let output = TelemetryReportOutput {
+            phase_durations: Vec::new(),
+            errors: Vec::new(),
+            hook_blocks: Vec::new(),
+            skipped_lines: TelemetrySkippedLineCount::from(0),
+            command_metrics: Vec::new(),
+            review_yield_metrics: vec![metric.clone()],
+        };
+        let report = Arc::new(StubReport { result: Mutex::new(Some(Ok(output))) });
+        let factory = Arc::new(StubFactory {
+            built_dir: Mutex::new(None),
+            port: Arc::new(RecordingArchivedPort::default()),
+        });
+        let interactor =
+            facade(Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) }), report, factory);
+
+        let output = interactor.report("t", Path::new("track/items"))?;
+
+        assert_eq!(output.review_yield_metrics, vec![metric]);
+        Ok(())
     }
 
     #[test]
@@ -813,6 +1082,184 @@ mod aggregate_interactor_tests {
         let err = interactor.report("t", Path::new("track/items")).unwrap_err();
         assert!(matches!(err, TelemetryAggregateServiceError::ReportUnavailable(_)));
         assert!(err.to_string().contains("telemetry report:"));
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_interactor_emit_completed_records_identity_duration_exit_and_error()
+    {
+        let git = Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) });
+        let report = Arc::new(StubReport { result: Mutex::new(None) });
+        let factory = Arc::new(StubFactory {
+            built_dir: Mutex::new(None),
+            port: Arc::new(RecordingArchivedPort::default()),
+        });
+        let active = Arc::new(RecordingActivePort::default());
+        let interactor = facade_with_active(
+            git,
+            report,
+            factory,
+            Arc::clone(&active) as Arc<dyn TelemetryEmitDynamicPort>,
+        );
+
+        interactor
+            .emit_completed(
+                Path::new("/repo/track/items"),
+                Some("track-id".to_owned()),
+                "sotp dry".to_owned(),
+                17,
+                240,
+                Some("command failed".to_owned()),
+            )
+            .unwrap();
+
+        assert_eq!(
+            active.calls.lock().unwrap().as_slice(),
+            [ActiveEmission {
+                items_dir: PathBuf::from("/repo/track/items"),
+                source_track_id: Some("track-id".to_owned()),
+                subcommand: "sotp dry".to_owned(),
+                exit_code: 17,
+                duration_ms: 240,
+                error_chain: Some("command failed".to_owned()),
+            }]
+        );
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_interactor_emit_completed_forwards_completion() {
+        let active = Arc::new(RecordingActivePort::default());
+        let interactor = facade_with_active(
+            Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) }),
+            Arc::new(StubReport { result: Mutex::new(None) }),
+            Arc::new(StubFactory {
+                built_dir: Mutex::new(None),
+                port: Arc::new(RecordingArchivedPort::default()),
+            }),
+            Arc::clone(&active) as Arc<dyn TelemetryEmitDynamicPort>,
+        );
+
+        interactor
+            .emit_completed(
+                Path::new("/repo/track/items"),
+                None,
+                "sotp dry".to_owned(),
+                0,
+                240,
+                None,
+            )
+            .unwrap();
+
+        assert_eq!(
+            active.calls.lock().unwrap().as_slice(),
+            [ActiveEmission {
+                items_dir: PathBuf::from("/repo/track/items"),
+                source_track_id: None,
+                subcommand: "sotp dry".to_owned(),
+                exit_code: 0,
+                duration_ms: 240,
+                error_chain: None,
+            }]
+        );
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_service_reports_and_emits_completed_track_event() {
+        let metric = CommandExecutionMetric::new(
+            SotpCommandIdentity::try_new("sotp dry".to_owned()).unwrap(),
+            CommandExecutionCount::from(2),
+            CommandExecutionCount::from(1),
+            CommandDurationMillis::from(240),
+        )
+        .unwrap();
+        let report = Arc::new(StubReport {
+            result: Mutex::new(Some(Ok(TelemetryReportOutput {
+                phase_durations: Vec::new(),
+                errors: Vec::new(),
+                hook_blocks: Vec::new(),
+                skipped_lines: TelemetrySkippedLineCount::from(0),
+                command_metrics: vec![metric],
+                review_yield_metrics: Vec::new(),
+            }))),
+        });
+        let archived = Arc::new(RecordingArchivedPort::default());
+        let factory =
+            Arc::new(StubFactory { built_dir: Mutex::new(None), port: Arc::clone(&archived) });
+        let active = Arc::new(RecordingActivePort::default());
+        let interactor = facade_with_active(
+            Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) }),
+            report,
+            factory,
+            Arc::clone(&active) as Arc<dyn TelemetryEmitDynamicPort>,
+        );
+
+        let output =
+            interactor.report("feature-2026-07-04", Path::new("/repo/track/items")).unwrap();
+        assert_eq!(output.command_metrics.len(), 1);
+        assert_eq!(output.command_metrics[0].command().as_str(), "sotp dry");
+        interactor
+            .emit_archived(
+                Path::new("/repo/track/items"),
+                "feature-2026-07-04",
+                "sotp dry".to_owned(),
+                0,
+                240,
+            )
+            .unwrap();
+        interactor
+            .emit_completed(
+                Path::new("/repo/track/items"),
+                Some("track-id".to_owned()),
+                "sotp dry".to_owned(),
+                17,
+                240,
+                Some("command failed".to_owned()),
+            )
+            .unwrap();
+
+        assert_eq!(archived.calls.lock().unwrap().len(), 1);
+        assert_eq!(
+            active.calls.lock().unwrap().as_slice(),
+            [ActiveEmission {
+                items_dir: PathBuf::from("/repo/track/items"),
+                source_track_id: Some("track-id".to_owned()),
+                subcommand: "sotp dry".to_owned(),
+                exit_code: 17,
+                duration_ms: 240,
+                error_chain: Some("command failed".to_owned()),
+            }]
+        );
+    }
+
+    #[test]
+    fn test_telemetry_aggregate_interactor_emit_completed_reports_active_append_failure() {
+        let active = Arc::new(RecordingActivePort {
+            calls: Mutex::new(Vec::new()),
+            attempts: Mutex::new(0),
+            fail: true,
+        });
+        let interactor = facade_with_active(
+            Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) }),
+            Arc::new(StubReport { result: Mutex::new(None) }),
+            Arc::new(StubFactory {
+                built_dir: Mutex::new(None),
+                port: Arc::new(RecordingArchivedPort::default()),
+            }),
+            Arc::clone(&active) as Arc<dyn TelemetryEmitDynamicPort>,
+        );
+
+        let error = interactor
+            .emit_completed(
+                Path::new("/repo/track/items"),
+                Some("track-id".to_owned()),
+                "sotp dry".to_owned(),
+                17,
+                240,
+                None,
+            )
+            .unwrap_err();
+        assert!(matches!(error, TelemetryAggregateServiceError::EmitUnavailable(_)));
+        assert!(active.calls.lock().unwrap().is_empty());
+        assert_eq!(*active.attempts.lock().unwrap(), 1);
     }
 
     #[test]
@@ -842,6 +1289,32 @@ mod aggregate_interactor_tests {
         let calls = archived.calls.lock().unwrap();
         assert_eq!(calls.len(), 1);
         assert_eq!(calls.first().map(String::as_str), Some("feature-2026-07-04|track init|0|42"));
+    }
+
+    #[test]
+    fn test_telemetry_archived_service_reuses_telemetry_jsonl_without_rotation() {
+        let git = Arc::new(StubGit { repo_root: Some(PathBuf::from("/repo")) });
+        let report = Arc::new(StubReport { result: Mutex::new(None) });
+        let archived = Arc::new(RecordingArchivedPort::default());
+        let factory =
+            Arc::new(StubFactory { built_dir: Mutex::new(None), port: Arc::clone(&archived) });
+        let interactor = facade(git, report, factory.clone());
+
+        interactor
+            .emit_archived(
+                Path::new("/work/track/items"),
+                "feature-2026-07-04",
+                "track archive".to_owned(),
+                0,
+                42,
+            )
+            .unwrap();
+
+        let telemetry_dir = factory.built_dir.lock().unwrap().clone().unwrap();
+        assert!(telemetry_dir.ends_with(Path::new("logs")));
+        assert!(!telemetry_dir.to_string_lossy().contains("command-trace"));
+        assert!(!telemetry_dir.join("telemetry.1.jsonl").exists());
+        assert_eq!(archived.calls.lock().unwrap().len(), 1);
     }
 
     #[test]

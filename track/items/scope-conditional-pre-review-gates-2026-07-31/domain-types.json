@@ -1,0 +1,714 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::review_v2::types::derive_review_approval_verdict": {
+      "action": "add",
+      "docs": "Pure domain helper for shared review-approval derivation (IN-14, AC-17).",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "states",
+          "ty": "impl IntoIterator<Item = (ScopeName, ReviewState)>"
+        },
+        {
+          "name": "review_json_exists",
+          "ty": "bool"
+        }
+      ],
+      "returns": "ReviewApprovalVerdict",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-14",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-17",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageViolation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateViolation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "MainScopeName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "MainScopeName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "MainScopeName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "MainScopeName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "MainScopeName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "MainScopeName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeNameError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeNameError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeNameError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeNameError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeNameError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "ScopeNameError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "ContractedEntryRef": {
+      "action": "reference",
+      "docs": "Catalogue-entry attribution identity (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer",
+              "ty": "LayerId"
+            },
+            {
+              "name": "entry_key",
+              "ty": "CatalogueEntryKey"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "layer",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&LayerId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryKey"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CoverageVerifyOutcome": {
+      "action": "modify",
+      "docs": "Modify task-contract coverage outcome; enum evolution: closed (IN-08, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                "NonEmptyVec<CoverageViolation>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "blocked",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<CoverageViolation>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CoverageViolation": {
+      "action": "modify",
+      "docs": "Modify task-contract coverage violation variants; enum evolution: closed (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingTaskContract",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "OrphanEntry",
+            "payload": {
+              "fields": [
+                "ContractedEntryRef"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidEntryRef",
+            "payload": {
+              "fields": [
+                "ContractedEntryRef",
+                "FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MissingSignalDocument",
+            "payload": {
+              "fields": [
+                "LayerId"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTaskRef",
+            "payload": {
+              "fields": [
+                "TaskId",
+                "Vec<ContractedEntryRef>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "MainScopeName": {
+      "action": "reference",
+      "docs": "Named review-scope value (CN-08, CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, ScopeNameError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "review_v2::types",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateOutcome": {
+      "action": "modify",
+      "docs": "Modify task-contract pre-review outcome; enum evolution: closed (IN-08, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Passed",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Blocked",
+            "payload": {
+              "fields": [
+                "NonEmptyVec<PreReviewGateViolation>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "blocked",
+          "params": [
+            {
+              "name": "violations",
+              "ty": "Vec<PreReviewGateViolation>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateViolation": {
+      "action": "modify",
+      "docs": "Modify task-contract pre-review violation variants; enum evolution: closed (IN-08, AC-10).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingTaskContract",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NonBlueSignal",
+            "payload": {
+              "fields": [
+                "ContractedEntryRef",
+                "ConfidenceSignal"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ScopeName": {
+      "action": "modify",
+      "docs": "Domain review-scope value with domain-owned raw-name classification (CN-08, CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Main",
+            "payload": {
+              "fields": [
+                "MainScopeName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Other",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "parse",
+          "params": [
+            {
+              "name": "value",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Result<Self, ScopeNameError>"
+        }
+      ],
+      "module_path": "review_v2::types",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ScopeNameError": {
+      "action": "reference",
+      "docs": "Validation failure for named review-scope construction and scope parsing (CN-08, CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Empty",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NotAscii",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Reserved",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review_v2::error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "TaskContractDocument": {
+      "action": "reference",
+      "docs": "Task-contract attribution document (IN-07, AC-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "BTreeMap<TaskId, Vec<ContractedEntryRef>>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "schema_version",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u32"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BTreeMap<TaskId, Vec<ContractedEntryRef>>"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

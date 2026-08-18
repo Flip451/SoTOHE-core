@@ -1,6 +1,7 @@
 ---
 name: impl-planner
 sandbox: workspace-write
+grok-sandbox: workspace
 description: Use when Codex is assigned the SoTOHE Phase 3 impl-planner capability. Writes impl-plan.json, task-coverage.json, task-contract.json, and batch-plan.json from the spec and type catalogues, then verifies plan artifact coverage and the batch-plan structural gate.
 ---
 

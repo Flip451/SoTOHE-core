@@ -31,7 +31,9 @@ use domain::tddd::primitive_occurrence_scanner::{
 };
 use syn::visit::Visit;
 
-use super::type_ref_parser::{parse_syn_type, parse_syn_type_param_bound};
+use super::type_ref_parser::{
+    parse_syn_type, parse_syn_type_param_bound, validate_maybe_const_bound,
+};
 
 // ---------------------------------------------------------------------------
 // SynPrimitiveOccurrenceScanner — secondary adapter
@@ -127,7 +129,20 @@ fn scan_bound(
     primitives: NonEmptyVec<PrimitiveName>,
     position: PrimitiveOccurrencePosition,
 ) -> Result<PrimitiveOccurrenceReport, PrimitiveOccurrenceScanError> {
-    match parse_syn_type_param_bound(type_ref.as_str()) {
+    // `syn` stable does not expose the nightly-only `~const` trait-bound
+    // modifier.  The catalogue codec accepts this supported spelling and
+    // stores the modifier separately, so scan the trait-bound payload while
+    // retaining the original `TypeRef` for diagnostics.
+    let bound_syntax = type_ref
+        .as_str()
+        .strip_prefix("~const ")
+        .map_or_else(|| type_ref.as_str(), str::trim_start);
+    if type_ref.as_str().starts_with("~const ")
+        && validate_maybe_const_bound(type_ref.as_str(), &[]).is_err()
+    {
+        return Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref });
+    }
+    match parse_syn_type_param_bound(bound_syntax) {
         Ok(syn::TypeParamBound::Lifetime(_)) => Ok(PrimitiveOccurrenceReport::new(BTreeMap::new())),
         Ok(syn::TypeParamBound::Trait(trait_bound)) => {
             let mut visitor = OccurrenceVisitor::new(primitives.as_slice(), position);
@@ -515,6 +530,25 @@ mod tests {
     fn bound_position_trait_bound_with_no_primitive_match_yields_empty_report() {
         let result = scan("MyTrait", one("String"), PrimitiveOccurrencePosition::Bound).unwrap();
         assert_eq!(result, BTreeMap::new());
+    }
+
+    #[test]
+    fn bound_position_maybe_const_trait_bound_is_scanned_without_parse_failure() {
+        let result =
+            scan("~const Clone", one("Clone"), PrimitiveOccurrencePosition::Bound).unwrap();
+        assert_eq!(result, expect(vec![(PrimitiveOccurrencePosition::Bound, vec!["Clone"])]));
+    }
+
+    #[test]
+    fn bound_position_maybe_const_rejects_non_trait_payloads() {
+        for bound in ["~const ?Sized", "~const 'static", "~const for<'a> Trait<'a>"] {
+            let result = scan(bound, one("Trait"), PrimitiveOccurrencePosition::Bound);
+            assert!(
+                matches!(result, Err(PrimitiveOccurrenceScanError::ParseFailure { type_ref })
+                    if type_ref.as_str() == bound),
+                "unsupported maybe-const bound must fail closed: {bound:?}"
+            );
+        }
     }
 
     #[test]

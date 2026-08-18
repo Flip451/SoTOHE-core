@@ -194,7 +194,11 @@ fn type_surface_types<'a>(
                 }
             })
             .collect(),
-        TypeKindV2::TypeAlias { target } => vec![target.as_str()],
+        TypeKindV2::TypeAlias { target, generics } => {
+            let mut types = vec![target.as_str()];
+            types.extend(generic_bound_types(generics, &[]));
+            types
+        }
     };
     types.extend(generic_bound_types(entry.generics(), entry.where_predicates()));
     for inherent_impl in catalogue

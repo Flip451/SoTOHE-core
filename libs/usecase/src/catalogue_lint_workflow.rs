@@ -730,6 +730,11 @@ mod tests {
                 .collect(),
             TypeRef::new(returns).unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         )
     }
@@ -1292,7 +1297,7 @@ mod tests {
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
-                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap() },
+                TypeKindV2::TypeAlias { target: TypeRef::new("String").unwrap(), generics: vec![] },
                 vec![],
                 vec![],
                 vec![],

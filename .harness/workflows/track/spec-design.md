@@ -36,10 +36,9 @@ forwards convention paths.
 Confirm `track/items/<track-id>/metadata.json` exists. If not, stop and instruct the caller
 to run the `init` workflow (`.harness/workflows/track/init.md`) first.
 
-**Step 2: Invoke spec-designer capability**
+**Step 2: Enter the spec-design phase**
 
-Invoke the `spec-designer` capability (see `.harness/capabilities/spec-designer.md` for the
-full internal pipeline). The briefing must include:
+Prepare the configured writer briefing at `tmp/spec-designer-briefing.md`. It must include:
 
 - Track id and the path `track/items/<track-id>/metadata.json`
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
@@ -49,8 +48,10 @@ The briefing must **not** carry convention paths. The capability's convention se
 from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
 document an input and would leave a zero-document resolution non-authoritative.
 
-The capability owns writing `track/items/<track-id>/spec.json`, rendering `spec.md`, and
-evaluating the spec → ADR signal (🔵🟡🔴). The workflow does not duplicate these steps.
+Then run `bin/sotp phase enter spec-design`. The phase engine runs the declared pre-entry
+checks and, only when they all succeed, invokes the configured `spec-designer` writer. The
+workflow must not dispatch that writer directly. The writer owns `track/items/<track-id>/spec.json`,
+rendering `spec.md`, and spec → ADR signal evaluation (🔵🟡🔴).
 
 **Step 3: Receive and surface the signal result**
 
@@ -66,13 +67,15 @@ caller without re-reading `spec.json`. Surface the full signal result as the wor
 | Capability reports signal counts | OK (counts surfaced to caller) |
 
 The workflow itself does not enforce a minimum signal color — the caller (`plan` workflow)
-applies the loop rule (🔵 proceed / 🟡 warn / 🔴 escalate). This workflow is single-shot.
+applies the loop rule (🔵 proceed / 🟡 recover before downstream entry / 🔴 escalate). This
+workflow is single-shot.
 
 ## Failure / recovery
 
 - **Missing metadata.json**: stop and instruct the caller to run the `init` workflow first.
-- **Capability execution failure**: retry up to 2 times (transient tooling errors). If retries
-  also fail, report to the caller and stop. Do not proceed past a capability failure.
+- **Phase-entry failure**: retry up to 2 times for transient execution failures. A failed
+  pre-entry check does not launch the writer; report it to the caller and stop. Do not proceed
+  past a phase-entry failure.
 - **Capability returns 🔴**: surface the failing element ids and cited ADR paths to the caller.
   The caller decides whether to invoke `adr-editor` or pause for the user. This workflow does
   not trigger back-and-forth escalation on its own.

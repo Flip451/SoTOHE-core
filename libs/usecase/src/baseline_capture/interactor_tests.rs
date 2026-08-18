@@ -559,3 +559,59 @@ fn test_run_source_workspace_is_passed_to_capture() {
         "source_workspace must be passed to capture"
     );
 }
+
+#[test]
+fn test_run_source_workspace_replaces_baseline_without_sync_or_view_side_effects() {
+    struct SourceWorkspaceBaselineCapture;
+
+    impl RustdocBaselineCapturePort for SourceWorkspaceBaselineCapture {
+        fn capture(
+            &self,
+            items_dir: &Path,
+            track_id: &TrackId,
+            rustdoc_workspace: &Path,
+            binding: &TdddLayerBinding,
+            _features: &[CargoFeatureName],
+        ) -> Result<(), BaselineCaptureIoError> {
+            let source_baseline = std::fs::read(rustdoc_workspace.join("baseline.json"))
+                .map_err(|error| BaselineCaptureIoError(error.to_string()))?;
+            let baseline_path = items_dir.join(track_id.as_ref()).join(&binding.baseline_file);
+            std::fs::write(baseline_path, source_baseline)
+                .map_err(|error| BaselineCaptureIoError(error.to_string()))
+        }
+    }
+
+    let workspace = tempfile::tempdir().unwrap();
+    let source_workspace = tempfile::tempdir().unwrap();
+    let track_dir = workspace.path().join("track/items/test-track-2026-01-01");
+    std::fs::create_dir_all(&track_dir).unwrap();
+
+    let prior_baseline = b"baseline-before-recovery";
+    let recovered_baseline = b"baseline-from-exact-merged-base";
+    let prior_unrelated_file = b"operator-owned-state";
+    let prior_rendered_view = b"# rendered view before recovery\n";
+    let baseline_path = track_dir.join("domain-types-baseline.json");
+    let unrelated_path = track_dir.join("operator-state.txt");
+    let rendered_view_path = track_dir.join("plan.md");
+    std::fs::write(&baseline_path, prior_baseline).unwrap();
+    std::fs::write(&unrelated_path, prior_unrelated_file).unwrap();
+    std::fs::write(&rendered_view_path, prior_rendered_view).unwrap();
+    std::fs::write(source_workspace.path().join("baseline.json"), recovered_baseline).unwrap();
+
+    let interactor = build_interactor(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(SourceWorkspaceBaselineCapture),
+    );
+    interactor
+        .run(BaselineCaptureRequest {
+            track_id: "test-track-2026-01-01".to_owned(),
+            workspace_root: workspace.path().to_path_buf(),
+            source_workspace: Some(source_workspace.path().to_path_buf()),
+            layer: None,
+        })
+        .unwrap();
+
+    assert_eq!(std::fs::read(&baseline_path).unwrap(), recovered_baseline);
+    assert_eq!(std::fs::read(&unrelated_path).unwrap(), prior_unrelated_file);
+    assert_eq!(std::fs::read(&rendered_view_path).unwrap(), prior_rendered_view);
+}

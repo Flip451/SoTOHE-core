@@ -1,0 +1,638 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-14T11:16:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2a0a134d1a917b67fd557268758dfba686e54abb7af450ba53ab2ee8b62d91d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:20:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2a0a134d1a917b67fd557268758dfba686e54abb7af450ba53ab2ee8b62d91d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:233c9389949e8ccdf384c8b6d8504bac8fe618e6eb7004183d7188d80e60823d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:56:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:233c9389949e8ccdf384c8b6d8504bac8fe618e6eb7004183d7188d80e60823d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46c6c81716620be03755d3ab67e78cf11321f2ad9a975452128d6cafabb16b13",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:55:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:46c6c81716620be03755d3ab67e78cf11321f2ad9a975452128d6cafabb16b13",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e55103b11cc55296bcbabf8373554c1fa5eaad3c2c2e402342c2feb82e2a4549",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:56:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e55103b11cc55296bcbabf8373554c1fa5eaad3c2c2e402342c2feb82e2a4549",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:57:53Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 6,
+              "message": "T001 restates the upstream behavior contract in prose (\"preserving the separately bounded, fail-closed verdict-envelope read\"). Keep only target + operation + anchor cite; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 12,
+              "message": "T002 restates upstream behavior contracts (tail retention through exit/timeout, removal of process termination, and preservation of safeguards). Keep only target + operation + anchor cite; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 18,
+              "message": "T003 restates AC-04 behavior in prose (invocation validation, repository-root execution, timeout, recursion protection, and first-failure behavior). Keep only target + operation + anchor cite; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 35,
+              "message": "Section S1 restates D2 validation-input behavior (\"preserving D2 validation-input handling\"). Use target + operation + anchor cite only; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/impl-plan.json",
+              "line": 45,
+              "message": "Section S2 restates the upstream diagnostic-tail and process-execution protection contracts. Use target + operation + anchor cite only; cite `no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c5ff3d49740b29f1b5aa97be27c22adba2b20b8100982805f10574ef9dc0410e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T13:00:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:baff65993df60110ac8ad4214a6a5d096757a2ba9bf0dde98f11e7b7a048d142",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T13:07:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:baff65993df60110ac8ad4214a6a5d096757a2ba9bf0dde98f11e7b7a048d142",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:05:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6773ac3f773028055eaae3aa203cc9634b07581706b2fa79829cf07386932b88",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:08:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6773ac3f773028055eaae3aa203cc9634b07581706b2fa79829cf07386932b88",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:50:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13377c878df622d459a1c51b1c89a9ce8facde98bf60c830fe8e465a78d03197",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:54:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:13377c878df622d459a1c51b1c89a9ce8facde98bf60c830fe8e465a78d03197",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T16:17:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b683d22d83cae8a57af2f3e52e9468f0fbc7f2a9232e9abedfda487a6455f9db",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T16:23:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b683d22d83cae8a57af2f3e52e9468f0fbc7f2a9232e9abedfda487a6455f9db",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-14T14:05:39Z",
+          "findings": [
+            {
+              "category": "adapter correctness / fail-closed validation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs",
+              "line": 304,
+              "message": "`spawn_and_collect_codex` now uses the diagnostic tail collector for stdout, but `mod.rs` still uses returned stdout as fallback input to `parse_sentinel`. This removes the required 1 MiB fail-closed validation bound and can discard a valid sentinel outside the final 64 KiB. Keep stdout validation collection separate from diagnostic tail capture.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d9238840aed02462acabd98bf568585d9ebd67abe9e1113b39b91eb41cc800b8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:15:13Z",
+          "findings": [
+            {
+              "category": "process lifecycle / fail-closed validation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs",
+              "line": 304,
+              "message": "The validation stdout collector still fails closed at 1 MiB, but the change removes the output-limit cancellation signal from `spawn_and_collect_codex`. When stdout exceeds the limit, the collector returns and drops the pipe without notifying the supervisor; a child that continues writing can block, so the runner waits until the one-hour timeout instead of terminating promptly as before. Preserve cancellation for validation-output overflow while allowing only the diagnostic tail collector to drain without cancellation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f718a071aaaa607c8c1797312ec96ff7a650b57545723c93323e598e2de32f90",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:22:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f501aee6923c0ce9f7b5d5bc66a9d2674a022a5a573fe1178a070a016d2c20fd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T14:30:44Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/spawn.rs",
+              "line": 309,
+              "message": "Review-fix stdout is still routed through the fail-closed collector, so a child emitting more than 1 MiB on diagnostic stdout is terminated instead of continuing with bounded tail retention. This violates IN-01/AC-01, which explicitly cover both stdout and stderr. The new “validation stdout” regression also locks in the incorrect behavior; validation should remain on the separately bounded output-last-message path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f501aee6923c0ce9f7b5d5bc66a9d2674a022a5a573fe1178a070a016d2c20fd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:40:39Z",
+          "findings": [
+            {
+              "category": "non-fail-closed validation",
+              "file": "libs/infrastructure/src/review_v2/review_fix_runner/mod.rs",
+              "line": 214,
+              "message": "The diagnostic stdout tail is still passed to `parse_sentinel` as a validation fallback. Because `spawn_and_collect_codex` now truncates stdout without reporting overflow, a stream exceeding the prior validation bound can discard its prefix and still be accepted as `completed` when its retained tail ends with that sentinel. This violates CN-02/AC-03 and OS-01. Remove this fallback or preserve a separate bounded, fail-closed validation result alongside the diagnostic tail.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cdc07a9be2878b07ca93fa7f43b33cab7fd80db0be5a4a3c84eb5415a977d286",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T14:48:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2845ec064ff5b3f26b13be97d3259857e783e9b932cd6739debd7542d0c0ee71",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:52:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf48d4c1bcfdc3490a8ea9e700846e818a63c04f9866598837e8581fd8947504",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:58:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cf48d4c1bcfdc3490a8ea9e700846e818a63c04f9866598837e8581fd8947504",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:56:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddee21009689256ba970059c6ae4b53fdb6d53fd032cfdb039fc0016d1054812",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:59:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddee21009689256ba970059c6ae4b53fdb6d53fd032cfdb039fc0016d1054812",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:50:59Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 44,
+              "message": "This binding associates `test_program_runner_terminates_timed_out_process` with `CapturedProgramOutput × CN-01`, but the test only matches `ProgramRunOutcome::TimedOut` and never inspects the `CapturedProgramOutput` value. Bind it only to the `ProgramRunOutcome` edge, or use a test that asserts the captured output contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 115,
+              "message": "This binding associates `test_program_runner_terminates_timed_out_process` with `CapturedStreamOutput × CN-01`, but the test does not inspect either captured stream or its truncation/tail behavior. Remove this test from the stream-output edge or replace it with a test asserting that stream’s contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4b88d031675fb82fc27af9a40b20422031afc40dbcac125c8d7a2a9780da6893",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T15:53:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a901be224772d98409aa250837c8282512a60acd95aeaed34ecba010d520cfa6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T15:58:57Z",
+          "findings": [
+            {
+              "category": "test-obligation coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 35,
+              "message": "The CapturedProgramOutput × CN-01 binding now contains only the stdout-overflow test, but its frozen passing verdict covered a different set that also included the timeout test. `bin/sotp test-obligation check` reports this edge as `TestChanged`, so the claimed resolved edge is currently stale. Restore the intended tests or have the host re-evaluate this exact set.",
+              "severity": "P1"
+            },
+            {
+              "category": "test-obligation coverage",
+              "file": "track/items/2026-08-14-child-output-ring-capture/test-bindings.json",
+              "line": 101,
+              "message": "The CapturedStreamOutput × CN-01 binding likewise no longer matches its evaluated test set: the current record omits the timeout test present in the frozen verdict. The canonical check reports this edge as `TestChanged`; it must be restored or re-evaluated before the obligation gate can pass.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a901be224772d98409aa250837c8282512a60acd95aeaed34ecba010d520cfa6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T16:07:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a901be224772d98409aa250837c8282512a60acd95aeaed34ecba010d520cfa6",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-14T11:39:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:da43cbe4983bbfa04ec3de30d494a2884cae5386c18bdf9d04cb862f7b090b1b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:44:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:da43cbe4983bbfa04ec3de30d494a2884cae5386c18bdf9d04cb862f7b090b1b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-14T12:04:13Z",
+          "findings": [
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 17,
+              "message": "`PhaseCommandDriver` docs restate the upstream truncation behavior instead of only identifying the change and citing `IN-02`/`AC-02`; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 32,
+              "message": "`CodexReviewFixRunner` docs restate upstream diagnostic-capture and fail-closed behavior instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 89,
+              "message": "`ProcessProgramRunner` docs restate the upstream tail-retention and timeout contract instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 157,
+              "message": "`ProgramRunnerPort` docs restate the upstream capacity-exhaustion behavior instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 243,
+              "message": "`CapturedProgramOutput` docs restate the upstream truncation/failure semantics instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 284,
+              "message": "`CapturedStreamOutput` docs restate the upstream exhaustive states and representation rationale instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 359,
+              "message": "`ProgramExecutionRecord` docs restate the upstream failure-classification behavior instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream_restatement",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 428,
+              "message": "`ProgramRunOutcome` docs restate the upstream outcome semantics instead of only identifying the change and citing anchors; see `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8a5fd7ab698df4fa204fe0b7d795641c38c9b359b0e29f8a0d697993bf88fe1a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:09:12Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` is declared `action: modify`, but both public method signatures (`new` and `handle`) are identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` is declared `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` is declared `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` is declared `action: modify`, but its `run` method signature is identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` is declared `action: modify`, but its `classify` method signature and declared fields are identical to the frozen rustdoc baseline. The catalogue action must correspond to an actual declared API change.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc00b153a8694903ab04e96484b1c3c75c70c450b808c7ac44cb0518d2728796",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:12:50Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` remains `action: modify`, but both public method signatures (`new` and `handle`) are identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` remains `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` remains `action: modify`, but its `new` method signature is identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` remains `action: modify`, but its `run` method signature is identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` remains `action: modify`, but its `classify` method signature and declared fields are identical to the frozen rustdoc baseline.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc00b153a8694903ab04e96484b1c3c75c70c450b808c7ac44cb0518d2728796",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:22:31Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` is `action: modify`, but its `new` and `handle` method signatures are unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` is `action: modify`, but its `new` method signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` is `action: modify`, but its `new` method signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` is `action: modify`, but its `run` method signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` is `action: modify`, but its declared fields and `classify` method signature are unchanged from the frozen baseline.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bc00b153a8694903ab04e96484b1c3c75c70c450b808c7ac44cb0518d2728796",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:37:06Z",
+          "findings": [
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+              "line": 16,
+              "message": "`cli_driver::PhaseCommandDriver` is declared `action: modify`, but its `new` and `handle` signatures are unchanged from the frozen baseline; the entry should not claim a method-level modification.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 31,
+              "message": "`infrastructure::CodexReviewFixRunner` is declared `action: modify`, but its `new` signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/infrastructure-types.json",
+              "line": 88,
+              "message": "`infrastructure::ProcessProgramRunner` is declared `action: modify`, but its `new` signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 156,
+              "message": "`usecase::ProgramRunnerPort` is declared `action: modify`, but its `run` signature is unchanged from the frozen baseline.",
+              "severity": "P1"
+            },
+            {
+              "category": "action_incoherent_with_diff",
+              "file": "track/items/2026-08-14-child-output-ring-capture/usecase-types.json",
+              "line": 358,
+              "message": "`usecase::ProgramExecutionRecord` is declared `action: modify`, but its fields and `classify` signature are unchanged from the frozen baseline.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:422a7308ac16764571c04ae0fa6ee4dd608715925c6ae52737300e85855ac8ef",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:41:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:422a7308ac16764571c04ae0fa6ee4dd608715925c6ae52737300e85855ac8ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:47:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:422a7308ac16764571c04ae0fa6ee4dd608715925c6ae52737300e85855ac8ef",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-14T15:51:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3036d886fdc09d1f70af60db928950a55860ac2b75987944a7f319d9bba10c06",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T16:00:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3036d886fdc09d1f70af60db928950a55860ac2b75987944a7f319d9bba10c06",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

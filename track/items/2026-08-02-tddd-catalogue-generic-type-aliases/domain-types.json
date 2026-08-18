@@ -1,0 +1,315 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        }
+      ]
+    },
+    "domain::tddd::catalogue_linter::evaluate_catalogue_lint": {
+      "action": "add",
+      "docs": "Catalogue lint evaluator for validated declarations.",
+      "generics": [
+        {
+          "bounds": [
+            "PrimitiveOccurrenceScanner"
+          ],
+          "name": "S"
+        }
+      ],
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "rules",
+          "ty": "&[CatalogueLinterRule]"
+        },
+        {
+          "name": "all_catalogues",
+          "ty": "&std::collections::BTreeMap<LayerId, CatalogueDocument>"
+        },
+        {
+          "name": "target_layer_id",
+          "ty": "&LayerId"
+        },
+        {
+          "name": "scanner",
+          "ty": "&S"
+        }
+      ],
+      "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeKindV2",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueLinterError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueLinterError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueLinterError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterError",
+      "trait_ref": "core::convert::From<PrimitiveOccurrenceScanError>"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CatalogueLinterError": {
+      "action": "modify",
+      "docs": "Catalogue-lint evaluation errors, including invalid, duplicate, and conflicting alias-generic-parameter rejection.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DuplicateTypeAliasGenericParameter",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
+                },
+                {
+                  "name": "parameter_name",
+                  "ty": "ParamName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidTypeAliasGenericParameterName",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
+                },
+                {
+                  "name": "parameter_name",
+                  "ty": "ParamName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ConflictingTypeAliasGenericParameters",
+            "payload": {
+              "fields": [
+                {
+                  "name": "alias_name",
+                  "ty": "TypeName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidRuleConfig",
+            "payload": {
+              "fields": [
+                "FreeText"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownLayer",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "LayerId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ScanFailed",
+            "payload": {
+              "fields": [
+                "PrimitiveOccurrenceScanError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        }
+      ]
+    },
+    "TypeKindV2": {
+      "action": "modify",
+      "docs": "Catalogue type-shape vocabulary whose TypeAlias payload is extended with generic-parameter metadata.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Struct",
+            "payload": {
+              "fields": [
+                "StructKind"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Enum",
+            "payload": {
+              "fields": [
+                {
+                  "name": "variants",
+                  "ty": "Vec<VariantDecl>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TypeAlias",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target",
+                  "ty": "TypeRef"
+                },
+                {
+                  "name": "generics",
+                  "ty": "Vec<MethodGenericParam>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::composite",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-02-tddd-catalogue-generic-type-aliases/spec.json"
+        }
+      ]
+    }
+  }
+}

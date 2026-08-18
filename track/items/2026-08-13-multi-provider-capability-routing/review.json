@@ -1,0 +1,864 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-13T16:43:11Z",
+          "findings": [
+            {
+              "category": "scope leakage into ADR body",
+              "file": "knowledge/adr/2026-08-02-0151-multi-provider-capability-routing.md",
+              "line": 53,
+              "message": "ADRが未定義のトラック内識別子「G24実装」を参照し、上流のADRから将来の実装成果物へ逆方向の依存を作っています。G24への言及を削除するか、永続的なADR上の設計決定として参照してください（同じ問題がReassess Whenにもあります）。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7b8189a00cc86b2135d76868b02de67fa78a15b7ddf9bda9b12a4a5871d3a9b8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T16:48:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5a7204daa9d0d41e957417a892268e2b30f929177c859036b3b333de66b2d1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T16:51:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f5a7204daa9d0d41e957417a892268e2b30f929177c859036b3b333de66b2d1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:00:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1cf25ba399627ca714108bad453616ee52410401f1482f383937af86027aa1d2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:02:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1cf25ba399627ca714108bad453616ee52410401f1482f383937af86027aa1d2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c91d9728f8b8a845d132539810ba63d57aed3ce288197f3d3f11430511e2de32",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:21:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c91d9728f8b8a845d132539810ba63d57aed3ce288197f3d3f11430511e2de32",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:23:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c91d9728f8b8a845d132539810ba63d57aed3ce288197f3d3f11430511e2de32",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:38:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2d5f158b0ea07224fa59ce99cb172c1a2e54e6b22bb77528d3945a930bc520c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:41:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2d5f158b0ea07224fa59ce99cb172c1a2e54e6b22bb77528d3945a930bc520c",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:18:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:11de712f05fa5a4fa81a1e2b3db6e790b125d12c1d71769e2665d4b4d40c0959",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:22:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:11de712f05fa5a4fa81a1e2b3db6e790b125d12c1d71769e2665d4b4d40c0959",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80d4f5af8dd1df3d429c8f5c26f8bbca94d63ac5e25784352241b58bd623630f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:19:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:80d4f5af8dd1df3d429c8f5c26f8bbca94d63ac5e25784352241b58bd623630f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-14T01:15:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad8d28593089390016dc3daa403f20bc802deacd21275c512c40415dc0a7e933",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:18:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad8d28593089390016dc3daa403f20bc802deacd21275c512c40415dc0a7e933",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "at": "2026-08-14T01:15:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ed0e1a03aa9290f964864e748e1b515e0e92264ee1da20341c0944d4e39d2ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:19:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5ed0e1a03aa9290f964864e748e1b515e0e92264ee1da20341c0944d4e39d2ae",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:07:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:10:39Z",
+          "findings": [
+            {
+              "category": "branch-wide consistency",
+              "file": ".harness/config/phase-commands.json",
+              "line": 17,
+              "message": "The shipped-config regression test in apps/cli/src/commands/phase.rs still uses include_str! on this file and asserts that spec-design has two pre-entry commands, including the removed adr final-review command. With the current one-command array, test_shipped_phase_commands_declare_direct_upstream_convergence_matrix will fail and block CI. Update that expectation to reflect the adjudicated interim configuration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:15:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4f55eef405070df112d8c0e9900419c6d43577d54c66df8921470ff3a6a8c168",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:06:26Z",
+          "findings": [
+            {
+              "category": "capability-routing-documentation",
+              "file": "README.md",
+              "line": 124,
+              "message": "README.md の provider 設定例は、`provider = \"codex\"` のまま typed-pipeline で利用できるように読めますが、ADR D2 が要求する「DeepSeek / GLM / Qwen の verdict envelope・structured output を含む typed-pipeline 準拠は未検証」という重要な利用制限を明記していません。consumer が外部 provider を既存の typed-pipeline capability に設定した際、互換性が検証済みだと誤認し得ます。provider ごとの typed-pipeline 検証状態（未検証、検証済みの場合は対象範囲）を設定例の近くに明示してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5e6ff830a5d33562f5960c4b640887b89685764f4c0f1ae8f4f78f4824946c9f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:08:06Z",
+          "findings": [
+            {
+              "category": "capability-routing-documentation",
+              "file": "README.md",
+              "line": 124,
+              "message": "README.md の provider 設定例は外部 provider を typed-pipeline capability に設定できるように示していますが、DeepSeek / GLM / Qwen の verdict envelope・structured output を含む typed-pipeline 準拠が未検証であることを明記していません。consumer が互換性を検証済みと誤認し得るため、設定例の近くに外部 provider の検証状態（未検証）を明示してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5e6ff830a5d33562f5960c4b640887b89685764f4c0f1ae8f4f78f4824946c9f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:11:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:968374b5ea21dafb7da5a0df34d3758b1cac704819c3abe31498a924fea23966",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:19:51Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": "README.md",
+              "line": 114,
+              "message": "The example is not a usable SoTOHE capability entry. `fast-lane` is not defined or invoked anywhere in the template, and the object omits the required `execution_mode` plus the reasoning effort needed at dispatch. Copying it into `agent-profiles.json` therefore fails profile loading instead of selecting DeepSeek. Show a complete existing capability entry or explicitly show only the fields to merge into one.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": "README.md",
+              "line": 97,
+              "message": "The GLM sample connects Codex's Responses transport to an endpoint Z.AI documents as OpenAI Chat Completions only. Current Codex supports only `wire_api = \"responses\"`, so this concrete example cannot connect; the later generic warning does not make it runnable. Supply an actual Responses endpoint or document GLM as Anthropic-only/unsupported for this route. See the [Codex configuration reference](https://developers.openai.com/codex/config-reference) and [Z.AI tool integration documentation](https://docs.z.ai/devpack/tool/others).",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": "README.md",
+              "line": 123,
+              "message": "The text implies `model_provider` works for typed-pipeline capabilities, but those runners resolve `CodexCustom` back to plain `codex` and receive only provider/model/effort; the `--config model_provider=...` argument is added only by the generic capability-exec adapter. A configured reviewer or other typed pipeline therefore silently uses the default Codex provider. The accepted “typed-pipeline conformance unverified” caveat covers response compatibility, not routing that never occurs. Narrow this guidance to supported orchestrator-output capabilities until typed-pipeline runners transport the custom binding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:968374b5ea21dafb7da5a0df34d3758b1cac704819c3abe31498a924fea23966",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:36:15Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": "README.md",
+              "line": 97,
+              "message": "README incorrectly classifies DeepSeek as Chat-Completions-only and comments out an otherwise valid Codex custom-provider configuration. DeepSeek’s current official documentation explicitly supports the Responses API at `https://api.deepseek.com` and provides Codex integration for `deepseek-v4-flash` and `deepseek-v4-pro`. Consequently, consumers are told a supported route is unusable and T004 no longer provides the required executable DeepSeek example. Restore the DeepSeek provider block and limit the unsupported warning to GLM. See [DeepSeek’s Responses API documentation](https://api-docs.deepseek.com/guides/responses_api/).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:31922a2a84d4892adbb98b3e745e65c071175bce2102fb26905b977c681ef399",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:41:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d191ee25acb66676d88b86a9de9c40cfeb795b86e952b57edf7f5407bbe3fb38",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:17:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e1997a5fd880f44cdac21656a23e6f319e11093757caf977e20ab2bfc241f99",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:20:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e1997a5fd880f44cdac21656a23e6f319e11093757caf977e20ab2bfc241f99",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:30:17Z",
+          "findings": [
+            {
+              "category": "convention contradiction",
+              "file": "README.md",
+              "line": 199,
+              "message": "The new policy states that setting `model_provider` on any capability sends its source, briefing, and diff to the external provider, but the preceding README explicitly says `typed-pipeline` capabilities do not forward `model_provider` and cannot be routed externally. This contradiction can cause consumers to make incorrect data-residency decisions; qualify the statement to only capabilities/paths where external routing is actually effective.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf32907b852280d02c903f5e5fbef089ce529b825d9050355c603b29cf4d5e9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T22:33:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6aad6ac8d3aaacc3a3c71801439e5781f83432df0fd7ea3afd26c492fbf38509",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:38:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6aad6ac8d3aaacc3a3c71801439e5781f83432df0fd7ea3afd26c492fbf38509",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b8f65a76f36ef43e84a1d049321dc71d25f5a37926141c6337893494f99f6aa2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:18:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b8f65a76f36ef43e84a1d049321dc71d25f5a37926141c6337893494f99f6aa2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:38:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1c05c935512cb691ba414d47cc52cc12fcde8db041bcf03507ef7b605bb764",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:42:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0a1c05c935512cb691ba414d47cc52cc12fcde8db041bcf03507ef7b605bb764",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:08:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f9b349d59758918e29445d0fa94076850aa92dbd7a8596f6facb87775f86af2a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:14:29Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/task-contract.json",
+              "line": 4,
+              "message": "`CapabilityProfilePort` is an `action: reference` usecase catalogue entry but is absent from every task attribution (T001/T002 are the relevant convergence tasks). Reference entries still require an owner; the current document produces an `OrphanEntry` from `bin/sotp task-contract coverage`.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/task-contract.json",
+              "line": 4,
+              "message": "`CapabilityProviderPort` is an `action: reference` usecase catalogue entry but is absent from every task attribution (T001/T003 are the relevant convergence tasks). Reference entries still require an owner; the current document produces an `OrphanEntry` from `bin/sotp task-contract coverage`.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/batch-plan.json",
+              "line": 58,
+              "message": "B2 is avoidable serialization. In B1, T001 and T004 are initially ready; placing T001 first makes T002 and T003 ready in that same batch. Their targets do not overlap (`usecase::capability_exec`, `README.md`, agent-profile DTO/adapter files, and the Codex adapter), and the combined per-scope estimates remain within the 500-line ceiling: usecase 170, infrastructure 445, and harness-policy 90. T002 and T003 can therefore join B1 after T001.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f9b349d59758918e29445d0fa94076850aa92dbd7a8596f6facb87775f86af2a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:18:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9a40ad51ba1624b10b547c3444589cecccf8053d4b4c51c858af3fb0e68f4b96",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:23:42Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 12,
+              "message": "T002 names `infrastructure::agent_profiles::AgentProfilesCapabilityAdapter`, but that symbol does not exist there; its catalogue/source target is `infrastructure::capability_exec::agent_profiles::AgentProfilesCapabilityAdapter`, while the DTOs belong under `agent_profiles`. Correct the separate targets so the executor does not have to infer the task boundary.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 30,
+              "message": "T004 bundles three independently verifiable documentation units while still `todo`: provider configuration and compatibility guidance (IN-03/AC-03), typed-pipeline verification status (CN-02/AC-04), and data-residency/default-profile policy (IN-04/CN-03/AC-05). Split these units into separately verifiable tasks and update their coverage, estimates, and batch membership.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9a40ad51ba1624b10b547c3444589cecccf8053d4b4c51c858af3fb0e68f4b96",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:31:44Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 30,
+              "message": "T004のdescriptionはAC-03の具体的なプロバイダー互換性・設定挙動を再記述しています。許可される形式（target + operation + anchor cite）に留め、上流契約の本文を重複させないでください。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 36,
+              "message": "T005のdescriptionはAC-04の「typed-pipeline未検証」および検証条件をそのまま行動契約として再記述しています。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 42,
+              "message": "T006のdescriptionはAC-05のデータレジデンシー、デフォルトプロファイル、CI/self-hosted routeの契約を再記述しています。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/impl-plan.json",
+              "line": 69,
+              "message": "section.id `consumer-provider-guidance` のdescriptionはAC-03〜AC-05の互換性、検証状態、データレジデンシー方針を上流契約として再記述しています。See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:431190f417a3d841393482cb0d11ba0cbc3f0035d98638a99ecaa6565365a17f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T19:37:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:919e3a42185fda6deb330456670df5552c340b0c30aebfa0b9b13220f22a1a99",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:41:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:919e3a42185fda6deb330456670df5552c340b0c30aebfa0b9b13220f22a1a99",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:05:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6e21b88a31d2414243dd52b48075a78e140a25144ecf35963be0b8bef83a5af4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:07:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6e21b88a31d2414243dd52b48075a78e140a25144ecf35963be0b8bef83a5af4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:17:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:156c99c0179bc4654aabddce7cd198111adb09fde18801ae388287df92716358",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:20:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:156c99c0179bc4654aabddce7cd198111adb09fde18801ae388287df92716358",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:29:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ec25c652f3b62b4633c01a4909fd92ab5222978bdb3c759edaab370dc74aa4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:32:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ec25c652f3b62b4633c01a4909fd92ab5222978bdb3c759edaab370dc74aa4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:42:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:534523c2da5acf141f029f6259901e33a6e4ba4fcf37954b0470c4b864cee96a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T22:45:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:534523c2da5acf141f029f6259901e33a6e4ba4fcf37954b0470c4b864cee96a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:16:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c49ef31cc3f8023f85d2f8e6a584e0b85f0677950b845be28079dfe439d034ca",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:20:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c49ef31cc3f8023f85d2f8e6a584e0b85f0677950b845be28079dfe439d034ca",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-13T21:06:38Z",
+          "findings": [
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/capability_exec/session.rs",
+              "line": 71,
+              "message": "Session reuse ignores the Codex custom model-provider binding. `session_provider` collapses every `CodexCustom(_)` to `codex`, and `resumable_id` compares only provider and model, so changing a capability from `deepseek` to `qwen` can resume the old session under the wrong backend.",
+              "severity": "P1"
+            },
+            {
+              "category": "adapter correctness",
+              "file": "libs/infrastructure/src/capability_exec/codex.rs",
+              "line": 312,
+              "message": "The custom provider ID is interpolated into a quoted TOML `--config` value without escaping. Since `ModelProviderName` accepts any non-blank string, IDs containing `\"`, `\\\\`, or newlines produce malformed configuration and make dispatch fail despite successful boundary decoding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1dea3218907ba273d19e3e1f8c69ea4b1a77a6e6c4c40c7d13e096fcf5ac630f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:35:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea861902acd11db561a831b61468854063ef97754ee4850086f3a006b429e390",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:41:36Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/capability_exec/session.rs",
+              "line": 103,
+              "message": "`session_provider` erases the binding variant, so `Standard(\"codex\")` and the valid arbitrary binding `CodexCustom(\"codex\")` produce the same cache identity. If a capability keeps the same model while switching between those bindings, the adapter can reuse a session created against a different backend. Preserve the binding discriminant in the cached identity and cover the standard/custom collision case.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ea861902acd11db561a831b61468854063ef97754ee4850086f3a006b429e390",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T21:53:42Z",
+          "findings": [
+            {
+              "category": "adapter_correctness",
+              "file": "libs/infrastructure/src/capability_exec/session.rs",
+              "line": 24,
+              "message": "`cache_key` now replaces every capability with a synthetic `capability-binding:*` name. The Codex and Claude resume tests still seed `ProviderSessionCacheKey` using the real capability name, so their cached sessions are no longer found (and the track persistence test cannot load the entry it just saved). Existing standard-binding cache entries are likewise silently invalidated. Keep the original capability key and use the already discriminated session-provider identity to prevent Standard/CodexCustom collisions, or update every key producer and explicitly handle the cache migration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9fa83c0713294a52f65953833d8bb2bd0cb92d181e919ee6245242b7c3b8327d",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T22:07:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:568cdf4c13ff621b55c42e23fe1a15f7ff6a5c6695469bcc023e030db7cd7016",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-13T19:07:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fdaef51c7cf9105474d0569b40318aed466b155c78932e40e38605689fcfc2ee",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:10:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fdaef51c7cf9105474d0569b40318aed466b155c78932e40e38605689fcfc2ee",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:06:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a8eef9bc8181f84b7ba53fadd1978a7cdc29a06258ce38965d93d14630b957ea",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:10:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a8eef9bc8181f84b7ba53fadd1978a7cdc29a06258ce38965d93d14630b957ea",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:35:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c767fc9321a8002b845dddf4a7fc33ee700b9de56758af88798a3348cf83cd3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:37:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0c767fc9321a8002b845dddf4a7fc33ee700b9de56758af88798a3348cf83cd3",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:59:32Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 185,
+              "message": "The `usecase::CapabilityInputValidationError` docs restate the fail-closed behavior contract instead of referring to the upstream anchor; keep the entry description to the changed type/variant and anchor cite per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 262,
+              "message": "The `usecase::CapabilityProfile` docs restate routing behavior and provider-identity preservation; this behavior belongs in the spec, while the catalogue docs should identify the changed field and cite the relevant anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 85,
+              "message": "The `infrastructure::AgentProfilesCapabilityAdapter` docs restate propagation behavior from trusted profiles; replace the behavioral prose with a concise change description plus anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 134,
+              "message": "The `infrastructure::CapabilityConfigDto` docs restate the typed-vs-raw configuration design rationale; catalogue docs must reference the upstream contract rather than reproduce it.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 243,
+              "message": "The `infrastructure::CodexCapabilityAdapter` docs restate the CLI emission and provider-preservation behavior; keep this entry to the changed adapter surface and anchor cite.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 304,
+              "message": "The `infrastructure::ModelProviderNameDto` docs restate boundary conversion and raw-string avoidance rationale; describe the DTO surface and cite the upstream anchors instead.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0612921aeb13bef05fb5a01a2e457ddbd5c32a02fc19d042426cea56db51b1a9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:10:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0b52e97f07b73a12b5dc82651b56e8fdd5f8c22b9dec2bd346b78552d1c1e5ff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:18:43Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 84,
+              "message": "`infrastructure::AgentProfilesCapabilityAdapter` is declared `modify`, but the frozen rustdoc baseline already has the same private-field struct shape and the identical `new(PathBuf, PathBuf) -> Self` signature. Only existing port-method behavior is planned to change, so this TypeEntry does not describe a structural modification and is already blue before that work occurs. Declare the baseline-identical type/impl identity as `reference`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 242,
+              "message": "`infrastructure::CodexCapabilityAdapter` is declared `modify`, although its frozen-baseline shape and `new(PathBuf, PathBuf, Arc<dyn ProviderSessionCachePort>, Option<TrackId>) -> CodexCapabilityAdapter` signature are unchanged. The intended dispatch-body change is not a TypeEntry shape change, so this declaration cannot detect implementation progress; use `reference` for the baseline-identical type/impl identity.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 18,
+              "message": "`usecase::ModelProviderName::try_new` can structurally produce only `EmptyModelProviderName`, but its return type exposes all eight `CapabilityInputValidationError` variants. The method docs do not name the exact producible variant or justify that breadth, forcing callers to account for seven impossible cases. Use an operation-specific error or explicitly constrain the documented reachable subset.",
+              "severity": "P1"
+            },
+            {
+              "category": "per-method error imprecision",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 18,
+              "message": "`infrastructure::ModelProviderNameDto::try_new` merely delegates validation to `ModelProviderName::try_new`, so it likewise can produce only `EmptyModelProviderName` while exposing the eight-variant `CapabilityInputValidationError`. Its docs neither enumerate that sole reachable variant nor justify the broad error surface; narrow the error or document the precise subset.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0b52e97f07b73a12b5dc82651b56e8fdd5f8c22b9dec2bd346b78552d1c1e5ff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:26:34Z",
+          "findings": [
+            {
+              "category": "state-shape smell",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 277,
+              "message": "`usecase::CapabilityProfile` exposes `provider: ProviderName` and `model_provider: Option<ModelProviderName>` as independent public fields. This permits `model_provider: Some(...)` with a non-Codex provider, even though AC-02 requires profiles using `model_provider` to retain `provider = codex`. No constructor or enum enforces that relationship, so an invalid routing state is representable; encode the binding as a validated composite/enum or use private fields with a validating constructor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b7981357fe1b9481625b75d02ac6deed34eead1a5f64aaea738795700d402a7b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:40:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 278,
+              "message": "The `usecase::CapabilityProfile` docs restate the behavioral invariant that only `CodexCustom` may carry a custom provider. Keep the catalogue description to the changed shape and anchor citation per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/usecase-types.json",
+              "line": 331,
+              "message": "The `usecase::CapabilityProviderBinding` docs restate variant behavior and the provider-pairing invariant. This behavior belongs upstream; the catalogue should identify the type and cite anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 114,
+              "message": "The `infrastructure::AgentProfilesCapabilityAdapter` docs restate the implementation's profile-mapping behavior despite being a baseline reference. Use a concise type/reference description with anchor citation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 163,
+              "message": "The `infrastructure::CapabilityConfigDto` docs restate deserialization flow and the downstream profile-construction behavior. Replace the behavioral prose with the changed surface and anchor citation.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 264,
+              "message": "The `infrastructure::CapabilityProviderBindingDto` docs restate variant semantics and the custom-deserialization rejection rule. Catalogue docs must reference the upstream behavior rather than reproduce it.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-multi-provider-capability-routing/infrastructure-types.json",
+              "line": 319,
+              "message": "The `infrastructure::CodexCapabilityAdapter` docs restate dispatch behavior while declaring a baseline reference. Keep the description limited to the reference surface and anchor citation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ce10b58320765af3a1936c68c8f6e784a10434beac26f501cc7e1478029b83f8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:54:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42adf7451d59f88a1ecf63d79cf5ca35970811d8413ecfac07fd6a2fdb83b7a1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T19:01:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42adf7451d59f88a1ecf63d79cf5ca35970811d8413ecfac07fd6a2fdb83b7a1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-13T21:05:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c580bb2133db8631016bdaeb54fe58abf915849b6147e5a288d4122fa0f58066",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T21:10:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c580bb2133db8631016bdaeb54fe58abf915849b6147e5a288d4122fa0f58066",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:15:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6abbd0f5e2aab5e76cfceb352c5f58f58675c0994d178abd90af690cf87f1252",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:19:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6abbd0f5e2aab5e76cfceb352c5f58f58675c0994d178abd90af690cf87f1252",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

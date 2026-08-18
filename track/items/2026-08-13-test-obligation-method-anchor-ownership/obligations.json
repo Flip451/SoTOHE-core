@@ -1,0 +1,113 @@
+{
+  "obligations": [
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+      "declaration_hash": "f16ac9ab78ae4e45557af18af903242cb2dbf5cdb1549a94369bb8b8052565c5",
+      "id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-14",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_add_modify_methods_have_spec_refs",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+      "declaration_hash": "dad0dbd071ecd1ad4e844ca5ea44dcaf9ac9527c74e810c01cde5c765d0a097b",
+      "id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "IN-13",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-14",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-15",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_method_anchor_coverage",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+      "declaration_hash": "62b8f545991bd25024575ec33b3b748d63ab56fb6dfaf98a0ac48616c15d217e",
+      "id": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "IN-15",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        },
+        {
+          "element_id": "AC-16",
+          "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs",
+        "file_path": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
+    }
+  ],
+  "track_id": "2026-08-13-test-obligation-method-anchor-ownership"
+}

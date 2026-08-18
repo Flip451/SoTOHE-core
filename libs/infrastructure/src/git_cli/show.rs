@@ -21,8 +21,15 @@
 //! §D4, §D4.1, §D4.3, §D5.3.
 
 use std::path::Path;
+use std::process::{Output, Stdio};
 
-use super::guarded_git_command;
+use super::isolation::isolated_git_command;
+use super::{collect_bounded_git_output, guarded_git_command, spawn_bounded_git_child};
+
+/// Retain at most this many bytes from either stream of a Git probe. The
+/// Keeping the subprocess bound here makes the blob limit real even when Git
+/// is asked to emit a larger blob or a very large tree listing.
+const MAX_GIT_OUTPUT_BYTES: usize = 16 * 1024 * 1024;
 
 /// Low-level result of running `git show origin/<ref>:<path>`.
 #[derive(Debug)]
@@ -72,14 +79,31 @@ pub(crate) fn is_path_not_found_stderr(stderr: &str) -> bool {
 /// `env_clear` is NOT used — we want to preserve PATH and git-specific
 /// env vars (e.g. `GIT_CONFIG`) — but `LANG`, `LC_ALL`, and `LANGUAGE`
 /// are explicitly overridden to `C`.
-fn spawn_git(repo_root: &Path, args: &[&str]) -> std::io::Result<std::process::Output> {
-    guarded_git_command()
+fn spawn_git(repo_root: &Path, args: &[&str]) -> std::io::Result<Output> {
+    let mut command = guarded_git_command();
+    command
         .env("LANG", "C")
         .env("LC_ALL", "C")
         .env("LANGUAGE", "C")
         .args(args)
         .current_dir(repo_root)
-        .output()
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let child = spawn_bounded_git_child(&mut command)?;
+    collect_bounded_git_output(child, MAX_GIT_OUTPUT_BYTES)
+}
+
+/// Spawns a bounded Git subprocess for a verdict-bearing branch read.
+///
+/// This keeps the locale and output bound of [`spawn_git`] while also using the
+/// repository/history isolation contract required when the answer is hashed
+/// into branch-read safety.
+fn spawn_isolated_git(repo_root: &Path, args: &[&str]) -> std::io::Result<Output> {
+    let mut command = isolated_git_command(repo_root, args);
+    command.env("LANG", "C").env("LC_ALL", "C").env("LANGUAGE", "C");
+    let child = spawn_bounded_git_child(&mut command)?;
+    collect_bounded_git_output(child, MAX_GIT_OUTPUT_BYTES)
 }
 
 /// Inspects `git ls-tree origin/<branch> -- <path>` and returns the
@@ -97,6 +121,24 @@ pub(crate) fn git_ls_tree_entry_kind(
     let output = spawn_git(repo_root, &["ls-tree", &git_ref, "--", path])
         .map_err(|e| format!("failed to run git ls-tree for {path}: {e}"))?;
 
+    parse_tree_entry_kind(path, output)
+}
+
+/// Isolated counterpart of [`git_ls_tree_entry_kind`] for branch reads that
+/// contribute to a branch-read decision.
+pub(crate) fn git_ls_tree_entry_kind_isolated(
+    repo_root: &Path,
+    branch: &str,
+    path: &str,
+) -> Result<TreeEntryKind, String> {
+    let git_ref = format!("origin/{branch}");
+    let output = spawn_isolated_git(repo_root, &["ls-tree", &git_ref, "--", path])
+        .map_err(|e| format!("failed to run git ls-tree for {path}: {e}"))?;
+
+    parse_tree_entry_kind(path, output)
+}
+
+fn parse_tree_entry_kind(path: &str, output: Output) -> Result<TreeEntryKind, String> {
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         return Err(format!(
@@ -142,6 +184,10 @@ pub(crate) fn git_show_blob(repo_root: &Path, branch: &str, path: &str) -> BlobR
         }
     };
 
+    classify_git_show_output(path, output)
+}
+
+fn classify_git_show_output(path: &str, output: Output) -> BlobResult {
     if output.status.success() {
         return BlobResult::Found(output.stdout);
     }
@@ -376,6 +422,14 @@ mod tests {
     }
 
     #[test]
+    fn test_git_show_blob_rejects_output_above_bound() {
+        let contents = vec![b'x'; MAX_GIT_OUTPUT_BYTES + 1];
+        let dir = setup_repo_with_file("large.bin", &contents);
+        let result = git_show_blob(dir.path(), "main", "large.bin");
+        assert!(matches!(result, BlobResult::CommandFailed(_)), "got {result:?}");
+    }
+
+    #[test]
     fn test_git_show_blob_invalid_repo_spawn_error_or_failure() {
         // repo_root is a directory that exists but is not a git repo.
         let dir = tempfile::tempdir().unwrap();
@@ -394,6 +448,18 @@ mod tests {
     fn test_git_ls_tree_entry_kind_not_found() {
         let dir = setup_repo_with_file("spec.json", b"{}");
         let kind = git_ls_tree_entry_kind(dir.path(), "main", "missing.json").unwrap();
+        assert_eq!(kind, TreeEntryKind::NotFound);
+    }
+
+    #[test]
+    fn test_isolated_git_ls_tree_entry_kind_ignores_ambient_repository_selection() {
+        let target = setup_repo_with_file("target.txt", b"target repository");
+        let elsewhere = setup_repo_with_file("elsewhere.txt", b"ambient repository");
+        let kind =
+            temp_env::with_var("GIT_DIR", Some(elsewhere.path().join(".git").as_os_str()), || {
+                git_ls_tree_entry_kind_isolated(target.path(), "main", "elsewhere.txt")
+            })
+            .unwrap();
         assert_eq!(kind, TreeEntryKind::NotFound);
     }
 

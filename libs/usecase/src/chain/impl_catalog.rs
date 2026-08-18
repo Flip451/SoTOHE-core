@@ -177,7 +177,7 @@ impl LoadablePersistedChain for ImplCatalogChain {
         input: &Self::Input<'_>,
         persisted: &Self::Persisted,
     ) -> Result<(), Self::StaleError> {
-        let stored = persisted.declaration_hash();
+        let stored = persisted.cache_key().declaration_hash();
         let current = input.current_catalogue_hash.to_hex();
         if stored.as_digest().as_str() == current {
             Ok(())
@@ -251,8 +251,11 @@ mod tests {
         let digest = domain::Sha256Digest::try_new(declaration_hash.to_owned()).unwrap();
         TypeSignalsDocument::new(
             ts(),
-            domain::CatalogueDeclarationHash::new(digest.clone()),
-            domain::ImplementationInputHash::new(digest),
+            domain::TypeSignalsCacheKey::new(
+                domain::CatalogueDeclarationHash::new(digest.clone()),
+                domain::CommitHash::try_new("a".repeat(40)).unwrap(),
+                domain::BaselineHash::new(digest),
+            ),
             signals,
         )
     }

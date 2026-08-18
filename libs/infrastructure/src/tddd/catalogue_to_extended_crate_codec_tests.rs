@@ -1,6 +1,5 @@
 //! Tests for [`catalogue_to_extended_crate_codec`] (split out to keep the main module under the 200-400 line guideline).
 
-use domain::tddd::CatalogueToExtendedCratePort;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::composite::{StructKind, StructShape, TypeKindV2};
 use domain::tddd::catalogue_v2::entries::{AssocConstDecl, AssocTypeDecl, TraitEntry, TypeEntry};
@@ -11,15 +10,18 @@ use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction, Self
 use domain::tddd::catalogue_v2::traits::TraitImplDeclV2;
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl};
 use domain::tddd::catalogue_v2::{
-    AssocConstName, CatalogueDocument, CrateName, DeletionRecord, FieldName, FunctionName,
+    AssocConstName, BoundOp, CatalogueDocument, CrateName, DeletionRecord, FieldName, FunctionName,
     FunctionPath, MethodName, ModulePath, ParamName, TraitName, TypeName, TypeRef, VariantName,
+    WherePredicateDecl,
 };
+use domain::tddd::{CatalogueToExtendedCratePort, SignalEvaluatorPort};
 use rustdoc_types::{
     AssocItemConstraintKind, GenericArg, GenericArgs, GenericBound, GenericParamDefKind, Id,
-    ItemEnum, ItemKind, Term, Type, VariantKind, WherePredicate,
+    ItemEnum, ItemKind, Term, TraitBoundModifier, Type, VariantKind, WherePredicate,
 };
 
 use super::*;
+use crate::tddd::signal_evaluator_v2::SignalEvaluatorV2;
 use crate::tddd::type_ref_parser::UNRESOLVED_CRATE_ID;
 
 fn make_doc(crate_name: &str) -> CatalogueDocument {
@@ -177,18 +179,20 @@ fn test_encode_returns_invalid_type_ref_for_unparseable_field_type() {
                 },
                 None,
             )),
-            vec![MethodDeclaration {
-                name: MethodName::new("get_value").unwrap(),
-                receiver: Some(SelfReceiver::SharedRef),
-                params: vec![],
+            vec![MethodDeclaration::new(
+                MethodName::new("get_value").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
                 // TypeRef::new accepts any non-empty string; the codec rejects it at syn parse time.
-                returns: TypeRef::new("42invalid").unwrap(),
-                is_async: false,
-                has_default_impl: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-            }],
+                TypeRef::new("42invalid").unwrap(),
+                false,
+                false,
+                vec![],
+                vec![],
+                vec![],
+                ItemAction::Add,
+                None,
+            )],
             vec![],
             vec![],
             ModulePath::root(),
@@ -312,6 +316,11 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     vec![],
                     TypeRef::new("Self").unwrap(),
                     false,
+                    false,
+                    vec![],
+                    vec![],
+                    vec![],
+                    ItemAction::Add,
                     None,
                 ),
                 MethodDeclaration::new(
@@ -320,6 +329,11 @@ fn test_encode_type_with_methods_produces_single_inherent_impl_block() {
                     vec![],
                     TypeRef::new("str").unwrap(),
                     false,
+                    false,
+                    vec![],
+                    vec![],
+                    vec![],
+                    ItemAction::Add,
                     None,
                 ),
             ],
@@ -643,7 +657,10 @@ fn test_encode_type_alias_produces_type_alias_item() {
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
-            TypeKindV2::TypeAlias { target: TypeRef::new("Result<User, DomainError>").unwrap() },
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("Result<User, DomainError>").unwrap(),
+                generics: vec![],
+            },
             vec![],
             vec![],
             vec![],
@@ -865,18 +882,22 @@ fn test_encode_enum_struct_variant_produces_named_struct_field_items() {
 #[test]
 fn test_encode_method_generic_param_type_emits_type_generic() {
     let mut doc = make_doc("domain");
-    let mut method = MethodDeclaration::new(
+    let method = MethodDeclaration::new(
         MethodName::new("set_value").unwrap(),
         Some(SelfReceiver::ExclusiveRef),
         vec![ParamDeclaration::new(ParamName::new("value").unwrap(), TypeRef::new("T").unwrap())],
         TypeRef::new("()").unwrap(),
         false,
+        false,
+        vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Into<String>").unwrap()],
+        }],
+        vec![],
+        vec![],
+        ItemAction::Add,
         None,
     );
-    method.generics = vec![MethodGenericParam {
-        name: ParamName::new("T").unwrap(),
-        bounds: vec![TypeRef::new("Into<String>").unwrap()],
-    }];
     doc.insert_type(
         TypeName::new("ValueHolder").unwrap(),
         TypeEntry::new(
@@ -1016,9 +1037,15 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
         TypeEntry::new(
             ItemAction::Add,
             DataRole::value_object(),
-            TypeKindV2::TypeAlias { target: TypeRef::new("T").unwrap() },
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![],
+                }],
+            },
             vec![],
-            vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+            vec![],
             vec![],
             ModulePath::root(),
             None,
@@ -1040,6 +1067,683 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
     );
 }
 
+#[test]
+fn test_encode_type_alias_generic_bound_preserves_catalogue_spelling() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Clone").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    assert_eq!(trait_.path, "Clone");
+    assert_ne!(trait_.id, Id(UNRESOLVED_CRATE_ID));
+    assert_eq!(ec.krate().paths[&trait_.id].path, ["std", "clone", "Clone"]);
+
+    // A bare prelude trait in an alias bound must make it through Phase 1 as
+    // a known external, rather than being rejected as a local unresolved name.
+    // Model the current rustdoc crate's graph-local id for `Clone`: the
+    // lexical alias comparison must ignore that id while Phase 1 still
+    // requires the catalogue-side bound to be a resolved external.
+    let mut c = ec.krate().clone();
+    for item in c.index.values_mut() {
+        let ItemEnum::TypeAlias(alias) = &mut item.inner else {
+            continue;
+        };
+        for predicate in &mut alias.generics.where_predicates {
+            let WherePredicate::BoundPredicate { bounds, .. } = predicate else {
+                continue;
+            };
+            for bound in bounds {
+                if let GenericBound::TraitBound { trait_, .. } = bound {
+                    if trait_.path == "Clone" {
+                        trait_.id = Id(9_000);
+                    }
+                }
+            }
+        }
+    }
+    let empty_baseline = rustdoc_types::Crate {
+        root: Id(0),
+        crate_version: None,
+        includes_private: false,
+        index: std::collections::HashMap::new(),
+        paths: std::collections::HashMap::new(),
+        external_crates: std::collections::HashMap::new(),
+        format_version: rustdoc_types::FORMAT_VERSION,
+        target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
+    };
+    let evaluation = SignalEvaluatorV2::new().evaluate(ec, empty_baseline, c);
+    assert!(evaluation.is_ok(), "alias bound must survive evaluator Phase 1: {evaluation:?}");
+}
+
+#[test]
+fn test_encode_type_alias_generic_bound_preserves_unknown_abi_literal_quotes() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Outer<extern \"efiapi\" fn()>").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = trait_.args.as_deref() else {
+        panic!("expected Outer generic arguments")
+    };
+    let Some(GenericArg::Type(Type::FunctionPointer(function_pointer))) = args.first() else {
+        panic!("expected function pointer generic argument")
+    };
+    assert_eq!(function_pointer.header.abi, rustdoc_types::Abi::Other("\"efiapi\"".to_owned()));
+}
+
+#[test]
+fn test_encode_type_alias_generic_bound_accepts_raw_pointer_argument() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Outer<*const u8>").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    let Some(GenericArgs::AngleBracketed { args, .. }) = trait_.args.as_deref() else {
+        panic!("expected Outer generic arguments")
+    };
+    let Some(GenericArg::Type(Type::RawPointer { is_mutable, type_ })) = args.first() else {
+        panic!("expected raw pointer generic argument")
+    };
+    assert!(!is_mutable, "expected `*const` raw pointer");
+    assert!(matches!(type_.as_ref(), Type::Primitive(name) if name == "u8"));
+}
+
+#[test]
+fn test_encode_type_alias_where_subject_preserves_catalogue_spelling() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("Vec<T>").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { type_, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias where predicate")
+    };
+    let Type::ResolvedPath(path) = type_ else {
+        panic!("expected resolved Vec<T> where subject, got {type_:?}")
+    };
+    assert_eq!(path.path, "Vec");
+    assert!(path.args.is_some(), "expected generic argument T on Vec<T>");
+}
+
+#[test]
+fn test_encode_type_alias_where_subject_rejects_unsupported_array_lengths() {
+    for lhs in ["[u8; LEN]", "[u8; 1 as usize]"] {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            TypeName::new("Alias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("u8").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![WherePredicateDecl {
+                    lhs: TypeRef::new(lhs).unwrap(),
+                    rhs: vec![TypeRef::new("Clone").unwrap()],
+                    operator: BoundOp::Bound,
+                }],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+        assert!(
+            matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)),
+            "unsupported lexical array length should be rejected: {lhs}: {error:?}"
+        );
+    }
+}
+
+#[test]
+fn test_encode_legacy_type_alias_where_subject_accepts_array_lengths() {
+    for lhs in ["[u8; LEN]", "[u8; 1 as usize]"] {
+        let mut doc = make_doc("domain");
+        doc.insert_type(
+            TypeName::new("Alias").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias { target: TypeRef::new("u8").unwrap(), generics: vec![] },
+                vec![],
+                vec![],
+                vec![WherePredicateDecl {
+                    lhs: TypeRef::new(lhs).unwrap(),
+                    rhs: vec![TypeRef::new("Clone").unwrap()],
+                    operator: BoundOp::Bound,
+                }],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        assert!(
+            CatalogueToExtendedCrateCodec::new().encode(doc).is_ok(),
+            "legacy alias where subject should remain accepted: {lhs}"
+        );
+    }
+}
+
+#[test]
+fn test_encode_type_alias_generic_maybe_const_bound_preserves_catalogue_spelling() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("~const Clone").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec.krate().index.values().find(|item| {
+        item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+    });
+    let ItemEnum::TypeAlias(ref ta) = alias.expect("expected TypeAlias").inner else {
+        panic!("expected TypeAlias")
+    };
+    let Some(WherePredicate::BoundPredicate { bounds, .. }) = ta.generics.where_predicates.first()
+    else {
+        panic!("expected alias bound predicate")
+    };
+    let Some(GenericBound::TraitBound { trait_, modifier, .. }) = bounds.first() else {
+        panic!("expected trait bound")
+    };
+    assert_eq!(trait_.path, "Clone");
+    assert_eq!(*modifier, TraitBoundModifier::MaybeConst);
+}
+
+/// A type-alias target using an unqualified associated-type projection rooted
+/// at its declared generic (`type Alias<T: Iterator> = T::Item`) must encode
+/// as a `QualifiedPath` over `Type::Generic("T")`, not as an external crate
+/// path named `T::Item`.
+#[test]
+fn test_encode_type_alias_target_generic_projection_emits_qualified_path() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T::Item").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("Iterator").unwrap()],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let ec = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
+    let alias = ec
+        .krate()
+        .index
+        .values()
+        .find(|item| {
+            item.name.as_deref() == Some("Alias") && matches!(item.inner, ItemEnum::TypeAlias(_))
+        })
+        .expect("expected TypeAlias item for 'Alias'");
+    let ItemEnum::TypeAlias(alias) = &alias.inner else { panic!("expected TypeAlias") };
+    let Type::QualifiedPath { name, self_type, trait_, .. } = &alias.type_ else {
+        panic!("expected alias target T::Item to be a qualified path, got {:?}", alias.type_);
+    };
+    assert_eq!(name, "Item");
+    assert!(trait_.is_none());
+    assert_eq!(self_type.as_ref(), &Type::Generic("T".to_owned()));
+    assert!(
+        !ec.krate().external_crates.values().any(|external| external.name == "T"),
+        "generic projection prefix must not be registered as an external crate"
+    );
+}
+
+/// Keyword-named generic declarations are rejected before lexical comparison;
+/// the codec does not recreate Rust grammar to reinterpret `dyn::Item`.
+#[test]
+fn test_encode_type_alias_target_keyword_generic_projection_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("dyn::Item").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("dyn").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// Raw/keyword generic declarations are rejected; qself parsing is not used to
+/// infer a catalogue declaration that the lexical boundary has disallowed.
+#[test]
+fn test_encode_type_alias_target_qualified_path_keyword_qself_generics_is_rejected() {
+    let mut doc = make_doc("domain");
+    for (alias_name, generic_name, target) in [
+        ("AsAlias", "as", "<as as Trait>::Assoc"),
+        ("DynAlias", "dyn", "<dyn as Trait>::Assoc"),
+        ("ImplAlias", "impl", "<impl as Trait>::Assoc"),
+    ] {
+        doc.insert_type(
+            TypeName::new(alias_name).unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new(target).unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new(generic_name).unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+    }
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// Raw/keyword spellings are rejected at the catalogue boundary instead of
+/// being restored by a hand-written Rust grammar classifier.
+#[test]
+fn test_encode_type_alias_target_rustdoc_normalized_raw_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("Vec<type>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("type").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A keyword-named generic is rejected even when it appears next to valid raw
+/// pointer syntax; the codec does not restore raw identifiers heuristically.
+#[test]
+fn test_encode_type_alias_target_const_pointer_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("*const const").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("const").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// Keyword generic names in both targets and where predicates are rejected;
+/// no grammar-aware restoration is attempted for nested expressions.
+#[test]
+fn test_encode_type_alias_where_predicate_nested_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("Vec<type>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("type").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![WherePredicateDecl {
+                lhs: TypeRef::new("Vec<type>").unwrap(),
+                rhs: vec![TypeRef::new("Clone").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A keyword declaration is rejected even if the target expression itself has
+/// valid function-pointer syntax.
+#[test]
+fn test_encode_type_alias_target_with_keyword_syntax_and_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("for<'a> fn(&'a str)").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("for").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A `dyn` declaration is rejected rather than being inferred from a `dyn`
+/// trait-object target expression.
+#[test]
+fn test_encode_type_alias_target_with_leading_path_dyn_syntax_and_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("dyn ::Trait<dyn>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("dyn").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+/// A keyword declaration is rejected even when the target has a valid `dyn`
+/// trait-object lifetime bound.
+#[test]
+fn test_encode_type_alias_target_with_lifetime_dyn_syntax_and_keyword_generic_is_rejected() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("dyn 'static + Trait<dyn>").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("dyn").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let error = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(matches!(error, domain::tddd::NewTypeGraphCodecError::InvalidTypeRef(_)));
+}
+
+#[test]
+fn test_encode_type_alias_with_two_generic_declarations_returns_error() {
+    let mut doc = make_doc("domain");
+    doc.insert_type(
+        TypeName::new("Alias").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::TypeAlias {
+                target: TypeRef::new("T").unwrap(),
+                generics: vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![],
+                }],
+            },
+            vec![],
+            vec![MethodGenericParam { name: ParamName::new("U").unwrap(), bounds: vec![] }],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
+
+    let err = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap_err();
+    assert!(
+        err.to_string().contains("both the entry and kind payload"),
+        "unexpected error: {err:?}"
+    );
+}
+
 // -----------------------------------------------------------------------
 // ADR 0248 D13: per-method `has_body` from `has_default_impl` (Gap 1)
 // -----------------------------------------------------------------------
@@ -1050,15 +1754,19 @@ fn test_encode_type_alias_target_generic_emits_type_generic() {
 #[test]
 fn test_encode_trait_method_with_has_default_impl_true_produces_has_body_true() {
     let mut doc = make_doc("usecase");
-    let mut method = MethodDeclaration::new(
+    let method = MethodDeclaration::new(
         MethodName::new("describe").unwrap(),
         Some(SelfReceiver::SharedRef),
         vec![],
         TypeRef::new("String").unwrap(),
         false,
+        true,
+        vec![],
+        vec![],
+        vec![],
+        ItemAction::Add,
         None,
     );
-    method.has_default_impl = true;
     doc.insert_trait(
         TraitName::new("Describable").unwrap(),
         TraitEntry::new(
@@ -1105,10 +1813,15 @@ fn test_encode_trait_method_with_has_default_impl_false_produces_has_body_false(
         vec![],
         TypeRef::new("()").unwrap(),
         false,
+        false,
+        vec![],
+        vec![],
+        vec![],
+        ItemAction::Add,
         None,
     );
-    // has_default_impl defaults to false via MethodDeclaration::new.
-    assert!(!method.has_default_impl);
+    // has_default_impl is explicitly false via MethodDeclaration::new.
+    assert!(!method.has_default_impl());
     doc.insert_trait(
         TraitName::new("RequiredOps").unwrap(),
         TraitEntry::new(
@@ -1158,9 +1871,14 @@ fn test_encode_inherent_method_always_has_body_true_regardless_of_has_default_im
         vec![],
         TypeRef::new("u32").unwrap(),
         false,
+        false,
+        vec![],
+        vec![],
+        vec![],
+        ItemAction::Add,
         None,
     );
-    assert!(!method.has_default_impl);
+    assert!(!method.has_default_impl());
     doc.insert_type(
         TypeName::new("Calculator").unwrap(),
         TypeEntry::new(

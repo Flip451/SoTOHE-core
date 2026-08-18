@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-14-workflow-byproduct-disk-hygiene",
+  "entries": {
+    "T001": [
+      {"layer": "usecase", "entry_key": "ScopeDiffMeasurePort"},
+      {"layer": "infrastructure", "entry_key": "GitScopeDiffMeasurer"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "ScopeDiffMeasurePort"},
+      {"layer": "infrastructure", "entry_key": "GitScopeDiffMeasurer"}
+    ],
+    "T003": [],
+    "T004": [],
+    "T005": []
+  }
+}

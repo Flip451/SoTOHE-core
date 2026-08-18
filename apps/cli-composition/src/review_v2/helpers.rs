@@ -1,21 +1,11 @@
 //! Private helpers shared across `CliApp` `review_v2` methods.
 
 use std::path::PathBuf;
-use std::sync::Mutex;
-use std::time::Instant;
 
-use crate::CommandOutcome;
 use crate::error::CompositionError;
 
 use super::shared::CodexReviewOutcome;
-
-pub(crate) fn record_instant_once(slot: &Mutex<Option<Instant>>) {
-    if let Ok(mut recorded_at) = slot.lock() {
-        if recorded_at.is_none() {
-            *recorded_at = Some(Instant::now());
-        }
-    }
-}
+use usecase::review_v2::RunReviewOutput;
 
 // ---------------------------------------------------------------------------
 // Track-ID resolution
@@ -118,34 +108,61 @@ pub(super) fn build_base_prompt_from_input(
     }
 }
 
-/// Converts a `CodexReviewOutcome` into a `CommandOutcome`.
-///
-/// The verdict JSON is written to stdout; the exit code is propagated directly.
+/// Converts an internal review outcome into the structured usecase output.
 ///
 /// # Errors
 /// Returns `Err` for `SubprocessFailed` (the subprocess was launched but failed).
 /// All other variants return `Ok`.
-pub(super) fn outcome_to_command_outcome(
+pub(super) fn outcome_to_run_review_output(
     outcome: CodexReviewOutcome,
-) -> Result<CommandOutcome, CompositionError> {
+) -> Result<RunReviewOutput, CompositionError> {
     match outcome {
-        CodexReviewOutcome::Skipped { scope_label } => {
-            eprintln!("[auto-record] Scope '{scope_label}' is empty, skipping");
-            Ok(CommandOutcome {
-                stdout: Some(r#"{"verdict":"zero_findings","findings":[]}"#.to_owned()),
-                stderr: None,
-                exit_code: 0,
+        CodexReviewOutcome::WithDiagnostics { outcome, .. } => {
+            outcome_to_run_review_output(*outcome)
+        }
+        CodexReviewOutcome::Skipped { .. } => Ok(RunReviewOutput {
+            verdict_kind: "skipped".to_owned(),
+            skipped: true,
+            finding_count: 0,
+            summary: Some(r#"{"verdict":"zero_findings","findings":[]}"#.to_owned()),
+            exit_code: 0,
+        }),
+        CodexReviewOutcome::FinalCompleted { verdict_json, exit_code, findings_count, .. } => {
+            Ok(RunReviewOutput {
+                verdict_kind: if exit_code == 0 { "approved" } else { "rejected" }.to_owned(),
+                skipped: false,
+                finding_count: findings_count as usize,
+                summary: Some(verdict_json),
+                exit_code,
             })
         }
-        CodexReviewOutcome::FinalCompleted { verdict_json, exit_code, .. } => {
-            Ok(CommandOutcome { stdout: Some(verdict_json), stderr: None, exit_code })
-        }
-        CodexReviewOutcome::FastCompleted { verdict_json, exit_code, .. } => {
-            Ok(CommandOutcome { stdout: Some(verdict_json), stderr: None, exit_code })
+        CodexReviewOutcome::FastCompleted { verdict_json, exit_code, findings_count, .. } => {
+            Ok(RunReviewOutput {
+                verdict_kind: if exit_code == 0 { "approved" } else { "rejected" }.to_owned(),
+                skipped: false,
+                finding_count: findings_count as usize,
+                summary: Some(verdict_json),
+                exit_code,
+            })
         }
         CodexReviewOutcome::SubprocessFailed { error, .. } => {
             Err(CompositionError::Infrastructure(error))
         }
+    }
+}
+
+/// Collects diagnostics that belong exclusively to the local-review DTO.
+pub(super) fn diagnostics_for_local_review(outcome: &CodexReviewOutcome) -> Vec<String> {
+    match outcome {
+        CodexReviewOutcome::WithDiagnostics { diagnostics, outcome } => {
+            diagnostics.iter().cloned().chain(diagnostics_for_local_review(outcome)).collect()
+        }
+        CodexReviewOutcome::Skipped { scope_label } => {
+            vec![format!("[auto-record] Scope '{scope_label}' is empty, skipping")]
+        }
+        CodexReviewOutcome::FinalCompleted { .. }
+        | CodexReviewOutcome::FastCompleted { .. }
+        | CodexReviewOutcome::SubprocessFailed { .. } => Vec::new(),
     }
 }
 

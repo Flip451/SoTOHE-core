@@ -9,6 +9,8 @@ use domain::review_v2::{
 
 use super::review_store::FsReviewStore;
 
+const MAX_REVIEW_JSON_BYTES: usize = 1024 * 1024;
+
 fn make_store(dir: &std::path::Path) -> FsReviewStore {
     FsReviewStore::new(dir.join("review.json"), dir.to_path_buf())
 }
@@ -241,6 +243,23 @@ fn test_read_rejects_symlinked_review_json() {
     assert!(result.is_err(), "should reject symlinked review.json on read");
 }
 
+#[cfg(unix)]
+#[test]
+fn test_write_rejects_symlinked_lock_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let target = tempfile::NamedTempFile::new().unwrap();
+    let lock_path = dir.path().join("review.json.lock");
+    std::os::unix::fs::symlink(target.path(), &lock_path).unwrap();
+
+    let result = make_store(dir.path()).write_verdict(
+        &sample_scope(),
+        &Verdict::ZeroFindings,
+        &sample_hash(),
+    );
+
+    assert!(result.is_err(), "should reject symlinked review lock file");
+}
+
 // ── malformed schema_version (P1 fix) ───────────────────────────
 
 #[test]
@@ -285,6 +304,18 @@ fn test_read_treats_missing_schema_version_as_empty() {
     assert!(map.is_empty());
 }
 
+#[test]
+fn test_read_rejects_unknown_v2_field() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("review.json");
+
+    std::fs::write(&path, r#"{"schema_version":2,"scopes":{},"unknown_gate_input":true}"#).unwrap();
+
+    let result = make_store(dir.path()).read_latest_finals();
+
+    assert!(result.is_err(), "unknown v2 fields must be rejected");
+}
+
 // ── ReviewExistsPort ────────────────────────────────────────────
 
 #[test]
@@ -313,6 +344,19 @@ fn test_review_json_exists_returns_true_when_file_present() {
     let store = make_store(dir.path());
     let result = store.review_json_exists().unwrap();
     assert!(result);
+}
+
+#[cfg(unix)]
+#[test]
+fn test_review_json_exists_rejects_symlinked_file() {
+    let dir = tempfile::tempdir().unwrap();
+    let target = tempfile::NamedTempFile::new().unwrap();
+    let path = dir.path().join("review.json");
+    std::os::unix::fs::symlink(target.path(), &path).unwrap();
+
+    let result = make_store(dir.path()).review_json_exists();
+
+    assert!(result.is_err(), "should reject symlinked review.json existence check");
 }
 
 #[cfg(unix)]
@@ -365,4 +409,39 @@ fn test_read_whitespace_only_file_returns_empty_map() {
     let store = make_store(dir.path());
     let map = store.read_latest_finals().unwrap();
     assert!(map.is_empty());
+}
+
+#[test]
+fn test_read_rejects_oversized_review_state_before_decoding() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("review.json");
+    std::fs::write(&path, vec![b'x'; MAX_REVIEW_JSON_BYTES + 1]).unwrap();
+
+    let result = make_store(dir.path()).read_latest_finals();
+
+    assert!(result.is_err(), "oversized review state must be rejected before decoding");
+}
+
+#[test]
+fn test_write_rejects_review_state_larger_than_read_limit() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = make_store(dir.path());
+    let oversized_message = "x".repeat(MAX_REVIEW_JSON_BYTES);
+    let finding = ReviewerFinding::new(
+        &oversized_message,
+        Some("P1".to_owned()),
+        Some("lib.rs".to_owned()),
+        Some(1),
+        Some("persistence".to_owned()),
+    )
+    .unwrap();
+    let verdict = Verdict::findings_remain(vec![finding]).unwrap();
+
+    let result = store.write_verdict(&sample_scope(), &verdict, &sample_hash());
+
+    assert!(result.is_err(), "writer must reject state it could not later read");
+    assert!(
+        !dir.path().join("review.json").exists(),
+        "oversized state must not be committed to disk"
+    );
 }

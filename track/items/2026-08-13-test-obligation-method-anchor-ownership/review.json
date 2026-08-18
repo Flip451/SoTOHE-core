@@ -1,0 +1,3504 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "at": "2026-08-13T17:44:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c2cc53c33edddfa76c2ffe29202a97000cb6dd34918f07349391941da03df42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:49:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2c2cc53c33edddfa76c2ffe29202a97000cb6dd34918f07349391941da03df42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T17:55:41Z",
+          "findings": [
+            {
+              "category": "inconsistent_decisions",
+              "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md",
+              "line": 36,
+              "message": "D1/D2 leaves a silent verification bypass: when a multi-method entry keeps entry-level `spec_refs` but a method omits optional method-level `spec_refs`, those anchors are not copied to any method obligation, while D2 limits fulfillment evaluation to obligation-owned anchors. The ADR therefore permits a grounded trait-level promise to receive no fulfillment verification without stating how it is resolved.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7d698821ce37f35c389dac14fcfce60d2724b257210bdea2b9971b05c8129bf5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:04:56Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions within the same ADR",
+              "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md",
+              "line": 40,
+              "message": "D1 is internally contradictory: it states that a trait_method obligation owns only the method's `spec_refs` (line 40), but then says single-method traits retain existing behavior (line 42), although the prior ADR defines method-level refs as optional and entry-level refs as the fallback. Clarify whether the method-only ownership rule applies to single-method traits; otherwise the scope of anchor ownership is undecidable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:63dc410521381297f354f1b4a1ba22f1480aa75db64ebb62bcba11a4f032ffa7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:11:27Z",
+          "findings": [
+            {
+              "category": "inconsistent decisions",
+              "file": "knowledge/adr/2026-08-13-1720-test-obligation-method-anchor-ownership.md",
+              "line": 42,
+              "message": "D1 permits a single-method trait to declare a partial `method-level spec_refs` set without requiring coverage or falling back to the entry-level refs. Those omitted entry-level anchors then have no owning obligation, contradicting D2's claim that every entry-level anchor is independently verified and allowing fulfillment to silently bypass them. Require single-method coverage or define fallback for partial declarations.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:8bfde04d55db857e50db9f742c6740d5d1ff2cfa59bc926ccf782bee9d20fccc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-13T18:23:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e901c9c4f5177939c3fa6b2e81276bc846c105efacfd36f95d3cd9152c8290e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-13T18:27:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e901c9c4f5177939c3fa6b2e81276bc846c105efacfd36f95d3cd9152c8290e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:32:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:49f874b13dbe64fffc31f47d40650d9b8b065615e5318421d280e228fa791a40",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T01:36:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:49f874b13dbe64fffc31f47d40650d9b8b065615e5318421d280e228fa791a40",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:20:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02dc2613c6792e777169c505b2805be340c0134a4527f8579c39161b64f5836f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:25:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02dc2613c6792e777169c505b2805be340c0134a4527f8579c39161b64f5836f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:55:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:491ca33f79aac7d0b73f42dab2a750039ecb914d00b660b5dcfceb42e8a75b42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:56:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:491ca33f79aac7d0b73f42dab2a750039ecb914d00b660b5dcfceb42e8a75b42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T02:59:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:491ca33f79aac7d0b73f42dab2a750039ecb914d00b660b5dcfceb42e8a75b42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:45:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62c35dee101ed0534ccf7b5df1b34a1893bd6cdc56ddea30c3f65502bd27122b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:46:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:62c35dee101ed0534ccf7b5df1b34a1893bd6cdc56ddea30c3f65502bd27122b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:00:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6d228197a5745d658a7efc2742e51f4c3c908f77ff512785980b0a86d1c045",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:02:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4e6d228197a5745d658a7efc2742e51f4c3c908f77ff512785980b0a86d1c045",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:25:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca7dc44714212b100ee42917690b7d4d0387a0bd81ea3f8390a51bdaa05c3548",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:27:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ca7dc44714212b100ee42917690b7d4d0387a0bd81ea3f8390a51bdaa05c3548",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T15:57:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6376424c8627e99c1fcad07a5030c9c352cc38252b3816beb1f2ea315cb1b082",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:05:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ef9a89f5a9cff055f1e3d3cd00e396d914b71dc0222b036251e73180310da3fa",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "at": "2026-08-16T12:41:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d62d7b704cb6057c1065c0ba780e0e139a337fb04e0e90943f4d575b0d835b0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:58:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d62d7b704cb6057c1065c0ba780e0e139a337fb04e0e90943f4d575b0d835b0",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "at": "2026-08-17T09:35:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d7bbda3d3533c42a829c74b80ba13189b56de5a128350f4f372b5b8867779a55",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:41:02Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "apps/cli-composition/src/test_obligation.rs",
+              "line": 545,
+              "message": "The test now copies the active track's `impl-plan.json` without pinning an unfinished task. Once T10–T13 are completed, the copied plan derives `TrackStatus::Done`, so the `InProgress` assertion fails and derive is rejected. This makes the regression test—and eventually CI—depend on the track remaining unfinished. Preserve an active status in the temporary fixture while continuing to use this current-schema catalogue.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d7bbda3d3533c42a829c74b80ba13189b56de5a128350f4f372b5b8867779a55",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:47:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82d9f2e5821e6b0ae0aabc92ed97df1246de006211908a5178ff5f0edbd625c1",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "at": "2026-08-14T10:18:54Z",
+          "findings": [
+            {
+              "category": "contract-conformance",
+              "file": "libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 239,
+              "message": "`MethodDeclaration::new` does not match the declared catalogue contract: the contract requires the complete ten-argument constructor, but this implementation retains the legacy six-argument signature and moves the complete form to an undeclared `from_parts` API. This leaves the implementation/catalogue chain inconsistent and keeps the temporary second construction API in the public surface.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:851a97c2fdcff52ce25be141d54e1f91874e3d2af2a33fe71963cd2fcbcfa6c0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T10:49:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d66e7ee4389c75f48cae0e3bd6d6e2856173fe823397b7406ad641991054c75",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:56:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d66e7ee4389c75f48cae0e3bd6d6e2856173fe823397b7406ad641991054c75",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:48:46Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 4067,
+              "message": "The lint test can pass even if `evaluate_catalogue_lint` silently skips `MethodDeclaration` (or returns no violations): all selected rules are expected to produce zero violations, and the test only asserts `violations.is_empty()`. Add a sentinel case or otherwise assert that the entry was actually evaluated so GO-02/IN-05/AC-06 are genuinely covered.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:eadf2552b123eec6ee72403fdd1c801c08611c62f379a8c9d13c597100e2a12b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T11:55:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:77a1e4bcc3d9cc5ad55eff98a3370d8b7332d538fb3f9e7f87e1d73c9ed80bd6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:01:28Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 4016,
+              "message": "The test's hard-coded `rules` vector does not represent all catalogue-lint rules currently applicable to a `ValueObject`. It omits `TraitImplRequired`, `NoRoleInMethodSignature`, `KindLayerConstraint`, `MethodReferenceSignature`, and `ForbiddenMethodReceiver`; notably, the fixture declares no `PartialEq`/`Eq` trait implementations, yet still passes because `TraitImplRequired` is absent. Consequently this test can remain green while the declared `MethodDeclaration` fails an active rule, so it does not substantiate the GO-02/IN-05 conformance bindings. Exercise the complete applicable rule set and mirror the active trait implementations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:77a1e4bcc3d9cc5ad55eff98a3370d8b7332d538fb3f9e7f87e1d73c9ed80bd6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:24:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7e03a1448580b14666cd34cf8351bd9e5d62eb1022abc76f8d1d2ae5648af911",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:28:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7e03a1448580b14666cd34cf8351bd9e5d62eb1022abc76f8d1d2ae5648af911",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:41:48Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/domain/src/tddd/catalogue_v2/methods.rs",
+              "line": 870,
+              "message": "This permanent domain test hardcodes a track-specific `domain-types.json` path, coupling the domain crate's test build to a mutable/renamable track artifact. Removing or renaming that track directory will make unrelated domain tests fail to compile; use a stable fixture or test the Rust API directly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2d9fc57cd77ce61a5871041f5558462b93c43e09a98dfd2d5a1a15ef763888a6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:56:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fc55f389ab8ba2ae99140de96088f75169479a92a0e90fb1567c9bd84ee50e42",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:11:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fc55f389ab8ba2ae99140de96088f75169479a92a0e90fb1567c9bd84ee50e42",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:56:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:793b397bc353bdf5e355f1be79fe7f3e37d7fae0f831ede0acd3c4e2f639870d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:57:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:793b397bc353bdf5e355f1be79fe7f3e37d7fae0f831ede0acd3c4e2f639870d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:45:33Z",
+          "findings": [
+            {
+              "category": "logic correctness",
+              "file": "libs/domain/src/tddd/test_obligation/projection.rs",
+              "line": 64,
+              "message": "Filtering methods here breaks the positional mapping used by the caller: `emit_trait_role_rules` enumerates these returned items, then indexes the original `entry.methods()` by that enumeration index. If a `Reference`/`Delete` method precedes an `Add`/`Modify` method, the obligation for the latter receives the former method's anchors (or wrong fallback anchors), so method-level obligations are mis-grounded. Return the selected method indices/objects or make the caller map by method name.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:55a66273398da7781aeb5f44654b92e449ce57465633d4d4b6b6c483eb50172a",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:54:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e45d67fcbc0d485f9c1c90f259d08fd2ba1c7a26f1e383984e87aa7f98c5ef4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:02:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d1653e62c280e8f93c732f15cd158d485888af40a5a8cd61286616097e9c4e8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:20:16Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 4151,
+              "message": "The test that claims to mirror the active `MethodDeclaration` catalogue surface is stale: `new` omits the new `action: ItemAction` parameter, the method list omits `action()`, and the expected count remains 13. Consequently, this test can pass without applying the catalogue lint rules to the newly added API surface. Add both declarations and update the count to 14.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "libs/domain/src/tddd/test_obligation/projection.rs",
+              "line": 475,
+              "message": "The projector regression test covers only a `Reference` method through `contract_role_items(...TraitMethod)`. It does not exercise `Delete` or the separately changed `data_role_items(...Method)` branch, so regressions that emit obligations for those non-derivable methods would pass. Add table-driven Reference/Delete coverage for both public projection paths.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5d1653e62c280e8f93c732f15cd158d485888af40a5a8cd61286616097e9c4e8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:28:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d30f60410505412c875ba0902b5be118b7a3bd5309d189c6f607892d36d2e4f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:50:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f72d6a18a3a1a4b8edc048a3320adde96a3e41037865bfa57cde6b6c670b5c53",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:55:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f72d6a18a3a1a4b8edc048a3320adde96a3e41037865bfa57cde6b6c670b5c53",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:58:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f72d6a18a3a1a4b8edc048a3320adde96a3e41037865bfa57cde6b6c670b5c53",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:12:15Z",
+          "findings": [
+            {
+              "category": "doc-contract-contradiction",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 27,
+              "message": "Doc comment contradicts the enforced invariant: it states \"the union of method references must cover that set\" and that a single-method trait \"must declare the complete set on that method\", but after this change only Add/Modify method references count toward coverage — Reference/Delete method refs never satisfy it, and declaring the full set on a single Reference/Delete method is no longer sufficient (it is unconditionally rejected by the union check). This is a factual contract mismatch, not phrasing.",
+              "severity": "minor"
+            },
+            {
+              "category": "diagnostic-contradiction",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 49,
+              "message": "The single-method special-case branch was not updated alongside the Add/Modify union-check change and now (a) is fully subsumed by the union check (single Add/Modify method: identical condition; single Reference/Delete method: union check always fails for a non-empty entry set), and (b) for a single Reference/Delete method emits \"single-method trait must declare entry-level spec anchor ... on its method\" — an unrealizable remedy, since declaring the anchors on that method is still rejected by the union check. Fail-closed behavior is preserved, but the diagnostic contradicts the new invariant; restrict the branch to Add/Modify methods or remove it so the accurate \"not assigned to any add/modify method\" message is emitted.",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:bb03422f26cae6485464b9ab78517d1c9fc275dd0ce5677756e3769703ac2dd0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T12:27:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6815486666da1899b9897e3cd19fe6a287986bee8855be2b7d99082a78df6393",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:11:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c2ce868b29d8015449143a372a4368c893de1c98795a11e0490bd71b29f57926",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:18:48Z",
+          "findings": [
+            {
+              "category": "doc-contract-contradiction",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 26,
+              "message": "validate_method_anchor_coverage の doc comment が本 diff の挙動変更と矛盾している。「Every method-level reference must belong to the entry-level set, including methods on a Reference/Delete parent」は Reference/Delete 親の method-level spec_refs が containment 検証の対象として合法に存在し得ることを示すが、行 40 で配線された validate_parent_forbids_method_spec_refs により、それらは containment 判定に到達する前に一律拒否される (entry-level set に含まれる anchor でも Err)。また # Errors 節 (行 33-37) はこの新しい拒否条件を列挙していない。doc を信頼する呼び出し側は「Reference/Delete 親の method が entry set 内の anchor を引くのは合法」と誤って予測する。summary 冒頭文の修正と # Errors への拒否条件追記が必要。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:1c09cc42e3ddda63738b073ef80dd5ae0ef7bb239145164845be74cab8be6345",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T17:24:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9e65859314f9a34883d68304582940d3fa29a189e1e137b8c5daefda18297d5f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:50:55Z",
+          "findings": [
+            {
+              "category": "stale-test-name",
+              "file": "libs/domain/src/tddd/test_obligation/obligations.rs",
+              "line": 787,
+              "message": "Test name `test_add_method_on_reference_parent_cannot_declare_absent_anchor` still asserts the removed inventory-containment rule (\"absent anchor\" rejection). The entry now fails solely because the Reference parent forbids any method spec_refs (`validate_parent_forbids_method_spec_refs`); the cited anchor IN-99 being absent from the entry-level set plays no role in the outcome (the test would still err with IN-99 included). The sibling test was renamed for exactly this staleness (`test_reference_method_cannot_cover_entry_anchors_alone` → `test_reference_method_need_not_cover_entry_anchors`), but this one was missed, so the suite factually contradicts the track's design intent that containment is removed. Rename to reflect the parent-forbids path, e.g. `test_add_method_with_spec_refs_on_reference_parent_is_rejected`.",
+              "severity": "low"
+            }
+          ],
+          "hash": "rvw1:sha256:e9e987ff34b56da38656a6fc5385b571a9c5b1f35de38ff264fdb2601cf37f79",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T01:57:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5c0c238918e2a74742359030c2ea9f54d8aecd0538ce8b341b8ffc1f60bbb06b",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "at": "2026-08-16T15:13:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe55ef97d7985d6094904766281108bf779a3e1294c1d16bf394df5971c7214d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:16:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fe55ef97d7985d6094904766281108bf779a3e1294c1d16bf394df5971c7214d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:47:24Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 107,
+              "message": "`pr-reviewer` is routed to `provider: grok` with `model: grok-4.6`, but this capability is not a provider-CLI dispatch. `AgentProfiles::resolve_execution` treats `pr-reviewer` as the sole HostedService branch (model/effort are ignored), and `usecase::pr_review::validate_reviewer_provider` admits only `codex` because `/track:pr-review` posts `@codex review` to Codex Cloud. This change fail-closes `pr_trigger_review` / `pr_review_cycle` with \"reviewer provider 'grok' does not support structured output; requires one of: codex\". The new `.agents/skills/pr-reviewer/SKILL.md` cannot make this dispatchable: hosted execution never admits `grok-sandbox`. Keep `pr-reviewer.provider` as `codex` (model/effort are not required) until a non-hosted grok PR-review path exists.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 113,
+              "message": "`ref-verifier-chain1` final is routed to `provider: grok`. The dedicated typed-pipeline runner (`libs/infrastructure/src/ref_verify/process_runner.rs` `run_ref_verifier_agent`) only launches `claude` / `codex` / `gemini` and fail-closes with \"unsupported ref-verifier provider 'grok'\". Fast stays Codex and still works; commit/merge final Chain-1 ref-verify will not. Adding `.agents/skills/ref-verifier-chain1/SKILL.md` `grok-sandbox` does not create a grok launch arm (ADR 2026-08-14-1225 D5 requires the dedicated path). Keep this final provider on `codex` until that arm exists.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 123,
+              "message": "`ref-verifier-chain2` final is routed to `provider: grok`. It uses the same `run_ref_verifier_agent` match as Chain 1 (`claude` / `codex` / `gemini` only) and will fail closed on final catalogue-spec ref-verify with \"unsupported ref-verifier provider 'grok'\". The new `.agents/skills/ref-verifier-chain2/SKILL.md` is not consulted by this runner. Keep this final provider on `codex` until the dedicated path has a grok contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 133,
+              "message": "`obligation-fulfillment-verifier` final is routed to `provider: grok`. Fulfillment verification reuses `make_agent_process_runner` / `run_ref_verifier_agent`, which has no grok arm, so final obligation-fulfillment judgements fail closed with \"unsupported ref-verifier provider 'grok'\". Fast stays Codex. `.agents/skills/obligation-fulfillment-verifier/SKILL.md` cannot admit a launch this runner never performs. Keep this final provider on `codex` until the shared semantic-verifier pipeline has a grok contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 142,
+              "message": "`waiver-verifier` final is routed to `provider: grok`. Waiver verification uses the same shared semantic-verifier runner as fulfillment/ref-verify (`claude` / `codex` / `gemini` only), so final waiver judgements fail closed with \"unsupported ref-verifier provider 'grok'\". Fast stays Codex. `.agents/skills/waiver-verifier/SKILL.md` is unused by this path. Keep this final provider on `codex` until the dedicated runner has a grok contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6921fe840fd5fc9703b8e13baaab40f22246c94d433b870865f04381ecd8d633",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T10:50:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8d990bc888d4e123a768f331b6d56ac7ee0a1f43e1377a5c0b20be55c412efed",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:08:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd958617e101e9e6035d17df97cf2828268fa6ca2738fe11424cc3ea17ee2992",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:45:49Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 6,
+              "message": "Task T1 restates upstream behavior/design rationale in prose (“catalogue-defined, lint-compliant representation”, “record each method's owned spec-anchor share”, and compatibility behavior) instead of using only target + operation + anchor cite, contrary to `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "Task T2 has target symbols and operations but no AC/IN/CN/spec-element anchor cite, so its implementation boundary is not executable under the impl-plan policy.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "Task T2 restates the AC-05 behavior contract (“re-ground ... without its recorded accepted deviations”) in prose instead of referencing the anchor only.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 18,
+              "message": "Task T3 has an operation and a general target but no AC/IN/CN/spec-element anchor cite, leaving the executor to infer the governing contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 18,
+              "message": "Task T3 restates the upstream validation behavior (“subset, full-coverage, single-method total-declaration, and no-retroactivity validation rules”) in prose rather than using anchor references.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 24,
+              "message": "Task T4 has an operation and general symbols but no AC/IN/CN/spec-element anchor cite, so its required boundary is not executable from the task text.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 35,
+              "message": "The `method-declaration` section descriptions restate the upstream representation, ownership, compatibility, and accepted-deviation behavior instead of using target + operation + anchor cites.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 44,
+              "message": "The `obligation-derivation` section description restates the upstream ownership and rejection contract instead of referencing its spec anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 52,
+              "message": "The `fulfillment-verification` section description restates the upstream fulfillment-scope behavior instead of referencing its spec anchors.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3caa14f740bcc554dd52a881dc68d7acce0dfd778bd8e230b6478537f12698ea",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:48:30Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 29,
+              "message": "The `impl-plan.json` omits `plan.summary`, so GO-01 and GO-02 have no goal-to-task traceability. `task-coverage.json` intentionally cannot carry GO mappings; the impl-plan policy requires these mappings in `plan.summary`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6766d414535c37ec7c3200317f219dd1039f01f807320ec6a2d079fa3b7f7c31",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:49:58Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 6,
+              "message": "`IN-03` is mapped to T3, but T3 only implements `TraitMethodObligationDerivation` and structural validation. IN-03 requires fulfillment verification and rendered verifier instructions to be limited to owned anchors; that behavior belongs to T4. This is a load-bearing task-coverage mismatch.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 7,
+              "message": "`IN-04` is mapped to T4, but T4 only updates `FulfillmentVerification` and guidance. IN-04 requires re-grounding the discovered three-method ApplicationService trait and removing its Known Accepted Deviations, which the plan assigns to T2/AC-05. This leaves the in-scope requirement attributed to a task that does not describe delivering it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:44bdb399419d493ad7790474ad8df10f732d6739180e4b5819e1499531f82a35",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:51:03Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 6,
+              "message": "The plan omits the dependency edges needed to make the declared execution order reliable: T2 must follow T1 before migrating MethodDeclaration call sites, T3 must follow T1/T2 before deriving obligations from the new ownership fields, and T4 must follow T3 before fulfillment verification consumes the validated ownership boundary. All are in B-01/B-02 without `depends_on`, so batch execution can rely only on an unsafe heuristic and may schedule a consumer before its producer.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:312fdcb377c19e64b73f25493d4561674e11676ce5d35e95a92065fb1b190980",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:52:36Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 12,
+              "message": "`task-contract.json` attributes T3 to the non-existent usecase catalogue entry `TraitMethodObligationDerivation`; the active catalogue exposes `DeriveTestObligationsInteractor` instead. T3 therefore has no valid catalogue attribution.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 15,
+              "message": "`task-contract.json` attributes T4 to the non-existent usecase catalogue entry `FulfillmentVerification`; the active catalogue exposes `EvaluateTestObligationsInteractor` instead. T4 therefore has no valid catalogue attribution.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 4,
+              "message": "The active domain catalogue entry `TestObligation` has no task attribution in `task-contract.json`, leaving a catalogue entry orphaned from the implementation plan.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 4,
+              "message": "The active usecase catalogue entry `DeriveTestObligationsInteractor` has no task attribution in `task-contract.json`; T3's invalid `TraitMethodObligationDerivation` key does not cover it.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 4,
+              "message": "The active usecase catalogue entry `EvaluateTestObligationsInteractor` has no task attribution in `task-contract.json`; T4's invalid `FulfillmentVerification` key does not cover it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:def5e55b1263df89851de633a5b3baca3bf4f4d6cc85c23e22c8298c8440a53f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:54:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad9d06e2f02c2c455eef48e79f384ba47a5733814c2f3bd79c00cd7439e1c4da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:03:07Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 4,
+              "message": "IN-01 and AC-01 are mapped only to T1, which updates MethodDeclaration. Both elements also require trait_method obligations to own the method-level anchors; that behavior is implemented by T3's derivation work, but T3 is absent from both mappings and does not cite either anchor. Add T3 as a co-owner of IN-01 and AC-01.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "T2 bundles two independently verifiable units: MethodDeclaration codec/call-site migration (AC-06/CN-05/IN-05) and PhaseCommandService re-grounding plus accepted-deviation cleanup (AC-05/CN-04/IN-04). The latter has distinct targets and ownership constraints, yet the description names only a generic “originating ApplicationService trait,” and its usecase/harness work is absent from T2's scope estimates. Split these units before implementation and give the PhaseCommandService cleanup an explicit, sanctioned target/writer boundary.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ad9d06e2f02c2c455eef48e79f384ba47a5733814c2f3bd79c00cd7439e1c4da",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:10:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:59d26ea3cdb351b94affb84cf553f10cffb2a00bb0bfa316e283d845f796b0d9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:13:24Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 33,
+              "message": "T5 names “this track's existing test-bindings.json records for PhaseCommandService,” but this track's catalogues, obligations, and bindings contain no PhaseCommandService records. The actual grounding/binding records are under `track/items/scope-conditional-pre-review-gates-2026-07-31/`, while the accepted-deviation record is in `.harness/custom/review-prompts/harness-policy.md`. Consequently T5 cannot deliver IN-04/AC-05/CN-04 within its declared target and ownership boundary; it needs explicit sanctioned targets/writers rather than the nonexistent current-track records.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:59d26ea3cdb351b94affb84cf553f10cffb2a00bb0bfa316e283d845f796b0d9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T07:50:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2de243e46b60f8af5a235ca36f7455e46a54fdc5ff4596ce8039f872e6ac8a29",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:56:19Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 42,
+              "message": "T5 depends only on T4, so the declared full-cycle proceeds directly from B-02 to B-03. The required type-design re-entry is mentioned only in prose; it is not an executable dependency or workflow step. At that point the current catalogue still lacks PhaseCommandService, task-contract.json has no attribution for it, and current-track obligations/bindings cannot contain its methods. End this plan after B-02 and re-enter type design and Phase 3 before declaring the recovery task, or otherwise represent an enforced re-entry gate.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "T5 bundles four independently verifiable units while still todo: validate fulfillment (AC-05), explain fulfillment (AC-07), enter fulfillment (AC-08), and removal of the live deviation after all three pass (AC-09). Split the three method fulfillments into separately verifiable tasks and make a final deviation-removal task depend on them.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "T5 restates OS-02 as “Do not modify the merged scope-conditional-pre-review-gates-2026-07-31 historical binding record” instead of citing that anchor. Keep the target and removal operations, and replace this repeated behavioral exclusion with an OS-02 citation as required by `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 58,
+              "message": "All three plan sections restate upstream behavior in prose: method-declaration describes lint conformance and catalogue enablement, obligation-ownership repeats method-owned derivation/verification behavior, and post-reentry-recovery repeats the three fulfillments plus historical-record exclusion. Replace these descriptions with target + operation + the applicable anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2de243e46b60f8af5a235ca36f7455e46a54fdc5ff4596ce8039f872e6ac8a29",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:07:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4930d22fd84d7dbc9165d351c1ed5177bd5421037c749ecdbe5034f713f5d815",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:10:54Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 33,
+              "message": "T5 is not an executable implementation task: its target is “post-B-02 type-design and Phase 3 re-entry,” not a file or symbol, and its operation is an orchestrator phase transition rather than a concrete implementation change. Remove this placeholder from the implementation task list and perform the sanctioned re-entry outside the batch plan; author executable recovery tasks after the catalogue converges.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 7,
+              "message": "IN-04/06/07/08, AC-05/07/08/09, and CN-04/06/07/08 are mapped solely to T5, but T5 only requires catalogue re-entry; it does not add the three method-specific fulfillments or remove the live deviation. A future Phase 3 pass does not make these current mappings genuine. Attribute them to the executable recovery tasks created after re-entry.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "The current `plan` omits `summary`, so GO-01 and GO-02 have no task traceability. Restore their mappings in `impl-plan.json` `plan.summary`; do not add goals to task-coverage.json, whose schema intentionally excludes them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4930d22fd84d7dbc9165d351c1ed5177bd5421037c749ecdbe5034f713f5d815",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:23:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0fd43aa35e1d69ad4d59c9310c8d737828459606ea695b2a5eb2d8c355b89d6b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:28:29Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 34,
+              "message": "T5–T8 are the sole owners of the twelve recovery elements, but all four are marked `skipped`. Here `skipped` is a settled terminal state: the batch plan may omit these tasks, full-cycle does not implement them, and the merge guard treats them as resolved. Consequently no declared batch creates the PhaseCommandService bindings or removes the deviation, so the coverage is nominal. T5–T7 also declare only T4 as a dependency and never represent the required type-design/Phase 3 re-entry. Re-author the recovery tasks after that re-entry as executable unsettled tasks and include them in the batch plan.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0fd43aa35e1d69ad4d59c9310c8d737828459606ea695b2a5eb2d8c355b89d6b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T08:50:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:08e926a788fa735778752d0d9c42ecccc8d812a7ba9c53846a0c5ffb96afc588",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:54:54Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 20,
+              "message": "OS-02 remains an enforced out-of-scope element in spec v1.1, but this map skips directly from OS-01 to OS-03 and no task cites OS-02. The prohibition on canonicalizing cross-populated fulfillment or rewriting historical binding records therefore has no task owner in this pass.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 63,
+              "message": "B-01 contains only T1, although T1 must implement the catalogue-declared breaking MethodDeclaration::new signature while T2, in B-02, owns migration of its existing call sites. Because full-cycle compiles, reviews, and commits each batch independently, B-01 cannot compile before T2 runs. The API change needs compatibility staging or caller migration in the same executable batch.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 17,
+              "message": "T2 explicitly owns MethodDeclaration construction call sites, including eleven invocations under libs/usecase, but its estimates declare only domain and infrastructure scopes. B-02 already consumes 480 of the 500-line usecase ceiling through T3 and T4, so omitting T2's required usecase migration makes the batch composition and ceiling rationale unsound.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:08e926a788fa735778752d0d9c42ecccc8d812a7ba9c53846a0c5ffb96afc588",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:05:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:75d61b1b6b1b6d2e21228a3737ad2a89cd1eee52cd06dab1f68c3c8c59f99530",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T09:10:00Z",
+          "findings": [
+            {
+              "category": "implausible indivisibility justification",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 24,
+              "message": "T1's justification—“MethodDeclaration::new must adopt its catalogue-declared signature together with every affected construction site…”—only establishes that the final constructor cutover and its callers must land together; it does not make the entire 720-line domain task indivisible. T1 also bundles independently verifiable lint remediation/accessor work (IN-05, AC-06, CN-05) and method-level spec_refs plus codec support (IN-01, AC-01). These can be staged while retaining a temporary compatible constructor, followed by the atomic signature/caller cutover. Split these units instead of exempting all of T1 from the ceiling.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:75d61b1b6b1b6d2e21228a3737ad2a89cd1eee52cd06dab1f68c3c8c59f99530",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:16:03Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 7,
+              "message": "T3 is mapped to IN-05, AC-06, and CN-05, but its described operation is only the constructor cutover and its tests. It does not perform or validate MethodDeclaration lint remediation, accessors, or preservation of the method contract; those anchors belong to T1. This makes the coverage attribution implausible.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 17,
+              "message": "T2 is mapped to CN-01 and CN-02, but its operation is limited to codec support and compatibility integration. It does not enforce the method-anchor subset/coverage invariants or active-catalogue-only validation; those are implemented by T4's derivation and structural-validation task. The mappings therefore do not represent genuine delivery of these constraints.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:53ad472f1524b5ecb38682a2f84749af93d65082459b9c584577318136cb5cb6",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:19:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a254aabe4639d4bbbefa21a8e124e99ffa44bb8b56dee2d0d34fe654b745b5ff",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T09:23:32Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 5,
+              "message": "T1 and T2 are explicitly compatibility-staging tasks, while T3 performs the final MethodDeclaration constructor cutover. Nevertheless, all three are attributed to MethodDeclaration. Attribution denotes catalogue convergence at task completion; after B-01 marks T1/T2 done, the pre-review gate will require a Blue final-shape signal even though the catalogue-declared constructor is intentionally deferred to T3. Attribute convergence to T3 only, or redesign the stages so B-01 actually reaches the declared shape.",
+              "severity": "P1"
+            },
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 43,
+              "message": "B-01 cannot independently deliver T1's AC-06 lint remediation. Making MethodDeclaration fields non-public requires migrating existing direct field reads and struct literals, including production code under `libs/infrastructure/src/tddd/catalogue_to_extended_crate_codec/`, but T1 targets only `methods.rs`, T2 only `catalogue_document_codec/`, and T3 is deferred to B-02 and names only construction call sites. B-01 therefore either fails compilation or leaves AC-06 incomplete. Move all accessor-use migration into B-01 or defer the field-visibility cutover and AC-06 ownership to the batch containing that migration.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a254aabe4639d4bbbefa21a8e124e99ffa44bb8b56dee2d0d34fe654b745b5ff",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:30:19Z",
+          "findings": [
+            {
+              "category": "dependency or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 12,
+              "message": "T2 is ordered before the domain API its codec work requires. MethodDeclaration currently has no method-level `spec_refs` storage or accessor, T2 targets only infrastructure, and T3—the next task touching `methods.rs`—runs in the following batch. Consequently T2 cannot implement and test codec round-tripping without inventing an unlisted domain change. Add the backward-compatible `spec_refs` API to T2's targets and estimates, or make it an explicit IN-01/AC-01 deliverable of T1 and map/trace T1 accordingly before T2 consumes it.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e8f15d304cda2136e8e24943c3c9a9457e2f3d207c2ce29c26c5db806ada8402",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T09:32:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3f66e9ec8fae51396553b8e54de9a9d7848a75aebd4a7df8adcfc28f309fe1b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:18:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d527c5da95dbdbc5b2dbd082cf887b36b1d89052074893fa3303a5acf169d7da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:23:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:012a8785fea41f00a7972d8744306db7bcc04754076ac1cba12dc57fb4a48f92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:02:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d527c5da95dbdbc5b2dbd082cf887b36b1d89052074893fa3303a5acf169d7da",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:05:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d527c5da95dbdbc5b2dbd082cf887b36b1d89052074893fa3303a5acf169d7da",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:47:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:084311311177dbe06a8d60079b33a98cb6bb4523c20b88fa0edeb0363c900ac3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:53:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:084311311177dbe06a8d60079b33a98cb6bb4523c20b88fa0edeb0363c900ac3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:24:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5e0130575fd48de736e4d25e18df350eb3c1db6bf454dc11d93079bdb0e92ba",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:28:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5e0130575fd48de736e4d25e18df350eb3c1db6bf454dc11d93079bdb0e92ba",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T07:32:11Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 39,
+              "message": "GO-01 traceability stops at T5, but T6 is the sole task covering IN-09..IN-11 and AC-10..AC-12—the D3 recovery that makes the concrete multi-method `PhaseCommandService` satisfy GO-01. Add T6 to the GO-01 summary mapping.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 88,
+              "message": "T6 bundles four independently verifiable behavior units while still `todo`: validate grounding (IN-09/AC-10), explain grounding (IN-10/AC-11), enter grounding (IN-11/AC-12), and deviation-clause removal (IN-12/AC-13). Split the three method recoveries into independently testable tasks and make the policy cleanup depend on their completion.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 60,
+              "message": "B-04 unnecessarily serializes T5 after T4. T5 becomes ready after T4 within B-03, their targets do not overlap, and their combined usecase estimate is 480 lines (T4: 300; T5: 180), under the 500-line ceiling; domain and infrastructure each have only one contributor. Place T5 after T4 in B-03 and use the following batch for the remaining T6 work.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a8a5d8f415efcbca8ace930aa627f47212158afc2061130be5b9aab03fbf6e77",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T08:02:57Z",
+          "findings": [
+            {
+              "category": "unsound batch composition",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 83,
+              "message": "B-05 groups T6, T7, and T8 despite concrete overlapping ownership: all three modify method-specific grounding/evidence for the same `PhaseCommandService`, whose implementation is in the single `libs/usecase/src/phase_command.rs` file, and all three are attributed to that same catalogue entry. Concurrent ownership is unsafe; place these tasks in separate ordered batches or establish genuinely non-overlapping write targets.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 86,
+              "message": "B-06 unnecessarily serializes T9. After T6, T7, and T8 appear earlier in B-05, T9 is ready; its `harness-policy.md` target does not overlap their PhaseCommandService target, and the batch totals remain within the ceilings (usecase 220 lines, other 10 lines). Place T9 after its predecessors in the same final recovery batch, or after the last recovery task if their overlapping ownership is split across batches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1f1e0c63420f3a1b0b418c7f1584f39eaffb52a6fb47635a08e71834e901c797",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T08:08:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:aead5508ec7e3b90fd8860b91d632bc0f4adf5ff7b9f0377838dcb632981adff",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:24:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98accade9e04102057a86c46aa0238042a77f65797ae4d6fdd33616100522dc9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:30:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:98accade9e04102057a86c46aa0238042a77f65797ae4d6fdd33616100522dc9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:58:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:67d46f00133c7bb8f3cbb51dec4933cf8beca2b5afbf70b38b335d4f5ed65a14",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:55:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:622b848def653803c5d7aab1eedc1a4ff4889f34d34f6baf148468ec82900735",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:59:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:622b848def653803c5d7aab1eedc1a4ff4889f34d34f6baf148468ec82900735",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:46:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9dd5966dc58134ef03b6ee1e139c7c820ce3f9cf4f61417807c3475a3e4f04f7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:49:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9dd5966dc58134ef03b6ee1e139c7c820ce3f9cf4f61417807c3475a3e4f04f7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:52:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d4d88f6bb808d22ba809c6921d6b6394e85fb9da7bdd8df1ad24a478f2f8c5a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:55:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5d4d88f6bb808d22ba809c6921d6b6394e85fb9da7bdd8df1ad24a478f2f8c5a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:03:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b14650480f3eac027bc45f22bddfe2c623b99b7f9d4fb804c688f6b1cced8f3e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:07:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b14650480f3eac027bc45f22bddfe2c623b99b7f9d4fb804c688f6b1cced8f3e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:16:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d915dcef15ef1659d62125af685569a414fcf5c2ca97a92b68792c10cf12dc4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:19:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7d915dcef15ef1659d62125af685569a414fcf5c2ca97a92b68792c10cf12dc4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:25:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ade5fd3ad2397096bf0d978c6b54e2b3d91c9929ce1a078b291521a3199cd9ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:28:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ade5fd3ad2397096bf0d978c6b54e2b3d91c9929ce1a078b291521a3199cd9ef",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:01:04Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 144,
+              "message": "T10 restates upstream behavior in prose (\"treat omission as add without parent-action inheritance; reject empty or omitted spec_refs...\"). Keep only target + operation + anchor cites per no-upstream-restatement policy.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 153,
+              "message": "T11 restates the behavior contract (\"apply only to command-named catalogues, while unnamed catalogues are neither rewritten nor rejected\"). Replace the prose with target + operation + anchor cites.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 42,
+              "message": "The method-action-reentry plan section repeats the upstream behavior contract (independent action, non-empty refs, and command-only schema application). Reduce it to target + operation + anchor cites.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:263ca25a68aa297b5719692af88c3f60bd3b176dca8fecbf518cc71d75227260",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:04:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f738097dc222d4429a82a058cf2265af7729457f869b6661b7ffe48e13388d14",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:10:44Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 144,
+              "message": "T10 は IN-13 / AC-14 を担当する一方、対象を `libs/domain/src/tddd/` と domain tests に限定しています。しかし `MethodDeclaration.action` の JSON round-trip と省略時 `add` を成立させるには `libs/infrastructure/src/tddd/catalogue_document_codec/` の DTO・decode・encode、および全層の `MethodDeclaration` construction call sites の更新が必要です。T11 もこれらを所有せず、batch-plan の T10 見積りにも infrastructure scope がありません。現状では executor が未宣言の境界を発明しなければ AC-14 を完了できないため、具体的な対象と scope estimates を追加するか専用 task を設けてください。",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 144,
+              "message": "未着手の T10 は、(1) MethodDeclaration の独立 action・default add・親 action 非継承（IN-13 / AC-14）と、(2) Add/Modify method の非空 spec_refs 検証と anchor projection（IN-14 / AC-03 / CN-01）という個別に検証可能な behavior unit を一つに束ねています。schema/codec unit と validation/projection unit に分割し、後者を前者へ依存させたうえで T11 を後続させてください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f738097dc222d4429a82a058cf2265af7729457f869b6661b7ffe48e13388d14",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:19:04Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 60,
+              "message": "Task descriptions T10, T12, and T11 restate upstream behavior contracts in prose (for example, defaulting omitted action, non-empty spec_refs enforcement, sibling-substitution behavior, and unnamed-catalogue behavior). Reduce them to target + operation + anchor cites per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 27,
+              "message": "B-10 unnecessarily serializes T11 after B-09. Once T12 runs first within B-09, T11 is dependency-ready; T12 targets domain files while T11 targets usecase selection/derive files, and their per-scope totals (domain 300; usecase 260) fit the 500-line ceiling. Place T11 in B-09 after T12, or provide a concrete ownership/ceiling reason.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2dbefdc47b24b5b8ea04e7d57edf409a251b6ccc515a06f80b38a08e63aef4f7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:23:53Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 77,
+              "message": "`plan.summary` が削除されており、impl-plan SSoT 上の GO-01 / GO-02 からタスクへのトレーサビリティがありません。GO 要素は task-coverage.json ではなく `impl-plan.json` の `plan.summary` で追跡する必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fc6326f772769829b50238259c2f6e274bca0dfbd883cb36f19857f954cd1cb0",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:26:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2cc2d48f277e305642d2d5ee8bfd264731e77dc0cb75416319053799d206f95a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:32:39Z",
+          "findings": [
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-contract.json",
+              "line": 6,
+              "message": "T4 still owns `MethodDeclaration`, but T4 completed before the delta added the current `action` constructor parameter/accessor; the implementation therefore could not have converged with the current catalogue shape at T4 completion. T10 is the correct convergence owner, so remove the T4 attribution.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 31,
+              "message": "AC-03 still maps to T4 even though AC-03 was replaced by the delta: T4 implemented the former allow-empty behavior, while current AC-03 requires rejecting empty `spec_refs` on Add/Modify methods. Retain the current T12/T11 mappings but remove T4 from AC-03.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/task-coverage.json",
+              "line": 38,
+              "message": "AC-14 maps only to T10, whose work stops at the MethodDeclaration schema/codec and constructor migration. AC-14 also requires action-specific obligation-gate behavior; that behavior belongs to T12's projection and T11's derivation boundary, as corroborated by their attributed catalogue entries. Map AC-14 to the task(s) implementing and testing those gate semantics and cite it in their descriptions.",
+              "severity": "P1"
+            },
+            {
+              "category": "pre-implementation split proposal",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 66,
+              "message": "T12 bundles two independently testable behavior units in separate symbols/files: Add/Modify `spec_refs` validation (`IN-14`/`AC-03`) and action-aware method obligation projection (`AC-14`). Split these into separate pre-implementation tasks with focused tests and update coverage, attribution, estimates, and batches accordingly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:2cc2d48f277e305642d2d5ee8bfd264731e77dc0cb75416319053799d206f95a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:36:51Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 72,
+              "message": "T13 restates the upstream behavior contract in prose: “add/modify/reference/delete receive their obligation-gate semantics.” Keep only the target, operation, and AC-14 anchor; the semantics belong in the upstream spec. See .harness/policies/no-upstream-restatement.md.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a3271182b819b745d55f2ec9e3a6757db6e01268555d31c3746b31340113e242",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:39:48Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 66,
+              "message": "T12's description restates the upstream behavior contract in prose — “reject empty or absent method spec_refs for add and modify actions” — instead of limiting the plan text to target + operation + anchor cite. Replace the behavior wording with an operation-only description and retain IN-14/AC-03 anchors, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:aa437a60821c0a880d5ddeebf696a99a05312ea3c0da12222dc21bad77132542",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:42:17Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 65,
+              "message": "T10→T12→T13→T11 is only described textually; none of these tasks declares `depends_on`. Since batch execution orders tasks by declared dependencies, B-09 cannot guarantee this required sequence, allowing T11 to run before the artifacts produced by T12/T13. Add the dependency edges.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 85,
+              "message": "`plan.summary` omits T13 from GO-01, although T13 implements the action-aware projection required for each trait_method obligation to own only its method-relevant anchors. This leaves GO-01 goal traceability incomplete.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:137ac8141b989ce59bb8fa6d22ce2859905e8c923257f69113c7f4527a9d774c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:44:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0206132778fcc88033213290ac51415f993f60703d55b956733fbc81d5c915f0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:50:30Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 24,
+              "message": "T4 と section `obligation-ownership` は現在も AC-03 を引用していますが、delta により AC-03 は Add/Modify method の非空 `spec_refs` 検証へ置き換わっています。T4 は変更前の検証を完了した task であり、現行 `task-coverage.json` でも AC-03 の担当は T12/T11 に修正済みです。この引用は新しい AC-03 を完了済み task へ誤って追跡するため、T4 と同 section から AC-03 を除去してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0206132778fcc88033213290ac51415f993f60703d55b956733fbc81d5c915f0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T07:52:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d5a1f5626f464db1cf42124f00bf66bc57853fa8a5fe186e8ec48c43a64b5f3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T07:59:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1d5a1f5626f464db1cf42124f00bf66bc57853fa8a5fe186e8ec48c43a64b5f3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:29:25Z",
+          "findings": [
+            {
+              "category": "dependency cycle or wrong ordering",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/impl-plan.json",
+              "line": 47,
+              "message": "`T12`, `T13`, and `T11` are in the same `B-09` batch with no dependency edges, despite the plan declaring the order `T10 → T12 → T13 → T11`. `T11` consumes the validation and projection behavior owned by `T12` and `T13`, so it may run before those producers complete. Add dependencies (at minimum `T12 -> T11` and `T13 -> T11`) or split the batch.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:462a1d61e078fc8b87307bd0b8e1eba0b569392971dcef8b55f99dab7372b86e",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:32:33Z",
+          "findings": [
+            {
+              "category": "avoidable batch serialization",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/batch-plan.json",
+              "line": 28,
+              "message": "B-09, B-10, and B-11 unnecessarily serialize T12, T13, and T11. After T10, these tasks have distinct concrete targets (obligations.rs, projection.rs, and derive.rs), no declared dependency requiring separate batches, and their combined estimates fit the resolved 500-line ceilings (domain 160/200; usecase 140/120). They can share one batch with producer-first execution if needed.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:74e93b61347a368b07d5164e80f960fb4eb11265cbc54f21329a3ae9e2285698",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:40:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:462a1d61e078fc8b87307bd0b8e1eba0b569392971dcef8b55f99dab7372b86e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:42:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:462a1d61e078fc8b87307bd0b8e1eba0b569392971dcef8b55f99dab7372b86e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:03:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c226e098a29f228832924f54f27174da714b1dc74673b751f7b39946c61c32ef",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:14:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c226e098a29f228832924f54f27174da714b1dc74673b751f7b39946c61c32ef",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T11:26:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dff5e7efcf41052cd80adff2676ac08485ada6d3fc4786f5276e2b8afbab83fe",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T11:34:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:237d54c5c07fdbc2cf4e8b77890028e3cd435aa9ea90d3cff28f8df889a9580e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T11:39:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fcda8653262cd2572643ee5cbe483e2f3d627e1b87ef216419be83f70c825097",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:05:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:617aa569b34f7bc99f5c050587093475f2b7c388275b849a4e7ac8910a28c15a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:10:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bad87cb7a4edc6f2378dc65e109c54bd45d01c41dbddce56b4bf371c8677a041",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:37:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2376b16efcb8c7802cffa518d47e7ed6791dd5ac6fad427cd3ca3f7b828c04ee",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:42:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5364bab2941f39919580c5810dc8a3302e67512af63d96ecf9addb1ac75d09e6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:51:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:66c1fe09b7c8a928345d1b9aa34abea2ceb92ac234d6169c9d59af1282b97576",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T02:08:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:94ae5da9b34f40a7ca12b3fd337b673a56c48f46c5aa8504db24c5b93c746b28",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-14T10:19:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:210971b1c132de7f8c005086f9176eb19c47d8d15f943f8a88e0f13374dc1cdf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:25:32Z",
+          "findings": [
+            {
+              "category": "compilation",
+              "file": "libs/infrastructure/src/tddd/catalogue_document_codec/decode_impls.rs",
+              "line": 209,
+              "message": "`MethodDeclaration::from_parts` does not exist in the current domain API, so this decode path and the three new test constructions cannot compile. The scoped tests also retain several six-argument calls to `MethodDeclaration::new`, whose current signature now requires ten arguments. Restore the intended constructor split or migrate every scoped call consistently.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:210971b1c132de7f8c005086f9176eb19c47d8d15f943f8a88e0f13374dc1cdf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T10:44:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a265882a6cb02e898681c8447afdb1d06a50a824d3a372277c39e2e67739346",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:49:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a265882a6cb02e898681c8447afdb1d06a50a824d3a372277c39e2e67739346",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:52:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6a265882a6cb02e898681c8447afdb1d06a50a824d3a372277c39e2e67739346",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:24:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f423065b0935070226552ec2e7530f5ddc630e7e28cb25a261f778b923ac04e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:28:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2f423065b0935070226552ec2e7530f5ddc630e7e28cb25a261f778b923ac04e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:55:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc1c944d9a9037716256febd73c1d385140865a14fbdf7f01e093e115b723e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:59:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6fc1c944d9a9037716256febd73c1d385140865a14fbdf7f01e093e115b723e1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:55:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:366ac118ee27954d3324925cc0546c40f6244d850ef1cfe09298f08120d7afa0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:05:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:366ac118ee27954d3324925cc0546c40f6244d850ef1cfe09298f08120d7afa0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:58:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c6b5c5e5c300ea9ab0fffab0a6f339ace6854e1731a4a1cbdc2616a20c75cf05",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T11:03:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5fdda51912bf2b69de56c564a727bde71aef186de74e27c229cc899ac6ef4b99",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:11:46Z",
+          "findings": [
+            {
+              "category": "documentation",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "line": 416,
+              "message": "The doc comment block starting \"Builds the argument list for the `claude -p` invocation.\" (lines 392-415), including the numbered CN-05 read-only contract description, is now attached to the newly inserted helper `claude_review_json_schema()` instead of `build_claude_args`. Only its final paragraph (the `$schema` stripping rationale) describes the helper; the rest is factually wrong for that function, and the security-critical `build_claude_args` is left undocumented. The new fallible helper also lacks an `# Errors` section. Split the doc block: keep the `$schema`-stripping paragraph (plus an `# Errors` section) on `claude_review_json_schema`, and move the argv/CN-05 contract documentation back onto `build_claude_args`.",
+              "severity": "P3"
+            }
+          ],
+          "hash": "rvw1:sha256:176adc6887784e7edf9208002fba2fe8ba785a81f05493ed9514a4e9ff86ea57",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T12:26:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d93be8cdc369712c52f22ef7955aa6651d88ecc48f2b39646e5638232d56a832",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:46:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6f547918488ffd50ff0c5c66a7f6508dbbe6045729aa578acf91e8c67b17e312",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:58:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f982b2b6049805bb47e32ee9bec72741cf430bdb08209ffd2b6e8fac2e26116",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T13:17:18Z",
+          "findings": [
+            {
+              "category": "adapter-correctness",
+              "file": "libs/infrastructure/src/grok_common.rs",
+              "line": 172,
+              "message": "is_grok_stream_result_or_failure treats a JSON-null field as a match: `value.get(\"failure_reason\").is_some()` is true for `\"failure_reason\": null`, and `structured_output_value` returns `Some(Value::Null)` for `\"structured_output\": null`. A post-result event carrying an explicit null (e.g. `{\"type\":\"end\",\"failure_reason\":null}`, a common shape when a serializer emits optional fields as nulls) would therefore still overwrite the preceding structured-output line — contradicting this diff's own documented contract (\"a later `type=end` (or any other event without structured output or a failure) must not\" replace the result) and reproducing the exact P0 class this change fixes. Predicate behavior is confirmed from the code; the triggering stream shape is not evidenced in-repo (PLAUSIBLE). Harden by treating null-valued fields as absent: `.filter(|value| !value.is_null())` in `structured_output_value` (also aligns GrokOutputEnvelope decoding — `Succeeded(Null)` becomes `Failed(missing structured output)`, which downstream already requires) and a non-null check for `failure_reason` in the stream filter.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:485fec0daaaf49197e7e50becfd68ab65c7375bf45519b71d85eb30d52d6094e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T13:25:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d3dcf3f129a065d366f452dd728c2ba470b6059a7a4dfa7943e83e5312223f1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T15:03:28Z",
+          "findings": [
+            {
+              "category": "environment",
+              "file": null,
+              "line": null,
+              "message": "レビュー対象の briefing、severity policy、current diff、指定ソースを read-only 環境で読み込めませんでした。shell が bubblewrap の namespace 制限で起動せず、レビュー完了不能です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:feaf08805c32309d17cae889a00215d71939b896b16f40b95e8519d91325eef5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T15:10:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:feaf08805c32309d17cae889a00215d71939b896b16f40b95e8519d91325eef5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T03:33:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5fcca9fc62e63706e13bd8084e73547589af866cc9302c42471582bd914d64a7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T04:22:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e733ed388d3bd0d08fd8f1c3d550534f1077f84258199e3c5b92b23cc104a2c5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T04:48:15Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "レビュー対象ファイル、briefing、scope-specific severity policy、CURRENT diff を読み込めませんでした。read-only sandbox の shell 実行が `bwrap: No permissions to create new namespace` で失敗したため、信頼できるレビュー verdict を生成できません。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ddbd07dd78c75539648f7825d720ba770b63a4def0c40dc9f087e4128abaf2a9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T04:53:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddbd07dd78c75539648f7825d720ba770b63a4def0c40dc9f087e4128abaf2a9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T05:00:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e3706747d3aa76e50477e73ee30bddadb9445f6b5da55a8052e205eb99ace96a",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:45:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7f2586e56f0e9dd0557cf778da314423738c87f3e274e2792355090787d7b01",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:47:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e7f2586e56f0e9dd0557cf778da314423738c87f3e274e2792355090787d7b01",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T11:48:42Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 5,
+              "message": "The bindings for GO-01, IN-01, and AC-01 cite only constructor/accessor tests that show two MethodDeclaration values retain different spec_refs. They do not exercise catalogue obligation extraction, method-scoped ownership, or fulfillment/verifier behavior, so they cannot establish the broader ownership and gate promises of these anchors. Bind an integration test covering actual trait_method obligation ownership and method-relevant fulfillment, or narrow/waive these bindings.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 117,
+              "message": "AC-03 is bound only to an empty-spec_refs accessor assertion. That demonstrates the field is empty, but not the anchor's additional compatibility promise that an existing catalogue remains valid without new method-level declarations. The binding should include an existing-catalogue compatibility test or be converted to a justified waiver.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:22356382aa7e7619b5a73ae49395ffa9b34cbc744267bb011a9b0917f4bea282",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:09:18Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 5,
+              "message": "GO-01's waiver is not justified: the ownership and fulfillment promise is cross-entry, but it is still testable by an integration test bound to MethodDeclaration. The reason incorrectly limits evidence to constructor/accessor tests and defers the behavior to later tasks. Add a catalogue/obligation-pipeline binding or narrow the anchor.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 33,
+              "message": "IN-01's waiver incorrectly treats cross-entry ownership as inherently unverifiable. A catalogue-level test can verify that distinct trait_method obligations receive their declared method-specific anchors, so this should be bound to such evidence rather than waived.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 44,
+              "message": "IN-02's waiver is not supported: subset and full-coverage rejection are explicitly structural validation behavior and can be tested with a multi-method catalogue fixture. The absence of a constructor-local validation path does not establish that no bound test can verify the promise.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 72,
+              "message": "AC-01's waiver improperly defers the active-catalogue multi-method ownership behavior to later tasks. Since AC-03 is already bound to an infrastructure integration test, the same kind of catalogue-level test can verify AC-01; this is not an inherently unverifiable promise.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 83,
+              "message": "AC-02's waiver is not justified. Unknown-anchor and incomplete-coverage rejection are observable structural-validation outcomes and should be covered by tests using invalid multi-method catalogue declarations; saying MethodDeclaration itself lacks the validation path is insufficient.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 128,
+              "message": "CN-01's waiver incorrectly classifies the required completeness, subset, and coverage invariants as untestable merely because they span entries. A catalogue-level test can directly verify those invariants and should be bound to this anchor.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 139,
+              "message": "CN-02's waiver is too broad: active-only and non-retroactive behavior is a catalogue lifecycle rule, but it remains observable and testable with active and legacy catalogue fixtures. The binding record already demonstrates that tests outside the constructor module may be bound to this entry.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b6227113cf134ba20efceb713bfbc2aa7826af05f0d320e27bfd89e415a36806",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:24:43Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 39,
+              "message": "AC-02 remains incorrectly waived. Unknown-anchor and incomplete-coverage rejection are observable catalogue-level behavior, and an integration test can be bound to MethodDeclaration even though the constructor lacks the validation path. The reason does not establish that no test could verify the promise.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 84,
+              "message": "CN-01 remains incorrectly waived. Completeness, subset, and cross-method coverage are explicitly testable structural invariants; the fact that they span entries does not make them unverifiable. Bind a catalogue-level invariant test or reassign the edge to the task implementing that validation.",
+              "severity": "P1"
+            },
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 95,
+              "message": "CN-02 remains incorrectly waived. Active-only and non-retroactive behavior can be verified with active and legacy catalogue fixtures. Its lifecycle scope explains where the test belongs, but not why no test bound to this entry could verify the promise.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a9271453c298b1453e5ce5d14f75740881ca097eaef54de85fec7a4c947748fb",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:26:40Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 39,
+              "message": "The AC-03 binding is incomplete. The cited codec test proves that omitted method-level spec_refs decode as empty and remain round-trippable, but it does not verify the anchor's behavioral promise that the resulting trait_method obligation owns no anchors. Bind an obligation-derivation test when that behavior is implemented, or leave AC-03 unbound with the corresponding task attribution.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c4fe381164b9d474cf6a304375c455282a687a9949870542c0620d868909b90",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:27:31Z",
+          "findings": [
+            {
+              "category": "traceability",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 3,
+              "message": "The current record set silently drops AC-02, AC-03, CN-01, and CN-02 in addition to the four edges explicitly reassigned to T4. The briefing only authorizes removal of GO-01, IN-01, IN-02, and AC-01 and explicitly says AC-03 plus the remaining waivers should remain represented. Preserve those bindings/waivers or document and attribute their reassignment; otherwise the entry's owed edges are not traceable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:994661c4996f6ee01cdf12f82fc24704a154f35c50699d511871bd9a77b12c19",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:34:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6c4fe381164b9d474cf6a304375c455282a687a9949870542c0620d868909b90",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T12:39:12Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 17,
+              "message": "The GO-02, IN-05, and AC-06 bindings cite a test that loads the active lint rules but manually constructs a separate `MethodDeclaration` fixture. It never reads or compares the actual active catalogue entry, so the three promises can regress while this evidence remains green. Bind these edges to a test that lints the real declared entry or proves the fixture cannot drift from it.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 51,
+              "message": "AC-03 is only bound to a codec compatibility test. That test proves omitted method-level `spec_refs` remain decodable and round-trippable, but it never derives a `trait_method` obligation or verifies that an unassigned method owns no anchors, which is also required by AC-03. Add ownership evidence after T4 or leave this edge unresolved in the todo lane.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 85,
+              "message": "The CN-05 test only verifies that `MethodDeclaration::new` and its accessors preserve supplied values. It does not exercise the lint-compliance remediation or compare the active catalogue declaration's method signatures and metadata, so the catalogue can drop or alter the contract information named by CN-05 without failing this test. Bind CN-05 to evidence covering the remediated declaration itself.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6c4fe381164b9d474cf6a304375c455282a687a9949870542c0620d868909b90",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T12:41:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b79495ba41beb8ff4b41cdb7697b63bcaa240057107da0d2bd003ce833693fc3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:25:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7c0df283c04fb10e67b67f782a0a9d345aaec829074edf82ff1f4f41816e1ff0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:32:33Z",
+          "findings": [
+            {
+              "category": "Testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 82,
+              "message": "The IN-02, AC-02, and CN-01 records now bind different usecase tests than the frozen fulfilled verdicts. `bin/sotp test-obligation check` currently reports `TestChanged` for all three edges, so the T4-done obligation gate is not green. Re-run the host-owned evaluation for these binding sets and commit fresh verdicts; repair any bindings the evaluator rejects.",
+              "severity": "P1"
+            },
+            {
+              "category": "Testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 213,
+              "message": "The CN-01 binding contains only rejection cases for out-of-catalogue, uncovered, and partial single-method anchors. CN-01 also requires shared ownership to be accepted, but no bound test exercises that positive case, so a regression rejecting anchors shared by multiple methods could still satisfy this evidence set. Add the existing `test_trait_method_obligations_own_only_each_method_spec_refs` positive test to this record.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:519d00bac6e752cc902174facf7f935a2d3a93ef3793f7c3956a525f714950f1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:14:53Z",
+          "findings": [
+            {
+              "category": "Testing",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 5,
+              "message": "The new fulfillment record targets an obligation whose declaration hash is already stale. On the current tree, `bin/sotp test-obligation check` fails with `differing_obligations=[domain::tddd::test_obligation::obligations::validate_method_anchor_coverage:Logic:entry (declaration_hash)]`, contradicting the briefing’s green-gate claim and blocking the done T4 lane. Re-run `test-obligation derive`, then refresh evaluation verdicts if the regenerated hash invalidates them.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:fa336ea2174ad66f7d2251ba165afec1bddd80f03420af43b949f70348e2a740",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:18:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fa336ea2174ad66f7d2251ba165afec1bddd80f03420af43b949f70348e2a740",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:55:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb851be8cc768ee020727cb2a7f39671a8918f595e817b92032d2186ace92a28",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:03:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eb851be8cc768ee020727cb2a7f39671a8918f595e817b92032d2186ace92a28",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:46:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea0957d31aad10256cb865205b9e86d2593dce4d185dcd086fe17313076bc777",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:49:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ea0957d31aad10256cb865205b9e86d2593dce4d185dcd086fe17313076bc777",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T08:55:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:808b5179a5ab1020aa405b3d1c280ec82c59cf315d138016305ac7b1f065218a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:08:53Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 63,
+              "message": "The active domain catalogue adds the `validate_add_modify_methods_have_spec_refs` logic obligation, but this records array contains no fulfillment for it. `bin/sotp test-obligation check` confirms that exact obligation is missing from the derived artifact; after re-derivation the binding will still be absent and the obligation gate cannot pass. Add a fulfillment using its direct happy/error tests.",
+              "severity": "P1"
+            },
+            {
+              "category": "artifact_consistency",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 394,
+              "message": "`MethodDeclaration` now actively cites IN-13 and AC-15, but the voluntary records stop after AC-14. Bindings are resolved by exact entry-key/anchor pairs, so tests attached to the validator obligation or another anchor do not resolve these two direct edges. Add voluntary bindings for IN-13 and AC-15.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 50,
+              "message": "The fulfillment still does not prove the omitted-action portion of IN-13/AC-14. Despite its name, `test_method_action_does_not_inherit_parent_and_defaults_to_add` constructs the method with an explicit `ItemAction::Add`; none of this fulfillment's tests decodes an omitted action or exercises that behavior through TypeEntry/inherent-impl methods. Bind evidence that actually covers defaulting and the affected method containers, or correct the obligation grounding.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/test-bindings.json",
+              "line": 175,
+              "message": "The GO-02, IN-05, AC-06, and CN-05 lint bindings only parse a hand-written shape fixture or test constructors/accessors; none runs the configured catalogue linter against the active `MethodDeclaration` entry. A linter regression can therefore pass while these edges appear covered. Bind a test that evaluates the applicable lint rules and verifies both the valid entry and failure sentinels.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:808b5179a5ab1020aa405b3d1c280ec82c59cf315d138016305ac7b1f065218a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:36:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bba82992d9c56d4ceedf97756b1f087ace0326d18f36386f63a269903f48e58b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:54:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:962be675a9c9a1944b1d315e2b5440a0df2b7a1029e6372490d505f3d219b3ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:57:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:962be675a9c9a1944b1d315e2b5440a0df2b7a1029e6372490d505f3d219b3ae",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:31:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:586c478cfd7f1fc95a2f1cced91d172919047dc8b1c7afd0333a76d6271b53cb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:50:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c2736e3930be4b0f7c9952764ac2efd6777f08d9eaaf3d1df35b855fda76b55d",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-14T04:05:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0566dccadf13e33b371efdc507b4ce043ba5764f4acc73a64792d74be2078385",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:08:24Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 41,
+              "message": "AC-04 contradicts CN-01 for shared anchors. CN-01 permits the same anchor to be assigned to multiple methods, but AC-04 says an obligation must not require an anchor assigned to another method. A shared anchor is both owned by the current obligation and assigned to another method, so the criterion gives conflicting expected behavior. Define the exclusion in terms of anchors not owned by the current obligation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0566dccadf13e33b371efdc507b4ce043ba5764f4acc73a64792d74be2078385",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T04:15:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:dd2394a22a58fa15c5b351d2f56eab396073683afe432f553a62b2ccfed6815a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:35:57Z",
+          "findings": [
+            {
+              "category": "goal not anchored to a decision",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 143,
+              "message": "GO-02 is not anchored to the cited ADR D1. D1 defines adding method-level `spec_refs`, ownership, coverage validation, and active-catalogue applicability, but does not decide that pre-existing catalogue-lint violations must be remediated in this track or that they must not block progress. This goal expands the ADR decision space.",
+              "severity": "P1"
+            },
+            {
+              "category": "constraint vague or untestable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 113,
+              "message": "CN-05 is too vague to provide a concrete downstream contract: “既存の method declaration の利用上の意味を維持” does not define which observable behavior or fields constitute the preserved meaning. Type/implementation planning would have to invent the compatibility boundary while performing the lint remediation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:489b795dd5536165faf1cac527f8ab7b35b44e7c40eb9dc8107973534dccfe5b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T04:48:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:14860eccf6fbdb43bde8c5f8e808edb6289cd90490f37e5763033aceddb36582",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T04:52:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:14860eccf6fbdb43bde8c5f8e808edb6289cd90490f37e5763033aceddb36582",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:31:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e40c2ad8d530e9428c040d7310dc5bde2415524d4aa872d41b335786a17c6e72",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T06:35:24Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 81,
+              "message": "AC-09 requires removing the live-harness Known Accepted Deviations allowance, but the in_scope set now contains only the three per-method re-grounding outcomes plus mechanism/lint work; none declares deviation-record removal. CN-08 reinforces the same hidden completion requirement. The acceptance criteria therefore require behavior outside the declared in_scope contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e40c2ad8d530e9428c040d7310dc5bde2415524d4aa872d41b335786a17c6e72",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T06:38:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b07b386e5e48952a1cc3d0f6ad6f66cbe4977bb1bc1e8548f9f3e88815e87154",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:40:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73cfce82e250eacbb04acf9c28943a1a9f0c3d90673e90baade3b7ac8801c37a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T08:43:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73cfce82e250eacbb04acf9c28943a1a9f0c3d90673e90baade3b7ac8801c37a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:10:11Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 51,
+              "message": "AC-10 は deviation を名前で限定せず、指定 Track ID の conditional Known Accepted Deviations が一件も残らないことを要求しています。しかし `harness-policy.md` には同じ Track ID に対する unit-variant、composition、port placement など無関係な allowance も複数あります。この AC を満たすにはそれらまで削除する必要があり、CN-09 の「recovery は PhaseCommandService の validate/explain/enter に限定する」という制約と矛盾して D3 の範囲を越えます。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a1ebae6046255b45741c1aaaa0cddde8d7366b231af2fc89cf41726d3a10aa5b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:13:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2be83ed67d8eb3fce229764e7117988a184e61c04ccc1c98f0e6a20b6cbd8cf9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:45:41Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 80,
+              "message": "AC-13 は `harness-policy.md` から PhaseCommandService の conditional deviation 条項を撤去する挙動を要求していますが、現在の in_scope は IN-09〜IN-11 の各 method の re-grounding だけで、policy 条項の撤去を含む項目がありません。そのため、この acceptance criterion は declared in_scope の外にあります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:dfd15d309837259ec618a89c4b61db8fd4512cdcbda198349161a4f5e460e9e5",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T06:49:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2be83ed67d8eb3fce229764e7117988a184e61c04ccc1c98f0e6a20b6cbd8cf9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T07:10:33Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 81,
+              "message": "AC-13 requires deleting the track-specific PhaseCommandService deviation from `harness-policy.md`, but the declared in-scope set (IN-09–IN-11) covers only re-grounding and fulfillment bindings for validate/explain/enter; it never places the policy-record removal in scope. The acceptance criterion therefore requires behavior outside the declared scope.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:0730361036c68834055d950c2819e5bb348fa28c69c6e596dd580dd878417dce",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:21:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0cfd07df5356a09f284abb127880d1a08a5a130de2ea1ddd3a3ef675f821a3a3",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:05:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8a41f3cf4b72fad70597be4d3178f9690a208086938015b07a8817d9cc65c8d8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:08:13Z",
+          "findings": [
+            {
+              "category": "acceptance criterion non-observable",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 119,
+              "message": "AC-15 は適用対象を「この決定を実装する作業および後続作業が書く catalogue」という履歴上の由来で定義していますが、その由来を判定できる catalogue field、version、path、または command predicate がありません。同じ未定義の「本決定を適用する catalogue」が AC-01/02/03/06 と IN-14 も制御しているため、任意の catalogue に新しい action/spec_refs 規則を適用すべきかを決定的に検証できず、後続フェーズが対象選択を発明する必要があります。機械的に観測可能な適用条件へ落とし込む必要があります。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8a41f3cf4b72fad70597be4d3178f9690a208086938015b07a8817d9cc65c8d8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T05:11:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:175a3eca8c1ec6e556f3d92a8ff335b3fd390de9e3cb21da2f96c9b4987c39a1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:12:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:175a3eca8c1ec6e556f3d92a8ff335b3fd390de9e3cb21da2f96c9b4987c39a1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:18:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec99016af444c53bcb0012ad9e528ddef01604a54dbad0397c7f6c8fce0fd10",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:19:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec99016af444c53bcb0012ad9e528ddef01604a54dbad0397c7f6c8fce0fd10",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T16:08:41Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 373,
+              "message": "IN-15 conflicts with CN-01/IN-02/AC-02 for a reference/delete parent that carries non-empty entry-level spec_refs: CN-01 unconditionally requires every entry-level anchor to be owned by at least one method (\"少なくとも一つの method に担当されなければならない\") and AC-02 rejects declarations whose methods do not cover the entry-level anchors, while IN-15 requires every child MethodDeclaration's spec_refs to be empty under such a parent. The shape is legitimate and reachable — 1720 D1 uses entry-level spec_refs as the trait-to-spec inventory independent of obligation derivation, and delete tombstones canonically record spec_refs (catalogue-schema.md:684). Before IN-15 the conflict was latent because add/modify child methods could own the anchors; this diff closes that escape, so the spec now imposes contradictory requirements (must assign vs. must not assign) on the same declaration with no stated precedence or action-scoping. The current validator resolves it by skipping the cover direction for non-Add/Modify parent entries (libs/domain/src/tddd/test_obligation/obligations.rs:53), a scoping stated nowhere in the spec — Phase 2/3 are forced to invent it. Clarify in CN-01/IN-02/AC-02 (or IN-15) whether the coverage direction applies only to add/modify parent entries, or otherwise define which rule governs reference/delete parents with non-empty entry-level spec_refs.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7c2897c56da142533d8dd35a595ad24550b5daefa391c2d5359841c071c79534",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T16:17:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2265f415a8f82920fbe6a7408b9490c6d40f1ed037e859314888c48ece5891b9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T16:30:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eecc1270a605e9c89085f72ff1263add15155af62688e624d7ac8a21f8ca0918",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:18:35Z",
+          "findings": [
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 29,
+              "message": "AC-02 の「構造検証で拒否しない」が無限定の全称主張になっており、同一 spec 内の拒否規則と同一 fixture 上で矛盾する。fixture「指名 catalogue、entry-level spec_refs 非空の単一 method trait、action 省略（AC-14 により add）、spec_refs 未宣言」は AC-02 では『拒否しない』、AC-03 / IN-14 では『拒否される』。同様に、親 entry が reference / delete の子 method が entry-level に無い anchor を非空 spec_refs に持つ fixture は AC-02 第 1 節では『拒否しない』、AC-16 / IN-15 では『拒否される』。引用元 0055 D1 は総目録根拠（包含・被覆・全量写し）による構造的棄却のみを撤回し 0340 D2 / 0040 D1 を明示的に残しているため、AC-02 の非拒否主張は撤回根拠に限定して記述される必要がある。",
+              "severity": "major"
+            },
+            {
+              "category": "scope / acceptance_criteria contradiction",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/spec.json",
+              "line": 53,
+              "message": "AC-04 の前提「D1 の割り当て検証が通った trait_method 義務について」が、本改訂で撤回され spec 内でも未定義になった検証ゲートを参照している。引用先 1720 D2 の文脈で「D1 の割り当て検証」は包含・被覆・全量写しの構造検証を指すが、0055 D1 がそれと構造的棄却を撤回し、spec 側でそれを定義していた旧 IN-02 / AC-02 も独立集合宣言に書き換え済みのため、現行契約にこの前提を定義する要素が存在しない。CN-03 からは coverage 前置ゲートが除去されたのに AC-04 には同等の前置条件が残存し、下流 phase は fulfillment に先立つ割り当て検証の意味を発明せざるを得ない。付随して括弧書き「（別 method だけが担当する anchor）」も被覆モデル前提の言い換えであり、0055 後に存在しうる『どの method も所有しない entry-only anchor』を含まない不完全な定義になっている。",
+              "severity": "medium"
+            }
+          ],
+          "hash": "rvw1:sha256:96c4a5b47a9c78fafe7d894009fbdab301ce985f5f3dafec22d9aa682d946e8c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T01:23:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:363c1c2c36cef3e0f3bd0885ea6883b5873b720eae32a573378ea9720cd17759",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-14T05:14:46Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 10,
+              "message": "`domain::MethodDeclaration` docs restate upstream behavior and rationale (private-field preservation, method-level anchor ownership, boolean semantics, and rendering) instead of limiting the entry to the changed surface plus anchor cites. Replace the prose with a concise change declaration referencing the relevant spec anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 220,
+              "message": "`domain::TestObligation` docs restate the upstream ownership and behavioral contract (typed `spec_refs` as the ownership boundary and changed derivation/evaluation behavior). Keep only the declared surface/change and cite the relevant spec anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 10,
+              "message": "`usecase::DeriveTestObligationsInteractor` docs restate the upstream derivation, subset, and coverage behavior. The entry should identify the existing surface and reference the spec anchors without reproducing the behavioral contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 99,
+              "message": "`usecase::EvaluateTestObligationsInteractor` docs restate the upstream method-scoped fulfillment behavior. Reduce the text to the changed/observed surface with anchor cites rather than repeating the specification.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:826af6a9cbfaf9855c44d0d732fb3cdeee9bbc4ae911e69ac8eab52ae5ad0090",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-14T05:29:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bdcd3d3b007bb8dcdf691a988a8507235e4948a29df0418783e9463129164bfb",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T05:35:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bdcd3d3b007bb8dcdf691a988a8507235e4948a29df0418783e9463129164bfb",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:04:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8a7f48baeaa265a1202b0558af19ca04582212da9aa9a22ba83b9f0c4d4cb92",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T07:09:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f8a7f48baeaa265a1202b0558af19ca04582212da9aa9a22ba83b9f0c4d4cb92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T06:39:06Z",
+          "findings": [
+            {
+              "category": "spec_refs off-topic",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 36,
+              "message": "`usecase::PhaseCommandService` copies the complete entry-level set (`IN-09`, `CN-09`, `AC-10`) onto each of `validate`, `explain`, and `enter`. Every cited element describes all three methods plus removal of a harness-policy deviation, so no individual method obligation/test can establish the whole cited contract. This recreates entry-level cross-population instead of D1's method-scoped ownership. Introduce method-specific upstream anchors if necessary and cite only each method's own promises while preserving total entry coverage.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9a003c74bf2657b6db6d2fb11daad04ef9ca834eb3d378c902847a0c8f9922f1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T07:11:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd6870077e2fd5560ac1a599d5e51cbafa83859488fceacf397dd6b28d8608a5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:56:59Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 6,
+              "message": "`domain::tddd::test_obligation::obligations::validate_method_anchor_coverage` has `docs` that restates the upstream behavior contract in prose (method refs must be a covering subset). Per `.harness/policies/no-upstream-restatement.md`, replace this with an anchor-based identification such as the operation plus `IN-01`, `IN-02`, `AC-02`, and `CN-01`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:21b8fa88138c8b51856058181b22ef8046f778ae146f764ea790fa020e6eb345",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T13:07:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c1498440d71c075e2c2120ae27364185641b70ac0c01dd87ef187275f0459974",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:15:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c1498440d71c075e2c2120ae27364185641b70ac0c01dd87ef187275f0459974",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:46:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5131de87232e282e40c783e4f8a03fd241680c8d078dba9e78a7d2392f729ae7",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:50:05Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5131de87232e282e40c783e4f8a03fd241680c8d078dba9e78a7d2392f729ae7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:56:29Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 310,
+              "message": "`domain::TestObligation` の `docs` が「anchorless obligations are not fulfillment targets」と上流 spec の挙動契約を散文で再説明しています。`docs` は変更対象・操作・anchor cite に限定し、挙動の説明は IN-01 / AC-03 への参照に委ねるべきです。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:b984be12fe73cfe98d47cf8b73df76b271ace1f11d5786942dc3d156a28a5f63",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T00:01:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd4ed684b5d3e64705edd58c528027d67e31e518a97d4c45e964027d2623dbd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:04:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2fd4ed684b5d3e64705edd58c528027d67e31e518a97d4c45e964027d2623dbd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T05:33:15Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 103,
+              "message": "`domain::MethodDeclaration` docs restate upstream design rationale for bool accessors and `signature_string`; keep only the change surface and anchor references per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 386,
+              "message": "`domain::TestObligation` docs restate the upstream rationale for `owns_edge` being a bool; keep catalogue docs limited to the declared surface and anchor references.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 103,
+              "message": "Existing `domain::MethodDeclaration` methods omit method-level `action`, which defaults to `add`, despite already existing unchanged in the frozen rustdoc baseline. Declare their actual per-method actions and grounding explicitly.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e3fcfb5ba166547108af902b8487d016e7dd57ce14a2f5c014f50d6954ebcffc",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:10:16Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 185,
+              "message": "`domain::MethodDeclaration`'s `associated_function` method is declared `action: reference`, but this track adds the `action: ItemAction` parameter to its signature. Because the method exists in the frozen baseline and its signature changes, it must be `modify`.",
+              "severity": "P1"
+            },
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 220,
+              "message": "The existing `domain::MethodDeclaration` methods `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` are declared `action: add` even though these method signatures already exist in the frozen rustdoc baseline and are unchanged by this track. Their method actions should be `reference`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/usecase-types.json",
+              "line": 141,
+              "message": "`usecase::DeriveTestObligationsInteractor` docs restate upstream behavior by describing derivation as consuming independent method-action and path-scoped Add/Modify grounding semantics. Keep the catalogue docs to the public change surface and anchor citations, per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d91341c1383b19050d014e1c9e053e878409a0e14a9c28f7478cb3fc3250b497",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:19:57Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 5,
+              "message": "`domain::validate_method_anchor_coverage` replaces its anchor-based docs with prose enumerating the upstream behavior contract (method-level anchor ownership, independent method action, and path-scoped Add/Modify grounding). Keep the docs to the change surface plus anchor citations; do not restate the upstream contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1d05de9346c929cd87e62db2d7892931925b46b320d09a7b6e7cee462934de62",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:22:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:417b582823e99d85a87e3704c2d5ca2decde22794861b0724ea8b3b09803dab3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:31:28Z",
+          "findings": [
+            {
+              "category": "action incoherent with diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 207,
+              "message": "`domain::MethodDeclaration` misclassifies the newly introduced accessors `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` as `reference`. The frozen rustdoc baseline exposes only `new`, `associated_function`, and `signature_string` as inherent methods; former public fields do not make these accessor method identities pre-existing. Marking them `reference` incorrectly places this track's additions outside the change/obligation surface. Their method actions should be `add`; their existing non-empty `spec_refs` already satisfy the Add-method requirement.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:417b582823e99d85a87e3704c2d5ca2decde22794861b0724ea8b3b09803dab3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:39:42Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 206,
+              "message": "The existing `domain::MethodDeclaration` methods `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` are declared `action: add` even though their signatures are already present in the frozen rustdoc baseline and unchanged by this track. They should be declared `reference`; only the new `action` accessor is an add.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:41:46Z",
+          "findings": [
+            {
+              "category": "action incoherent with the diff",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 206,
+              "message": "The existing `domain::MethodDeclaration` methods `name`, `receiver`, `params`, `returns`, `is_async`, `has_default_impl`, `generics`, `where_predicates`, `spec_refs`, and `docs` are declared `action: add` even though their signatures are already present in the frozen rustdoc baseline and unchanged by this track. They should be `reference`; only the new `action` accessor is an add.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T06:43:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T06:51:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:20ac4213be5eacbedafb3cf58d5b3057ad69f631fd21b8c520b1546e2c5fd952",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:04:55Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddcaeec2b91dc705c02b94b66ad87c0e101fa45061397f230bb9536c45263e67",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:15:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ddcaeec2b91dc705c02b94b66ad87c0e101fa45061397f230bb9536c45263e67",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T16:49:43Z",
+          "findings": [
+            {
+              "category": "upstream restatement",
+              "file": "track/items/2026-08-13-test-obligation-method-anchor-ownership/domain-types.json",
+              "line": 78,
+              "message": "The `docs` field of the new entry `domain::tddd::test_obligation::obligations::validate_parent_forbids_method_spec_refs` restates the IN-15 / AC-16 behaviour contract in prose instead of referencing it by anchor cite. \"Reject non-empty method spec_refs when the parent ItemAction is Reference or Delete\" reproduces AC-16's core contract, and \"the caller resolves the owning TypeEntry in the same named catalogue by type_name and fail-closes if missing, then passes that TypeEntry.action as parent\" reproduces IN-15's second sentence (parent-source resolution + fail-closed rule). This exceeds the short-noun-phrase exception of .harness/policies/no-upstream-restatement.md — sibling entries in the same file show the compliant form (e.g. \"Add the Add/Modify method spec_refs validator (IN-14, AC-03).\"). Shorten to change-target + operation + anchor cite, e.g. \"Add the parent-action method spec_refs validator; parent is caller-resolved (IN-15, AC-16).\"",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bfd90fd5831de41fb7c7e8145d22b5ce348337100a9c7535f5b4dad5c4fd7a75",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T16:55:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e830a4ddefbce0e7918111649dfef34074e83f7258841935bee4311b33603ff8",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "at": "2026-08-14T10:50:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:510e0bdf1838d19e72b02b15cbfcd31285c6783d8154885470270522ab17d74f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-14T10:54:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:510e0bdf1838d19e72b02b15cbfcd31285c6783d8154885470270522ab17d74f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T12:42:42Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 167,
+              "message": "非遡及要件を満たしていません。全ての入力 trait に検証を適用するため、method-level `spec_refs` を持たない legacy entry も entry-level anchor の全体被覆を要求され、既存 catalogue が拒否されます。また導出側も method refs がない legacy entry の anchor を空にしており、従来の entry-level anchor を保持しません。明示的な method-level 宣言を持つ entry のみに新検証・method単位導出を適用してください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:9f8f84f0ae2f1a31ff11c31cbb72db6fbed3e93de1c451e61d86605d7d8570b4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:48:04Z",
+          "findings": [
+            {
+              "category": "architecture",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 587,
+              "message": "The usecase layer reimplements the catalogue coverage rule in `validate_method_anchor_coverage` instead of calling the domain-owned validation required by the briefing. This duplicates domain business logic in the orchestrator and allows future domain/usecase validation semantics to diverge; move the rule to the domain API and keep only the call site in `derive.rs`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9f8f84f0ae2f1a31ff11c31cbb72db6fbed3e93de1c451e61d86605d7d8570b4",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T12:57:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b220bad5cfeed08c7a198f0c73192c07497a57571ec4bed476abcff4f082c013",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:11:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b220bad5cfeed08c7a198f0c73192c07497a57571ec4bed476abcff4f082c013",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T13:56:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19b79808042faba0be355bac079b782e2461b31e3a3a9608aa84db42db8ed814",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:00:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19b79808042faba0be355bac079b782e2461b31e3a3a9608aa84db42db8ed814",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:45:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:654f30a26be00be70a466a91c7ca4ac5e28784ba5cc23405031563490fd9be79",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T14:49:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:654f30a26be00be70a466a91c7ca4ac5e28784ba5cc23405031563490fd9be79",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:43:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19a1386ff39d7f571592328b9df60fc66a7ac5375a7b433f05396ca6b876a755",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T15:50:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:19a1386ff39d7f571592328b9df60fc66a7ac5375a7b433f05396ca6b876a755",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T16:43:54Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 835,
+              "message": "The new write-side coverage gate is explicitly intended to apply to both `Add` and `Modify`, but the tests only verify rejection for `Add`; no test exercises an incomplete `Modify` trait. A regression that accidentally filters out `Modify` would pass the current suite.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:378aa21fa52d7380ec17f16caf17d526c0eb8cd5c8889e60d31816108f4be81b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T16:51:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5713ed649c30cf8b6b680aff1a31f14a4f9fc405f46dec379eab00f1ae59ae2",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T16:53:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5713ed649c30cf8b6b680aff1a31f14a4f9fc405f46dec379eab00f1ae59ae2",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:45:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:47:45Z",
+          "findings": [
+            {
+              "category": "business_logic_leak",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 154,
+              "message": "The D1 rule “an obligation is a fulfillment target iff it owns anchors” is domain policy, but this filter derives it directly from `TestObligation::spec_refs()` in the usecase layer; `results_status.rs` now repeats the same decision and `check.rs` contains another copy. This duplication is what allowed these surfaces to diverge. Put the predicate on the domain `TestObligation` type and have the usecase orchestrators call that domain decision.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-16T23:56:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1a60635ea3bef6e2805a1d78a62201f49194faafd0da6e9e1ad08af2ea08ceb1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-16T23:58:12Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1a60635ea3bef6e2805a1d78a62201f49194faafd0da6e9e1ad08af2ea08ceb1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:05:42Z",
+          "findings": [
+            {
+              "category": "business logic leak",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 154,
+              "message": "The skeleton reimplements the domain ownership rule with `!obligation.spec_refs().is_empty()` instead of using `TestObligation::owns_anchors()`. This duplicates a domain decision in the usecase layer and can drift from the domain invariant; use the domain method here.",
+              "severity": "P1"
+            },
+            {
+              "category": "business logic leak",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 153,
+              "message": "The results path independently decides anchor ownership via `edges.is_empty()` instead of `TestObligation::owns_anchors()`. This duplicates the domain decision in the usecase layer and violates the briefing's required domain-owned predicate; use the domain method here.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T00:06:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T00:07:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:bedc2ad2fc3f23c1220898463a611ba63aff62bb460b44b318666d5554514fdd",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:01:27Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 152,
+              "message": "This emits a fulfillment skeleton record for obligations with empty `spec_refs`, directly violating D1 and causing the persisted skeleton to be rejected as an orphan by `check`. Anchorless obligations must be filtered out.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 369,
+              "message": "This changes anchorless obligations from non-fulfillment targets into required voluntary/waiver targets, so a valid unbound empty-`spec_refs` obligation now produces a `Missing` drift. `check` should only orphan an actual fulfillment record and otherwise skip the obligation.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 183,
+              "message": "This reports an unbound empty-`spec_refs` obligation as missing. Per D1, `results` must not classify anchorless obligations as fulfillment gaps; the empty-edge branch should return without adding a finding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39b243099f059b27298b23fe0eee61e2c03b0727062ce68935405be0d97c9562",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T03:08:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f7db5574b6640d72f3f709fa62c998baba69e499353f7e644d401acf8e773d6a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:11:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f7db5574b6640d72f3f709fa62c998baba69e499353f7e644d401acf8e773d6a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T03:14:31Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/bindings_skeleton.rs",
+              "line": 152,
+              "message": "This emits a fulfillment skeleton record for obligations with empty `spec_refs`, violating D1 and causing the persisted skeleton to be rejected as an orphan by `check`. Anchorless obligations must be filtered out.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 369,
+              "message": "This changes anchorless obligations into required voluntary/waiver targets, so an unbound empty-`spec_refs` obligation now produces a `Missing` drift. `check` should only orphan an actual fulfillment record and otherwise skip the obligation.",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 183,
+              "message": "This reports an unbound empty-`spec_refs` obligation as missing. Per D1, `results` must not classify anchorless obligations as fulfillment gaps; the empty-edge branch should return without adding a finding.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:39b243099f059b27298b23fe0eee61e2c03b0727062ce68935405be0d97c9562",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T08:55:47Z",
+          "findings": [
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 219,
+              "message": "`validate_method_anchor_coverage_for_methods` reimplements the domain rule that Add/Modify methods must have non-empty `spec_refs` instead of delegating to a domain API. This violates the usecase purity constraint that method-anchor coverage rules remain in `domain`; expose/reuse a domain validator for type and inherent-impl methods.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d4f4aa41c2ee08f084a30a34320b7fbd15617dc6c2cf740192984c675a9d8cb7",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:02:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7cb82970a2477b42f4db48100e1554b26ee17b8b17292fb505f8b32f4cdc0c62",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:19:16Z",
+          "findings": [
+            {
+              "category": "orchestration correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 211,
+              "message": "The early `continue` skips every method-level validation for `Reference`/`Delete` trait entries, even though method actions are independent of the parent action. Consequently, a command-named catalogue containing a `Reference` trait with an `Add` method whose `spec_refs` are empty is accepted; `test_method_action_does_not_inherit_parent_and_defaults_to_add` will fail. Validate Add/Modify methods for every trait before restricting parent-level anchor-coverage validation to derivable traits.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:7cb82970a2477b42f4db48100e1554b26ee17b8b17292fb505f8b32f4cdc0c62",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T09:27:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:fdfcc25351f14da96ce01f641fa23f69a959bd04e0ceb718acd999f273b5ca57",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:50:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1e923315bf5ff6ae7f8f674aa080f2f6d6be0e1e2b09fb532592f0517941776c",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:55:25Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b00c37b2daf75325d827ff995f191e96393b49413e6da043b83269c79e756",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T09:59:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2d8b00c37b2daf75325d827ff995f191e96393b49413e6da043b83269c79e756",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:10:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45dd5d9908fd4223949e7aab298199b6ed898613ca2fce269b086c13dfe4550b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T10:47:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:45dd5d9908fd4223949e7aab298199b6ed898613ca2fce269b086c13dfe4550b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T11:01:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:688bf916ef3e5a9c97a6ff3a65e75e19b75d369e8511d23a400650c5a40338f8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T12:17:41Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 208,
+              "message": "Add/Modify method 義務を emit するようになった Reference/Delete 親 TraitEntry が D1 anchor-membership 検証を bypass する。validate_derivable_method_anchor_coverage は is_derivable(entry.action()) の TraitEntry にのみ validate_method_anchor_coverage を適用するため、非 derivable 親の Add/Modify method が entry-level spec_refs に存在しない anchor を宣言しても拒否されず、その anchor がそのまま義務に載る。AC-02 第 1 節(method が entry-level に存在しない anchor を担当する宣言は構造検証で拒否される — 親 action の限定なし)と不整合。例: Reference 親 TestPort (entry spec_refs=[IN-01]) の Add method load が spec_refs=[IN-99] を宣言 → Add 親なら拒否される宣言が derive を通過し IN-99 anchored の義務が artifact に書かれる。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 307,
+              "message": "type 経路の method 軸義務が method 自身の spec_refs を使わず、常に親 entry の anchors で grounding される。derive_type_obligations → emit_rules → emit_rule_items は全 item に entry-level anchors を渡し、trait 経路の method_anchors_for_item に相当する per-method 解決がない。今回 method_axes_only で Reference/Delete 親 type も method 軸を emit するため、production rules の DomainService (logic_result per method) で現実に発火する: Reference 親 type の Add method は AC-03 で非空 spec_refs を強制されるのに、生成される method:<name> 義務は変更されていない親の anchors(親 spec_refs が空なら anchor ゼロ)を持ち、method の宣言 anchor は使われない。AC-14 の「TypeEntry.methods も義務ゲート上独立」と不整合で、fulfillment 検証が誤った anchor を対象にする。",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 389,
+              "message": "minimum floor filler が method_axes_only でも無条件に適用され、非 derivable 親が親所有の捏造義務を emit しうる (latent)。emit_trait_role_rules の method 軸分岐 (389-396) と emit_rules→emit_rule_items (539-556→572-577) の両方で、consumer 編集可能な .harness/config/test-obligation-rules.json の method/trait_method rule に min を付けると、Add/Modify method を持たない Reference/Delete 親からも min#0… item が emit され、method_anchors_for_item の fallback (':' なし → entry_anchors) により親 entry anchors 付きの親レベル義務になる。module doc の「Reference/Delete entries emit only Add/Modify method axes」および briefing checklist「非 derivable 親は親レベル義務を emit しない」に反する。committed rules doc には method 軸 min がないため現時点では発火しない。",
+              "severity": "P3"
+            },
+            {
+              "category": "test-coverage",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 882,
+              "message": "変更挙動の test 固定が trait 経路の半分のみ。(a) type 経路の positive ケース — Reference/Delete TypeEntry の Add method が method:<name> を emit すること — が未固定で、test 用 rules doc には data-role の Method 軸 rule 自体が存在しない。(b) trait 経路の suppression ケース — Reference 親 + 非 method 軸 contract rule (例: entry 軸) が zero emission になること (derive.rs:411 の else if !method_axes_only 分岐) — も未固定。briefing checklist 1-2 項の type 側/suppression 側が regression 検出不能。",
+              "severity": "P3"
+            },
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/test_obligation/derive.rs",
+              "line": 539,
+              "message": "「どの軸が method 軸か」の分類 matches!(per_axis, Method | TraitMethod) が derive.rs:384-387 と 539-544 の 2 箇所に重複した。projection.rs の module doc は usecase が role/軸を解釈しない方針を明言しており、この分類は domain vocab 型 TestObligationPerAxis に is_method_axis() として置くべき (TestObligationDriftKind::is_existence / is_freshness の前例あり)。2 箇所が drift すると trait 経路と type 経路の method_axes_only 意味論が静かに乖離する。",
+              "severity": "minor"
+            }
+          ],
+          "hash": "rvw1:sha256:4e1e6ddf384a031ad77725440d55796d9323ce57809f04eeb69bc6e5ce7812e3",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T12:39:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:261d53d70e89509bb1067d635d8d5d11e6647366a5362d9bf708d21d66a59a8a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T13:54:12Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 41,
+              "message": "Duplicate obligation identities: derive_inherent_impl_obligations projects inherent-block methods without deduplicating against TypeEntry.methods (or across blocks). The canonical merge semantics already exist in domain (collect_methods_for_type: method name is the logical identity; identical duplicates across the two sources are legal and ignored; differing duplicates fail closed) but are not applied. A linter-legal catalogue declaring the same method identically in types[].methods and an inherent block makes derive emit two obligations with the same id (entry_key, kind, method:<name>) and different decl hashes; evaluate resolves both declarations to the same TypeEntry text, producing two fulfillment cache entries with an identical complete identity, so the next lookup_current returns AmbiguousCurrentEntries and the check gate reports corrupt cache state permanently (evaluate re-emits both rows every run and never heals).",
+              "severity": "P1"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 39,
+              "message": "Inherent-only method obligations are adjudicated and freshness-tracked against a declaration that does not contain the method: the obligation's decl_hash is Debug(inherent block) but evaluate/check resolve declaration text via entry_declaration_text, which for Types returns only the TypeEntry Debug (mod.rs:158-178) and ignores inherent_impls. Consequences: (a) the fulfillment/waiver verifier judges method:<name> obligations with an EntryDeclaration that never declares the method's signature/contract; (b) the cache-key declaration hash tracks only the TypeEntry, so semantically editing the inherent method's declaration never fires decl_changed drift (check.rs:522-523, 655) and the frozen verdict survives a change to the very declaration under test — asymmetric with entry-declared methods and defeating the CN-04 freshness model for this obligation class.",
+              "severity": "P1"
+            },
+            {
+              "category": "business-logic-leak",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 57,
+              "message": "Business logic leak: inherent_method_items re-implements the Method-axis projection decision (is_derivable filter + `method:` identifier format) in usecase. This decision-table interpretation belongs on domain's RoleObligationItemsProjector (projection.rs data_role_items, owner of CN-10/IN-05 semantics); derive_obligations_document threads the projector to every other derive function but not the inherent path. The `method:` format is now defined independently in domain (projection.rs:41) and usecase (inherent.rs:68) and implicitly coupled to method_anchors_for_item's rsplit_once(':'), so the two derivation sources can silently diverge. Move the projection onto RoleObligationItemsProjector (e.g. an inherent_method_items method).",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 27,
+              "message": "Fail-open on broken owner reference: an inherent block whose type_name resolves to no types[] entry in the same catalogue silently yields zero obligations (continue). Unlike trait_impl's External case there is no legitimate \"external\" inherent impl — an unresolved owner is always a catalogue inconsistency, and neither the codec, catalogue-lint (which walks from type entries), nor the derive-side D2 validation detects an orphan block. This silently reintroduces the exact P0 gap this change fixes (inherent-only methods producing no obligations) for orphan blocks; it should fail closed with a DiagnosticMessage.",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 398,
+              "message": "Waiver lane still has the sibling-ambiguity defect the fulfillment fix addresses: emit_waiver_action builds the WaiverPair without the obligation item identifier, so per-owner waiver adjudications for sibling method obligations of one entry sharing an anchor are byte-identical (same reason, declaration, anchor_text). The waiver verifier cannot tell which method's obligation the waiver claims — the same defect class as PR #247 P0 #2, fixed only in emit_fulfillment_action. Cache entries are disambiguated by obligation_id so no corruption occurs, but the adjudication input is indistinguishable across siblings.",
+              "severity": "P2"
+            },
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 453,
+              "message": "Verdicts frozen under the pre-fix pair construction are never re-adjudicated: the cache key intentionally excludes the `## Obligation item` suffix (checklist §3) and the verifier fingerprint hashes only the infrastructure prompt preamble (fulfillment_verifier.rs:74-78), which this diff does not change, so the evidence-format change is invisible to the freshness model. The current track's obligation-fulfillment-cache.json holds 25 frozen verdicts produced without the item identifier that all remain fresh (no same-entry sibling pairs exist in the current cache, so present harm is limited). D3 waives legacy hash compatibility — bumping the verifier prompt preamble/fingerprint (or folding a pair-format version into it) would retire pre-fix verdicts safely.",
+              "severity": "P3"
+            }
+          ],
+          "hash": "rvw1:sha256:7ee6777ee020ad02439296007c4b7254fdaf433f6367951bccae4df34dd8f174",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T14:11:30Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/derive/inherent.rs",
+              "line": 55,
+              "message": "Obligations derived from inherent-impl-only methods resolve their evaluate/check declaration to the TypeEntry text alone: the new derivation targets CatalogueSectionKey::Types (inherent.rs:55), and obligation_declaration_text_from_loaded/entry_declaration_text (test_obligation/mod.rs:158-178, 251-264) special-case only TraitImpl, so the verifier pair for an inherent-only method contains no signature/docs/spec_refs of the obligated method — only the `## Obligation item` name suffix. Consequently the fulfillment/waiver cache keys (evaluate plan.rs:433, check.rs:655, results_status.rs:299) hash the unchanged TypeEntry text: editing the inherent method's declaration changes the derive-side obligation decl_hash (inherent.rs:61, marking the obligations artifact stale) but never invalidates cached verdicts, which continue to pass the check gate as fresh. This breaks the invariant established for trait impls by trait_impl_pair_declaration_text (\"an implementation's cache key changes with either side of the pair\") and is asymmetric with TypeEntry-declared methods, whose edits do rotate the key. Fix likely belongs in the shared declaration resolution (test_obligation/mod.rs, outside this scope's file list) by freezing the inherent impl declaration into the pair for inherent-derived method obligations.",
+              "severity": "P1"
+            },
+            {
+              "category": "cache-staleness",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 445,
+              "message": "Cached verdicts produced before this fix are never invalidated: the `## Obligation item` suffix is deliberately outside the cache key (briefing checklist 3), and fulfillment_verifier_fingerprint()/waiver counterpart hash only the static prompt preamble (infrastructure/test_obligation/fulfillment_verifier.rs:74-78), which this diff does not change. Any fulfillment/waiver verdict cached earlier in this track — produced by the pre-fix prompt exhibiting exactly the P0 sibling-method confusion on shared anchors — still matches on (edge_id, obligation_id, key, fingerprint) and is reused via the cache-hit branch without re-verification, so the P0 fix does not take effect retroactively for already-cached pairs. Remediation is operational rather than a usecase code change: a one-time invalidation of this track's fulfillment/waiver cache documents, or a preamble revision that rotates the verifier fingerprint.",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:cb0c2bcff8ccc837bd205d33f1c6a41440f27b8ca76eb5e280e856b96ef4e1bd",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-17T14:25:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c4278ed90123469da194f1896a4f8e83bec40a84e549d50b5100527c87c2902e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:12:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c8f5d01a0f9d16621f275012b4ea9a86912aa5677123ee735f96060c3b064b97",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-17T17:58:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4423c3d8a089ca205cafa8479b8743b4aefa60caad7fc69c8c3998b0911eb2cf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T00:01:05Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューに必要な briefing、scope 固有ポリシー、対象ファイル、CURRENT diff を読み取れませんでした。ローカルシェルが全コマンドでサンドボックス namespace 初期化エラーになったため、コード上の verdict は判定不能です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d08e3f1653e687522af09c92dff52d3dc2b5e53082b285f37cb2d41f4cefc843",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T00:08:46Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 328,
+              "message": "results の inspect_waiver は waiver cache entry を edge_id のみで lookup している (entry.edge_id() == edge)。evaluate は owner obligation ごとに 1 entry を書き (plan.rs:316-344)、check は (edge × obligation) スコープで解決する (check.rs:639) のに対し、results だけが owner を無視して先頭 entry を掴む。本修正で owner ごとの declaration hash は item identifier により必ず異なるため、同一 edge を複数 obligation が所有する waived edge (domain は MultipleOwners を明示的にモデル化) では 2 番目以降の owner の item-augmented declaration hash が別 owner の key と比較され、偽の stale が status lane に計上される。同じ cache 状態を check は resolved と判定するため check と results が乖離し、「check と results が evaluate の書いた同じ key を消費する」という本修正の意図に反する。修正方向: inspect_fulfillment (results_status.rs:293) と同様に呼び出し元から obligation id (owner id / synthetic_voluntary_obligation_id) を渡し entry.obligation_id() == Some(obligation_id) で絞り込む。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:d08e3f1653e687522af09c92dff52d3dc2b5e53082b285f37cb2d41f4cefc843",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T00:20:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5f59cc1f6323642afa0a7d37754e777c0656fec398c7f1618acbb295a39eb92",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T01:55:15Z",
+          "findings": [
+            {
+              "category": "stale-comment",
+              "file": "libs/usecase/src/test_obligation/derive/mod.rs",
+              "line": 145,
+              "message": "Derive call-site comment still describes the validation as \"D1 coverage is a write-side gate\" (lines 145-147), and the derive_obligations_document doc (lines 169-170) still justifies itself with \"Method-anchor coverage is intentionally not applied here … D1 does not reject existing catalogues\" — both cite the 1720-D1 inventory/coverage semantics retracted by ADR 2026-08-18-0055 D1. The briefing's design intent explicitly states the derive call-site comment no longer calls this D1 coverage, but the diff only rewrote the fn doc at line 212; the intended edit is missing.",
+              "severity": "medium"
+            },
+            {
+              "category": "redundant-orchestration",
+              "file": "libs/usecase/src/test_obligation/derive/mod.rs",
+              "line": 217,
+              "message": "The trait loop in validate_derivable_method_anchor_coverage (lines 217-219) is now fully redundant: after the domain narrowing, validate_method_anchor_coverage performs exactly the two checks (validate_add_modify_methods_have_spec_refs + validate_parent_forbids_method_spec_refs) that validate_named_catalogue_add_modify_methods already applied to every trait entry, so the wrapper is behaviorally identical to validate_named_catalogue_add_modify_methods alone. When collapsing it, also fix the new one-line doc at line 212, which claims trait-only scope while types and inherent-impl methods are checked too.",
+              "severity": "low"
+            },
+            {
+              "category": "misleading-test-name",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 865,
+              "message": "test_derive_rejects_incomplete_coverage_for_modify_trait names the retracted non-cover rejection as its contract, contradicting the new test_trait_method_anchor_union_need_not_cover_entry_catalogue; the rejection it actually exercises is the empty-spec_refs Add-default method on a Modify parent (0340 D2). Rename to state the real rejection reason.",
+              "severity": "low"
+            },
+            {
+              "category": "misleading-test-name",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 938,
+              "message": "test_add_method_on_reference_trait_rejects_absent_anchor names the retracted outside-entry (absent-anchor) rejection, contradicting test_trait_method_anchor_outside_entry_is_accepted; the rejection now comes from 0040 D1 (Reference parent forbids method spec_refs), making the test behaviorally identical to test_add_method_on_reference_trait_is_rejected (line 920) except for the anchor string. Rename or fold into the duplicate.",
+              "severity": "low"
+            },
+            {
+              "category": "misleading-test-name",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 1270,
+              "message": "test_derive_skips_coverage_for_reference_and_delete_traits still names \"coverage\" as something skipped for Reference/Delete parents, implying coverage validation still exists for Add/Modify parents — retracted by ADR 0055. Mildest of the stale-name sweep misses; rename to describe the accepted ref-free Reference/Delete method shape.",
+              "severity": "low"
+            }
+          ],
+          "hash": "rvw1:sha256:ad276c13f13b02082f096d9073e56b33715d18d20677f0cfae3419b833548421",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T02:03:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c55281d0f9ac305f338df00bb1eac99d40f812bff4e2e4c8a124519b1972bd04",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T02:25:29Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 471,
+              "message": "push_method_cited_anchor_ids counts spec_refs of methods whose own action is `delete` into the cited set. Entry-level traversal (mod.rs:428) excludes ItemAction::Delete, and spec AC-14 / ADR 0340 D1 (via 0359 D13) give method actions the same obligation-gate semantics as entry actions at method granularity — a delete method derives zero obligations. The state is reachable: domain structural validation (validate_method_anchor_coverage) only rejects empty spec_refs on Add/Modify methods (AC-03) and non-empty child spec_refs under Reference/Delete parents (AC-16), so a delete method with non-empty spec_refs under an Add/Modify parent passes (spec AC-02 limits rejections to exactly those two rules). If such a method is the only citer of an AC/CN, the uncited finding is wrongly suppressed. The added doc comment itself says only \"An Add/Modify method may cite\", which the implementation contradicts. Fix: skip methods with action Delete in push_method_cited_anchor_ids (Reference methods mirror the entry-level inclusion; if kept, align the doc comment).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4e8f2a235a40ba741c36e0071c1ab0fe7fbcfdc69ce914f723d2cf563e88e8a0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T02:36:15Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "libs/usecase/src/test_obligation/check_tests.rs",
+              "line": 1577,
+              "message": "The two new tests for cited_anchor_ids exercise only the traits() branch. The TypeEntry.methods branch (mod.rs:434-438) and the inherent_impls branch (mod.rs:446-453 — owner lookup plus owner-action skip, the most intricate part of the fix, and explicitly named in the briefing checklist) have no test coverage, new or pre-existing: every existing covering_method use is on trait entries and the only push_inherent_impl test targets obligation_declaration_text. A regression removing the types or inherent loops would pass the suite. Add tests asserting a method-only AC is counted as cited when declared on a TypeEntry method and on an inherent-impl method (and ideally that a Delete owner suppresses inherent-method refs).",
+              "severity": "moderate"
+            }
+          ],
+          "hash": "rvw1:sha256:cd076a85016b67d8ba9492cf2273909dc9f47ae192575c1ce206eae32cb3d6f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T02:47:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b0eba85551863008d313d43163682dcb5b4c38fc1dba97c2e110591ed0b91b90",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T03:57:57Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 429,
+              "message": "cited_anchor_ids の entry ループが ItemAction::Delete のみを skip し、Reference entry の entry-level spec_refs を cited 集合に含めている。ADR 0359 D13 (Reference は edge 宇宙の外) および同モジュールの edge 会計 (check_support.rs:151-154 active_ref_action は Add/Modify entry のみ active ref edge を所有) と矛盾し、Reference entry だけが cite する AC/CN は edge ゼロ (verdict が一切要求されない) のまま uncited AC/CN 警報 (IN-16 の edge-zero 警報) が抑止される — 今回修正した Codex P0 (Reference method refs) と同一欠陥クラスの entry-level 残存。現 track の実カタログで AC-04 / AC-10 / AC-11 / AC-12 / CN-03 が Reference entry (例: usecase-types.json の PhaseCommandService) の entry-level spec_refs からのみ cite されており、この 5 anchor は現在 edge を持たず警報も出ない live な silent-drop 状態。修正方向は entry ループでの Delete | Reference skip (active_ref_action と同一述語の再利用)。適用時は上記 5 anchor の uncited finding が顕在化し、カタログ再 grounding (Phase 2 差し戻し) が連鎖し得る。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:0fe84b27524212807a89e4c5edd46a569ac24f167a6aead16aa3677469b8760a",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T04:09:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:4d414613028d1159b0287aa83d00b9ebdfc52aaf32a6c31f152f41c101cffc14",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T05:24:32Z",
+          "findings": [
+            {
+              "category": "dead-code",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 628,
+              "message": "resolve_edge の第 3 戻り値 DeclarationHash が本 diff で全呼び出し元から未使用になった (plan_voluntary_record / plan_waiver_record とも _declaration_hash で破棄)。hasher port の計算結果が常に捨てられるうえ、これは本変更が排除した parent-only 宣言ハッシュそのものの計算であり、残すと誤再利用の危険がある。タプル第 3 要素と plan.rs:628 の計算を削除すべき。",
+              "severity": "low"
+            },
+            {
+              "category": "test-coverage",
+              "file": "libs/usecase/src/test_obligation/derive_tests.rs",
+              "line": 1318,
+              "message": "AC-15 derive テストの post-execute reload アサーションは fail し得ない: StubCatalogue は不変 HashMap から clone を返すだけで、DeriveTestObligationsInteractor は catalogue 書き込み port を持たないため、execute 後の load は常にコンストラクタ入力を返す。pre-execute clone への旧アサーションと識別力が同一で、design intent の強化になっていない。「unread」を検証するには stub に load 呼び出し記録を持たせ、未選択パスが一度も load されないことをアサートする形が必要。",
+              "severity": "low"
+            }
+          ],
+          "hash": "rvw1:sha256:7d6f232689cd2ed6a6e3b331c5d69fe215938cb558554390b9cd89ecd243d54c",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T05:35:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cadee06d2858c8aeda5ad46915c419c3b9fe740aa0a893d80aef8cf384dd9514",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    }
+  }
+}

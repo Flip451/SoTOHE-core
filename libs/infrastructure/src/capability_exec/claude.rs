@@ -109,7 +109,7 @@ impl ClaudeCapabilityAdapter {
         passthrough: &mut impl Write,
     ) -> Result<CapabilityDispatchOutcome, CapabilityExecError> {
         let allowed_tools = self.agent_tools(request)?;
-        if request.request.host == self.provider {
+        if request.request.host.as_ref() == Some(&self.provider) {
             return Ok(CapabilityDispatchOutcome::DelegateInHost {
                 capability: request.request.capability.clone(),
                 briefing_file: request.request.briefing_file.clone(),
@@ -119,7 +119,10 @@ impl ClaudeCapabilityAdapter {
 
         let prompt = capability_prompt(request);
         let session =
-            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone());
+            CapabilitySession::new(request, self.track_id.as_ref(), self.session_cache.clone())
+                .map_err(|error| {
+                    adapter_preflight_error(request, &self.provider, error.to_string())
+                })?;
         let resume_id = session.resumable_id(&request.request.resume);
         let args = build_claude_args_with_resume(
             request.request.capability.as_str(),
@@ -327,13 +330,15 @@ mod tests {
         Ok(CapabilityDispatchRequest {
             request: CapabilityExecRequest {
                 capability: CapabilityName::try_new(capability)?,
-                host: ProviderName::try_new(host)?,
+                host: Some(ProviderName::try_new(host)?),
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
                 timeout: None,
                 resume: usecase::capability_exec::CapabilityResumeRequest::Fresh,
             },
             profile: CapabilityProfile {
-                provider: ProviderName::try_new("claude")?,
+                provider: usecase::capability_exec::CapabilityProviderBinding::Standard(
+                    ProviderName::try_new("claude")?,
+                ),
                 model: ModelName::try_new("claude-opus")?,
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,
@@ -347,6 +352,12 @@ mod tests {
         host: &str,
     ) -> Result<CapabilityDispatchRequest, Box<dyn std::error::Error>> {
         request_with_capability_from_host("implementer", host)
+    }
+
+    fn request_without_host() -> Result<CapabilityDispatchRequest, Box<dyn std::error::Error>> {
+        let mut request = request_from_host("claude")?;
+        request.request.host = None;
+        Ok(request)
     }
 
     fn write_agent(root: &Path, definition: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -458,7 +469,7 @@ mod tests {
     }
 
     #[test]
-    fn test_claude_capability_adapter_cross_provider_uses_native_agent_prompt()
+    fn test_claude_capability_adapter_mismatched_supplied_host_uses_subprocess()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
         write_agent(
@@ -509,6 +520,34 @@ mod tests {
     }
 
     #[test]
+    fn test_claude_capability_adapter_omitted_host_uses_subprocess()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_agent(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools: Read\n---\nagent body\n",
+        )?;
+        let runner = Arc::new(RecordingProcessRunner { exit_code: 9, ..Default::default() });
+        let adapter = ClaudeCapabilityAdapter::with_process_runner(
+            directory.path().to_owned(),
+            directory.path().join("runtime"),
+            runner.clone(),
+        );
+
+        let outcome = adapter.dispatch(&request_without_host()?)?;
+
+        assert!(matches!(
+            outcome,
+            CapabilityDispatchOutcome::Executed { ref provider, exit_code: 9 }
+                if provider.as_str() == "claude"
+        ));
+        let invocations = runner.invocations.lock().expect("test process recorder lock");
+        assert_eq!(invocations.len(), 1);
+        assert_eq!(invocations.first().expect("one process invocation is recorded").0, "claude");
+        Ok(())
+    }
+
+    #[test]
     fn test_claude_capability_adapter_resumes_workspace_session_with_explicit_flags()
     -> Result<(), Box<dyn std::error::Error>> {
         let directory = tempfile::tempdir()?;
@@ -539,7 +578,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("prior-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("claude")?,
                 request.profile.model.clone(),
                 request.profile.effort,
             ),
@@ -587,7 +626,7 @@ mod tests {
             capability: request.request.capability.clone(),
             target_artifacts: targets,
         };
-        let current_provider = request.profile.provider.clone();
+        let current_provider = ProviderName::try_new("claude")?;
         let recorded_provider = ProviderName::try_new("codex")?;
         assert_ne!(current_provider, recorded_provider);
         cache.save(
@@ -652,7 +691,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("stale-model-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("claude")?,
                 recorded_model,
                 request.profile.effort,
             ),
@@ -712,7 +751,7 @@ mod tests {
             &key,
             &ProviderSessionCacheEntry::new(
                 ProviderSessionId::try_new("prior-session".to_owned())?,
-                request.profile.provider.clone(),
+                ProviderName::try_new("claude")?,
                 request.profile.model.clone(),
                 request.profile.effort,
             ),

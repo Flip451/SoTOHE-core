@@ -716,6 +716,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Approved").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -806,6 +811,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("str").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         let m2 = MethodDeclaration::new(
@@ -814,6 +824,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("bool").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
 
@@ -1169,7 +1184,7 @@ include_function_roles = []
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
-                TypeKindV2::TypeAlias { target: TypeRef::new("RawId").unwrap() },
+                TypeKindV2::TypeAlias { target: TypeRef::new("RawId").unwrap(), generics: vec![] },
                 vec![],
                 vec![],
                 vec![],
@@ -1183,6 +1198,229 @@ include_function_roles = []
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
         let output = result.content().as_ref();
         assert!(output.contains("alias_of"), "alias_of label must appear: {output}");
+    }
+
+    #[test]
+    fn test_render_generic_alias_parameter_shadows_declared_type() {
+        // A kind-level alias parameter (`Alias<T> = Result<T, RawId>`) shadows an
+        // identically named declared catalogue type `T`: the generic use must not
+        // resolve to that unrelated type, while the declared `RawId` still gets
+        // its alias_of edge.
+        use domain::tddd::catalogue_v2::identifiers::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let opts = ContractMapRenderOptions::default();
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+
+        for name in ["T", "RawId"] {
+            doc.insert_type(
+                TypeName::new(name).unwrap(),
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(
+                        StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                        None,
+                    )),
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+        }
+
+        doc.insert_type(
+            TypeName::new("UserId").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Result<T, RawId>").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter.render(&[doc], &[layer], &opts).unwrap();
+        let output = result.content().as_ref();
+        let source = render::type_rep_node_id("domain", "domain", "UserId");
+        let raw_id = render::type_rep_node_id("domain", "domain", "RawId");
+        let shadowed_id = render::type_rep_node_id("domain", "domain", "T");
+        let raw_edge = format!("{source} ---|alias_of| {raw_id}");
+        let shadowed_edge = format!("{source} ---|alias_of| {shadowed_id}");
+        assert_eq!(
+            output.matches(&raw_edge).count(),
+            1,
+            "the declared RawId target must produce exactly one alias_of edge: {output}"
+        );
+        assert!(
+            !output.contains(&shadowed_edge),
+            "the alias parameter T must not resolve to the declared type T: {output}"
+        );
+    }
+
+    #[test]
+    fn test_render_generic_rooted_alias_target_is_not_resolved_as_qualified_type() {
+        // `Alias<T> = T::Item` is a projection on the alias parameter. Even
+        // when another rendered catalogue is a crate literally named `T` with
+        // a type `Item`, the generic-rooted target must not resolve to that
+        // unrelated node.
+        use domain::tddd::catalogue_v2::identifiers::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let opts = ContractMapRenderOptions::default();
+
+        let t_crate = CrateName::new("T").unwrap();
+        let t_layer = LayerId::try_new("usecase").unwrap();
+        let mut t_doc = CatalogueDocument::new(3, t_crate, t_layer.clone());
+        t_doc.insert_type(
+            TypeName::new("Item").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
+                    StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                    None,
+                )),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        doc.insert_type(
+            TypeName::new("UserId").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("T::Item").unwrap(),
+                    generics: vec![MethodGenericParam {
+                        name: ParamName::new("T").unwrap(),
+                        bounds: vec![],
+                    }],
+                },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter.render(&[doc, t_doc], &[layer, t_layer], &opts).unwrap();
+        let output = result.content().as_ref();
+        assert!(
+            !output.contains("alias_of"),
+            "a generic-rooted alias target must not resolve to a same-named crate's type: \
+             {output}"
+        );
+    }
+
+    #[test]
+    fn test_render_legacy_alias_parameter_shadows_declared_type() {
+        // The same shadowing must apply when the alias parameter is declared in
+        // the legacy entry-level generics field instead of the TypeAlias kind.
+        use domain::tddd::catalogue_v2::identifiers::ParamName;
+        use domain::tddd::catalogue_v2::methods::MethodGenericParam;
+
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), FULL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let opts = ContractMapRenderOptions::default();
+
+        let crate_name = CrateName::new("domain").unwrap();
+        let layer = LayerId::try_new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+
+        for name in ["T", "RawId"] {
+            doc.insert_type(
+                TypeName::new(name).unwrap(),
+                TypeEntry::new(
+                    ItemAction::Add,
+                    DataRole::value_object(),
+                    TypeKindV2::Struct(StructKind::new(
+                        StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                        None,
+                    )),
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+        }
+
+        doc.insert_type(
+            TypeName::new("UserId").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Result<T, RawId>").unwrap(),
+                    generics: vec![],
+                },
+                vec![],
+                vec![MethodGenericParam { name: ParamName::new("T").unwrap(), bounds: vec![] }],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter.render(&[doc], &[layer], &opts).unwrap();
+        let output = result.content().as_ref();
+        let source = render::type_rep_node_id("domain", "domain", "UserId");
+        let raw_id = render::type_rep_node_id("domain", "domain", "RawId");
+        let shadowed_id = render::type_rep_node_id("domain", "domain", "T");
+        let raw_edge = format!("{source} ---|alias_of| {raw_id}");
+        let shadowed_edge = format!("{source} ---|alias_of| {shadowed_id}");
+        assert_eq!(
+            output.matches(&raw_edge).count(),
+            1,
+            "the declared RawId target must produce exactly one alias_of edge: {output}"
+        );
+        assert!(
+            !output.contains(&shadowed_edge),
+            "the legacy alias parameter T must not resolve to the declared type T: {output}"
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -1589,6 +1827,11 @@ include_function_roles = []
             vec![ParamDeclaration::new(ParamName::new("w").unwrap(), TypeRef::new("W").unwrap())],
             TypeRef::new("L").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -1740,6 +1983,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Result<ContractMapContent, ContractMapRendererError>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -1829,6 +2077,11 @@ include_function_roles = []
                 )],
                 TypeRef::new("()").unwrap(),
                 false,
+                false,
+                vec![],
+                vec![],
+                vec![],
+                ItemAction::Add,
                 None,
             );
             doc.insert_type(
@@ -1895,6 +2148,11 @@ include_function_roles = []
             ],
             TypeRef::new("Result<(), String>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -1963,6 +2221,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Self").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_type(
@@ -2160,6 +2423,11 @@ include_function_roles = []
             )],
             TypeRef::new("Arc<dyn DeclaredPort>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_trait(
@@ -2201,7 +2469,10 @@ include_function_roles = []
             TypeEntry::new(
                 ItemAction::Add,
                 DataRole::value_object(),
-                TypeKindV2::TypeAlias { target: TypeRef::new("Arc<dyn AliasPort>").unwrap() },
+                TypeKindV2::TypeAlias {
+                    target: TypeRef::new("Arc<dyn AliasPort>").unwrap(),
+                    generics: vec![],
+                },
                 vec![],
                 vec![],
                 vec![],
@@ -2305,6 +2576,11 @@ include_function_roles = []
             vec![],
             TypeRef::new("Arc<dyn std::fmt::Debug>").unwrap(),
             false,
+            false,
+            vec![],
+            vec![],
+            vec![],
+            ItemAction::Add,
             None,
         );
         doc.insert_trait(

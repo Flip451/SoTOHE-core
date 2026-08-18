@@ -26,6 +26,8 @@ pub mod latest_track;
 pub mod layers;
 pub mod machine_paths;
 pub mod merge_gate_adapter;
+mod merge_gate_freshness;
+mod merge_gate_reader;
 pub mod module_size;
 pub(crate) mod path_safety;
 pub mod plan_artifact_refs;

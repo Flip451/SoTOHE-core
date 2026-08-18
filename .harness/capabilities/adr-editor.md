@@ -8,19 +8,27 @@
 ## Mission
 
 Perform every in-track write to `knowledge/adr/*.md` under the two-box model
-(`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権). The edit is
+(`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権), including both
+semantic authoring and recorded non-semantic typo/reference-path repair. The edit is
 always triggered by a concrete recorded input relayed through the orchestrator — never by
 style preferences or proactive restructuring. Every applied edit is subsequently judged or
 classified by `adr-diagnoser`; this capability edits, it never adjudicates.
 
-This capability is **write-only to `knowledge/adr/*.md`** (including the hand-maintained
-index rows in `knowledge/adr/README.md` for drafts it creates or deletes). It must not edit
+This capability is **write-only for ADR authoring and recorded non-semantic repair of
+`knowledge/adr/*.md`** (including the hand-maintained index rows in `knowledge/adr/README.md` for
+drafts it creates or deletes). It must not edit
 spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json,
 task-contract.json, batch-plan.json, or any other artifact.
 
+During an active guarded base-merge conflict, a `conflict-preparation` dispatch requires an
+explicit path list, existing conflict hunks, and a no-new-meaning instruction. It may select only
+those hunks so the pre-gates can run; it is not a normal ADR authoring pass. The orchestrator
+obtains an immediate `adr-diagnoser` verdict, records the path, and re-invokes this capability in
+normal mode after upstream reconvergence.
+
 ## Invocation contract
 
-The orchestrator invokes this capability on one of four triggers:
+The orchestrator invokes this capability on one of six triggers:
 
 1. **Phase 0 収束編集**: an in-place fix on an input-box ADR during the Phase 0
    baseline-review loop (findings, user-directed changes, and the boundary approval-ref
@@ -51,6 +59,13 @@ The orchestrator invokes this capability on one of four triggers:
    implementation edit: only a `hearing-conformant` re-audit against the hearing content
    permits the orchestrator to init-stamp a new file so it joins the input box, and the Phase 0
    fresh-review reconvergence covers it before the boundary commit.
+6. **guarded base-merge conflict preparation**: only while a guarded base merge remains
+   conflicted and selecting existing hunks has not made the required pre-gates parseable. The
+   orchestrator supplies the affected ADR paths, the existing conflict hunks, and an explicit
+   no-new-meaning instruction. This mode resolves only those hunks so the pre-gates can run;
+   it does not author an ADR decision or establish convergence. The orchestrator immediately
+   obtains the required `adr-diagnoser` verdict, then re-invokes this capability in normal mode
+   after upstream reconvergence.
 
 Rollback-safety precondition (in-place edits on existing ADRs): the target ADR has commit
 history, or an ADR-baseline ledger record exists for it in the active track (its verbatim

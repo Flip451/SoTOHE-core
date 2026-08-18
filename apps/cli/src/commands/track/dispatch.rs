@@ -25,8 +25,6 @@ use crate::commands::track::{
 /// `CliError`, and `None` on success.  The error message is also printed to
 /// stderr so user-visible output is unchanged from `execute`.
 ///
-/// This variant exists so that `execute_track_with_telemetry` in `main.rs` can
-/// populate `NonZeroExit.error_chain` (IN-03) without a second dispatch round.
 #[allow(clippy::too_many_lines)]
 pub fn execute_with_error_chain(cmd: TrackCommand) -> (ExitCode, Option<String>) {
     use crate::CliError;
@@ -43,6 +41,7 @@ pub fn execute_with_error_chain(cmd: TrackCommand) -> (ExitCode, Option<String>)
 }
 
 /// Public entry point for callers that do not need the error chain string.
+#[allow(dead_code)]
 pub fn execute(cmd: TrackCommand) -> ExitCode {
     execute_with_error_chain(cmd).0
 }
@@ -53,6 +52,20 @@ pub fn execute(cmd: TrackCommand) -> ExitCode {
 /// logic is written once and the two public entry points share it.
 #[allow(clippy::too_many_lines)]
 fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
+    dispatch_track_cmd_with_dependencies(cmd, |input| {
+        TrackCompositionRoot::new().track_driver().handle_base_merge(input)
+    })
+}
+
+/// Dispatches track commands with injected command-boundary outcomes.
+///
+/// Keeping this seam local lets command tests exercise the `MergeBase` enum dispatch without
+/// reimplementing any guarded merge policy outside the driver and usecase layers.
+#[allow(clippy::too_many_lines)]
+fn dispatch_track_cmd_with_dependencies(
+    cmd: TrackCommand,
+    base_merge: impl FnOnce(cli_driver::track::BaseMergeInput) -> cli_driver::CommandOutcome,
+) -> Result<ExitCode, crate::CliError> {
     use crate::CliError;
 
     match cmd {
@@ -182,5 +195,57 @@ fn dispatch_track_cmd(cmd: TrackCommand) -> Result<ExitCode, crate::CliError> {
                 .handle(TrackInput::SwitchBase { project_root });
             track_driver_outcome_to_result(outcome)
         }
+        TrackCommand::MergeBase => {
+            let outcome = base_merge(cli_driver::track::BaseMergeInput {
+                workspace_root: PathBuf::from("."),
+            });
+            track_driver_outcome_to_result(outcome)
+        }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_track_command_merge_base_dispatches_argument_free_workspace_to_completed_outcome() {
+        let result = dispatch_track_cmd_with_dependencies(TrackCommand::MergeBase, |input| {
+            assert_eq!(input.workspace_root, PathBuf::from("."));
+            cli_driver::CommandOutcome::success(Some("base merge completed".to_owned()))
+        });
+
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
+    }
+
+    #[test]
+    fn test_track_command_merge_base_dispatches_conflicted_outcome_as_recovery_failure() {
+        let result = dispatch_track_cmd_with_dependencies(TrackCommand::MergeBase, |_| {
+            cli_driver::CommandOutcome::failure(Some(
+                "base merge conflicted; continue with /track:recover".to_owned(),
+            ))
+        });
+
+        let error = result.unwrap_err().to_string();
+        assert!(error.contains("/track:recover"));
+        assert!(!error.contains("base merge completed"));
+    }
+
+    #[test]
+    fn test_track_command_merge_base_dispatches_composition_root_guard_failure_without_merge_success()
+     {
+        let workspace = tempfile::tempdir().unwrap();
+        let result = dispatch_track_cmd_with_dependencies(TrackCommand::MergeBase, |_| {
+            TrackCompositionRoot::new().track_driver().handle_base_merge(
+                cli_driver::track::BaseMergeInput {
+                    workspace_root: workspace.path().to_path_buf(),
+                },
+            )
+        });
+
+        let error = result.unwrap_err().to_string();
+        assert!(error.contains("base merge failed"));
+        assert!(!error.contains("base merge completed"));
     }
 }

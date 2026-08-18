@@ -198,7 +198,6 @@ impl EvaluateTestObligationsInteractor {
             )));
             return Ok(());
         };
-        let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
         // Multi-anchor fulfillment: one planned action per anchor, in the
         // order the obligation lists them (matches the pre-refactor loop).
         for anchor in obligation.spec_refs() {
@@ -221,7 +220,6 @@ impl EvaluateTestObligationsInteractor {
                 obligation.id().clone(),
                 &declaration,
                 &anchor_text,
-                declaration_hash.clone(),
                 tests,
                 existing_fulfillment_cache,
                 plan,
@@ -263,14 +261,11 @@ impl EvaluateTestObligationsInteractor {
                     )));
                     continue;
                 };
-                let declaration_hash =
-                    DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
                 self.emit_fulfillment_action(
                     edge_id.clone(),
                     obligation.id().clone(),
                     &declaration,
                     &anchor_text,
-                    declaration_hash,
                     tests,
                     existing_fulfillment_cache,
                     plan,
@@ -279,9 +274,7 @@ impl EvaluateTestObligationsInteractor {
             return Ok(());
         }
 
-        let Some((declaration, anchor_text, declaration_hash)) =
-            self.resolve_edge(edge_id, catalogues, spec)
-        else {
+        let Some((declaration, anchor_text)) = self.resolve_edge(edge_id, catalogues, spec) else {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
                 edge_id.clone(),
             )));
@@ -292,7 +285,6 @@ impl EvaluateTestObligationsInteractor {
             synthetic_obligation_id(edge_id),
             &declaration,
             &anchor_text,
-            declaration_hash,
             tests,
             existing_fulfillment_cache,
             plan,
@@ -344,9 +336,7 @@ impl EvaluateTestObligationsInteractor {
             return Ok(());
         }
 
-        let Some((declaration, anchor_text, _declaration_hash)) =
-            self.resolve_edge(edge_id, catalogues, spec)
-        else {
+        let Some((declaration, anchor_text)) = self.resolve_edge(edge_id, catalogues, spec) else {
             plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingWaiverEdge(
                 edge_id.clone(),
             )));
@@ -375,6 +365,10 @@ impl EvaluateTestObligationsInteractor {
         existing_waiver_cache: Option<&WaiverCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) {
+        let declaration = crate::test_obligation::declaration_with_obligation_item(
+            &declaration,
+            obligation_id.item_identifier().as_str(),
+        );
         let reason_hash = WaivedReasonHash::new(self.hasher.sha256(reason.as_str().as_bytes()));
         let declaration_hash_actual =
             DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
@@ -413,7 +407,6 @@ impl EvaluateTestObligationsInteractor {
         obligation_id: TestObligationId,
         declaration: &str,
         anchor_text: &str,
-        declaration_hash: DeclarationHash,
         tests: &[TestLocation],
         existing_fulfillment_cache: Option<&ObligationFulfillmentCacheDocument>,
         plan: &mut Vec<PlannedAction>,
@@ -425,6 +418,11 @@ impl EvaluateTestObligationsInteractor {
             .resolve_source(locations)
             .map_err(ObligationEvaluateError::TestSourceScan)?;
         let bound_hash = resolved_bound_tests.set_hash().clone();
+        let declaration = crate::test_obligation::declaration_with_obligation_item(
+            declaration,
+            obligation_id.item_identifier().as_str(),
+        );
+        let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
         let anchor_hash = AnchorTextHash::new(self.hasher.sha256(anchor_text.as_bytes()));
         let key = ObligationFulfillmentCacheKey::new(bound_hash, declaration_hash, anchor_hash);
         let cached_verdict = cached_fulfillment_verdict(
@@ -456,7 +454,7 @@ impl EvaluateTestObligationsInteractor {
             key,
             resolved_bound_tests,
             tests_source,
-            declaration: declaration.to_owned(),
+            declaration,
             anchor_text: anchor_text.to_owned(),
         }));
         Ok(())
@@ -619,12 +617,11 @@ impl EvaluateTestObligationsInteractor {
         edge_id: &TestObligationEdgeId,
         catalogues: &[LoadedCatalogueDocument],
         spec: &SpecDocument,
-    ) -> Option<(String, String, DeclarationHash)> {
+    ) -> Option<(String, String)> {
         let declaration =
             find_declaration_text_from_loaded(catalogues, edge_id.entry_key().as_str())?;
         let anchor_text = resolve_anchor_text(spec, edge_id.anchor_id().element_id())?;
-        let declaration_hash = DeclarationHash::new(self.hasher.sha256(declaration.as_bytes()));
-        Some((declaration, anchor_text, declaration_hash))
+        Some((declaration, anchor_text))
     }
 }
 

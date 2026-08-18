@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Sotp Tracing Instrumentation",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "track ブランチ上で、track が解決できる純表示系ではない `sotp` コマンドの完了観測を共通 entry point から既存 telemetry に記録し、利用頻度、所要時間、および失敗率を確認できるようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "track ブランチ上で完了した、track が解決できる純表示系ではない `sotp` コマンドを共通の entry point で計装し、完了時にコマンド identity、所要時間、および exit 結果を観測する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "track ブランチ上で完了した、track が解決できる純表示系ではないコマンドの観測イベントを、通常は既存の track-local `track/items/<track-id>/logs/telemetry.jsonl` へ追記する。`track archive` の成功時だけは、既存ログが track とともに archive へ移動するため `track/archive/<track-id>/logs/telemetry.jsonl` へ追記し、active 側のログを再作成しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "既存の `sotp telemetry` 集計を、追記されたコマンド観測イベントを含めて利用頻度、所要時間、および失敗率を分析できるように拡張する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "telemetry の track 帰属は現在の branch に結び付け、track ブランチ上の実行だけを当該 track の時系列観測に含める。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "計装記録または telemetry 分析結果を外部サービスへ送信することは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "新たな `telemetry.jsonl` 以外の command-trace sink またはローテーション方針を導入しない。既存 report reader の互換読み取りは変更対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "track ブランチ以外で実行されたコマンドを telemetry に記録することは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OUT-04",
+        "text": "コマンド内部の詳細な span を追加することは対象外とし、必要性が判明した場合に再評価する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "計装記録はローカルで完結させ、外部送信を行わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "診断用 telemetry の追記失敗はコマンドの完了結果を変更せず、SoT 成果物を損なわない fire-and-forget の挙動を維持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "`sotp telemetry` は、形式不正な記録および未知の `schema_version` を持つ記録を fail-open で skip し、skip した記録件数を報告する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D6"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "track ブランチ上で、track が解決できる純表示系ではない任意の `sotp` コマンドが完了すると、同じ track の `telemetry.jsonl` にコマンド identity、所要時間、および exit 結果を含むイベントが追記される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`sotp telemetry` は既存の telemetry 記録を集計し、コマンド横断の実行頻度、所要時間、および失敗率を確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-29-0839-sotp-tracing-instrumentation.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "telemetry の追記に失敗しても、実行済みコマンドの exit 結果は telemetry 失敗によって失敗へ変わらない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "track ブランチ以外でコマンドを実行しても、track の telemetry 記録は生成または更新されない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "実行後に作成または更新されるコマンド観測の記録先は既存の `telemetry.jsonl` のみであり、別の command-trace file やローテーション済み世代は作成されない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-06-10-1129-track-workflow-telemetry.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    }
+  ],
+  "signals": {
+    "blue": 17,
+    "yellow": 0,
+    "red": 0
+  }
+}

@@ -62,12 +62,28 @@ pub enum TypeSignalsError {
     /// The frozen actual-capture feature declaration could not be loaded or verified.
     #[error("feature declaration error: {0}")]
     FeatureDeclaration(TdddActualFeatureDeclarationPortError),
+    /// A required input for the named layer could not be loaded or validated.
+    #[error("authoritative input failed for layer '{layer_id}': {reason}")]
+    AuthoritativeInputFailed {
+        /// Layer whose authoritative input failed.
+        layer_id: LayerId,
+        /// Human-readable diagnostic.
+        reason: DiagnosticText,
+    },
     /// Signal evaluation failed for the given layer.
     #[error("type-signals evaluation failed for layer '{layer_id}': {reason}")]
     EvaluationFailed {
         /// Layer id for which evaluation failed.
         layer_id: LayerId,
         /// Human-readable reason.
+        reason: DiagnosticText,
+    },
+    /// A refreshed cache for the named layer could not be persisted.
+    #[error("type-signals cache write failed for layer '{layer_id}': {reason}")]
+    CacheWriteFailed {
+        /// Layer whose cache write failed.
+        layer_id: LayerId,
+        /// Human-readable diagnostic.
         reason: DiagnosticText,
     },
     /// The request contains an inconsistent combination of fields.

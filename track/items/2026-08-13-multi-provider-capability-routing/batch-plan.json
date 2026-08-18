@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-13-multi-provider-capability-routing",
+  "task_estimates": [
+    {
+      "task_id": "T001",
+      "scope_estimates": [
+        {
+          "scope": "usecase",
+          "production_lines": 100,
+          "test_lines": 70
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T002",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 180,
+          "test_lines": 120
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T003",
+      "scope_estimates": [
+        {
+          "scope": "infrastructure",
+          "production_lines": 65,
+          "test_lines": 80
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T004",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 45,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T005",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 20,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    },
+    {
+      "task_id": "T006",
+      "scope_estimates": [
+        {
+          "scope": "harness-policy",
+          "production_lines": 25,
+          "test_lines": 0
+        }
+      ],
+      "oversize_justification": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "B1",
+      "task_ids": [
+        "T001",
+        "T004",
+        "T002",
+        "T003"
+      ]
+    },
+    {
+      "id": "B2",
+      "task_ids": [
+        "T005"
+      ]
+    },
+    {
+      "id": "B3",
+      "task_ids": [
+        "T006"
+      ]
+    }
+  ]
+}

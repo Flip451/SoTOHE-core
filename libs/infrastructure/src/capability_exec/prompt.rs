@@ -37,14 +37,16 @@ mod tests {
         CapabilityDispatchRequest {
             request: CapabilityExecRequest {
                 capability: CapabilityName::try_new("implementer").expect("valid capability"),
-                host: ProviderName::try_new("codex").expect("valid host"),
+                host: Some(ProviderName::try_new("codex").expect("valid host")),
                 briefing_file: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))
                     .expect("valid briefing"),
                 timeout: None,
                 resume,
             },
             profile: CapabilityProfile {
-                provider: ProviderName::try_new("codex").expect("valid provider"),
+                provider: usecase::capability_exec::CapabilityProviderBinding::Standard(
+                    ProviderName::try_new("codex").expect("valid provider"),
+                ),
                 model: ModelName::try_new("gpt-5").expect("valid model"),
                 effort: ReasoningEffort::High,
                 execution_mode: ExecutionMode::OrchestratorOutput,

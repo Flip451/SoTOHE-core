@@ -1,0 +1,152 @@
+{
+  "baseline_hash": "032ba99eee200722e430ba1823f05634c1dcd22d44f2004fdbb7f07db6a4a569",
+  "declaration_hash": "90ed0d2999fb96d7e22967dff2fe5d9a0ce286ee3a985d256958137b263a2d96",
+  "generated_at": "2026-08-13T13:53:44Z",
+  "head_commit": "633de68ce30f768d44c24a4b172f58f2ecd8a4c1",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "BaseBranchName"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "BaseMergeDirection"
+    },
+    {
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error",
+        "From<RefValidationError>"
+      ],
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "BaseMergeDirectionError"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "BaselineHash"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TypeSignalsAuthorityStatus"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "TypeSignalsCacheKey"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "TypeSignalsDocument"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "TypeSignalsReuseInput"
+    },
+    {
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TypeSignalsWorktreeStatus"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::branch_strategy::derive_base_merge_direction"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "ImplementationInputHash"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "CommitHash"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "type_name": "TrackMetadata"
+    }
+  ]
+}

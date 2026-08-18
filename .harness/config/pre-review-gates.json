@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "scopes": [
+    {
+      "scope": "domain",
+      "commands": [
+        {"argv": ["bin/sotp", "signal", "calc-impl-catalog"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "coverage"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "check"], "timeout_seconds": 3600}
+      ]
+    },
+    {
+      "scope": "usecase",
+      "commands": [
+        {"argv": ["bin/sotp", "signal", "calc-impl-catalog"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "coverage"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "check"], "timeout_seconds": 3600}
+      ]
+    },
+    {
+      "scope": "infrastructure",
+      "commands": [
+        {"argv": ["bin/sotp", "signal", "calc-impl-catalog"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "coverage"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "check"], "timeout_seconds": 3600}
+      ]
+    },
+    {
+      "scope": "cli_driver",
+      "commands": [
+        {"argv": ["bin/sotp", "signal", "calc-impl-catalog"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "coverage"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "check"], "timeout_seconds": 3600}
+      ]
+    },
+    {
+      "scope": "cli",
+      "commands": [
+        {"argv": ["bin/sotp", "signal", "calc-impl-catalog"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "coverage"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "check"], "timeout_seconds": 3600}
+      ]
+    },
+    {
+      "scope": "cli_composition",
+      "commands": [
+        {"argv": ["bin/sotp", "signal", "calc-impl-catalog"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "signal", "check-impl-catalog", "--gate", "commit"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "coverage"], "timeout_seconds": 3600},
+        {"argv": ["bin/sotp", "task-contract", "check"], "timeout_seconds": 3600}
+      ]
+    },
+    {"scope": "adr", "commands": []},
+    {"scope": "spec", "commands": []},
+    {"scope": "types", "commands": []},
+    {"scope": "impl-plan", "commands": []},
+    {"scope": "harness-policy", "commands": []},
+    {"scope": "other", "commands": []}
+  ]
+}

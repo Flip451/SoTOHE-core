@@ -11,6 +11,7 @@ mod pair_source_json;
 pub mod process_runner;
 mod retry;
 pub mod scope_resolver;
+mod selected_check_approved;
 
 use guarded_io::{CacheWriteGuard, atomic_write_guarded_file, read_guarded_text};
 

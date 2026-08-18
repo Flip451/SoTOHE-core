@@ -14,10 +14,8 @@ Write a briefing containing the track id, paths to `spec.json` and each `<layer>
 and paths to the related ADR(s). Do not put convention paths in the briefing: the capability
 dispatcher resolves the `impl-planner` convention set and delivers it with the dispatch, and
 that resolution is the complete convention input (workflow SSoT § Inputs). Then run
-`bin/sotp capability exec impl-planner --host claude --briefing-file tmp/impl-planner-briefing.md`.
-The dispatcher resolves `capabilities.impl-planner` internally from
-`.harness/config/agent-profiles.json` and either completes the dispatch or returns the
-in-host delegation instruction to follow.
+`bin/sotp phase enter impl-plan`. Phase entry runs its declared convergence checks and launches
+the configured writer only after they pass. Do not launch the writer from this adapter.
 
 The subagent owns: writing `impl-plan.json`, `task-coverage.json`, `task-contract.json`, and `batch-plan.json` (sole writer of all four), and evaluating both binary gates — task-coverage (`bin/sotp verify plan-artifact-refs`) and batch-plan structural (`bin/sotp batch-plan check`); Phase 3 passes only when both are OK.
 

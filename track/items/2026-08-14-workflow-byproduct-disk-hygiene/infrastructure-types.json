@@ -1,0 +1,80 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "GitScopeDiffMeasurer": {
+      "action": "reference",
+      "docs": "Baseline unit secondary adapter for per-scope git diff measurement. D1/D2 change only its internal config loading, git pathspec application, and untracked directory filtering; its public unit shape, constructor, and impl set remain baseline-identical. Referenced so the adapter-to-port edge remains visible (IN-01, IN-02, AC-01, AC-02, AC-03, CN-01, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "GitScopeDiffMeasurer"
+        }
+      ],
+      "module_path": "scope_diff_measure",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "GitScopeDiffMeasurer",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "GitScopeDiffMeasurer",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "GitScopeDiffMeasurer",
+      "trait_ref": "usecase::batch_plan::ports::ScopeDiffMeasurePort"
+    }
+  ]
+}

@@ -1,0 +1,763 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_branch_strategy["domain::branch_strategy"]
+    direction TB
+  subgraph T28_domain_domain_BaseBranchName["branch_strategy::BaseBranchName"]
+    direction TB
+    T28_domain_domain_BaseBranchName__self[BaseBranchName]
+    T28_domain_domain_BaseBranchName_try_new([try_new])
+    T28_domain_domain_BaseBranchName_as_str([as_str])
+  end
+  subgraph T32_domain_domain_BaseMergeDirection["branch_strategy::BaseMergeDirection"]
+    direction TB
+    T32_domain_domain_BaseMergeDirection__self[BaseMergeDirection]
+    T32_domain_domain_BaseMergeDirection_track_id([track_id])
+    T32_domain_domain_BaseMergeDirection_active_track([active_track])
+    T32_domain_domain_BaseMergeDirection_source([source])
+  end
+  subgraph T37_domain_domain_BaseMergeDirectionError["branch_strategy::BaseMergeDirectionError"]
+    direction TB
+    T37_domain_domain_BaseMergeDirectionError__self[BaseMergeDirectionError]
+    T37_domain_domain_BaseMergeDirectionError_InactiveTrack[InactiveTrack]
+    T37_domain_domain_BaseMergeDirectionError_InvalidBaseName[InvalidBaseName]
+  end
+  F66_domain_domain_domain__branch_strategy__derive_base_merge_direction[[derive_base_merge_direction]]
+  end
+  subgraph domain_domain_module_ids["domain::ids"]
+    direction TB
+  subgraph T24_domain_domain_CommitHash["ids::CommitHash"]
+    direction TB
+    T24_domain_domain_CommitHash__self[CommitHash]
+    T24_domain_domain_CommitHash_try_new([try_new])
+  end
+  end
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T26_domain_domain_BaselineHash["tddd::type_signals_doc::BaselineHash"]
+    direction TB
+    T26_domain_domain_BaselineHash__self[BaselineHash]
+    T26_domain_domain_BaselineHash_new([new])
+    T26_domain_domain_BaselineHash_as_digest([as_digest])
+  end
+  subgraph T40_domain_domain_TypeSignalsAuthorityStatus["tddd::type_signals_doc::TypeSignalsAuthorityStatus"]
+    direction TB
+    T40_domain_domain_TypeSignalsAuthorityStatus__self[TypeSignalsAuthorityStatus]
+    T40_domain_domain_TypeSignalsAuthorityStatus_Readable[Readable]
+    T40_domain_domain_TypeSignalsAuthorityStatus_Unreadable[Unreadable]
+  end
+  subgraph T33_domain_domain_TypeSignalsCacheKey["tddd::type_signals_doc::TypeSignalsCacheKey"]
+    direction TB
+    T33_domain_domain_TypeSignalsCacheKey__self[TypeSignalsCacheKey]
+    T33_domain_domain_TypeSignalsCacheKey_new([new])
+    T33_domain_domain_TypeSignalsCacheKey_declaration_hash([declaration_hash])
+    T33_domain_domain_TypeSignalsCacheKey_head_commit([head_commit])
+    T33_domain_domain_TypeSignalsCacheKey_baseline_hash([baseline_hash])
+  end
+  subgraph T33_domain_domain_TypeSignalsDocument["tddd::type_signals_doc::TypeSignalsDocument"]
+    direction TB
+    T33_domain_domain_TypeSignalsDocument__self[TypeSignalsDocument]
+    T33_domain_domain_TypeSignalsDocument_new([new])
+    T33_domain_domain_TypeSignalsDocument_with_schema_version([with_schema_version])
+    T33_domain_domain_TypeSignalsDocument_schema_version([schema_version])
+    T33_domain_domain_TypeSignalsDocument_generated_at([generated_at])
+    T33_domain_domain_TypeSignalsDocument_cache_key([cache_key])
+    T33_domain_domain_TypeSignalsDocument_signals([signals])
+  end
+  subgraph T35_domain_domain_TypeSignalsReuseInput["tddd::type_signals_doc::TypeSignalsReuseInput"]
+    direction TB
+    T35_domain_domain_TypeSignalsReuseInput__self[TypeSignalsReuseInput]
+    T35_domain_domain_TypeSignalsReuseInput_verify([verify])
+  end
+  subgraph T39_domain_domain_TypeSignalsWorktreeStatus["tddd::type_signals_doc::TypeSignalsWorktreeStatus"]
+    direction TB
+    T39_domain_domain_TypeSignalsWorktreeStatus__self[TypeSignalsWorktreeStatus]
+    T39_domain_domain_TypeSignalsWorktreeStatus_Clean[Clean]
+    T39_domain_domain_TypeSignalsWorktreeStatus_Dirty[Dirty]
+  end
+  F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse[[decide_type_signals_reuse]]
+  end
+  subgraph domain_domain_module_track["domain::track"]
+    direction TB
+  subgraph T27_domain_domain_TrackMetadata["track::TrackMetadata"]
+    direction TB
+    T27_domain_domain_TrackMetadata__self[TrackMetadata]
+    T27_domain_domain_TrackMetadata_new([new])
+    T27_domain_domain_TrackMetadata_with_branch([with_branch])
+    T27_domain_domain_TrackMetadata_id([id])
+    T27_domain_domain_TrackMetadata_branch([branch])
+    T27_domain_domain_TrackMetadata_is_activated([is_activated])
+    T27_domain_domain_TrackMetadata_set_branch([set_branch])
+    T27_domain_domain_TrackMetadata_title([title])
+    T27_domain_domain_TrackMetadata_status_override([status_override])
+    T27_domain_domain_TrackMetadata_set_status_override([set_status_override])
+    T27_domain_domain_TrackMetadata_branch_strategy_snapshot([branch_strategy_snapshot])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_base_merge["usecase::base_merge"]
+    direction TB
+  subgraph T39_usecase_usecase_BaseMergeAttemptOutcome["base_merge::BaseMergeAttemptOutcome"]
+    direction TB
+    T39_usecase_usecase_BaseMergeAttemptOutcome__self[BaseMergeAttemptOutcome]
+    T39_usecase_usecase_BaseMergeAttemptOutcome_Clean[Clean]
+    T39_usecase_usecase_BaseMergeAttemptOutcome_Conflicted[Conflicted]
+  end
+  subgraph T39_usecase_usecase_BaseMergeCleanupRequest["base_merge::BaseMergeCleanupRequest"]
+    direction TB
+    T39_usecase_usecase_BaseMergeCleanupRequest__self[BaseMergeCleanupRequest]
+  end
+  subgraph T32_usecase_usecase_BaseMergeCommand["base_merge::BaseMergeCommand"]
+    direction TB
+    T32_usecase_usecase_BaseMergeCommand__self[BaseMergeCommand]
+  end
+  subgraph T37_usecase_usecase_BaseMergeContextError["base_merge::BaseMergeContextError"]
+    direction TB
+    T37_usecase_usecase_BaseMergeContextError__self[BaseMergeContextError]
+    T37_usecase_usecase_BaseMergeContextError_Unavailable[Unavailable]
+    T37_usecase_usecase_BaseMergeContextError_ActiveTrackMismatch[ActiveTrackMismatch]
+  end
+  subgraph T30_usecase_usecase_BaseMergeError["base_merge::BaseMergeError"]
+    direction TB
+    T30_usecase_usecase_BaseMergeError__self[BaseMergeError]
+    T30_usecase_usecase_BaseMergeError_Context[Context]
+    T30_usecase_usecase_BaseMergeError_ActiveTrackMismatch[ActiveTrackMismatch]
+    T30_usecase_usecase_BaseMergeError_Git[Git]
+    T30_usecase_usecase_BaseMergeError_DirtyWorktree[DirtyWorktree]
+    T30_usecase_usecase_BaseMergeError_PostMergeCleanup[PostMergeCleanup]
+    T30_usecase_usecase_BaseMergeError_ConflictedCleanupFailed[ConflictedCleanupFailed]
+  end
+  subgraph T33_usecase_usecase_BaseMergeGitError["base_merge::BaseMergeGitError"]
+    direction TB
+    T33_usecase_usecase_BaseMergeGitError__self[BaseMergeGitError]
+    T33_usecase_usecase_BaseMergeGitError_Execution[Execution]
+    T33_usecase_usecase_BaseMergeGitError_DirtyWorktree[DirtyWorktree]
+  end
+  subgraph T35_usecase_usecase_BaseMergeInteractor["base_merge::BaseMergeInteractor"]
+    direction TB
+    T35_usecase_usecase_BaseMergeInteractor__self[BaseMergeInteractor]
+    T35_usecase_usecase_BaseMergeInteractor_new([new])
+  end
+  subgraph T32_usecase_usecase_BaseMergeOutcome["base_merge::BaseMergeOutcome"]
+    direction TB
+    T32_usecase_usecase_BaseMergeOutcome__self[BaseMergeOutcome]
+    T32_usecase_usecase_BaseMergeOutcome_Completed[Completed]
+    T32_usecase_usecase_BaseMergeOutcome_Conflicted[Conflicted]
+  end
+  subgraph T40_usecase_usecase_BaselineReplacementError["base_merge::BaselineReplacementError"]
+    direction TB
+    T40_usecase_usecase_BaselineReplacementError__self[BaselineReplacementError]
+    T40_usecase_usecase_BaselineReplacementError_Isolation[Isolation]
+    T40_usecase_usecase_BaselineReplacementError_Generation[Generation]
+    T40_usecase_usecase_BaselineReplacementError_Validation[Validation]
+    T40_usecase_usecase_BaselineReplacementError_Publish[Publish]
+  end
+  subgraph T37_usecase_usecase_PostMergeCleanupError["base_merge::PostMergeCleanupError"]
+    direction TB
+    T37_usecase_usecase_PostMergeCleanupError__self[PostMergeCleanupError]
+    T37_usecase_usecase_PostMergeCleanupError_Views[Views]
+    T37_usecase_usecase_PostMergeCleanupError_Baseline[Baseline]
+  end
+  subgraph T38_usecase_usecase_ViewsRegenerationError["base_merge::ViewsRegenerationError"]
+    direction TB
+    T38_usecase_usecase_ViewsRegenerationError__self[ViewsRegenerationError]
+    T38_usecase_usecase_ViewsRegenerationError_Regeneration[Regeneration]
+  end
+  subgraph R36_usecase_usecase_BaseMergeCleanupPort["base_merge::BaseMergeCleanupPort"]
+    direction TB
+    R36_usecase_usecase_BaseMergeCleanupPort__self[BaseMergeCleanupPort]
+    R36_usecase_usecase_BaseMergeCleanupPort_regenerate_views([regenerate_views])
+    R36_usecase_usecase_BaseMergeCleanupPort_replace_baselines([replace_baselines])
+  end
+  subgraph R36_usecase_usecase_BaseMergeContextPort["base_merge::BaseMergeContextPort"]
+    direction TB
+    R36_usecase_usecase_BaseMergeContextPort__self[BaseMergeContextPort]
+    R36_usecase_usecase_BaseMergeContextPort_load_direction([load_direction])
+  end
+  subgraph R32_usecase_usecase_BaseMergeGitPort["base_merge::BaseMergeGitPort"]
+    direction TB
+    R32_usecase_usecase_BaseMergeGitPort__self[BaseMergeGitPort]
+    R32_usecase_usecase_BaseMergeGitPort_ensure_worktree_clean([ensure_worktree_clean])
+    R32_usecase_usecase_BaseMergeGitPort_merge_base([merge_base])
+  end
+  subgraph R32_usecase_usecase_BaseMergeService["base_merge::BaseMergeService"]
+    direction TB
+    R32_usecase_usecase_BaseMergeService__self[BaseMergeService]
+    R32_usecase_usecase_BaseMergeService_execute([execute])
+  end
+  end
+  subgraph usecase_usecase_module_git_stash["usecase::git_stash"]
+    direction TB
+  subgraph T34_usecase_usecase_GitStashInteractor["git_stash::GitStashInteractor"]
+    direction TB
+    T34_usecase_usecase_GitStashInteractor__self[GitStashInteractor]
+    T34_usecase_usecase_GitStashInteractor_new([new])
+  end
+  subgraph T32_usecase_usecase_GitStashPopError["git_stash::GitStashPopError"]
+    direction TB
+    T32_usecase_usecase_GitStashPopError__self[GitStashPopError]
+    T32_usecase_usecase_GitStashPopError_ForbiddenBranchRefUpdate[ForbiddenBranchRefUpdate]
+    T32_usecase_usecase_GitStashPopError_NoPendingGuardedStash[NoPendingGuardedStash]
+    T32_usecase_usecase_GitStashPopError_Unavailable[Unavailable]
+    T32_usecase_usecase_GitStashPopError_StashIdentityMissing[StashIdentityMissing]
+  end
+  subgraph T33_usecase_usecase_GitStashPushError["git_stash::GitStashPushError"]
+    direction TB
+    T33_usecase_usecase_GitStashPushError__self[GitStashPushError]
+    T33_usecase_usecase_GitStashPushError_ForbiddenBranchRefUpdate[ForbiddenBranchRefUpdate]
+    T33_usecase_usecase_GitStashPushError_PendingGuardedStashExists[PendingGuardedStashExists]
+    T33_usecase_usecase_GitStashPushError_Unavailable[Unavailable]
+  end
+  subgraph T35_usecase_usecase_GitStashPushOutcome["git_stash::GitStashPushOutcome"]
+    direction TB
+    T35_usecase_usecase_GitStashPushOutcome__self[GitStashPushOutcome]
+    T35_usecase_usecase_GitStashPushOutcome_Created[Created]
+    T35_usecase_usecase_GitStashPushOutcome_NothingToStash[NothingToStash]
+  end
+  subgraph R28_usecase_usecase_GitStashPort["git_stash::GitStashPort"]
+    direction TB
+    R28_usecase_usecase_GitStashPort__self[GitStashPort]
+    R28_usecase_usecase_GitStashPort_push([push])
+    R28_usecase_usecase_GitStashPort_pop([pop])
+  end
+  subgraph R31_usecase_usecase_GitStashService["git_stash::GitStashService"]
+    direction TB
+    R31_usecase_usecase_GitStashService__self[GitStashService]
+    R31_usecase_usecase_GitStashService_push([push])
+    R31_usecase_usecase_GitStashService_pop([pop])
+  end
+  end
+  subgraph usecase_usecase_module_merge_gate["usecase::merge_gate"]
+    direction TB
+  subgraph R31_usecase_usecase_TrackBlobReader["merge_gate::TrackBlobReader"]
+    direction TB
+    R31_usecase_usecase_TrackBlobReader__self[TrackBlobReader]
+    R31_usecase_usecase_TrackBlobReader_read_spec_document([read_spec_document])
+    R31_usecase_usecase_TrackBlobReader_read_type_catalogue([read_type_catalogue])
+    R31_usecase_usecase_TrackBlobReader_read_impl_plan([read_impl_plan])
+    R31_usecase_usecase_TrackBlobReader_read_enabled_layers([read_enabled_layers])
+    R31_usecase_usecase_TrackBlobReader_read_catalogue_for_spec_ref_check([read_catalogue_for_spec_ref_check])
+    R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signals_document([read_catalogue_spec_signals_document])
+    R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signal_opted_in_layers([read_catalogue_spec_signal_opted_in_layers])
+    R31_usecase_usecase_TrackBlobReader_read_type_signals([read_type_signals])
+    R31_usecase_usecase_TrackBlobReader_read_adr_verify_report([read_adr_verify_report])
+  end
+  end
+  subgraph usecase_usecase_module_type_signals["usecase::type_signals"]
+    direction TB
+  subgraph T32_usecase_usecase_TypeSignalsError["type_signals::service::TypeSignalsError"]
+    direction TB
+    T32_usecase_usecase_TypeSignalsError__self[TypeSignalsError]
+    T32_usecase_usecase_TypeSignalsError_BranchTrackMismatch[BranchTrackMismatch]
+    T32_usecase_usecase_TypeSignalsError_LayerBindingsLoad[LayerBindingsLoad]
+    T32_usecase_usecase_TypeSignalsError_NoLayers[NoLayers]
+    T32_usecase_usecase_TypeSignalsError_FeatureDeclaration[FeatureDeclaration]
+    T32_usecase_usecase_TypeSignalsError_AuthoritativeInputFailed[AuthoritativeInputFailed]
+    T32_usecase_usecase_TypeSignalsError_EvaluationFailed[EvaluationFailed]
+    T32_usecase_usecase_TypeSignalsError_CacheWriteFailed[CacheWriteFailed]
+    T32_usecase_usecase_TypeSignalsError_InconsistentRequest[InconsistentRequest]
+  end
+  subgraph T41_usecase_usecase_TypeSignalsExecutionError["type_signals::ports::TypeSignalsExecutionError"]
+    direction TB
+    T41_usecase_usecase_TypeSignalsExecutionError__self[TypeSignalsExecutionError]
+    T41_usecase_usecase_TypeSignalsExecutionError_AuthoritativeInput[AuthoritativeInput]
+    T41_usecase_usecase_TypeSignalsExecutionError_Evaluation[Evaluation]
+    T41_usecase_usecase_TypeSignalsExecutionError_CacheWrite[CacheWrite]
+  end
+  subgraph T37_usecase_usecase_TypeSignalsInteractor["type_signals::interactor::TypeSignalsInteractor"]
+    direction TB
+    T37_usecase_usecase_TypeSignalsInteractor__self[TypeSignalsInteractor]
+    T37_usecase_usecase_TypeSignalsInteractor_new([new])
+  end
+  subgraph R39_usecase_usecase_TypeSignalsExecutorPort["type_signals::ports::TypeSignalsExecutorPort"]
+    direction TB
+    R39_usecase_usecase_TypeSignalsExecutorPort__self[TypeSignalsExecutorPort]
+    R39_usecase_usecase_TypeSignalsExecutorPort_evaluate_layer([evaluate_layer])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_base_merge["infrastructure::base_merge"]
+    direction TB
+  subgraph T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter["base_merge::FsBaseMergeCleanupAdapter"]
+    direction TB
+    T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter__self[FsBaseMergeCleanupAdapter]
+    T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter_new([new])
+  end
+  subgraph T55_infrastructure_infrastructure_FsBaseMergeContextAdapter["base_merge::FsBaseMergeContextAdapter"]
+    direction TB
+    T55_infrastructure_infrastructure_FsBaseMergeContextAdapter__self[FsBaseMergeContextAdapter]
+    T55_infrastructure_infrastructure_FsBaseMergeContextAdapter_new([new])
+  end
+  subgraph T51_infrastructure_infrastructure_FsBaseMergeGitAdapter["base_merge::FsBaseMergeGitAdapter"]
+    direction TB
+    T51_infrastructure_infrastructure_FsBaseMergeGitAdapter__self[FsBaseMergeGitAdapter]
+    T51_infrastructure_infrastructure_FsBaseMergeGitAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_git_stash["infrastructure::git_stash"]
+    direction TB
+  subgraph T47_infrastructure_infrastructure_FsGitStashAdapter["git_stash::FsGitStashAdapter"]
+    direction TB
+    T47_infrastructure_infrastructure_FsGitStashAdapter__self[FsGitStashAdapter]
+    T47_infrastructure_infrastructure_FsGitStashAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T50_infrastructure_infrastructure_EvaluateSignalsError["tddd::type_signals_evaluator::EvaluateSignalsError"]
+    direction TB
+    T50_infrastructure_infrastructure_EvaluateSignalsError__self[EvaluateSignalsError]
+    T50_infrastructure_infrastructure_EvaluateSignalsError_AuthoritativeInput[AuthoritativeInput]
+    T50_infrastructure_infrastructure_EvaluateSignalsError_Evaluation[Evaluation]
+    T50_infrastructure_infrastructure_EvaluateSignalsError_CacheWrite[CacheWrite]
+  end
+  subgraph T51_infrastructure_infrastructure_TypeSignalsCodecError["tddd::type_signals_codec::TypeSignalsCodecError"]
+    direction TB
+    T51_infrastructure_infrastructure_TypeSignalsCodecError__self[TypeSignalsCodecError]
+    T51_infrastructure_infrastructure_TypeSignalsCodecError_Json[Json]
+    T51_infrastructure_infrastructure_TypeSignalsCodecError_UnsupportedSchemaVersion[UnsupportedSchemaVersion]
+    T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidSchemaVersion[InvalidSchemaVersion]
+    T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidTimestamp[InvalidTimestamp]
+    T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidDigest[InvalidDigest]
+    T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidSignal[InvalidSignal]
+  end
+  subgraph T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter["tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"]
+    direction TB
+    T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self[TypeSignalsExecutorAdapter]
+    T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter_new([new])
+  end
+  F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__decode[[decode]]
+  F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__encode[[encode]]
+  F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer[[execute_type_signals_for_layer]]
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_git["cli_driver::git"]
+    direction TB
+  subgraph T31_cli_driver_cli_driver_GitDriver["git::GitDriver"]
+    direction TB
+    T31_cli_driver_cli_driver_GitDriver__self[GitDriver]
+    T31_cli_driver_cli_driver_GitDriver_new([new])
+    T31_cli_driver_cli_driver_GitDriver_handle_stash([handle_stash])
+    T31_cli_driver_cli_driver_GitDriver_handle([handle])
+  end
+  subgraph T35_cli_driver_cli_driver_GitStashInput["git::GitStashInput"]
+    direction TB
+    T35_cli_driver_cli_driver_GitStashInput__self[GitStashInput]
+    T35_cli_driver_cli_driver_GitStashInput_Push[Push]
+    T35_cli_driver_cli_driver_GitStashInput_Pop[Pop]
+  end
+  end
+  subgraph cli_driver_cli_driver_module_track["cli_driver::track"]
+    direction TB
+  subgraph T36_cli_driver_cli_driver_BaseMergeInput["track::BaseMergeInput"]
+    direction TB
+    T36_cli_driver_cli_driver_BaseMergeInput__self[BaseMergeInput]
+  end
+  subgraph T33_cli_driver_cli_driver_TrackDriver["track::TrackDriver"]
+    direction TB
+    T33_cli_driver_cli_driver_TrackDriver__self[TrackDriver]
+    T33_cli_driver_cli_driver_TrackDriver_new([new])
+    T33_cli_driver_cli_driver_TrackDriver_handle_base_merge([handle_base_merge])
+    T33_cli_driver_cli_driver_TrackDriver_handle([handle])
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T18_cli_cli_GitCommand["commands::git::GitCommand"]
+    direction TB
+    T18_cli_cli_GitCommand__self[GitCommand]
+    T18_cli_cli_GitCommand_AddAll[AddAll]
+    T18_cli_cli_GitCommand_AddFromFile[AddFromFile]
+    T18_cli_cli_GitCommand_CommitFromFile[CommitFromFile]
+    T18_cli_cli_GitCommand_NoteFromFile[NoteFromFile]
+    T18_cli_cli_GitCommand_Sync[Sync]
+    T18_cli_cli_GitCommand_Unstage[Unstage]
+    T18_cli_cli_GitCommand_Stash[Stash]
+  end
+  subgraph T22_cli_cli_GitStashAction["commands::git::GitStashAction"]
+    direction TB
+    T22_cli_cli_GitStashAction__self[GitStashAction]
+    T22_cli_cli_GitStashAction_Push[Push]
+    T22_cli_cli_GitStashAction_Pop[Pop]
+  end
+  subgraph T20_cli_cli_TrackCommand["commands::track::TrackCommand"]
+    direction TB
+    T20_cli_cli_TrackCommand__self[TrackCommand]
+    T20_cli_cli_TrackCommand_Archive[Archive]
+    T20_cli_cli_TrackCommand_Transition[Transition]
+    T20_cli_cli_TrackCommand_Branch[Branch]
+    T20_cli_cli_TrackCommand_Resolve[Resolve]
+    T20_cli_cli_TrackCommand_Views[Views]
+    T20_cli_cli_TrackCommand_AddTask[AddTask]
+    T20_cli_cli_TrackCommand_SetOverride[SetOverride]
+    T20_cli_cli_TrackCommand_ClearOverride[ClearOverride]
+    T20_cli_cli_TrackCommand_NextTask[NextTask]
+    T20_cli_cli_TrackCommand_TaskCounts[TaskCounts]
+    T20_cli_cli_TrackCommand_TypeGraph[TypeGraph]
+    T20_cli_cli_TrackCommand_BaselineGraph[BaselineGraph]
+    T20_cli_cli_TrackCommand_ContractMap[ContractMap]
+    T20_cli_cli_TrackCommand_SpecElementHash[SpecElementHash]
+    T20_cli_cli_TrackCommand_BaselineCapture[BaselineCapture]
+    T20_cli_cli_TrackCommand_FixpointResolve[FixpointResolve]
+    T20_cli_cli_TrackCommand_SetCommitHash[SetCommitHash]
+    T20_cli_cli_TrackCommand_Lint[Lint]
+    T20_cli_cli_TrackCommand_CatalogueImplSignals[CatalogueImplSignals]
+    T20_cli_cli_TrackCommand_SwitchBase[SwitchBase]
+    T20_cli_cli_TrackCommand_MergeBase[MergeBase]
+  end
+  F35_cli_cli_cli__commands__git__execute[[execute]]
+  F76_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_dependencies[[dispatch_track_cmd_with_dependencies]]
+  end
+end
+T28_domain_domain_BaseBranchName_try_new --> T28_domain_domain_BaseBranchName__self
+T32_domain_domain_BaseMergeDirection_source --> T28_domain_domain_BaseBranchName__self
+F66_domain_domain_domain__branch_strategy__derive_base_merge_direction --o T27_domain_domain_TrackMetadata__self
+F66_domain_domain_domain__branch_strategy__derive_base_merge_direction --> T32_domain_domain_BaseMergeDirection__self
+F66_domain_domain_domain__branch_strategy__derive_base_merge_direction --> T37_domain_domain_BaseMergeDirectionError__self
+T24_domain_domain_CommitHash_try_new --> T24_domain_domain_CommitHash__self
+T26_domain_domain_BaselineHash_new --> T26_domain_domain_BaselineHash__self
+T33_domain_domain_TypeSignalsCacheKey_new --o T24_domain_domain_CommitHash__self
+T33_domain_domain_TypeSignalsCacheKey_new --o T26_domain_domain_BaselineHash__self
+T33_domain_domain_TypeSignalsCacheKey_new --> T33_domain_domain_TypeSignalsCacheKey__self
+T33_domain_domain_TypeSignalsCacheKey_head_commit --> T24_domain_domain_CommitHash__self
+T33_domain_domain_TypeSignalsCacheKey_baseline_hash --> T26_domain_domain_BaselineHash__self
+T33_domain_domain_TypeSignalsDocument_new --o T33_domain_domain_TypeSignalsCacheKey__self
+T33_domain_domain_TypeSignalsDocument_new --> T33_domain_domain_TypeSignalsDocument__self
+T33_domain_domain_TypeSignalsDocument_with_schema_version --o T33_domain_domain_TypeSignalsCacheKey__self
+T33_domain_domain_TypeSignalsDocument_with_schema_version --> T33_domain_domain_TypeSignalsDocument__self
+T33_domain_domain_TypeSignalsDocument_cache_key --> T33_domain_domain_TypeSignalsCacheKey__self
+T35_domain_domain_TypeSignalsReuseInput_verify --o T33_domain_domain_TypeSignalsCacheKey__self
+T35_domain_domain_TypeSignalsReuseInput_verify --o T33_domain_domain_TypeSignalsCacheKey__self
+T35_domain_domain_TypeSignalsReuseInput_verify --o T39_domain_domain_TypeSignalsWorktreeStatus__self
+T35_domain_domain_TypeSignalsReuseInput_verify --o T40_domain_domain_TypeSignalsAuthorityStatus__self
+T35_domain_domain_TypeSignalsReuseInput_verify --> T35_domain_domain_TypeSignalsReuseInput__self
+F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse --o T35_domain_domain_TypeSignalsReuseInput__self
+T27_domain_domain_TrackMetadata_new --> T27_domain_domain_TrackMetadata__self
+T27_domain_domain_TrackMetadata_with_branch --> T27_domain_domain_TrackMetadata__self
+T39_usecase_usecase_BaseMergeAttemptOutcome_Clean --o|base_commit| T24_domain_domain_CommitHash__self
+T39_usecase_usecase_BaseMergeAttemptOutcome_Conflicted --o|base_commit| T24_domain_domain_CommitHash__self
+T39_usecase_usecase_BaseMergeCleanupRequest__self --o|base_branch| T28_domain_domain_BaseBranchName__self
+T39_usecase_usecase_BaseMergeCleanupRequest__self --o|base_commit| T24_domain_domain_CommitHash__self
+T30_usecase_usecase_BaseMergeError_PostMergeCleanup --o T37_usecase_usecase_PostMergeCleanupError__self
+T30_usecase_usecase_BaseMergeError_ConflictedCleanupFailed --o T37_usecase_usecase_PostMergeCleanupError__self
+T35_usecase_usecase_BaseMergeInteractor_new --o R36_usecase_usecase_BaseMergeContextPort__self
+T35_usecase_usecase_BaseMergeInteractor_new --o R32_usecase_usecase_BaseMergeGitPort__self
+T35_usecase_usecase_BaseMergeInteractor_new --o R36_usecase_usecase_BaseMergeCleanupPort__self
+T35_usecase_usecase_BaseMergeInteractor_new --> T35_usecase_usecase_BaseMergeInteractor__self
+T37_usecase_usecase_PostMergeCleanupError_Views --o T38_usecase_usecase_ViewsRegenerationError__self
+T37_usecase_usecase_PostMergeCleanupError_Baseline --o T40_usecase_usecase_BaselineReplacementError__self
+R36_usecase_usecase_BaseMergeCleanupPort_regenerate_views --o T39_usecase_usecase_BaseMergeCleanupRequest__self
+R36_usecase_usecase_BaseMergeCleanupPort_regenerate_views --> T38_usecase_usecase_ViewsRegenerationError__self
+R36_usecase_usecase_BaseMergeCleanupPort_replace_baselines --o T39_usecase_usecase_BaseMergeCleanupRequest__self
+R36_usecase_usecase_BaseMergeCleanupPort_replace_baselines --> T40_usecase_usecase_BaselineReplacementError__self
+R36_usecase_usecase_BaseMergeContextPort_load_direction --> T37_usecase_usecase_BaseMergeContextError__self
+R36_usecase_usecase_BaseMergeContextPort_load_direction --> T32_domain_domain_BaseMergeDirection__self
+R32_usecase_usecase_BaseMergeGitPort_ensure_worktree_clean --> T33_usecase_usecase_BaseMergeGitError__self
+R32_usecase_usecase_BaseMergeGitPort_merge_base --o T32_domain_domain_BaseMergeDirection__self
+R32_usecase_usecase_BaseMergeGitPort_merge_base --> T39_usecase_usecase_BaseMergeAttemptOutcome__self
+R32_usecase_usecase_BaseMergeGitPort_merge_base --> T33_usecase_usecase_BaseMergeGitError__self
+R32_usecase_usecase_BaseMergeService_execute --o T32_usecase_usecase_BaseMergeCommand__self
+R32_usecase_usecase_BaseMergeService_execute --> T30_usecase_usecase_BaseMergeError__self
+R32_usecase_usecase_BaseMergeService_execute --> T32_usecase_usecase_BaseMergeOutcome__self
+T34_usecase_usecase_GitStashInteractor_new --o R28_usecase_usecase_GitStashPort__self
+T34_usecase_usecase_GitStashInteractor_new --> T34_usecase_usecase_GitStashInteractor__self
+T32_usecase_usecase_GitStashPopError_StashIdentityMissing --o T24_domain_domain_CommitHash__self
+T35_usecase_usecase_GitStashPushOutcome_Created --o T24_domain_domain_CommitHash__self
+R28_usecase_usecase_GitStashPort_push --> T33_usecase_usecase_GitStashPushError__self
+R28_usecase_usecase_GitStashPort_push --> T35_usecase_usecase_GitStashPushOutcome__self
+R28_usecase_usecase_GitStashPort_pop --> T32_usecase_usecase_GitStashPopError__self
+R31_usecase_usecase_GitStashService_push --> T33_usecase_usecase_GitStashPushError__self
+R31_usecase_usecase_GitStashService_push --> T35_usecase_usecase_GitStashPushOutcome__self
+R31_usecase_usecase_GitStashService_pop --> T32_usecase_usecase_GitStashPopError__self
+R31_usecase_usecase_TrackBlobReader_read_type_signals --> T33_domain_domain_TypeSignalsDocument__self
+T37_usecase_usecase_TypeSignalsInteractor_new --o R39_usecase_usecase_TypeSignalsExecutorPort__self
+T37_usecase_usecase_TypeSignalsInteractor_new --> T37_usecase_usecase_TypeSignalsInteractor__self
+R39_usecase_usecase_TypeSignalsExecutorPort_evaluate_layer --> T41_usecase_usecase_TypeSignalsExecutionError__self
+T35_usecase_usecase_BaseMergeInteractor__self -.impl.-> R32_usecase_usecase_BaseMergeService__self
+T34_usecase_usecase_GitStashInteractor__self -.impl.-> R31_usecase_usecase_GitStashService__self
+T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter_new --> T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter__self
+T55_infrastructure_infrastructure_FsBaseMergeContextAdapter_new --> T55_infrastructure_infrastructure_FsBaseMergeContextAdapter__self
+T51_infrastructure_infrastructure_FsBaseMergeGitAdapter_new --> T51_infrastructure_infrastructure_FsBaseMergeGitAdapter__self
+T47_infrastructure_infrastructure_FsGitStashAdapter_new --> T47_infrastructure_infrastructure_FsGitStashAdapter__self
+T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter_new --> T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self
+F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__decode --> T51_infrastructure_infrastructure_TypeSignalsCodecError__self
+F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__decode --> T33_domain_domain_TypeSignalsDocument__self
+F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__encode --o T33_domain_domain_TypeSignalsDocument__self
+F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__encode --> T51_infrastructure_infrastructure_TypeSignalsCodecError__self
+F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer --> T50_infrastructure_infrastructure_EvaluateSignalsError__self
+T55_infrastructure_infrastructure_FsBaseMergeContextAdapter__self -.impl.-> R36_usecase_usecase_BaseMergeContextPort__self
+T51_infrastructure_infrastructure_FsBaseMergeGitAdapter__self -.impl.-> R32_usecase_usecase_BaseMergeGitPort__self
+T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter__self -.impl.-> R36_usecase_usecase_BaseMergeCleanupPort__self
+T47_infrastructure_infrastructure_FsGitStashAdapter__self -.impl.-> R28_usecase_usecase_GitStashPort__self
+T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self -.impl.-> R39_usecase_usecase_TypeSignalsExecutorPort__self
+T31_cli_driver_cli_driver_GitDriver_new --o R31_usecase_usecase_GitStashService__self
+T31_cli_driver_cli_driver_GitDriver_new --> T31_cli_driver_cli_driver_GitDriver__self
+T31_cli_driver_cli_driver_GitDriver_handle_stash --o T35_cli_driver_cli_driver_GitStashInput__self
+T33_cli_driver_cli_driver_TrackDriver_new --o R32_usecase_usecase_BaseMergeService__self
+T33_cli_driver_cli_driver_TrackDriver_new --> T33_cli_driver_cli_driver_TrackDriver__self
+T33_cli_driver_cli_driver_TrackDriver_handle_base_merge --o T36_cli_driver_cli_driver_BaseMergeInput__self
+T18_cli_cli_GitCommand_Stash --o T22_cli_cli_GitStashAction__self
+F35_cli_cli_cli__commands__git__execute --o T18_cli_cli_GitCommand__self
+F76_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_dependencies --o T20_cli_cli_TrackCommand__self
+class T28_domain_domain_BaseBranchName_try_new method_node
+class T28_domain_domain_BaseBranchName_as_str method_node
+class T28_domain_domain_BaseBranchName__self value_object
+class T32_domain_domain_BaseMergeDirection_track_id method_node
+class T32_domain_domain_BaseMergeDirection_active_track method_node
+class T32_domain_domain_BaseMergeDirection_source method_node
+class T32_domain_domain_BaseMergeDirection__self value_object
+class T37_domain_domain_BaseMergeDirectionError_InactiveTrack variant_node
+class T37_domain_domain_BaseMergeDirectionError_InvalidBaseName variant_node
+class T37_domain_domain_BaseMergeDirectionError__self error_type
+class F66_domain_domain_domain__branch_strategy__derive_base_merge_direction free_function
+class F66_domain_domain_domain__branch_strategy__derive_base_merge_direction function_node
+class T24_domain_domain_CommitHash_try_new method_node
+class T24_domain_domain_CommitHash__self value_object
+class T26_domain_domain_BaselineHash_new method_node
+class T26_domain_domain_BaselineHash_as_digest method_node
+class T26_domain_domain_BaselineHash__self value_object
+class T40_domain_domain_TypeSignalsAuthorityStatus_Readable variant_node
+class T40_domain_domain_TypeSignalsAuthorityStatus_Unreadable variant_node
+class T40_domain_domain_TypeSignalsAuthorityStatus__self value_object
+class T33_domain_domain_TypeSignalsCacheKey_new method_node
+class T33_domain_domain_TypeSignalsCacheKey_declaration_hash method_node
+class T33_domain_domain_TypeSignalsCacheKey_head_commit method_node
+class T33_domain_domain_TypeSignalsCacheKey_baseline_hash method_node
+class T33_domain_domain_TypeSignalsCacheKey__self value_object
+class T33_domain_domain_TypeSignalsDocument_new method_node
+class T33_domain_domain_TypeSignalsDocument_with_schema_version method_node
+class T33_domain_domain_TypeSignalsDocument_schema_version method_node
+class T33_domain_domain_TypeSignalsDocument_generated_at method_node
+class T33_domain_domain_TypeSignalsDocument_cache_key method_node
+class T33_domain_domain_TypeSignalsDocument_signals method_node
+class T33_domain_domain_TypeSignalsDocument__self value_object
+class T35_domain_domain_TypeSignalsReuseInput_verify method_node
+class T35_domain_domain_TypeSignalsReuseInput__self value_object
+class T39_domain_domain_TypeSignalsWorktreeStatus_Clean variant_node
+class T39_domain_domain_TypeSignalsWorktreeStatus_Dirty variant_node
+class T39_domain_domain_TypeSignalsWorktreeStatus__self value_object
+class F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse free_function
+class F71_domain_domain_domain__tddd__type_signals_doc__decide_type_signals_reuse function_node
+class T27_domain_domain_TrackMetadata_new method_node
+class T27_domain_domain_TrackMetadata_with_branch method_node
+class T27_domain_domain_TrackMetadata_id method_node
+class T27_domain_domain_TrackMetadata_branch method_node
+class T27_domain_domain_TrackMetadata_is_activated method_node
+class T27_domain_domain_TrackMetadata_set_branch method_node
+class T27_domain_domain_TrackMetadata_title method_node
+class T27_domain_domain_TrackMetadata_status_override method_node
+class T27_domain_domain_TrackMetadata_set_status_override method_node
+class T27_domain_domain_TrackMetadata_branch_strategy_snapshot method_node
+class T27_domain_domain_TrackMetadata__self aggregate_root
+class T39_usecase_usecase_BaseMergeAttemptOutcome_Clean variant_node
+class T39_usecase_usecase_BaseMergeAttemptOutcome_Conflicted variant_node
+class T39_usecase_usecase_BaseMergeAttemptOutcome__self dto
+class T39_usecase_usecase_BaseMergeCleanupRequest__self dto
+class T32_usecase_usecase_BaseMergeCommand__self command
+class T37_usecase_usecase_BaseMergeContextError_Unavailable variant_node
+class T37_usecase_usecase_BaseMergeContextError_ActiveTrackMismatch variant_node
+class T37_usecase_usecase_BaseMergeContextError__self error_type
+class T30_usecase_usecase_BaseMergeError_Context variant_node
+class T30_usecase_usecase_BaseMergeError_ActiveTrackMismatch variant_node
+class T30_usecase_usecase_BaseMergeError_Git variant_node
+class T30_usecase_usecase_BaseMergeError_DirtyWorktree variant_node
+class T30_usecase_usecase_BaseMergeError_PostMergeCleanup variant_node
+class T30_usecase_usecase_BaseMergeError_ConflictedCleanupFailed variant_node
+class T30_usecase_usecase_BaseMergeError__self error_type
+class T33_usecase_usecase_BaseMergeGitError_Execution variant_node
+class T33_usecase_usecase_BaseMergeGitError_DirtyWorktree variant_node
+class T33_usecase_usecase_BaseMergeGitError__self error_type
+class T35_usecase_usecase_BaseMergeInteractor_new method_node
+class T35_usecase_usecase_BaseMergeInteractor__self interactor
+class T32_usecase_usecase_BaseMergeOutcome_Completed variant_node
+class T32_usecase_usecase_BaseMergeOutcome_Conflicted variant_node
+class T32_usecase_usecase_BaseMergeOutcome__self dto
+class T40_usecase_usecase_BaselineReplacementError_Isolation variant_node
+class T40_usecase_usecase_BaselineReplacementError_Generation variant_node
+class T40_usecase_usecase_BaselineReplacementError_Validation variant_node
+class T40_usecase_usecase_BaselineReplacementError_Publish variant_node
+class T40_usecase_usecase_BaselineReplacementError__self error_type
+class T37_usecase_usecase_PostMergeCleanupError_Views variant_node
+class T37_usecase_usecase_PostMergeCleanupError_Baseline variant_node
+class T37_usecase_usecase_PostMergeCleanupError__self error_type
+class T38_usecase_usecase_ViewsRegenerationError_Regeneration variant_node
+class T38_usecase_usecase_ViewsRegenerationError__self error_type
+class R36_usecase_usecase_BaseMergeCleanupPort_regenerate_views method_node
+class R36_usecase_usecase_BaseMergeCleanupPort_replace_baselines method_node
+class R36_usecase_usecase_BaseMergeCleanupPort__self secondary_port
+class R36_usecase_usecase_BaseMergeContextPort_load_direction method_node
+class R36_usecase_usecase_BaseMergeContextPort__self secondary_port
+class R32_usecase_usecase_BaseMergeGitPort_ensure_worktree_clean method_node
+class R32_usecase_usecase_BaseMergeGitPort_merge_base method_node
+class R32_usecase_usecase_BaseMergeGitPort__self secondary_port
+class R32_usecase_usecase_BaseMergeService_execute method_node
+class R32_usecase_usecase_BaseMergeService__self app_service
+class T34_usecase_usecase_GitStashInteractor_new method_node
+class T34_usecase_usecase_GitStashInteractor__self interactor
+class T32_usecase_usecase_GitStashPopError_ForbiddenBranchRefUpdate variant_node
+class T32_usecase_usecase_GitStashPopError_NoPendingGuardedStash variant_node
+class T32_usecase_usecase_GitStashPopError_Unavailable variant_node
+class T32_usecase_usecase_GitStashPopError_StashIdentityMissing variant_node
+class T32_usecase_usecase_GitStashPopError__self error_type
+class T33_usecase_usecase_GitStashPushError_ForbiddenBranchRefUpdate variant_node
+class T33_usecase_usecase_GitStashPushError_PendingGuardedStashExists variant_node
+class T33_usecase_usecase_GitStashPushError_Unavailable variant_node
+class T33_usecase_usecase_GitStashPushError__self error_type
+class T35_usecase_usecase_GitStashPushOutcome_Created variant_node
+class T35_usecase_usecase_GitStashPushOutcome_NothingToStash variant_node
+class T35_usecase_usecase_GitStashPushOutcome__self value_object
+class R28_usecase_usecase_GitStashPort_push method_node
+class R28_usecase_usecase_GitStashPort_pop method_node
+class R28_usecase_usecase_GitStashPort__self secondary_port
+class R31_usecase_usecase_GitStashService_push method_node
+class R31_usecase_usecase_GitStashService_pop method_node
+class R31_usecase_usecase_GitStashService__self app_service
+class R31_usecase_usecase_TrackBlobReader_read_spec_document method_node
+class R31_usecase_usecase_TrackBlobReader_read_type_catalogue method_node
+class R31_usecase_usecase_TrackBlobReader_read_impl_plan method_node
+class R31_usecase_usecase_TrackBlobReader_read_enabled_layers method_node
+class R31_usecase_usecase_TrackBlobReader_read_catalogue_for_spec_ref_check method_node
+class R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signals_document method_node
+class R31_usecase_usecase_TrackBlobReader_read_catalogue_spec_signal_opted_in_layers method_node
+class R31_usecase_usecase_TrackBlobReader_read_type_signals method_node
+class R31_usecase_usecase_TrackBlobReader_read_adr_verify_report method_node
+class R31_usecase_usecase_TrackBlobReader__self secondary_port
+class T32_usecase_usecase_TypeSignalsError_BranchTrackMismatch variant_node
+class T32_usecase_usecase_TypeSignalsError_LayerBindingsLoad variant_node
+class T32_usecase_usecase_TypeSignalsError_NoLayers variant_node
+class T32_usecase_usecase_TypeSignalsError_FeatureDeclaration variant_node
+class T32_usecase_usecase_TypeSignalsError_AuthoritativeInputFailed variant_node
+class T32_usecase_usecase_TypeSignalsError_EvaluationFailed variant_node
+class T32_usecase_usecase_TypeSignalsError_CacheWriteFailed variant_node
+class T32_usecase_usecase_TypeSignalsError_InconsistentRequest variant_node
+class T32_usecase_usecase_TypeSignalsError__self error_type
+class T41_usecase_usecase_TypeSignalsExecutionError_AuthoritativeInput variant_node
+class T41_usecase_usecase_TypeSignalsExecutionError_Evaluation variant_node
+class T41_usecase_usecase_TypeSignalsExecutionError_CacheWrite variant_node
+class T41_usecase_usecase_TypeSignalsExecutionError__self error_type
+class T37_usecase_usecase_TypeSignalsInteractor_new method_node
+class T37_usecase_usecase_TypeSignalsInteractor__self interactor
+class R39_usecase_usecase_TypeSignalsExecutorPort_evaluate_layer method_node
+class R39_usecase_usecase_TypeSignalsExecutorPort__self secondary_port
+class T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter_new method_node
+class T55_infrastructure_infrastructure_FsBaseMergeCleanupAdapter__self secondary_adapter
+class T55_infrastructure_infrastructure_FsBaseMergeContextAdapter_new method_node
+class T55_infrastructure_infrastructure_FsBaseMergeContextAdapter__self secondary_adapter
+class T51_infrastructure_infrastructure_FsBaseMergeGitAdapter_new method_node
+class T51_infrastructure_infrastructure_FsBaseMergeGitAdapter__self secondary_adapter
+class T47_infrastructure_infrastructure_FsGitStashAdapter_new method_node
+class T47_infrastructure_infrastructure_FsGitStashAdapter__self secondary_adapter
+class T50_infrastructure_infrastructure_EvaluateSignalsError_AuthoritativeInput variant_node
+class T50_infrastructure_infrastructure_EvaluateSignalsError_Evaluation variant_node
+class T50_infrastructure_infrastructure_EvaluateSignalsError_CacheWrite variant_node
+class T50_infrastructure_infrastructure_EvaluateSignalsError__self error_type
+class T51_infrastructure_infrastructure_TypeSignalsCodecError_Json variant_node
+class T51_infrastructure_infrastructure_TypeSignalsCodecError_UnsupportedSchemaVersion variant_node
+class T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidSchemaVersion variant_node
+class T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidTimestamp variant_node
+class T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidDigest variant_node
+class T51_infrastructure_infrastructure_TypeSignalsCodecError_InvalidSignal variant_node
+class T51_infrastructure_infrastructure_TypeSignalsCodecError__self error_type
+class T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter_new method_node
+class T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self secondary_adapter
+class F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__decode free_function
+class F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__decode function_node
+class F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__encode free_function
+class F78_infrastructure_infrastructure_infrastructure__tddd__type_signals_codec__encode function_node
+class F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer free_function
+class F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer function_node
+class T31_cli_driver_cli_driver_GitDriver_new method_node
+class T31_cli_driver_cli_driver_GitDriver_handle_stash method_node
+class T31_cli_driver_cli_driver_GitDriver_handle method_node
+class T31_cli_driver_cli_driver_GitDriver__self primary_adapter
+class T35_cli_driver_cli_driver_GitStashInput_Push variant_node
+class T35_cli_driver_cli_driver_GitStashInput_Pop variant_node
+class T35_cli_driver_cli_driver_GitStashInput__self dto
+class T36_cli_driver_cli_driver_BaseMergeInput__self dto
+class T33_cli_driver_cli_driver_TrackDriver_new method_node
+class T33_cli_driver_cli_driver_TrackDriver_handle_base_merge method_node
+class T33_cli_driver_cli_driver_TrackDriver_handle method_node
+class T33_cli_driver_cli_driver_TrackDriver__self primary_adapter
+class T18_cli_cli_GitCommand_AddAll variant_node
+class T18_cli_cli_GitCommand_AddFromFile variant_node
+class T18_cli_cli_GitCommand_CommitFromFile variant_node
+class T18_cli_cli_GitCommand_NoteFromFile variant_node
+class T18_cli_cli_GitCommand_Sync variant_node
+class T18_cli_cli_GitCommand_Unstage variant_node
+class T18_cli_cli_GitCommand_Stash variant_node
+class T18_cli_cli_GitCommand__self dto
+class T22_cli_cli_GitStashAction_Push variant_node
+class T22_cli_cli_GitStashAction_Pop variant_node
+class T22_cli_cli_GitStashAction__self dto
+class T20_cli_cli_TrackCommand_Archive variant_node
+class T20_cli_cli_TrackCommand_Transition variant_node
+class T20_cli_cli_TrackCommand_Branch variant_node
+class T20_cli_cli_TrackCommand_Resolve variant_node
+class T20_cli_cli_TrackCommand_Views variant_node
+class T20_cli_cli_TrackCommand_AddTask variant_node
+class T20_cli_cli_TrackCommand_SetOverride variant_node
+class T20_cli_cli_TrackCommand_ClearOverride variant_node
+class T20_cli_cli_TrackCommand_NextTask variant_node
+class T20_cli_cli_TrackCommand_TaskCounts variant_node
+class T20_cli_cli_TrackCommand_TypeGraph variant_node
+class T20_cli_cli_TrackCommand_BaselineGraph variant_node
+class T20_cli_cli_TrackCommand_ContractMap variant_node
+class T20_cli_cli_TrackCommand_SpecElementHash variant_node
+class T20_cli_cli_TrackCommand_BaselineCapture variant_node
+class T20_cli_cli_TrackCommand_FixpointResolve variant_node
+class T20_cli_cli_TrackCommand_SetCommitHash variant_node
+class T20_cli_cli_TrackCommand_Lint variant_node
+class T20_cli_cli_TrackCommand_CatalogueImplSignals variant_node
+class T20_cli_cli_TrackCommand_SwitchBase variant_node
+class T20_cli_cli_TrackCommand_MergeBase variant_node
+class T20_cli_cli_TrackCommand__self dto
+class F35_cli_cli_cli__commands__git__execute free_function
+class F35_cli_cli_cli__commands__git__execute function_node
+class F76_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_dependencies free_function
+class F76_cli_cli_cli__commands__track__dispatch__dispatch_track_cmd_with_dependencies function_node
+```

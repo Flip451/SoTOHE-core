@@ -1,0 +1,1039 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CommandTraceValueError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "SotpCommandIdentity"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u16"
+            }
+          ],
+          "returns": "Result<Self, CommandTraceValueError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "value",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u16"
+        }
+      ],
+      "type_name": "CommandFailureRateBasisPoints"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "command",
+              "ty": "SotpCommandIdentity"
+            },
+            {
+              "name": "executions",
+              "ty": "CommandExecutionCount"
+            },
+            {
+              "name": "failures",
+              "ty": "CommandExecutionCount"
+            },
+            {
+              "name": "total_duration",
+              "ty": "CommandDurationMillis"
+            }
+          ],
+          "returns": "Result<Self, CommandTraceValueError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure_rate",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CommandFailureRateBasisPoints"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "command",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&SotpCommandIdentity"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "executions",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CommandExecutionCount"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failures",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CommandExecutionCount"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "total_duration",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CommandDurationMillis"
+        }
+      ],
+      "type_name": "CommandExecutionMetric"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CommandTraceValueError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandTraceValueError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CommandTraceValueError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SotpCommandIdentity",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SotpCommandIdentity",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SotpCommandIdentity",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SotpCommandIdentity",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SotpCommandIdentity",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "CommandDurationMillis",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandDurationMillis",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CommandDurationMillis",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CommandDurationMillis",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CommandDurationMillis",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CommandDurationMillis",
+      "trait_ref": "core::convert::From<u64>"
+    },
+    {
+      "for_type": "CommandDurationMillis",
+      "trait_ref": "core::convert::AsRef<u64>"
+    },
+    {
+      "for_type": "CommandExecutionCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandExecutionCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CommandExecutionCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CommandExecutionCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CommandExecutionCount",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CommandExecutionCount",
+      "trait_ref": "core::convert::From<u64>"
+    },
+    {
+      "for_type": "CommandExecutionCount",
+      "trait_ref": "core::convert::AsRef<u64>"
+    },
+    {
+      "for_type": "CommandFailureRateBasisPoints",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandFailureRateBasisPoints",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CommandFailureRateBasisPoints",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CommandFailureRateBasisPoints",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CommandFailureRateBasisPoints",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CommandExecutionMetric",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CommandExecutionMetric",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CommandExecutionMetric",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CommandExecutionMetric",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TelemetryReportOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TelemetryReportOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TelemetrySkippedLineCount",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TelemetrySkippedLineCount",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TelemetrySkippedLineCount",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TelemetrySkippedLineCount",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TelemetrySkippedLineCount",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TelemetrySkippedLineCount",
+      "trait_ref": "core::convert::From<u64>"
+    },
+    {
+      "for_type": "TelemetrySkippedLineCount",
+      "trait_ref": "core::convert::AsRef<u64>"
+    },
+    {
+      "action": "modify",
+      "for_type": "TelemetryAggregateInteractor",
+      "trait_ref": "TelemetryAggregateService"
+    },
+    {
+      "action": "add",
+      "for_type": "TelemetryAggregateInteractor",
+      "trait_ref": "TelemetryReportService"
+    },
+    {
+      "action": "add",
+      "for_type": "TelemetryAggregateInteractor",
+      "trait_ref": "TelemetryEmitService"
+    },
+    {
+      "action": "add",
+      "for_type": "TelemetryAggregateInteractor",
+      "trait_ref": "TelemetryArchivedService"
+    },
+    {
+      "action": "add",
+      "for_type": "TelemetryEmitInteractor",
+      "trait_ref": "TelemetryEmitService"
+    },
+    {
+      "action": "add",
+      "for_type": "TelemetryArchiveInteractor",
+      "trait_ref": "TelemetryArchivedService"
+    }
+  ],
+  "traits": {
+    "TelemetryAggregateService": {
+      "action": "modify",
+      "docs": "Single driver-facing application service marker composed from report, active emission, and archived-track ports.",
+      "informal_grounds": [],
+      "methods": [],
+      "module_path": "telemetry",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "OUT-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "TelemetryReportService",
+        "TelemetryEmitService",
+        "TelemetryArchivedService",
+        "Send",
+        "Sync"
+      ]
+    },
+    "TelemetryArchivedService": {
+      "action": "add",
+      "docs": "Synchronous (non-async) filesystem-I/O boundary retained for the existing archive workflow; adapters block while writing and return typed failures. The driver-facing track_id string is validated immediately into domain::TrackId by TelemetryAggregateInteractor; items_dir is a technical filesystem boundary; subcommand is unconstrained diagnostic text; exit_code and duration_ms are raw OS/clock measurements.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "emit_archived",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "subcommand",
+              "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "duration_ms",
+              "ty": "u64"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TelemetryAggregateServiceError>"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "OUT-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TelemetryEmitDynamicPort": {
+      "action": "modify",
+      "docs": "Synchronous secondary port exposing the complete emit_active signature; implementations may perform blocking filesystem I/O, while command/error strings remain opaque diagnostics and integer values are raw OS/clock measurements.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "emit_active",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "source_track_id",
+              "ty": "Option<&str>"
+            },
+            {
+              "name": "subcommand",
+              "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "duration_ms",
+              "ty": "u64"
+            },
+            {
+              "name": "error_chain",
+              "ty": "Option<String>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TelemetryEmitDynamicPortError>"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+    {
+      "anchor": "AC-01",
+      "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+    }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TelemetryEmitService": {
+      "action": "add",
+      "docs": "Active-track emission application boundary for the existing telemetry sink; items_dir is a technical filesystem path, command/error strings are opaque diagnostics, and integer values are raw measurements.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "emit_completed",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "source_track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "subcommand",
+              "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "duration_ms",
+              "ty": "u64"
+            },
+            {
+              "name": "error_chain",
+              "ty": "Option<String>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TelemetryAggregateServiceError>"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TelemetryReportService": {
+      "action": "add",
+      "docs": "Synchronous (non-async) filesystem-I/O boundary: report adapters block while reading existing telemetry records and return ReportUnavailable on read failure. The driver-facing track_id string is validated immediately into domain::TrackId by TelemetryAggregateInteractor, and items_dir is a technical filesystem boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "report",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&str"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TelemetryReportOutput, TelemetryAggregateServiceError>"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CommandDurationMillis": {
+      "action": "add",
+      "docs": "Application telemetry duration in milliseconds. Construction and read access use the shared standard From<u64> and AsRef<u64> contracts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "CommandExecutionCount": {
+      "action": "add",
+      "docs": "Count of command executions or failures. Construction and read access use the shared standard From<u64> and AsRef<u64> contracts; zero remains valid for a failure count.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "CommandExecutionMetric": {
+      "action": "add",
+      "docs": "Per-command telemetry output DTO with private state. new is the only public construction path, produces only ZeroExecutions or FailureCountExceedsExecutions, and makes failure_rate defined for every constructed value; typed accessors expose the validated fields.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "CommandFailureRateBasisPoints": {
+      "action": "add",
+      "docs": "Failure rate measured in basis points and validated to the inclusive range 0..=10_000; try_new produces only CommandTraceValueError::FailureRateOutOfRange.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "CommandTraceValueError": {
+      "action": "add",
+      "docs": "Constructor errors with explicit owners: SotpCommandIdentity::try_new produces EmptyCommandIdentity; CommandExecutionMetric::new produces ZeroExecutions or FailureCountExceedsExecutions; CommandFailureRateBasisPoints::try_new produces FailureRateOutOfRange.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyCommandIdentity",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ZeroExecutions",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FailureCountExceedsExecutions",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FailureRateOutOfRange",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "SotpCommandIdentity": {
+      "action": "add",
+      "docs": "Validated non-empty command identity; try_new produces only CommandTraceValueError::EmptyCommandIdentity.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryAggregateInteractor": {
+      "action": "modify",
+      "docs": "Aggregate interactor composing report, active emission, and archived emission interactors behind the driver-facing marker; completion lifecycle is separately injected at the adapter boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "report",
+              "ty": "TelemetryReportInteractor"
+            },
+            {
+              "name": "emit",
+              "ty": "std::sync::Arc<TelemetryEmitInteractor>"
+            },
+            {
+              "name": "archived",
+              "ty": "std::sync::Arc<TelemetryArchiveInteractor>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryArchiveInteractor": {
+      "action": "add",
+      "docs": "Focused interactor for resolving archived-track paths and emitting the existing archived telemetry event.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "git",
+              "ty": "std::sync::Arc<dyn GitPrimitivePort>"
+            },
+            {
+              "name": "archived_factory",
+              "ty": "std::sync::Arc<dyn ArchivedTelemetryFactoryPort>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "emit_archived",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "subcommand",
+              "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "duration_ms",
+              "ty": "u64"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TelemetryAggregateServiceError>"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryEmitInteractor": {
+      "action": "modify",
+      "docs": "Focused interactor for active-track telemetry emission through the existing sink.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "active_emit",
+              "ty": "std::sync::Arc<dyn TelemetryEmitDynamicPort>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "emit_completed",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "source_track_id",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "subcommand",
+              "ty": "String"
+            },
+            {
+              "name": "exit_code",
+              "ty": "i32"
+            },
+            {
+              "name": "duration_ms",
+              "ty": "u64"
+            },
+            {
+              "name": "error_chain",
+              "ty": "Option<String>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TelemetryAggregateServiceError>"
+        }
+      ],
+      "module_path": "telemetry",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetryReportOutput": {
+      "action": "modify",
+      "docs": "Usecase report DTO modified with command_metrics and typed skipped_lines fields.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "phase_durations",
+              "ty": "Vec<TelemetryPhaseDuration>"
+            },
+            {
+              "name": "errors",
+              "ty": "Vec<TelemetryErrorEntry>"
+            },
+            {
+              "name": "hook_blocks",
+              "ty": "Vec<TelemetryHookBlockEntry>"
+            },
+            {
+              "name": "skipped_lines",
+              "ty": "TelemetrySkippedLineCount"
+            },
+            {
+              "name": "command_metrics",
+              "ty": "Vec<CommandExecutionMetric>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    },
+    "TelemetrySkippedLineCount": {
+      "action": "add",
+      "docs": "Count of skipped telemetry records. Construction and read access use the shared standard From<u64> and AsRef<u64> contracts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "telemetry::command_trace",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/2026-08-01-sotp-tracing-instrumentation/spec.json"
+        }
+      ]
+    }
+  }
+}

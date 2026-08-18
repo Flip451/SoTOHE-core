@@ -9,14 +9,84 @@
 //! CN-11 / AC-03).
 
 use crate::TrackId;
+use crate::tddd::catalogue_v2::roles::ItemAction;
+use crate::tddd::catalogue_v2::{MethodDeclaration, TraitEntry};
 use crate::tddd::semantic_verify::CatalogueEntryRef;
 use crate::tddd::test_obligation::errors::TestBindingConsistencyError;
 use crate::tddd::test_obligation::hashes::DeclarationHash;
 use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationEdgeId,
-    TestObligationId,
+    TestObligationId, unavailable_diagnostic_message,
 };
 use crate::tddd::test_obligation::vocab::TargetEntryRoleKind;
+
+/// Validates Add/Modify non-empty `spec_refs` and the parent-action combination
+/// on a trait. Entry-level refs are not an inventory: method refs need not be a
+/// subset of them and need not cover them.
+///
+/// # Errors
+///
+/// Returns a [`DiagnosticMessage`] when an Add/Modify method has empty
+/// `spec_refs`, or a method on a Reference/Delete parent declares any.
+pub fn validate_method_anchor_coverage(entry: &TraitEntry) -> Result<(), DiagnosticMessage> {
+    validate_add_modify_methods_have_spec_refs(entry.methods())?;
+    validate_parent_forbids_method_spec_refs(entry.action(), entry.methods())?;
+    Ok(())
+}
+
+/// Validates that every Add/Modify method declares non-empty `spec_refs`.
+///
+/// # Errors
+///
+/// Returns a [`DiagnosticMessage`] when an Add or Modify method has empty
+/// `spec_refs`.
+pub fn validate_add_modify_methods_have_spec_refs(
+    methods: &[MethodDeclaration],
+) -> Result<(), DiagnosticMessage> {
+    for method in methods {
+        if matches!(method.action(), ItemAction::Add | ItemAction::Modify)
+            && method.spec_refs().is_empty()
+        {
+            return Err(coverage_diag(&format!(
+                "add/modify method '{}' must declare non-empty spec_refs",
+                method.name().as_str(),
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// Rejects non-empty method `spec_refs` when the parent is Reference or Delete.
+///
+/// Combined with [`validate_add_modify_methods_have_spec_refs`], this makes
+/// Add/Modify methods undeclarable on those parents.
+///
+/// # Errors
+///
+/// Returns a [`DiagnosticMessage`] when a method on a Reference/Delete parent
+/// declares any `spec_refs`.
+pub fn validate_parent_forbids_method_spec_refs(
+    parent: ItemAction,
+    methods: &[MethodDeclaration],
+) -> Result<(), DiagnosticMessage> {
+    if !matches!(parent, ItemAction::Reference | ItemAction::Delete) {
+        return Ok(());
+    }
+    for method in methods {
+        if !method.spec_refs().is_empty() {
+            return Err(coverage_diag(&format!(
+                "method '{}' on a reference/delete parent must not declare spec_refs",
+                method.name().as_str(),
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn coverage_diag(detail: &str) -> DiagnosticMessage {
+    DiagnosticMessage::try_new(detail.to_owned())
+        .unwrap_or_else(|_| unavailable_diagnostic_message())
+}
 
 /// A single derived test obligation for one catalogue entry.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -316,6 +386,7 @@ fn stale_obligations_detail(
 mod tests {
     use super::*;
     use crate::ContentHash;
+    use crate::plan_ref::SpecRef;
     use crate::tddd::catalogue_v2::roles::DataRole;
     use crate::tddd::semantic_verify::{CatalogueEntryKey, CatalogueSectionKey};
     use crate::tddd::test_obligation::ids::TestObligationItemIdentifier;
@@ -671,5 +742,214 @@ mod tests {
         assert!(detail.as_str().contains("added=6"));
         assert!(detail.as_str().contains("showing 5 of 6"));
         assert!(detail.as_str().contains("missing_from_artifact"));
+    }
+
+    fn method(name: &str, action: ItemAction, spec_refs: Vec<SpecRef>) -> MethodDeclaration {
+        MethodDeclaration::new(
+            crate::tddd::catalogue_v2::MethodName::new(name).unwrap(),
+            Some(crate::tddd::catalogue_v2::roles::SelfReceiver::SharedRef),
+            vec![],
+            crate::tddd::catalogue_v2::TypeRef::new("()").unwrap(),
+            false,
+            false,
+            vec![],
+            vec![],
+            spec_refs,
+            action,
+            None,
+        )
+    }
+
+    fn spec_ref(anchor: &str) -> SpecRef {
+        SpecRef::new(
+            std::path::PathBuf::from("track/items/x/spec.json"),
+            crate::SpecElementId::try_new(anchor).unwrap(),
+        )
+    }
+
+    #[test]
+    fn test_add_modify_methods_without_spec_refs_are_rejected() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method("load", ItemAction::Add, vec![],)])
+                .is_err()
+        );
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Modify,
+                vec![],
+            )])
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_add_method_with_spec_refs_on_reference_parent_is_rejected() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Reference,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![method("load", ItemAction::Add, vec![spec_ref("IN-99")])],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_err());
+    }
+
+    #[test]
+    fn test_reference_method_need_not_cover_entry_anchors() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Add,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![method("load", ItemAction::Reference, vec![spec_ref("IN-01")])],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_ok());
+    }
+
+    #[test]
+    fn test_method_refs_outside_entry_set_are_accepted() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Add,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![method("load", ItemAction::Add, vec![spec_ref("IN-02")])],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_ok());
+    }
+
+    #[test]
+    fn test_method_refs_that_do_not_cover_entry_set_are_accepted() {
+        let entry = crate::tddd::catalogue_v2::TraitEntry::new(
+            ItemAction::Add,
+            crate::tddd::catalogue_v2::roles::ContractRole::SecondaryPort,
+            vec![
+                method("load", ItemAction::Add, vec![spec_ref("IN-01")]),
+                method("save", ItemAction::Add, vec![spec_ref("IN-01")]),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            crate::tddd::catalogue_v2::ModulePath::root(),
+            None,
+            vec![spec_ref("IN-01"), spec_ref("AC-01")],
+            vec![],
+        );
+        assert!(validate_method_anchor_coverage(&entry).is_ok());
+    }
+
+    #[test]
+    fn test_reference_method_without_spec_refs_is_accepted() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Reference,
+                vec![],
+            )])
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_add_method_with_spec_refs_is_accepted() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Add,
+                vec![spec_ref("IN-14")],
+            )])
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_delete_method_without_spec_refs_is_accepted() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[method(
+                "load",
+                ItemAction::Delete,
+                vec![],
+            )])
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_empty_add_method_is_rejected_even_when_sibling_has_spec_refs() {
+        assert!(
+            validate_add_modify_methods_have_spec_refs(&[
+                method("save", ItemAction::Add, vec![spec_ref("IN-14")]),
+                method("load", ItemAction::Add, vec![]),
+            ])
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_reference_parent_rejects_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Reference,
+                &[method("load", ItemAction::Reference, vec![spec_ref("IN-01")])],
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_delete_parent_rejects_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Delete,
+                &[method("load", ItemAction::Delete, vec![spec_ref("IN-01")])],
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn test_reference_parent_accepts_empty_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Reference,
+                &[method("load", ItemAction::Reference, vec![])],
+            )
+            .is_ok()
+        );
+    }
+
+    #[test]
+    fn test_add_parent_still_allows_method_spec_refs() {
+        assert!(
+            validate_parent_forbids_method_spec_refs(
+                ItemAction::Add,
+                &[method("load", ItemAction::Add, vec![spec_ref("IN-14")])],
+            )
+            .is_ok()
+        );
     }
 }

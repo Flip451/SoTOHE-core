@@ -1,6 +1,7 @@
 ---
 name: researcher
 sandbox: read-only
+grok-sandbox: read-only
 description: Use when Codex is assigned the SoTOHE researcher capability (crate research, codebase-wide analysis, external research). Read-only — never writes files; the orchestrator saves any output that must persist.
 ---
 

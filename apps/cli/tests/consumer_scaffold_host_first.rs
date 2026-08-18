@@ -4,54 +4,406 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
+use std::io::Write;
 use std::path::{Path, PathBuf};
-use std::process::Command;
-use std::sync::OnceLock;
+use std::process::{Command, Stdio};
+use std::sync::{Arc, OnceLock};
 
+use cli_driver::template_export::{TemplateDriver, TemplateExportInput, TemplateInput};
+use domain::FreeText;
+use infrastructure::template_export::{FsTemplateBoundaryManifestAdapter, FsTemplateExportAdapter};
 use tempfile::TempDir;
+use usecase::template_export::{
+    SelfBinaryTransplantError, SelfBinaryTransplantPort, TemplateBoundaryManifestPort,
+    TemplateExportInteractor, TemplateExportPort, TemplateExportService,
+};
 
-static EXPORTED_SCAFFOLD: OnceLock<TempDir> = OnceLock::new();
+static EXPORTED_SCAFFOLD_PATH: OnceLock<PathBuf> = OnceLock::new();
+static EXPORTED_SCAFFOLD_PARENT: OnceLock<PathBuf> = OnceLock::new();
+static EXPORTED_SCAFFOLD_CLEANUP_REGISTERED: OnceLock<()> = OnceLock::new();
+
+extern "C" fn cleanup_exported_scaffold() {
+    if let Some(path) = EXPORTED_SCAFFOLD_PARENT.get()
+        && let Err(error) = fs::remove_dir_all(path)
+        && error.kind() != std::io::ErrorKind::NotFound
+    {
+        let mut stderr = std::io::stderr().lock();
+        let _ = writeln!(
+            stderr,
+            "cannot remove template-export test directory {} at process exit: {error}",
+            path.display()
+        );
+        std::process::abort();
+    }
+}
 
 fn workspace_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..").canonicalize().unwrap()
 }
 
-fn exported_scaffold() -> PathBuf {
-    EXPORTED_SCAFFOLD
-        .get_or_init(|| {
-            let export_parent = tempfile::tempdir().unwrap();
-            let output_dir = export_parent.path().join("scaffold");
-            export_scaffold(&output_dir);
-            export_parent
-        })
-        .path()
-        .join("scaffold")
+fn template_export_temp_parent(
+    cargo_target_tmpdir: Option<PathBuf>,
+    workspace_root: &Path,
+) -> PathBuf {
+    cargo_target_tmpdir
+        .filter(|path| !path.as_os_str().is_empty())
+        .unwrap_or_else(|| workspace_root.join("target/tmp"))
 }
 
-fn export_scaffold(output_dir: &Path) {
-    let root = workspace_root();
+fn template_export_tempdir() -> TempDir {
+    let workspace_root = workspace_root();
+    let parent = template_export_temp_parent(
+        option_env!("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+        &workspace_root,
+    );
+    fs::create_dir_all(&parent).unwrap_or_else(|error| {
+        panic!("cannot create template-export temporary parent {}: {error}", parent.display())
+    });
+    tempfile::tempdir_in(&parent).unwrap_or_else(|error| {
+        panic!("cannot create template-export temporary directory in {}: {error}", parent.display())
+    })
+}
+
+fn machine_home_directory() -> Option<PathBuf> {
+    ["SOTP_MACHINE_HOME", "HOME", "USERPROFILE"].into_iter().find_map(|variable| {
+        std::env::var_os(variable).filter(|value| !value.is_empty()).map(PathBuf::from)
+    })
+}
+
+fn host_first_scaffold_parent(
+    cargo_target_tmpdir: Option<PathBuf>,
+    workspace_root: &Path,
+    process_id: u32,
+) -> PathBuf {
+    template_export_temp_parent(cargo_target_tmpdir, workspace_root)
+        .join(format!("consumer-scaffold-host-first-{process_id}"))
+}
+
+fn git_predicate(workspace_root: &Path, args: &[&str]) -> bool {
+    let status = Command::new("git")
+        .args(args)
+        .current_dir(workspace_root)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .unwrap_or_else(|error| panic!("cannot run git {}: {error}", args.join(" ")));
+
+    match status.code() {
+        Some(0) => true,
+        Some(1) => false,
+        code => panic!("git {} failed with exit code {code:?}", args.join(" ")),
+    }
+}
+
+fn gitignored_untracked(workspace_root: &Path, relative_path: &Path) -> bool {
+    let relative_path = relative_path.to_str().unwrap_or_else(|| {
+        panic!("workspace path is not valid UTF-8: {}", relative_path.display())
+    });
+    if git_predicate(workspace_root, &["ls-files", "--error-unmatch", "--", relative_path]) {
+        return false;
+    }
+    git_predicate(workspace_root, &["check-ignore", "--quiet", "--", relative_path])
+}
+
+fn copy_file(source: &Path, destination: &Path) {
+    if let Some(parent) = destination.parent() {
+        fs::create_dir_all(parent).unwrap_or_else(|error| {
+            panic!("cannot create fixture directory {}: {error}", parent.display())
+        });
+    }
+    fs::copy(source, destination).unwrap_or_else(|error| {
+        panic!("cannot copy {} to {}: {error}", source.display(), destination.display())
+    });
+}
+
+/// Test-only transplant adapter. The production export command keeps its
+/// copy-based adapter; this fixture uses a hard link so creating the exported
+/// scaffold does not duplicate the CLI binary.
+#[derive(Debug)]
+struct HardLinkSelfBinaryTransplantAdapter {
+    source: PathBuf,
+}
+
+impl HardLinkSelfBinaryTransplantAdapter {
+    fn new(source: PathBuf) -> Self {
+        Self { source }
+    }
+}
+
+fn hard_link_or_copy(source: &Path, destination: &Path) -> Result<(), std::io::Error> {
+    match fs::hard_link(source, destination) {
+        Ok(()) => Ok(()),
+        // The test source and target normally share Cargo's filesystem. A
+        // target directory mounted elsewhere still gets a usable fixture.
+        Err(error) if error.kind() == std::io::ErrorKind::CrossesDevices => {
+            fs::copy(source, destination).map(|_| ())
+        }
+        Err(error) => Err(error),
+    }
+}
+
+impl SelfBinaryTransplantPort for HardLinkSelfBinaryTransplantAdapter {
+    fn transplant(&self, destination: &Path) -> Result<(), SelfBinaryTransplantError> {
+        if let Some(parent) = destination.parent()
+            && !parent.as_os_str().is_empty()
+        {
+            fs::create_dir_all(parent).map_err(|error| {
+                SelfBinaryTransplantError::DestinationWriteFailure {
+                    path: destination.to_path_buf(),
+                    reason: FreeText::new(error.to_string()),
+                }
+            })?;
+        }
+
+        hard_link_or_copy(&self.source, destination).map_err(|error| {
+            SelfBinaryTransplantError::DestinationWriteFailure {
+                path: destination.to_path_buf(),
+                reason: FreeText::new(error.to_string()),
+            }
+        })
+    }
+}
+
+fn test_template_export_driver() -> TemplateDriver {
+    let manifest_port: Arc<dyn TemplateBoundaryManifestPort> =
+        Arc::new(FsTemplateBoundaryManifestAdapter::new());
+    let export_port: Arc<dyn TemplateExportPort> =
+        Arc::new(FsTemplateExportAdapter::new(machine_home_directory()));
+    let transplant_port: Arc<dyn SelfBinaryTransplantPort> = Arc::new(
+        HardLinkSelfBinaryTransplantAdapter::new(PathBuf::from(env!("CARGO_BIN_EXE_sotp"))),
+    );
+    let service: Arc<dyn TemplateExportService> =
+        Arc::new(TemplateExportInteractor::new(manifest_port, export_port, transplant_port));
+    TemplateDriver::new(service)
+}
+
+fn workspace_cargo_target_root(
+    workspace_root: &Path,
+    cargo_target_tmpdir: &Path,
+) -> Option<PathBuf> {
+    let cargo_target_tmpdir = cargo_target_tmpdir.canonicalize().unwrap_or_else(|error| {
+        panic!(
+            "cannot canonicalize Cargo target temporary directory {}: {error}",
+            cargo_target_tmpdir.display()
+        )
+    });
+    let target_root = cargo_target_tmpdir.parent()?.to_path_buf();
+    if target_root == workspace_root || !target_root.starts_with(workspace_root) {
+        return None;
+    }
+    Some(target_root)
+}
+
+fn copy_workspace_input_tree(
+    workspace_root: &Path,
+    relative_source: &Path,
+    destination: &Path,
+    excluded_root: Option<&Path>,
+) {
+    let source = workspace_root.join(relative_source);
+    if excluded_root.is_some_and(|root| source == root || source.starts_with(root)) {
+        return;
+    }
+    let metadata = fs::symlink_metadata(&source)
+        .unwrap_or_else(|error| panic!("cannot inspect {}: {error}", source.display()));
+    if metadata.file_type().is_symlink() {
+        panic!("workspace fixture source must not contain symlink {}", source.display());
+    }
+
+    if metadata.is_dir() {
+        fs::create_dir_all(destination).unwrap_or_else(|error| {
+            panic!("cannot create fixture directory {}: {error}", destination.display())
+        });
+        let mut entries = fs::read_dir(&source)
+            .unwrap_or_else(|error| panic!("cannot read {}: {error}", source.display()))
+            .map(|entry| {
+                entry.unwrap_or_else(|error| panic!("cannot read {}: {error}", source.display()))
+            })
+            .collect::<Vec<_>>();
+        entries.sort_by_key(std::fs::DirEntry::file_name);
+        for entry in entries {
+            let child = relative_source.join(entry.file_name());
+            let child_source = workspace_root.join(&child);
+            if child == Path::new(".git")
+                || excluded_root
+                    .is_some_and(|root| child_source == root || child_source.starts_with(root))
+                || gitignored_untracked(workspace_root, &child)
+            {
+                continue;
+            }
+            copy_workspace_input_tree(
+                workspace_root,
+                &child,
+                &destination.join(entry.file_name()),
+                excluded_root,
+            );
+        }
+    } else if metadata.is_file() {
+        copy_file(&source, destination);
+    } else {
+        panic!("workspace fixture source is not a regular file or directory: {}", source.display());
+    }
+}
+
+fn materialize_export_source(parent: &Path) -> PathBuf {
+    let workspace_root = workspace_root();
+    let source_root = parent.join("source");
+    fs::create_dir_all(&source_root).unwrap_or_else(|error| {
+        panic!("cannot create template-export source fixture {}: {error}", source_root.display())
+    });
+
+    let cargo_target_tmpdir = template_export_temp_parent(
+        option_env!("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+        &workspace_root,
+    );
+    let excluded_root = workspace_cargo_target_root(&workspace_root, &cargo_target_tmpdir);
+    copy_workspace_input_tree(
+        &workspace_root,
+        Path::new(""),
+        &source_root,
+        excluded_root.as_deref(),
+    );
+    source_root
+}
+
+fn exported_scaffold() -> PathBuf {
+    let export_parent = EXPORTED_SCAFFOLD_PARENT
+        .get_or_init(|| {
+            let workspace_root = workspace_root();
+            host_first_scaffold_parent(
+                option_env!("CARGO_TARGET_TMPDIR").map(PathBuf::from),
+                &workspace_root,
+                std::process::id(),
+            )
+        })
+        .clone();
+    EXPORTED_SCAFFOLD_CLEANUP_REGISTERED.get_or_init(|| {
+        // Safety: the callback has the required C ABI, captures no state, and only
+        // removes the process-isolated directory recorded in the OnceLock.
+        let registration = unsafe { libc::atexit(cleanup_exported_scaffold) };
+        if registration != 0 {
+            panic!("cannot register template-export test directory cleanup");
+        }
+    });
+    EXPORTED_SCAFFOLD_PATH
+        .get_or_init(|| {
+            // This fixed, process-isolated directory is deliberately stored as a
+            // path rather than a `TempDir`: it remains under Cargo's cleanable
+            // target temp root while allowing all tests in this binary to share
+            // one expensive export. Remove leftovers from an interrupted prior
+            // run before recreating the sibling source/scaffold trees.
+            if export_parent.exists() {
+                fs::remove_dir_all(&export_parent).unwrap_or_else(|error| {
+                    panic!(
+                        "cannot remove stale template-export test directory {}: {error}",
+                        export_parent.display()
+                    )
+                });
+            }
+            fs::create_dir_all(&export_parent).unwrap_or_else(|error| {
+                panic!(
+                    "cannot create template-export test directory {}: {error}",
+                    export_parent.display()
+                )
+            });
+            let output_dir = export_parent.join("scaffold");
+            let source_root = materialize_export_source(&export_parent);
+            export_scaffold(&source_root, &output_dir);
+            output_dir
+        })
+        .clone()
+}
+
+fn export_scaffold(source_root: &Path, output_dir: &Path) {
+    let outcome =
+        test_template_export_driver().handle(TemplateInput::Export(TemplateExportInput {
+            workspace_root: source_root.to_path_buf(),
+            manifest_path: source_root.join(".harness/config/template-boundary.json"),
+            overlay_dir: source_root.join("overlay"),
+            output_dir: output_dir.to_path_buf(),
+        }));
+
+    assert!(outcome.exit_code == 0, "template export failed: {outcome:?}",);
+
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt as _;
+
+        let source = fs::metadata(env!("CARGO_BIN_EXE_sotp")).unwrap();
+        let transplanted = fs::metadata(output_dir.join("bin/sotp")).unwrap();
+        if source.dev() == transplanted.dev() {
+            assert_eq!(source.ino(), transplanted.ino());
+        }
+    }
+}
+
+#[test]
+fn test_template_export_cli_dispatch_missing_manifest_returns_failure() {
+    let temp_dir = template_export_tempdir();
+    let workspace_root = temp_dir.path().join("workspace");
+    let manifest_path = workspace_root.join("boundary.json");
+    let overlay_dir = workspace_root.join("overlay");
+    let output_dir = temp_dir.path().join("scaffold");
+    fs::create_dir_all(&workspace_root).unwrap();
+
+    // Stop at manifest loading so this subprocess smoke test covers the real
+    // CLI/composition dispatch without invoking production's copy-based binary
+    // transplant; the in-process path above owns the hard-link transplant check.
     let output = Command::new(env!("CARGO_BIN_EXE_sotp"))
         .env("SOTP_TELEMETRY", "0")
-        .args([
-            "template",
-            "export",
-            "--workspace-root",
-            root.to_str().unwrap(),
-            "--manifest-path",
-            root.join(".harness/config/template-boundary.json").to_str().unwrap(),
-            "--overlay-dir",
-            root.join("overlay").to_str().unwrap(),
-            "--output-dir",
-            output_dir.to_str().unwrap(),
-        ])
+        .args(["template", "export", "--workspace-root"])
+        .arg(&workspace_root)
+        .arg("--manifest-path")
+        .arg(&manifest_path)
+        .arg("--overlay-dir")
+        .arg(&overlay_dir)
+        .arg("--output-dir")
+        .arg(&output_dir)
         .output()
         .unwrap();
 
     assert!(
-        output.status.success(),
-        "template export failed\nstdout: {}\nstderr: {}",
+        !output.status.success(),
+        "sotp template export must surface the missing manifest\nstdout: {}\nstderr: {}",
         String::from_utf8_lossy(&output.stdout),
         String::from_utf8_lossy(&output.stderr),
+    );
+    assert!(
+        String::from_utf8_lossy(&output.stderr).contains("template boundary manifest not found"),
+        "the CLI must dispatch through the composition-root manifest adapter"
+    );
+    assert!(!output_dir.exists(), "manifest failure must stop before creating an export");
+}
+
+#[test]
+fn test_template_export_temp_parent_prefers_cargo_target_tmpdir() {
+    let configured = PathBuf::from("/cargo/target/tmp");
+
+    assert_eq!(
+        template_export_temp_parent(Some(configured.clone()), Path::new("/workspace")),
+        configured
+    );
+}
+
+#[test]
+fn test_template_export_temp_parent_falls_back_to_workspace_target_tmp() {
+    assert_eq!(
+        template_export_temp_parent(None, Path::new("/workspace")),
+        PathBuf::from("/workspace/target/tmp")
+    );
+    assert_eq!(
+        template_export_temp_parent(Some(PathBuf::new()), Path::new("/workspace")),
+        PathBuf::from("/workspace/target/tmp")
+    );
+}
+
+#[test]
+fn test_host_first_scaffold_parent_is_process_isolated_under_target_tmp() {
+    let configured = PathBuf::from("/cargo/target/tmp");
+
+    assert_eq!(
+        host_first_scaffold_parent(Some(configured), Path::new("/workspace"), 4242),
+        PathBuf::from("/cargo/target/tmp/consumer-scaffold-host-first-4242")
     );
 }
 
@@ -284,6 +636,7 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
         "track-active-gate",
         "track-local-review",
         "track-local-review-fix",
+        "track-views-sync",
         "track-local-dry-fix",
         "pr-audit-comment",
         "track-commit-message",
@@ -303,14 +656,14 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
 
 #[test]
 fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() {
-    use std::os::unix::fs::PermissionsExt;
+    use std::os::unix::fs::{MetadataExt, PermissionsExt};
 
-    let export_parent = tempfile::tempdir().unwrap();
+    let export_parent = template_export_tempdir();
     let real_git = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
         .map(|directory| directory.join("git"))
         .find(|candidate| candidate.is_file())
         .expect("Git must be available on PATH");
-    let enclosing_repository = export_parent.path().join("enclosing-repository");
+    let enclosing_repository = export_parent.path().to_path_buf();
     let global_git_config = export_parent.path().join("gitconfig");
     fs::write(&global_git_config, "[user]\n\tuseConfigOnly = true\n").unwrap();
     fs::create_dir_all(&enclosing_repository).unwrap();
@@ -338,8 +691,9 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         );
     }
 
+    let source_root = materialize_export_source(export_parent.path());
     let scaffold = enclosing_repository.join("scaffold");
-    export_scaffold(&scaffold);
+    export_scaffold(&source_root, &scaffold);
     fs::write(
         &global_git_config,
         "[user]\n\tuseConfigOnly = true\n[core]\n\thooksPath = .githooks\n",
@@ -361,7 +715,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let cargo_shim = shim_dir.join("cargo");
     fs::write(
         &cargo_shim,
-        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make install-sotp') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; cp \"$RUNNABLE_SOTP\" bin/sotp; chmod +x bin/sotp ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; if [ \"${FAIL_BOOTSTRAP:-0}\" = 1 ]; then echo 'simulated bootstrap failure' >&2; exit 72; fi; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
+        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make install-sotp') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; ln \"$RUNNABLE_SOTP\" bin/sotp 2>/dev/null || cp \"$RUNNABLE_SOTP\" bin/sotp; chmod +x bin/sotp ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; if [ \"${FAIL_BOOTSTRAP:-0}\" = 1 ]; then echo 'simulated bootstrap failure' >&2; exit 72; fi; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
     )
     .unwrap();
     fs::set_permissions(&cargo_shim, fs::Permissions::from_mode(0o755)).unwrap();
@@ -527,6 +881,18 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     assert!(
         installed_sotp.is_file(),
         "a missing transplanted CLI must be restored before the convention index is generated"
+    );
+    let source_metadata = fs::metadata(&sotp_shim).unwrap();
+    let installed_metadata = fs::metadata(&installed_sotp).unwrap();
+    assert_eq!(
+        source_metadata.dev(),
+        installed_metadata.dev(),
+        "test transplant must remain on the source filesystem",
+    );
+    assert_eq!(
+        source_metadata.ino(),
+        installed_metadata.ino(),
+        "test install-sotp shim must use a hard link",
     );
     let branch_output = isolated_git_command(&real_git, &global_git_config)
         .args(["branch", "--show-current"])

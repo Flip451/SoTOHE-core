@@ -83,7 +83,24 @@ impl TypeSignalsExecutorPort for FailingExecutor {
         _binding: &TdddLayerBinding,
         _features: &[domain::tddd::CargoFeatureName],
     ) -> Result<(), TypeSignalsExecutionError> {
-        Err(TypeSignalsExecutionError("evaluation failed: nightly not installed".to_owned()))
+        Err(TypeSignalsExecutionError::Evaluation(crate::git_workflow::DiagnosticText::new(
+            "evaluation failed: nightly not installed",
+        )))
+    }
+}
+
+struct StagedFailingExecutor(TypeSignalsExecutionError);
+
+impl TypeSignalsExecutorPort for StagedFailingExecutor {
+    fn evaluate_layer(
+        &self,
+        _items_dir: &Path,
+        _track_id: &TrackId,
+        _workspace_root: &Path,
+        _binding: &TdddLayerBinding,
+        _features: &[domain::tddd::CargoFeatureName],
+    ) -> Result<(), TypeSignalsExecutionError> {
+        Err(self.0.clone())
     }
 }
 
@@ -434,7 +451,7 @@ fn test_run_with_layer_bindings_load_failure_preserves_diagnostic_text() {
 }
 
 #[test]
-fn test_run_with_failing_executor_returns_error() {
+fn test_run_maps_evaluation_executor_failure_to_evaluation_failed() {
     let interactor = build_interactor(
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(FailingExecutor),
@@ -448,6 +465,51 @@ fn test_run_with_failing_executor_returns_error() {
             if layer_id.as_ref() == "domain" && reason.as_str() == "evaluation failed: nightly not installed"),
         "evaluation failure must return EvaluationFailed, got: {err:?}"
     );
+}
+
+#[test]
+fn test_run_maps_authoritative_and_cache_write_executor_failures() {
+    let tmp = tempfile::tempdir().unwrap();
+    let authoritative = build_interactor(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(StagedFailingExecutor(TypeSignalsExecutionError::AuthoritativeInput(
+            crate::git_workflow::DiagnosticText::new("baseline unreadable"),
+        ))),
+    );
+    let cache_write = build_interactor(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(StagedFailingExecutor(TypeSignalsExecutionError::CacheWrite(
+            crate::git_workflow::DiagnosticText::new("atomic write rejected"),
+        ))),
+    );
+
+    assert!(matches!(
+        authoritative.run(valid_request(tmp.path())),
+        Err(TypeSignalsError::AuthoritativeInputFailed { .. })
+    ));
+    assert!(matches!(
+        cache_write.run(valid_request(tmp.path())),
+        Err(TypeSignalsError::CacheWriteFailed { .. })
+    ));
+}
+
+#[test]
+fn test_run_maps_evaluation_variant_from_executor_to_layered_failure() {
+    let interactor = build_interactor(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(StagedFailingExecutor(TypeSignalsExecutionError::Evaluation(
+            crate::git_workflow::DiagnosticText::new("signal evaluator rejected the graph"),
+        ))),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+
+    let error = interactor.run(valid_request(tmp.path())).unwrap_err();
+
+    assert!(matches!(
+        error,
+        TypeSignalsError::EvaluationFailed { ref layer_id, ref reason }
+            if layer_id.as_ref() == "domain" && reason.as_str() == "signal evaluator rejected the graph"
+    ));
 }
 
 #[test]

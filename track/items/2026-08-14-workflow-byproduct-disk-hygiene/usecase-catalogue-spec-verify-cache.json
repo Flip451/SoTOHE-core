@@ -1,0 +1,174 @@
+{
+  "entries": [
+    {
+      "claim_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeDiffMeasurePort",
+          "file_path": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "ce90898a8d6c9b180ab26d0ca632b77fd347362f73a15016807e623a6d43b325",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "Replace the hardcoded scope-diff exclusion set with an operator-owned configuration under `.harness/config/`; load it for untracked-path enumeration as top-level git exclusion pathspecs. The shipped configuration includes the current exclusions plus `.cache/**`, `tmp/**`, `libs/**/tmp/**`, and `apps/**/tmp/**`."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Replace the hardcoded scope-diff exclusion set with an operator-owned configuration under `.harness/config/`; load it for untracked-path enumeration as top-level git exclusion pathspecs.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeDiffMeasurePort",
+          "file_path": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "90ec10c853d50fceb499177cdfbfa74407453642d9578846a68364ee699faf80",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Exclude trailing-`/` directory entries reported by `git ls-files --others` from the untracked measurement set, while retaining existing fail-closed handling for other non-regular filesystem entries."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Exclude trailing-`/` directory entries reported by `git ls-files --others` from the untracked measurement set, while retaining existing fail-closed handling for other non-regular filesystem entries.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeDiffMeasurePort",
+          "file_path": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8e928124849e74c9875d433fa81fb0225c59248dc2ee8090727c874aecc8ab16",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "With a valid shipped scope-diff configuration, untracked enumeration excludes the configured patterns, including `.cache/**`, `tmp/**`, `libs/**/tmp/**`, and `apps/**/tmp/**`, without relying on a hardcoded exclusion array."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "With a valid shipped scope-diff configuration, untracked enumeration excludes the configured patterns, including `.cache/**`, `tmp/**`, `libs/**/tmp/**`, and `apps/**/tmp/**`, without relying on a hardcoded exclusion array.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeDiffMeasurePort",
+          "file_path": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "396036bc651cfe27070f03cde54c384541ea331871897da7f128b8667e400549",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "A missing, malformed, or empty scope-diff configuration causes measurement to fail with a hard error; it never silently proceeds with an incomplete exclusion policy."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "A missing, malformed, or empty scope-diff configuration causes measurement to fail with a hard error; it never silently proceeds with an incomplete exclusion policy.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeDiffMeasurePort",
+          "file_path": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "8dcb24bdca09e92ad28c780cf14c839df5cd01efb5e742af5399599d21a78b1a",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "When untracked enumeration reports a trailing-`/` nested-repository entry, scope-diff measurement completes without attempting to count that directory; an encountered symlink or other unsupported non-regular file still fails closed."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "When untracked enumeration reports a trailing-`/` nested-repository entry, scope-diff measurement completes without attempting to count that directory; an encountered symlink or other unsupported non-regular file still fails closed.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeDiffMeasurePort",
+          "file_path": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "b64bc594fe40bbf3b011194fe03d6c20b4566a3bf7ae6ccce1a0a7ce183f8de9",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "The scope-diff exclusion configuration is mandatory and fail-closed: absent, invalid, or empty configuration is a hard error rather than an implicit fallback to a partial or hardcoded policy."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The scope-diff exclusion configuration is mandatory and fail-closed: absent, invalid, or empty configuration is a hard error rather than an implicit fallback to a partial or hardcoded policy.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "cf1b7a2c26b4216a2eea91f22f32e0664ddbfb03ab84fae40fd40c70375a0d1e",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ScopeDiffMeasurePort",
+          "file_path": "track/items/2026-08-14-workflow-byproduct-disk-hygiene/usecase-types.json",
+          "section_key": "traits"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "690413fa7c289fc779ebc77cbf5f5b7199eb3716ea445d430dda42469005028f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "The directory-entry exception is structural and non-configurable; it must not relax fail-closed behavior for symlinks or other non-regular files."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The directory-entry exception is structural and non-configurable; it must not relax fail-closed behavior for symlinks or other non-regular files.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 1
+}

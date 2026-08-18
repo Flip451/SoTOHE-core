@@ -121,3 +121,70 @@ Violations of the role statement above are always reportable. The following prio
     excludes them from the distribution; references to them in
     convention docs (e.g., "your local overrides go in
     `.claude/settings.local.json`") are not a distribution leak.
+
+## Known Accepted Deviations
+
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Staged `check-zero-findings` registration (resolved)**: the staged-registration
+  suppression previously recorded here has EXPIRED — the review CLI enum registration
+  and execution path landed with task T042, and the driver dispatch / aggregate wiring
+  landed earlier; the former cli.md suppression note has been removed. The follow-on
+  attribution-semantics note has also EXPIRED — the T043 implementation landed, the
+  attributed cli_driver review entries converged with their declarations, and the
+  corresponding cli_driver.md note has been removed. No suppression remains under this
+  entry for any track or consumer.
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Unit-variant match premise error (cli_driver)**: a rollback-diagnoser adjudication
+  recorded that the review-results renderer's `match scope.state` /
+  `matches!(round.round_type, ...)` on borrowed places with unit-variant patterns binds
+  no payload and performs no move; the workspace passes `cargo make clippy`
+  (`-D warnings`) and `cargo make ci-rust` with this code. The cli_driver.md briefing
+  carries the matching track-limited note dismissing the repeated compile-error claim.
+  It is factual only and expires with this track.
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Pre-existing review_v2 composition surface**: a user adjudication (2026-07-22)
+  deferred the review_v2 composition wire-only/render remediation to a separate track.
+  A rollback-diagnoser adjudication on this track additionally recorded that the
+  T043 warning-transport rerouting (`eprintln!` → `RunReviewOutput.diagnostics`) is
+  transport-only and does not void the deferral; the run-lane findings
+  (`render_verdict_payload` rendering, composition-built `[WARN]` text / typed
+  diagnostic condition, `FindingsCountReviewer` placement) transfer to that deferred
+  remediation track. The cli_composition.md note carries the matching record.
+  The cli_composition briefing carries a matching track-limited note: invoke-leak
+  findings on the PRE-EXISTING review_v2 gated-entry surface
+  (`ReviewCompositionRoot::review_run_local`, the interim `ReviewServiceImpl` shim) are
+  not reported when this track's diff makes no semantic change to that surface;
+  NEW invoke paths added by this track remain fully reportable. The allowance expires
+  when the deferred remediation track lands. It is not an accepted deviation for any
+  other track or consumer.
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise ignore.**
+  **Pre-existing CommitHashReader / CommitHashWriter domain placement**: a
+  rollback-diagnoser verdict (2026-08-09) adjudicated the layer relocation of these
+  pre-existing ports (`libs/domain/src/review_v2/ports.rs`, introduced by an earlier
+  track under the review-system-v2 redesign ADR; see the ADR index) as out-of-diff for
+  this track; the
+  placement-rule conflict is to be resolved by a dedicated ADR-routed track (adr-editor
+  reconciling the ADR with the current Port-placement tie-break, then a migration track).
+  The domain.md briefing carries a matching track-limited note. The allowance expires
+  when that ADR track lands. It is not an accepted deviation for any other track or
+  consumer.
+
+- **Conditional allowance — apply only when the review run's resolved Track ID is
+  exactly `scope-conditional-pre-review-gates-2026-07-31`; otherwise, do not apply
+  this allowance.**
+  **Staged completion of the phase convergence matrix and workflow adoption**: the
+  shipped `.harness/config/phase-commands.json` does not yet declare the per-phase
+  direct-upstream convergence pre-entry sequences, and canonical workflows do not yet
+  invoke `bin/sotp phase enter`. Factual background: the admitted delta ADR
+  phase-enter adoption and check-commands ADR and spec elements
+  IN-12/IN-13/CN-06/AC-14/AC-15/AC-16 decide both obligations, and the in-track tasks
+  T038 (check-zero-findings command), T039 (ref-verify chain selector), T040 (config
+  convergence matrix), and T041 (workflow/adapter migration) are planned in batches
+  B6/B7 to implement them. The user adjudicated on 2026-08-04 to accept intermediate
+  commits while those planned tasks land within this track; this allowance expires when
+  T040 and T041 are complete and is not an accepted deviation for any other track or
+  consumer.

@@ -23,7 +23,7 @@ pub struct FilesArgs {
 
     /// Path to the track items directory.
     #[arg(long, default_value = "track/items")]
-    pub(super) items_dir: PathBuf,
+    pub(crate) items_dir: PathBuf,
 
     /// Scope name to enumerate (`other` for the implicit unmatched scope).
     #[arg(long)]
@@ -49,12 +49,9 @@ fn run_files(args: &FilesArgs) -> Result<String, crate::CliError> {
     let track_id = crate::commands::track::resolve_track_id(args.track_id.clone(), &args.items_dir)
         .map_err(|e| crate::CliError::Message(e.to_string()))?;
 
-    let outcome =
-        cli_composition::ReviewCompositionRoot::new().review_driver().handle(ReviewInput::Files {
-            scope: args.scope.clone(),
-            track_id: Some(track_id),
-            items_dir: args.items_dir.clone(),
-        });
+    let outcome = cli_composition::ReviewCompositionRoot::new()
+        .review_driver()
+        .handle(ReviewInput::Files(args.scope.clone(), Some(track_id), args.items_dir.clone()));
     if outcome.exit_code != 0 {
         return Err(crate::CliError::Message(
             outcome.stderr.unwrap_or_else(|| "review files failed".to_owned()),

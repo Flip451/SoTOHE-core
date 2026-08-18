@@ -1,0 +1,56 @@
+{
+  "catalogue_declaration_hash": "cd343251f330ad496711d0e56f222e3529eb9eff935095ae3c50d9602bf3e09c",
+  "schema_version": 1,
+  "signals": [
+    {
+      "entry_hash": "72b0660d93c22e01bfa8a09a3c17607ccf9593e896658c3753dae0d06cd5bde0",
+      "signal": "blue",
+      "type_name": "ContractedEntryRef"
+    },
+    {
+      "entry_hash": "6d4e56165678025cc2e7769b9e93a948716fda42c515531dfbed268a7ff4ebd1",
+      "signal": "blue",
+      "type_name": "CoverageVerifyOutcome"
+    },
+    {
+      "entry_hash": "2cde2e471fd152df66d21a4ce543b8c76ba54697ca8765d8cd6c64f4d77bd088",
+      "signal": "blue",
+      "type_name": "CoverageViolation"
+    },
+    {
+      "entry_hash": "5d2459d5c1a2c96b44feac67fbe67b17479dc564228ca41fee247bdea6178a58",
+      "signal": "blue",
+      "type_name": "MainScopeName"
+    },
+    {
+      "entry_hash": "65af73b3ee2e4bdabcd371e8122b1a4e2967523f485f8e7963c7a545507751bf",
+      "signal": "blue",
+      "type_name": "PreReviewGateOutcome"
+    },
+    {
+      "entry_hash": "bac4a030dc56592a609bdfea8fc93edfb4ca2c69d8e0638435843d0ca31445cf",
+      "signal": "blue",
+      "type_name": "PreReviewGateViolation"
+    },
+    {
+      "entry_hash": "bde30dc518a58e84a3e81bf8783aa07e8e4728ddbfada84d9ec33823c4980f98",
+      "signal": "blue",
+      "type_name": "ScopeName"
+    },
+    {
+      "entry_hash": "9b29e38c4197b97bd9115bc33255229513213744f8e7b9081bc658c6fc285a4b",
+      "signal": "blue",
+      "type_name": "ScopeNameError"
+    },
+    {
+      "entry_hash": "0559e68a790a150a6b95e90591b2d587dc665f29bc0f661323dca552f9dd1765",
+      "signal": "blue",
+      "type_name": "TaskContractDocument"
+    },
+    {
+      "entry_hash": "104337cb9c11234ff8ef1ec9902db18a2470ed208c8fdfa4a736a07201c7d969",
+      "signal": "blue",
+      "type_name": "domain::review_v2::types::derive_review_approval_verdict"
+    }
+  ]
+}

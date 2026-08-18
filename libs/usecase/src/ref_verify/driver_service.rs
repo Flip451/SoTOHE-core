@@ -227,6 +227,7 @@ pub trait RefVerifyCheckApprovedDriverService: Send + Sync {
         &self,
         track_id: &str,
         items_dir: &Path,
+        chain: RefVerifyChainFilter,
     ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError>;
 }
 
@@ -245,7 +246,7 @@ pub trait RefVerifyCheckApprovedDriverService: Send + Sync {
 /// extension is compile-safe before `FsRefVerifyAggregateAdapter` overrides it
 /// in T004. `RefVerifyDriver` holds one `Arc<dyn RefVerifyAggregateService>`
 /// and dispatches each `RefVerifyInput` variant to the corresponding method.
-pub trait RefVerifyAggregateService: Send + Sync {
+pub trait RefVerifyAggregateService: RefVerifyCheckApprovedDriverService + Send + Sync {
     /// Execute the semantic reference verification pipeline.
     ///
     /// # Errors
@@ -256,17 +257,6 @@ pub trait RefVerifyAggregateService: Send + Sync {
         track_id: &str,
         items_dir: &Path,
     ) -> Result<RefVerifyRunOutcome, RefVerifyDriverError>;
-
-    /// Execute the check-approved gate.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`RefVerifyDriverError`] when the request cannot be prepared or executed.
-    fn check_approved(
-        &self,
-        track_id: &str,
-        items_dir: &Path,
-    ) -> Result<RefVerifyCheckApprovedOutcome, RefVerifyDriverError>;
 
     /// Read the verify-cache and re-derive pending pairs, then return structured
     /// results data filtered by the given chain, layer, and verdict filters.

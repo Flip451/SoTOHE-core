@@ -1,39 +1,32 @@
 //! Codex-backed implementation of the `Reviewer` usecase port.
 
-use std::fs::OpenOptions;
-use std::io::{BufRead, BufReader, Read};
-use std::path::{Path, PathBuf};
-use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
-use std::thread;
-use std::time::{Duration, Instant};
-
-#[cfg(unix)]
-use std::os::unix::fs::OpenOptionsExt;
+use std::time::Duration;
 
 use domain::review_v2::{
     FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, RoundType, ScopeName, Verdict,
     VerdictError,
 };
 use domain::{CommitHash, TrackId};
-use usecase::capability_exec::{ModelName, ReasoningEffort};
+use usecase::capability_exec::{CODEX_PROVIDER_NAME, ModelName, ReasoningEffort};
 use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
-use usecase::review_v2::{ReviewerError, ports::Reviewer};
+use usecase::review_v2::{
+    ResolvedReviewer, ResolvedReviewerAssignment, ReviewerError, ports::Reviewer,
+};
 use usecase::review_workflow::{
     REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict,
-    classify_review_verdict, normalize_final_message, parse_review_final_message,
-    render_review_payload,
+    parse_review_final_message,
 };
 
+use super::codex_process::{
+    AutoManagedArtifacts, ReviewOutcomeRaw, build_codex_reviewer_invocation,
+    initialize_output_last_message, prepare_output_last_message_path, run_codex_child,
+    spawn_codex_reviewer, write_runtime_artifact,
+};
 use super::session::{ReviewerSession, effort_value};
 use crate::codex_common::{
-    POLL_INTERVAL, REVIEW_RUNTIME_DIR, configure_codex_command,
-    resolve_codex_runtime_for_current_repository, runtime_path, tee_stderr_to_file,
+    REVIEW_RUNTIME_DIR, resolve_codex_runtime_for_current_repository, runtime_path,
 };
-use crate::track::symlink_guard::reject_symlinks_up_to_root;
-
-type SpawnCodexReviewerResult =
-    Result<(Child, thread::JoinHandle<()>, thread::JoinHandle<Option<String>>), String>;
 
 /// Codex-backed reviewer implementation for the `Reviewer` usecase port.
 ///
@@ -50,6 +43,8 @@ pub struct CodexReviewer {
     /// Scope label injected into the prompt (e.g., `"cli"`, `"infrastructure"`).
     scope_label: String,
     session: ReviewerSession,
+    /// Validated assignment owned by this reviewer adapter.
+    assignment: ResolvedReviewerAssignment,
     /// Test-only: override the Codex binary path (avoids unsafe env var mutation).
     #[cfg(test)]
     bin_override: Option<std::ffi::OsString>,
@@ -75,6 +70,13 @@ impl CodexReviewer {
         base_prompt: ReviewerPrompt,
         session_cache: Arc<dyn ProviderSessionCachePort>,
     ) -> CodexReviewer {
+        let assignment = ResolvedReviewerAssignment::new(
+            track_id.clone(),
+            scope.clone(),
+            CODEX_PROVIDER_NAME.clone(),
+            model.clone(),
+            effort,
+        );
         Self {
             session: ReviewerSession::new(
                 track_id,
@@ -90,6 +92,7 @@ impl CodexReviewer {
             timeout,
             base_prompt: base_prompt.as_str().to_owned(),
             scope_label: scope.to_string(),
+            assignment,
             #[cfg(test)]
             bin_override: None,
         }
@@ -161,9 +164,9 @@ impl CodexReviewer {
         let _cleanup = AutoManagedArtifacts::new([&output_last_message, &output_schema]);
 
         // Write output schema file.
-        std::fs::write(&output_schema, REVIEW_OUTPUT_SCHEMA_JSON).map_err(|e| {
-            ReviewerError::Unexpected(format!("failed to write output-schema: {e}"))
-        })?;
+        write_runtime_artifact(&output_schema, REVIEW_OUTPUT_SCHEMA_JSON.as_bytes()).map_err(
+            |e| ReviewerError::Unexpected(format!("failed to write output-schema: {e}")),
+        )?;
 
         #[cfg(test)]
         let runtime = if self.bin_override.is_none() {
@@ -229,6 +232,12 @@ impl CodexReviewer {
     }
 }
 
+impl ResolvedReviewer for CodexReviewer {
+    fn resolved_assignment(&self) -> &ResolvedReviewerAssignment {
+        &self.assignment
+    }
+}
+
 impl Reviewer for CodexReviewer {
     fn review(&self, target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
         let raw = self.run_review(target, &self.scope_label)?;
@@ -245,14 +254,6 @@ impl Reviewer for CodexReviewer {
         self.session.save(session_id);
         Ok((verdict, log_info))
     }
-}
-
-/// Raw outcome from the Codex subprocess — parsed but not yet converted to domain types.
-struct ReviewOutcomeRaw {
-    verdict: ReviewVerdict,
-    final_message: Option<String>,
-    session_log_path: PathBuf,
-    session_id: Option<String>,
 }
 
 /// Converts a raw Codex outcome to a final `(Verdict, LogInfo)`.
@@ -332,361 +333,14 @@ fn convert_findings_to_domain(
         .collect()
 }
 
-// ---------------------------------------------------------------------------
-// Process management (internal helpers)
-// ---------------------------------------------------------------------------
-
-fn prepare_output_last_message_path(explicit: Option<&Path>) -> Result<PathBuf, String> {
-    match explicit {
-        Some(p) => {
-            let parent = p.parent().ok_or_else(|| {
-                format!("output-last-message path has no parent: {}", p.display())
-            })?;
-            std::fs::create_dir_all(parent)
-                .map_err(|e| format!("failed to create {}: {e}", parent.display()))?;
-            Ok(p.to_path_buf())
-        }
-        None => runtime_path(REVIEW_RUNTIME_DIR, "codex-last-message", "txt"),
-    }
-}
-
-struct AutoManagedArtifacts {
-    paths: Vec<PathBuf>,
-}
-
-impl AutoManagedArtifacts {
-    fn new<'a>(artifacts: impl IntoIterator<Item = &'a PathBuf>) -> Self {
-        Self { paths: artifacts.into_iter().cloned().collect() }
-    }
-}
-
-impl Drop for AutoManagedArtifacts {
-    fn drop(&mut self) {
-        for path in &self.paths {
-            let _ = std::fs::remove_file(path);
-        }
-    }
-}
-
-fn run_codex_child(
-    mut child: Child,
-    stderr_collector: thread::JoinHandle<()>,
-    stdout_collector: thread::JoinHandle<Option<String>>,
-    timeout: Duration,
-    output_last_message: PathBuf,
-    session_log_path: &Path,
-) -> Result<ReviewOutcomeRaw, ReviewerError> {
-    let start = Instant::now();
-    let mut timed_out = false;
-    let mut exit_success = false;
-
-    loop {
-        match child
-            .try_wait()
-            .map_err(|e| ReviewerError::Unexpected(format!("failed to poll reviewer child: {e}")))?
-        {
-            Some(status) => {
-                exit_success = status.success();
-                break;
-            }
-            None => {
-                if start.elapsed() >= timeout {
-                    timed_out = true;
-                    // Ignore kill error: the child may have exited between
-                    // try_wait() returning None and this kill() call.
-                    let _ = terminate_reviewer_child(&mut child);
-                    child.wait().map_err(|e| {
-                        ReviewerError::Unexpected(format!("failed to reap reviewer child: {e}"))
-                    })?;
-                    break;
-                }
-                thread::sleep(POLL_INTERVAL);
-            }
-        }
-    }
-
-    let session_id = if timed_out { None } else { stdout_collector.join().unwrap_or_default() };
-    if !timed_out {
-        // Only join drain threads when the child exited normally.
-        // On timeout, descendant processes may still hold the pipe FDs open,
-        // causing the drain threads to block indefinitely. Dropping the
-        // JoinHandles detaches the threads — they will terminate when all
-        // FD holders close their end or when the process exits.
-        let _ = stderr_collector.join();
-    }
-
-    let raw_content = match read_bounded_output_last_message(
-        &output_last_message,
-        MAX_CODEX_LAST_MESSAGE_BYTES,
-    ) {
-        Ok(content) => normalize_final_message(&content),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-        Err(e) => {
-            return Err(ReviewerError::Unexpected(format!(
-                "failed to read output-last-message {}: {e}",
-                output_last_message.display()
-            )));
-        }
-    };
-
-    let final_message_state = parse_review_final_message(raw_content.as_deref());
-
-    // No session-log fallback: the --output-last-message file is the sole
-    // authoritative verdict source. The session log contains stderr output
-    // which is a diagnostic channel, not a verdict channel. Parsing it as
-    // a fallback would turn a non-authoritative stream into an approval
-    // source, breaking the fail-closed contract.
-
-    let final_message = match &final_message_state {
-        ReviewFinalMessageState::Parsed(payload) => Some(
-            render_review_payload(payload).map_err(|e| ReviewerError::Unexpected(e.to_string()))?,
-        ),
-        _ => raw_content,
-    };
-
-    let verdict = classify_review_verdict(timed_out, exit_success, &final_message_state);
-
-    Ok(ReviewOutcomeRaw {
-        verdict,
-        final_message,
-        session_log_path: session_log_path.to_path_buf(),
-        session_id,
-    })
-}
-
-/// Maximum size accepted for Codex's authoritative final-message file.
-const MAX_CODEX_LAST_MESSAGE_BYTES: u64 = 4 * 1024 * 1024;
-
-/// Reads an authoritative Codex final-message file within an explicit byte limit.
-///
-/// The extra byte detects overflow while avoiding an unbounded allocation. Callers
-/// must treat an overflow as an error because this file is the verdict source.
-fn read_bounded_output_last_message(path: &Path, max_bytes: u64) -> std::io::Result<String> {
-    let metadata = std::fs::symlink_metadata(path)?;
-    if metadata.file_type().is_symlink() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("refusing to read symlinked output-last-message: {}", path.display()),
-        ));
-    }
-    if !metadata.file_type().is_file() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("output-last-message is not a regular file: {}", path.display()),
-        ));
-    }
-    let file = std::fs::File::open(path)?;
-    let mut bytes = Vec::new();
-    file.take(max_bytes.saturating_add(1)).read_to_end(&mut bytes)?;
-    if bytes.len() as u64 > max_bytes {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidData,
-            format!(
-                "output-last-message exceeds maximum size of {max_bytes} bytes: {} bytes",
-                bytes.len()
-            ),
-        ));
-    }
-    String::from_utf8(bytes).map_err(|error| {
-        std::io::Error::new(
-            std::io::ErrorKind::InvalidData,
-            format!("output-last-message is not valid UTF-8: {error}"),
-        )
-    })
-}
-
-/// Empties the authoritative Codex final-message file without following symlinks.
-///
-/// The file is reset before every invocation so a failed resumed attempt cannot
-/// donate a stale verdict to its fresh retry. On Unix, `O_NOFOLLOW` closes the
-/// check-to-open race; truncation occurs only after the opened handle is verified
-/// to be a regular file.
-fn initialize_output_last_message(path: &Path) -> std::io::Result<()> {
-    match std::fs::symlink_metadata(path) {
-        Ok(metadata) if metadata.file_type().is_symlink() => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                format!("refusing to initialize symlinked output-last-message: {}", path.display()),
-            ));
-        }
-        Ok(metadata) if !metadata.file_type().is_file() => {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidInput,
-                format!("output-last-message is not a regular file: {}", path.display()),
-            ));
-        }
-        Ok(_) => {}
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
-        Err(error) => return Err(error),
-    }
-
-    // The runtime path is relative to the workspace. Check every existing
-    // ancestor before opening the leaf so a symlinked `tmp/` or
-    // `reviewer-runtime/` cannot redirect the authoritative verdict outside
-    // the runtime tree.
-    reject_symlinks_up_to_root(path)?;
-
-    let mut options = OpenOptions::new();
-    options.write(true).create(true);
-    #[cfg(unix)]
-    options.custom_flags(libc::O_NOFOLLOW);
-    let file = options.open(path)?;
-    if !file.metadata()?.file_type().is_file() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("output-last-message is not a regular file: {}", path.display()),
-        ));
-    }
-    file.set_len(0)
-}
-
-fn build_codex_reviewer_invocation(
-    model: &str,
-    effort: &str,
-    resume_id: Option<&str>,
-    prompt: &str,
-    output_last_message: &Path,
-    output_schema: &Path,
-) -> Vec<std::ffi::OsString> {
-    // All exec-level options must precede the `resume` subcommand: the documented
-    // form is `codex exec [OPTIONS] resume [SESSION_ID] [PROMPT]`, and options
-    // placed after `resume` are not guaranteed to bind to the run.
-    let mut args = vec![
-        "exec".into(),
-        "--model".into(),
-        model.into(),
-        "--sandbox".into(),
-        "read-only".into(),
-        "--config".into(),
-        format!("model_reasoning_effort=\"{effort}\"").into(),
-        "--json".into(),
-        "--output-schema".into(),
-        output_schema.as_os_str().to_os_string(),
-        "--output-last-message".into(),
-        output_last_message.as_os_str().to_os_string(),
-    ];
-    if let Some(session_id) = resume_id {
-        args.extend(["resume".into(), session_id.into()]);
-    }
-    args.push(prompt.into());
-    args
-}
-
-fn spawn_codex_reviewer(
-    bin: &std::ffi::OsStr,
-    args: &[std::ffi::OsString],
-    session_log_path: &Path,
-    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
-) -> SpawnCodexReviewerResult {
-    let mut command = Command::new(bin);
-    command.args(args).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
-    if let Some(runtime) = runtime {
-        configure_codex_command(&mut command, runtime)?;
-    }
-    let mut log = std::fs::File::create(session_log_path).map_err(|error| {
-        format!("failed to create session log {}: {error}", session_log_path.display())
-    })?;
-    if let Some(runtime) = runtime {
-        use std::io::Write as _;
-        log.write_all(crate::codex_common::runtime_log_header(runtime).as_bytes()).map_err(
-            |error| format!("failed to write session log {}: {error}", session_log_path.display()),
-        )?;
-    }
-    let mut child = command
-        .spawn()
-        .map_err(|error| format!("failed to spawn {}: {error}", bin.to_string_lossy()))?;
-    let stderr = child
-        .stderr
-        .take()
-        .map(|pipe| thread::spawn(move || tee_stderr_to_file(pipe, log)))
-        .unwrap_or_else(|| thread::spawn(|| {}));
-    let stdout = child
-        .stdout
-        .take()
-        .map(|pipe| thread::spawn(move || collect_codex_session_id(pipe)))
-        .unwrap_or_else(|| thread::spawn(|| None));
-    Ok((child, stderr, stdout))
-}
-
-/// Maximum bytes retained for a single Codex JSON event while looking up `thread_id`.
-///
-/// Codex emits newline-delimited events. Larger or malformed events are discarded so a
-/// malfunctioning child cannot make the reviewer retain an unbounded stdout stream.
-const MAX_CODEX_EVENT_BYTES: usize = 64 * 1024;
-
-/// Drains Codex's JSON event stream while retaining only the first bounded `thread_id` event.
-fn collect_codex_session_id<R: Read>(pipe: R) -> Option<String> {
-    let mut reader = BufReader::new(pipe);
-    let mut event = Vec::with_capacity(MAX_CODEX_EVENT_BYTES);
-    let mut discarding_event = false;
-    let mut session_id = None;
-
-    while let Ok(buffer) = reader.fill_buf() {
-        if buffer.is_empty() {
-            break;
-        }
-
-        if session_id.is_some() {
-            let consumed = buffer.len();
-            reader.consume(consumed);
-            continue;
-        }
-
-        let newline = buffer.iter().position(|byte| *byte == b'\n');
-        let event_bytes = newline.unwrap_or(buffer.len());
-        if !discarding_event {
-            let remaining = MAX_CODEX_EVENT_BYTES.saturating_sub(event.len());
-            if event_bytes <= remaining {
-                if let Some(event_part) = buffer.get(..event_bytes) {
-                    event.extend_from_slice(event_part);
-                } else {
-                    discarding_event = true;
-                }
-            } else {
-                discarding_event = true;
-            }
-        }
-
-        let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
-        reader.consume(consumed);
-
-        if newline.is_some() {
-            if !discarding_event {
-                session_id = extract_codex_session_id_event(&event);
-            }
-            event.clear();
-            discarding_event = false;
-        }
-    }
-
-    session_id
-}
-
-fn extract_codex_session_id_event(event: &[u8]) -> Option<String> {
-    let event = std::str::from_utf8(event).ok()?;
-    let value = serde_json::from_str::<serde_json::Value>(event.trim()).ok()?;
-    value.get("thread_id")?.as_str().filter(|id| !id.trim().is_empty()).map(str::to_owned)
-}
-
-/// Terminates the reviewer child process.
-///
-/// Uses `child.kill()` (safe cross-platform API) to kill the direct child only.
-/// Descendant processes spawned by the child are NOT terminated here.
-///
-/// # Why no process group kill
-///
-/// `killpg(2)` requires `unsafe` which is `#[forbid(unsafe_code)]` in this crate.
-/// Process group termination is intentionally deferred to the CLI layer
-/// (`apps/cli`) where `unsafe` is permitted. This is an accepted architectural
-/// constraint — see `#[forbid(unsafe_code)]` policy for infrastructure crate.
-fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
-    child.kill().map_err(|e| format!("failed to kill reviewer child: {e}"))
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
+    use super::super::codex_process::{
+        MAX_CODEX_EVENT_BYTES, collect_codex_session_id, read_bounded_output_last_message,
+    };
     use super::*;
+    use std::path::Path;
 
     struct StaticSessionCache {
         entry: Option<usecase::provider_session::ProviderSessionCacheEntry>,
@@ -798,6 +452,31 @@ mod tests {
             ReviewerPrompt::try_new(prompt.to_owned()).unwrap(),
             cache,
         )
+    }
+
+    #[test]
+    fn test_codex_reviewer_resolved_assignment_returns_adapter_values() {
+        let mut reviewer: CodexReviewer = test_reviewer(Duration::from_secs(10), "Review.");
+        let assignment_before =
+            <CodexReviewer as usecase::review_v2::ResolvedReviewer>::resolved_assignment(&reviewer)
+                .clone();
+
+        // `model` and `scope_label` are mutable invocation configuration. The
+        // constructor stores a separate resolved assignment snapshot, so a
+        // later configuration change must not alter values persisted to telemetry.
+        reviewer.model = ModelName::try_new("profile-mutated-model").unwrap();
+        reviewer.scope_label = "profile-mutated-scope".to_owned();
+        let assignment =
+            <CodexReviewer as usecase::review_v2::ResolvedReviewer>::resolved_assignment(&reviewer);
+
+        assert_eq!(reviewer.model.as_str(), "profile-mutated-model");
+        assert_eq!(reviewer.scope_label, "profile-mutated-scope");
+        assert_eq!(assignment, &assignment_before);
+        assert_eq!(assignment.track_id().as_ref(), "test-track");
+        assert_eq!(assignment.scope(), &ScopeName::Other);
+        assert_eq!(assignment.provider().as_str(), "codex");
+        assert_eq!(assignment.model().as_str(), "gpt-5.4");
+        assert_eq!(assignment.reasoning_effort(), ReasoningEffort::High);
     }
 
     fn session_entry(provider: &str) -> usecase::provider_session::ProviderSessionCacheEntry {

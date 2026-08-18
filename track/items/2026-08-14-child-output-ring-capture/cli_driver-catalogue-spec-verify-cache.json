@@ -1,0 +1,54 @@
+{
+  "entries": [
+    {
+      "claim_hash": "5236cae6a9b46483041e6a274b9eb6adf642b91d6226ff9995dbedcb701ded71",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandDriver",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f73b2d9b44efa25ff0ad02d96a53dc6dd0e74a160720df74967ea628352644de",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "Apply the same diagnostic capture behavior to the program runner's equivalent child-process output surface, so reaching the diagnostic capacity does not kill the child.",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "5236cae6a9b46483041e6a274b9eb6adf642b91d6226ff9995dbedcb701ded71",
+      "claim_origin": {
+        "data": {
+          "entry_key": "PhaseCommandDriver",
+          "file_path": "track/items/2026-08-14-child-output-ring-capture/cli_driver-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "dcd676ae123d27215a2c6d904a75bfa2cceb6337d0d3364dc791f48844766f05",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity."
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "The program runner provides the same fixed-capacity tail capture and explicit truncation indication for diagnostic child output without terminating a child merely because its diagnostic output reaches the capture capacity.",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 1
+}

@@ -542,7 +542,7 @@ mod tests {
 
     #[test]
     fn test_derive_handler_repeated_active_branch_invocations_write_identical_bytes() {
-        const TRACK_ID: &str = "2026-08-01-deterministic-json-serialization";
+        const TRACK_ID: &str = "2026-08-13-test-obligation-method-anchor-ownership";
 
         let _guard = crate::test_support::process_env_lock().lock().unwrap();
         let workspace = tempfile::tempdir().unwrap();
@@ -580,13 +580,14 @@ mod tests {
                 .and_then(serde_json::Value::as_array_mut)
                 .unwrap()
                 .iter_mut()
-                .find(|task| task.get("id").and_then(serde_json::Value::as_str) == Some("T29"))
+                .find(|task| task.get("id").and_then(serde_json::Value::as_str) == Some("T10"))
                 .unwrap();
             let task_fields = task.as_object_mut().unwrap();
             task_fields.insert("status".to_owned(), serde_json::json!("todo"));
             task_fields.remove("commit_hash");
             std::fs::write(&impl_plan_path, serde_json::to_string_pretty(&impl_plan).unwrap())
                 .unwrap();
+
             assert_eq!(
                 FsTrackStatusReaderAdapter::new()
                     .read_status(&workspace_root.join("track/items"), TRACK_ID)

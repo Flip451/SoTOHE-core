@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-14-child-output-ring-capture",
+  "entries": {
+    "T001": [
+      {
+        "layer": "usecase",
+        "entry_key": "ReviewFixRunner"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "CodexReviewFixRunner"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "usecase",
+        "entry_key": "CapturedProgramOutput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "CapturedStreamOutput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FailedProgramExecutionRecord"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ProgramExecutionRecord"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ProgramOutputStream"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ProgramRunOutcome"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ProgramRunnerPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SuccessfulProgramExecutionRecord"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "ProcessProgramRunner"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "PhaseCommandDriver"
+      }
+    ]
+  }
+}

@@ -4,9 +4,10 @@ use domain::CommitHash;
 use domain::review_v2::{
     FastVerdict, FilePath, NotRequiredReason, RequiredReason, ReviewApprovalVerdict, ReviewHash,
     ReviewOutcome, ReviewReader, ReviewScopeConfig, ReviewState, ReviewTarget, ScopeName, Verdict,
+    derive_review_approval_verdict,
 };
 
-use super::error::ReviewCycleError;
+use super::error::{DiffGetError, ReviewCycleError};
 use super::ports::{DiffGetter, ReviewHasher, Reviewer};
 
 /// Review cycle orchestrator.
@@ -66,8 +67,10 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
         let (verdict, log_info) = self.reviewer.review(&target_before)?;
 
         // Check for file changes during review
-        let target_after = self.get_scope_target(scope)?;
-        let hash_after = self.hasher.calc(&target_after)?;
+        let target_after =
+            self.get_scope_target(scope).map_err(ReviewCycleError::PostReviewDiff)?;
+        let hash_after =
+            self.hasher.calc(&target_after).map_err(ReviewCycleError::PostReviewHash)?;
         if hash_before != hash_after {
             return Err(ReviewCycleError::FileChangedDuringReview);
         }
@@ -98,8 +101,10 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
 
         let (verdict, log_info) = self.reviewer.fast_review(&target_before)?;
 
-        let target_after = self.get_scope_target(scope)?;
-        let hash_after = self.hasher.calc(&target_after)?;
+        let target_after =
+            self.get_scope_target(scope).map_err(ReviewCycleError::PostReviewDiff)?;
+        let hash_after =
+            self.hasher.calc(&target_after).map_err(ReviewCycleError::PostReviewHash)?;
         if hash_before != hash_after {
             return Err(ReviewCycleError::FileChangedDuringReview);
         }
@@ -192,37 +197,11 @@ impl<R: Reviewer, H: ReviewHasher, D: DiffGetter> ReviewCycle<R, H, D> {
     ) -> Result<ReviewApprovalVerdict, ReviewCycleError> {
         let states = self.get_review_states(reader)?;
 
-        // Collect Required(*) scopes as (ScopeName, RequiredReason) pairs.
-        let required: Vec<(ScopeName, RequiredReason)> = states
-            .into_iter()
-            .filter_map(|(name, state)| match state {
-                ReviewState::Required(reason) => Some((name, reason)),
-                ReviewState::NotRequired(_) => None,
-            })
-            .collect();
-
-        if required.is_empty() {
-            return Ok(ReviewApprovalVerdict::Approved);
-        }
-
-        // Bypass: all Required scopes are NotStarted AND review.json is absent.
-        let all_not_started =
-            required.iter().all(|(_, reason)| matches!(reason, RequiredReason::NotStarted));
-        if all_not_started && !review_json_exists {
-            return Ok(ReviewApprovalVerdict::ApprovedWithBypass {
-                not_started_count: required.len(),
-            });
-        }
-
-        let mut required_scopes: Vec<ScopeName> =
-            required.into_iter().map(|(name, _)| name).collect();
-        // Sort by display representation for deterministic output across HashMap iteration.
-        required_scopes.sort_by_key(|a| a.to_string());
-        Ok(ReviewApprovalVerdict::Blocked { required_scopes })
+        Ok(derive_review_approval_verdict(states, review_json_exists))
     }
 
     /// Helper: gets the classified files for a single scope from the current diff.
-    fn get_scope_target(&self, scope: &ScopeName) -> Result<ReviewTarget, ReviewCycleError> {
+    fn get_scope_target(&self, scope: &ScopeName) -> Result<ReviewTarget, DiffGetError> {
         let files = self.diff_getter.list_diff_files(&self.base)?;
         let classified = self.scope_config.classify(&files);
         let scope_files: Vec<FilePath> = classified.get(scope).cloned().unwrap_or_default();

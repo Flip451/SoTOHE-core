@@ -1159,6 +1159,58 @@ fn test_results_new_keeps_unresolved_skipped_lane_informational() {
 }
 
 #[test]
+fn test_results_does_not_report_unbound_anchorless_obligation_as_missing() {
+    let obligation = obligation_with_spec_refs("Money", "status-lane", Vec::new());
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_type(
+        TypeName::new("Money").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            ModulePath::root(),
+            None,
+            Vec::new(),
+            Vec::new(),
+        ),
+    );
+    let task_id = TaskId::try_new("T001".to_owned()).unwrap();
+    let mut entries = BTreeMap::new();
+    entries.insert(
+        task_id.clone(),
+        vec![ContractedEntryRef::new(LayerId::try_new("domain").unwrap(), entry_key("Money"))],
+    );
+    let mut statuses = HashMap::new();
+    statuses.insert(task_id, TaskStatusKind::Done);
+
+    let output = TestObligationResultsInteractor::new(
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(track(), Vec::new())))),
+        Arc::new(StatusScanner),
+        Arc::new(StubFulfillmentCache(None)),
+        Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(StatusSpecReader(status_spec())),
+        Arc::new(StatusCatalogueReader(catalogue)),
+        Arc::new(StatusTaskContractReader(TaskContractDocument::new(track(), entries).unwrap())),
+        Arc::new(StatusImplPlanReader(statuses)),
+    )
+    .execute(&status_command())
+    .unwrap();
+
+    let summaries = output.status_lane_summaries().unwrap();
+    assert!(summaries.iter().all(|summary| summary.missing_count() == 0));
+}
+
+#[test]
 fn test_results_command_with_unreadable_catalogue_marks_status_lanes_unavailable() {
     let command =
         TestObligationResultsCommand::new(track(), vec![PathBuf::from("domain-types.json")]);

@@ -1,9 +1,6 @@
 //! `ref_verify` command family — per-context composition root and CliApp shim.
 
-use std::path::PathBuf;
 use std::sync::Arc;
-
-use crate::{CommandOutcome, error::CompositionError};
 
 // ---------------------------------------------------------------------------
 // Per-context composition root
@@ -27,55 +24,6 @@ impl Default for RefVerifyCompositionRoot {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct RefVerifyRunInput {
-    pub track_id: String,
-    pub items_dir: PathBuf,
-}
-
-/// Chain filter at the `cli_composition` boundary.
-///
-/// Mirrors `cli_driver::ref_verify::RefVerifyChainSelect`; callers of
-/// `ref_verify_results` must not depend on `usecase::ref_verify` types.
-#[derive(Debug, Clone)]
-pub enum RefVerifyChainFilter {
-    Chain1,
-    Chain2,
-    All,
-}
-
-/// Verdict filter at the `cli_composition` boundary.
-///
-/// Mirrors `cli_driver::ref_verify::RefVerifyVerdictSelect`; callers of
-/// `ref_verify_results` must not depend on `usecase::ref_verify` types.
-#[derive(Debug, Clone)]
-pub enum RefVerifyVerdictFilter {
-    FailPending,
-    Pass,
-    Fail,
-    Pending,
-    All,
-}
-
-/// Input for the `ref_verify results` command at the cli_composition boundary.
-///
-/// Uses composition-owned filter types (not usecase-layer types) so callers
-/// do not need to depend on `usecase::ref_verify`.
-#[derive(Debug, Clone)]
-pub struct RefVerifyResultsInput {
-    pub track_id: String,
-    pub items_dir: PathBuf,
-    pub chain: RefVerifyChainFilter,
-    pub layer: String,
-    pub verdict: RefVerifyVerdictFilter,
-}
-
-#[derive(Debug, Clone)]
-pub struct RefVerifyCheckApprovedInput {
-    pub track_id: String,
-    pub items_dir: PathBuf,
-}
-
 impl RefVerifyCompositionRoot {
     /// Build a wired [`cli_driver::ref_verify::RefVerifyDriver`] for the ref_verify family.
     ///
@@ -86,61 +34,6 @@ impl RefVerifyCompositionRoot {
         let service = Arc::new(infrastructure::FsRefVerifyAggregateAdapter::new())
             as Arc<dyn usecase::ref_verify::RefVerifyAggregateService>;
         cli_driver::ref_verify::RefVerifyDriver::new(service)
-    }
-
-    pub fn ref_verify_run(
-        &self,
-        input: RefVerifyRunInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use cli_driver::ref_verify::{RefVerifyInput, RefVerifyRunInput as DriverInput};
-
-        let driver_input = DriverInput { track_id: input.track_id, items_dir: input.items_dir };
-        Ok(self.ref_verify_driver().handle(RefVerifyInput::Run(driver_input)))
-    }
-
-    pub fn ref_verify_check_approved(
-        &self,
-        input: RefVerifyCheckApprovedInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use cli_driver::ref_verify::{RefVerifyCheckApprovedInput as DriverInput, RefVerifyInput};
-
-        let driver_input = DriverInput { track_id: input.track_id, items_dir: input.items_dir };
-        Ok(self.ref_verify_driver().handle(RefVerifyInput::CheckApproved(driver_input)))
-    }
-
-    /// Wire and dispatch the `ref_verify results` command.
-    ///
-    /// Converts composition-owned filter types to cli_driver-level representations and
-    /// delegates to [`cli_driver::ref_verify::RefVerifyDriver`].
-    pub fn ref_verify_results(
-        &self,
-        input: RefVerifyResultsInput,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use cli_driver::ref_verify::{
-            RefVerifyChainSelect, RefVerifyInput, RefVerifyResultsInput as DriverInput,
-            RefVerifyVerdictSelect,
-        };
-
-        let chain = match input.chain {
-            RefVerifyChainFilter::Chain1 => RefVerifyChainSelect::Chain1,
-            RefVerifyChainFilter::Chain2 => RefVerifyChainSelect::Chain2,
-            RefVerifyChainFilter::All => RefVerifyChainSelect::All,
-        };
-        let verdict = match input.verdict {
-            RefVerifyVerdictFilter::FailPending => RefVerifyVerdictSelect::FailPending,
-            RefVerifyVerdictFilter::Pass => RefVerifyVerdictSelect::Pass,
-            RefVerifyVerdictFilter::Fail => RefVerifyVerdictSelect::Fail,
-            RefVerifyVerdictFilter::Pending => RefVerifyVerdictSelect::Pending,
-            RefVerifyVerdictFilter::All => RefVerifyVerdictSelect::All,
-        };
-        let driver_input = DriverInput {
-            track_id: input.track_id,
-            items_dir: input.items_dir,
-            chain,
-            layer: input.layer,
-            verdict,
-        };
-        Ok(self.ref_verify_driver().handle(RefVerifyInput::Results(driver_input)))
     }
 }
 
@@ -157,15 +50,24 @@ mod tests {
     use std::path::{Path, PathBuf};
 
     use super::RefVerifyCompositionRoot;
-    use crate::{
-        CommandOutcome, RefVerifyChainFilter, RefVerifyCheckApprovedInput, RefVerifyResultsInput,
-        RefVerifyRunInput, RefVerifyVerdictFilter, test_support::repo_root_for_tests,
-    };
+    use crate::{CommandOutcome, test_support::repo_root_for_tests};
     use cli_driver::ref_verify::{
         RefVerifyChainSelect, RefVerifyCheckApprovedInput as DriverCheckApprovedInput,
         RefVerifyInput, RefVerifyResultsInput as DriverResultsInput,
         RefVerifyRunInput as DriverRunInput, RefVerifyVerdictSelect,
     };
+
+    #[derive(Debug, Clone)]
+    struct RefVerifyRunInput {
+        track_id: String,
+        items_dir: PathBuf,
+    }
+
+    #[derive(Debug, Clone)]
+    struct RefVerifyCheckApprovedInput {
+        track_id: String,
+        items_dir: PathBuf,
+    }
 
     fn run_via_driver(
         input: RefVerifyRunInput,
@@ -179,35 +81,27 @@ mod tests {
     fn check_approved_via_driver(
         input: RefVerifyCheckApprovedInput,
     ) -> Result<CommandOutcome, crate::error::CompositionError> {
-        let driver_input =
-            DriverCheckApprovedInput { track_id: input.track_id, items_dir: input.items_dir };
+        check_selected_chain_approved_via_driver(
+            input.track_id,
+            input.items_dir,
+            RefVerifyChainSelect::All,
+        )
+    }
+
+    fn check_selected_chain_approved_via_driver(
+        track_id: String,
+        items_dir: PathBuf,
+        chain: RefVerifyChainSelect,
+    ) -> Result<CommandOutcome, crate::error::CompositionError> {
+        let driver_input = DriverCheckApprovedInput { track_id, items_dir, chain };
         Ok(RefVerifyCompositionRoot::new()
             .ref_verify_driver()
             .handle(RefVerifyInput::CheckApproved(driver_input)))
     }
 
     fn results_via_driver(
-        input: RefVerifyResultsInput,
+        driver_input: DriverResultsInput,
     ) -> Result<CommandOutcome, crate::error::CompositionError> {
-        let chain = match input.chain {
-            RefVerifyChainFilter::Chain1 => RefVerifyChainSelect::Chain1,
-            RefVerifyChainFilter::Chain2 => RefVerifyChainSelect::Chain2,
-            RefVerifyChainFilter::All => RefVerifyChainSelect::All,
-        };
-        let verdict = match input.verdict {
-            RefVerifyVerdictFilter::FailPending => RefVerifyVerdictSelect::FailPending,
-            RefVerifyVerdictFilter::Pass => RefVerifyVerdictSelect::Pass,
-            RefVerifyVerdictFilter::Fail => RefVerifyVerdictSelect::Fail,
-            RefVerifyVerdictFilter::Pending => RefVerifyVerdictSelect::Pending,
-            RefVerifyVerdictFilter::All => RefVerifyVerdictSelect::All,
-        };
-        let driver_input = DriverResultsInput {
-            track_id: input.track_id,
-            items_dir: input.items_dir,
-            chain,
-            layer: input.layer,
-            verdict,
-        };
         Ok(RefVerifyCompositionRoot::new()
             .ref_verify_driver()
             .handle(RefVerifyInput::Results(driver_input)))
@@ -364,6 +258,20 @@ mod tests {
         })
     }
 
+    fn ref_verify_chain2_cmd(
+        track_id: &str,
+    ) -> Result<usecase::ref_verify::RefVerifyCommand, RefVerifyTestError> {
+        Ok(usecase::ref_verify::RefVerifyCommand {
+            track_id: domain::TrackId::try_new(track_id.to_owned())
+                .map_err(|e| RefVerifyTestError(format!("invalid track ID: {e}")))?,
+            scope: usecase::ref_verify::RefVerifyScope::Chain2 {
+                layer: domain::tddd::LayerId::try_new("test_domain".to_owned())
+                    .map_err(|e| RefVerifyTestError(format!("invalid layer ID: {e}")))?,
+            },
+            current_branch: format!("track/{track_id}"),
+        })
+    }
+
     fn write_cache_for_first_chain1_pair(
         items_dir: &Path,
         track_id: &str,
@@ -410,6 +318,123 @@ mod tests {
                 citation: EvidenceCitation::try_new("guarded path decision".to_owned()).unwrap(),
             }],
         );
+    }
+
+    fn write_stale_pass_cache_for_first_chain1_pair(items_dir: &Path, track_id: &str) {
+        use domain::ContentHash;
+        use domain::tddd::semantic_verify::{
+            EvidenceCitation, SemanticVerdict, SemanticVerifyEntry,
+        };
+        use infrastructure::ref_verify::{RefVerifyCacheAdapter, RefVerifyPairSourceAdapter};
+        use usecase::ref_verify::{
+            RefVerifyCachePort as _, RefVerifyCacheScope, RefVerifyPairSourcePort as _,
+        };
+
+        let project_root = project_root_from_items_dir(items_dir).to_path_buf();
+        let cmd = ref_verify_chain1_cmd(track_id).unwrap();
+        let pair = RefVerifyPairSourceAdapter::new(project_root.clone())
+            .load_pairs(&cmd, &usecase::ref_verify::RefVerifyConfig::default())
+            .unwrap()
+            .into_iter()
+            .find(|pair| !pair.known_bad)
+            .unwrap();
+        let stale_entry = SemanticVerifyEntry::new(
+            ContentHash::from_bytes([0; 32]),
+            pair.evidence_hash,
+            SemanticVerdict::Pass {
+                citation: EvidenceCitation::try_new("stale guarded path decision".to_owned())
+                    .unwrap(),
+            },
+            pair.claim_origin,
+            pair.evidence_origin,
+        );
+        RefVerifyCacheAdapter::new(project_root)
+            .save_entries(&cmd, &RefVerifyCacheScope::SpecAdr, vec![stale_entry])
+            .unwrap();
+    }
+
+    fn write_cache_for_first_chain2_pair(
+        items_dir: &Path,
+        track_id: &str,
+        verdicts: Vec<domain::tddd::semantic_verify::SemanticVerdict>,
+    ) {
+        use domain::tddd::semantic_verify::SemanticVerifyEntry;
+        use infrastructure::ref_verify::{RefVerifyCacheAdapter, RefVerifyPairSourceAdapter};
+        use usecase::ref_verify::{
+            RefVerifyCachePort as _, RefVerifyCacheScope, RefVerifyPairSourcePort as _,
+        };
+
+        let project_root = project_root_from_items_dir(items_dir).to_path_buf();
+        let cmd = ref_verify_chain2_cmd(track_id).unwrap();
+        let pair = RefVerifyPairSourceAdapter::new(project_root.clone())
+            .load_pairs(&cmd, &usecase::ref_verify::RefVerifyConfig::default())
+            .unwrap()
+            .into_iter()
+            .find(|pair| !pair.known_bad)
+            .unwrap();
+        let entries = verdicts
+            .into_iter()
+            .map(|verdict| {
+                SemanticVerifyEntry::new(
+                    pair.claim_hash.clone(),
+                    pair.evidence_hash.clone(),
+                    verdict,
+                    pair.claim_origin.clone(),
+                    pair.evidence_origin.clone(),
+                )
+            })
+            .collect();
+        let layer = domain::tddd::LayerId::try_new("test_domain".to_owned()).unwrap();
+        RefVerifyCacheAdapter::new(project_root)
+            .save_entries(&cmd, &RefVerifyCacheScope::CatalogueSpec { layer }, entries)
+            .unwrap();
+    }
+
+    fn write_pass_cache_for_first_chain2_pair(items_dir: &Path, track_id: &str) {
+        use domain::tddd::semantic_verify::{EvidenceCitation, SemanticVerdict};
+
+        write_cache_for_first_chain2_pair(
+            items_dir,
+            track_id,
+            vec![SemanticVerdict::Pass {
+                citation: EvidenceCitation::try_new("guarded catalogue reference".to_owned())
+                    .unwrap(),
+            }],
+        );
+    }
+
+    fn write_stale_pass_cache_for_first_chain2_pair(items_dir: &Path, track_id: &str) {
+        use domain::ContentHash;
+        use domain::tddd::semantic_verify::{
+            EvidenceCitation, SemanticVerdict, SemanticVerifyEntry,
+        };
+        use infrastructure::ref_verify::{RefVerifyCacheAdapter, RefVerifyPairSourceAdapter};
+        use usecase::ref_verify::{
+            RefVerifyCachePort as _, RefVerifyCacheScope, RefVerifyPairSourcePort as _,
+        };
+
+        let project_root = project_root_from_items_dir(items_dir).to_path_buf();
+        let cmd = ref_verify_chain2_cmd(track_id).unwrap();
+        let pair = RefVerifyPairSourceAdapter::new(project_root.clone())
+            .load_pairs(&cmd, &usecase::ref_verify::RefVerifyConfig::default())
+            .unwrap()
+            .into_iter()
+            .find(|pair| !pair.known_bad)
+            .unwrap();
+        let stale_entry = SemanticVerifyEntry::new(
+            ContentHash::from_bytes([0; 32]),
+            pair.evidence_hash,
+            SemanticVerdict::Pass {
+                citation: EvidenceCitation::try_new("stale guarded catalogue reference".to_owned())
+                    .unwrap(),
+            },
+            pair.claim_origin,
+            pair.evidence_origin,
+        );
+        let layer = domain::tddd::LayerId::try_new("test_domain".to_owned()).unwrap();
+        RefVerifyCacheAdapter::new(project_root)
+            .save_entries(&cmd, &RefVerifyCacheScope::CatalogueSpec { layer }, vec![stale_entry])
+            .unwrap();
     }
 
     #[cfg(unix)]
@@ -598,6 +623,30 @@ exit 64
 
     #[cfg(unix)]
     #[test]
+    fn test_ref_verify_check_approved_selected_chain2_missing_track_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-missing-track";
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+        let error = outcome.stderr.as_deref().unwrap_or_default();
+
+        assert_eq!(outcome.exit_code, 1, "missing selected Chain-2 track must block: {outcome:?}");
+        assert!(
+            error.contains("track directory not found"),
+            "missing selected Chain-2 track must fail closed, got: {error}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
     fn test_ref_verify_check_approved_non_vacuous_pass_cache_exits_zero() {
         let (_tmp, items_dir) = temp_project_with_items_dir();
         let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
@@ -614,6 +663,431 @@ exit 64
         .unwrap();
 
         assert_eq!(outcome.exit_code, 0, "expected approved outcome: {outcome:?}");
+    }
+
+    /// A selected Chain-1 gate succeeds when its real pair is current and
+    /// verified, even while the independently scoped Chain-2 pair is pending.
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain1_pass_ignores_pending_chain2() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain1-pass";
+        write_chain1_fixture(&items_dir, track_id);
+        add_chain2_tddd_layer_to_fixture(&items_dir, track_id);
+        write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain1,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 0, "selected Chain-1 must be approved: {outcome:?}");
+    }
+
+    /// A selected Chain-1 gate does not parse Chain-2 rules at all.  A malformed
+    /// Chain-2 configuration therefore cannot block an independently approved
+    /// Chain-1 cache snapshot.
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain1_pass_ignores_unenumerable_chain2() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain1-unenumerable-chain2";
+        write_chain1_fixture(&items_dir, track_id);
+        write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
+        std::fs::write(project_root.join("architecture-rules.json"), "{ malformed rules").unwrap();
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain1,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 0, "selected Chain-1 must be approved: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_missing_rules_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-missing-rules";
+        std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+        let error = outcome.stderr.as_deref().unwrap_or_default();
+
+        assert_eq!(outcome.exit_code, 1, "missing Chain-2 rules must block: {outcome:?}");
+        assert!(
+            error.contains("cannot load TDDD layer bindings for selected Chain-2 approval"),
+            "missing selected Chain-2 rules must fail closed, got: {error}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_catalogue_without_spec_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-catalogue-without-spec";
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            project_root.join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"test_domain","tddd":{"enabled":true}}]}"#,
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("test_domain-types.json"), "{}").unwrap();
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+        let error = outcome.stderr.as_deref().unwrap_or_default();
+
+        assert_eq!(outcome.exit_code, 1, "catalogue without spec must block: {outcome:?}");
+        assert!(
+            error.contains("spec.json not found") && error.contains("SoT Chain ordering violation"),
+            "selected Chain-2 catalogue before spec must fail closed, got: {error}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_spec_directory_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-spec-directory";
+        let track_dir = items_dir.join(track_id);
+        std::fs::create_dir_all(track_dir.join("spec.json")).unwrap();
+        std::fs::write(
+            project_root.join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"test_domain","tddd":{"enabled":true}}]}"#,
+        )
+        .unwrap();
+        std::fs::write(track_dir.join("test_domain-types.json"), "{}").unwrap();
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+        let error = outcome.stderr.as_deref().unwrap_or_default();
+
+        assert_eq!(outcome.exit_code, 1, "spec directory must block: {outcome:?}");
+        assert!(
+            error.contains("is not a regular file"),
+            "selected Chain-2 spec directory must fail closed, got: {error}"
+        );
+    }
+
+    /// A selected Chain-2 gate succeeds when its real pair is current and
+    /// verified, even while the independently scoped Chain-1 pair is pending.
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_pass_ignores_pending_chain1() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-pass";
+        write_chain1_fixture(&items_dir, track_id);
+        add_chain2_tddd_layer_to_fixture(&items_dir, track_id);
+        write_pass_cache_for_first_chain2_pair(&items_dir, track_id);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 0, "selected Chain-2 must be approved: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain1_absent_cache_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain1-absent";
+        write_chain1_fixture(&items_dir, track_id);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain1,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "absent Chain-1 cache must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain1_stale_cache_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain1-stale";
+        write_chain1_fixture(&items_dir, track_id);
+        write_stale_pass_cache_for_first_chain1_pair(&items_dir, track_id);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain1,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "stale Chain-1 cache must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain1_pending_cache_exits_one() {
+        use domain::tddd::semantic_verify::SemanticVerdict;
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain1-pending";
+        write_chain1_fixture(&items_dir, track_id);
+        write_cache_for_first_chain1_pair(&items_dir, track_id, vec![SemanticVerdict::Pending]);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain1,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "pending Chain-1 cache must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain1_failed_cache_exits_one() {
+        use domain::tddd::semantic_verify::SemanticVerdict;
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain1-failed";
+        write_chain1_fixture(&items_dir, track_id);
+        write_cache_for_first_chain1_pair(
+            &items_dir,
+            track_id,
+            vec![SemanticVerdict::Fail {
+                reason: "selected Chain-1 verification failed".to_owned(),
+            }],
+        );
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain1,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "failed Chain-1 cache must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain1_duplicate_pass_fail_exits_one() {
+        use domain::tddd::semantic_verify::{EvidenceCitation, SemanticVerdict};
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain1-duplicate";
+        write_chain1_fixture(&items_dir, track_id);
+        write_cache_for_first_chain1_pair(
+            &items_dir,
+            track_id,
+            vec![
+                SemanticVerdict::Pass {
+                    citation: EvidenceCitation::try_new("guarded path decision".to_owned())
+                        .unwrap(),
+                },
+                SemanticVerdict::Fail { reason: "duplicate selected Chain-1 failure".to_owned() },
+            ],
+        );
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain1,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "duplicate Chain-1 failure must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_absent_cache_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-absent";
+        write_chain1_fixture(&items_dir, track_id);
+        add_chain2_tddd_layer_to_fixture(&items_dir, track_id);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "absent Chain-2 cache must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_stale_cache_exits_one() {
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-stale";
+        write_chain1_fixture(&items_dir, track_id);
+        add_chain2_tddd_layer_to_fixture(&items_dir, track_id);
+        write_stale_pass_cache_for_first_chain2_pair(&items_dir, track_id);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "stale Chain-2 cache must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_pending_cache_exits_one() {
+        use domain::tddd::semantic_verify::SemanticVerdict;
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-pending";
+        write_chain1_fixture(&items_dir, track_id);
+        add_chain2_tddd_layer_to_fixture(&items_dir, track_id);
+        write_cache_for_first_chain2_pair(&items_dir, track_id, vec![SemanticVerdict::Pending]);
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "pending Chain-2 cache must block: {outcome:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_failed_cache_exits_one() {
+        use domain::tddd::semantic_verify::SemanticVerdict;
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-failed";
+        write_chain1_fixture(&items_dir, track_id);
+        add_chain2_tddd_layer_to_fixture(&items_dir, track_id);
+        write_cache_for_first_chain2_pair(
+            &items_dir,
+            track_id,
+            vec![SemanticVerdict::Fail {
+                reason: "selected Chain-2 verification failed".to_owned(),
+            }],
+        );
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "failed Chain-2 cache must block: {outcome:?}");
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|message| message.contains("selected Chain-2 verification failed")),
+            "failure reason must surface through selected Chain-2: {outcome:?}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_ref_verify_check_approved_selected_chain2_duplicate_pass_fail_exits_one() {
+        use domain::tddd::semantic_verify::{EvidenceCitation, SemanticVerdict};
+
+        let (_tmp, items_dir) = temp_project_with_items_dir();
+        let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
+        let track_id = "test-ref-verify-selected-chain2-duplicate";
+        write_chain1_fixture(&items_dir, track_id);
+        add_chain2_tddd_layer_to_fixture(&items_dir, track_id);
+        write_cache_for_first_chain2_pair(
+            &items_dir,
+            track_id,
+            vec![
+                SemanticVerdict::Pass {
+                    citation: EvidenceCitation::try_new("catalogue reference".to_owned()).unwrap(),
+                },
+                SemanticVerdict::Fail { reason: "duplicate selected Chain-2 failure".to_owned() },
+            ],
+        );
+
+        let outcome = with_fake_track_branch(&project_root, track_id, || {
+            check_selected_chain_approved_via_driver(
+                track_id.to_owned(),
+                items_dir,
+                RefVerifyChainSelect::Chain2,
+            )
+        })
+        .unwrap();
+
+        assert_eq!(outcome.exit_code, 1, "duplicate Chain-2 failure must block: {outcome:?}");
     }
 
     /// Discriminates the All-scope pair set in `ref_verify_check_approved`.
@@ -1157,20 +1631,18 @@ exit 64
     #[cfg(unix)]
     #[test]
     fn test_ref_verify_results_no_cache_returns_all_pending() {
-        use super::{RefVerifyChainFilter, RefVerifyResultsInput, RefVerifyVerdictFilter};
-
         let (_tmp, items_dir) = temp_project_with_items_dir();
         let project_root = project_root_from_items_dir(&items_dir).to_path_buf();
         let track_id = "test-ref-verify-results-no-cache";
         write_chain1_fixture(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            results_via_driver(RefVerifyResultsInput {
+            results_via_driver(DriverResultsInput {
                 track_id: track_id.to_owned(),
                 items_dir: items_dir.clone(),
-                chain: RefVerifyChainFilter::All,
+                chain: RefVerifyChainSelect::All,
                 layer: "all".to_owned(),
-                verdict: RefVerifyVerdictFilter::FailPending,
+                verdict: RefVerifyVerdictSelect::FailPending,
             })
             .unwrap()
         });

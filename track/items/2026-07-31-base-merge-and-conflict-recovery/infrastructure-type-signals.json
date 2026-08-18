@@ -1,0 +1,88 @@
+{
+  "baseline_hash": "cb2be6014b113d9a3b6ce074528ebb0ca2fe29742f5867abdbe4dfad89a9bd7d",
+  "declaration_hash": "b34abe14e19b03d5948c3345e3547cc21fff43bdf40962db11c3b75fc326b52d",
+  "generated_at": "2026-08-13T13:53:49Z",
+  "head_commit": "633de68ce30f768d44c24a4b172f58f2ecd8a4c1",
+  "schema_version": 4,
+  "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "EvaluateSignalsError"
+    },
+    {
+      "found_items": [
+        "usecase::base_merge::BaseMergeCleanupPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "FsBaseMergeCleanupAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::base_merge::BaseMergeContextPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "FsBaseMergeContextAdapter"
+    },
+    {
+      "found_items": [
+        "usecase::base_merge::BaseMergeGitPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "FsBaseMergeGitAdapter"
+    },
+    {
+      "found_items": [
+        "Default",
+        "usecase::git_stash::GitStashPort"
+      ],
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "FsGitStashAdapter"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "type_name": "TypeSignalsCodecError"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+    },
+    {
+      "found_type": false,
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "type_name": "infrastructure::verify::spec_states::check_impl_catalog_from_signals_file"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "type_name": "TypeSignalsExecutorAdapter"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_codec::decode"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "infrastructure::tddd::type_signals_codec::encode"
+    }
+  ]
+}

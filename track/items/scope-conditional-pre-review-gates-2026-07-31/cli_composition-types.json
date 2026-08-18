@@ -1,0 +1,503 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {
+    "cli_composition::review_v2::briefing::append_scope_briefing_reference_str": {
+      "action": "delete",
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli_composition::review_v2::scope::validate_review_group_name_str": {
+      "action": "delete",
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli_composition::review_v2::scope::validate_track_id_str": {
+      "action": "delete",
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "cli_composition::review_v2::shared::build_review_v2_str": {
+      "action": "delete",
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "build",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::phase_command::PhaseCommandDriver"
+        }
+      ],
+      "type_name": "PhaseCompositionRoot"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "ref_verify_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::ref_verify::RefVerifyDriver"
+        }
+      ],
+      "type_name": "RefVerifyCompositionRoot"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::review::ReviewDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_fix_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::review::ReviewFixDriver"
+        }
+      ],
+      "type_name": "ReviewCompositionRoot"
+    }
+  ],
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "PhaseCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PhaseCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "RefVerifyCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "ReviewCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityCompositionRoot": {
+      "action": "reference",
+      "docs": "Pre-existing capability composition root carried for driver edge exposure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "runtime_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "discover",
+          "params": [],
+          "returns": "Result<Self, CompositionError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capability_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::capability::CapabilityDriver"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "CodexReviewOutcome": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "review_v2::shared",
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "PhaseCompositionRoot": {
+      "action": "add",
+      "docs": "Phase-command composition root (IN-04, AC-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "phase_command",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyChainFilter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCheckApprovedInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyCompositionRoot": {
+      "action": "modify",
+      "docs": "Pure-DI ref-verify composition root exposing only construction and the wired CLI driver handoff (CN-06, AC-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "ref_verify",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyResultsInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyRunInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RefVerifyVerdictFilter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "ref_verify",
+      "spec_refs": [
+        {
+          "anchor": "CN-06",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewCompositionRoot": {
+      "action": "modify",
+      "docs": "Review command-family composition root (IN-15, AC-18, CN-09, AC-19, IN-16).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::review::ReviewDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "review_fix_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::review::ReviewFixDriver"
+        }
+      ],
+      "module_path": "review_v2::shim",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewResultsInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "review_v2::inputs",
+      "spec_refs": [
+        {
+          "anchor": "IN-15",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewSharedError": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "review_v2::shared",
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "ReviewV2Composition": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "review_v2::shared",
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    },
+    "RunReviewFixLocalInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "review_v2::inputs",
+      "spec_refs": [
+        {
+          "anchor": "CN-09",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        },
+        {
+          "anchor": "AC-19",
+          "file": "track/items/scope-conditional-pre-review-gates-2026-07-31/spec.json"
+        }
+      ]
+    }
+  }
+}

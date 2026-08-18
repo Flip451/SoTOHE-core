@@ -123,17 +123,20 @@ escalation after 🔴 / ERROR is this orchestrator's responsibility; apply the l
 defined in the `plan` workflow SSoT's "Phase 1 loop", "Phase 2 loop", and "Phase 3 loop"
 sections (see `.harness/workflows/track/plan.md`; do not re-state them here).
 
+Those phase workflows prepare their configured briefings and use only `bin/sotp phase enter`
+with their declared phase ids to launch phase writers. This orchestrator must not launch a
+phase writer outside that phase-entry path.
+
 Do NOT invoke the `plan` workflow: after Step 1, the orchestrator is on a `track/<id>` branch,
 so the `plan` workflow's Phase 0 (`init`, which requires the configured base branch) would fail.
 Plan artifacts are staged at Step 6 and committed at Step 7.
 
-Signal resolution rule for 🟡 (yellow): the `plan` workflow allows 🟡 to advance with a
-warning, but this `adr2pr` workflow requires actionable 🟡 to be resolved before Step 9
-(`full-cycle` begins). If Phase 1 or Phase 2 returns 🟡 after all reds are cleared,
-re-invoke the relevant writer to address the yellow before proceeding. Exception: the
-chain ⓪ 🟡 of an admitted delta draft is intentional — it rides to Step 10 and the strict
-merge gate, where the merge workflow's adjudication recovery obtains the user decision;
-do not attempt to resolve it inside this workflow.
+Signal resolution rule for 🟡 (yellow): resolve every actionable 🟡 before entering the next
+downstream phase. If Phase 1 or Phase 2 returns 🟡 after all reds are cleared, re-invoke the
+matching phase workflow and apply its `plan` workflow recovery loop before proceeding. Exception:
+the chain ⓪ 🟡 of an admitted delta draft is intentional — it rides to Step 10 and the strict
+merge gate, where the merge workflow's adjudication recovery obtains the user decision; do not
+attempt to resolve it inside this workflow.
 
 **Step 6: review workflow — plan artifacts**
 

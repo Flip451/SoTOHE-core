@@ -50,13 +50,12 @@ impl ReviewRoundType {
     ///
     /// Returns [`ReviewRoundTypeError`] for unrecognised values.
     pub fn parse(s: &str) -> Result<Self, ReviewRoundTypeError> {
-        match s {
-            "fast" => Ok(Self::Fast),
-            "final" => Ok(Self::Final),
-            other => Err(ReviewRoundTypeError::InvalidValue(format!(
-                "unknown round type: '{other}' (expected 'fast' or 'final')"
-            ))),
-        }
+        s.parse::<domain::RoundType>()
+            .map(|round| match round {
+                domain::RoundType::Fast => Self::Fast,
+                domain::RoundType::Final => Self::Final,
+            })
+            .map_err(|error| ReviewRoundTypeError::InvalidValue(error.to_string()))
     }
 }
 
@@ -193,7 +192,7 @@ mod tests {
     #[test]
     fn test_review_round_type_from_str_unknown_returns_error() {
         let err = ReviewRoundType::parse("bad").unwrap_err();
-        assert!(err.contains("bad"));
+        assert!(matches!(err, ReviewRoundTypeError::InvalidValue(_)));
     }
 
     #[test]

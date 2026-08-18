@@ -27,6 +27,12 @@ use super::dto_roles::{
     ContractRoleDto, DataRoleDto, IdentityAccessorDto, InvariantDeclDto, InvariantPredicateDto,
 };
 use super::dto_slots::{EntrySlotDto, TombstoneDto};
+use super::encode_validate::{validate_generic_params_for_encode, validate_type_alias_generics};
+use super::validate::{
+    validate_bound_str_with_generics, validate_type_alias_relaxed_bounds,
+    validate_type_alias_target, validate_type_alias_where_predicates,
+    validate_type_ref_str_with_generics,
+};
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -39,7 +45,8 @@ pub(super) fn domain_to_dto(
         .types()
         .iter()
         .map(|(k, v)| {
-            type_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
+            type_entry_to_dto(k.as_str(), v)
+                .map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
         })
         .collect::<Result<_, _>>()?;
     let mut traits: BTreeMap<String, EntrySlotDto<TraitEntryDto>> = doc
@@ -149,18 +156,50 @@ fn insert_tombstone<T>(
 // ---------------------------------------------------------------------------
 
 pub(super) fn type_entry_to_dto(
+    entry_name: &str,
     entry: &TypeEntry,
 ) -> Result<TypeEntryDto, CatalogueDocumentCodecError> {
-    let methods = entry.methods().iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    // Decode validates every entry-level generic declaration before it can be
+    // materialized.  Keep the encode boundary symmetric so malformed bounds,
+    // duplicate names, and shadowing are rejected before DTO serialization.
+    validate_generic_params_for_encode(entry_name, entry.generics(), &[])?;
+    let effective_generic_names = match entry.kind() {
+        TypeKindV2::TypeAlias { generics, .. } => {
+            let effective_generics: &[MethodGenericParam] =
+                if generics.is_empty() { entry.generics() } else { generics.as_slice() };
+            effective_generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>()
+        }
+        _ => entry.generics().iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>(),
+    };
+    let methods = entry
+        .methods()
+        .iter()
+        .map(|method| method_decl_to_dto_with_outer_generics(method, &effective_generic_names))
+        .collect::<Result<_, _>>()?;
+    let kind = type_kind_to_dto(entry_name, entry.kind(), entry.generics())?;
+    if let TypeKindV2::TypeAlias { generics: alias_generics, .. } = entry.kind() {
+        validate_type_alias_where_predicates(
+            entry_name,
+            entry.where_predicates(),
+            &effective_generic_names,
+        )?;
+        let effective_generics =
+            if alias_generics.is_empty() { entry.generics() } else { alias_generics.as_slice() };
+        validate_type_alias_relaxed_bounds(
+            entry_name,
+            effective_generics,
+            entry.where_predicates(),
+        )?;
+    }
     let where_predicates = entry
         .where_predicates()
         .iter()
-        .map(where_predicate_decl_to_dto)
+        .map(|predicate| where_predicate_decl_to_dto(predicate, &effective_generic_names))
         .collect::<Result<_, _>>()?;
     Ok(TypeEntryDto {
         action: entry.action().to_string(),
         role: data_role_to_dto(entry.role()),
-        kind: type_kind_to_dto(entry.kind()),
+        kind,
         methods,
         generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
@@ -237,17 +276,36 @@ fn invariants_to_dtos(invariants: &[InvariantDecl]) -> Vec<InvariantDeclDto> {
         .collect()
 }
 
-fn type_kind_to_dto(kind: &TypeKindV2) -> TypeKindDto {
+fn type_kind_to_dto(
+    entry_name: &str,
+    kind: &TypeKindV2,
+    entry_generics: &[MethodGenericParam],
+) -> Result<TypeKindDto, CatalogueDocumentCodecError> {
     match kind {
-        TypeKindV2::Struct(struct_kind) => TypeKindDto::Struct {
+        TypeKindV2::Struct(struct_kind) => Ok(TypeKindDto::Struct {
             shape: struct_shape_to_dto(&struct_kind.shape),
             typestate: struct_kind.typestate.as_ref().map(typestate_marker_to_dto),
-        },
+        }),
         TypeKindV2::Enum { variants } => {
-            TypeKindDto::Enum { variants: variants.iter().map(variant_decl_to_dto).collect() }
+            Ok(TypeKindDto::Enum { variants: variants.iter().map(variant_decl_to_dto).collect() })
         }
-        TypeKindV2::TypeAlias { target } => {
-            TypeKindDto::TypeAlias { target: target.as_str().to_owned() }
+        TypeKindV2::TypeAlias { target, generics } => {
+            if !generics.is_empty() && !entry_generics.is_empty() {
+                return Err(CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: entry_name.to_owned(),
+                    reason: "type alias generic declarations must not appear in both the entry and kind payload"
+                        .to_owned(),
+                });
+            }
+            let effective_generics = if generics.is_empty() { entry_generics } else { generics };
+            validate_type_alias_generics(entry_name, effective_generics)?;
+            let generic_names =
+                effective_generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+            validate_type_alias_target(entry_name, target.as_str(), &generic_names)?;
+            Ok(TypeKindDto::TypeAlias {
+                target: target.as_str().to_owned(),
+                generics: method_generic_params_to_dtos(generics),
+            })
         }
     }
 }
@@ -298,21 +356,33 @@ fn variant_payload_to_dto(payload: &VariantPayload) -> VariantPayloadDto {
     }
 }
 
-pub(super) fn method_decl_to_dto(
+fn method_decl_to_dto_with_outer_generics(
     m: &MethodDeclaration,
+    outer_generic_names: &[&str],
 ) -> Result<MethodDeclarationDto, CatalogueDocumentCodecError> {
-    let where_predicates =
-        m.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
+    validate_generic_params_for_encode(m.name().as_str(), m.generics(), outer_generic_names)?;
+    let generic_names = outer_generic_names
+        .iter()
+        .copied()
+        .chain(m.generics().iter().map(|generic| generic.name.as_str()))
+        .collect::<Vec<_>>();
+    let where_predicates = m
+        .where_predicates()
+        .iter()
+        .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
+        .collect::<Result<_, _>>()?;
     Ok(MethodDeclarationDto {
-        name: m.name.as_str().to_owned(),
-        receiver: m.receiver.map(|r| r.to_string()),
-        params: m.params.iter().map(param_decl_to_dto).collect(),
-        returns: m.returns.as_str().to_owned(),
-        is_async: m.is_async,
-        has_default_impl: m.has_default_impl,
-        generics: method_generic_params_to_dtos(&m.generics),
+        name: m.name().as_str().to_owned(),
+        receiver: m.receiver().map(|r| r.to_string()),
+        params: m.params().iter().map(param_decl_to_dto).collect(),
+        returns: m.returns().as_str().to_owned(),
+        is_async: m.is_async(),
+        has_default_impl: m.has_default_impl(),
+        generics: method_generic_params_to_dtos(m.generics()),
         where_predicates,
-        docs: m.docs.clone(),
+        docs: m.docs().map(|docs| docs.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(m.spec_refs()),
+        action: m.action().to_string(),
     })
 }
 
@@ -330,7 +400,14 @@ pub(super) fn method_decl_to_dto(
 /// when `w.rhs.len() != 1`.
 fn where_predicate_decl_to_dto(
     w: &WherePredicateDecl,
+    generic_names: &[&str],
 ) -> Result<WherePredicateDeclDto, CatalogueDocumentCodecError> {
+    validate_type_ref_str_with_generics(w.lhs.as_str(), generic_names).map_err(|error| {
+        CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: w.lhs.as_str().to_owned(),
+            reason: format!("invalid where predicate lhs syntax: {error}"),
+        }
+    })?;
     if w.rhs.is_empty() {
         return Err(CatalogueDocumentCodecError::InvalidEntry {
             entry_name: w.lhs.as_str().to_owned(),
@@ -358,6 +435,16 @@ fn where_predicate_decl_to_dto(
             BoundOpDto::Equal
         }
     };
+    for (idx, bound) in w.rhs.iter().enumerate() {
+        let validation = match w.operator {
+            BoundOp::Bound => validate_bound_str_with_generics(bound.as_str(), generic_names),
+            BoundOp::Equal => validate_type_ref_str_with_generics(bound.as_str(), generic_names),
+        };
+        validation.map_err(|error| CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: w.lhs.as_str().to_owned(),
+            reason: format!("invalid where predicate rhs[{idx}]: {error}"),
+        })?;
+    }
     Ok(WherePredicateDeclDto {
         lhs: w.lhs.as_str().to_owned(),
         rhs: w.rhs.iter().map(|b| b.as_str().to_owned()).collect(),
@@ -385,10 +472,13 @@ fn method_generic_params_to_dtos(generics: &[MethodGenericParam]) -> Vec<MethodG
 /// Emits `action`, `trait_ref`, and `for_type` fields exactly as stored in the
 /// schema's `TypeRef` slots.
 fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocumentCodecError> {
+    let generic_names =
+        t.impl_generics().iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+    validate_generic_params_for_encode("trait_impl", t.impl_generics(), &[])?;
     let impl_where_predicates = t
         .impl_where_predicates()
         .iter()
-        .map(where_predicate_decl_to_dto)
+        .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
         .collect::<Result<Vec<_>, _>>()?;
     Ok(TraitImplDto {
         action: t.action().to_string(),
@@ -402,11 +492,52 @@ fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocum
 pub(super) fn trait_entry_to_dto(
     entry: &TraitEntry,
 ) -> Result<TraitEntryDto, CatalogueDocumentCodecError> {
-    let methods = entry.methods().iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let generic_names =
+        entry.generics().iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+    validate_generic_params_for_encode("trait", entry.generics(), &[])?;
+    for (index, bound) in entry.supertrait_bounds().iter().enumerate() {
+        validate_bound_str_with_generics(bound.as_str(), &generic_names).map_err(|error| {
+            CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: "trait".to_owned(),
+                reason: format!("invalid supertrait bound[{index}]: {error}"),
+            }
+        })?;
+    }
+    for assoc in entry.assoc_types() {
+        for (index, bound) in assoc.bounds.iter().enumerate() {
+            validate_bound_str_with_generics(bound.as_str(), &generic_names).map_err(|error| {
+                CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: "trait".to_owned(),
+                    reason: format!("invalid associated type bound[{index}]: {error}"),
+                }
+            })?;
+        }
+        if let Some(default) = &assoc.default {
+            validate_type_ref_str_with_generics(default.as_str(), &generic_names).map_err(
+                |error| CatalogueDocumentCodecError::InvalidEntry {
+                    entry_name: "trait".to_owned(),
+                    reason: format!("invalid associated type default: {error}"),
+                },
+            )?;
+        }
+    }
+    for assoc in entry.assoc_consts() {
+        validate_type_ref_str_with_generics(assoc.ty.as_str(), &generic_names).map_err(
+            |error| CatalogueDocumentCodecError::InvalidEntry {
+                entry_name: "trait".to_owned(),
+                reason: format!("invalid associated const type: {error}"),
+            },
+        )?;
+    }
+    let methods = entry
+        .methods()
+        .iter()
+        .map(|method| method_decl_to_dto_with_outer_generics(method, &generic_names))
+        .collect::<Result<_, _>>()?;
     let where_predicates = entry
         .where_predicates()
         .iter()
-        .map(where_predicate_decl_to_dto)
+        .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
         .collect::<Result<_, _>>()?;
     let assoc_types = entry.assoc_types().iter().map(assoc_type_decl_to_dto).collect();
     let assoc_consts = entry.assoc_consts().iter().map(assoc_const_decl_to_dto).collect();
@@ -460,12 +591,19 @@ fn contract_role_to_dto(role: &ContractRole) -> ContractRoleDto {
 pub(super) fn inherent_impl_to_dto(
     decl: &InherentImplDeclV2,
 ) -> Result<InherentImplDeclDto, CatalogueDocumentCodecError> {
+    let generic_names =
+        decl.impl_generics.iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+    validate_generic_params_for_encode("inherent_impl", &decl.impl_generics, &[])?;
     let impl_where_predicates = decl
         .impl_where_predicates
         .iter()
-        .map(where_predicate_decl_to_dto)
+        .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
         .collect::<Result<Vec<_>, _>>()?;
-    let methods = decl.methods.iter().map(method_decl_to_dto).collect::<Result<Vec<_>, _>>()?;
+    let methods = decl
+        .methods
+        .iter()
+        .map(|method| method_decl_to_dto_with_outer_generics(method, &generic_names))
+        .collect::<Result<Vec<_>, _>>()?;
     Ok(InherentImplDeclDto {
         type_name: decl.type_name.as_str().to_owned(),
         impl_generics: method_generic_params_to_dtos(&decl.impl_generics),
@@ -477,10 +615,13 @@ pub(super) fn inherent_impl_to_dto(
 pub(super) fn function_entry_to_dto(
     entry: &FunctionEntry,
 ) -> Result<FunctionEntryDto, CatalogueDocumentCodecError> {
+    let generic_names =
+        entry.generics().iter().map(|generic| generic.name.as_str()).collect::<Vec<_>>();
+    validate_generic_params_for_encode("function", entry.generics(), &[])?;
     let where_predicates = entry
         .where_predicates()
         .iter()
-        .map(where_predicate_decl_to_dto)
+        .map(|predicate| where_predicate_decl_to_dto(predicate, &generic_names))
         .collect::<Result<_, _>>()?;
     Ok(FunctionEntryDto {
         action: entry.action().to_string(),

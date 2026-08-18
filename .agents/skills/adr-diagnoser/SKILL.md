@@ -1,6 +1,7 @@
 ---
 name: adr-diagnoser
 sandbox: read-only
+grok-sandbox: read-only
 description: >-
   Use when Codex is assigned the SoTOHE `adr-diagnoser` capability — the guardian of ADR
   decisions under the two-box model. Four read-only verdict modes; (1) Phase 0 edit judgment:
