@@ -1574,6 +1574,143 @@ fn test_materialized_scope_reports_uncited_findings() {
 }
 
 #[test]
+fn test_cited_anchor_ids_includes_method_only_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![covering_method("load", "AC-01")],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(cited.contains(&"AC-01".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_skips_delete_method_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_trait(
+        TraitName::new("TestPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![MethodDeclaration::new(
+                MethodName::new("drop").unwrap(),
+                None,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                false,
+                vec![],
+                vec![],
+                vec![SpecRef::new(
+                    PathBuf::from("spec.json"),
+                    SpecElementId::try_new("AC-99").unwrap(),
+                )],
+                ItemAction::Delete,
+                None,
+            )],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(!cited.contains(&"AC-99".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_includes_type_entry_method_only_refs() {
+    let mut catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    catalogue.insert_type(
+        TypeName::new("Compute").unwrap(),
+        TypeEntry::new(
+            ItemAction::Add,
+            DataRole::domain_service(),
+            TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+            vec![covering_method("compute", "AC-02")],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![SpecRef::new(
+                PathBuf::from("spec.json"),
+                SpecElementId::try_new("IN-05").unwrap(),
+            )],
+            vec![],
+        ),
+    );
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(cited.contains(&"AC-02".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_includes_inherent_method_only_refs() {
+    let mut catalogue = money_catalogue();
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Money").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![covering_method("amount", "AC-03")],
+    });
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(cited.contains(&"IN-05".to_owned()));
+    assert!(cited.contains(&"AC-03".to_owned()));
+}
+
+#[test]
+fn test_cited_anchor_ids_skips_inherent_methods_on_delete_owner() {
+    let mut catalogue = money_catalogue_in_layer("domain", "domain", ItemAction::Delete);
+    catalogue.push_inherent_impl(InherentImplDeclV2 {
+        type_name: TypeName::new("Money").unwrap(),
+        impl_generics: vec![],
+        impl_where_predicates: vec![],
+        methods: vec![covering_method("amount", "AC-04")],
+    });
+    let cited = crate::test_obligation::cited_anchor_ids(std::slice::from_ref(&catalogue));
+    assert!(!cited.contains(&"IN-05".to_owned()));
+    assert!(!cited.contains(&"AC-04".to_owned()));
+}
+
+#[test]
 fn test_obligation_declaration_text_uses_target_section_for_same_key() {
     let mut catalogue = money_catalogue();
     catalogue

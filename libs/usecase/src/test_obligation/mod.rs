@@ -412,8 +412,12 @@ pub(crate) fn catalogue_artifact_path(path: &Path) -> String {
         .join("/")
 }
 
-/// Collects the spec-anchor element ids cited by every catalogue entry across
-/// all layers (the "cited set" for the uncited `AC` / `CN` finding — IN-16).
+/// Collects the spec-anchor element ids cited by every catalogue entry and
+/// its methods (the "cited set" for the uncited `AC` / `CN` finding — IN-16).
+///
+/// Method refs are an independent owned set (0055 D1). An Add/Modify method
+/// may cite an AC/CN its parent entry does not cite; those ids still count.
+/// Delete methods, like Delete entries, do not contribute citations.
 #[must_use]
 pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> {
     use crate::catalogue_traversal::iter_catalogue_entries;
@@ -425,15 +429,54 @@ pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> 
             if matches!(entry.action, ItemAction::Delete) {
                 continue;
             }
-            for spec_ref in entry.spec_refs {
-                let id = spec_ref.anchor.as_ref().to_owned();
-                if !ids.contains(&id) {
-                    ids.push(id);
-                }
+            push_cited_anchor_ids(&mut ids, entry.spec_refs);
+        }
+        for entry in catalogue.types().values() {
+            if matches!(entry.action(), ItemAction::Delete) {
+                continue;
             }
+            push_method_cited_anchor_ids(&mut ids, entry.methods());
+        }
+        for entry in catalogue.traits().values() {
+            if matches!(entry.action(), ItemAction::Delete) {
+                continue;
+            }
+            push_method_cited_anchor_ids(&mut ids, entry.methods());
+        }
+        for inherent in catalogue.inherent_impls() {
+            let Some(owner) = catalogue.types().get(&inherent.type_name) else {
+                continue;
+            };
+            if matches!(owner.action(), ItemAction::Delete) {
+                continue;
+            }
+            push_method_cited_anchor_ids(&mut ids, &inherent.methods);
         }
     }
     ids
+}
+
+fn push_cited_anchor_ids(ids: &mut Vec<String>, spec_refs: &[domain::SpecRef]) {
+    for spec_ref in spec_refs {
+        let id = spec_ref.anchor.as_ref().to_owned();
+        if !ids.contains(&id) {
+            ids.push(id);
+        }
+    }
+}
+
+fn push_method_cited_anchor_ids(
+    ids: &mut Vec<String>,
+    methods: &[domain::tddd::catalogue_v2::MethodDeclaration],
+) {
+    use domain::tddd::catalogue_v2::roles::ItemAction;
+
+    for method in methods {
+        if matches!(method.action(), ItemAction::Delete) {
+            continue;
+        }
+        push_cited_anchor_ids(ids, method.spec_refs());
+    }
 }
 
 #[cfg(test)]

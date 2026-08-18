@@ -3366,6 +3366,43 @@
           "hash": "rvw1:sha256:c55281d0f9ac305f338df00bb1eac99d40f812bff4e2e4c8a124519b1972bd04",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T02:25:29Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/mod.rs",
+              "line": 471,
+              "message": "push_method_cited_anchor_ids counts spec_refs of methods whose own action is `delete` into the cited set. Entry-level traversal (mod.rs:428) excludes ItemAction::Delete, and spec AC-14 / ADR 0340 D1 (via 0359 D13) give method actions the same obligation-gate semantics as entry actions at method granularity — a delete method derives zero obligations. The state is reachable: domain structural validation (validate_method_anchor_coverage) only rejects empty spec_refs on Add/Modify methods (AC-03) and non-empty child spec_refs under Reference/Delete parents (AC-16), so a delete method with non-empty spec_refs under an Add/Modify parent passes (spec AC-02 limits rejections to exactly those two rules). If such a method is the only citer of an AC/CN, the uncited finding is wrongly suppressed. The added doc comment itself says only \"An Add/Modify method may cite\", which the implementation contradicts. Fix: skip methods with action Delete in push_method_cited_anchor_ids (Reference methods mirror the entry-level inclusion; if kept, align the doc comment).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:4e8f2a235a40ba741c36e0071c1ab0fe7fbcfdc69ce914f723d2cf563e88e8a0",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T02:36:15Z",
+          "findings": [
+            {
+              "category": "test-coverage",
+              "file": "libs/usecase/src/test_obligation/check_tests.rs",
+              "line": 1577,
+              "message": "The two new tests for cited_anchor_ids exercise only the traits() branch. The TypeEntry.methods branch (mod.rs:434-438) and the inherent_impls branch (mod.rs:446-453 — owner lookup plus owner-action skip, the most intricate part of the fix, and explicitly named in the briefing checklist) have no test coverage, new or pre-existing: every existing covering_method use is on trait entries and the only push_inherent_impl test targets obligation_declaration_text. A regression removing the types or inherent loops would pass the suite. Add tests asserting a method-only AC is counted as cited when declared on a TypeEntry method and on an inherent-impl method (and ideally that a Delete owner suppresses inherent-method refs).",
+              "severity": "moderate"
+            }
+          ],
+          "hash": "rvw1:sha256:cd076a85016b67d8ba9492cf2273909dc9f47ae192575c1ce206eae32cb3d6f4",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T02:47:27Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b0eba85551863008d313d43163682dcb5b4c38fc1dba97c2e110591ed0b91b90",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }
