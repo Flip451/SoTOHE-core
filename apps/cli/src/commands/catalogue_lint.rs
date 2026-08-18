@@ -23,9 +23,10 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 use cli_composition::TrackCompositionRoot;
-use cli_driver::track::TrackInput;
-
-use crate::commands::driver_outcome_to_exit;
+use cli_driver::adr_baseline::TrackIdInput;
+use cli_driver::track_tddd::{
+    TrackLintRulesFileInput, TrackTdddCatalogueLintActiveInput, TrackWorkspaceRootInput,
+};
 
 // ── sotp catalogue-lint ─────────────────────────────────────────────────────
 
@@ -91,23 +92,43 @@ pub fn execute(cmd: CatalogueLintCommand) -> ExitCode {
 
 /// Execute `sotp catalogue-lint check-active-track`.
 ///
-/// Routes through the `track` primary-adapter driver
-/// ([`cli_driver::track::TrackDriver`]) like every other `track`-family
-/// subcommand, rather than calling the composition root directly. The driver
-/// dispatches [`TrackInput::CatalogueLintCheckActiveTrack`] to
-/// [`TrackCompositionRoot::catalogue_lint_check_active_track`] (via the
-/// injected `TrackService`), which resolves the active track, enumerates
-/// `tddd.enabled` layers from `architecture-rules.json`, and aggregates
-/// violations across all of them.
+/// Routes through the Track TDDD primary adapter and its typed input DTO. The
+/// existing public subcommand remains unchanged; only its internal execution
+/// boundary is migrated.
 pub fn execute_check_active_track(args: CatalogueLintCheckActiveTrackArgs) -> ExitCode {
-    let outcome = TrackCompositionRoot::new().track_driver().handle(
-        TrackInput::CatalogueLintCheckActiveTrack {
-            track_id: args.track_id,
-            workspace_root: args.workspace_root,
-            rules_file: args.rules_file,
-        },
+    let track_id = match args.track_id.map(|value| value.parse::<TrackIdInput>()).transpose() {
+        Ok(track_id) => track_id,
+        Err(error) => {
+            eprintln!("invalid track id: {error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let workspace_root = match TrackWorkspaceRootInput::try_from(args.workspace_root) {
+        Ok(workspace_root) => workspace_root,
+        Err(error) => {
+            eprintln!("{error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let rules_file = match args.rules_file.map(TrackLintRulesFileInput::try_new).transpose() {
+        Ok(rules_file) => rules_file,
+        Err(error) => {
+            eprintln!("{error}");
+            return ExitCode::FAILURE;
+        }
+    };
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_catalogue_lint_active(
+        TrackTdddCatalogueLintActiveInput { track_id, workspace_root, rules_file },
     );
-    driver_outcome_to_exit(outcome)
+    let mut stdout = std::io::stdout();
+    let mut stderr = std::io::stderr();
+    match crate::commands::track::tddd::emit_driver_outcome!(outcome, &mut stdout, &mut stderr) {
+        Ok(code) => code,
+        Err(error) => {
+            eprintln!("{error}");
+            error.exit_code()
+        }
+    }
 }
 
 // ── Tests ────────────────────────────────────────────────────────────────────
@@ -116,6 +137,7 @@ pub fn execute_check_active_track(args: CatalogueLintCheckActiveTrackArgs) -> Ex
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
     use clap::Parser;
+    use cli_driver::CommandOutcome;
 
     use super::*;
 
@@ -183,5 +205,258 @@ mod tests {
     fn test_catalogue_lint_unknown_subcommand_is_rejected() {
         let result = TestCli::try_parse_from(["catalogue-lint", "unknown-subcmd"]);
         assert!(result.is_err(), "unrecognized catalogue-lint subcommand must be rejected by clap");
+    }
+
+    #[test]
+    fn test_check_active_track_missing_config_exits_one_without_stderr_contract_change() {
+        let workspace = tempfile::tempdir().expect("temp workspace");
+        let code = execute_check_active_track(CatalogueLintCheckActiveTrackArgs {
+            track_id: Some("missing-track".to_owned()),
+            workspace_root: workspace.path().to_path_buf(),
+            rules_file: None,
+        });
+        assert_eq!(code, ExitCode::from(1), "missing lint config must keep exit 1");
+    }
+
+    const RULES_JSON: &str = r#"{
+  "version": 2,
+  "layers": [
+    {
+      "crate": "domain",
+      "path": "libs/domain",
+      "may_depend_on": [],
+      "deny_reason": "no reverse dep",
+      "tddd": {
+        "enabled": true,
+        "catalogue_file": "domain-types.json",
+        "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+      }
+    }
+  ]
+}"#;
+
+    const LINT_CONFIG_WITH_INVARIANT_RULE: &str = r#"{
+  "schema_version": 1,
+  "rules": [
+    {
+      "target_roles": ["ValueObject"],
+      "kind": { "FieldNonEmpty": { "target_field": "invariants" } }
+    }
+  ]
+}"#;
+
+    const CATALOGUE_WITH_INVARIANT: &str = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "MyValueObject": {
+      "action": "add",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            { "name": "is_valid", "predicate": { "SelfMethod": "is_valid" } }
+          ]
+        }
+      },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [
+        {"name": "is_valid", "receiver": "&self", "params": [], "returns": "bool"}
+      ],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+    const CATALOGUE_NO_INVARIANTS: &str = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "BareValueObject": {
+      "action": "add",
+      "role": { "ValueObject": {} },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+    fn write_file(path: &std::path::Path, content: &str) {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).expect("create fixture parent");
+        }
+        std::fs::write(path, content).expect("write fixture");
+    }
+
+    fn list_relative_files(root: &std::path::Path) -> Vec<String> {
+        let mut files = Vec::new();
+        let mut pending = vec![root.to_path_buf()];
+        while let Some(dir) = pending.pop() {
+            for entry in std::fs::read_dir(&dir).expect("read fixture dir") {
+                let entry = entry.expect("fixture dir entry");
+                let path = entry.path();
+                if path.is_dir() {
+                    pending.push(path);
+                } else {
+                    files.push(
+                        path.strip_prefix(root)
+                            .expect("relative fixture path")
+                            .display()
+                            .to_string(),
+                    );
+                }
+            }
+        }
+        files.sort();
+        files
+    }
+
+    fn check_active_track_outcome(args: CatalogueLintCheckActiveTrackArgs) -> CommandOutcome {
+        let track_id = match args.track_id.map(|value| value.parse::<TrackIdInput>()).transpose() {
+            Ok(track_id) => track_id,
+            Err(error) => {
+                return CommandOutcome::failure(Some(format!("invalid track id: {error}")));
+            }
+        };
+        let workspace_root = match TrackWorkspaceRootInput::try_from(args.workspace_root) {
+            Ok(workspace_root) => workspace_root,
+            Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+        };
+        let rules_file = match args.rules_file.map(TrackLintRulesFileInput::try_new).transpose() {
+            Ok(rules_file) => rules_file,
+            Err(error) => return CommandOutcome::failure(Some(error.to_string())),
+        };
+        TrackCompositionRoot::new().track_tddd_driver().handle_catalogue_lint_active(
+            TrackTdddCatalogueLintActiveInput { track_id, workspace_root, rules_file },
+        )
+    }
+
+    fn run_migrated_call_site(
+        workspace: &std::path::Path,
+        track_id: &str,
+        rules_file: Option<std::path::PathBuf>,
+    ) -> (CommandOutcome, Vec<String>) {
+        let before = list_relative_files(workspace);
+        let outcome = check_active_track_outcome(CatalogueLintCheckActiveTrackArgs {
+            track_id: Some(track_id.to_owned()),
+            workspace_root: workspace.to_path_buf(),
+            rules_file,
+        });
+        let after = list_relative_files(workspace);
+        assert_eq!(after, before, "catalogue-lint must not persist extra files");
+        (outcome, after)
+    }
+
+    #[test]
+    fn test_check_active_track_call_site_preserves_cli_contract_across_migration() {
+        let workspace = tempfile::tempdir().expect("temp workspace");
+        let root = workspace.path();
+        write_file(&root.join("architecture-rules.json"), RULES_JSON);
+        write_file(
+            &root.join(".harness/catalogue-lint/config.json"),
+            LINT_CONFIG_WITH_INVARIANT_RULE,
+        );
+        write_file(
+            &root.join("track/items/test-track/domain-types.json"),
+            CATALOGUE_WITH_INVARIANT,
+        );
+
+        let (outcome, _) = run_migrated_call_site(root, "test-track", None);
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None, "stdout must stay empty on zero violations");
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.contains("Found 0 violation(s) across 1 layer(s)")),
+            "stderr must keep the zero-violation summary: {:?}",
+            outcome.stderr
+        );
+
+        write_file(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_NO_INVARIANTS);
+        let (outcome, _) = run_migrated_call_site(root, "test-track", None);
+        assert_eq!(outcome.exit_code, 1);
+        assert!(
+            outcome.stdout.as_deref().is_some_and(|stdout| {
+                stdout.contains("FieldNonEmpty") && stdout.contains("BareValueObject")
+            }),
+            "stdout must keep the violation detail: {:?}",
+            outcome.stdout
+        );
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.contains("Found 1 violation(s) across 1 layer(s)")),
+            "stderr must keep the violation summary: {:?}",
+            outcome.stderr
+        );
+
+        std::fs::remove_file(root.join(".harness/catalogue-lint/config.json"))
+            .expect("remove lint config");
+        let (outcome, _) = run_migrated_call_site(root, "test-track", None);
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stdout, None, "missing config must not write stdout");
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.contains("lint config not found")),
+            "stderr must keep the missing-config diagnostic: {:?}",
+            outcome.stderr
+        );
+
+        write_file(
+            &root.join(".harness/catalogue-lint/config.json"),
+            LINT_CONFIG_WITH_INVARIANT_RULE,
+        );
+        std::fs::remove_file(root.join("track/items/test-track/domain-types.json"))
+            .expect("remove catalogue");
+        let (outcome, files) = run_migrated_call_site(root, "test-track", None);
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None, "skip must not write stdout");
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.contains("catalogue-lint skipped")),
+            "stderr must keep the skip diagnostic: {:?}",
+            outcome.stderr
+        );
+        assert!(
+            !files
+                .iter()
+                .any(|path| path.contains("impl-plan.json") || path.ends_with(".commit_hash")),
+            "skip must not persist track state: {files:?}"
+        );
+
+        let custom = root.join("custom-lint-config.json");
+        write_file(&custom, LINT_CONFIG_WITH_INVARIANT_RULE);
+        write_file(&root.join("track/items/test-track/domain-types.json"), CATALOGUE_NO_INVARIANTS);
+        let (outcome, _) = run_migrated_call_site(root, "test-track", Some(custom));
+        assert_eq!(outcome.exit_code, 1);
+        assert!(
+            outcome.stdout.as_deref().is_some_and(|stdout| stdout.contains("FieldNonEmpty")),
+            "--rules-file must still select the override config: {:?}",
+            outcome.stdout
+        );
+        assert!(
+            outcome
+                .stderr
+                .as_deref()
+                .is_some_and(|stderr| stderr.contains("Found 1 violation(s) across 1 layer(s)")),
+            "--rules-file must keep the violation summary: {:?}",
+            outcome.stderr
+        );
     }
 }

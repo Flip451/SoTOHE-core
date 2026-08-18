@@ -3,7 +3,9 @@
 pub mod baseline_capture;
 pub mod baseline_graph;
 pub mod catalogue_impl_signals;
+pub mod catalogue_lint_active;
 pub mod catalogue_spec_signals;
+pub mod lint;
 
 use std::path::{Path, PathBuf};
 

@@ -10,7 +10,7 @@ mod dispatch;
 pub mod fixpoint_resolve;
 mod resolve;
 pub(crate) mod set_commit_hash;
-mod state_ops;
+pub(crate) mod state_ops;
 pub(crate) mod tddd;
 mod transition;
 mod validate;

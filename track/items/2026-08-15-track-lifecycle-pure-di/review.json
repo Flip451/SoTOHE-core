@@ -373,6 +373,20 @@
           "hash": "rvw1:sha256:b051957f7a09cf6d8f2582fe592b91beb025e0e8b2fffee7652b5384bc06a4ef",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T15:54:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f2818e2d52932deef82703128d22a8de9c5585d708166ac66f823948566c840",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:09:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9146c7ee3afec9d256468c0c5270b32d3c7d4996c6c59c8feb7b4c7e086e8301",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -576,6 +590,20 @@
           "at": "2026-08-18T11:56:24Z",
           "findings": [],
           "hash": "rvw1:sha256:38e4dac4abb60176115c76141acc0fc76c73ec535da85e3f4271b30f0ad77c6b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:01:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:53d9b4de0afb28a85397823cce71ccc53c209bd1761395c21859c3a327cda2d6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:07:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c93ed8f761f44f241683c4cccfcf236a332ba3c168c7ce6d5a3443859e539a1c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -844,6 +872,35 @@
           "at": "2026-08-18T09:18:54Z",
           "findings": [],
           "hash": "rvw1:sha256:24952217b3fd051f1693dfbaafe481fc0b37d33412c9cc96450b76d034f57b73",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:02:38Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 545,
+              "message": "AddTask validation no longer preserves the pre-migration stderr contract required by AC-05. Invalid items directories now emit `[ERROR] track items directory must end in 'track/items': …` via `TrackItemsDirectory::try_new`, and invalid track IDs emit `[ERROR] invalid track id: …` via `TrackLifecycleIdInput::try_new`. The previous `TrackService` path rendered `[ERROR] --items-dir must point to '<project-root>/track/items'; got …` and the raw `TrackId` diagnostic (for example `[ERROR] track id 'INVALID' must be a lowercase slug`, or `[ERROR] string must not be empty` for empty/whitespace IDs). This file already has the BranchCreate translators (`track_branch_create_invalid_items_dir` / `track_branch_create_invalid_track_id`); apply the same rendering here, excluding the accepted ParentDir rejection, and add exact-output regression tests.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:8d6785c6f5c2afda8dd27839d6d5bacfb670d9cee73e4be9e5f19a593ce03f78",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T16:04:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:82e61d490fab08ca77dd377f7fb46972d462c7aa893316993a220df8b5cbc39e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:07:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9bc256841922ef3c8100c1ab4a7de15db2cf650d3849431668dcf9d6da0feb5f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1450,6 +1507,13 @@
           "hash": "rvw1:sha256:e8fd96991ed96445f1dc5d2119a22387e54ee8d22909774565cfce723f513d10",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T15:00:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f97722c74b23e741cba7c099d4562d0ef607c7aa94b3b477467be5f509aa680f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2028,6 +2092,42 @@
           "hash": "rvw1:sha256:841b83b626c21be5b63ba46ac1fd456f16ab61c32a0399aaf90bfb70e1d14de6",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T15:54:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ce972acb86acf887d438ee4886fa3cbb6f8a1a22adaec173a22b1db4be51a041",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:08:22Z",
+          "findings": [
+            {
+              "category": "non-fail-closed config",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/catalogue_lint_active.rs",
+              "line": 109,
+              "message": "`ensure_config_file` treats any existing non-regular path as success (`Ok(_) => Ok(())`), including a symlink or directory. The catalogue pre-flight then returns `Skipped` when any layer catalogue is absent, so `FsLintConfigLoader` never runs. A blocking gate therefore skip-exits whenever the lint config is a non-file and a catalogue is missing — the same fail-open the config-first check exists to prevent (missing/invalid config must fail closed even on pre-Phase-2 tracks). Accept only a regular file here, reject symlink/directory immediately (as `FsLintConfigLoader` and `knowledge/conventions/security.md` require; silent skip of a symlink is prohibited), and add a regression test for a symlink or directory at the config path with an absent catalogue.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9bda2fe49df7eaa7677cdceec9380e054c1a726f91952816be7a3ed7532974a2",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T16:12:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:73f47b1e93ae2ee8029699290d53c77430a5d241749f163a826a12b1a52b41f1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T16:16:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a052eec68c950cb6a0e48b5f73ea1669de1f8f670be362e07c64981263747b00",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2326,6 +2426,79 @@
           "at": "2026-08-18T11:57:18Z",
           "findings": [],
           "hash": "rvw1:sha256:215996be80408d07b758be76e0b8e0f9dd25c3de2ee5111cb1ffa47d75c3f0f9",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T15:05:00Z",
+          "findings": [
+            {
+              "category": "obligation-model-conformance",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 326,
+              "message": "TrackCatalogueLintActiveService × AC-03 waiver duplicates an obligation-carrying edge: the same entry's trait_method:execute result fulfillment (line 287) already discharges AC-03 (obligation spec_refs are AC-02, AC-03, CN-03). Sibling Service records in this file (TrackAddTaskService, TrackCatalogueImplSignalsService, TrackCatalogueSpecSignalsService, TrackBranchSwitchService, TrackBranchCreateService) omit the AC-03 waiver and let the verified result fulfillment cover that edge. The waiver reason admits the execute signature transports a result or error — which is AC-03's usecase-boundary promise — then claims the edge is not independently verifiable, contradicting waiver semantics. The waiver cache already stores a waived verdict keyed to this result obligation, which preempts fulfillment verification. Fix: delete this waiver record.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 282,
+              "message": "The TrackAddTaskInteractor result fulfillment omits the existing test_track_add_task_interactor_view_failure_returns_warning_after_persistence test. That test is the only coverage of TrackViewSyncOutcome::Warning after a successful persist, which is part of this entry's result obligation (AC-03). The same test is already bound on TrackAddTaskService (line 283), and sibling interactors (TrackInitInteractor, TrackBranchCreateInteractor) bind every existing result/error test on the interactor fulfillment. Bind the view-failure test here.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 283,
+              "message": "The TrackAddTaskService result fulfillment omits the existing test_track_add_task_interactor_active_selection_resolves_and_propagates_operation_error test. The result obligation covers the error half of Result, but the bound evidence only has success persist/sync and the view-warning path. The omitted test is already bound on the Interactor (line 282). Sibling Service records bind the same complete test set as their Interactor. Bind the operation-error test here.",
+              "severity": "P1"
+            },
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 288,
+              "message": "The SystemTrackCatalogueLintActiveAdapter contract_conformance fulfillment binds four CLI tests, including clap-only parse tests (test_check_active_track_parses_track_id_arg, test_check_active_track_parses_custom_workspace_root_and_rules_file) that never construct or execute this adapter. The adapter cites CN-01, but unlike SystemTrackCatalogueImplSignalsAdapter and SystemTrackCatalogueSpecSignalsAdapter (each of which binds only infrastructure adapter tests and waives CN-01 as a presentation-free declaration edge) this record has no CN-01 waiver. CLI compatibility is not independently verifiable at this adapter declaration. Drop the CLI tests from this fulfillment and add a self-contained CN-01 waiver, matching the sibling adapters.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:49d4239ffc2ea4a894e485582948bd4ca1889482b9e3f79254b88484474b3263",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T15:08:16Z",
+          "findings": [
+            {
+              "category": "test-obligation-gate",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 282,
+              "message": "`bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` fails with TestChanged for TrackAddTaskInteractor × AC-03 (line 282) and TrackAddTaskService × AC-03 (line 283). Those fulfillment records now bind three tests, including view-failure and operation-error, but the frozen obligation-fulfillment cache still records the previous two-test sets. This is not a todo-lane warning. Re-evaluate those pairs through the sanctioned evaluate path so the cache matches the current bound test bodies; do not hand-edit the verdict caches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:34d32e336998b65d1be8970e61ea5091b0f0408d4c574009356887f23d698655",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T15:18:25Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 288,
+              "message": "The SystemTrackCatalogueLintActiveAdapter contract_conformance fulfillment binds CLI tests, including clap-only parse tests (test_check_active_track_parses_track_id_arg, test_check_active_track_parses_custom_workspace_root_and_rules_file) that never construct or execute this adapter. The adapter cites CN-01, but unlike SystemTrackCatalogueImplSignalsAdapter and SystemTrackCatalogueSpecSignalsAdapter (each binds only infrastructure adapter tests and waives CN-01 as a presentation-free declaration edge) this record has no CN-01 waiver. CLI compatibility is not independently verifiable at this adapter declaration. Drop the CLI tests from this fulfillment and add a self-contained CN-01 waiver, matching the sibling adapters.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3e02e887d8fc8d5518b5f55dd69d45794c61f93f8f34d77e4247102d15be6f4e",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T15:39:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d64c52b88fae74aa37d3a40c4fb1b0ea7d0d9794c83305a684799d05b87bdbe1",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3210,6 +3383,13 @@
           "at": "2026-08-18T11:54:57Z",
           "findings": [],
           "hash": "rvw1:sha256:bdb1254446b81e70e0bd4106480b53928dca4f83dfb0a4e192eb8fc20e9490bc",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T15:53:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:734845fef418911da7b28b685bac56646d06ab70ea2cc7d602ff41b321c1739e",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -1,8 +1,8 @@
 {
   "baseline_hash": "922aefbfd35307cd343f42b28ff9230e7c71b8823593c3554950f93e8d97fd02",
   "declaration_hash": "cdc5689c8b527be0647b6df57e174cfa60f5f1299f08328dfa70cea82bcb7fe7",
-  "generated_at": "2026-08-18T12:15:01Z",
-  "head_commit": "3399b3a4d1ea2fd2189b10635afcb96284edd055",
+  "generated_at": "2026-08-18T16:17:01Z",
+  "head_commit": "5f0b016454b3abaec3953c34e5a85c059b8a4b6b",
   "schema_version": 4,
   "signals": [
     {
@@ -85,12 +85,12 @@
       "type_name": "SystemTrackCatalogueImplSignalsAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
+      "found_items": [
         "usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActivePort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "SystemTrackCatalogueLintActiveAdapter"
     },
     {

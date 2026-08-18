@@ -15,16 +15,16 @@
 |------|------|--------|---------|--------|----------|
 | TrackIdInput | dto | reference | — | 🔵 | 🔵 |
 | TrackItemsDirectoryInput | dto | add | — | 🔵 | 🔵 |
-| TrackLayerInput | dto | add | — | 🟡 | 🔵 |
+| TrackLayerInput | dto | add | — | 🔵 | 🔵 |
 | TrackLayersInput | dto | add | — | 🔵 | 🔵 |
-| TrackLintRulesFileInput | dto | add | — | 🟡 | 🔵 |
+| TrackLintRulesFileInput | dto | add | — | 🔵 | 🔵 |
 | TrackResolutionDiagnostic | dto | add | — | 🔵 | 🔵 |
 | TrackSourceWorkspaceInput | dto | add | — | 🟡 | 🔵 |
 | TrackSpecAnchorInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddBaselineCaptureInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddBaselineGraphInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddCatalogueImplSignalsInput | dto | add | — | 🔵 | 🔵 |
-| TrackTdddCatalogueLintActiveInput | dto | add | — | 🟡 | 🔵 |
+| TrackTdddCatalogueLintActiveInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddCatalogueSpecSignalsInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddContractMapInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddLintInput | dto | add | — | 🟡 | 🔵 |

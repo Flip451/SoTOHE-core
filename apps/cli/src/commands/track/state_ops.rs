@@ -9,7 +9,7 @@ use cli_driver::track::TrackInput;
 
 use crate::CliError;
 
-pub(super) fn track_driver_outcome_to_result(
+pub(crate) fn track_driver_outcome_to_result(
     outcome: CommandOutcome,
 ) -> Result<ExitCode, CliError> {
     let exit_code = outcome.exit_code;

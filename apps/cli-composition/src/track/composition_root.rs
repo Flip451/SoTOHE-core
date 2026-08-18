@@ -85,6 +85,12 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         Arc::new(usecase::track_lifecycle::track_branch_switch::TrackBranchSwitchInteractor::new(
             Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
         ));
+    let track_add_task_service =
+        Arc::new(usecase::track_lifecycle::track_add_task::TrackAddTaskInteractor::new(
+            Arc::new(RequestScopedTrackTaskAddAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -114,6 +120,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         service,
         fixpoint_resolve_service,
         base_merge_service,
+        track_add_task_service,
     )
 }
 
@@ -159,10 +166,59 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             catalogue_spec_signals_resolver,
         ),
     );
+    let catalogue_lint_active_operation = Arc::new(
+        infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter,
+    );
+    let catalogue_lint_active_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let catalogue_lint_active_service = Arc::new(
+        usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintActiveInteractor::new(
+            catalogue_lint_active_operation,
+            catalogue_lint_active_resolver,
+        ),
+    );
     cli_driver::track_tddd::TrackTdddDriver::new(
         service,
         baseline_graph_service,
         catalogue_impl_signals_service,
         catalogue_spec_signals_service,
+        catalogue_lint_active_service,
     )
+}
+
+/// Rebuilds the existing task-operation interactor from the command's items directory.
+///
+/// T006 reuses `TaskOperationInteractor` as `TrackTaskAddPort`; the store root is
+/// request-scoped, so this wiring helper reconstructs that interactor per call.
+struct RequestScopedTrackTaskAddAdapter;
+
+impl usecase::track_lifecycle::TrackTaskAddPort for RequestScopedTrackTaskAddAdapter {
+    fn add_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+        description: domain::NonEmptyString,
+        section: Option<domain::NonEmptyString>,
+        after: Option<domain::TaskId>,
+    ) -> Result<usecase::task_ops::TaskOperationOutput, usecase::task_ops::TaskOperationError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let project_root = super::resolve_project_root(items_dir.as_path()).map_err(|error| {
+            usecase::task_ops::TaskOperationError::StoreFailed(error.to_string())
+        })?;
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let interactor = super::build_task_operation_interactor(
+            store,
+            super::build_branch_reader(&project_root),
+        );
+        usecase::track_lifecycle::TrackTaskAddPort::add_task(
+            &interactor,
+            track_id,
+            items_dir,
+            description,
+            section,
+            after,
+        )
+    }
 }

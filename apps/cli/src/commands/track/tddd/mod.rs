@@ -12,7 +12,7 @@ pub(crate) mod lint;
 pub(crate) mod spec_element_hash;
 
 /// Emits a composition outcome to the process streams and preserves its exit code.
-pub(super) fn emit_command_outcome<W: Write, E: Write>(
+pub(crate) fn emit_command_outcome<W: Write, E: Write>(
     outcome: &cli_composition::CommandOutcome,
     stdout: &mut W,
     stderr: &mut E,
@@ -32,7 +32,7 @@ pub(super) fn emit_command_outcome<W: Write, E: Write>(
 macro_rules! emit_driver_outcome {
     ($outcome:expr, $stdout:expr, $stderr:expr) => {{
         let outcome = $outcome;
-        if outcome.stderr.is_some() {
+        if outcome.stderr.is_some() && !(outcome.exit_code == 1 && outcome.stdout.is_some()) {
             $crate::commands::track::state_ops::track_driver_outcome_to_result(outcome)
         } else {
             $crate::commands::track::tddd::emit_command_outcome(&outcome, $stdout, $stderr)
@@ -40,7 +40,7 @@ macro_rules! emit_driver_outcome {
     }};
 }
 
-pub(super) use emit_driver_outcome;
+pub(crate) use emit_driver_outcome;
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]

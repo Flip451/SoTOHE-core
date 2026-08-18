@@ -10,6 +10,9 @@ use usecase::base_merge::{BaseMergeCommand, BaseMergeOutcome, BaseMergeService};
 use usecase::fixpoint_resolve_driver::{
     FixpointResolveDriverInput, FixpointResolveDriverOutcome, FixpointResolveDriverService,
 };
+use usecase::track_lifecycle::track_add_task::{
+    TrackAddTaskCommand, TrackAddTaskError, TrackAddTaskResult, TrackAddTaskService,
+};
 use usecase::track_lifecycle::track_archive::{
     TrackArchiveCommand, TrackArchiveError, TrackArchiveService,
 };
@@ -20,7 +23,10 @@ use usecase::track_lifecycle::track_branch_switch::{
     TrackBranchSwitchCommand, TrackBranchSwitchError, TrackBranchSwitchService,
 };
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
-use usecase::track_lifecycle::{TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput};
+use usecase::track_lifecycle::{
+    RenderedViewPath, TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput,
+    TrackSelection, TrackViewSyncOutcome,
+};
 use usecase::track_service::{TrackCommandOutput, TrackService};
 
 use crate::render::CommandOutcome;
@@ -248,10 +254,12 @@ pub struct TrackDriver {
     service: Arc<dyn TrackService>,
     fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
     base_merge_service: Arc<dyn BaseMergeService>,
+    track_add_task_service: Arc<dyn TrackAddTaskService>,
 }
 
 impl TrackDriver {
     /// Create a new `TrackDriver` with the given services.
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         track_init_service: Arc<dyn TrackInitService>,
         track_archive_service: Arc<dyn TrackArchiveService>,
@@ -260,6 +268,7 @@ impl TrackDriver {
         service: Arc<dyn TrackService>,
         fixpoint_resolve_service: Arc<dyn FixpointResolveDriverService>,
         base_merge_service: Arc<dyn BaseMergeService>,
+        track_add_task_service: Arc<dyn TrackAddTaskService>,
     ) -> Self {
         Self {
             track_init_service,
@@ -269,6 +278,7 @@ impl TrackDriver {
             service,
             fixpoint_resolve_service,
             base_merge_service,
+            track_add_task_service,
         }
     }
 
@@ -322,13 +332,14 @@ impl TrackDriver {
                 service_output_to_outcome(self.service.views_sync(project_root, track_id))
             }
             TrackInput::AddTask { items_dir, track_id, description, section, after } => {
-                service_output_to_outcome(self.service.add_task(
+                render_track_add_task_outcome(
+                    &*self.track_add_task_service,
                     items_dir,
                     track_id,
                     description,
                     section,
                     after,
-                ))
+                )
             }
             TrackInput::SetOverride { items_dir, track_id, status, reason } => {
                 service_output_to_outcome(
@@ -517,6 +528,102 @@ fn track_branch_switch_invalid_track_id(error: impl std::fmt::Display) -> Comman
 }
 
 fn track_branch_switch_invalid_items_dir(items_dir: &std::path::Path) -> CommandOutcome {
+    CommandOutcome::failure(Some(format!(
+        "[ERROR] --items-dir must point to '<project-root>/track/items'; got {}",
+        items_dir.display()
+    )))
+}
+
+fn render_track_add_task_outcome(
+    service: &dyn TrackAddTaskService,
+    items_dir: PathBuf,
+    track_id: Option<String>,
+    description: String,
+    section: Option<String>,
+    after: Option<String>,
+) -> CommandOutcome {
+    let items_dir_for_error = items_dir.clone();
+    let items_dir = match TrackItemsDirectory::try_new(items_dir) {
+        Ok(items_dir) => items_dir,
+        Err(_) => return track_add_task_invalid_items_dir(&items_dir_for_error),
+    };
+    let track = match track_id
+        .map(TrackLifecycleIdInput::try_new)
+        .transpose()
+        .map_err(|error| error.to_string())
+    {
+        Ok(track_id) => TrackSelection::from_input(track_id),
+        Err(error) => return track_add_task_invalid_track_id(error),
+    };
+    let project_root = project_root_for_items(items_dir.as_path());
+    let command = match TrackAddTaskCommand::try_new(items_dir, track, description, section, after)
+    {
+        Ok(command) => command,
+        Err(error) => return track_add_task_error_to_outcome(error),
+    };
+    service
+        .execute(command)
+        .map(|result| render_track_add_task_result(result, &project_root))
+        .unwrap_or_else(track_add_task_error_to_outcome)
+}
+
+fn render_track_add_task_result(
+    result: TrackAddTaskResult,
+    project_root: &std::path::Path,
+) -> CommandOutcome {
+    let mut lines = vec![format!(
+        "[OK] Added task {}: {} (track status: {})",
+        result.task_id, result.description, result.derived_status
+    )];
+    match result.view_sync {
+        TrackViewSyncOutcome::Synchronized(rendered_views) => {
+            lines.extend(render_rendered_views(project_root, rendered_views));
+        }
+        TrackViewSyncOutcome::Warning { rendered_views, diagnostic } => {
+            lines.extend(render_rendered_views(project_root, rendered_views));
+            lines.push(format!("warning: operation persisted but sync-views failed: {diagnostic}"));
+        }
+    }
+    CommandOutcome::success(Some(lines.join("\n")))
+}
+
+fn render_rendered_views(
+    project_root: &std::path::Path,
+    rendered_views: Vec<RenderedViewPath>,
+) -> Vec<String> {
+    rendered_views
+        .into_iter()
+        .map(|path| match path.as_path().strip_prefix(project_root) {
+            Ok(relative) => format!("[OK] Rendered: {}", relative.display()),
+            Err(_) => format!("[OK] Rendered: {}", path.as_path().display()),
+        })
+        .collect()
+}
+
+fn project_root_for_items(items_dir: &std::path::Path) -> PathBuf {
+    items_dir
+        .parent()
+        .and_then(std::path::Path::parent)
+        .filter(|root| !root.as_os_str().is_empty())
+        .map(std::path::Path::to_path_buf)
+        .unwrap_or_else(|| PathBuf::from("."))
+}
+
+fn track_add_task_error_to_outcome(error: TrackAddTaskError) -> CommandOutcome {
+    track_add_task_failure(error)
+}
+
+fn track_add_task_failure(error: impl std::fmt::Display) -> CommandOutcome {
+    CommandOutcome::failure(Some(format!("[ERROR] {error}")))
+}
+
+fn track_add_task_invalid_track_id(error: impl std::fmt::Display) -> CommandOutcome {
+    let error = error.to_string();
+    let legacy_error = error.strip_prefix("invalid track id: ").unwrap_or(&error);
+    track_add_task_failure(legacy_error)
+}
+
+fn track_add_task_invalid_items_dir(items_dir: &std::path::Path) -> CommandOutcome {
     CommandOutcome::failure(Some(format!(
         "[ERROR] --items-dir must point to '<project-root>/track/items'; got {}",
         items_dir.display()
@@ -748,6 +855,46 @@ mod tests {
         }
     }
 
+    struct UnusedTrackAddTaskService;
+
+    impl TrackAddTaskService for UnusedTrackAddTaskService {
+        fn execute(&self, _: TrackAddTaskCommand) -> Result<TrackAddTaskResult, TrackAddTaskError> {
+            unreachable!()
+        }
+    }
+
+    struct RecordingTrackAddTaskService {
+        calls: Mutex<Vec<(PathBuf, TrackSelection, String)>>,
+        error: Option<String>,
+    }
+
+    impl TrackAddTaskService for RecordingTrackAddTaskService {
+        fn execute(
+            &self,
+            command: TrackAddTaskCommand,
+        ) -> Result<TrackAddTaskResult, TrackAddTaskError> {
+            let TrackAddTaskCommand { items_dir, track, description, .. } = command;
+            self.calls.lock().expect("command lock is available").push((
+                items_dir.as_path().to_path_buf(),
+                track.clone(),
+                description.to_string(),
+            ));
+            if let Some(error) = &self.error {
+                return Err(TrackAddTaskError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                ));
+            }
+            Ok(TrackAddTaskResult {
+                track_id: TrackId::try_new("add-task-track").expect("track id is valid"),
+                task_id: domain::TaskId::try_new("T002").expect("task id is valid"),
+                description,
+                status: domain::TaskStatusKind::Todo,
+                derived_status: domain::TrackStatus::InProgress,
+                view_sync: TrackViewSyncOutcome::Synchronized(Vec::new()),
+            })
+        }
+    }
+
     impl TrackService for UnusedTrackService {
         fn init(&self, _: PathBuf, _: String, _: String) -> TrackCommandOutput {
             unreachable!()
@@ -859,6 +1006,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             service,
+            Arc::new(UnusedTrackAddTaskService),
         )
     }
 
@@ -876,6 +1024,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -906,6 +1055,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -917,6 +1067,131 @@ mod tests {
         assert!(outcome.stderr.unwrap().contains("invalid track id"));
         assert_eq!(outcome.exit_code, 1);
         assert!(service.calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_add_task_valid_input_routes_to_add_task_service() {
+        let service =
+            Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            service.clone(),
+        );
+
+        let outcome = driver.handle(TrackInput::AddTask {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("add-task-track".to_owned()),
+            description: "new task".to_owned(),
+            section: Some("work".to_owned()),
+            after: Some("T001".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.expect("add-task output is printed").contains("Added task T002"));
+        let calls = service.calls.lock().expect("command lock is available");
+        assert_eq!(calls.len(), 1);
+        let call = calls.first().expect("one add-task command is recorded");
+        assert_eq!(call.0, PathBuf::from("workspace/track/items"));
+        assert!(matches!(
+            &call.1,
+            TrackSelection::Explicit(track_id) if track_id.as_ref() == "add-task-track"
+        ));
+        assert_eq!(call.2, "new task");
+    }
+
+    #[test]
+    fn test_track_driver_add_task_invalid_after_returns_failure_without_service_call() {
+        let service =
+            Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            service.clone(),
+        );
+
+        let outcome = driver.handle(TrackInput::AddTask {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("add-task-track".to_owned()),
+            description: "new task".to_owned(),
+            section: None,
+            after: Some("not-a-task".to_owned()),
+        });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert!(outcome.stderr.expect("validation error is printed").contains("invalid --after"));
+        assert!(service.calls.lock().expect("command lock is available").is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_add_task_invalid_items_dir_preserves_error_prefix() {
+        let service =
+            Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            service.clone(),
+        );
+
+        let outcome = driver.handle(TrackInput::AddTask {
+            items_dir: PathBuf::from("wrong/items"),
+            track_id: Some("add-task-track".to_owned()),
+            description: "new task".to_owned(),
+            section: None,
+            after: None,
+        });
+
+        let expected_stderr =
+            "[ERROR] --items-dir must point to '<project-root>/track/items'; got wrong/items";
+        assert_eq!(outcome.stderr.as_deref(), Some(expected_stderr));
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.calls.lock().expect("command lock is available").is_empty());
+    }
+
+    #[test]
+    fn test_track_driver_add_task_invalid_track_id_preserves_legacy_diagnostic() {
+        let service =
+            Arc::new(RecordingTrackAddTaskService { calls: Mutex::new(Vec::new()), error: None });
+        let driver = TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            service.clone(),
+        );
+
+        let outcome = driver.handle(TrackInput::AddTask {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("INVALID".to_owned()),
+            description: "new task".to_owned(),
+            section: None,
+            after: None,
+        });
+
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some("[ERROR] track id 'INVALID' must be a lowercase slug")
+        );
+        assert_eq!(outcome.exit_code, 1);
+        assert!(service.calls.lock().expect("command lock is available").is_empty());
     }
 
     #[test]
@@ -933,6 +1208,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -961,6 +1237,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -996,6 +1273,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1022,6 +1300,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1048,6 +1327,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1073,6 +1353,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1102,6 +1383,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1129,6 +1411,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1155,6 +1438,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1180,6 +1464,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1209,6 +1494,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1238,6 +1524,7 @@ mod tests {
             Arc::new(UnusedTrackService),
             Arc::new(UnusedFixpointResolveService),
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {

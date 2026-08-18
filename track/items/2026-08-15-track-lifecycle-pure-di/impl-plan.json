@@ -111,6 +111,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "5f0b016454b3abaec3953c34e5a85c059b8a4b6b",
       "depends_on": [
         "T001"
       ],
@@ -124,7 +125,7 @@
       ],
       "description": "Implement the `TrackAddTask*` boundary in `libs/usecase/src/track_lifecycle/track_add_task.rs`; update the add-task dispatch in `apps/cli/src/commands/track/{dispatch.rs,state_ops.rs}`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T006",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -235,6 +236,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "5f0b016454b3abaec3953c34e5a85c059b8a4b6b",
       "depends_on": [
         "T001"
       ],
@@ -256,7 +258,7 @@
       ],
       "description": "Implement the `TrackCatalogueLintActive*` boundary in `libs/usecase/src/track_lifecycle/tddd/catalogue_lint_active.rs`; wire `catalogue-lint check-active-track` in `apps/cli/src/commands/track/tddd/lint.rs` through its driver and composition adapter, with regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T022",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

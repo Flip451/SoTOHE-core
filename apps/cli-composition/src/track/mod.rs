@@ -111,7 +111,7 @@ fn resolve_track_id_inner(
         interactor.resolve_for_read(None).map_err(|e| CompositionError::AdapterInit(e.to_string()))
     }
 }
-fn build_branch_reader(
+pub(crate) fn build_branch_reader(
     project_root: &Path,
 ) -> Option<Arc<dyn usecase::track_resolution::BranchReaderPort>> {
     use infrastructure::git_cli::SystemGitRepo;
@@ -124,7 +124,7 @@ fn build_branch_reader(
 /// Wires the task-operation interactor together with the admission
 /// collaborators every transition is judged through and the verifier every
 /// recorded commit hash is checked by.
-fn build_task_operation_interactor(
+pub(crate) fn build_task_operation_interactor(
     store: Arc<infrastructure::track::fs_store::FsTrackStore>,
     branch_reader: Option<Arc<dyn usecase::track_resolution::BranchReaderPort>>,
 ) -> usecase::task_ops::TaskOperationInteractor<infrastructure::track::fs_store::FsTrackStore> {
