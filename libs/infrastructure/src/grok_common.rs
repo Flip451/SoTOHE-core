@@ -135,6 +135,31 @@ fn structured_output_value(value: &serde_json::Value) -> Option<serde_json::Valu
         .cloned()
 }
 
+/// Session metadata can arrive on an earlier NDJSON event than the selected
+/// structured-result envelope. Scan the full stdout independently.
+#[must_use]
+pub(crate) fn session_id_from_grok_stdout(stdout: &[u8]) -> Option<String> {
+    let mut session_id = None;
+    for line in stdout.split(|byte| *byte == b'\n') {
+        if session_id.is_none() {
+            session_id = extract_grok_session_id(line);
+        }
+    }
+    session_id.or_else(|| extract_grok_session_id(stdout))
+}
+
+fn extract_grok_session_id(event: &[u8]) -> Option<String> {
+    let event = std::str::from_utf8(event).ok()?;
+    let value = serde_json::from_str::<serde_json::Value>(event.trim()).ok()?;
+    value
+        .get("session_id")
+        .or_else(|| value.get("thread_id"))
+        .or_else(|| value.get("sessionId"))?
+        .as_str()
+        .filter(|id| !id.trim().is_empty())
+        .map(str::to_owned)
+}
+
 /// Selects the Grok envelope bytes from provider stdout.
 ///
 /// Prefers the last NDJSON line that carries structured output. A later
@@ -420,6 +445,18 @@ mod tests {
         assert_eq!(
             envelope.into_structured_output().expect("structured output"),
             serde_json::json!({"result": "OK"}),
+        );
+    }
+
+    #[test]
+    fn test_session_id_from_grok_stdout_reads_earlier_ndjson_event() {
+        let stdout = concat!(
+            "{\"type\":\"start\",\"sessionId\":\"early-session\"}\n",
+            "{\"structured_output\":{\"status\":\"ok\"}}\n",
+        );
+        assert_eq!(
+            session_id_from_grok_stdout(stdout.as_bytes()).as_deref(),
+            Some("early-session"),
         );
     }
 

@@ -14,7 +14,9 @@ use usecase::provider_session::{
 
 use crate::capability_exec::grok::{build_grok_args, resolve_grok_capability_definition};
 use crate::capability_exec::process::run_command_with_bounded_output;
-use crate::grok_common::{GrokOutputEnvelope, GrokSandbox, grok_envelope_bytes_from_stdout};
+use crate::grok_common::{
+    GrokOutputEnvelope, GrokSandbox, grok_envelope_bytes_from_stdout, session_id_from_grok_stdout,
+};
 use crate::provider_session::FsProviderSessionCacheAdapter;
 
 use super::{dry_fix_sentinel_to_exit_code, parse_dry_fix_sentinel};
@@ -123,11 +125,7 @@ fn parse_launch_output(stdout: &[u8], exit_ok: bool) -> Result<GrokLaunchOutput,
     })?;
     let value: serde_json::Value = serde_json::from_slice(&envelope_bytes)
         .map_err(|error| format!("cannot decode Grok dry-fix envelope: {error}"))?;
-    let session_id = value
-        .get("sessionId")
-        .or_else(|| value.get("session_id"))
-        .and_then(serde_json::Value::as_str)
-        .map(str::to_owned);
+    let session_id = session_id_from_grok_stdout(stdout);
     let envelope: GrokOutputEnvelope = serde_json::from_value(value)
         .map_err(|error| format!("cannot decode Grok dry-fix envelope: {error}"))?;
     match envelope {

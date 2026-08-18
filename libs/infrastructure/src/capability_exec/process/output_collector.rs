@@ -134,23 +134,8 @@ fn collect_grok_provider_output<R: Read>(
         ));
     }
     let final_message = grok_envelope_bytes_from_stdout(&stdout);
-    let session_id = session_id_from_grok_stdout(&stdout);
+    let session_id = crate::grok_common::session_id_from_grok_stdout(&stdout);
     Ok(ProviderCollectedOutput { session_id, final_message })
-}
-
-/// Session metadata can arrive on an earlier NDJSON event than the selected
-/// structured-result envelope. Scan the retained stdout independently.
-fn session_id_from_grok_stdout(stdout: &[u8]) -> Option<String> {
-    let mut session_id = None;
-    for line in stdout.split(|byte| *byte == b'\n') {
-        if session_id.is_none() {
-            session_id = extract_provider_session_id(line);
-        }
-    }
-    if session_id.is_none() {
-        session_id = extract_provider_session_id(stdout);
-    }
-    session_id
 }
 
 fn max_provider_event_bytes(provider: &ProviderName) -> usize {
