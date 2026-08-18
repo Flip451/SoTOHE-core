@@ -3193,6 +3193,43 @@
           "hash": "rvw1:sha256:4423c3d8a089ca205cafa8479b8743b4aefa60caad7fc69c8c3998b0911eb2cf",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-18T00:01:05Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "レビューに必要な briefing、scope 固有ポリシー、対象ファイル、CURRENT diff を読み取れませんでした。ローカルシェルが全コマンドでサンドボックス namespace 初期化エラーになったため、コード上の verdict は判定不能です。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d08e3f1653e687522af09c92dff52d3dc2b5e53082b285f37cb2d41f4cefc843",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T00:08:46Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "libs/usecase/src/test_obligation/results_status.rs",
+              "line": 328,
+              "message": "results の inspect_waiver は waiver cache entry を edge_id のみで lookup している (entry.edge_id() == edge)。evaluate は owner obligation ごとに 1 entry を書き (plan.rs:316-344)、check は (edge × obligation) スコープで解決する (check.rs:639) のに対し、results だけが owner を無視して先頭 entry を掴む。本修正で owner ごとの declaration hash は item identifier により必ず異なるため、同一 edge を複数 obligation が所有する waived edge (domain は MultipleOwners を明示的にモデル化) では 2 番目以降の owner の item-augmented declaration hash が別 owner の key と比較され、偽の stale が status lane に計上される。同じ cache 状態を check は resolved と判定するため check と results が乖離し、「check と results が evaluate の書いた同じ key を消費する」という本修正の意図に反する。修正方向: inspect_fulfillment (results_status.rs:293) と同様に呼び出し元から obligation id (owner id / synthetic_voluntary_obligation_id) を渡し entry.obligation_id() == Some(obligation_id) で絞り込む。",
+              "severity": "P2"
+            }
+          ],
+          "hash": "rvw1:sha256:d08e3f1653e687522af09c92dff52d3dc2b5e53082b285f37cb2d41f4cefc843",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T00:20:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e5f59cc1f6323642afa0a7d37754e777c0656fec398c7f1618acbb295a39eb92",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     }

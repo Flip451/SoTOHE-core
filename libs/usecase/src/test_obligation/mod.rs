@@ -148,6 +148,13 @@ pub(crate) fn sha256_content_hash(bytes: &[u8]) -> ContentHash {
     ContentHash::from_bytes(out)
 }
 
+/// Appends the obligation item so evaluate, check, and results hash the same
+/// waiver declaration the verifier judged.
+#[must_use]
+pub(crate) fn declaration_with_obligation_item(declaration: &str, item_identifier: &str) -> String {
+    format!("{declaration}\n## Obligation item\n{item_identifier}")
+}
+
 /// Canonical declaration text for the catalogue entry named `key` in the
 /// `section_key` section, if present.
 ///
@@ -427,4 +434,15 @@ pub(crate) fn cited_anchor_ids(catalogues: &[CatalogueDocument]) -> Vec<String> 
         }
     }
     ids
+}
+
+#[cfg(test)]
+mod declaration_item_tests {
+    #[test]
+    fn test_declaration_with_obligation_item_appends_identifier() {
+        assert_eq!(
+            super::declaration_with_obligation_item("TypeEntry { .. }", "method:load"),
+            "TypeEntry { .. }\n## Obligation item\nmethod:load"
+        );
+    }
 }

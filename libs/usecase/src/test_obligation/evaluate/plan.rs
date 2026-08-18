@@ -375,7 +375,7 @@ impl EvaluateTestObligationsInteractor {
         existing_waiver_cache: Option<&WaiverCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) {
-        let declaration = declaration_with_obligation_item(
+        let declaration = crate::test_obligation::declaration_with_obligation_item(
             &declaration,
             obligation_id.item_identifier().as_str(),
         );
@@ -454,8 +454,10 @@ impl EvaluateTestObligationsInteractor {
             }
             Ok(None) | Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { .. }) => {}
         }
-        let declaration =
-            declaration_with_obligation_item(declaration, obligation_id.item_identifier().as_str());
+        let declaration = crate::test_obligation::declaration_with_obligation_item(
+            declaration,
+            obligation_id.item_identifier().as_str(),
+        );
         plan.push(PlannedAction::Fulfillment(FulfillmentLlmTask {
             edge_id,
             obligation_id,
@@ -634,10 +636,6 @@ impl EvaluateTestObligationsInteractor {
     }
 }
 
-fn declaration_with_obligation_item(declaration: &str, item_identifier: &str) -> String {
-    format!("{declaration}\n## Obligation item\n{item_identifier}")
-}
-
 /// Materialises the fulfillment pair value once so the LLM future's async
 /// block only borrows it — reduces per-poll allocations in the multiplexer.
 fn build_fulfillment_pair_input(
@@ -666,17 +664,4 @@ fn invalid_input_error(field: &str) -> ObligationEvaluateError {
             &format!("invalid evaluate input: {field}"),
         )),
     )
-}
-
-#[cfg(test)]
-mod tests {
-    use super::declaration_with_obligation_item;
-
-    #[test]
-    fn test_declaration_with_obligation_item_appends_identifier() {
-        assert_eq!(
-            declaration_with_obligation_item("TypeEntry { .. }", "method:load"),
-            "TypeEntry { .. }\n## Obligation item\nmethod:load"
-        );
-    }
 }

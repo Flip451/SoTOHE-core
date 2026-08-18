@@ -52,8 +52,9 @@ use super::status_lanes::{
     target_for_direct_edge, target_for_obligation, targets_for_scope,
 };
 use super::{
-    LoadedCatalogueDocument, diag, find_declaration_text_from_loaded,
-    obligation_declaration_text_from_loaded, sha256_content_hash,
+    LoadedCatalogueDocument, declaration_with_obligation_item, diag,
+    find_declaration_text_from_loaded, obligation_declaration_text_from_loaded,
+    sha256_content_hash,
 };
 
 use super::ports::ObligationFulfillmentCachePort;
@@ -575,8 +576,10 @@ impl CheckTestObligationsInteractor {
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
-        let declaration =
-            obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default();
+        let declaration = declaration_with_obligation_item(
+            &obligation_declaration_text_from_loaded(catalogues, obligation).unwrap_or_default(),
+            obligation.id().item_identifier().as_str(),
+        );
         self.resolve_waiver_cache_entry(
             edge,
             obligation.id(),
@@ -600,11 +603,15 @@ impl CheckTestObligationsInteractor {
         waiver: &WaiverCacheDocument,
         gate: &mut GateState,
     ) {
-        let declaration = find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
-            .unwrap_or_default();
+        let obligation_id = synthetic_voluntary_obligation_id(edge);
+        let declaration = declaration_with_obligation_item(
+            &find_declaration_text_from_loaded(catalogues, edge.entry_key().as_str())
+                .unwrap_or_default(),
+            obligation_id.item_identifier().as_str(),
+        );
         self.resolve_waiver_cache_entry(
             edge,
-            &synthetic_voluntary_obligation_id(edge),
+            &obligation_id,
             reason,
             &declaration,
             target,

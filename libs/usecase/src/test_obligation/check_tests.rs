@@ -88,8 +88,9 @@ use crate::test_obligation::hasher::ContentHasherPort;
 use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use crate::test_obligation::results::TestObligationStatusLaneSummary;
 use crate::test_obligation::{
-    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, obligation_declaration_text,
-    obligation_declaration_text_from_loaded, sha256_content_hash,
+    LoadedCatalogueDocument, TestObligationCatalogueCommandInput, declaration_with_obligation_item,
+    find_declaration_text, obligation_declaration_text, obligation_declaration_text_from_loaded,
+    sha256_content_hash,
 };
 use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 
@@ -1278,15 +1279,8 @@ fn fresh_fulfillment_cache_for_catalogue(
 /// synthetic voluntary obligation id for ownerless edges, so the frozen entry must
 /// carry that id for the (edge × obligation) resolution to match.
 fn fresh_direct_waiver_cache() -> WaiverCacheDocument {
-    let source = obligation();
     let reason = WaivedReason::try_new("covered elsewhere".to_owned()).unwrap();
     let reason_hash = WaivedReasonHash::new(sha256_content_hash(reason.as_str().as_bytes()));
-    let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(&money_catalogue()), &source)
-            .unwrap()
-            .as_bytes(),
-    ));
-    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let synthetic = TestObligationId::new(
         edge().entry_key().clone(),
         TestObligationKind::Logic,
@@ -1296,6 +1290,12 @@ fn fresh_direct_waiver_cache() -> WaiverCacheDocument {
         ))
         .unwrap(),
     );
+    let declaration = declaration_with_obligation_item(
+        &find_declaration_text(std::slice::from_ref(&money_catalogue()), "Money").unwrap(),
+        synthetic.item_identifier().as_str(),
+    );
+    let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
+    let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = WaiverCacheEntry::new(
         edge(),
         Some(synthetic),
@@ -1322,11 +1322,11 @@ fn fresh_waiver_cache_for_catalogue(
 ) -> WaiverCacheDocument {
     let reason = WaivedReason::try_new("covered elsewhere".to_owned()).unwrap();
     let reason_hash = WaivedReasonHash::new(sha256_content_hash(reason.as_str().as_bytes()));
-    let decl = DeclarationHash::new(sha256_content_hash(
-        obligation_declaration_text(std::slice::from_ref(catalogue), obligation)
-            .unwrap()
-            .as_bytes(),
-    ));
+    let declaration = declaration_with_obligation_item(
+        &obligation_declaration_text(std::slice::from_ref(catalogue), obligation).unwrap(),
+        obligation.id().item_identifier().as_str(),
+    );
+    let decl = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
     let entry = WaiverCacheEntry::new(
         edge(),
