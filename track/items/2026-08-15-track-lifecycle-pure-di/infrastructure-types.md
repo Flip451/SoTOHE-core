@@ -14,7 +14,7 @@
 | SystemTrackCatalogueImplSignalsAdapter | secondary_adapter | add | impl TrackCatalogueImplSignalsPort | 🔵 | 🔵 |
 | SystemTrackCatalogueLintActiveAdapter | secondary_adapter | add | impl TrackCatalogueLintActivePort | 🔵 | 🔵 |
 | SystemTrackCatalogueSpecSignalsAdapter | secondary_adapter | add | impl TrackCatalogueSpecSignalsPort | 🔵 | 🔵 |
-| SystemTrackContractMapAdapter | secondary_adapter | add | impl TrackContractMapPort | 🟡 | 🔵 |
+| SystemTrackContractMapAdapter | secondary_adapter | add | impl TrackContractMapPort | 🔵 | 🔵 |
 | SystemTrackLintAdapter | secondary_adapter | add | impl TrackLintPort | 🔵 | 🔵 |
 | SystemTrackResolutionAdapter | secondary_adapter | add | impl TrackResolutionPort | 🔵 | 🔵 |
 | SystemTrackSpecElementHashAdapter | secondary_adapter | add | impl TrackSpecElementHashPort | 🟡 | 🔵 |

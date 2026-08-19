@@ -41,9 +41,11 @@ pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track;
+mod track_contract_map;
 mod track_next_task;
 pub mod track_resolution;
 pub mod track_tddd;
+mod track_transition;
 pub mod verify;
 
 pub use render::CommandOutcome;

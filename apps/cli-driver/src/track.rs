@@ -24,6 +24,7 @@ use usecase::track_lifecycle::track_branch_switch::{
 };
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
 use usecase::track_lifecycle::track_next_task::TrackNextTaskService;
+use usecase::track_lifecycle::track_transition::TrackTransitionService;
 use usecase::track_lifecycle::{
     RenderedViewPath, TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput,
     TrackSelection, TrackViewSyncOutcome,
@@ -32,6 +33,7 @@ use usecase::track_service::{TrackCommandOutput, TrackService};
 
 use crate::render::CommandOutcome;
 use crate::track_next_task::render_track_next_task_outcome;
+use crate::track_transition::render_track_transition_outcome;
 
 // ---------------------------------------------------------------------------
 // Input type
@@ -250,6 +252,7 @@ fn render_base_merge_result(
 /// exposes `handle(input) -> CommandOutcome`.
 pub struct TrackDriver {
     track_init_service: Arc<dyn TrackInitService>,
+    track_transition_service: Arc<dyn TrackTransitionService>,
     track_archive_service: Arc<dyn TrackArchiveService>,
     track_branch_create_service: Arc<dyn TrackBranchCreateService>,
     track_branch_switch_service: Arc<dyn TrackBranchSwitchService>,
@@ -273,9 +276,11 @@ impl TrackDriver {
         base_merge_service: Arc<dyn BaseMergeService>,
         track_add_task_service: Arc<dyn TrackAddTaskService>,
         track_next_task_service: Arc<dyn TrackNextTaskService>,
+        track_transition_service: Arc<dyn TrackTransitionService>,
     ) -> Self {
         Self {
             track_init_service,
+            track_transition_service,
             track_archive_service,
             track_branch_create_service,
             track_branch_switch_service,
@@ -319,13 +324,14 @@ impl TrackDriver {
                 track_id,
             ),
             TrackInput::Transition { items_dir, track_id, task_id, target_status, commit_hash } => {
-                service_output_to_outcome(self.service.transition(
+                render_track_transition_outcome(
+                    &*self.track_transition_service,
                     items_dir,
                     track_id,
                     task_id,
                     target_status,
                     commit_hash,
-                ))
+                )
             }
             TrackInput::Resolve { items_dir, track_id } => {
                 service_output_to_outcome(self.service.resolve(items_dir, track_id))
@@ -691,6 +697,9 @@ mod tests {
     use usecase::track_lifecycle::track_next_task::{
         TrackNextTaskCommand, TrackNextTaskError, TrackNextTaskResult,
     };
+    use usecase::track_lifecycle::track_transition::{
+        TrackTransitionCommand, TrackTransitionError, TrackTransitionResult,
+    };
 
     struct UnusedTrackService;
 
@@ -873,11 +882,22 @@ mod tests {
 
     struct UnusedTrackNextTaskService;
 
+    struct UnusedTrackTransitionService;
+
     impl TrackNextTaskService for UnusedTrackNextTaskService {
         fn execute(
             &self,
             _: TrackNextTaskCommand,
         ) -> Result<TrackNextTaskResult, TrackNextTaskError> {
+            unreachable!()
+        }
+    }
+
+    impl TrackTransitionService for UnusedTrackTransitionService {
+        fn execute(
+            &self,
+            _: TrackTransitionCommand,
+        ) -> Result<TrackTransitionResult, TrackTransitionError> {
             unreachable!()
         }
     }
@@ -1054,6 +1074,7 @@ mod tests {
             service,
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         )
     }
 
@@ -1073,6 +1094,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1105,6 +1127,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1132,6 +1155,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1169,6 +1193,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1198,6 +1223,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1229,6 +1255,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1268,6 +1295,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             service.clone(),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1305,6 +1333,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             service,
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1334,6 +1363,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             service,
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1364,6 +1394,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1394,6 +1425,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1431,6 +1463,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1459,6 +1492,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1487,6 +1521,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1514,6 +1549,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1545,6 +1581,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1574,6 +1611,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1602,6 +1640,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1629,6 +1668,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1660,6 +1700,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1691,6 +1732,7 @@ mod tests {
             Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {

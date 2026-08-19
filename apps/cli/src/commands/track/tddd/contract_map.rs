@@ -16,6 +16,10 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use cli_composition::TrackCompositionRoot;
+use cli_driver::adr_baseline::TrackIdInput;
+use cli_driver::track_tddd::{
+    TrackItemsDirectoryInput, TrackLayersInput, TrackTdddContractMapInput, TrackWorkspaceRootInput,
+};
 
 use crate::CliError;
 
@@ -32,9 +36,20 @@ pub fn execute_contract_map(
     workspace_root: PathBuf,
     layers: Option<String>,
 ) -> Result<ExitCode, CliError> {
-    let outcome = TrackCompositionRoot::new()
-        .track_contract_map(items_dir, Some(track_id), workspace_root, layers)
-        .map_err(|e| CliError::Message(e.to_string()))?;
+    let track_id = track_id
+        .parse::<TrackIdInput>()
+        .map_err(|error| CliError::Message(format!("invalid track id: {error}")))?;
+    let items_dir = TrackItemsDirectoryInput::try_new(items_dir)
+        .map_err(|error| CliError::Message(error.to_string()))?;
+    let workspace_root =
+        TrackWorkspaceRootInput::try_from(workspace_root).map_err(CliError::Message)?;
+    let layers = layers
+        .map(TrackLayersInput::try_new)
+        .transpose()
+        .map_err(|error| CliError::Message(error.to_string()))?;
+    let outcome = TrackCompositionRoot::new().track_tddd_driver().handle_contract_map(
+        TrackTdddContractMapInput { track_id: Some(track_id), items_dir, workspace_root, layers },
+    );
     super::emit_command_outcome(&outcome, &mut io::stdout(), &mut io::stderr())
 }
 
@@ -106,5 +121,117 @@ mod tests {
             "[OK] contract-map: wrote track/items/test-track/contract-map.md \
              (layers=1, entries=2, warnings=[UndefinedRoleStyle { role: ValueObject }])\n"
         );
+    }
+
+    const RULES_JSON: &str = r#"{
+      "version": 2,
+      "layers": [{
+        "crate": "domain",
+        "path": "libs/domain",
+        "may_depend_on": [],
+        "deny_reason": "no reverse dep",
+        "tddd": {
+          "enabled": true,
+          "catalogue_file": "domain-types.json",
+          "schema_export": {"method": "rustdoc", "targets": ["domain"]}
+        }
+      }]
+    }"#;
+
+    const EMPTY_CATALOGUE: &str = r#"{
+      "schema_version": 5,
+      "crate_name": "domain",
+      "layer": "domain",
+      "types": {},
+      "traits": {},
+      "functions": {}
+    }"#;
+
+    const MINIMAL_STYLE_CONFIG: &str = "[filter]\ninclude_function_roles = []\n";
+
+    fn write_file(path: &std::path::Path, content: &str) {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        std::fs::write(path, content).unwrap();
+    }
+
+    fn list_relative_files(root: &std::path::Path) -> Vec<String> {
+        let mut files = Vec::new();
+        let mut pending = vec![root.to_path_buf()];
+        while let Some(dir) = pending.pop() {
+            for entry in std::fs::read_dir(&dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    pending.push(path);
+                } else {
+                    files.push(path.strip_prefix(root).unwrap().display().to_string());
+                }
+            }
+        }
+        files.sort();
+        files
+    }
+
+    fn contract_map_call_site_outcome(root: &std::path::Path) -> cli_driver::CommandOutcome {
+        let track_id = "test-track".parse::<TrackIdInput>().expect("track id is valid");
+        let items_dir = TrackItemsDirectoryInput::try_new(root.join("track/items"))
+            .expect("items directory is valid");
+        let workspace_root =
+            TrackWorkspaceRootInput::try_from(root.to_path_buf()).expect("workspace is valid");
+        TrackCompositionRoot::new().track_tddd_driver().handle_contract_map(
+            TrackTdddContractMapInput {
+                track_id: Some(track_id),
+                items_dir,
+                workspace_root,
+                layers: None,
+            },
+        )
+    }
+
+    #[test]
+    fn test_track_contract_map_call_site_preserves_cli_contract_across_migration() {
+        let workspace = tempfile::tempdir().expect("temporary workspace");
+        let root = workspace.path();
+        write_file(&root.join("architecture-rules.json"), RULES_JSON);
+        write_file(&root.join(".harness/config/contract-map-style.toml"), MINIMAL_STYLE_CONFIG);
+        write_file(&root.join("track/items/test-track/domain-types.json"), EMPTY_CATALOGUE);
+        let before = list_relative_files(root);
+
+        let items_dir = root.join("track/items");
+        let track_id = "test-track".to_owned();
+        let workspace_root = root.to_path_buf();
+        let layers = None::<String>;
+        let cli_exit = execute_contract_map(
+            items_dir.clone(),
+            track_id.clone(),
+            workspace_root.clone(),
+            layers.clone(),
+        )
+        .expect("legacy CLI argv must remain accepted");
+        assert_eq!(cli_exit, ExitCode::from(0));
+
+        let outcome = contract_map_call_site_outcome(root);
+        assert_eq!(items_dir, root.join("track/items"));
+        assert_eq!(track_id, "test-track");
+        assert_eq!(workspace_root, root.to_path_buf());
+        assert_eq!(layers, None);
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "[OK] contract-map: wrote track/items/test-track/contract-map.md (layers=1, entries=0)"
+            )
+        );
+        assert_eq!(outcome.stderr, None);
+        let after = list_relative_files(root);
+        assert!(after.contains(&"track/items/test-track/contract-map.md".to_owned()));
+        assert!(
+            std::fs::read_to_string(root.join("track/items/test-track/contract-map.md"))
+                .unwrap()
+                .contains("flowchart LR")
+        );
+        assert_eq!(after.len(), before.len() + 1);
     }
 }

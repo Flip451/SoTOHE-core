@@ -7727,6 +7727,966 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionCommand"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "a3eee8ef82d8ae86296b615e6449d8a0e7d2bc0784b607e04a3b7b9e55e4c568",
+        "waived_reason_hash": "8c500d1e9291b30f3f91cf543f3e48890e5eb1d1a9328bb01f516de735ba2862"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionCommand",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Track Transition application command boundary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionCommand"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "16be99a8d8523de30697c71bfd8ab63708c80105d56626cc87377f8ea7548021",
+        "waived_reason_hash": "e5207d9e6ac31e4a1f94f7362faf26901e53e8bb13c4fc271f2db838ae9623ce"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionCommand",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionCommand"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "2b60ee47986c13b0c23d4ae69da147c07f855962ec26db94c608bbf38652c97a",
+        "waived_reason_hash": "2d02ef47708f57dae5def00b673e6a5482365aad9a4009c63b64e06abe126f66"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionCommand",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Track Transition application command boundary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "009c9fe36c35b1e705c97126bc2d2db9e98cf6c6d521580921c560ab4fc89980",
+        "waived_reason_hash": "dba7bc4763c5533fb4dea250ffc1e14f000c4c59f17a8eb176bd49ed5b2494d8"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionError"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "08820c4eda0ccd038f2d39384ba8beafc6cc73a3813066228fb4046b5fa8e30a",
+        "waived_reason_hash": "f5744a113432c7ba8eec975e745cb88a696ab72cde39069e1f3ea90774ecaa85"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionError",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionError"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "8029d632fb72f1aabe8d61f1aaff9dece42226473446b328f8e6d937225af1d4",
+        "waived_reason_hash": "08faafd6d5128ef2653d456a4f9b5e27bed4d954fb0f5a51f914daa15834dc33"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionError"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "5144a22064ec96bf2686553439b868b702d77c317cf5078a3da064c58b6a965e",
+        "waived_reason_hash": "cdd5c1762ab394a448fb5d3b6b19f520f3683035960eefaf219c86c2f1d80c10"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionError",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"track_transition\")])",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "fddf5d5f9f6695e7fe4a1e2b0d58b1fadc21b96b8da053c7c1d48ab6beeecac7",
+        "waived_reason_hash": "bbfee6ddf63f6486d72e2283b2ad08a28f806001f758f3f1cb2c9236de1a0cb3"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "Track Transition command-context interactor.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "fddf5d5f9f6695e7fe4a1e2b0d58b1fadc21b96b8da053c7c1d48ab6beeecac7",
+        "waived_reason_hash": "f412fd854a0d8c08aedb0609cd8be9f277764e2676c462659a47f3ac92bf3f60"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "fddf5d5f9f6695e7fe4a1e2b0d58b1fadc21b96b8da053c7c1d48ab6beeecac7",
+        "waived_reason_hash": "431042d338526b95e239f0fec3d2af1b6f67cce75aef1563fd9c4121fd1a8fb8"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"track_transition\")])",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionResult"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "02eddbd057c5e5cb51bab8eb338671ccbee2d009685a3b8bb1c3babe312dc7b1",
+        "waived_reason_hash": "53a94d365458a6ed54a067fca52c1ef5f42b5fe1199b448812c286ca8102f975"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionResult",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionResult"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "824b49802cd2ecd936ef56539803e0b1a1cf554606f4ba171537737e0b1c2963",
+        "waived_reason_hash": "3b285f8ebea3463790ca840971dadd962bc2e76df5ef9d679a2c1e573ff567d5"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionResult",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionResult"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "62bc459f19f8674d66c980aa6b7621dbecb096cad34a86c0b6e55f14123a6694",
+        "waived_reason_hash": "990c282d07a0900aa443ab1616938329318e887694f0593475c54c5e1969b51c"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionResult",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionResult"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "d96925c0071a7e45a84a33c3f9b9ab8f484653b701f0279433ab70689b966c80",
+        "waived_reason_hash": "193992e370a715d776b5b05ceb3175a532dff1580f358aee87edb9847b997096"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionResult",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"Track Transition result DTO for primary-adapter transfer.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTaskTransitionPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "1160f50d88a1923909e275d68983f6d664b6f632043f66c8d5f9c31f4251445b",
+        "waived_reason_hash": "3dc401f04d3f4de1c3fdb938b0536d534d00716a8605f2f1f14058f9330c1105"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTaskTransitionPort",
+        "item_identifier": "trait_method:transition_task",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTaskTransitionPort"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "644d027463aa8dd8d5e8e5f130caeb98e90fab4a95d1f968220eb435a47d5773",
+        "waived_reason_hash": "a755f9f286be79409d1df6930d76cbd72cb823c1c4e4b6571b2077539136257c"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTaskTransitionPort",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Synchronous Track Transition secondary port; adapter-owned blocking storage and Git I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionService"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "75669402abca9ba202c4d31fe676b4b07f7d34d944285d0c8caf4e2571fccb16",
+        "waived_reason_hash": "707b3f1e8b80c5a54a052123c6314790ffbefebee224ac09ed3e47ec7cccec87"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"execute\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"command\")), ty: TypeRef(\"TrackTransitionCommand\") }], returns: TypeRef(\"Result<TrackTransitionResult, TrackTransitionError>\"), is_async: false, has_default_impl: false, generics: [], where_predicates: [], docs: None, spec_refs: [SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"AC-02\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"AC-03\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"CN-03\") }], action: Add }],",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionService"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "75839b24fd404aaf5c3e5ace0277817817a9f93ae97bd0c13f0602d54e6c0929",
+        "waived_reason_hash": "a8f09b506dccdbd2008dd4f7eefe76883b4ebe877ebf5510d696c26d97a0d545"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionService",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Synchronous Track Transition application-service input port; secondary-adapter-owned blocking I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTransitionService"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "75669402abca9ba202c4d31fe676b4b07f7d34d944285d0c8caf4e2571fccb16",
+        "waived_reason_hash": "de8dbf628abb11913f4441bab7f3ae3c7550c597f6ec4d38ac5da90ecf5d8030"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTransitionService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"execute\")) }]",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapCommand"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "b6365a8e0ff1cc8ee5a44e6d7f9da70ab272faf78a9a4563966a133f1fce9288",
+        "waived_reason_hash": "65cda2644e34da1a21889119cbb4984f7512eee99cf2a5a6c72754cb50b2b3be"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapCommand",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackContractMapCommand typed application command.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapCommand"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "1f84c3ee2fa254e94b11dac17dd5efe0aef0aea5af33f4e4a0ad56b7215f8f7a",
+        "waived_reason_hash": "be9a2c82c381271118cf4421b1e7bac3750b72a1700c887bb39fd1bdc06d0f73"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapCommand",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapCommand"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "ced56ec6351ef59cfaa8a19d324d7e17975a9487f8e36d32008e9e444570e486",
+        "waived_reason_hash": "51163f78e2b54b80b9cf884269f0af3f6e4ed74c2691990aef3753a721a647ae"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapCommand",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "04012fd5e4068b3fd3ca817dbe93d1bc7e3836e70c466e606e11df7172c1b501",
+        "waived_reason_hash": "33c68c8925a49bf995b8fb2faaa6754ef6c887942cc4c37d25d364376b44eb13"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapError"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "06eb8ad5923a5e8a128829a52d53a468d8f41ea0720c6da83ad11fb615494f5a",
+        "waived_reason_hash": "cc20218573428ecb03ef14d8eb7009d8b12370afa7614a7960f35dcd10f9d314"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapError"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "29fb811868c26f3761d1bb4991da8e0ce47d2f57943ace6b20a8d08a750c1657",
+        "waived_reason_hash": "a6103ef7a0b17774901e5b8c409c63de306d3839911c92914e6fdf0d44f8eeae"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapError",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"ExecutionFailed\")), payload: Tuple([TypeRef(\"DiagnosticText\")]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"tddd\"), Identifier(\"contract_map\")]), docs: Some(DocString(\"TrackContractMapError application error.\")), spec_refs: [SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"AC-03\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"AC-04\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"CN-01\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "bf57844d4c1215dc27c4c86e138854bf891f1bcf584044b86d964c4e948c47e7",
+        "waived_reason_hash": "e8b46f05513b96aa4b9dd464a3bab4f4247950a1f97f4177310af47198a406b7"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "bf57844d4c1215dc27c4c86e138854bf891f1bcf584044b86d964c4e948c47e7",
+        "waived_reason_hash": "089911b814f35553400984dabf0906e4cbd9fb57e7385e31c216d1157ba8b9d8"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "methods: [],",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "bf57844d4c1215dc27c4c86e138854bf891f1bcf584044b86d964c4e948c47e7",
+        "waived_reason_hash": "fbb0b4eb0a70f3342e875ecbfdb078d90be604f8048aca63a4629e71e42a27c6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapResult"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "9ef71169da5506eaa7060ca92f19ef5cfa97e445749d4a546f8278ba7c63ee18",
+        "waived_reason_hash": "24674d114872c9412a28142abe384c4b6e12eed916045e4c4e5476ac24bfd643"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapResult",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackContractMapResult primary-adapter result DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapResult"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "b003db4d692b2231a04d072d8bb35ebcb53e8ac0fa41cecc5247eabda8b3661c",
+        "waived_reason_hash": "b342ad2b095925f88d5d6d3ddbda9fb11f895cabb8493b13128e901006a0fdee"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapResult",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackContractMapResult primary-adapter result DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "77c3f3c3c09557929c2324e482653b70005f7e62ca50ea988c94d7208ffb7011",
+        "waived_reason_hash": "249c0a3a6aefd24e2ffb95ae479eb285c4d75c172f95987f566cc52501c8b673"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapPort"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "77c3f3c3c09557929c2324e482653b70005f7e62ca50ea988c94d7208ffb7011",
+        "waived_reason_hash": "cbf194f8a9c839115ef1f11d32ce4f937c4c25dfc5a03a006cf55031d275f122"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "Synchronous Track ContractMap secondary port; adapter-owned blocking I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapService"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "526315984d30cce818e92d833147dcca7744fefc1468621ef44116aa2dee4be0",
+        "waived_reason_hash": "3bb9fbc1a04eaae005c62aa0bee8f23aceedd323fea1c2d7667b45b05ee32350"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "複数 execution method を束ねる Service-style input boundary を新設せず",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapService"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "121ac1e4ab4a34a0f252104a69d55a7f45b96989d8313eddc942bce35878e995",
+        "waived_reason_hash": "9b393138aeeddfa81649fc1efbb3353351af2a84a4ad6fcbcd20a728e62869ce"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapService",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackContractMapService"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "526315984d30cce818e92d833147dcca7744fefc1468621ef44116aa2dee4be0",
+        "waived_reason_hash": "0dda4dcd944461f09c4d9357cf86e683b5a0b1ddb21c6cb0388dff05a0aef972"
+      },
+      "obligation_id": {
+        "entry_key": "TrackContractMapService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "SystemTrackContractMapAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "6909f58eb55fcca0b3e6d35e08fb62e0034220fa5b40f846a13022b95df7a329",
+        "waived_reason_hash": "f0f92f9fdc698b650b77b05521ab803c282e1728a06cbcc91fa727bdfe720a43"
+      },
+      "obligation_id": {
+        "entry_key": "SystemTrackContractMapAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "trait_impl: TraitImplDeclV2 { action: Add, trait_ref: TypeRef(\"usecase::track_lifecycle::tddd::contract_map::TrackContractMapPort\"), for_type: TypeRef(\"SystemTrackContractMapAdapter\")",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddContractMapInput"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "0cd5dfd0b016488ae056b80a3101dde112bff660019321ba89cf3f928fceeaca",
+        "waived_reason_hash": "9df3b58df9194f840440df8f9156ddcfd33be1ac11d11e6679f5e12230820a97"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddContractMapInput",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackTdddContractMapInput typed primary-adapter input DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackTdddContractMapInput"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "ffe0dd3e5ed372dee5f45659c335f68aab5f833857d6fb17929efc4af3ce8126",
+        "waived_reason_hash": "7c0971744dcf90f5e65680bfb228c0ccf4f535b69e2d1917682549a5faa8def0"
+      },
+      "obligation_id": {
+        "entry_key": "TrackTdddContractMapInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TrackTdddContractMapInput typed primary-adapter input DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSourceWorkspaceInput"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "fb042f1b73598bc7d5708eb5f4e00d3b1160316286ecb87f05502ce5b298f016",
+        "waived_reason_hash": "c2007c386241f7267488b62ff2a9c7ec88b74c19012775053cf9ba14db32814a"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSourceWorkspaceInput",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSourceWorkspaceInput"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "0b9a3c4e9b3b1780590925587a6e70e02d6673047f66486b37a5693fe18fc1cc",
+        "waived_reason_hash": "50d7d2f6315cbd08a07c8a1d7c31f1841d6173b3f59759a5c1bc70012bbdd04c"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSourceWorkspaceInput",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ],
   "track_id": "2026-08-15-track-lifecycle-pure-di"

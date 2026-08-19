@@ -22,6 +22,7 @@ use usecase::track_lifecycle::tddd::catalogue_spec_signals::{
     TrackCatalogueSpecSignalsCommand, TrackCatalogueSpecSignalsError,
     TrackCatalogueSpecSignalsService,
 };
+use usecase::track_lifecycle::tddd::contract_map::TrackContractMapService;
 use usecase::track_lifecycle::tddd::lint::{
     TrackLintCommand, TrackLintError, TrackLintResult, TrackLintRulesFile, TrackLintService,
 };
@@ -69,7 +70,7 @@ impl TrackItemsDirectoryInput {
         TrackWorkspaceRootInput { value: root }
     }
 
-    fn into_usecase(self) -> Result<TrackItemsDirectory, TrackResolutionDiagnostic> {
+    pub(crate) fn into_usecase(self) -> Result<TrackItemsDirectory, TrackResolutionDiagnostic> {
         TrackItemsDirectory::try_new(self.value)
             .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))
     }
@@ -98,7 +99,7 @@ impl TrackLayersInput {
         Ok(Self { value: layers })
     }
 
-    fn into_usecase(self) -> TrackLayerFilter {
+    pub(crate) fn into_usecase(self) -> TrackLayerFilter {
         TrackLayerFilter::Selected(self.value)
     }
 }
@@ -120,7 +121,7 @@ impl TryFrom<PathBuf> for TrackWorkspaceRootInput {
 }
 
 impl TrackWorkspaceRootInput {
-    fn into_usecase(self) -> Result<TrackWorkspaceRoot, String> {
+    pub(crate) fn into_usecase(self) -> Result<TrackWorkspaceRoot, String> {
         TrackWorkspaceRoot::try_new(self.value).map_err(|error| error.to_string())
     }
 }
@@ -135,13 +136,18 @@ impl TryFrom<PathBuf> for TrackSourceWorkspaceInput {
     type Error = String;
 
     fn try_from(value: PathBuf) -> Result<Self, Self::Error> {
-        TrackSourceWorkspace::try_new(value.clone())
-            .map(|_| Self { value })
-            .map_err(|error| error.to_string())
+        Self::try_new(value).map_err(|error| error.to_string())
     }
 }
 
 impl TrackSourceWorkspaceInput {
+    /// Validates and wraps a source-workspace path.
+    pub fn try_new(value: PathBuf) -> Result<Self, TrackResolutionDiagnostic> {
+        TrackSourceWorkspace::try_new(value.clone())
+            .map(|_| Self { value })
+            .map_err(|error| TrackResolutionDiagnostic::new(error.to_string()))
+    }
+
     fn into_usecase(self) -> Result<TrackSourceWorkspace, String> {
         TrackSourceWorkspace::try_new(self.value).map_err(|error| error.to_string())
     }
@@ -253,6 +259,18 @@ pub struct TrackTdddLintInput {
     pub rules_file: Option<TrackLintRulesFileInput>,
 }
 
+/// Typed primary-adapter input for contract-map rendering.
+pub struct TrackTdddContractMapInput {
+    /// Optional explicit track id; omitted values select the active track.
+    pub track_id: Option<TrackIdInput>,
+    /// Directory containing the track artifacts.
+    pub items_dir: TrackItemsDirectoryInput,
+    /// Workspace containing the track artifacts and renderer configuration.
+    pub workspace_root: TrackWorkspaceRootInput,
+    /// Optional comma-separated layer filter.
+    pub layers: Option<TrackLayersInput>,
+}
+
 /// Typed primary-adapter input for active-track catalogue linting.
 pub struct TrackTdddCatalogueLintActiveInput {
     /// Optional explicit track id; omitted values select the active track.
@@ -271,6 +289,7 @@ pub struct TrackTdddDriver {
     catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
     catalogue_lint_active: Arc<dyn TrackCatalogueLintActiveService>,
     lint: Arc<dyn TrackLintService>,
+    contract_map: Arc<dyn TrackContractMapService>,
 }
 
 impl TrackTdddDriver {
@@ -283,6 +302,7 @@ impl TrackTdddDriver {
         catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
         catalogue_lint_active: Arc<dyn TrackCatalogueLintActiveService>,
         lint: Arc<dyn TrackLintService>,
+        contract_map: Arc<dyn TrackContractMapService>,
     ) -> Self {
         Self {
             baseline_capture,
@@ -291,6 +311,7 @@ impl TrackTdddDriver {
             catalogue_spec_signals,
             catalogue_lint_active,
             lint,
+            contract_map,
         }
     }
 
@@ -370,6 +391,11 @@ impl TrackTdddDriver {
             Err(error) => return CommandOutcome::failure(Some(error)),
         };
         self.lint.execute(command).map(render_lint_result).unwrap_or_else(lint_error_to_outcome)
+    }
+
+    /// Executes the contract-map input boundary.
+    pub fn handle_contract_map(&self, input: TrackTdddContractMapInput) -> CommandOutcome {
+        crate::track_contract_map::render_track_contract_map_outcome(&*self.contract_map, input)
     }
 }
 
@@ -631,6 +657,9 @@ mod tests {
     use usecase::track_lifecycle::tddd::baseline_graph::TrackBaselineGraphResult;
     use usecase::track_lifecycle::tddd::catalogue_impl_signals::TrackCatalogueImplSignalsResult;
     use usecase::track_lifecycle::tddd::catalogue_lint_active::TrackCatalogueLintLayerResult;
+    use usecase::track_lifecycle::tddd::contract_map::{
+        TrackContractMapCommand, TrackContractMapError,
+    };
     use usecase::track_lifecycle::{TrackRenderedLayerCount, TrackWrittenFileCount};
 
     #[test]
@@ -703,6 +732,20 @@ mod tests {
 
     impl TrackLintService for UnusedLintService {
         fn execute(&self, _: TrackLintCommand) -> Result<TrackLintResult, TrackLintError> {
+            unreachable!()
+        }
+    }
+
+    struct UnusedTrackContractMapService;
+
+    impl TrackContractMapService for UnusedTrackContractMapService {
+        fn execute(
+            &self,
+            _: TrackContractMapCommand,
+        ) -> Result<
+            usecase::track_lifecycle::tddd::contract_map::TrackContractMapResult,
+            TrackContractMapError,
+        > {
             unreachable!()
         }
     }
@@ -872,6 +915,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -911,6 +955,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let input = TrackTdddBaselineCaptureInput {
@@ -940,6 +985,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -1012,6 +1058,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -1056,6 +1103,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
         let input = TrackTdddBaselineGraphInput {
             track_id: None,
@@ -1086,6 +1134,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -1118,6 +1167,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
@@ -1168,6 +1218,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
         let input = TrackTdddCatalogueImplSignalsInput {
             track_id: None,
@@ -1197,6 +1248,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
@@ -1231,6 +1283,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
@@ -1266,6 +1319,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
         let input = TrackTdddCatalogueSpecSignalsInput {
             track_id: None,
@@ -1296,6 +1350,7 @@ mod tests {
             service,
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
@@ -1331,6 +1386,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             service.clone(),
             Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
         );
 
         let outcome = driver.handle_catalogue_lint_active(catalogue_lint_active_input());
@@ -1395,6 +1451,7 @@ mod tests {
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
             lint,
+            Arc::new(UnusedTrackContractMapService),
         )
     }
 

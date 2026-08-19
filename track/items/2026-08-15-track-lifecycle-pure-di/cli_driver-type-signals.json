@@ -1,8 +1,8 @@
 {
   "baseline_hash": "f80a049a51ead3f8c296d234a9293ee6422ea2945e5aa12f45cbcd7aeac48346",
   "declaration_hash": "c67873117dadadfc21928de3321deb7fda0cfefabd627d9993b2261ae567b032",
-  "generated_at": "2026-08-19T02:28:55Z",
-  "head_commit": "979c36fa2d83ac7c026b74de0d6967f42fc448f8",
+  "generated_at": "2026-08-19T04:47:08Z",
+  "head_commit": "95784f92f7970ee110a4b8aee64599a70ea2cd68",
   "schema_version": 4,
   "signals": [
     {
@@ -109,7 +109,7 @@
       ],
       "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSourceWorkspaceInput"
     },
     {
@@ -164,9 +164,9 @@
       "type_name": "TrackTdddCatalogueSpecSignalsInput"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTdddContractMapInput"
     },
     {

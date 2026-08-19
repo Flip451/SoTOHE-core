@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
   "declaration_hash": "333f8be42d6dc99d2fbfb9ddfd4eabf49d1cfc986810eb144d59619973cf9c86",
-  "generated_at": "2026-08-19T02:28:51Z",
-  "head_commit": "979c36fa2d83ac7c026b74de0d6967f42fc448f8",
+  "generated_at": "2026-08-19T04:47:03Z",
+  "head_commit": "95784f92f7970ee110a4b8aee64599a70ea2cd68",
   "schema_version": 4,
   "signals": [
     {
@@ -600,47 +600,47 @@
       "type_name": "TrackCommitHashPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackContractMapCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackContractMapError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackContractMapService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackContractMapInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackContractMapPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackContractMapResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackContractMapService"
     },
     {
@@ -1278,39 +1278,39 @@
       ],
       "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTransitionCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackTransitionError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackTransitionService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackTransitionInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTransitionResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTransitionService"
     },
     {

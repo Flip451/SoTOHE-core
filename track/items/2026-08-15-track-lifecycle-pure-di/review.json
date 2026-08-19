@@ -408,6 +408,13 @@
           "hash": "rvw1:sha256:97419f8b64acadd705de7dca34ee78cc82c5ee5606ee16a5584df2bb416ed2c9",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:36:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:60977a45705790896ac755430437ce3845ba2d7b88e3d72b726484e7a5bd201e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -646,6 +653,13 @@
           "at": "2026-08-19T02:05:01Z",
           "findings": [],
           "hash": "rvw1:sha256:2bf386ad5210d2604685c9319a238602b3d5c7e6dd5c65a81c88fe57c48baf63",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:42:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f3e6b8cc8362d775ff16b846fa7767bdf65f69f85c838013c55bf75f195263c8",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -994,6 +1008,13 @@
           "at": "2026-08-19T02:28:31Z",
           "findings": [],
           "hash": "rvw1:sha256:109f88737881d6d6d97801133d324a307c1d66e0812e11b66417296080d9feae",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:37:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:50ea1749ffb8a02f9e9dec58e01a402cbd634e0d428f923a7c4053f1967b291a",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1619,6 +1640,13 @@
           "at": "2026-08-19T01:36:13Z",
           "findings": [],
           "hash": "rvw1:sha256:3485c2ad85bdc30359ffd1b3640d7c577f34b7951a0437d3a961507c81d90429",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:15:19Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd3aa91d97aad7285c7073efdaee0d62a863218e91228897ae75de0d47e3234c",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2294,6 +2322,13 @@
           "hash": "rvw1:sha256:d99c6c4f7efde9a633a862fbc55b1b18a603fce0dd40c735cc7e66e8821322ae",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:46:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3c8c0cb180984ee2b79939b3977e554ac4c9d150d5cde4a5ac678ac2ef64da1f",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2709,6 +2744,28 @@
           "at": "2026-08-19T02:05:30Z",
           "findings": [],
           "hash": "rvw1:sha256:e06d33c19dd9d29722dbddd4efec09f53466dbb619ce4414dd7290e9c95c75e6",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:15:50Z",
+          "findings": [
+            {
+              "category": "obligation-model-conformance",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 438,
+              "message": "SystemTrackContractMapAdapter × CN-01 is waived at the declaration edge, but this adapter writes contract-map.md and can change persist/CLI observables. The contract_conformance obligation already cites CN-01, and the fulfillment at line 399 already binds the four infrastructure adapter tests plus test_track_contract_map_call_site_preserves_cli_contract_across_migration. The waiver-cache row is keyed to that same contract_conformance obligation, so obligation-fulfillment-cache has no SystemTrackContractMapAdapter entry and those bound tests are not verified. This contradicts the accepted SystemTrackLintAdapter / SystemTrackCatalogueLintActiveAdapter shape (fulfill CN-01 with infra tests plus the call-site contract test; do not waive). The reason also defers to ‘the conformance obligation’, which is not a self-contained declaration-edge waiver and contradicts waiver semantics. Delete this CN-01 waiver and re-evaluate so CN-01 is fulfilled, not waived.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:5ef7ea7bd4c7d4aa6c108cf305553c949e4ac7a8344dfbbb86dbadaac7cb02c1",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T04:38:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af8983b0bd1eae3704ac87b9280f20f5098da87f876ac9365009466eca4827fd",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3694,6 +3751,13 @@
           "at": "2026-08-19T02:11:59Z",
           "findings": [],
           "hash": "rvw1:sha256:2e4b737b6425cfa97b4fa2cf65691f34d12221a04739c1d1bb09eb6bf5f050df",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:17:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:eaf761132e75690c1bab83268830ba9b4258e953bc6d1acec316bc890c4ebbbc",
           "type": "final",
           "verdict": "zero_findings"
         }
