@@ -80,6 +80,350 @@
           "verdict": "zero_findings"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "at": "2026-08-19T01:27:06Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "The required review could not be completed because the repository read tool failed before execution with `bwrap: No permissions to create new namespace`; therefore the briefing, scope policy, current diff, and four scoped files were not inspectable.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030ab145b0ddf53c21d30669f7c0bf182c0b66819a9fb50c424c24cc09fb9838",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:31:55Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "The required review remains blocked: the repository read command fails before execution with `bwrap: No permissions to create new namespace`. Consequently, the mandated severity policy, briefing, current diff, and four scoped files could not be read or adjudicated.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030ab145b0ddf53c21d30669f7c0bf182c0b66819a9fb50c424c24cc09fb9838",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:39:29Z",
+          "findings": [
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/impl-plan.json",
+              "line": 6,
+              "message": "This task description is not independently executable: it lacks a concrete implementation target, affected files or symbols, required behavior, and verifiable completion criteria. Rewrite it as an actionable implementation contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "task description non-executable",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/impl-plan.json",
+              "line": 12,
+              "message": "This separate task description has the same execution gap: it does not identify the concrete implementation target, required behavior, or validation/tests. Make the task independently executable.",
+              "severity": "P1"
+            },
+            {
+              "category": "task-contract attribution mismatch",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/task-contract.json",
+              "line": 4,
+              "message": "The task attribution in this contract does not match the corresponding task identity in impl-plan.json. Align the task identifier/attribution and rerun plan coverage validation so the contract cannot bind to the wrong task or leave a planned task uncovered.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030ab145b0ddf53c21d30669f7c0bf182c0b66819a9fb50c424c24cc09fb9838",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:42:59Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: the workspace read path failed before the briefing, impl-plan severity policy, scoped JSON files, and current diff could be inspected. No valid code-review verdict can be issued without that evidence.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030ab145b0ddf53c21d30669f7c0bf182c0b66819a9fb50c424c24cc09fb9838",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:45:46Z",
+          "findings": [
+            {
+              "category": "environment",
+              "file": null,
+              "line": null,
+              "message": "Review blocked: the required read-only shell fails before execution (`bwrap: No permissions to create new namespace`), so the briefing, scope severity policy, current diff, and four impl-plan files could not be inspected. No code finding can be adjudicated.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030ab145b0ddf53c21d30669f7c0bf182c0b66819a9fb50c424c24cc09fb9838",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T03:43:27Z",
+          "findings": [
+            {
+              "category": "tooling",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: the read-only shell failed before executing any command (`bwrap: No permissions to create new namespace`), so the required briefing, severity policy, files, and diff could not be inspected.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030ab145b0ddf53c21d30669f7c0bf182c0b66819a9fb50c424c24cc09fb9838",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T04:03:52Z",
+          "findings": [
+            {
+              "category": "task-coverage gap",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/impl-plan.json",
+              "line": 6,
+              "message": "T001 maps AC-01 through AC-05 and AC-09, but its executable description only adds implementation code and contains no test or other validation operation. Those behavior criteria therefore have no task-level validation step; add the required grok-arm tests (or a dedicated validation task) to the plan.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:030ab145b0ddf53c21d30669f7c0bf182c0b66819a9fb50c424c24cc09fb9838",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T04:12:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:17b5c3af91cbde14694de9ea780019a9c315f52aaf0c6c1b46078612130d9dec",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:20:22Z",
+          "findings": [],
+          "hash": "rvw1:sha256:17b5c3af91cbde14694de9ea780019a9c315f52aaf0c6c1b46078612130d9dec",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "at": "2026-08-19T01:26:59Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/test-bindings.json",
+              "line": null,
+              "message": "Unable to complete the required review: the briefing, current diff, and scoped file could not be read because the workspace shell is blocked by the sandbox (bwrap namespace-permission failure).",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1f07fb6aa19f220404668ac67b00ef7588bb8ba9c5910fa89e812d6c9f1ae996",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:35:47Z",
+          "findings": [
+            {
+              "category": "process",
+              "file": "tmp/reviewer-runtime/briefing-other.md",
+              "line": 1,
+              "message": "Unable to complete the review: the read-only shell is blocked by the execution sandbox (`bwrap: No permissions to create new namespace`), so the required briefing, current diff, and scoped file could not be inspected.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1f07fb6aa19f220404668ac67b00ef7588bb8ba9c5910fa89e812d6c9f1ae996",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T04:03:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1f07fb6aa19f220404668ac67b00ef7588bb8ba9c5910fa89e812d6c9f1ae996",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T04:11:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1f07fb6aa19f220404668ac67b00ef7588bb8ba9c5910fa89e812d6c9f1ae996",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "at": "2026-08-18T23:54:59Z",
+          "findings": [
+            {
+              "category": "process",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json",
+              "line": null,
+              "message": "Required review inputs could not be inspected because the repository read tool fails before execution with a sandbox namespace error (`bwrap: No permissions to create new namespace`). No spec verdict can be safely adjudicated from the unavailable briefing, policy, file, or diff.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a09c8b7f368516a64589531529c977171ca98c614cce3331f49b2b5c112611e9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-18T23:57:40Z",
+          "findings": [
+            {
+              "category": "missing AC coverage",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json",
+              "line": 171,
+              "message": "GO-01 requires the four dedicated paths to remain outside capability exec, but no AC deterministically verifies that non-convergence; CN-01/OS-01 alone do not provide acceptance coverage for this stated goal.",
+              "severity": "P1"
+            },
+            {
+              "category": "missing AC coverage",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json",
+              "line": 171,
+              "message": "GO-01 requires that only the committed reviewer shipped default be changed to grok, but the ACs verify the reviewer values and the four target/sample values only; no AC deterministically verifies that every other capability's shipped default remains unchanged.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:a09c8b7f368516a64589531529c977171ca98c614cce3331f49b2b5c112611e9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:01:49Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acf7c1431f097b7e8ab88e64b8141fb4c605a4d4cabd2fb2ef0f2120a721d81f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:08:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:acf7c1431f097b7e8ab88e64b8141fb4c605a4d4cabd2fb2ef0f2120a721d81f",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "at": "2026-08-19T00:35:40Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "Review blocked: the required briefing, severity policy, current diff, and scoped files could not be read because the available shell environment failed to start its sandbox namespace. No code findings can be adjudicated.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ff14101e0bde916bb8420c60f32da0d1017efedd78186dbbd935bf0be076b0e8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:41:10Z",
+          "findings": [
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 6,
+              "message": "The `infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args` docs restate the mapping and prompt behavior contract in prose; retain only the changed symbol/operation and spec-anchor references per `.harness/policies/no-upstream-restatement.md`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 70,
+              "message": "The `infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner` docs restate runner-sharing and trusted-root behavior; these design/behavior details belong upstream and should be represented by anchors only.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 111,
+              "message": "`GrokCapabilityDefinition` docs restate the admission API and caller-validation behavior instead of only identifying the referenced surface and its anchors.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 192,
+              "message": "`GrokEnvelopeError` docs restate fail-closed output-extraction behavior; the catalogue docs must not reproduce the upstream behavior contract.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 229,
+              "message": "`GrokOutputEnvelope` docs restate success/failure payload semantics and the prohibition on using envelope text as a result channel; replace the prose contract with anchor-only identification.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 292,
+              "message": "`GrokSandbox` docs restate provider-mapping, cross-operation stability, and layer-placement rationale; these upstream design decisions should not be duplicated in the type catalogue docs.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 348,
+              "message": "`GrokSandboxProfileName` docs restate the reserved-name invariant and its enforcement ownership; use a concise symbol/operation description with spec anchors instead.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 399,
+              "message": "`GrokSandboxProfileNameError` docs restate the constructor's empty/reserved-value behavior; this is an upstream behavior contract and should not be repeated in `docs`.",
+              "severity": "P1"
+            },
+            {
+              "category": "upstream-restatement",
+              "file": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+              "line": 432,
+              "message": "`ResolvedExecution` docs restate provider-resolution behavior and out-of-scope hosted-path semantics; retain only the reference identity and spec-anchor citations.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:ff14101e0bde916bb8420c60f32da0d1017efedd78186dbbd935bf0be076b0e8",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:52:41Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd39b7c666752a874b552e262798e312b5419d1d4a44a7f82663961dfa5612bd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T01:07:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cd39b7c666752a874b552e262798e312b5419d1d4a44a7f82663961dfa5612bd",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
     }
   }
 }

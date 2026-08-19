@@ -1,0 +1,750 @@
+{
+  "entries": [
+    {
+      "claim_hash": "28c6f3a72541a575c6fc6fb59ef6522ae5825392b16a3aea880d4181f83fd1b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityDefinition",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bdab123416141ecceee247639b2bdf815154c01b1c7b8423a47d4f786e35b6c2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。これら 4 経路専用の起動契約表や例外表は存在しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "28c6f3a72541a575c6fc6fb59ef6522ae5825392b16a3aea880d4181f83fd1b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityDefinition",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f2b1827cef5508d1b684075c4e0ae1985726c61c5fe5a9d2b65fe7c75352d3cb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "これら 4 経路の起動契約は既存の grok 写像（model / effort / resume / sandbox）を使う。経路ごとの起動契約や例外表は新設しない。返却は envelope の構造化出力フィールドから取り、テキスト欄は使わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の grok 写像（model / effort / resume / sandbox）を使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "28c6f3a72541a575c6fc6fb59ef6522ae5825392b16a3aea880d4181f83fd1b8",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokCapabilityDefinition",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a489ee6cf7a7b2987b11b263b276d5355f77431d3886e42007b20d073e00ceec",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d9cc5eeb3d788ebf5460295639df3ed30525ee7ad9feb7a6129059f3aa6db885",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokEnvelopeError",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e07b0d18927123af85d457e8fa56bf8ff500755db35e7977db912da5d33a16c5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "それら経路での grok 実行が成功したとき、返却は envelope の構造化出力フィールドの値だけである。その値が無い場合は fail-closed し、envelope の失敗理由を出し、テキスト欄を結果として扱わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "返却は envelope の構造化出力フィールドの値だけである。その値が無い場合は fail-closed し、envelope の失敗理由を出し、テキスト欄を結果として扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "d9cc5eeb3d788ebf5460295639df3ed30525ee7ad9feb7a6129059f3aa6db885",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokEnvelopeError",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fed2567cd82b7d46ee91659c83457942787bdca530c1a3519bae20cefbbf9f66",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "これら 4 経路の grok 実行の返却抽出は envelope の構造化出力フィールドに限り、テキスト欄は返却チャネルにしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の grok 実行の返却抽出は envelope の構造化出力フィールドに限り、テキスト欄は返却チャネルにしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "62883aea8fe5e6269248cf9d8b2a9c742e24979296f04aa768c5d370cbe63def",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokOutputEnvelope",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "e07b0d18927123af85d457e8fa56bf8ff500755db35e7977db912da5d33a16c5",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-04",
+          "section": "acceptance_criteria",
+          "text_label": "それら経路での grok 実行が成功したとき、返却は envelope の構造化出力フィールドの値だけである。その値が無い場合は fail-closed し、envelope の失敗理由を出し、テキスト欄を結果として扱わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "返却は envelope の構造化出力フィールドの値だけである。その値が無い場合は fail-closed し、envelope の失敗理由を出し、テキスト欄を結果として扱わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "62883aea8fe5e6269248cf9d8b2a9c742e24979296f04aa768c5d370cbe63def",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokOutputEnvelope",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f2b1827cef5508d1b684075c4e0ae1985726c61c5fe5a9d2b65fe7c75352d3cb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "これら 4 経路の起動契約は既存の grok 写像（model / effort / resume / sandbox）を使う。経路ごとの起動契約や例外表は新設しない。返却は envelope の構造化出力フィールドから取り、テキスト欄は使わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "返却は envelope の構造化出力フィールドから取り、テキスト欄は使わない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "62883aea8fe5e6269248cf9d8b2a9c742e24979296f04aa768c5d370cbe63def",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokOutputEnvelope",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fed2567cd82b7d46ee91659c83457942787bdca530c1a3519bae20cefbbf9f66",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-03",
+          "section": "constraint",
+          "text_label": "これら 4 経路の grok 実行の返却抽出は envelope の構造化出力フィールドに限り、テキスト欄は返却チャネルにしない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の grok 実行の返却抽出は envelope の構造化出力フィールドに限り、テキスト欄は返却チャネルにしない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "56d99d5678dd9e9db2d0093b65f319fcb600d8bea9ce35c07a4803355cf84f4f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandbox",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bdab123416141ecceee247639b2bdf815154c01b1c7b8423a47d4f786e35b6c2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。これら 4 経路専用の起動契約表や例外表は存在しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "56d99d5678dd9e9db2d0093b65f319fcb600d8bea9ce35c07a4803355cf84f4f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandbox",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f2b1827cef5508d1b684075c4e0ae1985726c61c5fe5a9d2b65fe7c75352d3cb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "これら 4 経路の起動契約は既存の grok 写像（model / effort / resume / sandbox）を使う。経路ごとの起動契約や例外表は新設しない。返却は envelope の構造化出力フィールドから取り、テキスト欄は使わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の起動契約は既存の grok 写像（model / effort / resume / sandbox）を使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "56d99d5678dd9e9db2d0093b65f319fcb600d8bea9ce35c07a4803355cf84f4f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandbox",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a489ee6cf7a7b2987b11b263b276d5355f77431d3886e42007b20d073e00ceec",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1196e96e2b7dc495b791a0f493e5a70853cfc78dd561ae5536d9caeb21339282",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandboxProfileName",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bdab123416141ecceee247639b2bdf815154c01b1c7b8423a47d4f786e35b6c2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。これら 4 経路専用の起動契約表や例外表は存在しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "1196e96e2b7dc495b791a0f493e5a70853cfc78dd561ae5536d9caeb21339282",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandboxProfileName",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a489ee6cf7a7b2987b11b263b276d5355f77431d3886e42007b20d073e00ceec",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "0586f01f360b7686bd0607eea649cb4f92b6d3267e7cbecdf8556dbcd4c532b7",
+      "claim_origin": {
+        "data": {
+          "entry_key": "GrokSandboxProfileNameError",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bdab123416141ecceee247639b2bdf815154c01b1c7b8423a47d4f786e35b6c2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。これら 4 経路専用の起動契約表や例外表は存在しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3027710b59a40f29d77b37723eb2edb79df5b26e5968460f7ec239d5091049ab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ResolvedExecution",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cba26df97b5c1e868e55edcb9f424dfdf1df52b952834200dee5db4836f39b9f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "対象 4 capability のそれぞれについて、provider が grok の profile は、未対応の grok provider として fail-closed せず grok を起動する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 capability のそれぞれについて、provider が grok の profile は、未対応の grok provider として fail-closed せず grok を起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3027710b59a40f29d77b37723eb2edb79df5b26e5968460f7ec239d5091049ab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ResolvedExecution",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bfeaed904167672339a0cf4529b66b02231633c478c2d5c8d858a5e9338f321f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 4 capability のそれぞれについて、fast_provider が grok の profile は、未対応の grok provider として fail-closed せず fast 側の grok を起動する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 capability のそれぞれについて、fast_provider が grok の profile は、未対応の grok provider として fail-closed せず fast 側の grok を起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3027710b59a40f29d77b37723eb2edb79df5b26e5968460f7ec239d5091049ab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ResolvedExecution",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cdab2d5553c3b744d3da815f2ec5b20e06e7c5441551b32d8413bf761085c5c6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "agent-profiles.json の provider が grok のとき、次の 4 つの typed-pipeline 専用経路が grok を起動できる: ref-verifier-chain1、ref-verifier-chain2、obligation-fulfillment-verifier、waiver-verifier。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "agent-profiles.json の provider が grok のとき、次の 4 つの typed-pipeline 専用経路が grok を起動できる: ref-verifier-chain1、ref-verifier-chain2、obligation-fulfillment-verifier、waiver-verifier。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "3027710b59a40f29d77b37723eb2edb79df5b26e5968460f7ec239d5091049ab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "ResolvedExecution",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "977c525d5491c63250ba848c064e1ce4dff95c9784f6ede891326beee5f0aced",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "同じ 4 capability について、fast_provider に grok を書いたときも、未対応 provider として fail-closed しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同じ 4 capability について、fast_provider に grok を書いたときも、未対応 provider として fail-closed しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cba26df97b5c1e868e55edcb9f424dfdf1df52b952834200dee5db4836f39b9f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-01",
+          "section": "acceptance_criteria",
+          "text_label": "対象 4 capability のそれぞれについて、provider が grok の profile は、未対応の grok provider として fail-closed せず grok を起動する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 capability のそれぞれについて、provider が grok の profile は、未対応の grok provider として fail-closed せず grok を起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bfeaed904167672339a0cf4529b66b02231633c478c2d5c8d858a5e9338f321f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-02",
+          "section": "acceptance_criteria",
+          "text_label": "対象 4 capability のそれぞれについて、fast_provider が grok の profile は、未対応の grok provider として fail-closed せず fast 側の grok を起動する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 capability のそれぞれについて、fast_provider が grok の profile は、未対応の grok provider として fail-closed せず fast 側の grok を起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "bdab123416141ecceee247639b2bdf815154c01b1c7b8423a47d4f786e35b6c2",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-03",
+          "section": "acceptance_criteria",
+          "text_label": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。これら 4 経路専用の起動契約表や例外表は存在しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "それら grok 起動は既存の grok 写像（model / effort / resume / sandbox）を適用する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "cdab2d5553c3b744d3da815f2ec5b20e06e7c5441551b32d8413bf761085c5c6",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-01",
+          "section": "in_scope",
+          "text_label": "agent-profiles.json の provider が grok のとき、次の 4 つの typed-pipeline 専用経路が grok を起動できる: ref-verifier-chain1、ref-verifier-chain2、obligation-fulfillment-verifier、waiver-verifier。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "agent-profiles.json の provider が grok のとき、次の 4 つの typed-pipeline 専用経路が grok を起動できる: ref-verifier-chain1、ref-verifier-chain2、obligation-fulfillment-verifier、waiver-verifier。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "977c525d5491c63250ba848c064e1ce4dff95c9784f6ede891326beee5f0aced",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-02",
+          "section": "in_scope",
+          "text_label": "同じ 4 capability について、fast_provider に grok を書いたときも、未対応 provider として fail-closed しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同じ 4 capability について、fast_provider に grok を書いたときも、未対応 provider として fail-closed しない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "f2b1827cef5508d1b684075c4e0ae1985726c61c5fe5a9d2b65fe7c75352d3cb",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-03",
+          "section": "in_scope",
+          "text_label": "これら 4 経路の起動契約は既存の grok 写像（model / effort / resume / sandbox）を使う。経路ごとの起動契約や例外表は新設しない。返却は envelope の構造化出力フィールドから取り、テキスト欄は使わない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の起動契約は既存の grok 写像（model / effort / resume / sandbox）を使う。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a489ee6cf7a7b2987b11b263b276d5355f77431d3886e42007b20d073e00ceec",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-02",
+          "section": "constraint",
+          "text_label": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "これら 4 経路の model / effort / resume / sandbox 写像は既存の grok 写像を使い、経路ごとの例外表は持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "79f124c3b6f4e717ccf3b91b23077d115751d45cad45f18b360c0b919193378f",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "3c6b5a1b39412463ef95dcbc8ee854b52349ae198043317cd304f2d3255c6e2c",
+      "evidence_origin": {
+        "data": {
+          "element_id": "GO-01",
+          "section": "goal",
+          "text_label": "現在 fail-closed している typed-pipeline 専用経路 4 つについて、provider と fast_provider の両方で grok を割り当て可能にする。起動は既存の grok 写像を共有 runner の grok arm 1 本で行い、専用経路を capability exec に合流させず、対象 4 経路と sample の committed 値は grok に書き換えず、shipped default の書き換えは committed の reviewer provider のみとする。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "起動は既存の grok 写像を共有 runner の grok arm 1 本で行い",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6334a80134449b9f79b4bb09c79f880e8d7be8d48d5a11aff09ebf0e267ceab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "72ece20d03acebefcb9742ccbc1232c246128dd500c42294455370bf1e1870ff",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "対象 4 capability は、既存の共有 provider-dispatching process runner 上の grok arm 1 本を共有し、それぞれ独立した grok runner を持たない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 capability は、既存の共有 provider-dispatching process runner 上の grok arm 1 本を共有し、それぞれ独立した grok runner を持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6334a80134449b9f79b4bb09c79f880e8d7be8d48d5a11aff09ebf0e267ceab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "30013b4758e94f34202cbec2311bb8d2f186a7bd21853850daf84617c8da1455",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-09",
+          "section": "acceptance_criteria",
+          "text_label": "対象 4 capability は capability exec の起動対象に追加されず、それぞれの typed-pipeline 専用経路から grok を起動する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 capability は capability exec の起動対象に追加されず、それぞれの typed-pipeline 専用経路から grok を起動する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6334a80134449b9f79b4bb09c79f880e8d7be8d48d5a11aff09ebf0e267ceab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "fa16e62134e51792061be06a79424fec96e94d77a71fdb26a902fc39d062b59f",
+      "evidence_origin": {
+        "data": {
+          "element_id": "IN-04",
+          "section": "in_scope",
+          "text_label": "対象 4 capability は、既存の共有 provider-dispatching process runner に足す grok arm 1 本を使う。capability ごとの独立した grok 起動経路は持たない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "既存の共有 provider-dispatching process runner に足す grok arm 1 本を使う。capability ごとの独立した grok 起動経路は持たない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6334a80134449b9f79b4bb09c79f880e8d7be8d48d5a11aff09ebf0e267ceab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "7d71a1250087b3d7259dfb64d71adc29d7e4eb097c47d868fa54e8e190c7a890",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "対象 4 つの専用経路は専用経路のまま残し、capability exec に合流させない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 つの専用経路は専用経路のまま残し、capability exec に合流させない。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "c6334a80134449b9f79b4bb09c79f880e8d7be8d48d5a11aff09ebf0e267ceab",
+      "claim_origin": {
+        "data": {
+          "entry_key": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/infrastructure-types.json",
+          "section_key": "functions"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "545a7968d5f2ae83306e89cddd4897472f60f57bb5efca74eacbbe2c26de7563",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-04",
+          "section": "constraint",
+          "text_label": "対象 4 capability は共有 process runner の grok arm 1 本を共有する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "対象 4 capability は共有 process runner の grok arm 1 本を共有する。",
+        "kind": "pass"
+      }
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 1
+}

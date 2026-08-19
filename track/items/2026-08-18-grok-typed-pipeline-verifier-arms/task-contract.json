@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "track_id": "2026-08-18-grok-typed-pipeline-verifier-arms",
+  "entries": {
+    "T001": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "GrokCapabilityDefinition"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "GrokEnvelopeError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "GrokOutputEnvelope"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "GrokSandbox"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "GrokSandboxProfileName"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "GrokSandboxProfileNameError"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "ResolvedExecution"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner"
+      }
+    ],
+    "T002": []
+  }
+}
