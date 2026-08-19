@@ -39,6 +39,10 @@ subgraph usecase["usecase"]
   direction TB
   subgraph usecase_usecase_module_task_ops["usecase::task_ops"]
     direction TB
+  subgraph T30_usecase_usecase_NextTaskOutput["task_ops::NextTaskOutput"]
+    direction TB
+    T30_usecase_usecase_NextTaskOutput__self[NextTaskOutput]
+  end
   subgraph T35_usecase_usecase_TaskQueryInteractor["task_ops::TaskQueryInteractor"]
     direction TB
     T35_usecase_usecase_TaskQueryInteractor__self[TaskQueryInteractor]
@@ -1485,6 +1489,7 @@ R32_usecase_usecase_TrackLintService_execute --> T31_usecase_usecase_TrackLintRe
 R33_usecase_usecase_TrackMetadataPort_save --o T35_usecase_usecase_TrackItemsDirectory__self
 R33_usecase_usecase_TrackMetadataPort_find --o T35_usecase_usecase_TrackItemsDirectory__self
 R38_usecase_usecase_TrackNextTaskQueryPort_next_task --o T35_usecase_usecase_TrackItemsDirectory__self
+R38_usecase_usecase_TrackNextTaskQueryPort_next_task --> T30_usecase_usecase_NextTaskOutput__self
 R38_usecase_usecase_TrackNextTaskQueryPort_next_task --> T34_usecase_usecase_TrackNextTaskError__self
 R36_usecase_usecase_TrackNextTaskService_execute --o T36_usecase_usecase_TrackNextTaskCommand__self
 R36_usecase_usecase_TrackNextTaskService_execute --> T34_usecase_usecase_TrackNextTaskError__self
@@ -1713,6 +1718,7 @@ T52_cli_composition_cli_composition_TrackCompositionRoot_new --> T52_cli_composi
 T52_cli_composition_cli_composition_TrackCompositionRoot_track_driver --> T33_cli_driver_cli_driver_TrackDriver__self
 T52_cli_composition_cli_composition_TrackCompositionRoot_track_tddd_driver --> T37_cli_driver_cli_driver_TrackTdddDriver__self
 T52_cli_composition_cli_composition_TrackCompositionRoot_track_resolution_driver --> T43_cli_driver_cli_driver_TrackResolutionDriver__self
+class T30_usecase_usecase_NextTaskOutput__self dto
 class T35_usecase_usecase_TaskQueryInteractor_new method_node
 class T35_usecase_usecase_TaskQueryInteractor__self interactor
 class T31_usecase_usecase_ProcessExitCode_new method_node

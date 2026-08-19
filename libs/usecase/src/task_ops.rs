@@ -50,10 +50,11 @@ pub struct TaskOperationOutput {
 ///
 /// Contains the `task_id` and `description` of the next open task so the CLI
 /// can print them without importing domain task types.
-#[derive(Debug)]
 pub struct NextTaskOutput {
     pub task_id: String,
     pub description: String,
+    /// Persisted status kind of the next open task (`todo` / `in_progress`).
+    pub status: String,
 }
 
 /// DTO returned by `TaskQueryService::task_counts`.
@@ -595,6 +596,7 @@ where
         Ok(plan.next_open_task().map(|t| NextTaskOutput {
             task_id: t.id().as_ref().to_owned(),
             description: t.description().to_owned(),
+            status: t.status().kind().to_string(),
         }))
     }
 
@@ -1072,8 +1074,8 @@ mod tests {
     fn task_query_invalid_track_id_returns_error() {
         let store = Arc::new(StubStore::default());
         let interactor = TaskQueryInteractor::new(Arc::clone(&store));
-        let err = interactor.next_task("".to_owned(), PathBuf::new()).unwrap_err();
-        assert!(matches!(err, TaskOperationError::InvalidTrackId(_)));
+        let result = interactor.next_task("".to_owned(), PathBuf::new());
+        assert!(matches!(result, Err(TaskOperationError::InvalidTrackId(_))));
     }
 
     #[test]

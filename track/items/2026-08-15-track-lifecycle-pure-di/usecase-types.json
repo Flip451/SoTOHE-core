@@ -1798,6 +1798,7 @@
       ],
       "methods": [
         {
+          "action": "reference",
           "has_default_impl": false,
           "is_async": false,
           "name": "new",
@@ -1807,8 +1808,7 @@
               "ty": "Arc<S>"
             }
           ],
-          "returns": "Self",
-          "action": "reference"
+          "returns": "Self"
         }
       ],
       "type_name": "TaskQueryInteractor"
@@ -5773,6 +5773,47 @@
     }
   },
   "types": {
+    "NextTaskOutput": {
+      "action": "modify",
+      "docs": "Next-open-task query DTO carrying task id, description, and persisted status kind.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "task_id",
+              "ty": "String"
+            },
+            {
+              "name": "description",
+              "ty": "String"
+            },
+            {
+              "name": "status",
+              "ty": "String"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "task_ops",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-05",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
     "ProcessExitCode": {
       "action": "add",
       "docs": "Process exit-code application-boundary value.",
@@ -7948,34 +7989,6 @@
         }
       ]
     },
-    "TrackLifecycleIdInput": {
-      "action": "add",
-      "docs": "Validated track identifier at the track-lifecycle application boundary.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "tuple"
-        }
-      },
-      "methods": [],
-      "module_path": "track_lifecycle",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "AC-03",
-          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        },
-        {
-          "anchor": "CN-03",
-          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
-        }
-      ]
-    },
     "TrackInitCommand": {
       "action": "add",
       "docs": "Track Init application command boundary.",
@@ -8294,6 +8307,34 @@
         },
         {
           "anchor": "CN-01",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ]
+    },
+    "TrackLifecycleIdInput": {
+      "action": "add",
+      "docs": "Validated track identifier at the track-lifecycle application boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "track_lifecycle",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "anchor": "CN-03",
           "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         }
       ]

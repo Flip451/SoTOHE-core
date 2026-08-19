@@ -1,7 +1,12 @@
 {
-  "catalogue_declaration_hash": "26ed9da2ff07951afa1e8f9f8b0baaba31bfed6ba4dfb17d8f8d85218d50770d",
+  "catalogue_declaration_hash": "333f8be42d6dc99d2fbfb9ddfd4eabf49d1cfc986810eb144d59619973cf9c86",
   "schema_version": 1,
   "signals": [
+    {
+      "entry_hash": "255a25c34ecd24da8df4b5bbb4ffdf3b00e9cf7254d5242fa5b61120331141b1",
+      "signal": "blue",
+      "type_name": "NextTaskOutput"
+    },
     {
       "entry_hash": "da7d1c05487589e6535c8c3ee85ff8108b4768ca7b80499b4e4d22401eff3550",
       "signal": "blue",

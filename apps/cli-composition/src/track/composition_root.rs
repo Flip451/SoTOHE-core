@@ -91,6 +91,11 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
             Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
         ));
+    let track_next_task_service =
+        Arc::new(usecase::track_lifecycle::track_next_task::TrackNextTaskInteractor::new(
+            Arc::new(RequestScopedTrackNextTaskQueryAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -121,6 +126,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         fixpoint_resolve_service,
         base_merge_service,
         track_add_task_service,
+        track_next_task_service,
     )
 }
 
@@ -176,12 +182,20 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             catalogue_lint_active_resolver,
         ),
     );
+    let lint_operation =
+        Arc::new(infrastructure::track_lifecycle::tddd::lint::SystemTrackLintAdapter);
+    let lint_resolver = Arc::new(infrastructure::track::GitTrackSelectionAdapter);
+    let lint_service = Arc::new(usecase::track_lifecycle::tddd::lint::TrackLintInteractor::new(
+        lint_operation,
+        lint_resolver,
+    ));
     cli_driver::track_tddd::TrackTdddDriver::new(
         service,
         baseline_graph_service,
         catalogue_impl_signals_service,
         catalogue_spec_signals_service,
         catalogue_lint_active_service,
+        lint_service,
     )
 }
 
@@ -220,5 +234,26 @@ impl usecase::track_lifecycle::TrackTaskAddPort for RequestScopedTrackTaskAddAda
             section,
             after,
         )
+    }
+}
+
+struct RequestScopedTrackNextTaskQueryAdapter;
+
+impl usecase::track_lifecycle::TrackNextTaskQueryPort for RequestScopedTrackNextTaskQueryAdapter {
+    fn next_task(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<
+        Option<usecase::task_ops::NextTaskOutput>,
+        usecase::track_lifecycle::track_next_task::TrackNextTaskError,
+    > {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let query = usecase::task_ops::TaskQueryInteractor::new(store);
+        usecase::track_lifecycle::TrackNextTaskQueryPort::next_task(&query, track_id, items_dir)
     }
 }

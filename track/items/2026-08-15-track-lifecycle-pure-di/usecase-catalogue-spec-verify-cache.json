@@ -1,6 +1,54 @@
 {
   "entries": [
     {
+      "claim_hash": "255a25c34ecd24da8df4b5bbb4ffdf3b00e9cf7254d5242fa5b61120331141b1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NextTaskOutput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "977d342f47b1ef5ed02635fa0aa0a0ffd454ed158b07ea393627d7a346e9183b",
+      "evidence_origin": {
+        "data": {
+          "element_id": "AC-05",
+          "section": "acceptance_criteria",
+          "text_label": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+        "kind": "pass"
+      }
+    },
+    {
+      "claim_hash": "255a25c34ecd24da8df4b5bbb4ffdf3b00e9cf7254d5242fa5b61120331141b1",
+      "claim_origin": {
+        "data": {
+          "entry_key": "NextTaskOutput",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+          "section_key": "types"
+        },
+        "kind": "catalogue_entry"
+      },
+      "evidence_hash": "a9a9bf07bc0ab4c2c19e772a423f8073d5cf665c83e54dcc35644f9c267e2d12",
+      "evidence_origin": {
+        "data": {
+          "element_id": "CN-01",
+          "section": "constraint",
+          "text_label": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        },
+        "kind": "spec_element"
+      },
+      "verdict": {
+        "citation": "構造変更前後で、対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+        "kind": "pass"
+      }
+    },
+    {
       "claim_hash": "da7d1c05487589e6535c8c3ee85ff8108b4768ca7b80499b4e4d22401eff3550",
       "claim_origin": {
         "data": {

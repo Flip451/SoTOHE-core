@@ -9,4 +9,5 @@ pub mod tddd {
     pub mod catalogue_impl_signals;
     pub mod catalogue_lint_active;
     pub mod catalogue_spec_signals;
+    pub mod lint;
 }

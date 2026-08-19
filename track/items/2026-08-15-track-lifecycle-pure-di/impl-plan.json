@@ -120,6 +120,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "979c36fa2d83ac7c026b74de0d6967f42fc448f8",
       "depends_on": [
         "T001"
       ],
@@ -133,7 +134,7 @@
       ],
       "description": "Implement the `TrackNextTask*` boundary in `libs/usecase/src/track_lifecycle/track_next_task.rs`; update the next-task dispatch in `apps/cli/src/commands/track/{dispatch.rs,state_ops.rs}`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T007",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -253,6 +254,7 @@
       "status": "todo"
     },
     {
+      "commit_hash": "979c36fa2d83ac7c026b74de0d6967f42fc448f8",
       "depends_on": [
         "T001"
       ],
@@ -266,7 +268,7 @@
       ],
       "description": "Implement the `TrackLint*` boundary in `libs/usecase/src/track_lifecycle/tddd/lint.rs`; wire the remaining TDDD lint handler in `apps/cli/src/commands/track/tddd/lint.rs` through its driver and composition adapter, with regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T023",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

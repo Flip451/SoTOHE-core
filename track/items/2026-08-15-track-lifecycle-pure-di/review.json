@@ -387,6 +387,27 @@
           "hash": "rvw1:sha256:9146c7ee3afec9d256468c0c5270b32d3c7d4996c6c59c8feb7b4c7e086e8301",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:16:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02f5d7a730516d7e806a0a2911aaa96db65d4babf5a11994dfdb00a579e60fc4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:43:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:02f5d7a730516d7e806a0a2911aaa96db65d4babf5a11994dfdb00a579e60fc4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T02:15:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:97419f8b64acadd705de7dca34ee78cc82c5ee5606ee16a5584df2bb416ed2c9",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -604,6 +625,27 @@
           "at": "2026-08-18T16:07:02Z",
           "findings": [],
           "hash": "rvw1:sha256:c93ed8f761f44f241683c4cccfcf236a332ba3c168c7ce6d5a3443859e539a1c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:16:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf386ad5210d2604685c9319a238602b3d5c7e6dd5c65a81c88fe57c48baf63",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:41:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b566e5d2e1bfd800dc3c1f41f7373c502300bb8fb3f43bc821be76f3a69e5f5f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T02:05:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2bf386ad5210d2604685c9319a238602b3d5c7e6dd5c65a81c88fe57c48baf63",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -901,6 +943,57 @@
           "at": "2026-08-18T16:07:13Z",
           "findings": [],
           "hash": "rvw1:sha256:9bc256841922ef3c8100c1ab4a7de15db2cf650d3849431668dcf9d6da0feb5f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:17:17Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 358,
+              "message": "`NextTask` now delegates to `TrackNextTaskService`, whose result reports every found task as `todo`; the previous path queried task counts and reported `in_progress` whenever an in-progress task existed. Thus this routing change regresses the established JSON `status` contract for tracks with in-progress work.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b43b922db85ac28c354cd076a731d35493c9b6629a5b456bdaa0b11e4f1eaf2b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:31:08Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track.rs",
+              "line": 358,
+              "message": "`NextTask` now routes through `TrackNextTaskService`, whose concrete result reports every found task as `todo`; the previous path queried task counts and reported `in_progress` whenever in-progress work existed. This changes the established JSON status contract for tracks with in-progress tasks.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:b43b922db85ac28c354cd076a731d35493c9b6629a5b456bdaa0b11e4f1eaf2b",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:35:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b43b922db85ac28c354cd076a731d35493c9b6629a5b456bdaa0b11e4f1eaf2b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:53:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b43b922db85ac28c354cd076a731d35493c9b6629a5b456bdaa0b11e4f1eaf2b",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T02:28:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:109f88737881d6d6d97801133d324a307c1d66e0812e11b66417296080d9feae",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1512,6 +1605,20 @@
           "at": "2026-08-18T15:00:10Z",
           "findings": [],
           "hash": "rvw1:sha256:f97722c74b23e741cba7c099d4562d0ef607c7aa94b3b477467be5f509aa680f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:09:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1ab6247fabfde294df60a5845c089d622594dd107b9bf8fd42130f9a910fe0b6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T01:36:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3485c2ad85bdc30359ffd1b3640d7c577f34b7951a0437d3a961507c81d90429",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2128,6 +2235,65 @@
           "hash": "rvw1:sha256:a052eec68c950cb6a0e48b5f73ea1669de1f8f670be362e07c64981263747b00",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:17:25Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/lint.rs",
+              "line": 30,
+              "message": "An explicit absolute rules-file path is accepted and passed directly to the filesystem loader without verifying it remains under the workspace trusted root. This allows the adapter to read configuration outside the trusted workspace; enforce trusted-root containment before loading.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d67dcbf4d7cb01ee774bbaa50c40101dd7d8b349ba7efafc0090e36e65941268",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:31:23Z",
+          "findings": [
+            {
+              "category": "trusted-root violation",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/lint.rs",
+              "line": 63,
+              "message": "The trusted-root check compares paths lexically without normalizing the workspace root. With the documented default `--workspace-root .`, any valid absolute `--rules-file` path is rejected because `/repo/rules.json` does not start with `.`. Resolve/canonicalize the workspace root before containment checking.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6736e28270e6d54766b8b5e6a1a3743b74bec271fbf044552bf530b9b4ac728c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:35:32Z",
+          "findings": [
+            {
+              "category": "symlink not rejected at boundary",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/lint.rs",
+              "line": 65,
+              "message": "Canonicalizing the override path before `ensure_config_file` resolves away symlinks. A symlinked config pointing to a regular file inside the trusted root is therefore accepted and loaded, bypassing the required symlink rejection; preserve the original path for symlink checks and use canonicalization only for containment.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:a20cd1795cb5080f39ef03a5cd0809c3e133f288fdc0f6afe3b0694542f78fb5",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:36:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d99c6c4f7efde9a633a862fbc55b1b18a603fce0dd40c735cc7e66e8821322ae",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:43:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d99c6c4f7efde9a633a862fbc55b1b18a603fce0dd40c735cc7e66e8821322ae",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2499,6 +2665,50 @@
           "at": "2026-08-18T15:39:44Z",
           "findings": [],
           "hash": "rvw1:sha256:d64c52b88fae74aa37d3a40c4fb1b0ea7d0d9794c83305a684799d05b87bdbe1",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:10:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ad80f8e6e4f15be1f76518f4f48212b27830e5bdda22a3f4e5a407d95e05bb47",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T01:29:39Z",
+          "findings": [
+            {
+              "category": "test_coverage",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 345,
+              "message": "The SystemTrackLintAdapter contract_conformance fulfillment binds three tests that never construct or execute this adapter: test_execute_lint_rejects_invalid_track_id (fails at TrackIdInput parse inside execute_lint before TrackCompositionRoot/handle_lint), test_track_tddd_driver_valid_lint_input_returns_success (RecordingLintService mock), and test_render_lint_result_red_report_preserves_report_and_summary (renderer-only). CN-01 on this adapter is supposed to stay fulfilled by the infrastructure adapter tests plus test_track_lint_call_site_preserves_cli_contract_across_migration; do not add a CN-01 waiver. The accepted SystemTrackCatalogueLintActiveAdapter record uses exactly that shape (infra tests + one call-site contract test). Drop the three non-constructing tests and keep the four infrastructure adapter tests plus the call-site contract test.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e06d33c19dd9d29722dbddd4efec09f53466dbb619ce4414dd7290e9c95c75e6",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:31:03Z",
+          "findings": [
+            {
+              "category": "test-obligation-gate",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 345,
+              "message": "`bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` fails with TestChanged for SystemTrackLintAdapter × CN-01. The fulfillment now correctly binds the four infrastructure adapter tests plus test_track_lint_call_site_preserves_cli_contract_across_migration (no CN-01 waiver; matches the briefing and SystemTrackCatalogueLintActiveAdapter), but the frozen obligation-fulfillment cache still records the previous eight-test bound_tests_set_hash. This is not a todo-lane warning. Re-evaluate that pair through the sanctioned evaluate path so the cache matches the current bound test bodies; do not hand-edit the verdict caches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:864691ad65a14fb1e7de3c0567add72735c52f94ec63efaa4e44aa470af93e4b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T02:05:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e06d33c19dd9d29722dbddd4efec09f53466dbb619ce4414dd7290e9c95c75e6",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3114,6 +3324,42 @@
           "hash": "rvw1:sha256:dbdf009d39ed892964a037cffa2ef2b26b67bb7352b4d52a394c7770f84fabfe",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:31:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44050abcd4c0b31281e5051193bdac6adfb25f49f4a42612a5f358c686dfc917",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:42:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:44050abcd4c0b31281e5051193bdac6adfb25f49f4a42612a5f358c686dfc917",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T01:23:28Z",
+          "findings": [
+            {
+              "category": "lossy boundary downgrade",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/usecase-types.json",
+              "line": 5776,
+              "message": "`usecase::NextTaskOutput` is declared `action: modify` with a new `status: String` documented as the persisted task status kind, citing AC-05/CN-01. The frozen rustdoc baseline of this DTO has only `task_id` and `description`; the existing next-task JSON `status` is not that persisted kind but a counts-derived flag (`in_progress` iff `task_counts.in_progress > 0`, else `todo`). `TrackNextTaskResult::Found.status` therefore cannot be reconstructed from the modified DTO without changing CN-01 stdout when those values differ. The sibling `TrackTaskCountsQueryPort` already returns the structured counts, but `TrackNextTaskInteractor::new` still only takes `query` and `resolver`. Leave `NextTaskOutput` unmodified and add `counts: Arc<dyn TrackTaskCountsQueryPort>` to the interactor constructor.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:466d3ffdf0b51869cf27010906186d61e8afdc57dfd74bcbb32397096385d011",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:31:02Z",
+          "findings": [],
+          "hash": "rvw1:sha256:466d3ffdf0b51869cf27010906186d61e8afdc57dfd74bcbb32397096385d011",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3390,6 +3636,64 @@
           "at": "2026-08-18T15:53:15Z",
           "findings": [],
           "hash": "rvw1:sha256:734845fef418911da7b28b685bac56646d06ab70ea2cc7d602ff41b321c1739e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T00:17:02Z",
+          "findings": [
+            {
+              "category": "logic error",
+              "file": "libs/usecase/src/track_lifecycle/track_next_task.rs",
+              "line": 113,
+              "message": "`map_found` は常に `TaskStatusKind::Todo` を返すため、永続化された次のオープンタスクが `in_progress` の場合も JSON 契約の status が `todo` になります。`NextTaskOutput` から実際の status を運び、`in_progress` を保持してください。",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:d3ad22db975905ab32bf06afb0be5314d2afea1c7fe0fd5c0e5fb787d6684c0c",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T00:31:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:3b6bf3a2e9f8de2b3a998493379bb2cfdff2f0a0b90335283fa0c81c3c9bd3cf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T01:01:28Z",
+          "findings": [
+            {
+              "category": "business logic leak",
+              "file": "libs/usecase/src/track_lifecycle/track_next_task.rs",
+              "line": 111,
+              "message": "`TrackNextTaskInteractor` injects `TrackTaskCountsQueryPort` and sets `Found.status` from `counts.in_progress > 0`. That status decision belongs on the persisted next-open task (`domain::TrackTask::status` via `ImplPlan::next_open_task()`), not on an aggregate from another command context. The catalogued constructor is `new(query, resolver)`. Carry the task's persisted `todo`/`in_progress` through `NextTaskOutput.status` and map that onto `Found.status`; when the next open task is in progress this remains counts-equivalent for the JSON contract.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:3b6bf3a2e9f8de2b3a998493379bb2cfdff2f0a0b90335283fa0c81c3c9bd3cf",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T01:22:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e58a978177c2e5dd332e313bd1b1cc621f7d535bb014390d1869ba29f71815f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T02:09:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:171fe73afaa59ca354f4f693564f8d543d93cda3289cc02957244aac375ca43c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T02:11:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2e4b737b6425cfa97b4fa2cf65691f34d12221a04739c1d1bb09eb6bf5f050df",
           "type": "final",
           "verdict": "zero_findings"
         }

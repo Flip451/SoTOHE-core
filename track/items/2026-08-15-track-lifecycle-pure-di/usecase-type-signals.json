@@ -1,10 +1,16 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
-  "declaration_hash": "26ed9da2ff07951afa1e8f9f8b0baaba31bfed6ba4dfb17d8f8d85218d50770d",
-  "generated_at": "2026-08-18T16:16:57Z",
-  "head_commit": "5f0b016454b3abaec3953c34e5a85c059b8a4b6b",
+  "declaration_hash": "333f8be42d6dc99d2fbfb9ddfd4eabf49d1cfc986810eb144d59619973cf9c86",
+  "generated_at": "2026-08-19T02:28:51Z",
+  "head_commit": "979c36fa2d83ac7c026b74de0d6967f42fc448f8",
   "schema_version": 4,
   "signals": [
+    {
+      "found_type": true,
+      "kind_tag": "dto",
+      "signal": "blue",
+      "type_name": "NextTaskOutput"
+    },
     {
       "found_items": [
         "Clone",
@@ -760,41 +766,41 @@
       "type_name": "TrackLifecycleIdInput"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackLintCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackLintError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackLintService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackLintInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackLintPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackLintResult"
     },
     {
@@ -808,9 +814,9 @@
       "type_name": "TrackLintRulesFile"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackLintService"
     },
     {
@@ -842,12 +848,12 @@
       "type_name": "TrackNextTaskError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackNextTaskService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackNextTaskInteractor"
     },
     {
@@ -857,15 +863,15 @@
       "type_name": "TrackNextTaskQueryPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackNextTaskResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackNextTaskService"
     },
     {

@@ -22,7 +22,9 @@ use usecase::track_lifecycle::tddd::catalogue_spec_signals::{
     TrackCatalogueSpecSignalsCommand, TrackCatalogueSpecSignalsError,
     TrackCatalogueSpecSignalsService,
 };
-use usecase::track_lifecycle::tddd::lint::TrackLintRulesFile;
+use usecase::track_lifecycle::tddd::lint::{
+    TrackLintCommand, TrackLintError, TrackLintResult, TrackLintRulesFile, TrackLintService,
+};
 use usecase::track_lifecycle::{
     TrackItemsDirectory, TrackLayerFilter, TrackLayerSelection, TrackLifecycleIdInput,
     TrackSelection, TrackSourceWorkspace, TrackWorkspaceRoot,
@@ -239,6 +241,18 @@ impl TrackLintRulesFileInput {
     }
 }
 
+/// Typed primary-adapter input for single-layer catalogue linting.
+pub struct TrackTdddLintInput {
+    /// Optional explicit track id; omitted values select the active track.
+    pub track_id: Option<TrackIdInput>,
+    /// Workspace containing the track artifacts and TDDD configuration.
+    pub workspace_root: TrackWorkspaceRootInput,
+    /// The layer to lint.
+    pub layer: TrackLayerInput,
+    /// Optional override for the lint rules file.
+    pub rules_file: Option<TrackLintRulesFileInput>,
+}
+
 /// Typed primary-adapter input for active-track catalogue linting.
 pub struct TrackTdddCatalogueLintActiveInput {
     /// Optional explicit track id; omitted values select the active track.
@@ -256,6 +270,7 @@ pub struct TrackTdddDriver {
     catalogue_impl_signals: Arc<dyn TrackCatalogueImplSignalsService>,
     catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
     catalogue_lint_active: Arc<dyn TrackCatalogueLintActiveService>,
+    lint: Arc<dyn TrackLintService>,
 }
 
 impl TrackTdddDriver {
@@ -267,6 +282,7 @@ impl TrackTdddDriver {
         catalogue_impl_signals: Arc<dyn TrackCatalogueImplSignalsService>,
         catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
         catalogue_lint_active: Arc<dyn TrackCatalogueLintActiveService>,
+        lint: Arc<dyn TrackLintService>,
     ) -> Self {
         Self {
             baseline_capture,
@@ -274,6 +290,7 @@ impl TrackTdddDriver {
             catalogue_impl_signals,
             catalogue_spec_signals,
             catalogue_lint_active,
+            lint,
         }
     }
 
@@ -344,6 +361,15 @@ impl TrackTdddDriver {
             .execute(command)
             .map(render_catalogue_lint_active_result)
             .unwrap_or_else(catalogue_lint_active_error_to_outcome)
+    }
+
+    /// Executes the single-layer catalogue-lint input boundary.
+    pub fn handle_lint(&self, input: TrackTdddLintInput) -> CommandOutcome {
+        let command = match lint_input_to_command(input) {
+            Ok(command) => command,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        self.lint.execute(command).map(render_lint_result).unwrap_or_else(lint_error_to_outcome)
     }
 }
 
@@ -555,6 +581,46 @@ fn catalogue_lint_active_error_to_outcome(error: TrackCatalogueLintActiveError) 
     CommandOutcome::failure(Some(error.to_string()))
 }
 
+fn lint_input_to_command(input: TrackTdddLintInput) -> Result<TrackLintCommand, String> {
+    let track = input
+        .track_id
+        .map(|track_id| TrackLifecycleIdInput::try_new(track_id.to_string()))
+        .transpose()
+        .map_err(|error| error.to_string())
+        .map(TrackSelection::from_input)?;
+    let workspace_root = input.workspace_root.into_usecase()?;
+    let layer = input.layer.into_usecase();
+    let rules_file = input.rules_file.map(TrackLintRulesFileInput::into_usecase).transpose()?;
+    Ok(TrackLintCommand { track, workspace_root, layer, rules_file })
+}
+
+fn render_lint_result(result: TrackLintResult) -> CommandOutcome {
+    let mut stdout_lines = Vec::new();
+    for violation in &result.violations {
+        stdout_lines.push(format!(
+            "{} on {}: {}",
+            violation.rule_kind(),
+            violation.entry_name(),
+            violation.message(),
+        ));
+    }
+    let count = result.violations.len();
+    let stderr_msg = format!("Found {count} violation(s)");
+    if count > 0 {
+        CommandOutcome {
+            stdout: Some(stdout_lines.join("\n")),
+            stderr: Some(stderr_msg),
+            exit_code: 1,
+        }
+    } else {
+        CommandOutcome { stdout: None, stderr: Some(stderr_msg), exit_code: 0 }
+    }
+}
+
+fn lint_error_to_outcome(error: TrackLintError) -> CommandOutcome {
+    CommandOutcome::failure(Some(error.to_string()))
+}
+
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unreachable, clippy::unwrap_used)]
 mod tests {
@@ -630,6 +696,31 @@ mod tests {
             _: TrackCatalogueLintActiveCommand,
         ) -> Result<TrackCatalogueLintActiveResult, TrackCatalogueLintActiveError> {
             unreachable!()
+        }
+    }
+
+    struct UnusedLintService;
+
+    impl TrackLintService for UnusedLintService {
+        fn execute(&self, _: TrackLintCommand) -> Result<TrackLintResult, TrackLintError> {
+            unreachable!()
+        }
+    }
+
+    struct RecordingLintService {
+        commands: Mutex<Vec<TrackLintCommand>>,
+        result: Result<TrackLintResult, String>,
+    }
+
+    impl TrackLintService for RecordingLintService {
+        fn execute(&self, command: TrackLintCommand) -> Result<TrackLintResult, TrackLintError> {
+            self.commands.lock().expect("command lock is available").push(command);
+            match &self.result {
+                Ok(result) => Ok(TrackLintResult { violations: result.violations.clone() }),
+                Err(error) => Err(TrackLintError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+            }
         }
     }
 
@@ -780,6 +871,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -818,6 +910,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let input = TrackTdddBaselineCaptureInput {
@@ -846,6 +939,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle(TrackTdddBaselineCaptureInput {
@@ -917,6 +1011,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -960,6 +1055,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
         let input = TrackTdddBaselineGraphInput {
             track_id: None,
@@ -989,6 +1085,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle_baseline_graph(graph_input());
@@ -1020,6 +1117,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
@@ -1069,6 +1167,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
         let input = TrackTdddCatalogueImplSignalsInput {
             track_id: None,
@@ -1097,6 +1196,7 @@ mod tests {
             service,
             Arc::new(UnusedCatalogueSpecSignalsService),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle_catalogue_impl_signals(catalogue_impl_signals_input());
@@ -1130,6 +1230,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             service.clone(),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
@@ -1164,6 +1265,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             service.clone(),
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
         let input = TrackTdddCatalogueSpecSignalsInput {
             track_id: None,
@@ -1193,6 +1295,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             service,
             Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle_catalogue_spec_signals(catalogue_spec_signals_input());
@@ -1227,6 +1330,7 @@ mod tests {
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
             service.clone(),
+            Arc::new(UnusedLintService),
         );
 
         let outcome = driver.handle_catalogue_lint_active(catalogue_lint_active_input());
@@ -1266,5 +1370,91 @@ mod tests {
         assert_eq!(outcome.exit_code, 1);
         assert_eq!(outcome.stderr.as_deref(), Some("Found 1 violation(s) across 1 layer(s)"));
         assert!(outcome.stdout.expect("red report is printed").contains("NoPublicField"));
+    }
+
+    fn lint_input() -> TrackTdddLintInput {
+        TrackTdddLintInput {
+            track_id: Some("lint-track".parse().expect("track id is valid")),
+            workspace_root: workspace_root(),
+            layer: TrackLayerInput::try_new("domain".to_owned()).expect("layer is valid"),
+            rules_file: Some(
+                TrackLintRulesFileInput::try_new(PathBuf::from("custom/rules.json"))
+                    .expect("rules file is valid"),
+            ),
+        }
+    }
+
+    fn lint_driver(lint: Arc<RecordingLintService>) -> TrackTdddDriver {
+        TrackTdddDriver::new(
+            Arc::new(RecordingService {
+                commands: Mutex::new(Vec::new()),
+                result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
+            }),
+            Arc::new(UnusedBaselineGraphService),
+            Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedCatalogueLintActiveService),
+            lint,
+        )
+    }
+
+    #[test]
+    fn test_track_tddd_driver_valid_lint_input_returns_success() {
+        let service = Arc::new(RecordingLintService {
+            commands: Mutex::new(Vec::new()),
+            result: Ok(TrackLintResult { violations: Vec::new() }),
+        });
+        let outcome = lint_driver(service.clone()).handle_lint(lint_input());
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.is_none());
+        assert_eq!(outcome.stderr.as_deref(), Some("Found 0 violation(s)"));
+        let commands = service.commands.lock().expect("command lock is available");
+        assert_eq!(commands.len(), 1);
+        let command = commands.first().expect("one command is recorded");
+        assert!(matches!(
+            &command.track,
+            TrackSelection::Explicit(track_id) if track_id.as_ref() == "lint-track"
+        ));
+        assert_eq!(command.workspace_root.as_path(), std::path::Path::new("workspace"));
+        assert_eq!(command.layer.as_ref(), "domain");
+        assert_eq!(
+            command.rules_file.as_ref().map(|rules| rules.as_path()),
+            Some(std::path::Path::new("custom/rules.json"))
+        );
+    }
+
+    #[test]
+    fn test_track_tddd_driver_lint_service_error_maps_to_failure_outcome() {
+        let service = Arc::new(RecordingLintService {
+            commands: Mutex::new(Vec::new()),
+            result: Err("lint failed".to_owned()),
+        });
+        let outcome = lint_driver(service).handle_lint(lint_input());
+        assert_eq!(outcome.stderr.as_deref(), Some("lint failed"));
+        assert_eq!(outcome.exit_code, 1);
+    }
+
+    #[test]
+    fn test_render_lint_result_red_report_preserves_report_and_summary() {
+        let outcome = render_lint_result(TrackLintResult {
+            violations: vec![domain::CatalogueLintViolation::new(
+                "NoPublicField",
+                "TrackLintCommand",
+                "public field is forbidden",
+            )],
+        });
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stderr.as_deref(), Some("Found 1 violation(s)"));
+        assert!(outcome.stdout.expect("red report is printed").contains("NoPublicField"));
+    }
+
+    #[test]
+    fn test_track_lint_rules_file_input_try_new_rejects_parent_relative_path() {
+        let error = match TrackLintRulesFileInput::try_new(PathBuf::from("../rules.json")) {
+            Ok(_) => panic!("parent-relative rules path must fail"),
+            Err(error) => error,
+        };
+        assert!(error.to_string().contains("track lint rules file"));
     }
 }
