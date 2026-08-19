@@ -72,44 +72,44 @@ fn resolve_track_id_inner(
     anchor: &Path,
     write_mode: bool,
 ) -> Result<String, CompositionError> {
-    use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
     if !write_mode {
         if let Some(id) = explicit_id {
             return Ok(id);
         }
     }
-    // Explicit write IDs still need branch proof; fail closed if git discovery fails.
-    if write_mode {
-        if let Some(ref id) = explicit_id {
-            validate_track_id_str(id)?;
-            let repo =
-                infrastructure::git_cli::SystemGitRepo::discover_from(anchor).map_err(|e| {
-                    CompositionError::AdapterInit(format!(
-                        "cannot discover git repository from {}: {e} \
-                         (write operations require a git repository)",
-                        anchor.display()
-                    ))
-                })?;
-            let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-            return interactor
-                .resolve_for_write(explicit_id)
-                .map_err(|e| CompositionError::AdapterInit(e.to_string()));
+    use infrastructure::track::GitTrackSelectionAdapter;
+    use usecase::track_lifecycle::{
+        TrackItemsDirectory, TrackSelection, TrackSelectionPort, TrackWorkspaceRoot,
+    };
+
+    let workspace_root = TrackWorkspaceRoot::try_new(anchor.to_path_buf())
+        .map_err(|error| CompositionError::AdapterInit(error.to_string()))?;
+    let items_dir = TrackItemsDirectory::try_new(anchor.join("track/items"))
+        .map_err(|error| CompositionError::AdapterInit(error.to_string()))?;
+    let selection = match explicit_id {
+        Some(id) => {
+            if write_mode {
+                validate_track_id_str(&id)?;
+            }
+            let id = domain::TrackId::try_new(id)
+                .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+            TrackSelection::Explicit(id)
         }
+        None => TrackSelection::Active,
+    };
+    let adapter = GitTrackSelectionAdapter;
+    let track_id = if write_mode {
+        adapter.resolve_required(&items_dir, &selection)
+    } else {
+        adapter.resolve_active(&workspace_root)
     }
-    let repo = infrastructure::git_cli::SystemGitRepo::discover_from(anchor).map_err(|e| {
+    .map_err(|error| {
         CompositionError::AdapterInit(format!(
-            "cannot discover git repository from {}: {e}",
+            "cannot discover git repository from {}: {error}",
             anchor.display()
         ))
     })?;
-    let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-    if write_mode {
-        interactor
-            .resolve_for_write(explicit_id)
-            .map_err(|e| CompositionError::AdapterInit(e.to_string()))
-    } else {
-        interactor.resolve_for_read(None).map_err(|e| CompositionError::AdapterInit(e.to_string()))
-    }
+    Ok(track_id.as_ref().to_owned())
 }
 pub(crate) fn build_branch_reader(
     project_root: &Path,
@@ -307,23 +307,17 @@ impl TrackCompositionRoot {
         project_root: PathBuf,
         track_id: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
-        use usecase::track_resolution::{
-            ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
-        };
+        use infrastructure::track::GitTrackSelectionAdapter;
+        use usecase::track_lifecycle::{TrackSelectionPort, TrackWorkspaceRoot};
+
         let resolved_track_id = match track_id {
-            Some(id) => {
-                // WRITE guard: verify explicit id matches the current branch
-                Some(resolve_track_id_inner(Some(id), &project_root, true)?)
-            }
-            None => {
-                // Auto-detect from branch — fall back to None for registry-only mode
-                infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).ok().and_then(
-                    |repo| {
-                        let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-                        interactor.resolve_active_track().ok()
-                    },
-                )
-            }
+            Some(id) => Some(resolve_track_id_inner(Some(id), &project_root, true)?),
+            None => TrackWorkspaceRoot::try_new(project_root.clone())
+                .ok()
+                .and_then(|workspace_root| {
+                    GitTrackSelectionAdapter.resolve_active(&workspace_root).ok()
+                })
+                .map(|track_id| track_id.as_ref().to_owned()),
         };
         let changed = infrastructure::track::render::sync_rendered_views(
             &project_root,
@@ -653,6 +647,49 @@ mod tests {
         assert!(
             items_dir.join("new-track").join("metadata.json").is_file(),
             "track init must bootstrap track/items and write metadata"
+        );
+    }
+
+    #[test]
+    fn test_track_init_call_site_preserves_cli_contract_for_branch_strategy_adapter() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "adapter-track".to_owned();
+        let argv_description = "Adapter Track".to_owned();
+        let outcome =
+            crate::track::TrackCompositionRoot::new().track_driver().handle(TrackInput::Init {
+                items_dir: argv_items_dir.clone(),
+                track_id: argv_track_id.clone(),
+                description: argv_description.clone(),
+            });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_items_dir, items_dir);
+        assert_eq!(argv_track_id, "adapter-track");
+        assert_eq!(argv_description, "Adapter Track");
+        assert!(
+            items_dir.join("adapter-track").join("metadata.json").is_file(),
+            "branch-strategy adapter call site must persist metadata"
         );
     }
 

@@ -429,6 +429,20 @@
           "hash": "rvw1:sha256:20f1adc2fdedb2ac1cfdf271c5d6f24ceddc0ca2b9a02f8c48ab3e85ba19c39d",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:24:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b7106c0a3f7ff3be30e420c01171ef13ad0529013b7e81c6e91845373b304e3",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:37:43Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9b7106c0a3f7ff3be30e420c01171ef13ad0529013b7e81c6e91845373b304e3",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -688,6 +702,20 @@
           "at": "2026-08-19T08:00:59Z",
           "findings": [],
           "hash": "rvw1:sha256:f03388410bb558d90cd5fb15a7034c61e14cb87c37cb6b58796eeb74a7a256a7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:25:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37e4d72e8c72bd37a64724977ca5690dca6212ac84e4453d6e40b2f6abd2c667",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T11:00:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:37e4d72e8c72bd37a64724977ca5690dca6212ac84e4453d6e40b2f6abd2c667",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1057,6 +1085,20 @@
           "at": "2026-08-19T08:05:05Z",
           "findings": [],
           "hash": "rvw1:sha256:5d0b2c96908765a81e40a0121f2bc08d4043de2d40798c261cc654ea71532803",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:25:08Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b51b51e5c0c6cd5b58761e78b1888f3375b23ce751db50b5aad0a033995f4344",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:47:21Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b51b51e5c0c6cd5b58761e78b1888f3375b23ce751db50b5aad0a033995f4344",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1703,6 +1745,20 @@
           "at": "2026-08-19T07:44:33Z",
           "findings": [],
           "hash": "rvw1:sha256:16dd588dace051424f289d0798441af00277ebd78851e69701dd3a699f8a0def",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:24:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2435e9c1ebeb0986626d16be60bd87ec5bc8bcdd2af7299f7ab527b5d49289f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:30:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a2435e9c1ebeb0986626d16be60bd87ec5bc8bcdd2af7299f7ab527b5d49289f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2852,6 +2908,56 @@
           "hash": "rvw1:sha256:44703733910d977308ab323fb4cf1f8ea0ad0aa012d68801813371e621cc27be",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:24:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c38c51bd72ad0ff161a697d534e3e9081eac3d0439a77f7908bc97c253e91843",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T11:43:23Z",
+          "findings": [
+            {
+              "category": "obligation-model-conformance",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 513,
+              "message": "TrackSetOverrideInteractor × AC-04 is waived with a reason that defers to ‘the execution obligation’, which is not a self-contained declaration-edge waiver. The waiver-cache row is keyed to the same entry/result obligation whose fulfillment already binds the three interactor tests, so those tests are evaluated only for AC-03 and AC-04 is never judged. This contradicts waiver edge-locality (the reason is not verifiable from this entry × AC-04 alone) and the accepted TrackArchiveInteractor × AC-04 shape (compile-time interactor declaration; no standalone compatibility shim, ServiceImpl reference, or reverse delegation; AC-04 is an execution-graph property of the wired path). Rewrite this reason to that self-contained form, or delete the waiver and let the existing interactor tests fulfill AC-04.",
+              "severity": "P1"
+            },
+            {
+              "category": "obligation-model-conformance",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 515,
+              "message": "TrackSetOverrideService × AC-02 is waived with a reason that defers to ‘the method obligation’, which is not a self-contained declaration-edge waiver. The waiver-cache row is keyed to the same trait_method:execute result obligation whose fulfillment already binds the interactor, driver, CLI, and composition tests, so those tests are not evaluated against AC-02. This contradicts waiver edge-locality and the accepted TrackArchiveService × AC-02 shape (single-method application-service declaration; primary-adapter command selection and independent invocation are not behavior of this trait edge). Rewrite this reason to that self-contained form, or delete the waiver so AC-02 is fulfilled rather than waived on the execute obligation.",
+              "severity": "P1"
+            },
+            {
+              "category": "obligation-model-conformance",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 517,
+              "message": "TrackSetOverrideService × CN-03 is waived with a reason that defers to ‘the method obligation’ and describes CN-03 as runtime behavior. CN-03 is crate-topology / same-module colocation, not runtime, and the waiver-cache row is keyed to the same trait_method:execute result obligation, so the bound execute tests are not evaluated against CN-03. This is not a self-contained declaration-edge waiver. Use the accepted TrackArchiveService × CN-03 shape (presentation-free; command-context placement is a structural catalogue invariant; CN-03 is not independently executable behavior of this declaration) and do not defer to another obligation.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c38c51bd72ad0ff161a697d534e3e9081eac3d0439a77f7908bc97c253e91843",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T11:51:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8d8cb5a60a2cf4e08927716a0aa3f676ebdd37367d45f7a32e41ce95f99036d",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T11:55:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d8d8cb5a60a2cf4e08927716a0aa3f676ebdd37367d45f7a32e41ce95f99036d",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3856,6 +3962,20 @@
           "at": "2026-08-19T08:25:54Z",
           "findings": [],
           "hash": "rvw1:sha256:205be51580aab63e1c591094d2d84d53ad9e9bee30307b850b7c651469fdd718",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T10:25:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8dcaee8ab46e5fbb28393c0a014f9d7442ad346661f29049f54219b67ae658",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T11:22:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:0f8dcaee8ab46e5fbb28393c0a014f9d7442ad346661f29049f54219b67ae658",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -102,6 +102,12 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(RequestScopedTrackNextTaskQueryAdapter),
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
         ));
+    let track_set_override_service =
+        Arc::new(usecase::track_lifecycle::track_set_override::TrackSetOverrideInteractor::new(
+            Arc::new(RequestScopedTrackOverrideSetAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ));
     let track_clear_override_service = Arc::new(
         usecase::track_lifecycle::track_clear_override::TrackClearOverrideInteractor::new(
             Arc::new(RequestScopedTrackOverrideClearAdapter),
@@ -141,6 +147,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         track_add_task_service,
         track_next_task_service,
         track_transition_service,
+        track_set_override_service,
         track_clear_override_service,
     )
 }
@@ -360,11 +367,98 @@ impl usecase::track_lifecycle::TrackOverrideClearPort for RequestScopedTrackOver
     }
 }
 
+/// Rebuilds the existing task-operation interactor from the command's items directory
+/// for a set-override mutation. The port remains request-scoped so the storage root
+/// is never captured in a long-lived composition object.
+struct RequestScopedTrackOverrideSetAdapter;
+
+impl usecase::track_lifecycle::TrackOverrideSetPort for RequestScopedTrackOverrideSetAdapter {
+    fn set_override(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+        status: domain::StatusOverrideKind,
+        reason: usecase::git_workflow::DiagnosticText,
+    ) -> Result<usecase::task_ops::TaskOperationOutput, usecase::task_ops::TaskOperationError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let project_root = super::resolve_project_root(items_dir.as_path()).map_err(|error| {
+            usecase::task_ops::TaskOperationError::StoreFailed(error.to_string())
+        })?;
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let interactor = super::build_task_operation_interactor(
+            store,
+            super::build_branch_reader(&project_root),
+        );
+        usecase::track_lifecycle::TrackOverrideSetPort::set_override(
+            &interactor,
+            track_id,
+            items_dir,
+            status,
+            reason,
+        )
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::unwrap_used)]
 mod tests {
     use super::*;
     use cli_driver::track::TrackInput;
+
+    #[test]
+    fn test_track_set_override_active_selection_call_site_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/active-track");
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("active-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "active-track",
+  "branch": null,
+  "title": "Active Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = None;
+        let argv_status = "blocked".to_owned();
+        let argv_reason = "active-selection blocker".to_owned();
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::SetOverride {
+            items_dir: argv_items_dir.clone(),
+            track_id: argv_track_id,
+            status: argv_status.clone(),
+            reason: argv_reason.clone(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            outcome
+                .stdout
+                .as_deref()
+                .is_some_and(|stdout| stdout.contains("Override set to 'blocked'"))
+        );
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_items_dir, items_dir);
+        assert_eq!(argv_status, "blocked");
+        assert_eq!(argv_reason, "active-selection blocker");
+        let persisted = std::fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(persisted.contains("\"blocked\""));
+        assert!(persisted.contains("active-selection blocker"));
+    }
 
     #[test]
     fn test_track_transition_call_site_persists_status() {

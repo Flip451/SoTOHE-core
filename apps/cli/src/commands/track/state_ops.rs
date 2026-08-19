@@ -399,6 +399,56 @@ mod tests {
     }
 
     #[test]
+    fn test_track_set_override_call_site_preserves_cli_contract_across_migration() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, track_dir) = setup_test_track_branchless(tmp.path(), "test-track");
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "test-track".to_owned();
+        let argv_status = "blocked".to_owned();
+        let argv_reason = "migration blocker".to_owned();
+
+        let cli_exit = execute_set_override(
+            argv_items_dir.clone(),
+            argv_track_id.clone(),
+            argv_status.clone(),
+            argv_reason.clone(),
+        )
+        .expect("legacy CLI argv must remain accepted");
+        assert_eq!(cli_exit, ExitCode::from(0));
+        assert_eq!(argv_items_dir, tmp.path().join("track/items"));
+        assert_eq!(argv_track_id, "test-track");
+        assert_eq!(argv_status, "blocked");
+        assert_eq!(argv_reason, "migration blocker");
+
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::SetOverride {
+            items_dir: items_dir.clone(),
+            track_id: Some("test-track".to_owned()),
+            status: "blocked".to_owned(),
+            reason: "migration blocker".to_owned(),
+        });
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            outcome
+                .stdout
+                .as_deref()
+                .is_some_and(|stdout| stdout.contains("Override set to 'blocked'")),
+            "stdout must keep the set-override summary: {:?}",
+            outcome.stdout
+        );
+        assert_eq!(outcome.stderr, None, "successful set-override must not write stderr");
+
+        let content = fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(
+            content.contains("\"blocked\""),
+            "metadata.json must contain the override status after set-override:\n{content}"
+        );
+        assert!(
+            content.contains("migration blocker"),
+            "metadata.json must contain the override reason after set-override:\n{content}"
+        );
+    }
+
+    #[test]
     fn test_execute_clear_override_happy_path() {
         // Uses a branchless track fixture so the in-usecase branch guard is
         // skipped. First sets an override, then clears it. Verifies both the

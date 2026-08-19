@@ -23,18 +23,14 @@ use super::{resolve_project_root, resolve_track_id_inner, validate_track_id_str}
 pub(super) fn resolve_branch_strategy_snapshot(
     project_root: &Path,
 ) -> Result<domain::BranchStrategySnapshot, CompositionError> {
-    use infrastructure::branch_strategy::JsonConfigBranchStrategyAdapter;
-    use usecase::branch_strategy::BranchStrategyPort as _;
+    use infrastructure::track::FsTrackBranchStrategyAdapter;
+    use usecase::track_lifecycle::{TrackBranchStrategyPort, TrackItemsDirectory};
 
-    let config_path = project_root.join(".harness").join("config").join("branch-strategy.json");
-    let adapter = JsonConfigBranchStrategyAdapter::new(config_path)
-        .map_err(|e| CompositionError::WiringFailed(format!("branch strategy config: {e}")))?;
-    let base_branch = domain::NonEmptyString::try_new(adapter.base_branch())
-        .map_err(|e| CompositionError::WiringFailed(format!("branch strategy base_branch: {e}")))?;
-    let merge_target = domain::NonEmptyString::try_new(adapter.merge_target()).map_err(|e| {
-        CompositionError::WiringFailed(format!("branch strategy merge_target: {e}"))
-    })?;
-    Ok(domain::BranchStrategySnapshot::new(base_branch, merge_target, adapter.merge_method()))
+    let items_dir = TrackItemsDirectory::try_new(project_root.join("track/items"))
+        .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+    FsTrackBranchStrategyAdapter
+        .global_for_items(&items_dir)
+        .map_err(|error| CompositionError::WiringFailed(error.to_string()))
 }
 
 /// Wire a fresh [`usecase::git_workflow::TrackGitInteractor`] from the standard
@@ -113,28 +109,18 @@ impl TrackCompositionRoot {
         &self,
         project_root: PathBuf,
     ) -> Result<CommandOutcome, CompositionError> {
-        use domain::TrackReader as _;
-        use infrastructure::branch_strategy::SnapshotBranchStrategyAdapter;
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::branch_strategy::BranchStrategyPort as _;
+        use infrastructure::track::FsTrackBranchStrategyAdapter;
+        use usecase::track_lifecycle::{TrackBranchStrategyPort, TrackWorkspaceRoot};
 
         let active_track_id = resolve_track_id_inner(None, &project_root, false)?;
         let id = domain::TrackId::try_new(&active_track_id)
             .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-        let items_dir = project_root.join("track").join("items");
-        let store = FsTrackStore::new(items_dir);
-        let metadata = store
-            .find(&id)
-            .map_err(|e| {
-                CompositionError::Infrastructure(format!("failed to read track metadata: {e}"))
-            })?
-            .ok_or_else(|| {
-                CompositionError::WiringFailed(format!("track '{active_track_id}' not found"))
-            })?;
-        let adapter =
-            SnapshotBranchStrategyAdapter::new(metadata.branch_strategy_snapshot().clone());
-
-        let base_branch = adapter.base_branch().to_owned();
+        let workspace_root = TrackWorkspaceRoot::try_new(project_root.clone())
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let snapshot = FsTrackBranchStrategyAdapter
+            .snapshot_for_track(&workspace_root, &id)
+            .map_err(|error| CompositionError::Infrastructure(error.to_string()))?;
+        let base_branch = snapshot.base_branch().to_owned();
         build_track_git_interactor()
             .switch_to_base(&project_root, &base_branch)
             .map(|msg| CommandOutcome::success(Some(msg)))

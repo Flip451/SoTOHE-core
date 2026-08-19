@@ -1803,6 +1803,30 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "FsTrackBranchStrategyAdapter"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "f2a5f2ed2635c03795cabad7d58b83948137caeeb3e2dc3aa4382eb5abbd34a9",
+        "waived_reason_hash": "d844619d5b90659c037b50a6026127cbb4a67150b057ceebcce738209cb2e491"
+      },
+      "obligation_id": {
+        "entry_key": "FsTrackBranchStrategyAdapter",
+        "item_identifier": "trait_impl:usecase::track_lifecycle::TrackBranchStrategyPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "CN-01",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
@@ -1811,7 +1835,7 @@
       "key": {
         "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
         "declaration_hash": "a9288257265ea6141e467d8c1817d68b8e7e80c6bb790a9b7bc1d1def5f73d98",
-        "waived_reason_hash": "543c518cbdd740c4a2096a9b9e65654d093aae7721cfb5c156219f0e26cd01d5"
+        "waived_reason_hash": "17b2b41f80ca761f566e94b58a57053db0ba2e7e1a7f62e5d877318d4ffca79e"
       },
       "obligation_id": {
         "entry_key": "GitTrackSelectionAdapter",
@@ -1819,7 +1843,7 @@
         "obligation_kind": "contract_conformance"
       },
       "verdict": {
-        "citation": "Synchronous Track selection secondary port; adapter-owned blocking Git and metadata I/O.",
+        "citation": "対象 Track command contexts と旧 resolution helper を利用する対象外 context の call site における CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -3579,6 +3603,54 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBranchStrategyPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "3fbbd7f444d634cd04ad371ad91756c58962e6373a9465b586e3982ca13efba1",
+        "waived_reason_hash": "f6130f4fefef532bbb1b0d88a40ec4ea48cc7faf3e3225fc0b53fdceb2cc0e6e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBranchStrategyPort",
+        "item_identifier": "trait_method:global_for_items",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "\"Synchronous Track branch-strategy secondary port; adapter-owned blocking configuration I/O.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackBranchStrategyPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "071163e6d745836a53d9843df8ffc58a6c800de0e5bb61387cfc2bdd4746ab5f",
+        "waived_reason_hash": "f6130f4fefef532bbb1b0d88a40ec4ea48cc7faf3e3225fc0b53fdceb2cc0e6e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackBranchStrategyPort",
+        "item_identifier": "trait_method:snapshot_for_track",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "\"Synchronous Track branch-strategy secondary port; adapter-owned blocking configuration I/O.\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "AC-03",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
@@ -3692,6 +3764,78 @@
       },
       "verdict": {
         "citation": "Synchronous Track selection secondary port; adapter-owned blocking Git and metadata I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSelectionPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "e8fa901d84738968f5005dec9696fc8e56df0440301165edd9cc8267ba39c625",
+        "waived_reason_hash": "20c0e54835e9338fd02be81a2dd256b01f64a59d8b6d772f98339fec0cc54188"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_required",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSelectionPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "f24eb735f3f8331f10f1dd8b2205eb435f1e7fcd4149e24b547d0e6046c55b26",
+        "waived_reason_hash": "20c0e54835e9338fd02be81a2dd256b01f64a59d8b6d772f98339fec0cc54188"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_active",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "Synchronous Track selection secondary port; adapter-owned blocking Git and metadata I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSelectionPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "0d69245b3cffee5df5ac733560c3235c6f115e956fdb8388403b4b7a9b087a79",
+        "waived_reason_hash": "20c0e54835e9338fd02be81a2dd256b01f64a59d8b6d772f98339fec0cc54188"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "trait_method:resolve_views_scope",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
@@ -9692,6 +9836,510 @@
       },
       "verdict": {
         "citation": "TrackTdddSpecElementHashInput typed primary-adapter input DTO.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSelectionPort"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "dce5e5a7c05eb28050609d6a62c1b4997e4b116401c9444dc1ee78a39ac58828",
+        "waived_reason_hash": "15e6c2b71f21941db0c4e8e7fde34271acfa083f058011cc6bf30d7e16eefc87"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSelectionPort",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Synchronous Track selection secondary port; adapter-owned blocking Git and metadata I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackOverrideSetPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "d764e24c081da52abecc310ea23aee8705750a9c555c41a086d6eddb1da767c9",
+        "waived_reason_hash": "eb6ca20b9d979d520a83d78977d921f79decc0567e95996b09e23d6f9a5fd892"
+      },
+      "obligation_id": {
+        "entry_key": "TrackOverrideSetPort",
+        "item_identifier": "trait_method:set_override",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "role: SecondaryPort",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackOverrideSetPort"
+      },
+      "key": {
+        "anchor_text_hash": "9e5469c2243f87d21a8e26c2fd6c1d0e0e890aa2c9fb80bd1179d57b2b33eb88",
+        "declaration_hash": "1ce6f319c3417c51d53a4a30b841a7245b0d71e85add81fcbe44e35a23ce9616",
+        "waived_reason_hash": "0f81b065bc323a3106d34befbf8d15d7b2c05311ca8bfda872f0014314d557a8"
+      },
+      "obligation_id": {
+        "entry_key": "TrackOverrideSetPort",
+        "item_identifier": "voluntary:CN-01",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Synchronous Track SetOverride secondary port; adapter-owned blocking storage I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideCommand"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "199e7173f23d9f304399621ab9641b0ffb763cfb363dfbe499e862262d6e5826",
+        "waived_reason_hash": "deb0e0cd01ad9214916f360b3c9ecbc678070d5f5738d858dd4acb7a276f1cb5"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideCommand",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideCommand"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "cb090f3cd89bfcb384c0c9605b26f2992b375e1116cfb4781a4f2fd861b641d9",
+        "waived_reason_hash": "9f8e9d2c990f974ff55121a0b0444c0bb0e9b45689dde92319313e72cb2d7368"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideCommand",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideCommand"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "9d169837a84e4f2c397c17e948f0d4436370e05988e6b1d45261e68d714cfd43",
+        "waived_reason_hash": "a0671a1bec04ce91686ae19055ac7ebcc56fbd4a2825ae0191b3f4f52515fa64"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideCommand",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "f768dc3e12e05fcbca3654f5a372a2ad0ea0bdef2b602f06ba6ff21099e529f4",
+        "waived_reason_hash": "2bb1100149ceabb3762e15be7f22d0b5f2b7e4ba21cbd9f7383c041407bd6994"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideError"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "4e38716f5f0eb2470acab9204b8fee3ae8b2621d0208cea6c815ea3c46078746",
+        "waived_reason_hash": "d4bc61d16378c9997af0c851f8b62f9ac735c8b4f63af03f417c0f16ce36cff6"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideError",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"一つの独立した usecase execution boundary があり\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideError"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "1b33580e7d51b958cf1ce0dd0bf62869c4d572647e6d50db40c7798bf4880924",
+        "waived_reason_hash": "323b5dc0510e594516afb1b2d7c8dea94986704c60ab2e2d1de66fa7910bb63d"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideError"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "ab7a3f5a9569105a1e6ca114e487b7e40f3ae3b5dcc72642527d797dc5bea99c",
+        "waived_reason_hash": "fee06030649fe81491dbd29ef75bd7d09a35e4269de8a5d250c7703af9c1e699"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideError"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "2bb4c9d3d3b77de2df7995e9dc861439ec8adbf25ff8cc2ef5e7291adfef6c73",
+        "waived_reason_hash": "297de0a14ef3bd6b1b5312ab858da7e4baab31e65216e87b17972073d75cd6bd"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideError",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"track_set_override\")])",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideResult"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "dc026a660cea00ff1adad49981e5cea37378df254b45c18728fe19180a7f61d3",
+        "waived_reason_hash": "ff35ce3aa4d077a47e9d2e26bda26b7d2b241cc2fcf144b3a191bc80a5590f37"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideResult",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Track SetOverride result DTO for primary-adapter transfer.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideResult"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "2f72fb2586a003ac94b62f560018565c8a07304d068e5865f9043bc7f2ab73a2",
+        "waived_reason_hash": "8cf3dd857727d9d7d9661d41e55cea541e25707f81f56816ced2c2d75d3e2f3d"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideResult",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideResult"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "f6fb7f66e77884ad4d16b2dc1bac41f8c5cd1058868f4c0159da60a56aa9aa01",
+        "waived_reason_hash": "be83e0b0f27ef823babec09759eefb55ff0fc427522f84856136bd5bf52ab855"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideResult",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideResult"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "d49961f0ee593b950ac6393b44460d60c2c12e0228f45ee724ff83a691c3fb75",
+        "waived_reason_hash": "7390843ebd17882342a89e334eecc1fb5f328ff3cb60a702d2d2ec5dc6562a98"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideResult",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "7421e4b71ddb4975057bcc13ff76fa5cd0b487c1dac5f1cf9b6ccb1d756ac0b3",
+        "waived_reason_hash": "49bfa9a84daccfd05c6302667ee869a57ba75b5646f2786fb00529d81476906d"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "fields: [], has_stripped_fields: true ... methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "7421e4b71ddb4975057bcc13ff76fa5cd0b487c1dac5f1cf9b6ccb1d756ac0b3",
+        "waived_reason_hash": "74d2a1f40703e4588009e4d4f5e664ecda1e4f1cb7a259a20dd8a3cf0050b410"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "7421e4b71ddb4975057bcc13ff76fa5cd0b487c1dac5f1cf9b6ccb1d756ac0b3",
+        "waived_reason_hash": "363c4da8b0d52df380ab0223275a54ae00896f272167973c933047855c18fe85"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "\"各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideService"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "dfbda4024ea9f103f13a824b8c5a5e99823b23c37a32c59be13bc4f0f42e0828",
+        "waived_reason_hash": "2255ddeaa3171bed895afd9a253e72a98f76a7b567c91b95bb6dbb942cf06c23"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "\"methods: [MethodDeclaration { name: MethodName(Identifier(\"execute\"))\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideService"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "3c346e76dd4a986d886272fb837e34227fdfff4337e46c6a1c506c132e2dd078",
+        "waived_reason_hash": "f64e53ab9c3d7791c1147414baa55084ed8f16189386b7e793d49e8e4198bf2f"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideService",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackSetOverrideService"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "dfbda4024ea9f103f13a824b8c5a5e99823b23c37a32c59be13bc4f0f42e0828",
+        "waived_reason_hash": "ebd88848cd495f9e38812242e4e5c2fa563fe7f5cf49a3e06c397001c13966b1"
+      },
+      "obligation_id": {
+        "entry_key": "TrackSetOverrideService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"

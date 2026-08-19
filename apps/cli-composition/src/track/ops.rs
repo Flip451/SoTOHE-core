@@ -236,11 +236,13 @@ impl TrackCompositionRoot {
     /// Uses `project_root` for git discovery so that auto-detection is consistent
     /// with `--project-root` invocations and does not depend on the process CWD.
     pub fn detect_active_track_from_branch(&self, project_root: &Path) -> Option<String> {
-        use usecase::track_resolution::{
-            ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
-        };
-        let repo = infrastructure::git_cli::SystemGitRepo::discover_from(project_root).ok()?;
-        let interactor = ActiveTrackResolveInteractor::new(Arc::new(repo));
-        interactor.resolve_active_track().ok()
+        use infrastructure::track::GitTrackSelectionAdapter;
+        use usecase::track_lifecycle::{TrackSelectionPort, TrackWorkspaceRoot};
+
+        let workspace_root = TrackWorkspaceRoot::try_new(project_root.to_path_buf()).ok()?;
+        GitTrackSelectionAdapter
+            .resolve_active(&workspace_root)
+            .ok()
+            .map(|track_id| track_id.as_ref().to_owned())
     }
 }

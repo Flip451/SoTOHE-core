@@ -25,6 +25,7 @@ use usecase::track_lifecycle::track_branch_switch::{
 use usecase::track_lifecycle::track_clear_override::TrackClearOverrideService;
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
 use usecase::track_lifecycle::track_next_task::TrackNextTaskService;
+use usecase::track_lifecycle::track_set_override::TrackSetOverrideService;
 use usecase::track_lifecycle::track_transition::TrackTransitionService;
 use usecase::track_lifecycle::{
     RenderedViewPath, TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput,
@@ -35,6 +36,7 @@ use usecase::track_service::{TrackCommandOutput, TrackService};
 use crate::render::CommandOutcome;
 use crate::track_clear_override::render_track_clear_override_outcome;
 use crate::track_next_task::render_track_next_task_outcome;
+use crate::track_set_override::render_track_set_override_outcome;
 use crate::track_transition::render_track_transition_outcome;
 
 // ---------------------------------------------------------------------------
@@ -263,6 +265,7 @@ pub struct TrackDriver {
     base_merge_service: Arc<dyn BaseMergeService>,
     track_add_task_service: Arc<dyn TrackAddTaskService>,
     track_next_task_service: Arc<dyn TrackNextTaskService>,
+    track_set_override_service: Arc<dyn TrackSetOverrideService>,
     track_clear_override_service: Arc<dyn TrackClearOverrideService>,
 }
 
@@ -280,6 +283,7 @@ impl TrackDriver {
         track_add_task_service: Arc<dyn TrackAddTaskService>,
         track_next_task_service: Arc<dyn TrackNextTaskService>,
         track_transition_service: Arc<dyn TrackTransitionService>,
+        track_set_override_service: Arc<dyn TrackSetOverrideService>,
         track_clear_override_service: Arc<dyn TrackClearOverrideService>,
     ) -> Self {
         Self {
@@ -293,6 +297,7 @@ impl TrackDriver {
             base_merge_service,
             track_add_task_service,
             track_next_task_service,
+            track_set_override_service,
             track_clear_override_service,
         }
     }
@@ -358,8 +363,12 @@ impl TrackDriver {
                 )
             }
             TrackInput::SetOverride { items_dir, track_id, status, reason } => {
-                service_output_to_outcome(
-                    self.service.set_override(items_dir, track_id, status, reason),
+                render_track_set_override_outcome(
+                    &*self.track_set_override_service,
+                    items_dir,
+                    track_id,
+                    status,
+                    reason,
                 )
             }
             TrackInput::ClearOverride { items_dir, track_id } => {
@@ -709,6 +718,10 @@ mod tests {
     use usecase::track_lifecycle::track_next_task::{
         TrackNextTaskCommand, TrackNextTaskError, TrackNextTaskResult,
     };
+    use usecase::track_lifecycle::track_set_override::{
+        TrackSetOverrideCommand, TrackSetOverrideError, TrackSetOverrideResult,
+        TrackSetOverrideService,
+    };
     use usecase::track_lifecycle::track_transition::{
         TrackTransitionCommand, TrackTransitionError, TrackTransitionResult,
     };
@@ -896,6 +909,8 @@ mod tests {
 
     struct UnusedTrackTransitionService;
 
+    struct UnusedTrackSetOverrideService;
+
     struct UnusedTrackClearOverrideService;
 
     impl TrackNextTaskService for UnusedTrackNextTaskService {
@@ -912,6 +927,15 @@ mod tests {
             &self,
             _: TrackTransitionCommand,
         ) -> Result<TrackTransitionResult, TrackTransitionError> {
+            unreachable!()
+        }
+    }
+
+    impl TrackSetOverrideService for UnusedTrackSetOverrideService {
+        fn execute(
+            &self,
+            _: TrackSetOverrideCommand,
+        ) -> Result<TrackSetOverrideResult, TrackSetOverrideError> {
             unreachable!()
         }
     }
@@ -1098,6 +1122,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         )
     }
@@ -1119,6 +1144,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1153,6 +1179,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1182,6 +1209,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1221,6 +1249,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1252,6 +1281,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1285,6 +1315,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1326,6 +1357,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             service.clone(),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1365,6 +1397,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             service,
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1396,6 +1429,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             service,
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1428,6 +1462,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1460,6 +1495,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1499,6 +1535,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1529,6 +1566,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1559,6 +1597,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1588,6 +1627,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1621,6 +1661,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1652,6 +1693,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1682,6 +1724,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1711,6 +1754,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1744,6 +1788,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 
@@ -1777,6 +1822,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
             Arc::new(UnusedTrackClearOverrideService),
         );
 

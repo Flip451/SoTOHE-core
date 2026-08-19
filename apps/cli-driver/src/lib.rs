@@ -45,6 +45,7 @@ mod track_clear_override;
 mod track_contract_map;
 mod track_next_task;
 pub mod track_resolution;
+mod track_set_override;
 mod track_spec_element_hash;
 pub mod track_tddd;
 mod track_transition;

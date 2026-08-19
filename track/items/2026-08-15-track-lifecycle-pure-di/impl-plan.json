@@ -147,6 +147,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "10df1b3e0c2d8af0fa77d3dae879bf5ad9a4da2b",
       "depends_on": [
         "T001"
       ],
@@ -160,7 +161,7 @@
       ],
       "description": "Implement the `TrackSetOverride*` boundary in `libs/usecase/src/track_lifecycle/track_set_override.rs`; update the set-override handler in `apps/cli/src/commands/track/state_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T010",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -283,6 +284,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "10df1b3e0c2d8af0fa77d3dae879bf5ad9a4da2b",
       "depends_on": [
         "T001"
       ],
@@ -331,7 +333,7 @@
       ],
       "description": "In `libs/usecase/src/track_lifecycle/` (`TrackBranchStrategyPort`, `TrackSelectionPort`) and `libs/infrastructure/src/track/` (`FsTrackBranchStrategyAdapter`, `GitTrackSelectionAdapter`), migrate branch-strategy and selection access behind the declared ports and add adapter-contract regressions. [IN-01; IN-02; CN-01; CN-02; AC-03]",
       "id": "T032",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

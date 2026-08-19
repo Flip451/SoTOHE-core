@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
   "declaration_hash": "333f8be42d6dc99d2fbfb9ddfd4eabf49d1cfc986810eb144d59619973cf9c86",
-  "generated_at": "2026-08-19T08:48:46Z",
-  "head_commit": "84cc2b4f4565b483e1f5440970c3519dc8a6f190",
+  "generated_at": "2026-08-19T11:56:41Z",
+  "head_commit": "10df1b3e0c2d8af0fa77d3dae879bf5ad9a4da2b",
   "schema_version": 4,
   "signals": [
     {
@@ -1057,39 +1057,39 @@
       ],
       "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSetOverrideCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackSetOverrideError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackSetOverrideService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackSetOverrideInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSetOverrideResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSetOverrideService"
     },
     {

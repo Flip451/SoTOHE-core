@@ -65,7 +65,7 @@
 | TrackResolutionCompatError | error_type | add | Unavailable | 🔵 | 🔵 |
 | TrackResolveError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackSetCommitHashError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
-| TrackSetOverrideError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackSetOverrideError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSpecElementHashError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSwitchBaseError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackTaskCountsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
@@ -123,7 +123,7 @@
 | TrackResolutionService | application_service | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🔵 | 🔵 |
 | TrackResolveService | application_service | add | fn execute(&self, command: TrackResolveCommand) -> Result<TrackResolveResult, TrackResolveError> | 🟡 | 🔵 |
 | TrackSetCommitHashService | application_service | add | fn execute(&self, command: TrackSetCommitHashCommand) -> Result<TrackSetCommitHashResult, TrackSetCommitHashError> | 🟡 | 🔵 |
-| TrackSetOverrideService | application_service | add | fn execute(&self, command: TrackSetOverrideCommand) -> Result<TrackSetOverrideResult, TrackSetOverrideError> | 🟡 | 🔵 |
+| TrackSetOverrideService | application_service | add | fn execute(&self, command: TrackSetOverrideCommand) -> Result<TrackSetOverrideResult, TrackSetOverrideError> | 🔵 | 🔵 |
 | TrackSpecElementHashService | application_service | add | fn execute(&self, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🔵 | 🔵 |
 | TrackSwitchBaseService | application_service | add | fn execute(&self, command: TrackSwitchBaseCommand) -> Result<TrackSwitchBaseResult, TrackSwitchBaseError> | 🟡 | 🔵 |
 | TrackTaskCountsService | application_service | add | fn execute(&self, command: TrackTaskCountsCommand) -> Result<TrackTaskCountsResult, TrackTaskCountsError> | 🟡 | 🔵 |
@@ -155,7 +155,7 @@
 | TrackResolutionInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackResolveInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackSetCommitHashInteractor | interactor | add | — | 🟡 | 🔵 |
-| TrackSetOverrideInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackSetOverrideInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSpecElementHashInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSwitchBaseInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackTaskCountsInteractor | interactor | add | — | 🟡 | 🔵 |
@@ -185,7 +185,7 @@
 | TrackInitResult | dto | add | — | 🔵 | 🔵 |
 | TrackLintResult | dto | add | — | 🔵 | 🔵 |
 | TrackSetCommitHashResult | dto | add | — | 🟡 | 🔵 |
-| TrackSetOverrideResult | dto | add | — | 🟡 | 🔵 |
+| TrackSetOverrideResult | dto | add | — | 🔵 | 🔵 |
 | TrackTaskCountsResult | dto | add | — | 🟡 | 🔵 |
 | TrackTypeSignalsResult | dto | add | — | 🟡 | 🔵 |
 | TrackViewsValidateResult | dto | add | — | 🟡 | 🔵 |
@@ -210,7 +210,7 @@
 | TrackNextTaskCommand | command | add | — | 🔵 | 🔵 |
 | TrackResolveCommand | command | add | — | 🟡 | 🔵 |
 | TrackSetCommitHashCommand | command | add | — | 🟡 | 🔵 |
-| TrackSetOverrideCommand | command | add | — | 🟡 | 🔵 |
+| TrackSetOverrideCommand | command | add | — | 🔵 | 🔵 |
 | TrackSpecElementHashCommand | command | add | — | 🔵 | 🔵 |
 | TrackSwitchBaseCommand | command | add | — | 🟡 | 🔵 |
 | TrackTaskCountsCommand | command | add | — | 🔵 | 🔵 |
