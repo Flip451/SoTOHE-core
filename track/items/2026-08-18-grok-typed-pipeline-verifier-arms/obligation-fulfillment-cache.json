@@ -1,4 +1,333 @@
 {
-  "entries": [],
+  "entries": [
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-01",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "278a91c80b0c20f6e8eb49b1b7944daf7b06921428829ac0c33c395d0b0cb22b",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for capability_name in [\n                    \"ref-verifier-chain1\",\n                    \"ref-verifier-chain2\",\n                    \"obligation-fulfillment-verifier\",\n                    \"waiver-verifier\",\n                ] { ... assert!(matches!(\n                            &resolved,\n                            ResolvedExecution::ProviderCli { provider, .. }\n                                if provider.as_str() == \"grok\"\n                        )); ... }\n...\nassert_eq!(invocation_count, 8, \"each provider/round capability pair launched Grok\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "65409bbaffd52c154f2bf474e13e730cc4b6f5bd69f6ce37d135c881cef36166",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for capability_name in [\n                    \"ref-verifier-chain1\",\n                    \"ref-verifier-chain2\",\n                    \"obligation-fulfillment-verifier\",\n                    \"waiver-verifier\",\n                ] {\n                    ...\n                    for round_type in [RoundType::Final, RoundType::Fast] {\n                        ...\n                        assert!(matches!(\n                            &resolved,\n                            ResolvedExecution::ProviderCli { provider, .. }\n                                if provider.as_str() == \"grok\"\n                        ));\n                        ...\n                        let result = super::super::run_ref_verifier_agent(\n                            directory.path(),\n                            resolved,\n                            format!(\"{capability_name} {round_type:?}\"),\n                            super::super::CODEX_OUTPUT_SCHEMA,\n                        );\n                    }\n                }\n                ...\n        assert_eq!(invocation_count, 8, \"each provider/round capability pair launched Grok\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "afff3acc573e202bf6730bd21d8b1863dc36b032837e5ec1feb5e3e020214c52",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "let actual =\n                build_grok_ref_verifier_args(&model, effort, &sandbox, resume_id.as_ref(), prompt);\n            let expected = build_grok_args(\n                model.as_str(),\n                effort,\n                &sandbox,\n                resume_id.as_ref().map(ProviderSessionId::as_str),\n                prompt,\n            );\n\n            assert_eq!(actual, expected, \"Grok mapping drifted for model {model_value}\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-01",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "d16e47f33a9bfbb68b6e6850218148b6a91854a9249c04ad63189e345797df94",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for capability_name in [\n                    \"ref-verifier-chain1\",\n                    \"ref-verifier-chain2\",\n                    \"obligation-fulfillment-verifier\",\n                    \"waiver-verifier\",\n                ] {",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-02",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "a02a54168c9c1197f1b58dba26e6f96fc9344dd0127f5fcf19369dbb70c3c905",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "for capability_name in [\n                    \"ref-verifier-chain1\",\n                    \"ref-verifier-chain2\",\n                    \"obligation-fulfillment-verifier\",\n                    \"waiver-verifier\",\n                ] {\n                    let capability =\n                        CapabilityName::try_new(capability_name.to_owned()).expect(\"capability\");\n                    for round_type in [RoundType::Final, RoundType::Fast] {\n                        let resolved = profiles\n                            .resolve_execution(&capability, round_type)\n                            .expect(\"Grok provider resolves for both rounds\");\n                        assert!(matches!(\n                            &resolved,\n                            ResolvedExecution::ProviderCli { provider, .. }\n                                if provider.as_str() == \"grok\"\n                        ));",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "IN-03",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "9434a84d75390c4559464bcea078bfad39e2c533a037b9a308bee1cfb4a22b69",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(actual, expected, \"Grok mapping drifted for model {model_value}\"); ... assert_eq!(result, r#\"{\"kind\":\"pass\",\"citation\":\"AC-01\",\"reason\":null}\"#);",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-02",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "f594aa32ccd308a0629e046dfaf50d3895bd9f0bd6c34b9e896887e35dc9c719",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(actual, expected, \"Grok mapping drifted for model {model_value}\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    },
+    {
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_build_grok_ref_verifier_args_reuses_provider_mapping"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_run_ref_verifier_agent_grok_returns_structured_result_and_ignores_text"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::ref_verify::process_runner::grok::tests",
+          "test_name": "test_grok_provider_and_fast_provider_launch_shared_ref_verifier_arm"
+        }
+      ],
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "GO-01",
+          "file_path": "track/items/2026-08-18-grok-typed-pipeline-verifier-arms/spec.json"
+        },
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args"
+      },
+      "key": {
+        "anchor_text_hash": "623864c98b1c3695a2332dce4baaa1c1601b5577a7955c1afbba6470c9c771e4",
+        "bound_tests_set_hash": "2ce8e670e1ba32a7927bde30bc3269ebcfd1374d3512312d5bc5887337ba543a",
+        "declaration_hash": "0705dd9c458e32b352e17db74a5f0d8134b656eb2fac45d993f88aa6a64fb700"
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "assert_eq!(actual, expected, \"Grok mapping drifted for model {model_value}\");",
+        "kind": "fulfilled"
+      },
+      "verifier_fingerprint": "0403be10e6c10d61dcd5417869126b13ec6a6dd5233b78290f8f41e36ac7aea2"
+    }
+  ],
   "track_id": "2026-08-18-grok-typed-pipeline-verifier-arms"
 }

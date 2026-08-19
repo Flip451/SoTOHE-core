@@ -42,21 +42,37 @@
 //! Long verbose headers (telemetry banners) must not bury the actual error.
 
 use std::ffi::{OsStr, OsString};
-use std::io::{Read, Write};
+
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::Arc;
 
-use usecase::capability_exec::ReasoningEffort;
+use usecase::capability_exec::{ModelName, ReasoningEffort};
+use usecase::provider_session::ProviderSessionId;
 use usecase::ref_verify::RefVerifyError;
 
 use crate::agent_profiles::ResolvedExecution;
 use crate::codex_common::{REVIEW_RUNTIME_DIR, runtime_path};
+use crate::grok_common::GrokSandbox;
 use crate::ref_verify::AgentExecutionRunner;
 
+mod grok;
+mod io;
 mod transient_files;
 
 use transient_files::AutoCleanupFile;
+
+/// Build the argv for the `grok` ref-verifier subprocess.
+#[must_use]
+pub fn build_grok_ref_verifier_args(
+    model: &ModelName,
+    effort: ReasoningEffort,
+    sandbox: &GrokSandbox,
+    resume_id: Option<&ProviderSessionId>,
+    prompt: &str,
+) -> Vec<OsString> {
+    grok::build_grok_ref_verifier_args(model, effort, sandbox, resume_id, prompt)
+}
 
 const MAX_REF_VERIFY_SESSION_LOG_BYTES: usize = 4 * 1024 * 1024;
 const STDERR_SESSION_LOG_HEADING: &[u8] = b"=== STDERR ===\n";
@@ -169,6 +185,7 @@ fn run_ref_verifier_agent(
             codex_output_schema,
         ),
         "gemini" => run_gemini_ref_verifier(project_root, model.as_str(), effort, &prompt),
+        "grok" => grok::run_grok_ref_verifier(project_root, &model, effort, &prompt),
         other => {
             Err(ref_verify_runner_error(format!("unsupported ref-verifier provider '{other}'")))
         }
@@ -379,16 +396,6 @@ struct ProcessOutcome {
     stdout: String,
 }
 
-struct RefVerifySessionLog {
-    path: PathBuf,
-    written_bytes: usize,
-}
-
-struct BoundedStderr {
-    bytes: Vec<u8>,
-    truncated: bool,
-}
-
 /// Spawn `bin args …` with `current_dir = project_root`, wait without timeout,
 /// and return stdout. On non-zero exit, attach the **tail** of stderr (up to
 /// 4 KB / 20 lines) to the error so a long verbose header cannot bury the
@@ -410,8 +417,8 @@ fn run_process(
                     path.display()
                 ))
             })?;
-            let mut session_log = RefVerifySessionLog { path, written_bytes: 0 };
-            append_session_log(
+            let mut session_log = io::RefVerifySessionLog { path, written_bytes: 0 };
+            io::append_session_log(
                 &mut session_log,
                 crate::codex_common::runtime_log_header(runtime).as_bytes(),
             )?;
@@ -442,32 +449,38 @@ fn run_process(
         .stderr
         .take()
         .ok_or_else(|| ref_verify_runner_error(format!("{label} stderr was not captured")))?;
-    let stdout_handle = spawn_read_to_string(stdout);
-    let stderr_handle = spawn_bounded_stderr_reader(stderr, MAX_REF_VERIFY_SESSION_LOG_BYTES);
+    let stdout_handle = io::spawn_bounded_stdout_reader(stdout, MAX_REF_VERIFY_SESSION_LOG_BYTES);
+    let stderr_handle = io::spawn_bounded_stderr_reader(stderr, MAX_REF_VERIFY_SESSION_LOG_BYTES);
 
     let status = child.wait().map_err(|e| {
         ref_verify_runner_error(format!("failed to wait on {label} subprocess: {e}"))
     })?;
 
-    let stdout_text = stdout_handle
+    let stdout = stdout_handle
         .join()
         .map_err(|_| ref_verify_runner_error(format!("{label} stdout reader thread panicked")))?
         .map_err(|e| ref_verify_runner_error(format!("failed to read {label} stdout: {e}")))?;
+    if stdout.exceeded_limit {
+        return Err(ref_verify_runner_error(format!(
+            "{label} stdout exceeds {MAX_REF_VERIFY_SESSION_LOG_BYTES} bytes"
+        )));
+    }
+    let stdout_text = stdout.text;
     let stderr = stderr_handle
         .join()
         .map_err(|_| ref_verify_runner_error(format!("{label} stderr reader thread panicked")))?
         .map_err(|e| ref_verify_runner_error(format!("failed to read {label} stderr: {e}")))?;
     if let Some(session_log) = session_log.as_mut() {
-        append_session_log(session_log, STDERR_SESSION_LOG_HEADING)?;
-        append_session_log(session_log, &stderr.bytes)?;
+        io::append_session_log(session_log, STDERR_SESSION_LOG_HEADING)?;
+        io::append_session_log(session_log, &stderr.bytes)?;
         if stderr.truncated {
-            append_session_log(session_log, STDERR_SESSION_LOG_TRUNCATED_NOTICE)?;
+            io::append_session_log(session_log, STDERR_SESSION_LOG_TRUNCATED_NOTICE)?;
         }
     }
     let stderr_text = String::from_utf8_lossy(&stderr.bytes).into_owned();
 
     if !status.success() {
-        let tail = stderr_tail(&stderr_text, 20, 4096);
+        let tail = io::stderr_tail(&stderr_text, 20, 4096);
         return Err(ref_verify_runner_error(format!(
             "{label} exited with non-zero status: {status}; stderr tail: {tail}"
         )));
@@ -496,105 +509,6 @@ fn run_process_retryable(
         || run_process(bin, args, current_dir, label, runtime),
         std::thread::sleep,
     )
-}
-
-fn spawn_read_to_string<R>(mut pipe: R) -> std::thread::JoinHandle<std::io::Result<String>>
-where
-    R: Read + Send + 'static,
-{
-    std::thread::spawn(move || {
-        let mut buf = String::new();
-        pipe.read_to_string(&mut buf).map(|_| buf)
-    })
-}
-
-fn spawn_bounded_stderr_reader<R>(
-    pipe: R,
-    maximum_bytes: usize,
-) -> std::thread::JoinHandle<std::io::Result<BoundedStderr>>
-where
-    R: Read + Send + 'static,
-{
-    std::thread::spawn(move || collect_bounded_stderr(pipe, maximum_bytes))
-}
-
-fn collect_bounded_stderr<R>(mut pipe: R, maximum_bytes: usize) -> std::io::Result<BoundedStderr>
-where
-    R: Read,
-{
-    let mut buffer = [0_u8; 8192];
-    let mut retained = Vec::new();
-    let mut truncated = false;
-    loop {
-        let read = pipe.read(&mut buffer)?;
-        if read == 0 {
-            break;
-        }
-        let bytes = buffer.get(..read).ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid stderr read count")
-        })?;
-        if bytes.len() >= maximum_bytes {
-            retained.clear();
-            retained.extend_from_slice(
-                bytes.get(bytes.len().saturating_sub(maximum_bytes)..).unwrap_or_default(),
-            );
-            truncated = true;
-            continue;
-        }
-        let overflow = retained.len().saturating_add(bytes.len()).saturating_sub(maximum_bytes);
-        if overflow > 0 {
-            retained.drain(..overflow);
-            truncated = true;
-        }
-        retained.extend_from_slice(bytes);
-    }
-    Ok(BoundedStderr { bytes: retained, truncated })
-}
-
-fn append_session_log(
-    session_log: &mut RefVerifySessionLog,
-    bytes: &[u8],
-) -> Result<(), RefVerifyError> {
-    let remaining = MAX_REF_VERIFY_SESSION_LOG_BYTES.saturating_sub(session_log.written_bytes);
-    let retained = bytes.get(..bytes.len().min(remaining)).unwrap_or_default();
-    if retained.is_empty() {
-        return Ok(());
-    }
-    let mut file =
-        std::fs::OpenOptions::new().append(true).open(&session_log.path).map_err(|error| {
-            ref_verify_runner_error(format!(
-                "failed to open ref-verify session log {}: {error}",
-                session_log.path.display()
-            ))
-        })?;
-    file.write_all(retained).map_err(|error| {
-        ref_verify_runner_error(format!(
-            "failed to write ref-verify session log {}: {error}",
-            session_log.path.display()
-        ))
-    })?;
-    session_log.written_bytes = session_log.written_bytes.saturating_add(retained.len());
-    Ok(())
-}
-
-fn stderr_tail(text: &str, max_lines: usize, max_bytes: usize) -> String {
-    if text.is_empty() {
-        return String::new();
-    }
-    let lines: Vec<&str> = text.lines().collect();
-    let start = lines.len().saturating_sub(max_lines);
-    let mut tail = lines.get(start..).map(|s| s.join("\n")).unwrap_or_default();
-    if tail.len() > max_bytes {
-        // Trim from the front so the most recent bytes are preserved.
-        let cut = tail.len() - max_bytes;
-        // Find a char boundary at or after `cut` to avoid splitting a UTF-8 sequence.
-        let mut idx = cut;
-        while idx < tail.len() && !tail.is_char_boundary(idx) {
-            idx += 1;
-        }
-        tail = tail.split_off(idx);
-    }
-    tail
 }
 
 #[cfg(unix)]
@@ -681,12 +595,12 @@ fn terminate_verifier_child(child: &mut Child, label: &str) -> Result<(), RefVer
     child.kill().map_err(|e| ref_verify_runner_error(format!("failed to terminate {label}: {e}")))
 }
 
-fn nonempty_trimmed(text: &str) -> Option<String> {
+pub(super) fn nonempty_trimmed(text: &str) -> Option<String> {
     let trimmed = text.trim();
     if trimmed.is_empty() { None } else { Some(trimmed.to_owned()) }
 }
 
-fn ref_verify_runner_error(message: impl Into<String>) -> RefVerifyError {
+pub(super) fn ref_verify_runner_error(message: impl Into<String>) -> RefVerifyError {
     RefVerifyError::VerifierPort { message: message.into() }
 }
 
@@ -750,21 +664,21 @@ mod tests {
     #[test]
     fn stderr_tail_preserves_last_lines() {
         let text = "line1\nline2\nline3\nline4\nline5";
-        let tail = stderr_tail(text, 2, 4096);
+        let tail = io::stderr_tail(text, 2, 4096);
         assert_eq!(tail, "line4\nline5");
     }
 
     #[test]
     fn stderr_tail_truncates_overlong_bytes_preserving_tail() {
         let text: String = (0..1000).map(|i| format!("line{i:04}\n")).collect();
-        let tail = stderr_tail(&text, 50, 64);
+        let tail = io::stderr_tail(&text, 50, 64);
         assert!(tail.len() <= 64);
         assert!(tail.contains("line0999"), "tail must include last line, got '{tail}'");
     }
 
     #[test]
     fn test_collect_bounded_stderr_retains_tail_and_marks_truncation() {
-        let output = collect_bounded_stderr(std::io::Cursor::new(b"0123456789"), 4)
+        let output = io::collect_bounded_stderr(std::io::Cursor::new(b"0123456789"), 4)
             .expect("stderr collector succeeds");
 
         assert_eq!(output.bytes, b"6789");
@@ -776,9 +690,9 @@ mod tests {
         let directory = tempfile::tempdir().expect("temporary directory is created");
         let path = directory.path().join("session.log");
         std::fs::File::create(&path).expect("session log is created");
-        let mut session_log = RefVerifySessionLog { path: path.clone(), written_bytes: 0 };
+        let mut session_log = io::RefVerifySessionLog { path: path.clone(), written_bytes: 0 };
 
-        append_session_log(&mut session_log, &vec![b'x'; MAX_REF_VERIFY_SESSION_LOG_BYTES + 1])
+        io::append_session_log(&mut session_log, &vec![b'x'; MAX_REF_VERIFY_SESSION_LOG_BYTES + 1])
             .expect("bounded log append succeeds");
 
         assert_eq!(
@@ -911,6 +825,30 @@ mod tests {
         )
         .unwrap();
         assert!(outcome.stdout.contains("hello subprocess"));
+    }
+
+    #[test]
+    fn run_process_rejects_stdout_over_limit() {
+        let dir = tempfile::tempdir().unwrap();
+        let oversized = MAX_REF_VERIFY_SESSION_LOG_BYTES.saturating_add(1);
+        let err = run_process(
+            OsStr::new("sh"),
+            &[
+                OsString::from("-c"),
+                OsString::from(format!("head -c {oversized} /dev/zero | tr '\\0' 'x'")),
+            ],
+            dir.path(),
+            "stdout-limit",
+            None,
+        )
+        .unwrap_err();
+        let RefVerifyError::VerifierPort { message } = err else {
+            panic!("expected VerifierPort, got {err:?}");
+        };
+        assert!(
+            message.contains("stdout exceeds"),
+            "expected fail-closed stdout limit, got: {message}"
+        );
     }
 
     /// Verify that `run_process` attaches stderr tail on non-zero exit.

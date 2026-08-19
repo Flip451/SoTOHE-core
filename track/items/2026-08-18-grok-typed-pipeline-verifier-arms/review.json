@@ -215,6 +215,75 @@
           "hash": "rvw1:sha256:17b5c3af91cbde14694de9ea780019a9c315f52aaf0c6c1b46078612130d9dec",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T06:59:37Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30b4c1e149afd46f184915f2ba949abdd789346b07656fd99d79f538c4e378a5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T07:22:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:30b4c1e149afd46f184915f2ba949abdd789346b07656fd99d79f538c4e378a5",
+          "type": "final",
+          "verdict": "zero_findings"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "at": "2026-08-19T07:03:20Z",
+          "findings": [
+            {
+              "category": "unbounded I/O",
+              "file": "libs/infrastructure/src/ref_verify/process_runner/grok.rs",
+              "line": 52,
+              "message": "The new Grok ref-verifier path feeds subprocess stdout through `read_to_string` without any size limit, so a malformed or misbehaving `grok` process can cause unbounded memory growth before envelope extraction. Bound stdout at the process boundary (as stderr is bounded) and fail closed when the limit is exceeded.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:15fa9c30a6378f232fec70aa90a6c2e1705b1d087d0b37b854e543ce1e9eb9fe",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T07:23:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:6ef1a5033aeca4849d591aee662d139d38cd63aefe902b24c01bed73f51891b8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T07:33:24Z",
+          "findings": [
+            {
+              "category": "module-size",
+              "file": "libs/infrastructure/src/ref_verify/process_runner.rs",
+              "line": 67,
+              "message": "`process_runner.rs` now has 705 production lines (everything above the `#[cfg(test)]` module). `architecture-rules.json` sets `module_limits.max_lines` to 700, and `sotp verify module-size` treats an overage as an error. HEAD was 692; this change added the public `build_grok_ref_verifier_args` forwarder plus the bounded-stdout join check. T001 moved the Grok arm into a sibling module specifically so the parent would stay within that cap. Re-export the sibling builder (`pub use grok::build_grok_ref_verifier_args`) or move more production code into the sibling modules so the parent is at most 700 lines.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:6ef1a5033aeca4849d591aee662d139d38cd63aefe902b24c01bed73f51891b8",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T07:35:52Z",
+          "findings": [],
+          "hash": "rvw1:sha256:603b881cc1fb80932fc1d919d110a471206f1a8ca71035ee6f3ac55baf129573",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T07:36:58Z",
+          "findings": [],
+          "hash": "rvw1:sha256:603b881cc1fb80932fc1d919d110a471206f1a8ca71035ee6f3ac55baf129573",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -261,6 +330,20 @@
           "at": "2026-08-19T04:11:10Z",
           "findings": [],
           "hash": "rvw1:sha256:1f07fb6aa19f220404668ac67b00ef7588bb8ba9c5910fa89e812d6c9f1ae996",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T06:59:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ffdf1b0194955e31ff916f2383dcbd6a456430ba79a215b6708fa9851b3df0d9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T07:11:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ffdf1b0194955e31ff916f2383dcbd6a456430ba79a215b6708fa9851b3df0d9",
           "type": "final",
           "verdict": "zero_findings"
         }

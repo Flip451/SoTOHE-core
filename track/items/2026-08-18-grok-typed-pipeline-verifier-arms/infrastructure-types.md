@@ -31,6 +31,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args | free_function | add | fn(model: &usecase::capability_exec::ModelName, effort: usecase::capability_exec::ReasoningEffort, sandbox: &GrokSandbox, resume_id: Option<&usecase::provider_session::ProviderSessionId>, prompt: &str) -> Vec<std::ffi::OsString> | 🟡 | 🔵 |
+| infrastructure::ref_verify::process_runner::build_grok_ref_verifier_args | free_function | add | fn(model: &usecase::capability_exec::ModelName, effort: usecase::capability_exec::ReasoningEffort, sandbox: &GrokSandbox, resume_id: Option<&usecase::provider_session::ProviderSessionId>, prompt: &str) -> Vec<std::ffi::OsString> | 🔵 | 🔵 |
 | infrastructure::ref_verify::process_runner::make_ref_verifier_process_runner | free_function | reference | fn(project_root: std::path::PathBuf) -> std::sync::Arc<AgentExecutionRunner> | 🔵 | 🔵 |
 
