@@ -102,6 +102,13 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(RequestScopedTrackNextTaskQueryAdapter),
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
         ));
+    let track_clear_override_service = Arc::new(
+        usecase::track_lifecycle::track_clear_override::TrackClearOverrideInteractor::new(
+            Arc::new(RequestScopedTrackOverrideClearAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ),
+    );
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -134,6 +141,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         track_add_task_service,
         track_next_task_service,
         track_transition_service,
+        track_clear_override_service,
     )
 }
 
@@ -179,6 +187,14 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             catalogue_spec_signals_resolver,
         ),
     );
+    let spec_element_hash_service = Arc::new(
+        usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashInteractor::new(
+            Arc::new(
+                infrastructure::track_lifecycle::tddd::spec_element_hash::SystemTrackSpecElementHashAdapter,
+            ),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ),
+    );
     let catalogue_lint_active_operation = Arc::new(
         infrastructure::track_lifecycle::tddd::catalogue_lint_active::SystemTrackCatalogueLintActiveAdapter,
     );
@@ -210,6 +226,7 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
         baseline_graph_service,
         catalogue_impl_signals_service,
         catalogue_spec_signals_service,
+        spec_element_hash_service,
         catalogue_lint_active_service,
         lint_service,
         contract_map_service,
@@ -307,6 +324,39 @@ impl usecase::track_lifecycle::TrackNextTaskQueryPort for RequestScopedTrackNext
         let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
         let query = usecase::task_ops::TaskQueryInteractor::new(store);
         usecase::track_lifecycle::TrackNextTaskQueryPort::next_task(&query, track_id, items_dir)
+    }
+}
+
+/// Rebuilds the existing task-operation interactor from the command's items directory
+/// for a clear-override mutation. The port remains request-scoped so the storage root
+/// is never captured in a long-lived composition object.
+struct RequestScopedTrackOverrideClearAdapter;
+
+impl usecase::track_lifecycle::TrackOverrideClearPort for RequestScopedTrackOverrideClearAdapter {
+    fn clear_override(
+        &self,
+        track_id: domain::TrackId,
+        items_dir: usecase::track_lifecycle::TrackItemsDirectory,
+    ) -> Result<usecase::task_ops::TaskOperationOutput, usecase::task_ops::TaskOperationError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let project_root = super::resolve_project_root(items_dir.as_path()).map_err(|error| {
+            usecase::task_ops::TaskOperationError::StoreFailed(error.to_string())
+        })?;
+        let store = Arc::new(FsTrackStore::new(items_dir.as_path().to_path_buf()));
+        let interactor = super::build_task_operation_interactor(
+            store,
+            super::build_branch_reader(&project_root),
+        );
+        usecase::task_ops::TaskOperationService::clear_override(
+            &interactor,
+            usecase::task_ops::ClearOverrideCommand {
+                items_dir: items_dir.as_path().to_path_buf(),
+                track_id: track_id.as_ref().to_owned(),
+            },
+        )
     }
 }
 

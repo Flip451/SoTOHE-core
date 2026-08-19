@@ -15,7 +15,7 @@
 | TrackResolveResult | enum | add | Ready, Blocked | 🟡 | 🔵 |
 | TrackSelection | enum | add | Active, Explicit | 🔵 | 🔵 |
 | TrackSpecAnchorSelection | enum | add | All, One | 🔵 | 🔵 |
-| TrackSpecElementHashResult | enum | add | Single, All | 🟡 | 🔵 |
+| TrackSpecElementHashResult | enum | add | Single, All | 🔵 | 🔵 |
 | TrackSwitchBaseResult | enum | add | Synced, SyncWarning, CheckoutFailed | 🟡 | 🔵 |
 | TrackTaskTransition | enum | add | Todo, InProgress, Done, Skipped | 🔵 | 🔵 |
 | TrackTransitionResult | enum | add | Transitioned, Rejected | 🔵 | 🔵 |
@@ -57,7 +57,7 @@
 | TrackCatalogueImplSignalsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackCatalogueLintActiveError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackCatalogueSpecSignalsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
-| TrackClearOverrideError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackClearOverrideError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackContractMapError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackInitError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackLintError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
@@ -66,7 +66,7 @@
 | TrackResolveError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackSetCommitHashError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackSetOverrideError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
-| TrackSpecElementHashError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackSpecElementHashError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSwitchBaseError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 | TrackTaskCountsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackTransitionError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
@@ -94,7 +94,7 @@
 | TrackOverrideSetPort | secondary_port | add | fn set_override(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory, status: domain::StatusOverrideKind, reason: DiagnosticText) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
 | TrackResolutionPort | secondary_port | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🔵 | 🔵 |
 | TrackSelectionPort | secondary_port | add | fn resolve_required(&self, items_dir: &TrackItemsDirectory, selection: &TrackSelection) -> Result<domain::TrackId, DiagnosticText>, fn resolve_active(&self, workspace_root: &TrackWorkspaceRoot) -> Result<domain::TrackId, DiagnosticText>, fn resolve_views_scope(&self, workspace_root: &TrackWorkspaceRoot, selection: &TrackSelection) -> Result<TrackViewsScope, DiagnosticText> | 🔵 | 🔵 |
-| TrackSpecElementHashPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🟡 | 🔵 |
+| TrackSpecElementHashPort | secondary_port | add | fn execute(&self, track_id: domain::TrackId, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🔵 | 🔵 |
 | TrackTaskAddPort | secondary_port | add | fn add_task(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory, description: domain::NonEmptyString, section: Option<domain::NonEmptyString>, after: Option<domain::TaskId>) -> Result<TaskOperationOutput, TaskOperationError> | 🔵 | 🔵 |
 | TrackTaskCountsQueryPort | secondary_port | add | fn task_counts(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory) -> Result<TaskCountsOutput, TrackTaskCountsError> | 🔵 | 🔵 |
 | TrackTaskTransitionPort | secondary_port | add | fn transition_task(&self, track_id: domain::TrackId, items_dir: TrackItemsDirectory, task_id: domain::TaskId, transition: TrackTaskTransition) -> Result<TaskTransitionOutcome, TaskOperationError> | 🔵 | 🔵 |
@@ -115,7 +115,7 @@
 | TrackCatalogueImplSignalsService | application_service | add | fn execute(&self, command: TrackCatalogueImplSignalsCommand) -> Result<TrackCatalogueImplSignalsResult, TrackCatalogueImplSignalsError> | 🔵 | 🔵 |
 | TrackCatalogueLintActiveService | application_service | add | fn execute(&self, command: TrackCatalogueLintActiveCommand) -> Result<TrackCatalogueLintActiveResult, TrackCatalogueLintActiveError> | 🔵 | 🔵 |
 | TrackCatalogueSpecSignalsService | application_service | add | fn execute(&self, command: TrackCatalogueSpecSignalsCommand) -> Result<TrackCatalogueSpecSignalsResult, TrackCatalogueSpecSignalsError> | 🔵 | 🔵 |
-| TrackClearOverrideService | application_service | add | fn execute(&self, command: TrackClearOverrideCommand) -> Result<TrackClearOverrideResult, TrackClearOverrideError> | 🟡 | 🔵 |
+| TrackClearOverrideService | application_service | add | fn execute(&self, command: TrackClearOverrideCommand) -> Result<TrackClearOverrideResult, TrackClearOverrideError> | 🔵 | 🔵 |
 | TrackContractMapService | application_service | add | fn execute(&self, command: TrackContractMapCommand) -> Result<TrackContractMapResult, TrackContractMapError> | 🔵 | 🔵 |
 | TrackInitService | application_service | add | fn execute(&self, command: TrackInitCommand) -> Result<TrackInitResult, TrackInitError> | 🔵 | 🔵 |
 | TrackLintService | application_service | add | fn execute(&self, command: TrackLintCommand) -> Result<TrackLintResult, TrackLintError> | 🔵 | 🔵 |
@@ -124,7 +124,7 @@
 | TrackResolveService | application_service | add | fn execute(&self, command: TrackResolveCommand) -> Result<TrackResolveResult, TrackResolveError> | 🟡 | 🔵 |
 | TrackSetCommitHashService | application_service | add | fn execute(&self, command: TrackSetCommitHashCommand) -> Result<TrackSetCommitHashResult, TrackSetCommitHashError> | 🟡 | 🔵 |
 | TrackSetOverrideService | application_service | add | fn execute(&self, command: TrackSetOverrideCommand) -> Result<TrackSetOverrideResult, TrackSetOverrideError> | 🟡 | 🔵 |
-| TrackSpecElementHashService | application_service | add | fn execute(&self, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🟡 | 🔵 |
+| TrackSpecElementHashService | application_service | add | fn execute(&self, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🔵 | 🔵 |
 | TrackSwitchBaseService | application_service | add | fn execute(&self, command: TrackSwitchBaseCommand) -> Result<TrackSwitchBaseResult, TrackSwitchBaseError> | 🟡 | 🔵 |
 | TrackTaskCountsService | application_service | add | fn execute(&self, command: TrackTaskCountsCommand) -> Result<TrackTaskCountsResult, TrackTaskCountsError> | 🟡 | 🔵 |
 | TrackTransitionService | application_service | add | fn execute(&self, command: TrackTransitionCommand) -> Result<TrackTransitionResult, TrackTransitionError> | 🔵 | 🔵 |
@@ -147,7 +147,7 @@
 | TrackCatalogueImplSignalsInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackCatalogueLintActiveInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackCatalogueSpecSignalsInteractor | interactor | add | — | 🔵 | 🔵 |
-| TrackClearOverrideInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackClearOverrideInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackContractMapInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackInitInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackLintInteractor | interactor | add | — | 🔵 | 🔵 |
@@ -156,7 +156,7 @@
 | TrackResolveInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackSetCommitHashInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackSetOverrideInteractor | interactor | add | — | 🟡 | 🔵 |
-| TrackSpecElementHashInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackSpecElementHashInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSwitchBaseInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackTaskCountsInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackTransitionInteractor | interactor | add | — | 🔵 | 🔵 |
@@ -180,7 +180,7 @@
 | TrackCatalogueImplSignalsResult | dto | add | — | 🔵 | 🔵 |
 | TrackCatalogueLintLayerResult | dto | add | — | 🔵 | 🔵 |
 | TrackCatalogueSpecSignalsResult | dto | add | — | 🔵 | 🔵 |
-| TrackClearOverrideResult | dto | add | — | 🟡 | 🔵 |
+| TrackClearOverrideResult | dto | add | — | 🔵 | 🔵 |
 | TrackContractMapResult | dto | add | — | 🔵 | 🔵 |
 | TrackInitResult | dto | add | — | 🔵 | 🔵 |
 | TrackLintResult | dto | add | — | 🔵 | 🔵 |
@@ -211,7 +211,7 @@
 | TrackResolveCommand | command | add | — | 🟡 | 🔵 |
 | TrackSetCommitHashCommand | command | add | — | 🟡 | 🔵 |
 | TrackSetOverrideCommand | command | add | — | 🟡 | 🔵 |
-| TrackSpecElementHashCommand | command | add | — | 🟡 | 🔵 |
+| TrackSpecElementHashCommand | command | add | — | 🔵 | 🔵 |
 | TrackSwitchBaseCommand | command | add | — | 🟡 | 🔵 |
 | TrackTaskCountsCommand | command | add | — | 🔵 | 🔵 |
 | TrackTransitionCommand | command | add | — | 🔵 | 🔵 |

@@ -22,6 +22,7 @@ use usecase::track_lifecycle::track_branch_create::{
 use usecase::track_lifecycle::track_branch_switch::{
     TrackBranchSwitchCommand, TrackBranchSwitchError, TrackBranchSwitchService,
 };
+use usecase::track_lifecycle::track_clear_override::TrackClearOverrideService;
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
 use usecase::track_lifecycle::track_next_task::TrackNextTaskService;
 use usecase::track_lifecycle::track_transition::TrackTransitionService;
@@ -32,6 +33,7 @@ use usecase::track_lifecycle::{
 use usecase::track_service::{TrackCommandOutput, TrackService};
 
 use crate::render::CommandOutcome;
+use crate::track_clear_override::render_track_clear_override_outcome;
 use crate::track_next_task::render_track_next_task_outcome;
 use crate::track_transition::render_track_transition_outcome;
 
@@ -261,6 +263,7 @@ pub struct TrackDriver {
     base_merge_service: Arc<dyn BaseMergeService>,
     track_add_task_service: Arc<dyn TrackAddTaskService>,
     track_next_task_service: Arc<dyn TrackNextTaskService>,
+    track_clear_override_service: Arc<dyn TrackClearOverrideService>,
 }
 
 impl TrackDriver {
@@ -277,6 +280,7 @@ impl TrackDriver {
         track_add_task_service: Arc<dyn TrackAddTaskService>,
         track_next_task_service: Arc<dyn TrackNextTaskService>,
         track_transition_service: Arc<dyn TrackTransitionService>,
+        track_clear_override_service: Arc<dyn TrackClearOverrideService>,
     ) -> Self {
         Self {
             track_init_service,
@@ -289,6 +293,7 @@ impl TrackDriver {
             base_merge_service,
             track_add_task_service,
             track_next_task_service,
+            track_clear_override_service,
         }
     }
 
@@ -358,7 +363,11 @@ impl TrackDriver {
                 )
             }
             TrackInput::ClearOverride { items_dir, track_id } => {
-                service_output_to_outcome(self.service.clear_override(items_dir, track_id))
+                render_track_clear_override_outcome(
+                    &*self.track_clear_override_service,
+                    items_dir,
+                    track_id,
+                )
             }
             TrackInput::NextTask { items_dir, track_id } => {
                 render_track_next_task_outcome(&*self.track_next_task_service, items_dir, track_id)
@@ -694,6 +703,9 @@ mod tests {
         BaseMergeContextError, BaseMergeContextPort, BaseMergeGitError, BaseMergeGitPort,
         BaselineReplacementError, PostMergeCleanupError, ViewsRegenerationError,
     };
+    use usecase::track_lifecycle::track_clear_override::{
+        TrackClearOverrideCommand, TrackClearOverrideError, TrackClearOverrideResult,
+    };
     use usecase::track_lifecycle::track_next_task::{
         TrackNextTaskCommand, TrackNextTaskError, TrackNextTaskResult,
     };
@@ -884,6 +896,8 @@ mod tests {
 
     struct UnusedTrackTransitionService;
 
+    struct UnusedTrackClearOverrideService;
+
     impl TrackNextTaskService for UnusedTrackNextTaskService {
         fn execute(
             &self,
@@ -898,6 +912,15 @@ mod tests {
             &self,
             _: TrackTransitionCommand,
         ) -> Result<TrackTransitionResult, TrackTransitionError> {
+            unreachable!()
+        }
+    }
+
+    impl TrackClearOverrideService for UnusedTrackClearOverrideService {
+        fn execute(
+            &self,
+            _: TrackClearOverrideCommand,
+        ) -> Result<TrackClearOverrideResult, TrackClearOverrideError> {
             unreachable!()
         }
     }
@@ -1075,6 +1098,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         )
     }
 
@@ -1095,6 +1119,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1128,6 +1153,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1156,6 +1182,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1194,6 +1221,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1224,6 +1252,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1256,6 +1285,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1296,6 +1326,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             service.clone(),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1334,6 +1365,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             service,
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1364,6 +1396,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             service,
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1395,6 +1428,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1426,6 +1460,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1464,6 +1499,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1493,6 +1529,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1522,6 +1559,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1550,6 +1588,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1582,6 +1621,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1612,6 +1652,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1641,6 +1682,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1669,6 +1711,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1701,6 +1744,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1733,6 +1777,7 @@ mod tests {
             Arc::new(UnusedTrackAddTaskService),
             Arc::new(UnusedTrackNextTaskService),
             Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackClearOverrideService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {

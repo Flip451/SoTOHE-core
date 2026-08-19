@@ -26,14 +26,19 @@ use usecase::track_lifecycle::tddd::contract_map::TrackContractMapService;
 use usecase::track_lifecycle::tddd::lint::{
     TrackLintCommand, TrackLintError, TrackLintResult, TrackLintRulesFile, TrackLintService,
 };
+use usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashService;
 use usecase::track_lifecycle::{
     TrackItemsDirectory, TrackLayerFilter, TrackLayerSelection, TrackLifecycleIdInput,
-    TrackSelection, TrackSourceWorkspace, TrackWorkspaceRoot,
+    TrackSelection, TrackSourceWorkspace, TrackSpecAnchorSelection, TrackWorkspaceRoot,
 };
 
 use crate::adr_baseline::TrackIdInput;
 use crate::render::CommandOutcome;
 use crate::track_resolution::TrackResolutionDiagnostic;
+use crate::track_spec_element_hash::{
+    render_track_spec_element_hash_result, spec_element_hash_input_to_command,
+    track_spec_element_hash_error_to_outcome,
+};
 
 /// Validated `track/items` input for a TDDD command.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -229,6 +234,36 @@ pub struct TrackTdddCatalogueSpecSignalsInput {
     pub layer: Option<TrackLayerInput>,
 }
 
+/// Validated spec-anchor input for a TDDD command.
+pub struct TrackSpecAnchorInput {
+    value: usecase::SpecElementId,
+}
+
+impl TrackSpecAnchorInput {
+    /// Validates and wraps a spec-element anchor.
+    pub fn try_new(value: String) -> Result<Self, TrackResolutionDiagnostic> {
+        usecase::SpecElementId::try_new(value.clone()).map(|value| Self { value }).map_err(
+            |error| {
+                TrackResolutionDiagnostic::new(format!("invalid spec anchor '{value}': {error}"))
+            },
+        )
+    }
+
+    pub(crate) fn into_usecase(self) -> TrackSpecAnchorSelection {
+        TrackSpecAnchorSelection::One(self.value)
+    }
+}
+
+/// Typed primary-adapter input for spec-element-hash lookup.
+pub struct TrackTdddSpecElementHashInput {
+    /// Optional explicit track id; omitted values select the active track.
+    pub track_id: Option<TrackIdInput>,
+    /// Directory containing the track items.
+    pub items_dir: TrackItemsDirectoryInput,
+    /// Optional single spec anchor; omitted values select all anchors.
+    pub anchor: Option<TrackSpecAnchorInput>,
+}
+
 /// Validated lint-rules-file input for a TDDD command.
 pub struct TrackLintRulesFileInput {
     value: PathBuf,
@@ -287,6 +322,7 @@ pub struct TrackTdddDriver {
     baseline_graph: Arc<dyn TrackBaselineGraphService>,
     catalogue_impl_signals: Arc<dyn TrackCatalogueImplSignalsService>,
     catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
+    spec_element_hash: Arc<dyn TrackSpecElementHashService>,
     catalogue_lint_active: Arc<dyn TrackCatalogueLintActiveService>,
     lint: Arc<dyn TrackLintService>,
     contract_map: Arc<dyn TrackContractMapService>,
@@ -294,12 +330,14 @@ pub struct TrackTdddDriver {
 
 impl TrackTdddDriver {
     /// Creates a baseline-capture driver from its application service.
+    #[allow(clippy::too_many_arguments)]
     #[must_use]
     pub fn new(
         baseline_capture: Arc<dyn TrackBaselineCaptureService>,
         baseline_graph: Arc<dyn TrackBaselineGraphService>,
         catalogue_impl_signals: Arc<dyn TrackCatalogueImplSignalsService>,
         catalogue_spec_signals: Arc<dyn TrackCatalogueSpecSignalsService>,
+        spec_element_hash: Arc<dyn TrackSpecElementHashService>,
         catalogue_lint_active: Arc<dyn TrackCatalogueLintActiveService>,
         lint: Arc<dyn TrackLintService>,
         contract_map: Arc<dyn TrackContractMapService>,
@@ -309,6 +347,7 @@ impl TrackTdddDriver {
             baseline_graph,
             catalogue_impl_signals,
             catalogue_spec_signals,
+            spec_element_hash,
             catalogue_lint_active,
             lint,
             contract_map,
@@ -367,6 +406,18 @@ impl TrackTdddDriver {
             .execute(command)
             .map(|_| CommandOutcome::success(None))
             .unwrap_or_else(catalogue_spec_signals_error_to_outcome)
+    }
+
+    /// Executes the spec-element-hash input boundary.
+    pub fn handle_spec_element_hash(&self, input: TrackTdddSpecElementHashInput) -> CommandOutcome {
+        let command = match spec_element_hash_input_to_command(input) {
+            Ok(command) => command,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        self.spec_element_hash
+            .execute(command)
+            .map(render_track_spec_element_hash_result)
+            .unwrap_or_else(track_spec_element_hash_error_to_outcome)
     }
 
     /// Executes the active-track catalogue-lint input boundary.
@@ -646,7 +697,6 @@ fn render_lint_result(result: TrackLintResult) -> CommandOutcome {
 fn lint_error_to_outcome(error: TrackLintError) -> CommandOutcome {
     CommandOutcome::failure(Some(error.to_string()))
 }
-
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::panic, clippy::unreachable, clippy::unwrap_used)]
 mod tests {
@@ -660,6 +710,7 @@ mod tests {
     use usecase::track_lifecycle::tddd::contract_map::{
         TrackContractMapCommand, TrackContractMapError,
     };
+    use usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashCommand;
     use usecase::track_lifecycle::{TrackRenderedLayerCount, TrackWrittenFileCount};
 
     #[test]
@@ -712,6 +763,20 @@ mod tests {
         ) -> Result<
             usecase::track_lifecycle::tddd::catalogue_spec_signals::TrackCatalogueSpecSignalsResult,
             TrackCatalogueSpecSignalsError,
+        > {
+            unreachable!()
+        }
+    }
+
+    struct UnusedSpecElementHashService;
+
+    impl TrackSpecElementHashService for UnusedSpecElementHashService {
+        fn execute(
+            &self,
+            _: TrackSpecElementHashCommand,
+        ) -> Result<
+            usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult,
+            usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashError,
         > {
             unreachable!()
         }
@@ -823,6 +888,37 @@ mod tests {
         }
     }
 
+    struct RecordingSpecElementHashService {
+        commands: Mutex<Vec<TrackSpecElementHashCommand>>,
+        result: Result<
+            usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult,
+            String,
+        >,
+    }
+
+    impl TrackSpecElementHashService for RecordingSpecElementHashService {
+        fn execute(
+            &self,
+            command: TrackSpecElementHashCommand,
+        ) -> Result<
+            usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult,
+            usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashError,
+        > {
+            self.commands.lock().expect("command lock is available").push(command);
+            match &self.result {
+                Ok(usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult::Single(hash)) => {
+                    Ok(usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult::Single(hash.clone()))
+                }
+                Ok(usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult::All(hashes)) => {
+                    Ok(usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult::All(hashes.clone()))
+                }
+                Err(error) => Err(usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+            }
+        }
+    }
+
     struct RecordingCatalogueLintActiveService {
         commands: Mutex<Vec<TrackCatalogueLintActiveCommand>>,
         error: Option<String>,
@@ -913,6 +1009,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -953,6 +1050,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -983,6 +1081,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1056,6 +1155,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1101,6 +1201,7 @@ mod tests {
             service.clone(),
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1132,6 +1233,7 @@ mod tests {
             service,
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1165,6 +1267,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             service.clone(),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1216,6 +1319,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             service.clone(),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1246,6 +1350,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             service,
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1281,6 +1386,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             service.clone(),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1317,6 +1423,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             service.clone(),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1348,6 +1455,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             service,
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1357,6 +1465,73 @@ mod tests {
 
         assert_eq!(outcome.stderr.as_deref(), Some("catalogue spec signals failed"));
         assert_eq!(outcome.exit_code, 1);
+    }
+
+    fn spec_element_hash_input() -> TrackTdddSpecElementHashInput {
+        TrackTdddSpecElementHashInput {
+            track_id: Some("hash-track".parse().expect("track id is valid")),
+            items_dir: TrackItemsDirectoryInput::try_new(PathBuf::from("workspace/track/items"))
+                .expect("items directory is valid"),
+            anchor: Some(
+                TrackSpecAnchorInput::try_new("GL-01".to_owned()).expect("spec anchor is valid"),
+            ),
+        }
+    }
+
+    fn spec_element_hash_driver(service: Arc<RecordingSpecElementHashService>) -> TrackTdddDriver {
+        TrackTdddDriver::new(
+            Arc::new(RecordingService {
+                commands: Mutex::new(Vec::new()),
+                result: Ok(TrackBaselineCaptureResult { layers: vec![] }),
+            }),
+            Arc::new(UnusedBaselineGraphService),
+            Arc::new(UnusedCatalogueImplSignalsService),
+            Arc::new(UnusedCatalogueSpecSignalsService),
+            service,
+            Arc::new(UnusedCatalogueLintActiveService),
+            Arc::new(UnusedLintService),
+            Arc::new(UnusedTrackContractMapService),
+        )
+    }
+
+    #[test]
+    fn test_track_spec_anchor_input_try_new_rejects_malformed_anchor() {
+        let error = match TrackSpecAnchorInput::try_new("not-an-anchor".to_owned()) {
+            Ok(_) => panic!("malformed spec anchor must be rejected"),
+            Err(error) => error,
+        };
+        assert!(error.to_string().contains("invalid spec anchor"));
+    }
+
+    #[test]
+    fn test_track_tddd_driver_spec_element_hash_preserves_single_hash_output() {
+        let service = Arc::new(RecordingSpecElementHashService {
+            commands: Mutex::new(Vec::new()),
+            result: Ok(
+                usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashResult::Single(
+                    domain::ContentHash::from_bytes([7; 32]),
+                ),
+            ),
+        });
+        let driver = spec_element_hash_driver(service.clone());
+
+        let outcome = driver.handle_spec_element_hash(spec_element_hash_input());
+
+        assert_eq!(outcome.exit_code, 0);
+        let expected = "07".repeat(32);
+        assert_eq!(outcome.stdout.as_deref(), Some(expected.as_str()));
+        let commands = service.commands.lock().expect("command lock is available");
+        assert_eq!(commands.len(), 1);
+        let command = commands.first().expect("one command is recorded");
+        assert!(matches!(
+            &command.track,
+            TrackSelection::Explicit(track_id) if track_id.as_ref() == "hash-track"
+        ));
+        assert_eq!(command.items_dir.as_path(), std::path::Path::new("workspace/track/items"));
+        assert!(matches!(
+            &command.anchor,
+            TrackSpecAnchorSelection::One(anchor) if anchor.as_ref() == "GL-01"
+        ));
     }
 
     fn catalogue_lint_active_input() -> TrackTdddCatalogueLintActiveInput {
@@ -1384,6 +1559,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             service.clone(),
             Arc::new(UnusedLintService),
             Arc::new(UnusedTrackContractMapService),
@@ -1449,6 +1625,7 @@ mod tests {
             Arc::new(UnusedBaselineGraphService),
             Arc::new(UnusedCatalogueImplSignalsService),
             Arc::new(UnusedCatalogueSpecSignalsService),
+            Arc::new(UnusedSpecElementHashService),
             Arc::new(UnusedCatalogueLintActiveService),
             lint,
             Arc::new(UnusedTrackContractMapService),

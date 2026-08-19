@@ -251,46 +251,6 @@ impl TrackCompositionRoot {
         }
     }
 
-    /// Emit canonical SHA-256 hashes for spec.json elements.
-    ///
-    /// READ operation.
-    ///
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_spec_element_hash(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-        anchor: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        let resolved_id = super::resolve_track_id(track_id, &items_dir)?;
-
-        super::validate_track_id_str(&resolved_id)?;
-
-        let hashes = infrastructure::track::spec_element_hash::compute_spec_element_hashes(
-            items_dir,
-            &resolved_id,
-            anchor.as_deref(),
-        )
-        .map_err(|e| CompositionError::Infrastructure(e.0))?;
-
-        let output = match anchor {
-            Some(ref anchor_id) => {
-                if let Some(hash) = hashes.get(anchor_id) {
-                    hash.clone()
-                } else {
-                    return Err(CompositionError::WiringFailed(format!(
-                        "anchor '{anchor_id}' not found in spec.json"
-                    )));
-                }
-            }
-            None => serde_json::to_string_pretty(&hashes)
-                .map_err(|e| CompositionError::Infrastructure(format!("JSON encode error: {e}")))?,
-        };
-
-        Ok(CommandOutcome::success(Some(output)))
-    }
-
     /// Capture the current TypeGraph as a baseline snapshot for TDDD reverse signal filtering.
     ///
     /// WRITE operation: the current branch must match `track/<track_id>`.

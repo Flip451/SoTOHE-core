@@ -1,8 +1,8 @@
 {
   "baseline_hash": "922aefbfd35307cd343f42b28ff9230e7c71b8823593c3554950f93e8d97fd02",
   "declaration_hash": "cdc5689c8b527be0647b6df57e174cfa60f5f1299f08328dfa70cea82bcb7fe7",
-  "generated_at": "2026-08-19T04:47:07Z",
-  "head_commit": "95784f92f7970ee110a4b8aee64599a70ea2cd68",
+  "generated_at": "2026-08-19T08:48:49Z",
+  "head_commit": "84cc2b4f4565b483e1f5440970c3519dc8a6f190",
   "schema_version": 4,
   "signals": [
     {
@@ -130,12 +130,12 @@
       "type_name": "SystemTrackResolutionAdapter"
     },
     {
-      "found_type": false,
-      "kind_tag": "secondary_adapter",
-      "missing_items": [
+      "found_items": [
         "usecase::track_lifecycle::tddd::spec_element_hash::TrackSpecElementHashPort"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
       "type_name": "SystemTrackSpecElementHashAdapter"
     },
     {

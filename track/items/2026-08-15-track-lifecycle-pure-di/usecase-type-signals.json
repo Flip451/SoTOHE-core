@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
   "declaration_hash": "333f8be42d6dc99d2fbfb9ddfd4eabf49d1cfc986810eb144d59619973cf9c86",
-  "generated_at": "2026-08-19T04:47:03Z",
-  "head_commit": "95784f92f7970ee110a4b8aee64599a70ea2cd68",
+  "generated_at": "2026-08-19T08:48:46Z",
+  "head_commit": "84cc2b4f4565b483e1f5440970c3519dc8a6f190",
   "schema_version": 4,
   "signals": [
     {
@@ -562,35 +562,35 @@
       "type_name": "TrackClearOverrideCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackClearOverrideError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackClearOverrideService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackClearOverrideInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackClearOverrideResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackClearOverrideService"
     },
     {
@@ -1116,47 +1116,47 @@
       "type_name": "TrackSpecAnchorSelection"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSpecElementHashCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackSpecElementHashError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackSpecElementHashService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackSpecElementHashInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSpecElementHashPort"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSpecElementHashResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSpecElementHashService"
     },
     {

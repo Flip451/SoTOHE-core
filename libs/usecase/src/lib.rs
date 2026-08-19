@@ -8,7 +8,7 @@
 pub use domain::tddd::LayerId;
 pub use domain::tddd::test_obligation::ids::DiagnosticMessage;
 pub use domain::tddd::test_obligation::verdict::DetectionRatePercent;
-pub use domain::{NonEmptyString, TaskId, Timestamp, TrackId, ValidationError};
+pub use domain::{NonEmptyString, SpecElementId, TaskId, Timestamp, TrackId, ValidationError};
 
 pub mod adr_baseline;
 pub mod arch;

@@ -425,4 +425,50 @@ mod tests {
             "metadata.json must not contain override status after clear-override:\n{content}"
         );
     }
+
+    #[test]
+    fn test_track_clear_override_call_site_preserves_cli_contract_across_migration() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (_root, items_dir, track_dir) = setup_test_track_branchless(tmp.path(), "test-track");
+        execute_set_override(
+            items_dir.clone(),
+            "test-track".to_string(),
+            "blocked".to_string(),
+            "initial blocker".to_string(),
+        )
+        .expect("set-override must succeed before clear-override test");
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = "test-track".to_string();
+        let cli_exit = execute_clear_override(argv_items_dir.clone(), argv_track_id.clone())
+            .expect("legacy CLI argv must remain accepted");
+        assert_eq!(cli_exit, ExitCode::from(0));
+        assert_eq!(argv_items_dir, tmp.path().join("track/items"));
+        assert_eq!(argv_track_id, "test-track");
+
+        execute_set_override(
+            items_dir.clone(),
+            "test-track".to_string(),
+            "blocked".to_string(),
+            "initial blocker".to_string(),
+        )
+        .expect("override must be restored before outcome capture");
+        let outcome =
+            TrackCompositionRoot::new().track_driver().handle(TrackInput::ClearOverride {
+                items_dir: items_dir.clone(),
+                track_id: Some("test-track".to_string()),
+            });
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            outcome.stdout.as_deref().is_some_and(|stdout| stdout.contains("Override cleared")),
+            "stdout must keep the cleared-override summary: {:?}",
+            outcome.stdout
+        );
+        assert_eq!(outcome.stderr, None, "successful clear-override must not write stderr");
+        let content = fs::read_to_string(track_dir.join("metadata.json")).unwrap();
+        assert!(
+            !content.contains("\"blocked\""),
+            "metadata.json must not contain override status after clear-override:\n{content}"
+        );
+    }
 }

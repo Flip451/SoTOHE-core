@@ -20,7 +20,7 @@
 | TrackLintRulesFileInput | dto | add | — | 🔵 | 🔵 |
 | TrackResolutionDiagnostic | dto | add | — | 🔵 | 🔵 |
 | TrackSourceWorkspaceInput | dto | add | — | 🔵 | 🔵 |
-| TrackSpecAnchorInput | dto | add | — | 🟡 | 🔵 |
+| TrackSpecAnchorInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddBaselineCaptureInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddBaselineGraphInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddCatalogueImplSignalsInput | dto | add | — | 🔵 | 🔵 |
@@ -28,7 +28,7 @@
 | TrackTdddCatalogueSpecSignalsInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddContractMapInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddLintInput | dto | add | — | 🔵 | 🔵 |
-| TrackTdddSpecElementHashInput | dto | add | — | 🟡 | 🔵 |
+| TrackTdddSpecElementHashInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddTypeGraphInput | dto | add | — | 🟡 | 🔵 |
 | TrackTdddTypeSignalsInput | dto | add | — | 🟡 | 🔵 |
 | TrackTypeGraphClusterDepthInput | dto | add | — | 🟡 | 🔵 |
