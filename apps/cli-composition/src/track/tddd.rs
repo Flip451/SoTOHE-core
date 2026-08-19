@@ -27,59 +27,33 @@ impl TrackCompositionRoot {
         workspace_root: PathBuf,
         layer: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
-        use domain::TrackBranch;
-        use infrastructure::git_cli::SystemGitRepo;
-        use infrastructure::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter;
-        use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
-        use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
-        use usecase::type_signals::{
-            TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService,
+        use cli_driver::adr_baseline::TrackIdInput;
+        use cli_driver::track_tddd::{
+            TrackLayerInput, TrackTdddTypeSignalsInput, TrackWorkspaceRootInput,
         };
-        use usecase::{LayerId, TrackId};
 
-        let items_dir = workspace_root.join("track").join("items");
-        let resolved_id = super::resolve_track_id_for_write(track_id, &items_dir)?;
-
-        // Resolve the current git branch for the CN-07 guard (TypeSignalsInteractor requires it).
-        let branch = SystemGitRepo::discover_from(&workspace_root)
-            .map_err(|e| CompositionError::AdapterInit(format!("cannot discover git repo: {e}")))?
-            .current_branch()
-            .map_err(|e| {
-                CompositionError::Infrastructure(format!("cannot read current branch: {e}"))
-            })?
-            .ok_or_else(|| {
-                CompositionError::Infrastructure(
-                    "cannot read current branch: git rev-parse --abbrev-ref HEAD returned non-zero"
-                        .to_owned(),
-                )
+        let track_id =
+            track_id.map(|value| value.parse::<TrackIdInput>()).transpose().map_err(|error| {
+                CompositionError::WiringFailed(format!("invalid track id: {error}"))
             })?;
-
-        let typed_track_id = TrackId::try_new(resolved_id.clone()).map_err(|error| {
-            CompositionError::WiringFailed(format!("invalid track ID '{resolved_id}': {error}"))
-        })?;
-        let typed_branch = TrackBranch::try_new(branch.clone()).map_err(|error| {
-            CompositionError::WiringFailed(format!("invalid track branch '{branch}': {error}"))
-        })?;
-        let typed_layer = layer.map(LayerId::try_new).transpose().map_err(|error| {
-            CompositionError::WiringFailed(format!("invalid layer id: {error}"))
-        })?;
-
-        let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
-        let executor = Arc::new(TypeSignalsExecutorAdapter::new());
-        let feature_declaration = Arc::new(FsTdddFeatureDeclarationAdapter::new());
-        let interactor = TypeSignalsInteractor::new(layer_bindings, executor, feature_declaration);
-
-        interactor
-            .run(TypeSignalsRequest {
-                items_dir,
-                track_id: typed_track_id,
-                branch: typed_branch,
-                workspace_root,
-                layer: typed_layer,
-            })
-            .map_err(|e| CompositionError::Usecase(e.to_string()))?;
-
-        Ok(CommandOutcome::success(None))
+        let workspace_root = TrackWorkspaceRootInput::try_from(workspace_root)
+            .map_err(CompositionError::WiringFailed)?;
+        let layer = layer
+            .map(TrackLayerInput::try_from)
+            .transpose()
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let outcome = self.track_tddd_driver().handle_type_signals(TrackTdddTypeSignalsInput {
+            track_id,
+            workspace_root,
+            layer,
+        });
+        if outcome.exit_code == 0 {
+            Ok(outcome)
+        } else {
+            Err(CompositionError::Usecase(
+                outcome.stderr.unwrap_or_else(|| "track type-signals failed".to_owned()),
+            ))
+        }
     }
 
     /// Render a mermaid type graph from rustdoc schema export.

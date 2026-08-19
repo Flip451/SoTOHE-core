@@ -115,6 +115,11 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
         ),
     );
+    let track_set_commit_hash_service = Arc::new(
+        usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashInteractor::new(
+            Arc::new(infrastructure::track::GitTrackCommitHashAdapter::new()),
+        ),
+    );
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -149,6 +154,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         track_transition_service,
         track_set_override_service,
         track_clear_override_service,
+        track_set_commit_hash_service,
     )
 }
 
@@ -228,6 +234,13 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
             contract_map_operation,
             contract_map_resolver,
         ));
+    let type_signals_service =
+        Arc::new(usecase::track_lifecycle::tddd::type_signals::TrackTypeSignalsInteractor::new(
+            Arc::new(
+                infrastructure::track_lifecycle::tddd::type_signals::SystemTrackTypeSignalsAdapter,
+            ),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
     cli_driver::track_tddd::TrackTdddDriver::new(
         service,
         baseline_graph_service,
@@ -237,6 +250,7 @@ pub(crate) fn build_track_tddd_driver() -> cli_driver::track_tddd::TrackTdddDriv
         catalogue_lint_active_service,
         lint_service,
         contract_map_service,
+        type_signals_service,
     )
 }
 

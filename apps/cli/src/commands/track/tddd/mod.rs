@@ -10,6 +10,7 @@ pub(crate) mod contract_map;
 pub(crate) mod graph;
 pub(crate) mod lint;
 pub(crate) mod spec_element_hash;
+pub(crate) mod type_signals;
 
 /// Emits a composition outcome to the process streams and preserves its exit code.
 pub(crate) fn emit_command_outcome<W: Write, E: Write>(

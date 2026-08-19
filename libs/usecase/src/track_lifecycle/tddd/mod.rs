@@ -8,6 +8,7 @@ pub mod catalogue_spec_signals;
 pub mod contract_map;
 pub mod lint;
 pub mod spec_element_hash;
+pub mod type_signals;
 
 use std::path::{Path, PathBuf};
 

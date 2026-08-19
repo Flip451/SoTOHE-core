@@ -1209,6 +1209,36 @@ subgraph cli_composition["cli_composition"]
 end
 subgraph cli["cli"]
   direction TB
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T20_cli_cli_TrackCommand["commands::track::TrackCommand"]
+    direction TB
+    T20_cli_cli_TrackCommand__self[TrackCommand]
+    T20_cli_cli_TrackCommand_Archive[Archive]
+    T20_cli_cli_TrackCommand_Transition[Transition]
+    T20_cli_cli_TrackCommand_Branch[Branch]
+    T20_cli_cli_TrackCommand_Resolve[Resolve]
+    T20_cli_cli_TrackCommand_Views[Views]
+    T20_cli_cli_TrackCommand_AddTask[AddTask]
+    T20_cli_cli_TrackCommand_SetOverride[SetOverride]
+    T20_cli_cli_TrackCommand_ClearOverride[ClearOverride]
+    T20_cli_cli_TrackCommand_NextTask[NextTask]
+    T20_cli_cli_TrackCommand_TaskCounts[TaskCounts]
+    T20_cli_cli_TrackCommand_TypeGraph[TypeGraph]
+    T20_cli_cli_TrackCommand_TypeSignals[TypeSignals]
+    T20_cli_cli_TrackCommand_BaselineGraph[BaselineGraph]
+    T20_cli_cli_TrackCommand_ContractMap[ContractMap]
+    T20_cli_cli_TrackCommand_SpecElementHash[SpecElementHash]
+    T20_cli_cli_TrackCommand_BaselineCapture[BaselineCapture]
+    T20_cli_cli_TrackCommand_FixpointResolve[FixpointResolve]
+    T20_cli_cli_TrackCommand_SetCommitHash[SetCommitHash]
+    T20_cli_cli_TrackCommand_Lint[Lint]
+    T20_cli_cli_TrackCommand_CatalogueImplSignals[CatalogueImplSignals]
+    T20_cli_cli_TrackCommand_SwitchBase[SwitchBase]
+    T20_cli_cli_TrackCommand_MergeBase[MergeBase]
+  end
+  F70_cli_cli_cli__commands__track__tddd__type_signals__execute_type_signals[[execute_type_signals]]
+  end
 end
 T35_usecase_usecase_TaskQueryInteractor_new --> T35_usecase_usecase_TaskQueryInteractor__self
 T31_usecase_usecase_ProcessExitCode_new --> T31_usecase_usecase_ProcessExitCode__self
@@ -2179,4 +2209,29 @@ class T52_cli_composition_cli_composition_TrackCompositionRoot_track_driver meth
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_tddd_driver method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot_track_resolution_driver method_node
 class T52_cli_composition_cli_composition_TrackCompositionRoot__self composition_root
+class T20_cli_cli_TrackCommand_Archive variant_node
+class T20_cli_cli_TrackCommand_Transition variant_node
+class T20_cli_cli_TrackCommand_Branch variant_node
+class T20_cli_cli_TrackCommand_Resolve variant_node
+class T20_cli_cli_TrackCommand_Views variant_node
+class T20_cli_cli_TrackCommand_AddTask variant_node
+class T20_cli_cli_TrackCommand_SetOverride variant_node
+class T20_cli_cli_TrackCommand_ClearOverride variant_node
+class T20_cli_cli_TrackCommand_NextTask variant_node
+class T20_cli_cli_TrackCommand_TaskCounts variant_node
+class T20_cli_cli_TrackCommand_TypeGraph variant_node
+class T20_cli_cli_TrackCommand_TypeSignals variant_node
+class T20_cli_cli_TrackCommand_BaselineGraph variant_node
+class T20_cli_cli_TrackCommand_ContractMap variant_node
+class T20_cli_cli_TrackCommand_SpecElementHash variant_node
+class T20_cli_cli_TrackCommand_BaselineCapture variant_node
+class T20_cli_cli_TrackCommand_FixpointResolve variant_node
+class T20_cli_cli_TrackCommand_SetCommitHash variant_node
+class T20_cli_cli_TrackCommand_Lint variant_node
+class T20_cli_cli_TrackCommand_CatalogueImplSignals variant_node
+class T20_cli_cli_TrackCommand_SwitchBase variant_node
+class T20_cli_cli_TrackCommand_MergeBase variant_node
+class T20_cli_cli_TrackCommand__self dto
+class F70_cli_cli_cli__commands__track__tddd__type_signals__execute_type_signals free_function
+class F70_cli_cli_cli__commands__track__tddd__type_signals__execute_type_signals function_node
 ```

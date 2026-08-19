@@ -134,6 +134,9 @@ fn dispatch_track_cmd_with_dependencies(
                 )
             })
         }
+        TrackCommand::TypeSignals { track_id, workspace_root, layer } => {
+            tddd::type_signals::execute_type_signals(track_id, workspace_root, layer)
+        }
         TrackCommand::BaselineGraph { items_dir, track_id, workspace_root, layers } => {
             let resolved = resolve_track_id_from_root_for_write(track_id, &workspace_root)
                 .map_err(|e| CliError::Message(e.to_string()));

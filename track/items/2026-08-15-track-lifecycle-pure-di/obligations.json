@@ -3155,6 +3155,34 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       }
+    },
+    {
+      "brief": "Author a logic test covering 'entry' of cli::commands::track::tddd::type_signals::execute_type_signals",
+      "declaration_hash": "92168042eb764e9a076cfdbb1aae6889ff9abdf5ae505d25080874059b1dc71e",
+      "id": {
+        "entry_key": "cli::commands::track::tddd::type_signals::execute_type_signals",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "spec_refs": [
+        {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        {
+          "element_id": "CN-01",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        }
+      ],
+      "target_entry": {
+        "entry_key": "cli::commands::track::tddd::type_signals::execute_type_signals",
+        "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/cli-types.json",
+        "section_key": "functions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      }
     }
   ],
   "track_id": "2026-08-15-track-lifecycle-pure-di"

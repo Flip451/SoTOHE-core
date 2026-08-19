@@ -156,6 +156,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1969b5bf9606a34c5e56e6932464262716b72a7c",
       "depends_on": [
         "T001"
       ],
@@ -169,7 +170,7 @@
       ],
       "description": "Implement the `TrackSetCommitHash*` boundary in `libs/usecase/src/track_lifecycle/track_set_commit_hash.rs`; integrate `TrackCommitHashPort` and `GitTrackCommitHashAdapter` through `apps/cli/src/commands/track/set_commit_hash.rs`, `apps/cli-composition/src/track/set_commit_hash.rs`, and the driver; add the before/after CLI persistence regression. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T011",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -254,7 +255,7 @@
       ],
       "description": "Implement the `TrackTypeSignals*` boundary in `libs/usecase/src/track_lifecycle/tddd/type_signals.rs`; wire its handler in `apps/cli/src/commands/track/tddd/` through the driver, composition adapter, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T021",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "979c36fa2d83ac7c026b74de0d6967f42fc448f8",
@@ -328,6 +329,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "1969b5bf9606a34c5e56e6932464262716b72a7c",
       "depends_on": [
         "T001"
       ],

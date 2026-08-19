@@ -1,8 +1,8 @@
 {
   "baseline_hash": "f80a049a51ead3f8c296d234a9293ee6422ea2945e5aa12f45cbcd7aeac48346",
   "declaration_hash": "c67873117dadadfc21928de3321deb7fda0cfefabd627d9993b2261ae567b032",
-  "generated_at": "2026-08-19T11:56:46Z",
-  "head_commit": "10df1b3e0c2d8af0fa77d3dae879bf5ad9a4da2b",
+  "generated_at": "2026-08-19T16:31:42Z",
+  "head_commit": "1969b5bf9606a34c5e56e6932464262716b72a7c",
   "schema_version": 4,
   "signals": [
     {
@@ -200,9 +200,9 @@
       "type_name": "TrackTdddTypeGraphInput"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackTdddTypeSignalsInput"
     },
     {

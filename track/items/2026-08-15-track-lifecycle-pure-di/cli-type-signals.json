@@ -1,8 +1,26 @@
 {
   "baseline_hash": "b3f1e2aa7589c41991aa2f91b56c84b460c7fbe460f9f231ed4b838dc1f237e8",
-  "declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "generated_at": "2026-08-19T11:56:47Z",
-  "head_commit": "10df1b3e0c2d8af0fa77d3dae879bf5ad9a4da2b",
+  "declaration_hash": "9f5f3b70fcf3085922da562133139db534bb58e4e1057ed4ceae313ac3091b95",
+  "generated_at": "2026-08-19T16:31:44Z",
+  "head_commit": "1969b5bf9606a34c5e56e6932464262716b72a7c",
   "schema_version": 4,
-  "signals": []
+  "signals": [
+    {
+      "found_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ],
+      "found_type": true,
+      "kind_tag": "enum",
+      "signal": "blue",
+      "type_name": "TrackCommand"
+    },
+    {
+      "found_type": true,
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "type_name": "cli::commands::track::tddd::type_signals::execute_type_signals"
+    }
+  ]
 }

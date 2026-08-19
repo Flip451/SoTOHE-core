@@ -30,7 +30,7 @@
 | TrackTdddLintInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddSpecElementHashInput | dto | add | — | 🔵 | 🔵 |
 | TrackTdddTypeGraphInput | dto | add | — | 🟡 | 🔵 |
-| TrackTdddTypeSignalsInput | dto | add | — | 🟡 | 🔵 |
+| TrackTdddTypeSignalsInput | dto | add | — | 🔵 | 🔵 |
 | TrackTypeGraphClusterDepthInput | dto | add | — | 🟡 | 🔵 |
 | TrackWorkspaceRootInput | dto | add | — | 🟡 | 🔵 |
 

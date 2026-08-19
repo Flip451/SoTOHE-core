@@ -192,6 +192,21 @@ pub enum TrackCommand {
         edges: String,
     },
 
+    /// Evaluate implementation type signals and persist each layer's signal document.
+    TypeSignals {
+        /// Track ID. When omitted, resolved from the current track branch.
+        #[arg(long)]
+        track_id: Option<String>,
+
+        /// Workspace root containing architecture-rules.json.
+        #[arg(long, default_value = ".")]
+        workspace_root: PathBuf,
+
+        /// Optional enabled layer filter.
+        #[arg(long)]
+        layer: Option<String>,
+    },
+
     /// Render the rustdoc-input baseline graph (Reality View) for a track
     /// (ADR 2026-05-22-1507-baseline-graph-renderer-rustdoc-adaptation).
     ///

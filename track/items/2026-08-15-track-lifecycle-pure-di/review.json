@@ -443,6 +443,48 @@
           "hash": "rvw1:sha256:9b7106c0a3f7ff3be30e420c01171ef13ad0529013b7e81c6e91845373b304e3",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:20:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:444bc31ca71aba507606a7ac97a61e1b5ca0c43b33d2883600d72603021e0e70",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:45:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:444bc31ca71aba507606a7ac97a61e1b5ca0c43b33d2883600d72603021e0e70",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T16:12:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b74847deda1f19d532671c1fce89f48d0c5d796e2fe76d71bc32b43b81e019db",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T16:15:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b74847deda1f19d532671c1fce89f48d0c5d796e2fe76d71bc32b43b81e019db",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T16:24:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b88de555f8ce2c4a0c38a5b6d529c1596ccf7953f34bd1d11cc8a0e67d8be357",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T16:30:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:b88de555f8ce2c4a0c38a5b6d529c1596ccf7953f34bd1d11cc8a0e67d8be357",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -716,6 +758,65 @@
           "at": "2026-08-19T11:00:48Z",
           "findings": [],
           "hash": "rvw1:sha256:37e4d72e8c72bd37a64724977ca5690dca6212ac84e4453d6e40b2f6abd2c667",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:10:55Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "Review could not be completed: the repository read tool failed before the briefing, scope policy, current diff, and scoped files could be inspected (sandbox namespace creation error).",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:c3eb029844a32eef0895bd34cddcb902f88ef147024d0723514cd4b1b3462977",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T14:13:41Z",
+          "findings": [
+            {
+              "category": "review-blocked",
+              "file": null,
+              "line": null,
+              "message": "Review remains blocked: the required read-only shell access fails before any repository content can be read, with a sandbox error (`bwrap: No permissions to create new namespace`). I therefore cannot validly inspect the required policy, briefing, current diff, or scoped files.",
+              "severity": null
+            }
+          ],
+          "hash": "rvw1:sha256:c3eb029844a32eef0895bd34cddcb902f88ef147024d0723514cd4b1b3462977",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T14:17:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c3eb029844a32eef0895bd34cddcb902f88ef147024d0723514cd4b1b3462977",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:42:48Z",
+          "findings": [
+            {
+              "category": "render leak",
+              "file": "apps/cli-composition/src/track/set_commit_hash.rs",
+              "line": 19,
+              "message": "`TrackCompositionRoot::track_set_commit_hash` still templates the user-facing `[set-commit-hash] ERROR:` / `Recovery:` CommandOutcome on `TrackIdInput` parse failure instead of only forwarding a driver-rendered outcome. That recovery copy already lives in `cli_driver::track_set_commit_hash::failure_outcome`. Keep this compatibility method as a parse-and-forward shim: map the invalid id to `CompositionError::WiringFailed` (or accept `TrackIdInput`) and leave CLI presentation to `cli_driver`.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:c3eb029844a32eef0895bd34cddcb902f88ef147024d0723514cd4b1b3462977",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T15:49:50Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e326de7f5a9826e6446f2b9c806789c984702c57701319c5a225a71771b049dd",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1101,6 +1202,27 @@
           "hash": "rvw1:sha256:b51b51e5c0c6cd5b58761e78b1888f3375b23ce751db50b5aad0a033995f4344",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:11:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:423f0932060cbd393658882e91bfa7d8109375ba413de3f43dbda1d1f5c1c4b8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:20:15Z",
+          "findings": [],
+          "hash": "rvw1:sha256:423f0932060cbd393658882e91bfa7d8109375ba413de3f43dbda1d1f5c1c4b8",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:44:13Z",
+          "findings": [],
+          "hash": "rvw1:sha256:423f0932060cbd393658882e91bfa7d8109375ba413de3f43dbda1d1f5c1c4b8",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1162,6 +1284,42 @@
           "at": "2026-08-18T12:13:19Z",
           "findings": [],
           "hash": "rvw1:sha256:1747444c1949d649d9424b2d175b0fda64edeb223dffc8b523add74ef2bbdbea",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:40:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d4fc7193100196eafe34dd93ca5bd57661d7e7f046e21c983c34bc6b986561c9",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:51:17Z",
+          "findings": [
+            {
+              "category": "capability routing mismatch",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 65,
+              "message": "`implementer` is now routed to `provider: grok` / `model: grok-4.6` / `reasoning_effort: medium` (execution_mode still `orchestrator-output`). That loader contract is satisfied — grok-4.6 is a grok model and `medium` is in grok `supported_reasoning_efforts` — but Grok dispatch is a separate fail-closed admission: `GrokCapabilityAdapter` resolves `.agents/skills/implementer/SKILL.md` and `admit_grok_capability_definition` rejects a missing `grok-sandbox` (`Grok capability definition must declare a non-empty grok-sandbox field`; ADR 2026-08-14-1225 D3/D5/D6). The implementer adapter currently declares only Codex `sandbox: workspace-write` and no `grok-sandbox`. Peer grok-routed writers (`spec-designer`, `type-designer`, `impl-planner`, `adr-editor`, `review-fix-lead`) already declare `grok-sandbox: workspace`. Codex `sandbox` is not converted. Keep the intended grok routing and add `grok-sandbox: workspace` to the implementer adapter; leaving the profile as-is makes `/track:implement` Grok subprocesses fail at preflight.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d4fc7193100196eafe34dd93ca5bd57661d7e7f046e21c983c34bc6b986561c9",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T15:52:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9308ae8f5fd54a94eeefe69bbf551f275402b3b5b77166ddf4f7a804229a584",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:53:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9308ae8f5fd54a94eeefe69bbf551f275402b3b5b77166ddf4f7a804229a584",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1759,6 +1917,20 @@
           "at": "2026-08-19T10:30:57Z",
           "findings": [],
           "hash": "rvw1:sha256:a2435e9c1ebeb0986626d16be60bd87ec5bc8bcdd2af7299f7ab527b5d49289f",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:16:34Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91dd91e1f16a6a9c9ba6bc44d41c2f3e063a6070e62c08c9aed3fd457de049e5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:54:18Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91dd91e1f16a6a9c9ba6bc44d41c2f3e063a6070e62c08c9aed3fd457de049e5",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2455,6 +2627,57 @@
           "hash": "rvw1:sha256:c965313535343054c830e413614b2f2cae90e23d2066e1bf5544f9054a30740f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:10:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cfe491635aae9c3eb11739a9d681a38d135ca99918692c0b4ed0fdd93a7f5d3f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:21:00Z",
+          "findings": [
+            {
+              "category": "test coverage gap",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/type_signals.rs",
+              "line": 74,
+              "message": "The new adapter has no happy-path infrastructure/call-site test covering the external I/O contract: layer selection, git branch resolution, persisted signal generation, decoded counts, and returned results. Existing tests cover only failure setup and symlink rejection, so regressions in the adapter’s core behavior can compile and pass review undetected.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:cfe491635aae9c3eb11739a9d681a38d135ca99918692c0b4ed0fdd93a7f5d3f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T14:26:16Z",
+          "findings": [],
+          "hash": "rvw1:sha256:256012df1ea0dd8661ca6118d2cf60568b0da608248a898e323b6b969157a19b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:41:50Z",
+          "findings": [
+            {
+              "category": "security",
+              "file": "libs/infrastructure/src/track_lifecycle/tddd/type_signals.rs",
+              "line": 50,
+              "message": "SystemTrackTypeSignalsAdapter authorizes type-signal persistence with SystemGitRepo::discover_from plus current_branch(), both of which inherit GIT_DIR and the other repository-selecting variables. That branch string is the CN-07 active-track guard, after which TypeSignalsInteractor writes <workspace>/track/items/<id>/*-type-signals.json. discover_from_isolated's docs require that a check whose verdict decides what is written under start_dir must not let GIT_DIR name a different repository; the sibling track_lifecycle/resolution_compat.rs adapter already uses discover_from_isolated plus isolated_bounded_git_output for the branch read, and the evaluator this adapter calls already isolates HEAD via isolated_bounded_git_output. As written, GIT_DIR can satisfy the guard from another repo while artifacts are written into workspace_root. Discover the repo and read the branch through the isolated git lane against workspace_root.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:256012df1ea0dd8661ca6118d2cf60568b0da608248a898e323b6b969157a19b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T15:50:31Z",
+          "findings": [],
+          "hash": "rvw1:sha256:f84a789239fe2b4a4ee6678e114fc15223d34a1120e50475cdb44b8f2d525dfb",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -2956,6 +3179,42 @@
           "at": "2026-08-19T11:55:54Z",
           "findings": [],
           "hash": "rvw1:sha256:d8d8cb5a60a2cf4e08927716a0aa3f676ebdd37367d45f7a32e41ce95f99036d",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:20:29Z",
+          "findings": [],
+          "hash": "rvw1:sha256:91b0424bb93daa1232d5c84d043076822b8282cf10ba6f0cb4a601e1837ec8e1",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:26:04Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 53,
+              "message": "The added `test_system_track_type_signals_adapter_selected_layer_persists_and_returns_counts` test changes the bound test body for the `SystemTrackTypeSignalsAdapter` CN-01 edge, but the obligation verdict/cache was not refreshed. `bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` fails with `DriftsDetected: bound test bodies changed since the verdict was frozen`, blocking the guarded commit.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:e46341ab5ce05814262706e6971b7858a2a3196ef85ed37f872bda6b9ecee86f",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T14:31:45Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e46341ab5ce05814262706e6971b7858a2a3196ef85ed37f872bda6b9ecee86f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:15:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e46341ab5ce05814262706e6971b7858a2a3196ef85ed37f872bda6b9ecee86f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3607,6 +3866,20 @@
           "hash": "rvw1:sha256:466d3ffdf0b51869cf27010906186d61e8afdc57dfd74bcbb32397096385d011",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:19:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2ff241483a726503a3cebf410268e20eeb740185947b488d996426bb9a2bc236",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:05:32Z",
+          "findings": [],
+          "hash": "rvw1:sha256:2ff241483a726503a3cebf410268e20eeb740185947b488d996426bb9a2bc236",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3976,6 +4249,27 @@
           "at": "2026-08-19T11:22:30Z",
           "findings": [],
           "hash": "rvw1:sha256:0f8dcaee8ab46e5fbb28393c0a014f9d7442ad346661f29049f54219b67ae658",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:13:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7a713b0c2af7f631a90e45c8c5272f1bba893b10b9517f0f517d1ca95e3f1637",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T14:20:00Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7a713b0c2af7f631a90e45c8c5272f1bba893b10b9517f0f517d1ca95e3f1637",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T15:23:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7a713b0c2af7f631a90e45c8c5272f1bba893b10b9517f0f517d1ca95e3f1637",
           "type": "final",
           "verdict": "zero_findings"
         }
