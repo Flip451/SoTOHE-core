@@ -25,6 +25,13 @@ impl CommandOutcome {
     pub fn failure(stderr: Option<String>) -> Self {
         Self { stdout: None, stderr, exit_code: 1 }
     }
+
+    /// Maps a leftover `TrackCommandOutput` onto the driver outcome.
+    pub(crate) fn from_track_command_output(
+        output: usecase::track_service::TrackCommandOutput,
+    ) -> Self {
+        Self { stdout: output.stdout, stderr: output.stderr, exit_code: output.exit_code }
+    }
 }
 
 // Note: the previous staging placeholder for `render_outcome(label, VerifyOutcome)`

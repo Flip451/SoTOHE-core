@@ -198,4 +198,59 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_execute_views_sync_persists_rendered_views_and_returns_success() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = init_repo_on_branch(&tmp, "track/views-track");
+        let track_dir = root.join("track/items/views-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "views-track",
+  "branch": null,
+  "title": "Views Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "tasks": [
+    {"id": "T001", "description": "Existing work", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Existing", "description": [], "task_ids": ["T001"]}
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+        )
+        .unwrap();
+
+        let result = execute_views(ViewAction::Sync {
+            project_root: root.clone(),
+            track_id: Some("views-track".to_owned()),
+        });
+
+        assert!(result.is_ok(), "matching views sync must succeed: {result:?}");
+        assert!(root.join("track/registry.md").is_file(), "registry.md must persist");
+        assert!(track_dir.join("plan.md").is_file(), "plan.md must persist");
+    }
 }

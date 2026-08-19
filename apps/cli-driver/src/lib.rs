@@ -55,6 +55,7 @@ mod track_task_counts;
 pub mod track_tddd;
 mod track_transition;
 mod track_type_signals;
+mod track_views_sync;
 pub mod verify;
 
 pub use render::CommandOutcome;

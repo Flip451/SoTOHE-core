@@ -132,6 +132,11 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(RequestScopedTrackPhaseAdapter),
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
         ));
+    let track_views_sync_service =
+        Arc::new(usecase::track_lifecycle::track_views_sync::TrackViewsSyncInteractor::new(
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -170,6 +175,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         track_set_commit_hash_service,
         track_switch_base_service,
         track_resolve_service,
+        track_views_sync_service,
     )
 }
 
@@ -741,5 +747,73 @@ mod tests {
             !metadata.contains("\"status\""),
             "metadata must not store derived status:\n{metadata}"
         );
+    }
+
+    #[test]
+    fn test_track_views_sync_call_site_persists_views_and_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/views-track");
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("views-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "views-track",
+  "branch": null,
+  "title": "Views Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "tasks": [
+    {"id": "T001", "description": "Existing work", "status": "todo"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Existing", "description": [], "task_ids": ["T001"]}
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","tddd":{"enabled":true,"catalogue_file":"domain-types.json"}}]}"#,
+        )
+        .unwrap();
+
+        let argv_project_root = root.path().to_path_buf();
+        let argv_track_id = Some("views-track".to_owned());
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::ViewsSync {
+            project_root: argv_project_root.clone(),
+            track_id: argv_track_id.clone(),
+        });
+
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        let stdout = outcome.stdout.as_deref().unwrap_or_default();
+        assert!(
+            stdout.contains("[OK] Rendered: track/registry.md")
+                || stdout.contains("[OK] Rendered: track/items/views-track/plan.md")
+                || stdout.contains("[OK] All views already up to date"),
+            "stdout must preserve the views-sync contract:\n{stdout}"
+        );
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_project_root, root.path());
+        assert_eq!(argv_track_id.as_deref(), Some("views-track"));
+        assert!(root.path().join("track/registry.md").is_file(), "registry.md must persist");
+        assert!(track_dir.join("plan.md").is_file(), "plan.md must persist");
     }
 }

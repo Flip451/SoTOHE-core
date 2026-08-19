@@ -1941,6 +1941,30 @@
       "trait_ref": "std::error::Error"
     },
     {
+      "for_type": "TrackViewsSyncCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackViewsSyncCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackViewsSyncCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackViewsSyncResult",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackViewsSyncResult",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackViewsSyncResult",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "for_type": "TrackAddTaskInteractor",
       "trait_ref": "TrackAddTaskService"
     },

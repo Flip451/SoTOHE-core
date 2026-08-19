@@ -513,6 +513,27 @@
           "hash": "rvw1:sha256:ee0bbd1e2d6145d8b829b98150b96a3d005af1fed2179ca368f668cd1d008519",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:05:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9fad97576fdf004237b87facf548d6a8302ba534efde5019e4e416ca4e05a98",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:31:38Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9fad97576fdf004237b87facf548d6a8302ba534efde5019e4e416ca4e05a98",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T22:00:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:a9fad97576fdf004237b87facf548d6a8302ba534efde5019e4e416ca4e05a98",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -924,6 +945,27 @@
           "at": "2026-08-19T19:57:22Z",
           "findings": [],
           "hash": "rvw1:sha256:4ad49abc128b2d78f736a444e07ba9cefba1112e2bbd36fd8917f2661da7876c",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:05:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42609860b3ffd55ae7d8572280e55144df45033c113b769b80e5d312fea1c850",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:31:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42609860b3ffd55ae7d8572280e55144df45033c113b769b80e5d312fea1c850",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:39:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:42609860b3ffd55ae7d8572280e55144df45033c113b769b80e5d312fea1c850",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1385,6 +1427,77 @@
           "at": "2026-08-19T20:02:55Z",
           "findings": [],
           "hash": "rvw1:sha256:b27b13cc4009d2210a7c256184b21183c25973b250500305cc7a3524968c72e7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:06:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1db8d0c618222b9036154c3f9554730ca57ca8a5e4cb6ee76d4d7fc9c578ca4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:30:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1db8d0c618222b9036154c3f9554730ca57ca8a5e4cb6ee76d4d7fc9c578ca4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:47:04Z",
+          "findings": [
+            {
+              "category": "correctness",
+              "file": "apps/cli-driver/src/track_views_sync.rs",
+              "line": 20,
+              "message": "ViewsSync validation no longer preserves the pre-migration stderr contract required by AC-05/CN-01. `render_track_views_sync_outcome` forwards `TrackWorkspaceRoot::try_new` and `TrackLifecycleIdInput::try_new` failures via `error.to_string()` with no `[ERROR]` prefix, so an invalid id such as `INVALID` now yields `invalid track id: track id 'INVALID' must be a lowercase slug` (empty/whitespace ids yield `invalid track id: string must not be empty`). The previous `TrackService`/`track_views_sync` path rendered those through `composition_to_output` as `[ERROR] track id 'INVALID' must be a lowercase slug` and `[ERROR] string must not be empty`, and workspace-root failures as `[ERROR] track workspace root must not …`. Sibling renderers already have the translators (`strip_prefix(\"invalid track id: \")` plus `[ERROR] {legacy}` for ids, and `[ERROR] {error}` for `TrackWorkspaceRoot`); apply the same rendering here (the accepted ParentDir fail-closed behavior may stay), and add exact-output regression tests for invalid track id, empty/whitespace id, and invalid workspace root. Also pin that `Some(valid-id)` builds `TrackSelection::Explicit` and `None` builds `Active` — current tests only check `calls.len()` / the workspace path.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:1db8d0c618222b9036154c3f9554730ca57ca8a5e4cb6ee76d4d7fc9c578ca4b",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T21:48:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7e0565f35499a505b277a0606f9a2b59ac6aa8bbc2117e0258e391129e71de15",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:50:51Z",
+          "findings": [],
+          "hash": "rvw1:sha256:7e0565f35499a505b277a0606f9a2b59ac6aa8bbc2117e0258e391129e71de15",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T22:16:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18498fe6599a32c894a9a329e4ce29d90c0fc21d76043af392ad4b8b9dca661a",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T22:18:44Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18498fe6599a32c894a9a329e4ce29d90c0fc21d76043af392ad4b8b9dca661a",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T22:20:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:29eebab2759844ed3784eb279515c5a5a5c4ecdbab93debfa96ed63000047b4b",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T22:22:01Z",
+          "findings": [],
+          "hash": "rvw1:sha256:29eebab2759844ed3784eb279515c5a5a5c4ecdbab93debfa96ed63000047b4b",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -2137,6 +2250,27 @@
           "at": "2026-08-19T19:55:50Z",
           "findings": [],
           "hash": "rvw1:sha256:4f824270abb8f1f2f8bb92eadbfd5cb3201b764581e6013fc5f95f289497c9ac",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:05:07Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e627c15da685298c9abd8e70babdbe0c41be0807d02e37454cd348d187842e6f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:32:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e627c15da685298c9abd8e70babdbe0c41be0807d02e37454cd348d187842e6f",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:38:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:e627c15da685298c9abd8e70babdbe0c41be0807d02e37454cd348d187842e6f",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3487,6 +3621,79 @@
           "hash": "rvw1:sha256:e38a0c138955b55b5298ec8f1f9f9c5b4f460ed3a9e71f42737e0304d020b260",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:05:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:01980137d859593f113e64902b5cc1468576d1e672e8cdef6567df494fc100ed",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:27:15Z",
+          "findings": [
+            {
+              "category": "test-obligation-gate",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 652,
+              "message": "`bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` fails with TestChanged for TrackViewsSyncInteractor × AC-03 (line 652) and TrackViewsSyncService × AC-03 (line 653). Those T015 result fulfillments bind the current interactor, driver, composition, and CLI tests, but the frozen obligation-fulfillment cache still records the previous bound_tests_set_hash (`results` reports `status:done stale=2`). This is not a todo-lane warning and is not the accepted TrackMetadataPort/TrackViewsPort SemanticFailuresConfirmed deviation. Re-evaluate those pairs through the sanctioned evaluate path so the cache matches the current bound test bodies; do not hand-edit the verdict caches.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01980137d859593f113e64902b5cc1468576d1e672e8cdef6567df494fc100ed",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T21:32:46Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 653,
+              "message": "The `TrackViewsSyncService::execute` fulfillment omits the existing active-selection success and resolver-failure tests (`test_track_views_sync_interactor_active_selection_uses_resolver_scope` and `test_track_views_sync_interactor_resolver_failure_returns_error_without_sync`). Consequently, the service obligation is not bound to coverage for its resolver branch/error path, unlike the corresponding interactor obligation and neighboring service bindings.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:01980137d859593f113e64902b5cc1468576d1e672e8cdef6567df494fc100ed",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T21:41:57Z",
+          "findings": [],
+          "hash": "rvw1:sha256:5edadd212348dc892033c3673fbc065b412aabd1222d2fd6b035de9f638d6bce",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:49:24Z",
+          "findings": [
+            {
+              "category": "testing",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 653,
+              "message": "The current binding update does not pass the repository obligation gate: `bin/sotp test-obligation check --track-id 2026-08-15-track-lifecycle-pure-di` reports `DriftsDetected` because bound `TrackViewsSyncService` AC-03 test bodies changed since the verdict was frozen. The updated fulfillment at this line therefore requires the corresponding obligation verdict/cache refresh before it can be accepted.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:18c2400d68a81114c075fed4f9a853355aa41807c8809b0f9db7b013ec6c1070",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T21:55:42Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18c2400d68a81114c075fed4f9a853355aa41807c8809b0f9db7b013ec6c1070",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T22:03:20Z",
+          "findings": [],
+          "hash": "rvw1:sha256:18c2400d68a81114c075fed4f9a853355aa41807c8809b0f9db7b013ec6c1070",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4178,6 +4385,27 @@
           "hash": "rvw1:sha256:6f4156208553e2120c70b5143e25b5e3695d360eae85c4bca84ea8c18afa2633",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:05:10Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8e9204acb7e90c727590a2e7523bdcbb6f7e321daf087504889d1937815071",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:31:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8e9204acb7e90c727590a2e7523bdcbb6f7e321daf087504889d1937815071",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T22:09:33Z",
+          "findings": [],
+          "hash": "rvw1:sha256:ee8e9204acb7e90c727590a2e7523bdcbb6f7e321daf087504889d1937815071",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4610,6 +4838,42 @@
           "at": "2026-08-19T20:04:44Z",
           "findings": [],
           "hash": "rvw1:sha256:6ecc3145ad391318f1b8333672db01bb6096844d54756981904fd30ceb971df7",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:06:22Z",
+          "findings": [
+            {
+              "category": "logic/data-integrity",
+              "file": "libs/usecase/src/track_lifecycle/track_views_sync.rs",
+              "line": 75,
+              "message": "Explicit selections bypass `TrackSelectionPort::resolve_views_scope`, skipping the adapter’s write guard that rejects IDs not matching the current branch. This allows callers to synchronize another track’s views; route both selection variants through the resolver.",
+              "severity": "P0"
+            }
+          ],
+          "hash": "rvw1:sha256:bb70a6479e10e182fd01a0139e3766fa40511b3f33514c3c59508a0f3b0121c9",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T21:29:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cbf49e2a2002fa1113e95085225970c2c7092f82a25d170e1b448f3a40d80c9e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:39:11Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cbf49e2a2002fa1113e95085225970c2c7092f82a25d170e1b448f3a40d80c9e",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T21:51:17Z",
+          "findings": [],
+          "hash": "rvw1:sha256:cbf49e2a2002fa1113e95085225970c2c7092f82a25d170e1b448f3a40d80c9e",
           "type": "final",
           "verdict": "zero_findings"
         }

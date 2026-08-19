@@ -192,6 +192,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "c8de1294",
       "depends_on": [
         "T001"
       ],
@@ -205,7 +206,7 @@
       ],
       "description": "Implement the `TrackViewsSync*` boundary in `libs/usecase/src/track_lifecycle/track_views_sync.rs`; integrate `TrackViewsPort` through `apps/cli/src/commands/track/views.rs`, the driver, and composition wiring, with sync and port-contract regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T015",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

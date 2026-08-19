@@ -31,11 +31,12 @@ use usecase::track_lifecycle::track_set_override::TrackSetOverrideService;
 use usecase::track_lifecycle::track_switch_base::TrackSwitchBaseService;
 use usecase::track_lifecycle::track_task_counts::TrackTaskCountsService;
 use usecase::track_lifecycle::track_transition::TrackTransitionService;
+use usecase::track_lifecycle::track_views_sync::TrackViewsSyncService;
 use usecase::track_lifecycle::{
     RenderedViewPath, TrackDirectoryPath, TrackItemsDirectory, TrackLifecycleIdInput,
     TrackSelection, TrackViewSyncOutcome,
 };
-use usecase::track_service::{TrackCommandOutput, TrackService};
+use usecase::track_service::TrackService;
 
 use crate::render::CommandOutcome;
 use crate::track_clear_override::render_track_clear_override_outcome;
@@ -46,6 +47,7 @@ use crate::track_set_override::render_track_set_override_outcome;
 use crate::track_switch_base::render_track_switch_base_outcome;
 use crate::track_task_counts::render_track_task_counts_outcome;
 use crate::track_transition::render_track_transition_outcome;
+use crate::track_views_sync::render_track_views_sync_outcome;
 
 // ---------------------------------------------------------------------------
 // Input type
@@ -204,10 +206,6 @@ pub struct BaseMergeInput {
 // Conversion helpers
 // ---------------------------------------------------------------------------
 
-fn service_output_to_outcome(output: TrackCommandOutput) -> CommandOutcome {
-    CommandOutcome { stdout: output.stdout, stderr: output.stderr, exit_code: output.exit_code }
-}
-
 /// Render a [`FixpointResolveDriverOutcome`] into a [`CommandOutcome`].
 ///
 /// Reproduces the exact text contract previously produced by
@@ -279,6 +277,7 @@ pub struct TrackDriver {
     track_set_commit_hash_service: Arc<dyn TrackSetCommitHashService>,
     track_switch_base_service: Arc<dyn TrackSwitchBaseService>,
     track_resolve_service: Arc<dyn TrackResolveService>,
+    track_views_sync_service: Arc<dyn TrackViewsSyncService>,
 }
 
 impl TrackDriver {
@@ -301,6 +300,7 @@ impl TrackDriver {
         track_set_commit_hash_service: Arc<dyn TrackSetCommitHashService>,
         track_switch_base_service: Arc<dyn TrackSwitchBaseService>,
         track_resolve_service: Arc<dyn TrackResolveService>,
+        track_views_sync_service: Arc<dyn TrackViewsSyncService>,
     ) -> Self {
         Self {
             track_init_service,
@@ -319,6 +319,7 @@ impl TrackDriver {
             track_set_commit_hash_service,
             track_switch_base_service,
             track_resolve_service,
+            track_views_sync_service,
         }
     }
 
@@ -375,11 +376,13 @@ impl TrackDriver {
                 render_track_resolve_outcome(&*self.track_resolve_service, items_dir, track_id)
             }
             TrackInput::ViewsValidate { project_root } => {
-                service_output_to_outcome(self.service.views_validate(project_root))
+                CommandOutcome::from_track_command_output(self.service.views_validate(project_root))
             }
-            TrackInput::ViewsSync { project_root, track_id } => {
-                service_output_to_outcome(self.service.views_sync(project_root, track_id))
-            }
+            TrackInput::ViewsSync { project_root, track_id } => render_track_views_sync_outcome(
+                &*self.track_views_sync_service,
+                project_root,
+                track_id,
+            ),
             TrackInput::AddTask { items_dir, track_id, description, section, after } => {
                 render_track_add_task_outcome(
                     &*self.track_add_task_service,
@@ -415,7 +418,7 @@ impl TrackDriver {
                 track_id,
             ),
             TrackInput::DetectActive { project_root } => {
-                service_output_to_outcome(self.service.detect_active(project_root))
+                CommandOutcome::from_track_command_output(self.service.detect_active(project_root))
             }
             TrackInput::FixpointResolve { track_id, current_branch, items_dir } => {
                 let outcome =
@@ -430,11 +433,13 @@ impl TrackDriver {
                 render_track_switch_base_outcome(&*self.track_switch_base_service, project_root)
             }
             TrackInput::CatalogueLintCheckActiveTrack { track_id, workspace_root, rules_file } => {
-                service_output_to_outcome(self.service.catalogue_lint_check_active_track(
-                    track_id,
-                    workspace_root,
-                    rules_file,
-                ))
+                CommandOutcome::from_track_command_output(
+                    self.service.catalogue_lint_check_active_track(
+                        track_id,
+                        workspace_root,
+                        rules_file,
+                    ),
+                )
             }
         }
     }
@@ -731,6 +736,7 @@ mod tests {
     use usecase::track_lifecycle::track_transition::{
         TrackTransitionCommand, TrackTransitionError, TrackTransitionResult,
     };
+    use usecase::track_service::TrackCommandOutput;
 
     struct UnusedTrackService;
 
@@ -927,6 +933,8 @@ mod tests {
 
     struct UnusedTrackResolveService;
 
+    struct UnusedTrackViewsSyncService;
+
     impl TrackNextTaskService for UnusedTrackNextTaskService {
         fn execute(
             &self,
@@ -995,6 +1003,18 @@ mod tests {
 
     impl TrackResolveService for UnusedTrackResolveService {
         fn execute(&self, _: TrackResolveCommand) -> Result<TrackResolveResult, TrackResolveError> {
+            unreachable!()
+        }
+    }
+
+    impl TrackViewsSyncService for UnusedTrackViewsSyncService {
+        fn execute(
+            &self,
+            _: usecase::track_lifecycle::track_views_sync::TrackViewsSyncCommand,
+        ) -> Result<
+            usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult,
+            usecase::track_lifecycle::track_views_sync::TrackViewsSyncError,
+        > {
             unreachable!()
         }
     }
@@ -1178,6 +1198,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         )
     }
 
@@ -1204,6 +1225,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1246,6 +1268,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1283,6 +1306,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1317,6 +1341,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1361,6 +1386,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1397,6 +1423,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1435,6 +1462,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1481,6 +1509,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1525,6 +1554,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1561,6 +1591,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1639,6 +1670,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         )
     }
 
@@ -1751,6 +1783,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1788,6 +1821,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1832,6 +1866,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1867,6 +1902,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1902,6 +1938,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1936,6 +1973,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1974,6 +2012,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -2010,6 +2049,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -2045,6 +2085,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -2079,6 +2120,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -2117,6 +2159,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -2155,6 +2198,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -2616,6 +2660,7 @@ mod tests {
             service,
             Arc::new(UnusedTrackSwitchBaseService),
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         )
     }
 
@@ -2723,6 +2768,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             service,
             Arc::new(UnusedTrackResolveService),
+            Arc::new(UnusedTrackViewsSyncService),
         )
     }
 
@@ -2833,6 +2879,7 @@ mod tests {
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
             service,
+            Arc::new(UnusedTrackViewsSyncService),
         )
     }
 
@@ -2885,5 +2932,105 @@ mod tests {
             outcome.stderr.as_deref(),
             Some("[ERROR] resolve failed: track not found: missing")
         );
+    }
+
+    struct RecordingTrackViewsSyncService {
+        result: Result<usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult, String>,
+        calls: Mutex<Vec<(PathBuf, TrackSelection)>>,
+    }
+
+    impl TrackViewsSyncService for RecordingTrackViewsSyncService {
+        fn execute(
+            &self,
+            command: usecase::track_lifecycle::track_views_sync::TrackViewsSyncCommand,
+        ) -> Result<
+            usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult,
+            usecase::track_lifecycle::track_views_sync::TrackViewsSyncError,
+        > {
+            self.calls
+                .lock()
+                .expect("service lock is available")
+                .push((command.workspace_root.as_path().to_path_buf(), command.scope.clone()));
+            match &self.result {
+                Ok(usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult::AlreadyCurrent) => {
+                    Ok(usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult::AlreadyCurrent)
+                }
+                Ok(usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult::Rendered(
+                    paths,
+                )) => Ok(usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult::Rendered(
+                    paths
+                        .iter()
+                        .map(|path| RenderedViewPath::new(path.as_path().to_path_buf()))
+                        .collect(),
+                )),
+                Err(error) => {
+                    Err(usecase::track_lifecycle::track_views_sync::TrackViewsSyncError::ExecutionFailed(
+                        usecase::git_workflow::DiagnosticText::new(error),
+                    ))
+                }
+            }
+        }
+    }
+
+    fn views_sync_driver(service: Arc<RecordingTrackViewsSyncService>) -> TrackDriver {
+        TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTaskCountsService),
+            Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
+            Arc::new(UnusedTrackClearOverrideService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
+            service,
+        )
+    }
+
+    #[test]
+    fn test_track_driver_views_sync_valid_input_preserves_output_contract() {
+        let service = Arc::new(RecordingTrackViewsSyncService {
+            result: Ok(
+                usecase::track_lifecycle::track_views_sync::TrackViewsSyncResult::AlreadyCurrent,
+            ),
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = views_sync_driver(service.clone());
+        let outcome = driver.handle(TrackInput::ViewsSync {
+            project_root: PathBuf::from("workspace"),
+            track_id: Some("views-track".to_owned()),
+        });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stdout.as_deref(), Some("[OK] All views already up to date"));
+        assert_eq!(outcome.stderr, None);
+        let calls = service.calls.lock().expect("service lock is available");
+        assert_eq!(calls.len(), 1);
+        assert!(matches!(
+            calls.first().map(|(_, selection)| selection),
+            Some(usecase::track_lifecycle::TrackSelection::Explicit(_))
+        ));
+    }
+
+    #[test]
+    fn test_track_driver_views_sync_service_error_maps_to_failure_outcome() {
+        let service = Arc::new(RecordingTrackViewsSyncService {
+            result: Err("disk full".to_owned()),
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = views_sync_driver(service);
+        let outcome = driver.handle(TrackInput::ViewsSync {
+            project_root: PathBuf::from("workspace"),
+            track_id: Some("views-track".to_owned()),
+        });
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stderr.as_deref(), Some("[ERROR] sync-views failed: disk full"));
+        assert_eq!(outcome.stdout, None);
     }
 }

@@ -272,44 +272,6 @@ impl TrackCompositionRoot {
         })?;
         Ok(CommandOutcome::success(Some("[OK] Track metadata is valid".to_owned())))
     }
-    /// Render plan.md and registry.md from metadata.json.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_views_sync(
-        &self,
-        project_root: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::GitTrackSelectionAdapter;
-        use usecase::track_lifecycle::{TrackSelectionPort, TrackWorkspaceRoot};
-
-        let resolved_track_id = match track_id {
-            Some(id) => Some(resolve_track_id_inner(Some(id), &project_root, true)?),
-            None => TrackWorkspaceRoot::try_new(project_root.clone())
-                .ok()
-                .and_then(|workspace_root| {
-                    GitTrackSelectionAdapter.resolve_active(&workspace_root).ok()
-                })
-                .map(|track_id| track_id.as_ref().to_owned()),
-        };
-        let changed = infrastructure::track::render::sync_rendered_views(
-            &project_root,
-            resolved_track_id.as_deref(),
-        )
-        .map_err(|e| CompositionError::Infrastructure(format!("sync-views failed: {e}")))?;
-        let lines = if changed.is_empty() {
-            vec!["[OK] All views already up to date".to_owned()]
-        } else {
-            changed
-                .iter()
-                .map(|path| match path.strip_prefix(&project_root) {
-                    Ok(rel) => format!("[OK] Rendered: {}", rel.display()),
-                    Err(_) => format!("[OK] Rendered: {}", path.display()),
-                })
-                .collect()
-        };
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
     /// Add a new task to a track.
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.

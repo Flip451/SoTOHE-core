@@ -23,7 +23,7 @@
 | TrackTypeGraphResult | enum | add | — | 🟡 | 🔵 |
 | TrackViewSyncOutcome | enum | add | Synchronized, Warning | 🔵 | 🔵 |
 | TrackViewsScope | enum | add | RegistryOnly, Track | 🔵 | 🔵 |
-| TrackViewsSyncResult | enum | add | AlreadyCurrent, Rendered | 🟡 | 🔵 |
+| TrackViewsSyncResult | enum | add | AlreadyCurrent, Rendered | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -72,7 +72,7 @@
 | TrackTransitionError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackTypeGraphError | error_type | add | RemovedCommand | 🟡 | 🔵 |
 | TrackTypeSignalsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
-| TrackViewsSyncError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackViewsSyncError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackViewsValidateError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
 
 ## Secondary Ports
@@ -130,7 +130,7 @@
 | TrackTransitionService | application_service | add | fn execute(&self, command: TrackTransitionCommand) -> Result<TrackTransitionResult, TrackTransitionError> | 🔵 | 🔵 |
 | TrackTypeGraphService | application_service | add | fn execute(&self, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🟡 | 🔵 |
 | TrackTypeSignalsService | application_service | add | fn execute(&self, command: TrackTypeSignalsCommand) -> Result<TrackTypeSignalsResult, TrackTypeSignalsError> | 🔵 | 🔵 |
-| TrackViewsSyncService | application_service | add | fn execute(&self, command: TrackViewsSyncCommand) -> Result<TrackViewsSyncResult, TrackViewsSyncError> | 🟡 | 🔵 |
+| TrackViewsSyncService | application_service | add | fn execute(&self, command: TrackViewsSyncCommand) -> Result<TrackViewsSyncResult, TrackViewsSyncError> | 🔵 | 🔵 |
 | TrackViewsValidateService | application_service | add | fn execute(&self, command: TrackViewsValidateCommand) -> Result<TrackViewsValidateResult, TrackViewsValidateError> | 🟡 | 🔵 |
 
 ## Interactors
@@ -162,7 +162,7 @@
 | TrackTransitionInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTypeGraphInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackTypeSignalsInteractor | interactor | add | — | 🔵 | 🔵 |
-| TrackViewsSyncInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackViewsSyncInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackViewsValidateInteractor | interactor | add | — | 🟡 | 🔵 |
 
 ## DTOs
@@ -217,6 +217,6 @@
 | TrackTransitionCommand | command | add | — | 🔵 | 🔵 |
 | TrackTypeGraphCommand | command | add | — | 🟡 | 🔵 |
 | TrackTypeSignalsCommand | command | add | — | 🔵 | 🔵 |
-| TrackViewsSyncCommand | command | add | — | 🟡 | 🔵 |
+| TrackViewsSyncCommand | command | add | — | 🔵 | 🔵 |
 | TrackViewsValidateCommand | command | add | — | 🟡 | 🔵 |
 

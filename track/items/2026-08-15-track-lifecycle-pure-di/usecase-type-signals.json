@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
-  "declaration_hash": "785df6c768b91d1310ec21ebd5366d805c38c7ad4ce61dfb22b81aed3e598c13",
-  "generated_at": "2026-08-19T20:28:36Z",
-  "head_commit": "1ff2cec47809198cee007fd6f2afb99a9a5c70a0",
+  "declaration_hash": "1b06b72e796f21120afcd040e49bc6167a5569e0a513d8f9883429ca9b002cbe",
+  "generated_at": "2026-08-19T22:33:34Z",
+  "head_commit": "c8de1294e5b82bafaca55865d17f4955be1b2532",
   "schema_version": 4,
   "signals": [
     {
@@ -1466,41 +1466,51 @@
       "type_name": "TrackViewsScope"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackViewsSyncCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackViewsSyncError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackViewsSyncService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackViewsSyncInteractor"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackViewsSyncResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackViewsSyncService"
     },
     {

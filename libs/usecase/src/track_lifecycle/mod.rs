@@ -25,6 +25,7 @@ pub mod track_set_override;
 pub mod track_switch_base;
 pub mod track_task_counts;
 pub mod track_transition;
+pub mod track_views_sync;
 
 pub use tddd::{
     TrackCatalogueEntryCount, TrackCatalogueImplLayerResult, TrackCataloguePath, TrackLayerFilter,

@@ -4947,6 +4947,102 @@
     {
       "edge_id": {
         "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsPort"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "9ac740db5e4d17da14be225f3b0aed39de41d95500ccaaeb8e0f56394409e178",
+        "waived_reason_hash": "2f5457a9a28dc1ec2cd5be5470ec51ec75938cdb3a53c345570908afe036a354"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "d600d916ed3a499cf91a27ac45ef8e303c5caf565281af3e204a2bbf000185f3",
+        "waived_reason_hash": "771f2405c3fc800e87fe50d782b7085f5dd7ced2c322a195c964dc6818013a45"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:validate",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "Synchronous Track views secondary port; adapter-owned blocking filesystem I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsPort"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "f838160a99a2152ae5e7c81f5a8a497987ce757fcdeebbb5443b5216af1de53b",
+        "waived_reason_hash": "771f2405c3fc800e87fe50d782b7085f5dd7ced2c322a195c964dc6818013a45"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:sync",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "\"role: SecondaryPort\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-05",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsPort"
+      },
+      "key": {
+        "anchor_text_hash": "a3d82995695c2588fa17ea816fdc804e16c4e3494b794f2ccb002f8ac3043d6b",
+        "declaration_hash": "f838160a99a2152ae5e7c81f5a8a497987ce757fcdeebbb5443b5216af1de53b",
+        "waived_reason_hash": "414eaf11e8c4f17e871413d42b9aef1c324a48375d0b173e59827460d19391af"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsPort",
+        "item_identifier": "trait_method:sync",
+        "obligation_kind": "contract"
+      },
+      "verdict": {
+        "citation": "integration tests は TDDD command contexts を含む各対象 Track lifecycle command context、および旧 resolution helper を利用する対象外 context の call site について",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
           "element_id": "AC-02",
           "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
         },
@@ -12692,6 +12788,414 @@
       },
       "verdict": {
         "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncCommand"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "e61b6e3001d021e8923cde9b008a7e2b0249f7e6213669acf1e479a71810f4a8",
+        "waived_reason_hash": "c69d718c7fb1c8d346dafb1a60d4d868072970166d6fdfe38670f4cdab6054b8"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncCommand",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncCommand"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "873c14a8ee7458694cda365d6b9ad4278d1e15132379650c6db321b099ced848",
+        "waived_reason_hash": "766d46e90360d91c7f5c77fbc95cb052d6632a02013c4802d6dce9aa908ef7c1"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncCommand",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncCommand"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "1445ed251332d083edb9ad9d17d885584e983f7d22d2242b378002a315fcf73c",
+        "waived_reason_hash": "806e7af95882c97b0bd2a9981816d58ca642c4d53a15fc7acdae739ce5106924"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncCommand",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Track ViewsSync application command boundary.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "19f22f667d65c3bf78566d47134058532eb9ded7cd0dd9c69df57eca042b25c2",
+        "waived_reason_hash": "871871d9db721706d758c00e759a997bd352da1d5c978a3ba45aaeeb03dce7cd"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "TypeEntry { action: Add, role: Command, kind: Struct(StructKind { shape: Plain { fields: [FieldDecl { name: FieldName(Identifier(\"workspace_root\")), ty: TypeRef(\"TrackWorkspaceRoot\") }, FieldDecl { name: FieldName(Identifier(\"scope\")), ty: TypeRef(\"TrackSelection\") }], has_stripped_fields: false }, typestate: None }), methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"track_views_sync\")]), docs: Some(DocString(\"Track ViewsSync application command boundary.\")), spec_refs: [SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"AC-02\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"AC-03\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"AC-04\") }, SpecRef { file: \"track/items/2026-08-15-track-lifecycle-pure-di/spec.json\", anchor: SpecElementId(\"CN-03\") }], informal_grounds: [] }",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncError"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "2246008d992e66d6fcd0917ae42faa6c265ff41e625f2b8d37c9b34712a5f610",
+        "waived_reason_hash": "7f7a2e1c44139b1c8af198c43785d246628f98aa9715a3f8db2beb9ddf823abf"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncError",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncError"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "444a8afd98ba4f0c5709b370dcdbb28a785012905e398485187193bf91590059",
+        "waived_reason_hash": "25e12f4e4154a0b60243b044c9030aaa0cf6d3a8e7e6e3903485ad939bff1533"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "\"presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う\"",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncError"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "43a9597a70bf370fc90384f746a9c74e02a211593145e10d0a6ca30ae6e21041",
+        "waived_reason_hash": "af27bac145daf4e66d2c143244babac83cc34069d4d1fa9208346d789e6a9695"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncResult"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "4cdb5a1dd25b05c433669215f4e4b98b5e79e20bfa10430d0cc6fe73b4e09252",
+        "waived_reason_hash": "1999cea9d0defce8807659b8d196b547fe855ce80ddcad84206e7a6de95eba6d"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncResult",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 CLI subcommand ごとに一つの独立した usecase execution boundary があり、複数 execution method を束ねる Service-style input boundary を新設せず、command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncResult"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "2e9ceb58ecbb72bf6c0a0fee8cba89a8429cebbf2522e5b1c32abc42c1a36350",
+        "waived_reason_hash": "4be5c7d9e3f3429a6cc8b8aad1af83cfe606629fcd4c94f5acb7f25ecde8a9d9"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncResult",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncResult"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "25178f6283def4b309fa492f7591254c8b6c3b70dbd73205d8217d8764e34764",
+        "waived_reason_hash": "59cd11b69812d910bb1d17a2624316d3638255e08424a0b4b828970ed55f2c54"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncResult",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncResult"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "c08c68b2dc94dd76195d414027ffd9f0fce0a47c6a1047770e35bdd48396eb44",
+        "waived_reason_hash": "e191e252204838c59f7a57e7c171c5f858918b4baccfd373d3cbef3d8a298552"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncResult",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "9dfb7b8520bf8115363fd0f66334eba3c002a865d8d43df88ae1d5aee49d45d8",
+        "waived_reason_hash": "a713fae2a5661ef14e1438b7c426dc924f42bef02aa91f1303fef0cd4c530e97"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "docs: Some(DocString(\"Track ViewsSync command-context interactor.\"))",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "9dfb7b8520bf8115363fd0f66334eba3c002a865d8d43df88ae1d5aee49d45d8",
+        "waived_reason_hash": "c7dd1fdb9d64106beb626895335737fce8902094f93b0f0bcf7edc4996cd0d2e"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "9dfb7b8520bf8115363fd0f66334eba3c002a865d8d43df88ae1d5aee49d45d8",
+        "waived_reason_hash": "7232f68a086177beab3d61cca5729c55e655bbf39afd8de7ead6c41efc7c7d50"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "module_path: ModulePath([Identifier(\"track_lifecycle\"), Identifier(\"track_views_sync\")])",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncService"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "a9df7ba4a427dd0f367d187b092f04dbbecc10a1fd70dea25bfebe79a9ab51ac",
+        "waived_reason_hash": "bf17f0c3b45be2a318294d5dd4e06981d3731b4244b27d873b1ea49339c21623"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"execute\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"command\")), ty: TypeRef(\"TrackViewsSyncCommand\") }], returns: TypeRef(\"Result<TrackViewsSyncResult, TrackViewsSyncError>\")",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncService"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "13166bb143aea6d1b7e955ed176708719611f9cf2b5f2c8b65805b4458f41d87",
+        "waived_reason_hash": "44683194ac57f2af6791c169038d57da05807ddf22aa3f9991b94a76869e74f0"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncService",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Synchronous Track ViewsSync application-service input port; secondary-adapter-owned blocking I/O.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackViewsSyncService"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "a9df7ba4a427dd0f367d187b092f04dbbecc10a1fd70dea25bfebe79a9ab51ac",
+        "waived_reason_hash": "0794edda8c33df0427a2400649af949e247c467593039ca9af9ceeefd3734077"
+      },
+      "obligation_id": {
+        "entry_key": "TrackViewsSyncService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
