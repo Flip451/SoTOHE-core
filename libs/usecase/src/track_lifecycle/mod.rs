@@ -19,6 +19,7 @@ pub mod track_branch_switch;
 pub mod track_clear_override;
 pub mod track_init;
 pub mod track_next_task;
+pub mod track_resolve;
 pub mod track_set_commit_hash;
 pub mod track_set_override;
 pub mod track_switch_base;

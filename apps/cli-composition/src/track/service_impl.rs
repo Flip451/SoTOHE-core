@@ -62,7 +62,14 @@ impl TrackService for TrackServiceImpl {
     }
 
     fn resolve(&self, items_dir: PathBuf, track_id: Option<String>) -> TrackCommandOutput {
-        composition_to_output(TrackCompositionRoot::new().track_resolve(items_dir, track_id))
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(cli_driver::track::TrackInput::Resolve { items_dir, track_id });
+        TrackCommandOutput {
+            stdout: outcome.stdout,
+            stderr: outcome.stderr,
+            exit_code: outcome.exit_code,
+        }
     }
 
     fn branch_create(&self, items_dir: PathBuf, track_id: String) -> TrackCommandOutput {

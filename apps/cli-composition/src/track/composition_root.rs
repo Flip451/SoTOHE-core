@@ -126,6 +126,11 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
             Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
         ));
+    let track_resolve_service =
+        Arc::new(usecase::track_lifecycle::track_resolve::TrackResolveInteractor::new(
+            Arc::new(RequestScopedTrackPhaseAdapter),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -162,6 +167,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         track_clear_override_service,
         track_set_commit_hash_service,
         track_switch_base_service,
+        track_resolve_service,
     )
 }
 
@@ -334,6 +340,27 @@ impl usecase::track_lifecycle::TrackTaskTransitionPort for RequestScopedTrackTas
     }
 }
 
+/// Rebuilds `TrackPhaseInteractor` from the command's items directory.
+///
+/// `TrackPhaseInteractor` captures a store root, so this request-scoped adapter
+/// reconstructs that interactor for each resolve call.
+struct RequestScopedTrackPhaseAdapter;
+
+impl usecase::track_phase::TrackPhaseService for RequestScopedTrackPhaseAdapter {
+    fn resolve(
+        &self,
+        track_id: String,
+        items_dir: std::path::PathBuf,
+    ) -> Result<usecase::track_phase::TrackPhaseOutput, usecase::track_phase::TrackPhaseError> {
+        use std::sync::Arc;
+
+        use infrastructure::track::fs_store::FsTrackStore;
+
+        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
+        usecase::track_phase::TrackPhaseInteractor::new(store).resolve(track_id, items_dir)
+    }
+}
+
 struct RequestScopedTrackNextTaskQueryAdapter;
 
 impl usecase::track_lifecycle::TrackNextTaskQueryPort for RequestScopedTrackNextTaskQueryAdapter {
@@ -428,6 +455,105 @@ impl usecase::track_lifecycle::TrackOverrideSetPort for RequestScopedTrackOverri
 mod tests {
     use super::*;
     use cli_driver::track::TrackInput;
+
+    #[test]
+    fn test_track_resolve_call_site_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("resolve-regression");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "resolve-regression",
+  "branch": null,
+  "title": "Resolve Regression",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            track_dir.join("impl-plan.json"),
+            r#"{
+  "schema_version": 1,
+  "tasks": [
+    {"id": "T001", "description": "Existing work", "status": "in_progress"}
+  ],
+  "plan": {
+    "summary": [],
+    "sections": [
+      {"id": "S1", "title": "Existing", "description": [], "task_ids": ["T001"]}
+    ]
+  }
+}"#,
+        )
+        .unwrap();
+
+        let argv_items_dir = items_dir.clone();
+        let argv_track_id = Some("resolve-regression".to_owned());
+        let outcome = TrackCompositionRoot::new().track_driver().handle(TrackInput::Resolve {
+            items_dir: argv_items_dir.clone(),
+            track_id: argv_track_id.clone(),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "Current phase: In Progress\nReason: track has unresolved tasks\nRecommended next command: /track:implement"
+            )
+        );
+        assert_eq!(outcome.stderr, None);
+        assert!(!outcome.stdout.as_deref().unwrap_or_default().contains("signal report"));
+        assert_eq!(argv_items_dir, items_dir);
+        assert_eq!(argv_track_id.as_deref(), Some("resolve-regression"));
+    }
+
+    #[test]
+    fn test_track_resolve_blocked_call_site_includes_blocker() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track/items");
+        let track_dir = items_dir.join("blocked-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            r#"{
+  "schema_version": 6,
+  "id": "blocked-track",
+  "branch": null,
+  "title": "Blocked Track",
+  "created_at": "2026-01-01T00:00:00Z",
+  "updated_at": "2026-01-01T00:00:00Z",
+  "status_override": {"status": "blocked", "reason": "waiting on review"},
+  "branch_strategy_snapshot": {
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }
+}"#,
+        )
+        .unwrap();
+
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::Resolve { items_dir, track_id: Some("blocked-track".to_owned()) });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "Current phase: Blocked\nReason: waiting on review\nRecommended next command: /track:status\nBlocker: waiting on review"
+            )
+        );
+        assert_eq!(outcome.stderr, None);
+    }
 
     #[test]
     fn test_track_set_override_active_selection_call_site_preserves_cli_contract() {

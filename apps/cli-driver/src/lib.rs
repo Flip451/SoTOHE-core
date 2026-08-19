@@ -46,6 +46,7 @@ mod track_contract_map;
 mod track_lint;
 mod track_next_task;
 pub mod track_resolution;
+mod track_resolve;
 mod track_set_commit_hash;
 mod track_set_override;
 mod track_spec_element_hash;

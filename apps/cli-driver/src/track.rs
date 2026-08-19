@@ -25,6 +25,7 @@ use usecase::track_lifecycle::track_branch_switch::{
 use usecase::track_lifecycle::track_clear_override::TrackClearOverrideService;
 use usecase::track_lifecycle::track_init::{TrackInitCommand, TrackInitError, TrackInitService};
 use usecase::track_lifecycle::track_next_task::TrackNextTaskService;
+use usecase::track_lifecycle::track_resolve::TrackResolveService;
 use usecase::track_lifecycle::track_set_commit_hash::TrackSetCommitHashService;
 use usecase::track_lifecycle::track_set_override::TrackSetOverrideService;
 use usecase::track_lifecycle::track_switch_base::TrackSwitchBaseService;
@@ -38,6 +39,7 @@ use usecase::track_service::{TrackCommandOutput, TrackService};
 use crate::render::CommandOutcome;
 use crate::track_clear_override::render_track_clear_override_outcome;
 use crate::track_next_task::render_track_next_task_outcome;
+use crate::track_resolve::render_track_resolve_outcome;
 use crate::track_set_commit_hash::render_track_set_commit_hash_outcome;
 use crate::track_set_override::render_track_set_override_outcome;
 use crate::track_switch_base::render_track_switch_base_outcome;
@@ -273,6 +275,7 @@ pub struct TrackDriver {
     track_clear_override_service: Arc<dyn TrackClearOverrideService>,
     track_set_commit_hash_service: Arc<dyn TrackSetCommitHashService>,
     track_switch_base_service: Arc<dyn TrackSwitchBaseService>,
+    track_resolve_service: Arc<dyn TrackResolveService>,
 }
 
 impl TrackDriver {
@@ -293,6 +296,7 @@ impl TrackDriver {
         track_clear_override_service: Arc<dyn TrackClearOverrideService>,
         track_set_commit_hash_service: Arc<dyn TrackSetCommitHashService>,
         track_switch_base_service: Arc<dyn TrackSwitchBaseService>,
+        track_resolve_service: Arc<dyn TrackResolveService>,
     ) -> Self {
         Self {
             track_init_service,
@@ -309,6 +313,7 @@ impl TrackDriver {
             track_clear_override_service,
             track_set_commit_hash_service,
             track_switch_base_service,
+            track_resolve_service,
         }
     }
 
@@ -362,7 +367,7 @@ impl TrackDriver {
                 )
             }
             TrackInput::Resolve { items_dir, track_id } => {
-                service_output_to_outcome(self.service.resolve(items_dir, track_id))
+                render_track_resolve_outcome(&*self.track_resolve_service, items_dir, track_id)
             }
             TrackInput::ViewsValidate { project_root } => {
                 service_output_to_outcome(self.service.views_validate(project_root))
@@ -702,6 +707,9 @@ mod tests {
     use usecase::track_lifecycle::track_next_task::{
         TrackNextTaskCommand, TrackNextTaskError, TrackNextTaskResult,
     };
+    use usecase::track_lifecycle::track_resolve::{
+        TrackResolveCommand, TrackResolveError, TrackResolveResult, TrackResolveService,
+    };
     use usecase::track_lifecycle::track_set_commit_hash::{
         TrackSetCommitHashCommand, TrackSetCommitHashError, TrackSetCommitHashResult,
         TrackSetCommitHashService,
@@ -905,6 +913,8 @@ mod tests {
 
     struct UnusedTrackSwitchBaseService;
 
+    struct UnusedTrackResolveService;
+
     impl TrackNextTaskService for UnusedTrackNextTaskService {
         fn execute(
             &self,
@@ -958,6 +968,12 @@ mod tests {
             usecase::track_lifecycle::track_switch_base::TrackSwitchBaseResult,
             usecase::track_lifecycle::track_switch_base::TrackSwitchBaseError,
         > {
+            unreachable!()
+        }
+    }
+
+    impl TrackResolveService for UnusedTrackResolveService {
+        fn execute(&self, _: TrackResolveCommand) -> Result<TrackResolveResult, TrackResolveError> {
             unreachable!()
         }
     }
@@ -1139,6 +1155,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         )
     }
 
@@ -1163,6 +1180,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1173,10 +1191,49 @@ mod tests {
 
         assert_eq!(outcome.exit_code, 0);
         assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr, None);
         assert_eq!(
             service.calls.lock().unwrap().as_slice(),
             &[(PathBuf::from("track/items"), "new-track".to_owned(), "New Track".to_owned(),)]
         );
+    }
+
+    #[test]
+    fn test_track_driver_init_service_error_maps_to_stderr_and_exit() {
+        let service = Arc::new(RecordingTrackInitService {
+            calls: Mutex::new(Vec::new()),
+            result: Err(TrackInitError::ExecutionFailed(
+                usecase::git_workflow::DiagnosticText::new("disk full"),
+            )),
+        });
+        let driver = TrackDriver::new(
+            service.clone(),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
+            Arc::new(UnusedTrackClearOverrideService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
+        );
+
+        let outcome = driver.handle(TrackInput::Init {
+            items_dir: PathBuf::from("track/items"),
+            track_id: "new-track".to_owned(),
+            description: "New Track".to_owned(),
+        });
+
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(outcome.stderr.as_deref(), Some("disk full"));
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(service.calls.lock().unwrap().len(), 1);
     }
 
     #[test]
@@ -1200,6 +1257,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::Init {
@@ -1232,6 +1290,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1274,6 +1333,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1308,6 +1368,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1344,6 +1405,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::AddTask {
@@ -1388,6 +1450,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1430,6 +1493,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1464,6 +1528,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::NextTask {
@@ -1499,6 +1564,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1534,6 +1600,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1576,6 +1643,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1609,6 +1677,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1642,6 +1711,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::Archive {
@@ -1674,6 +1744,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1710,6 +1781,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1744,6 +1816,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1777,6 +1850,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchCreate {
@@ -1809,6 +1883,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1845,6 +1920,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -1881,6 +1957,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         );
 
         let outcome = driver.handle(TrackInput::BranchSwitch {
@@ -2340,6 +2417,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             service,
             Arc::new(UnusedTrackSwitchBaseService),
+            Arc::new(UnusedTrackResolveService),
         )
     }
 
@@ -2445,6 +2523,7 @@ mod tests {
             Arc::new(UnusedTrackClearOverrideService),
             Arc::new(UnusedTrackSetCommitHashService),
             service,
+            Arc::new(UnusedTrackResolveService),
         )
     }
 
@@ -2498,5 +2577,113 @@ mod tests {
         assert_eq!(outcome.stdout.as_deref(), Some("Failed to checkout main"));
         assert_eq!(outcome.stderr, None);
         assert_eq!(outcome.exit_code, 7);
+    }
+
+    struct RecordingTrackResolveService {
+        result: Result<TrackResolveResult, String>,
+        calls: Mutex<Vec<(PathBuf, TrackSelection)>>,
+    }
+
+    impl TrackResolveService for RecordingTrackResolveService {
+        fn execute(
+            &self,
+            command: TrackResolveCommand,
+        ) -> Result<TrackResolveResult, TrackResolveError> {
+            self.calls
+                .lock()
+                .expect("service lock is available")
+                .push((command.items_dir.as_path().to_path_buf(), command.track.clone()));
+            match &self.result {
+                Ok(TrackResolveResult::Ready { phase, reason, next_command }) => {
+                    Ok(TrackResolveResult::Ready {
+                        phase: phase.clone(),
+                        reason: usecase::git_workflow::DiagnosticText::new(reason.as_str()),
+                        next_command: next_command.clone(),
+                    })
+                }
+                Ok(TrackResolveResult::Blocked { phase, reason, next_command, blocker }) => {
+                    Ok(TrackResolveResult::Blocked {
+                        phase: phase.clone(),
+                        reason: usecase::git_workflow::DiagnosticText::new(reason.as_str()),
+                        next_command: next_command.clone(),
+                        blocker: usecase::git_workflow::DiagnosticText::new(blocker.as_str()),
+                    })
+                }
+                Err(error) => Err(TrackResolveError::ExecutionFailed(
+                    usecase::git_workflow::DiagnosticText::new(error),
+                )),
+            }
+        }
+    }
+
+    fn resolve_driver(service: Arc<RecordingTrackResolveService>) -> TrackDriver {
+        TrackDriver::new(
+            Arc::new(UnusedTrackInitService),
+            Arc::new(UnusedTrackArchiveService),
+            Arc::new(UnusedTrackBranchCreateService),
+            Arc::new(UnusedTrackBranchSwitchService),
+            Arc::new(UnusedTrackService),
+            Arc::new(UnusedFixpointResolveService),
+            Arc::new(StubBaseMergeService::new(Ok(BaseMergeOutcome::Completed))),
+            Arc::new(UnusedTrackAddTaskService),
+            Arc::new(UnusedTrackNextTaskService),
+            Arc::new(UnusedTrackTransitionService),
+            Arc::new(UnusedTrackSetOverrideService),
+            Arc::new(UnusedTrackClearOverrideService),
+            Arc::new(UnusedTrackSetCommitHashService),
+            Arc::new(UnusedTrackSwitchBaseService),
+            service,
+        )
+    }
+
+    fn resolve_argv(value: &str) -> usecase::operator_command::CommandArgv {
+        usecase::operator_command::CommandArgv::try_new(vec![
+            usecase::operator_command::CommandArgument::try_new(value.to_owned()),
+        ])
+        .expect("command argv is valid")
+    }
+
+    #[test]
+    fn test_track_driver_resolve_valid_input_preserves_output_contract() {
+        let service = Arc::new(RecordingTrackResolveService {
+            result: Ok(TrackResolveResult::Ready {
+                phase: domain::track_phase::TrackPhase::InProgress,
+                reason: usecase::git_workflow::DiagnosticText::new("track has unresolved tasks"),
+                next_command: resolve_argv("/track:implement"),
+            }),
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = resolve_driver(service.clone());
+        let outcome = driver.handle(TrackInput::Resolve {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("resolve-track".to_owned()),
+        });
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "Current phase: In Progress\nReason: track has unresolved tasks\nRecommended next command: /track:implement"
+            )
+        );
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(service.calls.lock().expect("service lock is available").len(), 1);
+    }
+
+    #[test]
+    fn test_track_driver_resolve_service_error_maps_to_failure_outcome() {
+        let service = Arc::new(RecordingTrackResolveService {
+            result: Err("track not found: missing".to_owned()),
+            calls: Mutex::new(Vec::new()),
+        });
+        let driver = resolve_driver(service);
+        let outcome = driver.handle(TrackInput::Resolve {
+            items_dir: PathBuf::from("workspace/track/items"),
+            track_id: Some("missing".to_owned()),
+        });
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(
+            outcome.stderr.as_deref(),
+            Some("[ERROR] resolve failed: track not found: missing")
+        );
     }
 }

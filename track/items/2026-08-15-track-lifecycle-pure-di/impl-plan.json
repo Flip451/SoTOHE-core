@@ -174,6 +174,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "44b11ee0",
       "depends_on": [
         "T001"
       ],
@@ -187,7 +188,7 @@
       ],
       "description": "Implement the `TrackResolve*` command boundary in `libs/usecase/src/track_lifecycle/track_resolve.rs`; update `apps/cli/src/commands/track/resolve.rs`, the driver, composition wiring, and CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T013",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [

@@ -12,7 +12,7 @@
 | TrackNextTaskResult | enum | add | Found, NoOpenTask | 🔵 | 🔵 |
 | TrackResolutionCommand | enum | add | ReadFromItems, ReadFromRoot, WriteFromItems, WriteFromRoot, DetectActive | 🔵 | 🔵 |
 | TrackResolutionResult | enum | add | Resolved, Inactive | 🔵 | 🔵 |
-| TrackResolveResult | enum | add | Ready, Blocked | 🟡 | 🔵 |
+| TrackResolveResult | enum | add | Ready, Blocked | 🔵 | 🔵 |
 | TrackSelection | enum | add | Active, Explicit | 🔵 | 🔵 |
 | TrackSpecAnchorSelection | enum | add | All, One | 🔵 | 🔵 |
 | TrackSpecElementHashResult | enum | add | Single, All | 🔵 | 🔵 |
@@ -63,7 +63,7 @@
 | TrackLintError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackNextTaskError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackResolutionCompatError | error_type | add | Unavailable | 🔵 | 🔵 |
-| TrackResolveError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackResolveError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSetCommitHashError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSetOverrideError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSpecElementHashError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
@@ -121,7 +121,7 @@
 | TrackLintService | application_service | add | fn execute(&self, command: TrackLintCommand) -> Result<TrackLintResult, TrackLintError> | 🔵 | 🔵 |
 | TrackNextTaskService | application_service | add | fn execute(&self, command: TrackNextTaskCommand) -> Result<TrackNextTaskResult, TrackNextTaskError> | 🔵 | 🔵 |
 | TrackResolutionService | application_service | add | fn execute(&self, command: TrackResolutionCommand) -> Result<TrackResolutionResult, TrackResolutionCompatError> | 🔵 | 🔵 |
-| TrackResolveService | application_service | add | fn execute(&self, command: TrackResolveCommand) -> Result<TrackResolveResult, TrackResolveError> | 🟡 | 🔵 |
+| TrackResolveService | application_service | add | fn execute(&self, command: TrackResolveCommand) -> Result<TrackResolveResult, TrackResolveError> | 🔵 | 🔵 |
 | TrackSetCommitHashService | application_service | add | fn execute(&self, command: TrackSetCommitHashCommand) -> Result<TrackSetCommitHashResult, TrackSetCommitHashError> | 🔵 | 🔵 |
 | TrackSetOverrideService | application_service | add | fn execute(&self, command: TrackSetOverrideCommand) -> Result<TrackSetOverrideResult, TrackSetOverrideError> | 🔵 | 🔵 |
 | TrackSpecElementHashService | application_service | add | fn execute(&self, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🔵 | 🔵 |
@@ -153,7 +153,7 @@
 | TrackLintInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackNextTaskInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackResolutionInteractor | interactor | add | — | 🔵 | 🔵 |
-| TrackResolveInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackResolveInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSetCommitHashInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSetOverrideInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSpecElementHashInteractor | interactor | add | — | 🔵 | 🔵 |
@@ -208,7 +208,7 @@
 | TrackInitCommand | command | add | — | 🔵 | 🔵 |
 | TrackLintCommand | command | add | — | 🔵 | 🔵 |
 | TrackNextTaskCommand | command | add | — | 🔵 | 🔵 |
-| TrackResolveCommand | command | add | — | 🟡 | 🔵 |
+| TrackResolveCommand | command | add | — | 🔵 | 🔵 |
 | TrackSetCommitHashCommand | command | add | — | 🔵 | 🔵 |
 | TrackSetOverrideCommand | command | add | — | 🔵 | 🔵 |
 | TrackSpecElementHashCommand | command | add | — | 🔵 | 🔵 |

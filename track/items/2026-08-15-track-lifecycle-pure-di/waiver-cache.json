@@ -11807,6 +11807,414 @@
         "kind": "waived"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveCommand"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "5cb4b2bfd087f2654d1e421e4928d6412a42ab7149f0590f10642f3b363cfbb4",
+        "waived_reason_hash": "1110c5d70dc5fece1e8a6fc0d62e47cf2bf52e3dcf1384b3c599a818fb05c029"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveCommand",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveCommand"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "abdc23aa63af2b5196b20c075b72244bb308f72910218a31711d0832edcd587b",
+        "waived_reason_hash": "dbd9c0614a5cc4f547334a00b63b1a4ecbe93b66d0be42f37c6f091126b1fecc"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveCommand",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveCommand"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "2f44b7bc6f69e74b025fca2fa8a2b31ffcb912823312ccb2d497f90be7fdfa2b",
+        "waived_reason_hash": "e6a6ea51f75f593f5ae797a7821ffceafe07393391b61453eac79a8b9c67d4bf"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveCommand",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveCommand"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "32bd567db6cfc6602d775e7486def767eea81057d290a5c461f11c1c0cb2d2e9",
+        "waived_reason_hash": "ae4ff6a62abcb04fd7e895cc0e35816b07b541e99b4380bf9290fac36da9a7c9"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveCommand",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveError"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "3911000ab906992884ba05a875ed405ef32829cb96fb84cec0ac17e91bf9c645",
+        "waived_reason_hash": "b9f6c618016b2bc6f97446260eab2402ca7b867cd15122918b23acb8fb940104"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveError",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveError"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "1811ce462de83ccbb925e9421179855604c1362aad22d7c0f92e67d135fa62db",
+        "waived_reason_hash": "f4ea588a9aefb6506d989333c2c1fa6ff572954bfb34318d74d55f37e5403f05"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveError",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveError"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "aa7a49c1ffecbe2f242522b818ddad0fbadfe56e31a66f96066027f6127cdf97",
+        "waived_reason_hash": "bad1e49a15b106382be2cc223eada14399bc1c6fdb0e417770a61d83271cd56c"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveError",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveResult"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "398ad095b1f5359a301df7c7f4849a804d1e61a89f0509fcb95e8d15a379a160",
+        "waived_reason_hash": "8dae9e9006713b6d4b1bf1470825f10d120b716b9337d9ec49d98fa11add40ea"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveResult",
+        "item_identifier": "voluntary:AC-02",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "command selection は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveResult"
+      },
+      "key": {
+        "anchor_text_hash": "5960cc0b671ce966b99734a6c57af8e27303dea96d2bb39021adf94f6ed9359b",
+        "declaration_hash": "5f60187482274253d52584bd8721bb6113ae030a1707481e686d95de1aee892d",
+        "waived_reason_hash": "a74df9ddefb5434c22c4a75af5364056cbd15ab5212b9462edb50d91a116daad"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveResult",
+        "item_identifier": "voluntary:AC-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "対象 usecase boundary は検証済み入力を受けて presentation-free result または error を返し、stdout / stderr の整形と exit-code mapping は primary adapter が担う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveResult"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "a0a9703b91f2d35c0fa2c9c5fc4583accffc29ea3d4604f2e5cb90bf1ee2fc85",
+        "waived_reason_hash": "733eda5b52da055afac627e315f084c44947e2907ad6643a496349bf64ce7e66"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveResult",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "Track Resolve result DTO for primary-adapter transfer.",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveResult"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "aade5ab3fcbc9ba481ef4617d63ef2b08de87d8549a32712a1148decc1654e18",
+        "waived_reason_hash": "b79d7bd686cf9193d6ac27e89a1f6cdb4643d4aee386336a6b22754fb9656b69"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveResult",
+        "item_identifier": "voluntary:CN-03",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "849a41f4347ef4cb02f81cc519c404caa55632a91fd80bc2df5f7d183cc0e0f9",
+        "waived_reason_hash": "fce7f411836d9084063041c24cef065f58e94096307e9cbfe6265a33054632fc"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "command selection は primary adapter が担う",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "849a41f4347ef4cb02f81cc519c404caa55632a91fd80bc2df5f7d183cc0e0f9",
+        "waived_reason_hash": "cfa5c9b3c78a4c8391a4ee8ac148042821e06b2798be584a22e7dc951392d4a4"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: []",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveInteractor"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "849a41f4347ef4cb02f81cc519c404caa55632a91fd80bc2df5f7d183cc0e0f9",
+        "waived_reason_hash": "6995f1e9de36f08b0b523a46080775897ea834fbc25c323f6a523e91ef9271af"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "crate topology を維持し、各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し、Interactor と Application Service を別 crate に分離しない。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-02",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveService"
+      },
+      "key": {
+        "anchor_text_hash": "e2ac448e0ce84acaee13f14c617e881a36c0b6bda697a081473eaff71d65e84d",
+        "declaration_hash": "08e886dd34b2143823782e1a6760c132f31171c92d67cb0e5554d6f7bbdde89a",
+        "waived_reason_hash": "ad099f4c7244e9fa9ed6915350c42b38774628f27e48fa3ac985240e11416cad"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "TraitEntry { action: Add, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"execute\")),",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "AC-04",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveService"
+      },
+      "key": {
+        "anchor_text_hash": "beca7429835b6180e0c9a5105497f46ec0a77e251b2d12121bfe7c0e083a456e",
+        "declaration_hash": "ea376412a85fe8c046dd83493dfb7d0766c2c9efdca7c3db9ca22f289011251e",
+        "waived_reason_hash": "663378890357c3bfa038406416e9912e29d8845b613db32b43e8fae96d83506b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveService",
+        "item_identifier": "voluntary:AC-04",
+        "obligation_kind": "logic"
+      },
+      "verdict": {
+        "citation": "各対象 execution path は compatibility shim または中間 *ServiceImpl への runtime reference、call、reverse delegation を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "anchor_id": {
+          "element_id": "CN-03",
+          "file_path": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+        },
+        "entry_key": "TrackResolveService"
+      },
+      "key": {
+        "anchor_text_hash": "7e8d92bb0c481bca3d95190cb11a648282bb8f3e4ce3dbca6b6e115ec28be8ea",
+        "declaration_hash": "08e886dd34b2143823782e1a6760c132f31171c92d67cb0e5554d6f7bbdde89a",
+        "waived_reason_hash": "59133b943a06ace476fb8408c9a060c84febe99fc39fc8cb06e067ac79537d1b"
+      },
+      "obligation_id": {
+        "entry_key": "TrackResolveService",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "result"
+      },
+      "verdict": {
+        "citation": "各対象 CLI subcommand の Command・入力ポート・Interactor・Application Service・結果型・エラー型を、1 subcommand : 1 usecase に対応する libs/usecase 内の同一 command-context module に配置して役割を分離し",
+        "kind": "waived"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ],
   "track_id": "2026-08-15-track-lifecycle-pure-di"

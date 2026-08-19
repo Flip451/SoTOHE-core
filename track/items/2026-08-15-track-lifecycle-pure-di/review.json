@@ -485,6 +485,20 @@
           "hash": "rvw1:sha256:b88de555f8ce2c4a0c38a5b6d529c1596ccf7953f34bd1d11cc8a0e67d8be357",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:52:53Z",
+          "findings": [],
+          "hash": "rvw1:sha256:315d048740e6affb3e3aa2b98735ee7069577b93499509031713858ff71ad95e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:14:09Z",
+          "findings": [],
+          "hash": "rvw1:sha256:315d048740e6affb3e3aa2b98735ee7069577b93499509031713858ff71ad95e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -846,6 +860,42 @@
           "at": "2026-08-19T17:47:04Z",
           "findings": [],
           "hash": "rvw1:sha256:c014532699eb733724df9ea58303752b323ccd564b9f31f7a2a763302744cbe0",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:53:11Z",
+          "findings": [
+            {
+              "category": "adapter defined here",
+              "file": "apps/cli-composition/src/track/composition_root.rs",
+              "line": 349,
+              "message": "`RequestScopedTrackPhaseAdapter` is a secondary-port implementation (`impl usecase::track_phase::TrackPhaseService`) defined in `cli_composition`. Port implementations belong in `libs/infrastructure`; the composition root should only construct and wire the adapter.",
+              "severity": "P1"
+            },
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/service_impl.rs",
+              "line": 64,
+              "message": "`TrackServiceImpl::resolve` invokes application flow via `TrackCompositionRoot::new().track_driver().handle(...)`. This makes the composition layer execute the driver instead of leaving invocation to the CLI entry point.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:9f653823d1c84f5eab2d1eb8d6ab6384920f3302891a648c05a748f85d40e5bf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T18:57:39Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f653823d1c84f5eab2d1eb8d6ab6384920f3302891a648c05a748f85d40e5bf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:03:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:9f653823d1c84f5eab2d1eb8d6ab6384920f3302891a648c05a748f85d40e5bf",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1264,6 +1314,20 @@
           "at": "2026-08-19T17:44:26Z",
           "findings": [],
           "hash": "rvw1:sha256:8031ef7ee7b01918046585024d8e199907f78003559a675c9b69420ed9d1d6e4",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:53:06Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06d6e134056d3d5e5f9ebe88cec5f6d2527959da5bbc2e9d55060420ebc4eecd",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:05:47Z",
+          "findings": [],
+          "hash": "rvw1:sha256:06d6e134056d3d5e5f9ebe88cec5f6d2527959da5bbc2e9d55060420ebc4eecd",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1988,6 +2052,20 @@
           "at": "2026-08-19T18:00:14Z",
           "findings": [],
           "hash": "rvw1:sha256:00e06009130090250d9974368506244bbd35d02dd1981264d6c8347ca6ff5d26",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:52:23Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1f2b03f6faccd49e0a5e2c616dec717060d07a29cf6f7e18d6452f88576426e5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:59:30Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1f2b03f6faccd49e0a5e2c616dec717060d07a29cf6f7e18d6452f88576426e5",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3310,6 +3388,20 @@
           "hash": "rvw1:sha256:d41528e4e8b7836e7d094bc289ca2dd1403038aaa653804fc5420491f0d5f331",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:52:54Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d246878b0c56c63cd7e0667934e99aba66e6a7fd9e2d966bf2fc952b90cb2cc5",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:03:28Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d246878b0c56c63cd7e0667934e99aba66e6a7fd9e2d966bf2fc952b90cb2cc5",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4391,6 +4483,20 @@
           "at": "2026-08-19T17:43:36Z",
           "findings": [],
           "hash": "rvw1:sha256:d86aa2becbe99096db126915f1e57584a3533e3d26609939f6347e2ad0571ebf",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:53:35Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af393a3829667562ac2f321fe8bfc0dc2fc6c241074dc8561921db7cf462edd6",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T19:21:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:af393a3829667562ac2f321fe8bfc0dc2fc6c241074dc8561921db7cf462edd6",
           "type": "final",
           "verdict": "zero_findings"
         }

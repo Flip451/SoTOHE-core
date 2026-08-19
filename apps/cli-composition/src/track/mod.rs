@@ -259,34 +259,7 @@ impl TrackCompositionRoot {
             .map(|msg| CommandOutcome::success(Some(msg)))
             .map_err(|e| CompositionError::Infrastructure(e.to_string()))
     }
-    /// Resolve the current track phase, next command, and blocker.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_resolve(
-        &self,
-        items_dir: PathBuf,
-        track_id: Option<String>,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::fs_store::FsTrackStore;
-        use usecase::track_phase::TrackPhaseService as _;
-        resolve_project_root(&items_dir)?;
-        let effective_track_id = resolve_track_id(track_id, &items_dir)?;
-        validate_track_id_str(&effective_track_id)?;
-        let store = Arc::new(FsTrackStore::new(items_dir.clone()));
-        let service = usecase::track_phase::TrackPhaseInteractor::new(Arc::clone(&store));
-        let info = service
-            .resolve(effective_track_id, items_dir)
-            .map_err(|e| CompositionError::Usecase(format!("resolve failed: {e}")))?;
-        let mut lines = vec![
-            format!("Current phase: {}", info.phase),
-            format!("Reason: {}", info.reason),
-            format!("Recommended next command: {}", info.next_command),
-        ];
-        if let Some(blocker) = &info.blocker {
-            lines.push(format!("Blocker: {blocker}"));
-        }
-        Ok(CommandOutcome::success(Some(lines.join("\n"))))
-    }
+
     /// Validate metadata.json files under the repository.
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.

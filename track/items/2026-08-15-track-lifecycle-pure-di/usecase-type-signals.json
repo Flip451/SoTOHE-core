@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
   "declaration_hash": "1de7a8040724ee6619f8b3c5c8479679a61871afedbcf83b51dcd64861bd9fab",
-  "generated_at": "2026-08-19T18:03:11Z",
-  "head_commit": "0b53b9cee5367864f886047c1f33aa3307b42c27",
+  "generated_at": "2026-08-19T19:22:05Z",
+  "head_commit": "44b11ee02660a7e9bf365fad28104d174a00df5a",
   "schema_version": 4,
   "signals": [
     {
@@ -956,41 +956,41 @@
       "type_name": "TrackResolutionService"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolveCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackResolveError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackResolveService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackResolveInteractor"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolveResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackResolveService"
     },
     {

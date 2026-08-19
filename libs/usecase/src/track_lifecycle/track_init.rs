@@ -265,7 +265,8 @@ mod tests {
             views.clone(),
         );
 
-        interactor.execute(command("New Track")).expect("initialization succeeds");
+        let result = interactor.execute(command("New Track")).expect("initialization succeeds");
+        assert_eq!(result, TrackInitResult);
 
         assert_eq!(metadata.saved.lock().expect("metadata lock is available").len(), 1);
         assert_eq!(
