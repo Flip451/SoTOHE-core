@@ -118,6 +118,7 @@ pub(crate) fn default_fulfillment_verifier_runner(
     build_semantic_verifier_runner(
         workspace_root,
         crate::ref_verify::process_runner::CODEX_FULFILLMENT_OUTPUT_SCHEMA,
+        "obligation-fulfillment-verifier",
     )
 }
 
@@ -132,6 +133,7 @@ pub(crate) fn default_waiver_verifier_runner(
     build_semantic_verifier_runner(
         workspace_root,
         crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA,
+        "waiver-verifier",
     )
 }
 
@@ -147,10 +149,12 @@ pub(crate) fn default_waiver_verifier_runner(
 fn build_semantic_verifier_runner(
     workspace_root: PathBuf,
     codex_output_schema: &'static str,
+    capability: &'static str,
 ) -> Arc<SemanticVerifierRunner> {
     let inner = crate::ref_verify::process_runner::make_agent_process_runner(
         workspace_root,
         codex_output_schema,
+        capability,
     );
     Arc::new(move |resolved, prompt| {
         inner(resolved, prompt).map_err(|err| match err {

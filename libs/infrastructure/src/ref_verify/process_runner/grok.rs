@@ -7,10 +7,10 @@ use usecase::capability_exec::{ModelName, ReasoningEffort};
 use usecase::provider_session::ProviderSessionId;
 use usecase::ref_verify::RefVerifyError;
 
-use crate::capability_exec::grok::build_grok_args;
+use crate::capability_exec::grok::{build_grok_args, resolve_grok_capability_definition};
 use crate::grok_common::{GrokOutputEnvelope, GrokSandbox, grok_envelope_bytes_from_stdout};
 
-use super::{nonempty_trimmed, ref_verify_runner_error, run_process_retryable};
+use super::{nonempty_trimmed, ref_verify_runner_error, run_process};
 
 /// Builds the Grok argv for a ref-verifier invocation using the canonical
 /// model / effort / resume / sandbox mapping shared by Grok adapters.
@@ -41,15 +41,31 @@ pub(super) fn run_grok_ref_verifier(
     model: &ModelName,
     effort: ReasoningEffort,
     prompt: &str,
+    capability: &str,
 ) -> Result<String, RefVerifyError> {
-    // The four typed-pipeline capabilities routed through this shared runner
-    // all declare `grok-sandbox: read-only`. The existing runner callback does
-    // not carry a capability identifier, so one shared arm cannot resolve a
-    // capability-specific adapter definition here.
-    let sandbox = GrokSandbox::ReadOnly;
+    super::super::retry::retry_transient(
+        super::super::retry::DEFAULT_TRANSIENT_BACKOFFS,
+        || run_grok_ref_verifier_once(project_root, model, effort, prompt, capability),
+        std::thread::sleep,
+    )
+}
+
+fn run_grok_ref_verifier_once(
+    project_root: &Path,
+    model: &ModelName,
+    effort: ReasoningEffort,
+    prompt: &str,
+    capability: &str,
+) -> Result<String, RefVerifyError> {
+    let definition = resolve_grok_capability_definition(project_root, capability, model)
+        .map_err(ref_verify_runner_error)?;
+    let sandbox = definition.sandbox().cloned().ok_or_else(|| {
+        ref_verify_runner_error(format!(
+            "Grok capability '{capability}' did not resolve a grok-sandbox permission"
+        ))
+    })?;
     let args = build_grok_ref_verifier_args(model, effort, &sandbox, None, prompt);
-    let outcome =
-        run_process_retryable(OsStr::new("grok"), &args, project_root, "grok ref-verifier", None)?;
+    let outcome = run_process(OsStr::new("grok"), &args, project_root, "grok ref-verifier", None)?;
     let envelope_bytes = grok_envelope_bytes_from_stdout(outcome.stdout.as_bytes())
         .ok_or_else(|| ref_verify_runner_error("grok ref-verifier produced no output envelope"))?;
     let envelope =
@@ -140,7 +156,7 @@ mod tests {
         fs::write(
             &executable,
             format!(
-                "#!/bin/sh\nprintf '%s\\n' invoked >> \"$GROK_REF_VERIFIER_MARKER\"\nprintf '%s\\n' '{envelope}'\n"
+                "#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$GROK_REF_VERIFIER_MARKER\"\nprintf '%s\\n' '{envelope}'\n"
             ),
         )
         .expect("recording fake grok is written");
@@ -148,6 +164,18 @@ mod tests {
             fs::metadata(&executable).expect("recording fake grok metadata").permissions();
         permissions.set_mode(0o755);
         fs::set_permissions(&executable, permissions).expect("recording fake grok is executable");
+    }
+
+    fn write_grok_skill(root: &Path, capability: &str, sandbox: &str) {
+        let directory = root.join(".agents").join("skills").join(capability);
+        fs::create_dir_all(&directory).expect("skill directory is created");
+        fs::write(
+            directory.join("SKILL.md"),
+            format!(
+                "---\nname: {capability}\ndescription: test grok verifier skill\ngrok-sandbox: {sandbox}\n---\n"
+            ),
+        )
+        .expect("skill definition is written");
     }
 
     #[cfg(unix)]
@@ -169,6 +197,7 @@ mod tests {
             &bin_dir,
             r#"{"text":"ignore this text","structured_output":{"result":"{\"kind\":\"pass\",\"citation\":\"AC-01\",\"reason\":null}"}}"#,
         );
+        write_grok_skill(directory.path(), "ref-verifier-chain1", "read-only");
         let path = path_with_fake_grok(&bin_dir);
         let resolved = ResolvedExecution::ProviderCli {
             provider: ProviderName::try_new("grok".to_owned()).expect("provider is valid"),
@@ -182,6 +211,7 @@ mod tests {
                 resolved,
                 "prompt".to_owned(),
                 super::super::CODEX_OUTPUT_SCHEMA,
+                "ref-verifier-chain1",
             )
         })
         .expect("Grok structured result is returned");
@@ -233,6 +263,14 @@ mod tests {
             capability_entries = capability_entries
         );
         fs::write(&profile_path, profile).expect("Grok profile is written");
+        for capability_name in [
+            "ref-verifier-chain1",
+            "ref-verifier-chain2",
+            "obligation-fulfillment-verifier",
+            "waiver-verifier",
+        ] {
+            write_grok_skill(directory.path(), capability_name, "read-only");
+        }
         let profiles =
             AgentProfiles::load(directory.path(), &profile_path).expect("Grok profile loads");
 
@@ -270,6 +308,7 @@ mod tests {
                             resolved,
                             format!("{capability_name} {round_type:?}"),
                             super::super::CODEX_OUTPUT_SCHEMA,
+                            capability_name,
                         );
                         outcomes.push((capability_name, round_type, result));
                     }
@@ -300,6 +339,7 @@ mod tests {
             &bin_dir,
             r#"{"text":"do not use me","failure_reason":"provider rejected the request"}"#,
         );
+        write_grok_skill(directory.path(), "ref-verifier-chain1", "read-only");
         let path = path_with_fake_grok(&bin_dir);
         let resolved = ResolvedExecution::ProviderCli {
             provider: ProviderName::try_new("grok".to_owned()).expect("provider is valid"),
@@ -313,6 +353,7 @@ mod tests {
                 resolved,
                 "prompt".to_owned(),
                 super::super::CODEX_OUTPUT_SCHEMA,
+                "ref-verifier-chain1",
             )
         })
         .expect_err("Grok failure envelope must fail closed");
@@ -322,5 +363,88 @@ mod tests {
 
         assert!(message.contains("provider rejected the request"), "got: {message}");
         assert!(!message.contains("do not use me"), "envelope text must not be a result");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_ref_verifier_agent_grok_uses_capability_sandbox() {
+        let directory = tempfile::tempdir().expect("temporary directory is created");
+        let bin_dir = directory.path().join("bin");
+        fs::create_dir(&bin_dir).expect("fake bin directory is created");
+        write_grok_skill(directory.path(), "ref-verifier-chain2", "workspace");
+        install_recording_fake_grok(
+            &bin_dir,
+            r#"{"structured_output":{"result":"{\"kind\":\"pass\",\"citation\":\"sandbox\",\"reason\":null}"}}"#,
+        );
+        let path = path_with_fake_grok(&bin_dir);
+        let marker = directory.path().join("grok-invocations.log");
+        let resolved = ResolvedExecution::ProviderCli {
+            provider: ProviderName::try_new("grok".to_owned()).expect("provider is valid"),
+            model: ModelName::try_new("grok-4.6".to_owned()).expect("model is valid"),
+            effort: ReasoningEffort::High,
+        };
+
+        let result = temp_env::with_var("PATH", Some(path.as_os_str()), || {
+            temp_env::with_var("GROK_REF_VERIFIER_MARKER", Some(marker.as_os_str()), || {
+                super::super::run_ref_verifier_agent(
+                    directory.path(),
+                    resolved,
+                    "prompt".to_owned(),
+                    super::super::CODEX_OUTPUT_SCHEMA,
+                    "ref-verifier-chain2",
+                )
+            })
+        })
+        .expect("workspace sandbox launch succeeds");
+        assert_eq!(result, r#"{"kind":"pass","citation":"sandbox","reason":null}"#);
+        let recorded = fs::read_to_string(&marker).expect("argv is recorded");
+        assert!(recorded.contains("--sandbox workspace"), "got: {recorded}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_run_ref_verifier_agent_grok_retries_transient_envelope_failure() {
+        let directory = tempfile::tempdir().expect("temporary directory is created");
+        let bin_dir = directory.path().join("bin");
+        fs::create_dir(&bin_dir).expect("fake bin directory is created");
+        write_grok_skill(directory.path(), "waiver-verifier", "read-only");
+        let executable = bin_dir.join("grok");
+        fs::write(
+            &executable,
+            r#"#!/bin/sh
+if [ -f "$GROK_REF_VERIFIER_MARKER" ]; then
+  printf '%s\n' '{"structured_output":{"result":"{\"kind\":\"pass\",\"citation\":\"retried\",\"reason\":null}"}}'
+else
+  printf 'attempted\n' > "$GROK_REF_VERIFIER_MARKER"
+  printf '%s\n' '{"failure_reason":"rate limit exceeded"}'
+fi
+"#,
+        )
+        .expect("retry fake grok is written");
+        let mut permissions = fs::metadata(&executable).expect("fake grok metadata").permissions();
+        use std::os::unix::fs::PermissionsExt;
+        permissions.set_mode(0o755);
+        fs::set_permissions(&executable, permissions).expect("fake grok is executable");
+        let path = path_with_fake_grok(&bin_dir);
+        let marker = directory.path().join("grok-retry.log");
+        let resolved = ResolvedExecution::ProviderCli {
+            provider: ProviderName::try_new("grok".to_owned()).expect("provider is valid"),
+            model: ModelName::try_new("grok-4.6".to_owned()).expect("model is valid"),
+            effort: ReasoningEffort::High,
+        };
+
+        let result = temp_env::with_var("PATH", Some(path.as_os_str()), || {
+            temp_env::with_var("GROK_REF_VERIFIER_MARKER", Some(marker.as_os_str()), || {
+                super::super::run_ref_verifier_agent(
+                    directory.path(),
+                    resolved,
+                    "prompt".to_owned(),
+                    super::super::CODEX_OUTPUT_SCHEMA,
+                    "waiver-verifier",
+                )
+            })
+        })
+        .expect("transient envelope failure is retried");
+        assert_eq!(result, r#"{"kind":"pass","citation":"retried","reason":null}"#);
     }
 }

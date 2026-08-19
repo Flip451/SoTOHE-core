@@ -22,7 +22,7 @@ use super::driver_adapter_results::{
 use super::selected_check_approved::check_selected_chain_approved;
 use super::{
     AgentRefVerifierAdapter, RefVerifyCacheAdapter, RefVerifyPairSourceAdapter,
-    RefVerifyScopeResolver, make_ref_verifier_process_runner,
+    RefVerifyScopeResolver,
 };
 use crate::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles};
 
@@ -286,10 +286,20 @@ impl RefVerifyRunService for FsRefVerifyRunAdapter {
             .map_err(|e| RefVerifyDriverError::Unavailable(e.to_string()))?;
         let profiles = Arc::new(profiles);
 
-        let runner = make_ref_verifier_process_runner(canonical_root.clone());
-        let verifier =
-            Arc::new(AgentRefVerifierAdapter::new(profiles, runner, canonical_root.clone()))
-                as Arc<_>;
+        let project_root = canonical_root.clone();
+        let verifier = Arc::new(AgentRefVerifierAdapter::with_capability_runner(
+            profiles,
+            Arc::new(move |resolved, prompt, capability| {
+                crate::ref_verify::process_runner::run_ref_verifier_agent(
+                    &project_root,
+                    resolved,
+                    prompt,
+                    crate::ref_verify::process_runner::CODEX_OUTPUT_SCHEMA,
+                    capability,
+                )
+            }),
+            canonical_root.clone(),
+        )) as Arc<_>;
 
         let interactor = VerifySemanticRefsInteractor::new(pair_source, cache, verifier, config);
 

@@ -135,7 +135,7 @@ pub(crate) const CODEX_FULFILLMENT_OUTPUT_SCHEMA: &str = r#"{
 /// `tmp/reviewer-runtime/`.
 #[must_use]
 pub fn make_ref_verifier_process_runner(project_root: PathBuf) -> Arc<AgentExecutionRunner> {
-    make_agent_process_runner(project_root, CODEX_OUTPUT_SCHEMA)
+    make_agent_process_runner(project_root, CODEX_OUTPUT_SCHEMA, "ref-verifier-chain1")
 }
 
 /// Build an [`AgentExecutionRunner`] that shares the same subprocess pipeline
@@ -152,9 +152,10 @@ pub fn make_ref_verifier_process_runner(project_root: PathBuf) -> Arc<AgentExecu
 pub(crate) fn make_agent_process_runner(
     project_root: PathBuf,
     codex_output_schema: &'static str,
+    capability: &'static str,
 ) -> Arc<AgentExecutionRunner> {
     Arc::new(move |resolved: ResolvedExecution, prompt: String| {
-        run_ref_verifier_agent(&project_root, resolved, prompt, codex_output_schema)
+        run_ref_verifier_agent(&project_root, resolved, prompt, codex_output_schema, capability)
     })
 }
 
@@ -164,11 +165,12 @@ pub(crate) fn make_agent_process_runner(
 /// codex's `--output-schema` (see [`make_agent_process_runner`]). The claude
 /// and gemini paths ignore it: neither CLI enforces structural constraints on
 /// model output at this pipeline layer.
-fn run_ref_verifier_agent(
+pub(crate) fn run_ref_verifier_agent(
     project_root: &Path,
     resolved: ResolvedExecution,
     prompt: String,
     codex_output_schema: &str,
+    capability: &str,
 ) -> Result<String, RefVerifyError> {
     let ResolvedExecution::ProviderCli { provider, model, effort } = resolved else {
         return Err(ref_verify_runner_error(
@@ -185,7 +187,7 @@ fn run_ref_verifier_agent(
             codex_output_schema,
         ),
         "gemini" => run_gemini_ref_verifier(project_root, model.as_str(), effort, &prompt),
-        "grok" => grok::run_grok_ref_verifier(project_root, &model, effort, &prompt),
+        "grok" => grok::run_grok_ref_verifier(project_root, &model, effort, &prompt, capability),
         other => {
             Err(ref_verify_runner_error(format!("unsupported ref-verifier provider '{other}'")))
         }
@@ -392,15 +394,15 @@ fn reasoning_effort_value(effort: ReasoningEffort) -> &'static str {
 // ── subprocess core ──────────────────────────────────────────────────────────
 
 #[derive(Debug)]
-struct ProcessOutcome {
-    stdout: String,
+pub(super) struct ProcessOutcome {
+    pub(super) stdout: String,
 }
 
 /// Spawn `bin args …` with `current_dir = project_root`, wait without timeout,
 /// and return stdout. On non-zero exit, attach the **tail** of stderr (up to
 /// 4 KB / 20 lines) to the error so a long verbose header cannot bury the
 /// actual failure detail.
-fn run_process(
+pub(super) fn run_process(
     bin: &OsStr,
     args: &[OsString],
     current_dir: &Path,
@@ -719,9 +721,14 @@ mod tests {
             model: ModelName::try_new("m").unwrap(),
             effort: ReasoningEffort::High,
         };
-        let err =
-            run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned(), CODEX_OUTPUT_SCHEMA)
-                .unwrap_err();
+        let err = run_ref_verifier_agent(
+            dir.path(),
+            resolved,
+            "prompt".to_owned(),
+            CODEX_OUTPUT_SCHEMA,
+            "ref-verifier-chain1",
+        )
+        .unwrap_err();
         let RefVerifyError::VerifierPort { message } = err else {
             panic!("expected VerifierPort, got {err:?}");
         };
@@ -733,9 +740,14 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let resolved =
             ResolvedExecution::HostedService { provider: ProviderName::try_new("claude").unwrap() };
-        let err =
-            run_ref_verifier_agent(dir.path(), resolved, "prompt".to_owned(), CODEX_OUTPUT_SCHEMA)
-                .unwrap_err();
+        let err = run_ref_verifier_agent(
+            dir.path(),
+            resolved,
+            "prompt".to_owned(),
+            CODEX_OUTPUT_SCHEMA,
+            "ref-verifier-chain1",
+        )
+        .unwrap_err();
         let RefVerifyError::VerifierPort { message } = err else {
             panic!("expected VerifierPort, got {err:?}");
         };

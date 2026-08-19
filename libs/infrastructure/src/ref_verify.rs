@@ -295,9 +295,13 @@ struct VerdictResponseDto {
     reason: Option<String>,
 }
 
+type CapabilityAwareRunner = dyn Fn(crate::agent_profiles::ResolvedExecution, String, &str) -> Result<String, RefVerifyError>
+    + Send
+    + Sync;
+
 pub struct AgentRefVerifierAdapter {
     profiles: Arc<AgentProfiles>,
-    runner: Arc<AgentExecutionRunner>,
+    runner: Arc<CapabilityAwareRunner>,
     project_root: PathBuf,
 }
 
@@ -316,6 +320,19 @@ impl AgentRefVerifierAdapter {
     pub fn new(
         profiles: Arc<AgentProfiles>,
         runner: Arc<AgentExecutionRunner>,
+        project_root: PathBuf,
+    ) -> Self {
+        Self {
+            profiles,
+            runner: Arc::new(move |resolved, prompt, _capability| runner(resolved, prompt)),
+            project_root,
+        }
+    }
+
+    #[must_use]
+    pub(crate) fn with_capability_runner(
+        profiles: Arc<AgentProfiles>,
+        runner: Arc<CapabilityAwareRunner>,
         project_root: PathBuf,
     ) -> Self {
         Self { profiles, runner, project_root }
@@ -384,7 +401,7 @@ impl RefVerifierPort for AgentRefVerifierAdapter {
         };
         let prompt = render_prompt_template(&template_text, &claim, &evidence, tier_str);
 
-        let raw_output = (self.runner)(resolved, prompt)?;
+        let raw_output = (self.runner)(resolved, prompt, capability)?;
 
         let dto: VerdictResponseDto =
             extract_json_object_parsed(&raw_output).map_err(|e| RefVerifyError::VerifierPort {
