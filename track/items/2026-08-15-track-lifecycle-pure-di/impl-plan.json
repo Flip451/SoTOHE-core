@@ -165,6 +165,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "0b53b9ce",
       "depends_on": [
         "T001"
       ],
@@ -178,7 +179,7 @@
       ],
       "description": "Implement the `TrackSwitchBase*` boundary in `libs/usecase/src/track_lifecycle/track_switch_base.rs`; update the switch-base handler in `apps/cli/src/commands/track/branch_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T012",
-      "status": "todo"
+      "status": "done"
     },
     {
       "depends_on": [
@@ -250,6 +251,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "0b53b9ce",
       "depends_on": [
         "T001"
       ],

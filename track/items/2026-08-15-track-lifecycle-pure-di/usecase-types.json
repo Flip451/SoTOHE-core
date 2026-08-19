@@ -689,6 +689,33 @@
           "name": "new",
           "params": [
             {
+              "name": "workspace_root",
+              "ty": "TrackWorkspaceRoot"
+            }
+          ],
+          "returns": "Self",
+          "spec_refs": [
+            {
+              "anchor": "AC-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            },
+            {
+              "anchor": "CN-03",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/spec.json"
+            }
+          ]
+        }
+      ],
+      "type_name": "TrackSwitchBaseCommand"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
               "name": "persistence",
               "ty": "Arc<dyn TrackCommitHashPort>"
             }
@@ -2040,6 +2067,30 @@
     {
       "for_type": "TrackSwitchBaseError",
       "trait_ref": "std::error::Error"
+    },
+    {
+      "for_type": "TrackSwitchBaseCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackSwitchBaseCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackSwitchBaseCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackSwitchBaseResult",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackSwitchBaseResult",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackSwitchBaseResult",
+      "trait_ref": "core::cmp::Eq"
     },
     {
       "for_type": "TrackSetCommitHashInteractor",

@@ -174,7 +174,14 @@ impl TrackService for TrackServiceImpl {
     }
 
     fn switch_base(&self, project_root: PathBuf) -> TrackCommandOutput {
-        composition_to_output(TrackCompositionRoot::new().track_switch_base(project_root))
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(cli_driver::track::TrackInput::SwitchBase { project_root });
+        TrackCommandOutput {
+            stdout: outcome.stdout,
+            stderr: outcome.stderr,
+            exit_code: outcome.exit_code,
+        }
     }
 
     fn catalogue_lint_check_active_track(

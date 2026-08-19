@@ -819,6 +819,35 @@
           "hash": "rvw1:sha256:e326de7f5a9826e6446f2b9c806789c984702c57701319c5a225a71771b049dd",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:37:41Z",
+          "findings": [
+            {
+              "category": "invoke leak",
+              "file": "apps/cli-composition/src/track/branch_strategy.rs",
+              "line": 86,
+              "message": "`track_switch_base` は composition root 内で `TrackDriver::handle` を呼び出し、リクエストを実行して `CommandOutcome` を返しています。composition は driver を構築して返すだけにし、`handle` の呼び出しは `apps/cli` 側へ移してください。",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:f58f5e5619eb2bba94bd8a0680a8ed7af5dd076c329bc225b43e264d49e0bbcf",
+          "type": "fast",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T17:41:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c014532699eb733724df9ea58303752b323ccd564b9f31f7a2a763302744cbe0",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:47:04Z",
+          "findings": [],
+          "hash": "rvw1:sha256:c014532699eb733724df9ea58303752b323ccd564b9f31f7a2a763302744cbe0",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -1221,6 +1250,20 @@
           "at": "2026-08-19T15:44:13Z",
           "findings": [],
           "hash": "rvw1:sha256:423f0932060cbd393658882e91bfa7d8109375ba413de3f43dbda1d1f5c1c4b8",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:37:59Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8031ef7ee7b01918046585024d8e199907f78003559a675c9b69420ed9d1d6e4",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:44:26Z",
+          "findings": [],
+          "hash": "rvw1:sha256:8031ef7ee7b01918046585024d8e199907f78003559a675c9b69420ed9d1d6e4",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -1931,6 +1974,20 @@
           "at": "2026-08-19T14:54:18Z",
           "findings": [],
           "hash": "rvw1:sha256:91dd91e1f16a6a9c9ba6bc44d41c2f3e063a6070e62c08c9aed3fd457de049e5",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:37:03Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00e06009130090250d9974368506244bbd35d02dd1981264d6c8347ca6ff5d26",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:00:14Z",
+          "findings": [],
+          "hash": "rvw1:sha256:00e06009130090250d9974368506244bbd35d02dd1981264d6c8347ca6ff5d26",
           "type": "final",
           "verdict": "zero_findings"
         }
@@ -3217,6 +3274,42 @@
           "hash": "rvw1:sha256:e46341ab5ce05814262706e6971b7858a2a3196ef85ed37f872bda6b9ecee86f",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:37:40Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d41528e4e8b7836e7d094bc289ca2dd1403038aaa653804fc5420491f0d5f331",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:44:07Z",
+          "findings": [
+            {
+              "category": "test-obligation",
+              "file": "track/items/2026-08-15-track-lifecycle-pure-di/test-bindings.json",
+              "line": 587,
+              "message": "The TrackSwitchBaseService trait_method:execute result fulfillment (AC-03) is stale: `bin/sotp test-obligation check` reports `DriftsDetected` / `TestChanged` (`bound test bodies changed since the verdict was frozen`) on `TrackSwitchBaseService × AC-03`, and `results` shows `status:done stale=1`. This fulfillment binds composition tests in `apps/cli-composition/src/track/branch_strategy.rs` (`test_track_switch_base_call_site_preserves_cli_contract_across_migration`, `test_track_switch_base_checkout_failure_preserves_legacy_cli_contract`) whose file was written after the fulfillment-cache verdict was frozen, so the guarded commit will fail. Re-run host `evaluate` (or drop those tests from this record if they no longer belong) so the frozen bound-test hash matches the current bodies.",
+              "severity": "P1"
+            }
+          ],
+          "hash": "rvw1:sha256:d41528e4e8b7836e7d094bc289ca2dd1403038aaa653804fc5420491f0d5f331",
+          "type": "final",
+          "verdict": "findings_remain"
+        },
+        {
+          "at": "2026-08-19T18:00:48Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d41528e4e8b7836e7d094bc289ca2dd1403038aaa653804fc5420491f0d5f331",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T18:02:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d41528e4e8b7836e7d094bc289ca2dd1403038aaa653804fc5420491f0d5f331",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -3880,6 +3973,20 @@
           "hash": "rvw1:sha256:2ff241483a726503a3cebf410268e20eeb740185947b488d996426bb9a2bc236",
           "type": "final",
           "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:37:24Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1516a74e1c1d79ae4eccfbd1ad8a6ed25cf7041c6bcc4402427450ed465a0b3e",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:54:56Z",
+          "findings": [],
+          "hash": "rvw1:sha256:1516a74e1c1d79ae4eccfbd1ad8a6ed25cf7041c6bcc4402427450ed465a0b3e",
+          "type": "final",
+          "verdict": "zero_findings"
         }
       ]
     },
@@ -4270,6 +4377,20 @@
           "at": "2026-08-19T15:23:06Z",
           "findings": [],
           "hash": "rvw1:sha256:7a713b0c2af7f631a90e45c8c5272f1bba893b10b9517f0f517d1ca95e3f1637",
+          "type": "final",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:37:46Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d86aa2becbe99096db126915f1e57584a3533e3d26609939f6347e2ad0571ebf",
+          "type": "fast",
+          "verdict": "zero_findings"
+        },
+        {
+          "at": "2026-08-19T17:43:36Z",
+          "findings": [],
+          "hash": "rvw1:sha256:d86aa2becbe99096db126915f1e57584a3533e3d26609939f6347e2ad0571ebf",
           "type": "final",
           "verdict": "zero_findings"
         }

@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
-  "declaration_hash": "333f8be42d6dc99d2fbfb9ddfd4eabf49d1cfc986810eb144d59619973cf9c86",
-  "generated_at": "2026-08-19T16:31:38Z",
-  "head_commit": "1969b5bf9606a34c5e56e6932464262716b72a7c",
+  "declaration_hash": "1de7a8040724ee6619f8b3c5c8479679a61871afedbcf83b51dcd64861bd9fab",
+  "generated_at": "2026-08-19T18:03:11Z",
+  "head_commit": "0b53b9cee5367864f886047c1f33aa3307b42c27",
   "schema_version": 4,
   "signals": [
     {
@@ -1160,41 +1160,51 @@
       "type_name": "TrackSpecElementHashService"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSwitchBaseCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackSwitchBaseError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackSwitchBaseService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackSwitchBaseInteractor"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSwitchBaseResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackSwitchBaseService"
     },
     {

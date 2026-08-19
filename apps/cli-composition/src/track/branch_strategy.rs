@@ -11,7 +11,7 @@ use crate::CommandOutcome;
 use crate::error::CompositionError;
 use crate::track::composition_root::TrackCompositionRoot;
 
-use super::{resolve_project_root, resolve_track_id_inner, validate_track_id_str};
+use super::{resolve_project_root, validate_track_id_str};
 
 /// Resolve the effective branch strategy from `.harness/config/branch-strategy.json`
 /// under `project_root` and materialize it as a [`domain::BranchStrategySnapshot`].
@@ -49,28 +49,6 @@ pub(super) fn track_git_interactor() -> usecase::git_workflow::TrackGitInteracto
     build_track_git_interactor()
 }
 
-fn switch_base_error_to_outcome(
-    base_branch: &str,
-    error: usecase::git_workflow::GitWorkflowError,
-) -> Result<CommandOutcome, CompositionError> {
-    use usecase::git_workflow::GitWorkflowError;
-
-    // A typed `git switch` failure renders the legacy checkout-failure outcome:
-    // stdout `Failed to checkout <base>`, no stderr, and the u8-clamped exit
-    // code (CN-05 bit-equivalence with the pre-track inline behavior). All other
-    // errors remain typed composition errors.
-    if let GitWorkflowError::SwitchFailed { exit_code, .. } = &error {
-        let exit_code = u8::try_from(*exit_code).unwrap_or(1);
-        return Ok(CommandOutcome {
-            stdout: Some(format!("Failed to checkout {base_branch}")),
-            stderr: None,
-            exit_code,
-        });
-    }
-
-    Err(CompositionError::Infrastructure(error.to_string()))
-}
-
 impl TrackCompositionRoot {
     /// Create a new track branch from the configured base branch.
     /// # Errors
@@ -95,37 +73,6 @@ impl TrackCompositionRoot {
             .map(|()| CommandOutcome::success(None))
             .map_err(|e| CompositionError::Infrastructure(e.to_string()))
     }
-
-    /// Switch to the base branch from the active track's `branch_strategy_snapshot` (IN-05).
-    ///
-    /// Reads metadata.json from `project_root`, resolves a
-    /// [`infrastructure::branch_strategy::SnapshotBranchStrategyAdapter`] (CN-02: no
-    /// re-read of global config for post-init operations), and runs `git switch` +
-    /// `git pull` against the resolved `base_branch`.
-    /// # Errors
-    /// Returns `Err` when the active track cannot be resolved, its metadata cannot
-    /// be read, or the underlying git operations fail.
-    pub fn track_switch_base(
-        &self,
-        project_root: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::track::FsTrackBranchStrategyAdapter;
-        use usecase::track_lifecycle::{TrackBranchStrategyPort, TrackWorkspaceRoot};
-
-        let active_track_id = resolve_track_id_inner(None, &project_root, false)?;
-        let id = domain::TrackId::try_new(&active_track_id)
-            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-        let workspace_root = TrackWorkspaceRoot::try_new(project_root.clone())
-            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
-        let snapshot = FsTrackBranchStrategyAdapter
-            .snapshot_for_track(&workspace_root, &id)
-            .map_err(|error| CompositionError::Infrastructure(error.to_string()))?;
-        let base_branch = snapshot.base_branch().to_owned();
-        build_track_git_interactor()
-            .switch_to_base(&project_root, &base_branch)
-            .map(|msg| CommandOutcome::success(Some(msg)))
-            .or_else(|e| switch_base_error_to_outcome(&base_branch, e))
-    }
 }
 
 #[cfg(test)]
@@ -135,8 +82,6 @@ mod tests {
     use std::process::Command;
 
     use cli_driver::track::TrackInput;
-
-    use super::switch_base_error_to_outcome;
 
     fn write_branch_strategy_config(root: &Path) {
         let config_dir = root.join(".harness").join("config");
@@ -152,49 +97,83 @@ mod tests {
         .unwrap();
     }
 
-    #[test]
-    fn test_switch_base_error_to_outcome_checkout_failure_preserves_legacy_result()
-    -> Result<(), String> {
-        let result = switch_base_error_to_outcome(
-            "main",
-            usecase::git_workflow::GitWorkflowError::SwitchFailed {
-                branch: usecase::git_workflow::DiagnosticText::new("main"),
-                exit_code: 7,
-            },
-        );
-        let outcome = match result {
-            Ok(outcome) => outcome,
-            Err(error) => {
-                return Err(format!("checkout failure should map to legacy outcome: {error}"));
-            }
-        };
-
-        assert_eq!(outcome.stdout.as_deref(), Some("Failed to checkout main"));
-        assert_eq!(outcome.stderr, None);
-        assert_eq!(outcome.exit_code, 7);
-        Ok(())
+    fn write_track_metadata(root: &Path, track_id: &str, base_branch: &str) {
+        let track_dir = root.join("track").join("items").join(track_id);
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            track_dir.join("metadata.json"),
+            format!(
+                r#"{{
+  "schema_version": 6,
+  "id": "{track_id}",
+  "branch": null,
+  "title": "Switch Base Track",
+  "created_at": "2026-03-13T00:00:00Z",
+  "updated_at": "2026-03-13T00:00:00Z",
+  "branch_strategy_snapshot": {{
+    "base_branch": "{base_branch}",
+    "merge_target": "main",
+    "merge_method": "merge"
+  }}
+}}"#
+            ),
+        )
+        .unwrap();
     }
 
     #[test]
-    fn test_switch_base_error_to_outcome_unrelated_error_stays_infrastructure_error()
-    -> Result<(), String> {
-        let result = switch_base_error_to_outcome(
-            "main",
-            usecase::git_workflow::GitWorkflowError::Unavailable(
-                usecase::git_workflow::DiagnosticText::new("unexpected sync failure"),
-            ),
-        );
-        let error = match result {
-            Ok(outcome) => {
-                return Err(format!(
-                    "unrelated git errors must remain typed composition errors: {outcome:?}"
-                ));
-            }
-            Err(error) => error,
-        };
+    fn test_track_switch_base_call_site_preserves_cli_contract_across_migration() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/active-track");
+        write_branch_strategy_config(root.path());
+        write_track_metadata(root.path(), "active-track", "main");
+        let create_main =
+            Command::new("git").args(["branch", "main"]).current_dir(root.path()).status().unwrap();
+        assert!(create_main.success(), "fixture must have a main branch");
 
-        assert_eq!(error.to_string(), "git workflow unavailable: unexpected sync failure");
-        Ok(())
+        let argv_project_root = root.path().to_path_buf();
+        let outcome = crate::TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::SwitchBase { project_root: argv_project_root.clone() });
+
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        assert_eq!(argv_project_root, root.path());
+        let stdout = outcome.stdout.as_deref().unwrap_or("");
+        assert!(stdout.contains("Switching to main..."), "stdout={stdout}");
+        assert!(
+            stdout.contains("[WARN] Pull failed (may not have remote tracking branch)")
+                || stdout.contains("[OK] On main, up to date."),
+            "stdout={stdout}"
+        );
+        assert_eq!(outcome.stderr, None);
+
+        let branch = Command::new("git")
+            .args(["branch", "--show-current"])
+            .current_dir(root.path())
+            .output()
+            .unwrap();
+        assert_eq!(String::from_utf8(branch.stdout).unwrap().trim(), "main");
+    }
+
+    #[test]
+    fn test_track_switch_base_checkout_failure_preserves_legacy_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/active-track");
+        write_track_metadata(root.path(), "active-track", "missing-base");
+
+        let argv_project_root = root.path().to_path_buf();
+        let outcome = crate::TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::SwitchBase { project_root: argv_project_root.clone() });
+
+        assert_eq!(argv_project_root, root.path());
+        assert_eq!(outcome.stdout.as_deref(), Some("Failed to checkout missing-base"));
+        assert_eq!(outcome.stderr, None);
+        assert_ne!(outcome.exit_code, 0);
+        assert!(
+            !outcome.stdout.as_deref().unwrap_or("").contains("[ERROR]"),
+            "composition must not template driver presentation"
+        );
     }
 
     #[test]

@@ -120,6 +120,12 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::track::GitTrackCommitHashAdapter::new()),
         ),
     );
+    let track_switch_base_service =
+        Arc::new(usecase::track_lifecycle::track_switch_base::TrackSwitchBaseInteractor::new(
+            Arc::new(infrastructure::FsGitWorkflowAdapter::new()),
+            Arc::new(infrastructure::track::GitTrackSelectionAdapter),
+            Arc::new(infrastructure::track::FsTrackBranchStrategyAdapter),
+        ));
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -155,6 +161,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         track_set_override_service,
         track_clear_override_service,
         track_set_commit_hash_service,
+        track_switch_base_service,
     )
 }
 

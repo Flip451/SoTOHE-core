@@ -49,6 +49,7 @@ pub mod track_resolution;
 mod track_set_commit_hash;
 mod track_set_override;
 mod track_spec_element_hash;
+mod track_switch_base;
 pub mod track_tddd;
 mod track_transition;
 mod track_type_signals;

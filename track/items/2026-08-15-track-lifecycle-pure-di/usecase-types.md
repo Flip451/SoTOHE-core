@@ -16,7 +16,7 @@
 | TrackSelection | enum | add | Active, Explicit | 🔵 | 🔵 |
 | TrackSpecAnchorSelection | enum | add | All, One | 🔵 | 🔵 |
 | TrackSpecElementHashResult | enum | add | Single, All | 🔵 | 🔵 |
-| TrackSwitchBaseResult | enum | add | Synced, SyncWarning, CheckoutFailed | 🟡 | 🔵 |
+| TrackSwitchBaseResult | enum | add | Synced, SyncWarning, CheckoutFailed | 🔵 | 🔵 |
 | TrackTaskTransition | enum | add | Todo, InProgress, Done, Skipped | 🔵 | 🔵 |
 | TrackTransitionResult | enum | add | Transitioned, Rejected | 🔵 | 🔵 |
 | TrackTypeGraphEdgeSelection | enum | add | Methods, Fields, Impls, All | 🟡 | 🔵 |
@@ -67,7 +67,7 @@
 | TrackSetCommitHashError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSetOverrideError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackSpecElementHashError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
-| TrackSwitchBaseError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackSwitchBaseError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackTaskCountsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackTransitionError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackTypeGraphError | error_type | add | RemovedCommand | 🟡 | 🔵 |
@@ -125,7 +125,7 @@
 | TrackSetCommitHashService | application_service | add | fn execute(&self, command: TrackSetCommitHashCommand) -> Result<TrackSetCommitHashResult, TrackSetCommitHashError> | 🔵 | 🔵 |
 | TrackSetOverrideService | application_service | add | fn execute(&self, command: TrackSetOverrideCommand) -> Result<TrackSetOverrideResult, TrackSetOverrideError> | 🔵 | 🔵 |
 | TrackSpecElementHashService | application_service | add | fn execute(&self, command: TrackSpecElementHashCommand) -> Result<TrackSpecElementHashResult, TrackSpecElementHashError> | 🔵 | 🔵 |
-| TrackSwitchBaseService | application_service | add | fn execute(&self, command: TrackSwitchBaseCommand) -> Result<TrackSwitchBaseResult, TrackSwitchBaseError> | 🟡 | 🔵 |
+| TrackSwitchBaseService | application_service | add | fn execute(&self, command: TrackSwitchBaseCommand) -> Result<TrackSwitchBaseResult, TrackSwitchBaseError> | 🔵 | 🔵 |
 | TrackTaskCountsService | application_service | add | fn execute(&self, command: TrackTaskCountsCommand) -> Result<TrackTaskCountsResult, TrackTaskCountsError> | 🟡 | 🔵 |
 | TrackTransitionService | application_service | add | fn execute(&self, command: TrackTransitionCommand) -> Result<TrackTransitionResult, TrackTransitionError> | 🔵 | 🔵 |
 | TrackTypeGraphService | application_service | add | fn execute(&self, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🟡 | 🔵 |
@@ -157,7 +157,7 @@
 | TrackSetCommitHashInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSetOverrideInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackSpecElementHashInteractor | interactor | add | — | 🔵 | 🔵 |
-| TrackSwitchBaseInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackSwitchBaseInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTaskCountsInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackTransitionInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackTypeGraphInteractor | interactor | add | — | 🟡 | 🔵 |
@@ -212,7 +212,7 @@
 | TrackSetCommitHashCommand | command | add | — | 🔵 | 🔵 |
 | TrackSetOverrideCommand | command | add | — | 🔵 | 🔵 |
 | TrackSpecElementHashCommand | command | add | — | 🔵 | 🔵 |
-| TrackSwitchBaseCommand | command | add | — | 🟡 | 🔵 |
+| TrackSwitchBaseCommand | command | add | — | 🔵 | 🔵 |
 | TrackTaskCountsCommand | command | add | — | 🔵 | 🔵 |
 | TrackTransitionCommand | command | add | — | 🔵 | 🔵 |
 | TrackTypeGraphCommand | command | add | — | 🟡 | 🔵 |

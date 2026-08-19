@@ -21,6 +21,7 @@ pub mod track_init;
 pub mod track_next_task;
 pub mod track_set_commit_hash;
 pub mod track_set_override;
+pub mod track_switch_base;
 pub mod track_task_counts;
 pub mod track_transition;
 
