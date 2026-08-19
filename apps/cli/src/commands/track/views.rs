@@ -253,4 +253,55 @@ mod tests {
         assert!(root.join("track/registry.md").is_file(), "registry.md must persist");
         assert!(track_dir.join("plan.md").is_file(), "plan.md must persist");
     }
+
+    #[test]
+    fn test_execute_views_validate_preserves_success_cli_contract() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = init_repo_on_branch(&tmp, "track/views-track");
+        std::fs::create_dir_all(root.join("track/items")).unwrap();
+
+        let argv_project_root = root.clone();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+        let result =
+            execute_views(ViewAction::Validate { project_root: argv_project_root.clone() });
+
+        assert!(result.is_ok(), "empty workspace validate must succeed: {result:?}");
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        assert_eq!(outcome.stdout.as_deref(), Some("[OK] Track metadata is valid"));
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_project_root, root);
+    }
+
+    #[test]
+    fn test_execute_views_validate_preserves_failure_cli_contract() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = init_repo_on_branch(&tmp, "track/bad-track");
+        let track_dir = root.join("track/items/bad-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), "{").unwrap();
+
+        let argv_project_root = root.clone();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+        let result =
+            execute_views(ViewAction::Validate { project_root: argv_project_root.clone() });
+
+        assert!(result.is_err(), "invalid metadata must fail: {result:?}");
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.as_deref().unwrap_or_default();
+        assert!(
+            stderr.starts_with("[ERROR] track metadata validation failed:"),
+            "stderr must preserve the views-validate failure contract:\n{stderr}"
+        );
+        assert_eq!(outcome.stdout, None);
+        let err_msg = format!("{:?}", result.unwrap_err());
+        assert!(
+            err_msg.contains("track metadata validation failed"),
+            "CLI error must preserve the failure contract, got: {err_msg}"
+        );
+        assert_eq!(argv_project_root, root);
+    }
 }

@@ -81,7 +81,14 @@ impl TrackService for TrackServiceImpl {
     }
 
     fn views_validate(&self, project_root: PathBuf) -> TrackCommandOutput {
-        composition_to_output(TrackCompositionRoot::new().track_views_validate(project_root))
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(cli_driver::track::TrackInput::ViewsValidate { project_root });
+        TrackCommandOutput {
+            stdout: outcome.stdout,
+            stderr: outcome.stderr,
+            exit_code: outcome.exit_code,
+        }
     }
 
     fn views_sync(&self, project_root: PathBuf, track_id: Option<String>) -> TrackCommandOutput {

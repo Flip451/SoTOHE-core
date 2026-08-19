@@ -41,6 +41,7 @@ pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track;
+mod track_base_merge;
 mod track_clear_override;
 mod track_contract_map;
 mod track_lint;
@@ -56,6 +57,7 @@ pub mod track_tddd;
 mod track_transition;
 mod track_type_signals;
 mod track_views_sync;
+mod track_views_validate;
 pub mod verify;
 
 pub use render::CommandOutcome;

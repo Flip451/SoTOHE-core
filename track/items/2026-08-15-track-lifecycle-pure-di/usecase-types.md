@@ -73,7 +73,7 @@
 | TrackTypeGraphError | error_type | add | RemovedCommand | 🟡 | 🔵 |
 | TrackTypeSignalsError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 | TrackViewsSyncError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
-| TrackViewsValidateError | error_type | add | ExecutionFailed | 🟡 | 🔵 |
+| TrackViewsValidateError | error_type | add | ExecutionFailed | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -131,7 +131,7 @@
 | TrackTypeGraphService | application_service | add | fn execute(&self, command: TrackTypeGraphCommand) -> Result<TrackTypeGraphResult, TrackTypeGraphError> | 🟡 | 🔵 |
 | TrackTypeSignalsService | application_service | add | fn execute(&self, command: TrackTypeSignalsCommand) -> Result<TrackTypeSignalsResult, TrackTypeSignalsError> | 🔵 | 🔵 |
 | TrackViewsSyncService | application_service | add | fn execute(&self, command: TrackViewsSyncCommand) -> Result<TrackViewsSyncResult, TrackViewsSyncError> | 🔵 | 🔵 |
-| TrackViewsValidateService | application_service | add | fn execute(&self, command: TrackViewsValidateCommand) -> Result<TrackViewsValidateResult, TrackViewsValidateError> | 🟡 | 🔵 |
+| TrackViewsValidateService | application_service | add | fn execute(&self, command: TrackViewsValidateCommand) -> Result<TrackViewsValidateResult, TrackViewsValidateError> | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -163,7 +163,7 @@
 | TrackTypeGraphInteractor | interactor | add | — | 🟡 | 🔵 |
 | TrackTypeSignalsInteractor | interactor | add | — | 🔵 | 🔵 |
 | TrackViewsSyncInteractor | interactor | add | — | 🔵 | 🔵 |
-| TrackViewsValidateInteractor | interactor | add | — | 🟡 | 🔵 |
+| TrackViewsValidateInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## DTOs
 
@@ -188,7 +188,7 @@
 | TrackSetOverrideResult | dto | add | — | 🔵 | 🔵 |
 | TrackTaskCountsResult | dto | add | — | 🔵 | 🔵 |
 | TrackTypeSignalsResult | dto | add | — | 🔵 | 🔵 |
-| TrackViewsValidateResult | dto | add | — | 🟡 | 🔵 |
+| TrackViewsValidateResult | dto | add | — | 🔵 | 🔵 |
 
 ## Commands
 
@@ -218,5 +218,5 @@
 | TrackTypeGraphCommand | command | add | — | 🟡 | 🔵 |
 | TrackTypeSignalsCommand | command | add | — | 🔵 | 🔵 |
 | TrackViewsSyncCommand | command | add | — | 🔵 | 🔵 |
-| TrackViewsValidateCommand | command | add | — | 🟡 | 🔵 |
+| TrackViewsValidateCommand | command | add | — | 🔵 | 🔵 |
 

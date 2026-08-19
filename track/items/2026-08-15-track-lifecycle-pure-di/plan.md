@@ -5,7 +5,7 @@
 
 GO-01 → T001–T033; each independently verifiable command context has its own implementation task, followed by remaining migration and validation.
 
-## Tasks (28/33 resolved)
+## Tasks (29/33 resolved)
 
 ### S1 — Shared wiring
 
@@ -30,8 +30,8 @@ GO-01 → T001–T033; each independently verifiable command context has its own
 - [x] **T012**: Implement the `TrackSwitchBase*` boundary in `libs/usecase/src/track_lifecycle/track_switch_base.rs`; update the switch-base handler in `apps/cli/src/commands/track/branch_ops.rs`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`44b11ee0`)
 - [x] **T013**: Implement the `TrackResolve*` command boundary in `libs/usecase/src/track_lifecycle/track_resolve.rs`; update `apps/cli/src/commands/track/resolve.rs`, the driver, composition wiring, and CLI regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`1ff2cec4`)
 - [x] **T014**: Implement the `TrackTaskCounts*` boundary in `libs/usecase/src/track_lifecycle/track_task_counts.rs`; update the task-counts handler in `apps/cli/src/commands/track/{dispatch.rs,validate.rs}`, driver, composition wiring, and regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`c8de1294`)
-- [x] **T015**: Implement the `TrackViewsSync*` boundary in `libs/usecase/src/track_lifecycle/track_views_sync.rs`; integrate `TrackViewsPort` through `apps/cli/src/commands/track/views.rs`, the driver, and composition wiring, with sync and port-contract regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
-- [ ] **T016**: Implement the `TrackViewsValidate*` boundary in `libs/usecase/src/track_lifecycle/track_views_validate.rs`; integrate `FsTrackViewsAdapter` through `apps/cli/src/commands/track/validate.rs`, the driver, and composition wiring, with validation and adapter-conformance regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
+- [x] **T015**: Implement the `TrackViewsSync*` boundary in `libs/usecase/src/track_lifecycle/track_views_sync.rs`; integrate `TrackViewsPort` through `apps/cli/src/commands/track/views.rs`, the driver, and composition wiring, with sync and port-contract regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05] (`43cd8a39`)
+- [x] **T016**: Implement the `TrackViewsValidate*` boundary in `libs/usecase/src/track_lifecycle/track_views_validate.rs`; integrate `FsTrackViewsAdapter` through `apps/cli/src/commands/track/validate.rs`, the driver, and composition wiring, with validation and adapter-conformance regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]
 
 ### S3 — TDDD command contexts
 

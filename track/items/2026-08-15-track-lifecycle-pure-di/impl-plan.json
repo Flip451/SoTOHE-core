@@ -201,6 +201,7 @@
       "status": "done"
     },
     {
+      "commit_hash": "43cd8a39",
       "depends_on": [
         "T001"
       ],
@@ -215,7 +216,7 @@
       ],
       "description": "Implement the `TrackViewsValidate*` boundary in `libs/usecase/src/track_lifecycle/track_views_validate.rs`; integrate `FsTrackViewsAdapter` through `apps/cli/src/commands/track/validate.rs`, the driver, and composition wiring, with validation and adapter-conformance regressions. [IN-01; IN-02; IN-03; CN-01; CN-02; CN-03; AC-02; AC-03; AC-04; AC-05]",
       "id": "T016",
-      "status": "todo"
+      "status": "done"
     },
     {
       "commit_hash": "d3a90e14f288573f579624b16a0ee1524946219f",

@@ -137,6 +137,11 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
             Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
             Arc::new(infrastructure::track::GitTrackSelectionAdapter),
         ));
+    let track_views_validate_service = Arc::new(
+        usecase::track_lifecycle::track_views_validate::TrackViewsValidateInteractor::new(
+            Arc::new(infrastructure::track::FsTrackViewsAdapter::new()),
+        ),
+    );
     let service = Arc::new(TrackServiceImpl);
     let fixpoint_resolve_service =
         Arc::new(usecase::fixpoint_resolve_driver::FixpointResolveDriverInteractor::new(
@@ -176,6 +181,7 @@ pub(crate) fn build_track_driver() -> cli_driver::track::TrackDriver {
         track_switch_base_service,
         track_resolve_service,
         track_views_sync_service,
+        track_views_validate_service,
     )
 }
 
@@ -815,5 +821,45 @@ mod tests {
         assert_eq!(argv_track_id.as_deref(), Some("views-track"));
         assert!(root.path().join("track/registry.md").is_file(), "registry.md must persist");
         assert!(track_dir.join("plan.md").is_file(), "plan.md must persist");
+    }
+
+    #[test]
+    fn test_track_views_validate_call_site_preserves_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/views-track");
+        std::fs::create_dir_all(root.path().join("track/items")).unwrap();
+
+        let argv_project_root = root.path().to_path_buf();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+
+        assert_eq!(outcome.exit_code, 0, "stderr={:?}", outcome.stderr);
+        assert_eq!(outcome.stdout.as_deref(), Some("[OK] Track metadata is valid"));
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(argv_project_root, root.path());
+    }
+
+    #[test]
+    fn test_track_views_validate_call_site_preserves_failure_cli_contract() {
+        let root = tempfile::tempdir().unwrap();
+        crate::test_support::seed_repo(root.path(), "track/bad-track");
+        let track_dir = root.path().join("track/items/bad-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(track_dir.join("metadata.json"), "{").unwrap();
+
+        let argv_project_root = root.path().to_path_buf();
+        let outcome = TrackCompositionRoot::new()
+            .track_driver()
+            .handle(TrackInput::ViewsValidate { project_root: argv_project_root.clone() });
+
+        assert_eq!(outcome.exit_code, 1);
+        let stderr = outcome.stderr.as_deref().unwrap_or_default();
+        assert!(
+            stderr.starts_with("[ERROR] track metadata validation failed:"),
+            "stderr must preserve the views-validate failure contract:\n{stderr}"
+        );
+        assert_eq!(outcome.stdout, None);
+        assert_eq!(argv_project_root, root.path());
     }
 }

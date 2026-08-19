@@ -260,18 +260,6 @@ impl TrackCompositionRoot {
             .map_err(|e| CompositionError::Infrastructure(e.to_string()))
     }
 
-    /// Validate metadata.json files under the repository.
-    /// # Errors
-    /// Returns `Err` when the underlying composition logic fails.
-    pub fn track_views_validate(
-        &self,
-        project_root: PathBuf,
-    ) -> Result<CommandOutcome, CompositionError> {
-        infrastructure::track::render::validate_track_snapshots(&project_root).map_err(|e| {
-            CompositionError::Infrastructure(format!("track metadata validation failed: {e}"))
-        })?;
-        Ok(CommandOutcome::success(Some("[OK] Track metadata is valid".to_owned())))
-    }
     /// Add a new task to a track.
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.

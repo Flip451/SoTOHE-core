@@ -785,6 +785,22 @@ mod lifecycle_adapter_tests {
         assert!(root.path().join("track/registry.md").is_file());
     }
 
+    #[test]
+    fn test_fs_track_views_validate_invalid_metadata_returns_diagnostic() {
+        let root = tempdir().expect("temporary root is created");
+        let track_dir = root.path().join("track/items/bad-track");
+        fs::create_dir_all(&track_dir).expect("track directory exists");
+        fs::write(track_dir.join("metadata.json"), "{").expect("invalid metadata is written");
+        let workspace =
+            TrackWorkspaceRoot::try_new(root.path().to_path_buf()).expect("workspace is valid");
+
+        let error = FsTrackViewsAdapter::new()
+            .validate(&workspace)
+            .expect_err("invalid metadata fails validation");
+
+        assert!(error.as_str().contains("invalid"));
+    }
+
     fn init_git_repo_on_branch(path: &Path, branch: &str) {
         let run = |args: &[&str]| {
             let status = std::process::Command::new("git")

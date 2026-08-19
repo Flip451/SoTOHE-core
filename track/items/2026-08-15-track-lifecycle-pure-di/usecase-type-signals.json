@@ -1,8 +1,8 @@
 {
   "baseline_hash": "4fd015ce196d8a1a359c7741da3910b0e402766c8f15bf5931770c50e673f3dd",
-  "declaration_hash": "1b06b72e796f21120afcd040e49bc6167a5569e0a513d8f9883429ca9b002cbe",
-  "generated_at": "2026-08-19T22:33:34Z",
-  "head_commit": "c8de1294e5b82bafaca55865d17f4955be1b2532",
+  "declaration_hash": "c020a4d50114b6596523f5e7ac8c753d0ce7845b352e0c377804f884c3c6ca98",
+  "generated_at": "2026-08-19T23:31:13Z",
+  "head_commit": "43cd8a3931062266b06841c5444abb01703c90f3",
   "schema_version": 4,
   "signals": [
     {
@@ -1514,41 +1514,51 @@
       "type_name": "TrackViewsSyncService"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "command",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackViewsValidateCommand"
     },
     {
-      "found_type": false,
-      "kind_tag": "error_type",
-      "missing_items": [
+      "found_items": [
         "Debug",
         "Display",
         "Error"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "error_type",
+      "signal": "blue",
       "type_name": "TrackViewsValidateError"
     },
     {
-      "found_type": false,
-      "kind_tag": "interactor",
-      "missing_items": [
+      "found_items": [
         "TrackViewsValidateService"
       ],
-      "signal": "yellow",
+      "found_type": true,
+      "kind_tag": "interactor",
+      "signal": "blue",
       "type_name": "TrackViewsValidateInteractor"
     },
     {
-      "found_type": false,
+      "found_items": [
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ],
+      "found_type": true,
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackViewsValidateResult"
     },
     {
-      "found_type": false,
+      "found_type": true,
       "kind_tag": "application_service",
-      "signal": "yellow",
+      "signal": "blue",
       "type_name": "TrackViewsValidateService"
     },
     {

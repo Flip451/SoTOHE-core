@@ -1925,6 +1925,30 @@
       "trait_ref": "std::error::Error"
     },
     {
+      "for_type": "TrackViewsValidateCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackViewsValidateCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackViewsValidateCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TrackViewsValidateResult",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TrackViewsValidateResult",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TrackViewsValidateResult",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "for_type": "TrackViewsSyncInteractor",
       "trait_ref": "TrackViewsSyncService"
     },
